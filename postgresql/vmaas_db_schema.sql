@@ -82,12 +82,12 @@ BEGIN
             segm1_n NUMERIC := 0;
         begin
             -- Throw out all non-alphanum characters
-            while one <> '' and not rpm.isalphanum(one)
+            while one <> '' and not isalphanum(one)
             loop
                 one := substr(one, 2);
             end loop;
             str1 := one;
-            if str1 <> '' and rpm.isdigit(str1)
+            if str1 <> '' and isdigit(str1)
             then
                 str1 := ltrim(str1, digits);
                 isnum := true;
