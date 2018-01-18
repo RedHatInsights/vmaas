@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS evr (
   epoch VARCHAR(16) NOT NULL,
   version VARCHAR(512) NOT NULL,
   release VARCHAR(512) NOT NULL,
-  evr evr_t,
+  evr evr_t NOT NULL,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
