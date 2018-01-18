@@ -243,6 +243,22 @@ CREATE TABLE IF NOT EXISTS errata (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.errata_repo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS errata_repo (
+  errata_id INT NOT NULL,
+  repo_id INT NOT NULL,
+  UNIQUE (errata_id, repo_id),
+  CONSTRAINT errata_id
+    FOREIGN KEY (errata_id)
+    REFERENCES errata (id),
+  CONSTRAINT repo_id
+    FOREIGN KEY (repo_id)
+    REFERENCES repo (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.pkg_errata
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS pkg_errata (
