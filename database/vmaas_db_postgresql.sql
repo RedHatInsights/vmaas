@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS checksum_type (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS package (
   id SERIAL,
-  name VARCHAR(45) NOT NULL,
+  name VARCHAR(256) NOT NULL,
   evr_id INT NOT NULL,
   checksum VARCHAR(512) NOT NULL,
   checksum_type_id INT NOT NULL,
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS severity (
 CREATE TABLE IF NOT EXISTS errata (
   id SERIAL,
   name VARCHAR(45) NOT NULL UNIQUE,
-  synopsis VARCHAR(45) NOT NULL,
+  synopsis VARCHAR(4000) NOT NULL,
   severity_id INT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
