@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS evr (
   version VARCHAR(512) NOT NULL,
   release VARCHAR(512) NOT NULL,
   evr evr_t NOT NULL,
+  UNIQUE (epoch, version, release),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -136,7 +137,7 @@ CREATE TABLE IF NOT EXISTS evr (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS checksum_type (
   id SERIAL,
-  name VARCHAR(16) NOT NULL,
+  name VARCHAR(16) NOT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -149,6 +150,7 @@ CREATE TABLE IF NOT EXISTS package (
   evr_id INT NOT NULL,
   checksum VARCHAR(512) NOT NULL,
   checksum_type_id INT NOT NULL,
+  UNIQUE (checksum_type_id, checksum),
   PRIMARY KEY (id),
   CONSTRAINT evr_id
     FOREIGN KEY (evr_id)
@@ -174,7 +176,7 @@ CREATE TABLE IF NOT EXISTS product (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
-  name VARCHAR(45) NOT NULL,
+  name VARCHAR(45) NOT NULL UNIQUE,
   product_id INT NULL,
   eol BOOLEAN NOT NULL,
   PRIMARY KEY (id),
@@ -190,6 +192,7 @@ CREATE TABLE IF NOT EXISTS repo (
 CREATE TABLE IF NOT EXISTS pkg_repo (
   pkg_id INT NOT NULL,
   repo_id INT NOT NULL,
+  UNIQUE (pkg_id, repo_id),
   CONSTRAINT pkg_id
     FOREIGN KEY (pkg_id)
     REFERENCES package (id),
@@ -230,6 +233,7 @@ CREATE TABLE IF NOT EXISTS errata (
 CREATE TABLE IF NOT EXISTS pkg_errata (
   pkg_id INT NOT NULL,
   errata_id INT NOT NULL,
+  UNIQUE (pkg_id, errata_id),
   CONSTRAINT pkg_id
     FOREIGN KEY (pkg_id)
     REFERENCES package (id),
@@ -244,7 +248,7 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
-  name VARCHAR(45) NOT NULL,
+  name VARCHAR(45) NOT NULL UNIQUE,
   description VARCHAR(45) NULL,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
@@ -256,6 +260,7 @@ CREATE TABLE IF NOT EXISTS cve (
 CREATE TABLE IF NOT EXISTS errata_cve (
   errata_id INT NOT NULL,
   cve_id INT NOT NULL,
+  UNIQUE (errata_id, cve_id),
   CONSTRAINT errata_id
     FOREIGN KEY (errata_id)
     REFERENCES errata (id),
