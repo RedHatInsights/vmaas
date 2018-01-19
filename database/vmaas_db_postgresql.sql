@@ -284,7 +284,14 @@ CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
   name TEXT NOT NULL UNIQUE,
   description TEXT NULL,
-  PRIMARY KEY (id)
+  severity_id INT,
+  cvss3_score NUMERIC(5,3),
+  cwe TEXT,
+  iava TEXT,
+  PRIMARY KEY (id),
+  CONSTRAINT severity_id
+    FOREIGN KEY (severity_id)
+    REFERENCES severity (id)
 )TABLESPACE pg_default;
 
 
