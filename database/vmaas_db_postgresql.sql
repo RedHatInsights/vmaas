@@ -6,7 +6,7 @@
 -- and most importantly sorting
 -- -----------------------------------------------------
 create type evr_array_item as (
-        n       INT,
+        n       NUMERIC,
         s       VARCHAR(512)
 );
 
