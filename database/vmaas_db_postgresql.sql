@@ -7,7 +7,7 @@
 -- -----------------------------------------------------
 create type evr_array_item as (
         n       NUMERIC,
-        s       VARCHAR(512)
+        s       TEXT
 );
 
 create type evr_t as (
@@ -123,9 +123,9 @@ $$ language 'plpgsql';
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS evr (
   id SERIAL,
-  epoch VARCHAR(16) NOT NULL,
-  version VARCHAR(512) NOT NULL,
-  release VARCHAR(512) NOT NULL,
+  epoch TEXT NOT NULL,
+  version TEXT NOT NULL,
+  release TEXT NOT NULL,
   evr evr_t NOT NULL,
   UNIQUE (epoch, version, release),
   PRIMARY KEY (id)
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS evr (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS checksum_type (
   id SERIAL,
-  name VARCHAR(16) NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS checksum_type (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS arch (
   id SERIAL,
-  name VARCHAR(16) NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -157,10 +157,10 @@ CREATE TABLE IF NOT EXISTS arch (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS package (
   id SERIAL,
-  name VARCHAR(256) NOT NULL,
+  name TEXT NOT NULL,
   evr_id INT NOT NULL,
   arch_id INT NOT NULL,
-  checksum VARCHAR(512) NOT NULL,
+  checksum TEXT NOT NULL,
   checksum_type_id INT NOT NULL,
   UNIQUE (checksum_type_id, checksum),
   PRIMARY KEY (id),
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS package (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS product (
   id SERIAL,
-  name VARCHAR(45) NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS product (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
-  name VARCHAR(45) NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE,
   product_id INT NULL,
   eol BOOLEAN NOT NULL,
   PRIMARY KEY (id),
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS pkg_repo (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS severity (
   id SERIAL,
-  name VARCHAR(45) NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -232,8 +232,8 @@ CREATE TABLE IF NOT EXISTS severity (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata (
   id SERIAL,
-  name VARCHAR(45) NOT NULL UNIQUE,
-  synopsis VARCHAR(4000) NOT NULL,
+  name TEXT NOT NULL UNIQUE,
+  synopsis TEXT NOT NULL,
   severity_id INT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
@@ -263,8 +263,8 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
-  name VARCHAR(45) NOT NULL UNIQUE,
-  description VARCHAR(45) NULL,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT NULL,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
