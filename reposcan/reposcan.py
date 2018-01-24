@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 from download.downloader import FileDownloader, DownloadItem
 from download.unpacker import FileUnpacker
 from repodata.repomd import RepoMD
+from repodata.primary import PrimaryMD
 
 REPODATA_DIR = "repodata/"
 
@@ -29,6 +30,7 @@ def download_repodata(repo_url):
     downloader.run()
     repomd = RepoMD(target_repomd_path)
 
+    md_files = {}
     # Get primary and updateinfo
     for md_type in ("primary", "updateinfo"):
         md = repomd.get_metadata(md_type)
@@ -38,8 +40,13 @@ def download_repodata(repo_url):
             target_path=os.path.join(tmp_directory, os.path.basename(md["location"]))
         ))
         unpacker.add(os.path.join(tmp_directory, os.path.basename(md["location"])))
+        # FIXME: this should be done in different place
+        md_files[md_type] = os.path.join(tmp_directory, os.path.basename(md["location"])).rsplit(".", maxsplit=1)[0]
     downloader.run()
     unpacker.run()
+
+    primary = PrimaryMD(md_files["primary"])
+    print(primary.get_package_count())
 
 if __name__ == '__main__':
     repo_url = sys.argv[1]

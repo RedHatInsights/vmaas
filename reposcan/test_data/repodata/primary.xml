@@ -1,0 +1,995 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="12">
+<package type="rpm">
+  <name>389-ds-base</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">02248d6cc0aa7d4ecaa964fbd0628ad26cb2740b0526e5d6b054ccac1aa5eed2</checksum>
+  <summary>389 Directory Server (base)</summary>
+  <description>389 Directory Server is an LDAPv3 compliant server.  The base package includes
+the LDAP server and command line utilities for server administration.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199040" build="1511196852"/>
+  <size package="1862748" installed="5516279" archive="5589344"/>
+  <location href="Packages/3/389-ds-base-1.3.7.8-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>System Environment/Daemons</rpm:group>
+    <rpm:buildhost>buildvm-26.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="264312"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base(x86-64)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="config(389-ds-base)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="ldif2ldbm" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="libacctpolicy-plugin.so()(64bit)"/>
+      <rpm:entry name="libacctusability-plugin.so()(64bit)"/>
+      <rpm:entry name="libacl-plugin.so()(64bit)"/>
+      <rpm:entry name="libaddn-plugin.so()(64bit)"/>
+      <rpm:entry name="libattr-unique-plugin.so()(64bit)"/>
+      <rpm:entry name="libautomember-plugin.so()(64bit)"/>
+      <rpm:entry name="libback-ldbm.so()(64bit)"/>
+      <rpm:entry name="libbitwise-plugin.so()(64bit)"/>
+      <rpm:entry name="libchainingdb-plugin.so()(64bit)"/>
+      <rpm:entry name="libcollation-plugin.so()(64bit)"/>
+      <rpm:entry name="libcontentsync-plugin.so()(64bit)"/>
+      <rpm:entry name="libcos-plugin.so()(64bit)"/>
+      <rpm:entry name="libderef-plugin.so()(64bit)"/>
+      <rpm:entry name="libdistrib-plugin.so()(64bit)"/>
+      <rpm:entry name="libdna-plugin.so()(64bit)"/>
+      <rpm:entry name="libhttp-client-plugin.so()(64bit)"/>
+      <rpm:entry name="liblinkedattrs-plugin.so()(64bit)"/>
+      <rpm:entry name="libmanagedentries-plugin.so()(64bit)"/>
+      <rpm:entry name="libmemberof-plugin.so()(64bit)"/>
+      <rpm:entry name="libpam-passthru-plugin.so()(64bit)"/>
+      <rpm:entry name="libpassthru-plugin.so()(64bit)"/>
+      <rpm:entry name="libpbe-plugin.so()(64bit)"/>
+      <rpm:entry name="libposix-winsync-plugin.so()(64bit)"/>
+      <rpm:entry name="libpwdstorage-plugin.so()(64bit)"/>
+      <rpm:entry name="libreferint-plugin.so()(64bit)"/>
+      <rpm:entry name="libreplication-plugin.so()(64bit)"/>
+      <rpm:entry name="libretrocl-plugin.so()(64bit)"/>
+      <rpm:entry name="libroles-plugin.so()(64bit)"/>
+      <rpm:entry name="librootdn-access-plugin.so()(64bit)"/>
+      <rpm:entry name="libschemareload-plugin.so()(64bit)"/>
+      <rpm:entry name="libstatechange-plugin.so()(64bit)"/>
+      <rpm:entry name="libsyntax-plugin.so()(64bit)"/>
+      <rpm:entry name="libusn-plugin.so()(64bit)"/>
+      <rpm:entry name="libviews-plugin.so()(64bit)"/>
+      <rpm:entry name="libwhoami-plugin.so()(64bit)"/>
+      <rpm:entry name="perl(DSCreate)"/>
+      <rpm:entry name="perl(DSDialogs)"/>
+      <rpm:entry name="perl(DSMigration)"/>
+      <rpm:entry name="perl(DSUpdate)"/>
+      <rpm:entry name="perl(DSUpdateDialogs)"/>
+      <rpm:entry name="perl(DSUtil)"/>
+      <rpm:entry name="perl(Dialog)"/>
+      <rpm:entry name="perl(DialogManager)"/>
+      <rpm:entry name="perl(DialogYesNo)"/>
+      <rpm:entry name="perl(FileConn)"/>
+      <rpm:entry name="perl(Inf)"/>
+      <rpm:entry name="perl(Migration)"/>
+      <rpm:entry name="perl(Resource)"/>
+      <rpm:entry name="perl(Setup)"/>
+      <rpm:entry name="perl(SetupDialogs)"/>
+      <rpm:entry name="perl(SetupLog)"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="/bin/sh"/>
+      <rpm:entry name="/usr/bin/env"/>
+      <rpm:entry name="/usr/bin/perl"/>
+      <rpm:entry name="/usr/bin/python3"/>
+      <rpm:entry name="/usr/sbin/semanage"/>
+      <rpm:entry name="389-ds-base-libs" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="bind-utils"/>
+      <rpm:entry name="cyrus-sasl-gssapi"/>
+      <rpm:entry name="cyrus-sasl-md5"/>
+      <rpm:entry name="gperftools-libs"/>
+      <rpm:entry name="libcom_err.so.2()(64bit)"/>
+      <rpm:entry name="libcrypt.so.1()(64bit)"/>
+      <rpm:entry name="libcrypt.so.1(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="libdb-5.3.so()(64bit)"/>
+      <rpm:entry name="libdb-utils"/>
+      <rpm:entry name="libdl.so.2()(64bit)"/>
+      <rpm:entry name="libdl.so.2(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="libevent-2.0.so.5()(64bit)"/>
+      <rpm:entry name="libicudata.so.57()(64bit)"/>
+      <rpm:entry name="libicui18n.so.57()(64bit)"/>
+      <rpm:entry name="libicuuc.so.57()(64bit)"/>
+      <rpm:entry name="libk5crypto.so.3()(64bit)"/>
+      <rpm:entry name="libkrb5.so.3()(64bit)"/>
+      <rpm:entry name="liblber-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libldap-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libldap_r-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libldaputil.so.0()(64bit)"/>
+      <rpm:entry name="libns-dshttpd-1.3.7.8.so()(64bit)"/>
+      <rpm:entry name="libnspr4.so()(64bit)"/>
+      <rpm:entry name="libnss3.so()(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.12)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.2)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.3)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.4)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.9.2)(64bit)"/>
+      <rpm:entry name="libnunc-stans.so.0()(64bit)"/>
+      <rpm:entry name="libpam.so.0()(64bit)"/>
+      <rpm:entry name="libpam.so.0(LIBPAM_1.0)(64bit)"/>
+      <rpm:entry name="libpcre.so.1()(64bit)"/>
+      <rpm:entry name="libplc4.so()(64bit)"/>
+      <rpm:entry name="libplds4.so()(64bit)"/>
+      <rpm:entry name="libpthread.so.0()(64bit)"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="libsasl2.so.3()(64bit)"/>
+      <rpm:entry name="libsds.so.0()(64bit)"/>
+      <rpm:entry name="libsemanage-python"/>
+      <rpm:entry name="libslapd.so.0()(64bit)"/>
+      <rpm:entry name="libssl3.so()(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.14)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.2)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.7.4)(64bit)"/>
+      <rpm:entry name="libsvrcore.so.0()(64bit)"/>
+      <rpm:entry name="libsystemd.so.0()(64bit)"/>
+      <rpm:entry name="libsystemd.so.0(LIBSYSTEMD_209)(64bit)"/>
+      <rpm:entry name="libtcmalloc.so.4()(64bit)"/>
+      <rpm:entry name="nss-tools"/>
+      <rpm:entry name="openldap-clients"/>
+      <rpm:entry name="perl(:MODULE_COMPAT_5.26.1)"/>
+      <rpm:entry name="perl(Archive::Tar)"/>
+      <rpm:entry name="perl(Carp)"/>
+      <rpm:entry name="perl(Config)"/>
+      <rpm:entry name="perl(Cwd)"/>
+      <rpm:entry name="perl(DB)"/>
+      <rpm:entry name="perl(DB_File)"/>
+      <rpm:entry name="perl(DynaLoader)"/>
+      <rpm:entry name="perl(Exporter)"/>
+      <rpm:entry name="perl(File::Basename)"/>
+      <rpm:entry name="perl(File::Copy)"/>
+      <rpm:entry name="perl(File::Path)"/>
+      <rpm:entry name="perl(File::Spec)"/>
+      <rpm:entry name="perl(File::Spec::Functions)"/>
+      <rpm:entry name="perl(File::Temp)"/>
+      <rpm:entry name="perl(Getopt::Long)"/>
+      <rpm:entry name="perl(Getopt::Std)"/>
+      <rpm:entry name="perl(IO::File)"/>
+      <rpm:entry name="perl(IO::Uncompress::AnyUncompress)"/>
+      <rpm:entry name="perl(MIME::Base64)"/>
+      <rpm:entry name="perl(Mozilla::LDAP::API)"/>
+      <rpm:entry name="perl(Mozilla::LDAP::Conn)"/>
+      <rpm:entry name="perl(Mozilla::LDAP::LDIF)"/>
+      <rpm:entry name="perl(Mozilla::LDAP::Utils)"/>
+      <rpm:entry name="perl(NetAddr::IP::Util)"/>
+      <rpm:entry name="perl(POSIX)"/>
+      <rpm:entry name="perl(Scalar::Util)"/>
+      <rpm:entry name="perl(Socket)"/>
+      <rpm:entry name="perl(Sys::Hostname)"/>
+      <rpm:entry name="perl(Time::Local)"/>
+      <rpm:entry name="perl(lib)"/>
+      <rpm:entry name="perl(sigtrap)"/>
+      <rpm:entry name="perl(strict)"/>
+      <rpm:entry name="perl(vars)"/>
+      <rpm:entry name="perl(warnings)"/>
+      <rpm:entry name="perl-Errno" flags="GE" epoch="0" ver="1.23" rel="360"/>
+      <rpm:entry name="perl-Mozilla-LDAP"/>
+      <rpm:entry name="perl-NetAddr-IP"/>
+      <rpm:entry name="perl-Socket"/>
+      <rpm:entry name="policycoreutils-python-utils"/>
+      <rpm:entry name="python-ldap"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="selinux-policy" flags="GE" epoch="0" ver="3.13.1" rel="137"/>
+      <rpm:entry name="svrcore" flags="GE" epoch="0" ver="4.1.3"/>
+      <rpm:entry name="systemd-libs"/>
+      <rpm:entry name="systemd-units" pre="1"/>
+      <rpm:entry name="systemd-units"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.17)(64bit)"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="freeipa-server" flags="LT" epoch="0" ver="4.0.3"/>
+      <rpm:entry name="selinux-policy-base" flags="LT" epoch="0" ver="3.9.8"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="389-ds-base" flags="LE" epoch="0" ver="1.3.5.4"/>
+    </rpm:obsoletes>
+    <file type="dir">/etc/dirsrv</file>
+    <file type="dir">/etc/dirsrv/config</file>
+    <file>/etc/dirsrv/config/certmap.conf</file>
+    <file>/etc/dirsrv/config/slapd-collations.conf</file>
+    <file>/etc/dirsrv/config/template-initconfig</file>
+    <file type="dir">/etc/dirsrv/schema</file>
+    <file>/etc/dirsrv/schema/99user.ldif</file>
+    <file>/etc/sysconfig/dirsrv</file>
+    <file>/etc/sysconfig/dirsrv.systemd</file>
+    <file type="dir">/etc/systemd/system/dirsrv.target.wants</file>
+    <file>/usr/bin/cl-dump</file>
+    <file>/usr/bin/cl-dump.pl</file>
+    <file>/usr/bin/dbgen.pl</file>
+    <file>/usr/bin/dbscan</file>
+    <file>/usr/bin/ds-logpipe.py</file>
+    <file>/usr/bin/ds-replcheck</file>
+    <file>/usr/bin/dsktune</file>
+    <file>/usr/bin/infadd</file>
+    <file>/usr/bin/ldclt</file>
+    <file>/usr/bin/ldif</file>
+    <file>/usr/bin/logconv.pl</file>
+    <file>/usr/bin/migratecred</file>
+    <file>/usr/bin/mmldif</file>
+    <file>/usr/bin/pwdhash</file>
+    <file>/usr/bin/readnsstate</file>
+    <file>/usr/bin/repl-monitor</file>
+    <file>/usr/bin/repl-monitor.pl</file>
+    <file>/usr/bin/rsearch</file>
+    <file>/usr/sbin/bak2db</file>
+    <file>/usr/sbin/bak2db.pl</file>
+    <file>/usr/sbin/cleanallruv.pl</file>
+    <file>/usr/sbin/db2bak</file>
+    <file>/usr/sbin/db2bak.pl</file>
+    <file>/usr/sbin/db2index</file>
+    <file>/usr/sbin/db2index.pl</file>
+    <file>/usr/sbin/db2ldif</file>
+    <file>/usr/sbin/db2ldif.pl</file>
+    <file>/usr/sbin/dbmon.sh</file>
+    <file>/usr/sbin/dbverify</file>
+    <file>/usr/sbin/dn2rdn</file>
+    <file>/usr/sbin/ds_selinux_enabled</file>
+    <file>/usr/sbin/ds_selinux_port_query</file>
+    <file>/usr/sbin/ds_systemd_ask_password_acl</file>
+    <file>/usr/sbin/fixup-linkedattrs.pl</file>
+    <file>/usr/sbin/fixup-memberof.pl</file>
+    <file>/usr/sbin/ldif2db</file>
+    <file>/usr/sbin/ldif2db.pl</file>
+    <file>/usr/sbin/ldif2ldap</file>
+    <file>/usr/sbin/migrate-ds.pl</file>
+    <file>/usr/sbin/monitor</file>
+    <file>/usr/sbin/ns-accountstatus.pl</file>
+    <file>/usr/sbin/ns-activate.pl</file>
+    <file>/usr/sbin/ns-inactivate.pl</file>
+    <file>/usr/sbin/ns-newpwpolicy.pl</file>
+    <file>/usr/sbin/ns-slapd</file>
+    <file>/usr/sbin/remove-ds.pl</file>
+    <file>/usr/sbin/restart-dirsrv</file>
+    <file>/usr/sbin/restoreconfig</file>
+    <file>/usr/sbin/saveconfig</file>
+    <file>/usr/sbin/schema-reload.pl</file>
+    <file>/usr/sbin/setup-ds.pl</file>
+    <file>/usr/sbin/start-dirsrv</file>
+    <file>/usr/sbin/status-dirsrv</file>
+    <file>/usr/sbin/stop-dirsrv</file>
+    <file>/usr/sbin/suffix2instance</file>
+    <file>/usr/sbin/syntax-validate.pl</file>
+    <file>/usr/sbin/upgradedb</file>
+    <file>/usr/sbin/upgradednformat</file>
+    <file>/usr/sbin/usn-tombstone-cleanup.pl</file>
+    <file>/usr/sbin/verify-db.pl</file>
+    <file>/usr/sbin/vlvindex</file>
+    <file>/usr/share/gdb/auto-load/usr/sbin/ns-slapd-gdb.py</file>
+  </format>
+</package>
+<package type="rpm">
+  <name>389-ds-base-devel</name>
+  <arch>i686</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">19b6eb50b93c81b6a360e967b0732c7e3f7c9823c5d1f47c1ca88e1b4942e03c</checksum>
+  <summary>Development libraries for 389 Directory Server</summary>
+  <description>Development Libraries and headers for the 389 Directory Server base package.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199040" build="1511196866"/>
+  <size package="314864" installed="503750" archive="510000"/>
+  <location href="Packages/3/389-ds-base-devel-1.3.7.8-1.fc27.i686.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Development/Libraries</rpm:group>
+    <rpm:buildhost>buildvm-03.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="185792"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base-devel" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base-devel(x86-32)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="pkgconfig(dirsrv)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+      <rpm:entry name="pkgconfig(libsds)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+      <rpm:entry name="pkgconfig(nunc-stans)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/usr/bin/pkg-config"/>
+      <rpm:entry name="389-ds-base-libs" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="libevent"/>
+      <rpm:entry name="libldaputil.so.0"/>
+      <rpm:entry name="libnunc-stans.so.0"/>
+      <rpm:entry name="libsds.so.0"/>
+      <rpm:entry name="libslapd.so.0"/>
+      <rpm:entry name="libtalloc"/>
+      <rpm:entry name="libtevent"/>
+      <rpm:entry name="nspr-devel"/>
+      <rpm:entry name="nss-devel"/>
+      <rpm:entry name="openldap-devel"/>
+      <rpm:entry name="pkgconfig"/>
+      <rpm:entry name="pkgconfig(nspr)"/>
+      <rpm:entry name="svrcore-devel" flags="GE" epoch="0" ver="4.1.3"/>
+      <rpm:entry name="systemd-libs"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>389-ds-base-devel</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">a5f9eca37dfce745f32f3771d8bd4ac7b70205cf060da21fc54e2649e5b6d2d9</checksum>
+  <summary>Development libraries for 389 Directory Server</summary>
+  <description>Development Libraries and headers for the 389 Directory Server base package.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199041" build="1511196852"/>
+  <size package="314880" installed="503756" archive="510028"/>
+  <location href="Packages/3/389-ds-base-devel-1.3.7.8-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Development/Libraries</rpm:group>
+    <rpm:buildhost>buildvm-26.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="185812"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base-devel" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base-devel(x86-64)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="pkgconfig(dirsrv)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+      <rpm:entry name="pkgconfig(libsds)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+      <rpm:entry name="pkgconfig(nunc-stans)" flags="EQ" epoch="0" ver="1.3.7.8"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/usr/bin/pkg-config"/>
+      <rpm:entry name="389-ds-base-libs" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="libevent"/>
+      <rpm:entry name="libldaputil.so.0()(64bit)"/>
+      <rpm:entry name="libnunc-stans.so.0()(64bit)"/>
+      <rpm:entry name="libsds.so.0()(64bit)"/>
+      <rpm:entry name="libslapd.so.0()(64bit)"/>
+      <rpm:entry name="libtalloc"/>
+      <rpm:entry name="libtevent"/>
+      <rpm:entry name="nspr-devel"/>
+      <rpm:entry name="nss-devel"/>
+      <rpm:entry name="openldap-devel"/>
+      <rpm:entry name="pkgconfig"/>
+      <rpm:entry name="pkgconfig(nspr)"/>
+      <rpm:entry name="svrcore-devel" flags="GE" epoch="0" ver="4.1.3"/>
+      <rpm:entry name="systemd-libs"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>389-ds-base-libs</name>
+  <arch>i686</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">d072d2c69c338cbeab9bef1c68d6d52c1bbafd8408bd002c8f4cf9fe80c1a964</checksum>
+  <summary>Core libraries for 389 Directory Server</summary>
+  <description>Core libraries for the 389 Directory Server base package.  These libraries
+are used by the main package and the -devel package.  This allows the -devel
+package to be installed with just the -libs package and without the main package.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199040" build="1511196866"/>
+  <size package="785704" installed="1630531" archive="1634604"/>
+  <location href="Packages/3/389-ds-base-libs-1.3.7.8-1.fc27.i686.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>System Environment/Daemons</rpm:group>
+    <rpm:buildhost>buildvm-03.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="185272"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base-libs" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base-libs(x86-32)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="libldaputil.so.0"/>
+      <rpm:entry name="libns-dshttpd-1.3.7.8.so"/>
+      <rpm:entry name="libnunc-stans.so.0"/>
+      <rpm:entry name="libsds.so.0"/>
+      <rpm:entry name="libslapd.so.0"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="libcom_err.so.2"/>
+      <rpm:entry name="libevent"/>
+      <rpm:entry name="libevent-2.0.so.5"/>
+      <rpm:entry name="libgcc_s.so.1"/>
+      <rpm:entry name="libk5crypto.so.3"/>
+      <rpm:entry name="libkrb5.so.3"/>
+      <rpm:entry name="libkrb5.so.3(krb5_3_MIT)"/>
+      <rpm:entry name="liblber-2.4.so.2"/>
+      <rpm:entry name="libldap_r-2.4.so.2"/>
+      <rpm:entry name="libm.so.6"/>
+      <rpm:entry name="libnspr4.so"/>
+      <rpm:entry name="libnss3.so"/>
+      <rpm:entry name="libnss3.so(NSS_3.10.2)"/>
+      <rpm:entry name="libnss3.so(NSS_3.12)"/>
+      <rpm:entry name="libnss3.so(NSS_3.2)"/>
+      <rpm:entry name="libnss3.so(NSS_3.3)"/>
+      <rpm:entry name="libnss3.so(NSS_3.4)"/>
+      <rpm:entry name="libnss3.so(NSS_3.6)"/>
+      <rpm:entry name="libnss3.so(NSS_3.9)"/>
+      <rpm:entry name="libpcre.so.1"/>
+      <rpm:entry name="libplc4.so"/>
+      <rpm:entry name="libplds4.so"/>
+      <rpm:entry name="libpthread.so.0"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.0)"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.1)"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.1.1)"/>
+      <rpm:entry name="libsasl2.so.3"/>
+      <rpm:entry name="libssl3.so"/>
+      <rpm:entry name="libssl3.so(NSS_3.12.6)"/>
+      <rpm:entry name="libssl3.so(NSS_3.14)"/>
+      <rpm:entry name="libssl3.so(NSS_3.2)"/>
+      <rpm:entry name="libssl3.so(NSS_3.20)"/>
+      <rpm:entry name="libssl3.so(NSS_3.4)"/>
+      <rpm:entry name="libstdc++.so.6"/>
+      <rpm:entry name="libsvrcore.so.0"/>
+      <rpm:entry name="libsystemd.so.0"/>
+      <rpm:entry name="libtcmalloc.so.4"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.17)"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>389-ds-base-libs</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">23418ad533edb38770bd2dfcf6cb35800ca1929c9b8950135ce878fab4016fee</checksum>
+  <summary>Core libraries for 389 Directory Server</summary>
+  <description>Core libraries for the 389 Directory Server base package.  These libraries
+are used by the main package and the -devel package.  This allows the -devel
+package to be installed with just the -libs package and without the main package.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199041" build="1511196852"/>
+  <size package="761632" installed="1720451" archive="1724832"/>
+  <location href="Packages/3/389-ds-base-libs-1.3.7.8-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>System Environment/Daemons</rpm:group>
+    <rpm:buildhost>buildvm-26.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="185636"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base-libs" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base-libs(x86-64)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="libldaputil.so.0()(64bit)"/>
+      <rpm:entry name="libns-dshttpd-1.3.7.8.so()(64bit)"/>
+      <rpm:entry name="libnunc-stans.so.0()(64bit)"/>
+      <rpm:entry name="libsds.so.0()(64bit)"/>
+      <rpm:entry name="libslapd.so.0()(64bit)"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="libcom_err.so.2()(64bit)"/>
+      <rpm:entry name="libevent"/>
+      <rpm:entry name="libevent-2.0.so.5()(64bit)"/>
+      <rpm:entry name="libgcc_s.so.1()(64bit)"/>
+      <rpm:entry name="libk5crypto.so.3()(64bit)"/>
+      <rpm:entry name="libkrb5.so.3()(64bit)"/>
+      <rpm:entry name="libkrb5.so.3(krb5_3_MIT)(64bit)"/>
+      <rpm:entry name="liblber-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libldap_r-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libm.so.6()(64bit)"/>
+      <rpm:entry name="libnspr4.so()(64bit)"/>
+      <rpm:entry name="libnss3.so()(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.10.2)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.12)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.2)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.3)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.4)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.6)(64bit)"/>
+      <rpm:entry name="libnss3.so(NSS_3.9)(64bit)"/>
+      <rpm:entry name="libpcre.so.1()(64bit)"/>
+      <rpm:entry name="libplc4.so()(64bit)"/>
+      <rpm:entry name="libplds4.so()(64bit)"/>
+      <rpm:entry name="libpthread.so.0()(64bit)"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="libsasl2.so.3()(64bit)"/>
+      <rpm:entry name="libssl3.so()(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.12.6)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.14)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.2)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.20)(64bit)"/>
+      <rpm:entry name="libssl3.so(NSS_3.4)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6()(64bit)"/>
+      <rpm:entry name="libsvrcore.so.0()(64bit)"/>
+      <rpm:entry name="libsystemd.so.0()(64bit)"/>
+      <rpm:entry name="libtcmalloc.so.4()(64bit)"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.17)(64bit)"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>389-ds-base-snmp</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">af347788dc7f144a81821e7cce89fb5c1a3852c64013de1ae70287302d2f5ae7</checksum>
+  <summary>SNMP Agent for 389 Directory Server</summary>
+  <description>SNMP Agent for the 389 Directory Server base package.</description>
+  <packager>Fedora Project</packager>
+  <url>http://www.port389.org</url>
+  <time file="1511199039" build="1511196852"/>
+  <size package="208560" installed="72123" archive="73952"/>
+  <location href="Packages/3/389-ds-base-snmp-1.3.7.8-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>System Environment/Daemons</rpm:group>
+    <rpm:buildhost>buildvm-26.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>389-ds-base-1.3.7.8-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="183176"/>
+    <rpm:provides>
+      <rpm:entry name="389-ds-base-snmp" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="389-ds-base-snmp(x86-64)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="config(389-ds-base-snmp)" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="/bin/sh"/>
+      <rpm:entry name="389-ds-base" flags="EQ" epoch="0" ver="1.3.7.8" rel="1.fc27"/>
+      <rpm:entry name="libcrypto.so.1.1()(64bit)"/>
+      <rpm:entry name="libdl.so.2()(64bit)"/>
+      <rpm:entry name="liblber-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libldap-2.4.so.2()(64bit)"/>
+      <rpm:entry name="libm.so.6()(64bit)"/>
+      <rpm:entry name="libnetsnmp.so.30()(64bit)"/>
+      <rpm:entry name="libnetsnmpagent.so.30()(64bit)"/>
+      <rpm:entry name="libnetsnmpmibs.so.30()(64bit)"/>
+      <rpm:entry name="libnspr4.so()(64bit)"/>
+      <rpm:entry name="libnss3.so()(64bit)"/>
+      <rpm:entry name="libplc4.so()(64bit)"/>
+      <rpm:entry name="libplds4.so()(64bit)"/>
+      <rpm:entry name="libpthread.so.0()(64bit)"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="librpm.so.8()(64bit)"/>
+      <rpm:entry name="librpmio.so.8()(64bit)"/>
+      <rpm:entry name="libsasl2.so.3()(64bit)"/>
+      <rpm:entry name="libsensors.so.4()(64bit)"/>
+      <rpm:entry name="libssl.so.1.1()(64bit)"/>
+      <rpm:entry name="libssl3.so()(64bit)"/>
+      <rpm:entry name="libtcmalloc.so.4()(64bit)"/>
+      <rpm:entry name="libwrap.so.0()(64bit)"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.14)(64bit)"/>
+    </rpm:requires>
+    <rpm:obsoletes>
+      <rpm:entry name="389-ds-base" flags="LE" epoch="0" ver="1.3.7.3"/>
+    </rpm:obsoletes>
+    <file>/etc/dirsrv/config/ldap-agent.conf</file>
+    <file>/usr/sbin/ldap-agent</file>
+  </format>
+</package>
+<package type="rpm">
+  <name>3Depict</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="0.0.20" rel="5.fc27"/>
+  <checksum type="sha256" pkgid="YES">d1d0a41eea8745236ff1d87c5a28e0f658641d1f98780babd309b1ec80643c28</checksum>
+  <summary>Valued 3D point cloud visualization and analysis</summary>
+  <description>This software is designed to help users visualize and analyze 3D point clouds
+with an associated real value, in a fast and flexible fashion. It is
+specifically targeted to atom probe tomography applications, but may be
+useful for general scalar valued point data purposes.</description>
+  <packager>Fedora Project</packager>
+  <url>http://threedepict.sourceforge.net</url>
+  <time file="1507985552" build="1507977892"/>
+  <size package="5700628" installed="8408167" archive="8414464"/>
+  <location href="Packages/3/3Depict-0.0.20-5.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Applications/Engineering</rpm:group>
+    <rpm:buildhost>buildhw-05.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>3Depict-0.0.20-5.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="20024"/>
+    <rpm:provides>
+      <rpm:entry name="3Depict" flags="EQ" epoch="0" ver="0.0.20" rel="5.fc27"/>
+      <rpm:entry name="3Depict(x86-64)" flags="EQ" epoch="0" ver="0.0.20" rel="5.fc27"/>
+      <rpm:entry name="application()"/>
+      <rpm:entry name="application(3Depict.desktop)"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="libGL.so.1()(64bit)"/>
+      <rpm:entry name="libGLU.so.1()(64bit)"/>
+      <rpm:entry name="libdl.so.2()(64bit)"/>
+      <rpm:entry name="libfreetype.so.6()(64bit)"/>
+      <rpm:entry name="libftgl.so.2()(64bit)"/>
+      <rpm:entry name="libgcc_s.so.1()(64bit)"/>
+      <rpm:entry name="libgcc_s.so.1(GCC_3.0)(64bit)"/>
+      <rpm:entry name="libgomp.so.1()(64bit)"/>
+      <rpm:entry name="libgomp.so.1(GOMP_1.0)(64bit)"/>
+      <rpm:entry name="libgomp.so.1(GOMP_4.0)(64bit)"/>
+      <rpm:entry name="libgomp.so.1(OMP_1.0)(64bit)"/>
+      <rpm:entry name="libgomp.so.1(OMP_3.0)(64bit)"/>
+      <rpm:entry name="libgsl.so.23()(64bit)"/>
+      <rpm:entry name="libgslcblas.so.0()(64bit)"/>
+      <rpm:entry name="liblzma.so.5()(64bit)"/>
+      <rpm:entry name="libm.so.6()(64bit)"/>
+      <rpm:entry name="libm.so.6(GLIBC_2.2.5)(64bit)"/>
+      <rpm:entry name="libmgl.so.7.4.3()(64bit)"/>
+      <rpm:entry name="libpng16.so.16()(64bit)"/>
+      <rpm:entry name="libpng16.so.16(PNG16_0)(64bit)"/>
+      <rpm:entry name="libpthread.so.0()(64bit)"/>
+      <rpm:entry name="libqhull.so.7()(64bit)"/>
+      <rpm:entry name="libstdc++.so.6()(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(CXXABI_1.3)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(CXXABI_1.3.8)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(CXXABI_1.3.9)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.10)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.11)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.15)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.20)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.21)(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4.9)(64bit)"/>
+      <rpm:entry name="libwx_baseu-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_baseu-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_baseu_net-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_baseu_net-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_baseu_xml-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_baseu_xml-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_adv-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_adv-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_core-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_core-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_gl-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_gl-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_html-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_propgrid-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_propgrid-3.0.so.0(WXU_3.0)(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_qa-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_webview-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libwx_gtk3u_xrc-3.0.so.0()(64bit)"/>
+      <rpm:entry name="libxml2.so.2()(64bit)"/>
+      <rpm:entry name="libxml2.so.2(LIBXML2_2.4.30)(64bit)"/>
+      <rpm:entry name="libxml2.so.2(LIBXML2_2.6.0)(64bit)"/>
+      <rpm:entry name="libz.so.1()(64bit)"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.14)(64bit)"/>
+    </rpm:requires>
+    <file>/usr/bin/3Depict</file>
+  </format>
+</package>
+<package type="rpm">
+  <name>Agda</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="2.5.2" rel="9.fc27"/>
+  <checksum type="sha256" pkgid="YES">81d81a909607a53f14a8f7e360fa2f41bddd98b685d6514c8631f61d32d25929</checksum>
+  <summary>A dependently typed functional programming language and proof assistant</summary>
+  <description>Agda is a dependently typed functional programming language: it has
+inductive families, which are similar to Haskell's GADTs, but they can
+be indexed by values and not just types. It also has parameterized
+modules, mixfix operators, Unicode characters, and an interactive
+Emacs interface (the type checker can assist in the development of your code).
+
+Agda is also a proof assistant: It is an interactive system for writing and
+checking proofs. Agda is based on intuitionistic type theory,
+a foundational system for constructive mathematics developed by
+the Swedish logician Per Martin-Löf. It has many similarities with other
+proof assistants based on dependent types, such as Coq, Epigram and NuPRL.</description>
+  <packager>Fedora Project</packager>
+  <url>https://hackage.haskell.org/package/Agda</url>
+  <time file="1510803460" build="1510744290"/>
+  <size package="77868" installed="308195" archive="311812"/>
+  <location href="Packages/a/Agda-2.5.2-9.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>MIT and BSD</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Unspecified</rpm:group>
+    <rpm:buildhost>buildvm-15.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>Agda-2.5.2-9.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="15476"/>
+    <rpm:provides>
+      <rpm:entry name="Agda" flags="EQ" epoch="0" ver="2.5.2" rel="9.fc27"/>
+      <rpm:entry name="Agda(x86-64)" flags="EQ" epoch="0" ver="2.5.2" rel="9.fc27"/>
+      <rpm:entry name="emacs-agda" flags="EQ" epoch="0" ver="2.5.2" rel="9.fc27"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="ghc-Agda-devel" flags="EQ" epoch="0" ver="2.5.2" rel="9.fc27"/>
+    </rpm:requires>
+    <rpm:obsoletes>
+      <rpm:entry name="emacs-agda-el" flags="LT" epoch="0" ver="2.4.2.2" rel="5"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>BackupPC</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="4.1.5" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">1c1741786c83c8c844899af0e8104f3dc986ca42702468a50c2c3e1d10729572</checksum>
+  <summary>High-performance backup system</summary>
+  <description>BackupPC is a high-performance, enterprise-grade system for backing up Linux
+and WinXX and Mac OS X PCs and laptops to a server's disk. BackupPC is highly
+configurable and easy to install and maintain.
+
+NOTE: Proper configuration is required after install, see README.setup for more
+information.</description>
+  <packager>Fedora Project</packager>
+  <url>http://backuppc.github.io/backuppc/index.html</url>
+  <time file="1512747409" build="1512694164"/>
+  <size package="476836" installed="3014925" archive="3040292"/>
+  <location href="Packages/b/BackupPC-4.1.5-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv2+</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Unspecified</rpm:group>
+    <rpm:buildhost>buildhw-08.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>BackupPC-4.1.5-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="45060"/>
+    <rpm:provides>
+      <rpm:entry name="BackupPC" flags="EQ" epoch="0" ver="4.1.5" rel="1.fc27"/>
+      <rpm:entry name="BackupPC(x86-64)" flags="EQ" epoch="0" ver="4.1.5" rel="1.fc27"/>
+      <rpm:entry name="backuppc" flags="EQ" epoch="0" ver="4.1.5"/>
+      <rpm:entry name="config(BackupPC)" flags="EQ" epoch="0" ver="4.1.5" rel="1.fc27"/>
+      <rpm:entry name="perl(BackupPC::CGI::AdminOptions)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Archive)"/>
+      <rpm:entry name="perl(BackupPC::CGI::ArchiveInfo)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Browse)"/>
+      <rpm:entry name="perl(BackupPC::CGI::DirHistory)"/>
+      <rpm:entry name="perl(BackupPC::CGI::EditConfig)"/>
+      <rpm:entry name="perl(BackupPC::CGI::EmailSummary)"/>
+      <rpm:entry name="perl(BackupPC::CGI::GeneralInfo)"/>
+      <rpm:entry name="perl(BackupPC::CGI::HostInfo)"/>
+      <rpm:entry name="perl(BackupPC::CGI::LOGlist)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Lib)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Queue)"/>
+      <rpm:entry name="perl(BackupPC::CGI::RSS)"/>
+      <rpm:entry name="perl(BackupPC::CGI::ReloadServer)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Restore)"/>
+      <rpm:entry name="perl(BackupPC::CGI::RestoreFile)"/>
+      <rpm:entry name="perl(BackupPC::CGI::RestoreInfo)"/>
+      <rpm:entry name="perl(BackupPC::CGI::StartServer)"/>
+      <rpm:entry name="perl(BackupPC::CGI::StartStopBackup)"/>
+      <rpm:entry name="perl(BackupPC::CGI::StopServer)"/>
+      <rpm:entry name="perl(BackupPC::CGI::Summary)"/>
+      <rpm:entry name="perl(BackupPC::CGI::View)"/>
+      <rpm:entry name="perl(BackupPC::Config::Meta)"/>
+      <rpm:entry name="perl(BackupPC::DirOps)"/>
+      <rpm:entry name="perl(BackupPC::Lib)"/>
+      <rpm:entry name="perl(BackupPC::Storage)"/>
+      <rpm:entry name="perl(BackupPC::Storage::Text)"/>
+      <rpm:entry name="perl(BackupPC::View)"/>
+      <rpm:entry name="perl(BackupPC::Xfer)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Archive)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Ftp)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Protocol)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Rsync)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Smb)"/>
+      <rpm:entry name="perl(BackupPC::Xfer::Tar)"/>
+      <rpm:entry name="perl(BackupPC::Zip::FileMember)"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="/bin/sh"/>
+      <rpm:entry name="/usr/bin/perl"/>
+      <rpm:entry name="/usr/sbin/sendmail"/>
+      <rpm:entry name="bzip2"/>
+      <rpm:entry name="httpd"/>
+      <rpm:entry name="iputils"/>
+      <rpm:entry name="openssh-clients"/>
+      <rpm:entry name="par2cmdline"/>
+      <rpm:entry name="perl(Archive::Zip)"/>
+      <rpm:entry name="perl(BackupPC::XS)"/>
+      <rpm:entry name="perl(BackupPC::XS)" flags="GE" epoch="0" ver="0.53"/>
+      <rpm:entry name="perl(CGI)"/>
+      <rpm:entry name="perl(Carp)"/>
+      <rpm:entry name="perl(Compress::Zlib)"/>
+      <rpm:entry name="perl(Config)"/>
+      <rpm:entry name="perl(Cwd)"/>
+      <rpm:entry name="perl(Data::Dumper)"/>
+      <rpm:entry name="perl(Digest::MD5)"/>
+      <rpm:entry name="perl(DynaLoader)"/>
+      <rpm:entry name="perl(Encode)"/>
+      <rpm:entry name="perl(Errno)"/>
+      <rpm:entry name="perl(Exporter)"/>
+      <rpm:entry name="perl(Fcntl)"/>
+      <rpm:entry name="perl(File::Copy)"/>
+      <rpm:entry name="perl(File::Find)"/>
+      <rpm:entry name="perl(File::Listing)"/>
+      <rpm:entry name="perl(File::Path)"/>
+      <rpm:entry name="perl(Getopt::Std)"/>
+      <rpm:entry name="perl(IO::Handle)"/>
+      <rpm:entry name="perl(IO::Socket)"/>
+      <rpm:entry name="perl(Net::FTP::AutoReconnect)"/>
+      <rpm:entry name="perl(Net::FTP::RetrHandle)"/>
+      <rpm:entry name="perl(POSIX)"/>
+      <rpm:entry name="perl(Socket)"/>
+      <rpm:entry name="perl(Storable)"/>
+      <rpm:entry name="perl(Time::ParseDate)"/>
+      <rpm:entry name="perl(XML::RSS)"/>
+      <rpm:entry name="perl(base)"/>
+      <rpm:entry name="perl(constant)"/>
+      <rpm:entry name="perl(lib)"/>
+      <rpm:entry name="perl(strict)"/>
+      <rpm:entry name="perl(utf8)"/>
+      <rpm:entry name="perl(vars)"/>
+      <rpm:entry name="perl(version)"/>
+      <rpm:entry name="perl-Time-modules"/>
+      <rpm:entry name="policycoreutils"/>
+      <rpm:entry name="rrdtool"/>
+      <rpm:entry name="rsync-bpc" flags="GE" epoch="0" ver="3.0.9.6"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="samba-client"/>
+      <rpm:entry name="shadow-utils" pre="1"/>
+      <rpm:entry name="systemd" pre="1"/>
+      <rpm:entry name="systemd"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.2.5)(64bit)"/>
+    </rpm:requires>
+    <file type="dir">/etc/BackupPC</file>
+    <file>/etc/BackupPC/config.pl</file>
+    <file>/etc/BackupPC/config.pl.sample</file>
+    <file>/etc/BackupPC/hosts</file>
+    <file>/etc/BackupPC/hosts.sample</file>
+    <file>/etc/httpd/conf.d/BackupPC.conf</file>
+    <file>/etc/logrotate.d/BackupPC</file>
+    <file>/usr/share/BackupPC/bin/BackupPC</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_Admin_SCGI</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_archive</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_archiveHost</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_archiveStart</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_attribPrint</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_backupDelete</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_backupDuplicate</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_dump</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_fixupBackupSummary</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_fsck</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_ls</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_migrateV3toV4</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_nightly</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_poolCntPrint</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_refCountUpdate</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_restore</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_rrdUpdate</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_sendEmail</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_serverMesg</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_tarCreate</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_tarExtract</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_zcat</file>
+    <file>/usr/share/BackupPC/bin/BackupPC_zipCreate</file>
+    <file>/usr/share/BackupPC/sbin/BackupPC_Admin</file>
+  </format>
+</package>
+<package type="rpm">
+  <name>BackupPC-XS</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="0.57" rel="1.fc27"/>
+  <checksum type="sha256" pkgid="YES">cbe9d03961c5daab56ed2e40147b61d52b32ef373ad06b0dec4740fd4dbeb69e</checksum>
+  <summary>Implementation of various BackupPC functions in a perl-callable module</summary>
+  <description>BackupPC::XS implements various BackupPC functions in a perl-callable
+module.  This module is required for BackupPC V4+.</description>
+  <packager>Fedora Project</packager>
+  <url>https://github.com/backuppc/backuppc-xs</url>
+  <time file="1512747422" build="1512693603"/>
+  <size package="105168" installed="233474" archive="235484"/>
+  <location href="Packages/b/BackupPC-XS-0.57-1.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>GPLv3+ and (GPL+ or Artistic) and zlib</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Unspecified</rpm:group>
+    <rpm:buildhost>buildvm-24.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>BackupPC-XS-0.57-1.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="9796"/>
+    <rpm:provides>
+      <rpm:entry name="BackupPC-XS" flags="EQ" epoch="0" ver="0.57" rel="1.fc27"/>
+      <rpm:entry name="BackupPC-XS(x86-64)" flags="EQ" epoch="0" ver="0.57" rel="1.fc27"/>
+      <rpm:entry name="bundled(zlib)" flags="EQ" epoch="0" ver="1.2.3"/>
+      <rpm:entry name="perl(BackupPC::XS)" flags="EQ" epoch="0" ver="0.57"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="libperl.so.5.26()(64bit)"/>
+      <rpm:entry name="perl(:MODULE_COMPAT_5.26.1)"/>
+      <rpm:entry name="perl(:VERSION)" flags="GE" epoch="0" ver="5.8.0"/>
+      <rpm:entry name="perl(Exporter)"/>
+      <rpm:entry name="perl(XSLoader)"/>
+      <rpm:entry name="perl(constant)"/>
+      <rpm:entry name="perl(strict)"/>
+      <rpm:entry name="perl(vars)"/>
+      <rpm:entry name="perl(warnings)"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.14)(64bit)"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>CGSI-gSOAP</name>
+  <arch>i686</arch>
+  <version epoch="0" ver="1.3.10" rel="7.fc27"/>
+  <checksum type="sha256" pkgid="YES">b8d086f7464b9f75efa429ac7a96ea4aa5d3f3e69e70c7fd1cece22a0b043ba9</checksum>
+  <summary>GSI plugin for gSOAP</summary>
+  <description>This is a GSI plugin for gSOAP. It uses the globus GSI libraries to implement
+GSI secure authentication and encryption on top of gSOAP.</description>
+  <packager>Fedora Project</packager>
+  <url>http://glite.web.cern.ch/glite/</url>
+  <time file="1509981920" build="1509964323"/>
+  <size package="55748" installed="185372" archive="188964"/>
+  <location href="Packages/c/CGSI-gSOAP-1.3.10-7.fc27.i686.rpm"/>
+  <format>
+    <rpm:license>ASL 2.0</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Unspecified</rpm:group>
+    <rpm:buildhost>buildvm-28.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>CGSI-gSOAP-1.3.10-7.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="16636"/>
+    <rpm:provides>
+      <rpm:entry name="CGSI-gSOAP" flags="EQ" epoch="0" ver="1.3.10" rel="7.fc27"/>
+      <rpm:entry name="CGSI-gSOAP(x86-32)" flags="EQ" epoch="0" ver="1.3.10" rel="7.fc27"/>
+      <rpm:entry name="libcgsi_plugin.so.1"/>
+      <rpm:entry name="libcgsi_plugin_cpp.so.1"/>
+      <rpm:entry name="libcgsi_plugin_voms.so.1"/>
+      <rpm:entry name="libcgsi_plugin_voms_cpp.so.1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/sbin/ldconfig" pre="1"/>
+      <rpm:entry name="/sbin/ldconfig"/>
+      <rpm:entry name="libcrypto.so.1.1"/>
+      <rpm:entry name="libcrypto.so.1.1(OPENSSL_1_1_0)"/>
+      <rpm:entry name="libgcc_s.so.1"/>
+      <rpm:entry name="libglobus_common.so.0"/>
+      <rpm:entry name="libglobus_common.so.0(GLOBUS_COMMON_14)"/>
+      <rpm:entry name="libglobus_gsi_cert_utils.so.0"/>
+      <rpm:entry name="libglobus_gsi_credential.so.1"/>
+      <rpm:entry name="libglobus_gss_assist.so.3"/>
+      <rpm:entry name="libglobus_gssapi_gsi.so.4"/>
+      <rpm:entry name="libglobus_gssapi_gsi.so.4(globus_gssapi_gsi)"/>
+      <rpm:entry name="libm.so.6"/>
+      <rpm:entry name="libstdc++.so.6"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4)"/>
+      <rpm:entry name="libvomsapi.so.1"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.4)"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>CGSI-gSOAP</name>
+  <arch>x86_64</arch>
+  <version epoch="0" ver="1.3.10" rel="7.fc27"/>
+  <checksum type="sha256" pkgid="YES">6a01d0ba16bdda90b5f014461415c4cdabcb738927a7a3723ba2b5342a763012</checksum>
+  <summary>GSI plugin for gSOAP</summary>
+  <description>This is a GSI plugin for gSOAP. It uses the globus GSI libraries to implement
+GSI secure authentication and encryption on top of gSOAP.</description>
+  <packager>Fedora Project</packager>
+  <url>http://glite.web.cern.ch/glite/</url>
+  <time file="1509981919" build="1509964314"/>
+  <size package="54120" installed="187712" archive="191320"/>
+  <location href="Packages/c/CGSI-gSOAP-1.3.10-7.fc27.x86_64.rpm"/>
+  <format>
+    <rpm:license>ASL 2.0</rpm:license>
+    <rpm:vendor>Fedora Project</rpm:vendor>
+    <rpm:group>Unspecified</rpm:group>
+    <rpm:buildhost>buildvm-26.phx2.fedoraproject.org</rpm:buildhost>
+    <rpm:sourcerpm>CGSI-gSOAP-1.3.10-7.fc27.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="4504" end="16772"/>
+    <rpm:provides>
+      <rpm:entry name="CGSI-gSOAP" flags="EQ" epoch="0" ver="1.3.10" rel="7.fc27"/>
+      <rpm:entry name="CGSI-gSOAP(x86-64)" flags="EQ" epoch="0" ver="1.3.10" rel="7.fc27"/>
+      <rpm:entry name="libcgsi_plugin.so.1()(64bit)"/>
+      <rpm:entry name="libcgsi_plugin_cpp.so.1()(64bit)"/>
+      <rpm:entry name="libcgsi_plugin_voms.so.1()(64bit)"/>
+      <rpm:entry name="libcgsi_plugin_voms_cpp.so.1()(64bit)"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/sbin/ldconfig" pre="1"/>
+      <rpm:entry name="/sbin/ldconfig"/>
+      <rpm:entry name="libcrypto.so.1.1()(64bit)"/>
+      <rpm:entry name="libcrypto.so.1.1(OPENSSL_1_1_0)(64bit)"/>
+      <rpm:entry name="libgcc_s.so.1()(64bit)"/>
+      <rpm:entry name="libglobus_common.so.0()(64bit)"/>
+      <rpm:entry name="libglobus_common.so.0(GLOBUS_COMMON_14)(64bit)"/>
+      <rpm:entry name="libglobus_gsi_cert_utils.so.0()(64bit)"/>
+      <rpm:entry name="libglobus_gsi_credential.so.1()(64bit)"/>
+      <rpm:entry name="libglobus_gss_assist.so.3()(64bit)"/>
+      <rpm:entry name="libglobus_gssapi_gsi.so.4()(64bit)"/>
+      <rpm:entry name="libglobus_gssapi_gsi.so.4(globus_gssapi_gsi)(64bit)"/>
+      <rpm:entry name="libm.so.6()(64bit)"/>
+      <rpm:entry name="libstdc++.so.6()(64bit)"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4)(64bit)"/>
+      <rpm:entry name="libvomsapi.so.1()(64bit)"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.14)(64bit)"/>
+    </rpm:requires>
+  </format>
+</package>
+</metadata>
