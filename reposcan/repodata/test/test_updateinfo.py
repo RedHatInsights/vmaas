@@ -2,6 +2,8 @@ import unittest
 from xml.etree.ElementTree import ParseError
 from repodata.updateinfo import UpdateInfoMD
 
+KNOWN_UPDATE_TYPES = ["security", "bugfix", "enhancement", "newpackage"]
+
 
 class TestUpdateInfoMD(unittest.TestCase):
     def setUp(self):
@@ -43,7 +45,7 @@ class TestUpdateInfoMD(unittest.TestCase):
             self._test_pkg_ref(pkg_ref)
 
         # Check known update types
-        self.assertTrue(update["type"] in ["enhancement", "bugfix", "security", "newpackage"])
+        self.assertTrue(update["type"] in KNOWN_UPDATE_TYPES)
 
     def test_invalid_file(self):
         with self.assertRaises(FileNotFoundError):

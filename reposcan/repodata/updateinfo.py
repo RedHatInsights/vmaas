@@ -76,8 +76,5 @@ class UpdateInfoMD:
                 # Clear the XML tree continuously
                 root.clear()
 
-    def get_update_count(self):
-        return len(self.updates)
-
     def list_updates(self):
         return self.updates
