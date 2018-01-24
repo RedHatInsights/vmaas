@@ -6,6 +6,7 @@ import tempfile
 from urllib.parse import urljoin
 
 from download.downloader import FileDownloader, DownloadItem
+from download.unpacker import FileUnpacker
 from repodata.repomd import RepoMD
 
 REPODATA_DIR = "repodata/"
@@ -20,6 +21,7 @@ def download_repodata(repo_url):
 
     # Get repomd
     downloader = FileDownloader()
+    unpacker = FileUnpacker()
     downloader.add(DownloadItem(
         source_url=repomd_url,
         target_path=target_repomd_path
@@ -35,8 +37,9 @@ def download_repodata(repo_url):
             source_url=md_url,
             target_path=os.path.join(tmp_directory, os.path.basename(md["location"]))
         ))
+        unpacker.add(os.path.join(tmp_directory, os.path.basename(md["location"])))
     downloader.run()
-
+    unpacker.run()
 
 if __name__ == '__main__':
     repo_url = sys.argv[1]
