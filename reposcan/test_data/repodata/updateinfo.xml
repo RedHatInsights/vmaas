@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updates>
+  <update from="updates@fedoraproject.org" status="stable" type="enhancement" version="2.0">
+    <id>FEDORA-2017-85b23ed72d</id>
+    <title>golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27</title>
+    <issued date="2017-12-02 01:57:03"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27 enhancement update</summary>
+    <description>Bump to upstream 6b67b3fab74d992bd07f72550006ab2c6907c416</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1493960" id="1493960" type="bugzilla" title="Please update the package to a more recent version"/>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1498057" id="1498057" type="bugzilla" title="Tracker for golang-github-xeipuuv-gojsonschema"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.armv7hl.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.s390x.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.s390x.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.i686.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.i686.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.aarch64.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.ppc64le.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-unit-test-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/g/golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.x86_64.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-unit-test-devel-0-0.5.20171003git6b67b3f.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema-devel" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/g/golang-github-xeipuuv-gojsonschema-devel-0-0.5.20171003git6b67b3f.fc27.noarch.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-devel-0-0.5.20171003git6b67b3f.fc27.noarch.rpm</filename>
+        </package>
+        <package name="golang-github-xeipuuv-gojsonschema" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/g/golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27.src.rpm">
+          <filename>golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="bugfix" version="2.0">
+    <id>FEDORA-2017-63f9b40927</id>
+    <title>perl-Math-Base85-0.4-1.fc27</title>
+    <issued date="2017-11-11 13:29:22"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>perl-Math-Base85-0.4-1.fc27 bugfix update</summary>
+    <description>Updated to the latest version</description>
+    <references/>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="perl-Math-Base85" version="0.4" release="1.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/perl-Math-Base85-0.4-1.fc27.noarch.rpm">
+          <filename>perl-Math-Base85-0.4-1.fc27.noarch.rpm</filename>
+        </package>
+        <package name="perl-Math-Base85" version="0.4" release="1.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/p/perl-Math-Base85-0.4-1.fc27.src.rpm">
+          <filename>perl-Math-Base85-0.4-1.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="enhancement" version="2.0">
+    <id>FEDORA-2017-14fbbab6e0</id>
+    <title>rubygem-jgrep-1.5.0-1.fc27</title>
+    <issued date="2017-11-15 15:47:48"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>rubygem-jgrep-1.5.0-1.fc27 enhancement update</summary>
+    <description>[CHANGELOG](https://github.com/ploubser/JSON-Grep/blob/master/CHANGELOG.markdown)</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1480030" id="1480030" type="bugzilla" title="rubygem-jgrep-1.5.0 is available"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="rubygem-jgrep-doc" version="1.5.0" release="1.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/rubygem-jgrep-doc-1.5.0-1.fc27.noarch.rpm">
+          <filename>rubygem-jgrep-doc-1.5.0-1.fc27.noarch.rpm</filename>
+        </package>
+        <package name="rubygem-jgrep" version="1.5.0" release="1.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/rubygem-jgrep-1.5.0-1.fc27.noarch.rpm">
+          <filename>rubygem-jgrep-1.5.0-1.fc27.noarch.rpm</filename>
+        </package>
+        <package name="rubygem-jgrep" version="1.5.0" release="1.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/r/rubygem-jgrep-1.5.0-1.fc27.src.rpm">
+          <filename>rubygem-jgrep-1.5.0-1.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="bugfix" version="2.0">
+    <id>FEDORA-2017-82315d72d0</id>
+    <title>jinput-2.0.7-11.20170607git.294629a.fc27</title>
+    <issued date="2017-11-25 01:40:57"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>jinput-2.0.7-11.20170607git.294629a.fc27 bugfix update</summary>
+    <description>Fix a broken symbolic link.</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1513092" id="1513092" type="bugzilla" title="broken symlink in %_libdir/%name"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/j/jinput-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.s390x.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.s390x.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.s390x.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.s390x.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/j/jinput-2.0.7-11.20170607git.294629a.fc27.s390x.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.s390x.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/jinput-2.0.7-11.20170607git.294629a.fc27.i686.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.i686.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.i686.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.i686.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.i686.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.i686.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/j/jinput-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/j/jinput-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/j/jinput-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="jinput-javadoc" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/jinput-javadoc-2.0.7-11.20170607git.294629a.fc27.noarch.rpm">
+          <filename>jinput-javadoc-2.0.7-11.20170607git.294629a.fc27.noarch.rpm</filename>
+        </package>
+        <package name="jinput-debuginfo" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/j/jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm">
+          <filename>jinput-debuginfo-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/j/jinput-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="jinput-debugsource" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/j/jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm">
+          <filename>jinput-debugsource-2.0.7-11.20170607git.294629a.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="jinput" version="2.0.7" release="11.20170607git.294629a.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/j/jinput-2.0.7-11.20170607git.294629a.fc27.src.rpm">
+          <filename>jinput-2.0.7-11.20170607git.294629a.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="newpackage" version="2.0">
+    <id>FEDORA-2017-d43cfd33d4</id>
+    <title>adobe-source-han-sans-jp-fonts-1.004-1.fc27</title>
+    <issued date="2017-11-28 22:04:39"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>adobe-source-han-sans-jp-fonts-1.004-1.fc27 newpackage update</summary>
+    <description>Initial packaging</description>
+    <references/>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="adobe-source-han-sans-jp-fonts" version="1.004" release="1.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/a/adobe-source-han-sans-jp-fonts-1.004-1.fc27.noarch.rpm">
+          <filename>adobe-source-han-sans-jp-fonts-1.004-1.fc27.noarch.rpm</filename>
+        </package>
+        <package name="adobe-source-han-sans-jp-fonts" version="1.004" release="1.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/a/adobe-source-han-sans-jp-fonts-1.004-1.fc27.src.rpm">
+          <filename>adobe-source-han-sans-jp-fonts-1.004-1.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="enhancement" version="2.0">
+    <id>FEDORA-2017-01b02f5be8</id>
+    <title>synergy-1.8.8-2.fc27</title>
+    <issued date="2017-11-11 13:29:22"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>synergy-1.8.8-2.fc27 enhancement update</summary>
+    <description>Upstream update to 1.8.8</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1372714" id="1372714" type="bugzilla" title="Update to 1.8.8"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/s/synergy-debugsource-1.8.8-2.fc27.armv7hl.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/s/synergy-1.8.8-2.fc27.armv7hl.rpm">
+          <filename>synergy-1.8.8-2.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/s/synergy-debuginfo-1.8.8-2.fc27.armv7hl.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/s/synergy-debuginfo-1.8.8-2.fc27.s390x.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.s390x.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/s/synergy-debugsource-1.8.8-2.fc27.s390x.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.s390x.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/s/synergy-1.8.8-2.fc27.s390x.rpm">
+          <filename>synergy-1.8.8-2.fc27.s390x.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/s/synergy-debuginfo-1.8.8-2.fc27.i686.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.i686.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/s/synergy-debugsource-1.8.8-2.fc27.i686.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.i686.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/s/synergy-1.8.8-2.fc27.i686.rpm">
+          <filename>synergy-1.8.8-2.fc27.i686.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/s/synergy-1.8.8-2.fc27.ppc64.rpm">
+          <filename>synergy-1.8.8-2.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/s/synergy-debugsource-1.8.8-2.fc27.ppc64.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/s/synergy-debuginfo-1.8.8-2.fc27.ppc64.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/s/synergy-1.8.8-2.fc27.aarch64.rpm">
+          <filename>synergy-1.8.8-2.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/s/synergy-debuginfo-1.8.8-2.fc27.aarch64.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/s/synergy-debugsource-1.8.8-2.fc27.aarch64.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/s/synergy-debugsource-1.8.8-2.fc27.ppc64le.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/s/synergy-debuginfo-1.8.8-2.fc27.ppc64le.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/s/synergy-1.8.8-2.fc27.ppc64le.rpm">
+          <filename>synergy-1.8.8-2.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/s/synergy-1.8.8-2.fc27.x86_64.rpm">
+          <filename>synergy-1.8.8-2.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="synergy-debugsource" version="1.8.8" release="2.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/s/synergy-debugsource-1.8.8-2.fc27.x86_64.rpm">
+          <filename>synergy-debugsource-1.8.8-2.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="synergy-debuginfo" version="1.8.8" release="2.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/s/synergy-debuginfo-1.8.8-2.fc27.x86_64.rpm">
+          <filename>synergy-debuginfo-1.8.8-2.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="synergy" version="1.8.8" release="2.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/s/synergy-1.8.8-2.fc27.src.rpm">
+          <filename>synergy-1.8.8-2.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="enhancement" version="2.0">
+    <id>FEDORA-2017-3b82ccdb80</id>
+    <title>libsedml-0.4.3-4.fc27</title>
+    <issued date="2017-11-11 13:29:22"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>libsedml-0.4.3-4.fc27 enhancement update</summary>
+    <description>- Update to 0.4.3
+- New Epoch
+- Rebuild against new libnuml</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1496792" id="1496792" type="bugzilla" title="libsedml-v0.4.3 is available"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/r/ruby-SEDML-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/perl-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python2-libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-sharp-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-static-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/perl-SEDML-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python3-libsedml-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/R/R-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/R/R-SEDML-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python2-libsedml-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-debugsource-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/l/libsedml-devel-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python3-libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/R/R-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/perl-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python3-libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python2-libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-debugsource-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-sharp-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/R/R-SEDML-0.4.3-4.fc27.s390x.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/r/ruby-SEDML-0.4.3-4.fc27.s390x.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/perl-SEDML-0.4.3-4.fc27.s390x.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python3-libsedml-0.4.3-4.fc27.s390x.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python2-libsedml-0.4.3-4.fc27.s390x.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-static-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-devel-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/l/libsedml-0.4.3-4.fc27.s390x.rpm">
+          <filename>libsedml-0.4.3-4.fc27.s390x.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-debugsource-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="java-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/java-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>java-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python3-libsedml-0.4.3-4.fc27.i686.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="java-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/j/java-SEDML-0.4.3-4.fc27.i686.rpm">
+          <filename>java-SEDML-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/R/R-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-static-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/perl-SEDML-0.4.3-4.fc27.i686.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python2-libsedml-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/R/R-SEDML-0.4.3-4.fc27.i686.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python2-libsedml-0.4.3-4.fc27.i686.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-devel-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/ruby-SEDML-0.4.3-4.fc27.i686.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/perl-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python3-libsedml-debuginfo-0.4.3-4.fc27.i686.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/l/libsedml-sharp-0.4.3-4.fc27.i686.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.i686.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python2-libsedml-0.4.3-4.fc27.ppc64.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/perl-SEDML-0.4.3-4.fc27.ppc64.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/perl-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-devel-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-debugsource-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python3-libsedml-0.4.3-4.fc27.ppc64.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python2-libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python3-libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-static-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/R/R-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/r/ruby-SEDML-0.4.3-4.fc27.ppc64.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/l/libsedml-sharp-0.4.3-4.fc27.ppc64.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/R/R-SEDML-0.4.3-4.fc27.ppc64.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python2-libsedml-0.4.3-4.fc27.aarch64.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/perl-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-static-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python2-libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-sharp-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/perl-SEDML-0.4.3-4.fc27.aarch64.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/R/R-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/R/R-SEDML-0.4.3-4.fc27.aarch64.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python3-libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-debugsource-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python3-libsedml-0.4.3-4.fc27.aarch64.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/l/libsedml-devel-0.4.3-4.fc27.aarch64.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/r/ruby-SEDML-0.4.3-4.fc27.aarch64.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python2-libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/perl-SEDML-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python2-libsedml-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/r/ruby-SEDML-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/perl-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-static-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/R/R-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python3-libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python3-libsedml-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/R/R-SEDML-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-sharp-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-devel-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/l/libsedml-debugsource-0.4.3-4.fc27.ppc64le.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="java-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/j/java-SEDML-0.4.3-4.fc27.x86_64.rpm">
+          <filename>java-SEDML-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="perl-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/perl-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>perl-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/r/ruby-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>ruby-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="ruby-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/r/ruby-SEDML-0.4.3-4.fc27.x86_64.rpm">
+          <filename>ruby-SEDML-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-sharp-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-sharp-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-static" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-static-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-static-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="R-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/R/R-SEDML-0.4.3-4.fc27.x86_64.rpm">
+          <filename>R-SEDML-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python3-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python3-libsedml-0.4.3-4.fc27.x86_64.rpm">
+          <filename>python3-libsedml-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-debugsource" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-debugsource-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-debugsource-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-sharp-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-sharp-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-sharp-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml-devel" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/l/libsedml-devel-0.4.3-4.fc27.x86_64.rpm">
+          <filename>libsedml-devel-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python2-libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python2-libsedml-0.4.3-4.fc27.x86_64.rpm">
+          <filename>python2-libsedml-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python2-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python2-libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>python2-libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="R-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/R/R-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>R-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="java-SEDML-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/j/java-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>java-SEDML-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python3-libsedml-debuginfo" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python3-libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm">
+          <filename>python3-libsedml-debuginfo-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="perl-SEDML" version="0.4.3" release="4.fc27" epoch="1" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/perl-SEDML-0.4.3-4.fc27.x86_64.rpm">
+          <filename>perl-SEDML-0.4.3-4.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="libsedml" version="0.4.3" release="4.fc27" epoch="1" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/l/libsedml-0.4.3-4.fc27.src.rpm">
+          <filename>libsedml-0.4.3-4.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="bugfix" version="2.0">
+    <id>FEDORA-2017-7e342486cc</id>
+    <title>python-smartcols-0.3.0-1.fc27</title>
+    <issued date="2017-11-11 13:29:22"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>python-smartcols-0.3.0-1.fc27 bugfix update</summary>
+    <description>New requirements
+----------------
+
+* libsmartcols &gt;= 2.30
+
+API additions
+-------------
+
+* You can now set `nolinesep` and `nowrap` settings for `smartcols.Table`.
+
+API removals
+------------
+
+* No APIs were removed in this version.
+
+Breaking API changes
+--------------------
+
+* No breaking API changes in this version.
+</description>
+    <references/>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python-smartcols-debugsource-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python2-smartcols-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python3-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python2-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/p/python3-smartcols-0.3.0-1.fc27.armv7hl.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python3-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python2-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python-smartcols-debugsource-0.3.0-1.fc27.s390x.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python3-smartcols-0.3.0-1.fc27.s390x.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/p/python2-smartcols-0.3.0-1.fc27.s390x.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.s390x.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python2-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python2-smartcols-0.3.0-1.fc27.i686.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python3-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python-smartcols-debugsource-0.3.0-1.fc27.i686.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python3-smartcols-0.3.0-1.fc27.i686.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python3-smartcols-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python2-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python3-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python2-smartcols-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/p/python-smartcols-debugsource-0.3.0-1.fc27.ppc64.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python3-smartcols-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python2-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python2-smartcols-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python3-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/p/python-smartcols-debugsource-0.3.0-1.fc27.aarch64.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python2-smartcols-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python2-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python3-smartcols-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python-smartcols-debugsource-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/p/python3-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="python-smartcols-debugsource" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python-smartcols-debugsource-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python-smartcols-debugsource-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python3-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python3-smartcols-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python3-smartcols-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python-smartcols-doc" version="0.3.0" release="1.fc27" epoch="0" arch="noarch" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/p/python-smartcols-doc-0.3.0-1.fc27.noarch.rpm">
+          <filename>python-smartcols-doc-0.3.0-1.fc27.noarch.rpm</filename>
+        </package>
+        <package name="python3-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python3-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python3-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python2-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python2-smartcols-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python2-smartcols-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python2-smartcols-debuginfo" version="0.3.0" release="1.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/p/python2-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm">
+          <filename>python2-smartcols-debuginfo-0.3.0-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="python-smartcols" version="0.3.0" release="1.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/p/python-smartcols-0.3.0-1.fc27.src.rpm">
+          <filename>python-smartcols-0.3.0-1.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+  <update from="updates@fedoraproject.org" status="stable" type="enhancement" version="2.0">
+    <id>FEDORA-2017-be16788e4e</id>
+    <title>rpcbind-0.2.4-8.rc3.fc27</title>
+    <issued date="2017-12-28 01:13:53"/>
+    <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
+    <release>Fedora 27</release>
+    <summary>rpcbind-0.2.4-8.rc3.fc27 enhancement update</summary>
+    <description>Updated to latest upstream RC release: rpcbind-0_2_5-rc3 (bz 1431574)
+</description>
+    <references>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1431574" id="1431574" type="bugzilla" title="service file not starting rpcbind.target"/>
+    </references>
+    <pkglist>
+      <collection short="F27">
+        <name>Fedora 27</name>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/r/rpcbind-0.2.4-8.rc3.fc27.armv7hl.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.armv7hl.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="armv7hl" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/armv7hl/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.armv7hl.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.armv7hl.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.s390x.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.s390x.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.s390x.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.s390x.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="s390x" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/s390x/r/rpcbind-0.2.4-8.rc3.fc27.s390x.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.s390x.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/rpcbind-0.2.4-8.rc3.fc27.i686.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.i686.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.i686.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.i686.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="i686" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/i386/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.i686.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.i686.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.ppc64.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.ppc64.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64/r/rpcbind-0.2.4-8.rc3.fc27.ppc64.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.ppc64.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.aarch64.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/r/rpcbind-0.2.4-8.rc3.fc27.aarch64.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="aarch64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/aarch64/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.aarch64.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.aarch64.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.ppc64le.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/r/rpcbind-0.2.4-8.rc3.fc27.ppc64le.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="ppc64le" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/ppc64le/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.ppc64le.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.ppc64le.rpm</filename>
+        </package>
+        <package name="rpcbind-debugsource" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/r/rpcbind-debugsource-0.2.4-8.rc3.fc27.x86_64.rpm">
+          <filename>rpcbind-debugsource-0.2.4-8.rc3.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="rpcbind-debuginfo" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/r/rpcbind-debuginfo-0.2.4-8.rc3.fc27.x86_64.rpm">
+          <filename>rpcbind-debuginfo-0.2.4-8.rc3.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="x86_64" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/x86_64/r/rpcbind-0.2.4-8.rc3.fc27.x86_64.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="rpcbind" version="0.2.4" release="8.rc3.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/r/rpcbind-0.2.4-8.rc3.fc27.src.rpm">
+          <filename>rpcbind-0.2.4-8.rc3.fc27.src.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+</updates>
