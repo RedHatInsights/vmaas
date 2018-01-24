@@ -2,21 +2,27 @@ from cli.logger import SimpleLogger
 
 
 class Repository:
-    def __init__(self, repo_url, repomd, primary, updateinfo):
+    def __init__(self, repo_url):
         self.logger = SimpleLogger()
         self.repo_url = repo_url
-        self.repomd = repomd
-        self.primary = primary
-        self.updateinfo = updateinfo
+        self.repomd = None
+        self.primary = None
+        self.updateinfo = None
+        self.md_files = {}
+        self.tmp_directory = None
 
     def get_package_count(self):
-        return self.primary.get_package_count()
+        if self.primary:
+            return self.primary.get_package_count()
+        return 0
 
     def get_update_count(self, update_type=None):
         return len(self.list_updates(update_type=update_type))
 
     def list_packages(self):
-        return self.primary.list_packages()
+        if self.primary:
+            return self.primary.list_packages()
+        return []
 
     def list_updates(self, update_type=None):
         if self.updateinfo:
