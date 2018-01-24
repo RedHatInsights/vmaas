@@ -10,6 +10,7 @@ from download.unpacker import FileUnpacker
 from repodata.repository import Repository
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.primary import PrimaryMD
+from repodata.primary_db import PrimaryDatabaseMD
 from repodata.updateinfo import UpdateInfoMD
 
 REPODATA_DIR = "repodata/"
@@ -34,7 +35,7 @@ def download_repodata(repo_url):
 
     md_files = {}
     # Get primary and updateinfo
-    for md_type in ("primary", "updateinfo"):
+    for md_type in ("primary", "primary_db", "updateinfo"):
         try:
             md = repomd.get_metadata(md_type)
         except RepoMDTypeNotFound:
@@ -50,14 +51,16 @@ def download_repodata(repo_url):
     downloader.run()
     unpacker.run()
 
-    primary = updateinfo = None
+    primary = primary_db = updateinfo = None
     for md_type in md_files:
         if md_type == "primary":
             primary = PrimaryMD(md_files["primary"])
+        elif md_type == "primary_db":
+            primary_db = PrimaryDatabaseMD(md_files["primary_db"])
         elif md_type == "updateinfo":
             updateinfo = UpdateInfoMD(md_files["updateinfo"])
 
-    return Repository(repo_url, repomd, primary, updateinfo=updateinfo)
+    return Repository(repo_url, repomd, primary_db, updateinfo)
 
 
 
