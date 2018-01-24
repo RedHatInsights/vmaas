@@ -4,6 +4,7 @@ import tempfile
 from urllib.parse import urljoin
 
 from cli.logger import SimpleLogger
+from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem
 from download.unpacker import FileUnpacker
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
@@ -20,6 +21,7 @@ class RepositoryController:
         self.logger = SimpleLogger()
         self.downloader = FileDownloader()
         self.unpacker = FileUnpacker()
+        self.repo_store = RepositoryStore()
         self.repositories = []
 
     def _download_repomds(self):
@@ -98,7 +100,6 @@ class RepositoryController:
         self._unpack_metadata()
         for repository in self.repositories:
             self._load_metadata(repository)
-            self.logger.log(repository.get_package_count())
-            self.logger.log(repository.get_update_count())
+            self.repo_store.store(repository)
             self._unload_metadata(repository)
         self.clean_repodata()
