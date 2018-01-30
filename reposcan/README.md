@@ -14,4 +14,4 @@
 
 ### Run reposcan in container:
 
-```cd /vmaas-reposcan && ./reposcan.py -d $POSTGRES_DB -H $POSTGRES_HOST -U $POSTGRES_USER -P POSTGRES_PASSWORD -r https://dl.fedoraproject.org/pub/fedora/linux/releases/25/Server/x86_64/os/```
+```cd /vmaas-reposcan && ./reposcan.py -d $POSTGRES_DB -H $POSTGRES_HOST -U $POSTGRES_USER -P $POSTGRES_PASSWORD -r https://dl.fedoraproject.org/pub/fedora/linux/releases/25/Server/x86_64/os/```
