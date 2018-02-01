@@ -18,9 +18,14 @@ class UpdateInfoMD:
                 update["title"] = elem.find("title").text
                 update["summary"] = elem.find("summary").text
                 update["rights"] = elem.find("rights").text
-                update["description"] = elem.find("description").text
 
                 # Optional fields
+                description = elem.find("description")
+                if description is not None:
+                    update["description"] = description.text
+                else:
+                    update["description"] = None
+
                 issued = elem.find("issued")
                 if issued is not None:
                     update["issued"] = issued.get("date")
