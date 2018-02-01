@@ -194,7 +194,7 @@ class UpdateStore:
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
-            for cve in [cve["id"] for cve in update["references"] if cve["type"] == "cve"]:
+            for cve in set([cve["id"] for cve in update["references"] if cve["type"] == "cve"]):
                 cve_id = cve_map[cve]
                 if update_id in update_to_cves and cve_id in update_to_cves[update_id]:
                     # Already associated, remove from set
@@ -214,7 +214,7 @@ class UpdateStore:
 
         if to_associate:
             execute_values(cur, "insert into errata_cve (errata_id, cve_id) values %s",
-                           list(to_associate), page_size=len(to_associate))
+                           to_associate, page_size=len(to_associate))
 
         if to_disassociate:
             cur.execute("delete from errata_cve where (errata_id, cve_id) in %s", (tuple(to_disassociate),))
