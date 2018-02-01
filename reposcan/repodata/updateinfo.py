@@ -21,9 +21,9 @@ class UpdateInfoMD:
                 update["description"] = elem.find("description").text
 
                 # Optional fields
-                updated = elem.find("issued")
-                if updated is not None:
-                    update["issued"] = updated.get("date")
+                issued = elem.find("issued")
+                if issued is not None:
+                    update["issued"] = issued.get("date")
                 else:
                     update["issued"] = None
 
