@@ -56,15 +56,16 @@ class PackageStore:
         for pkg in packages:
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
         self.logger.log("Unique EVRs in repository: %d" % len(unique_evrs))
-        execute_values(cur,
-                       """select id, epoch, version, release from evr
-                       inner join (values %s) t(epoch, version, release)
-                       using (epoch, version, release)""",
-                       list(unique_evrs), page_size=len(unique_evrs))
-        for row in cur.fetchall():
-            evr_map[(row[1], row[2], row[3])] = row[0]
-            # Remove to not insert this evr
-            unique_evrs.remove((row[1], row[2], row[3]))
+        if unique_evrs:
+            execute_values(cur,
+                           """select id, epoch, version, release from evr
+                           inner join (values %s) t(epoch, version, release)
+                           using (epoch, version, release)""",
+                           list(unique_evrs), page_size=len(unique_evrs))
+            for row in cur.fetchall():
+                evr_map[(row[1], row[2], row[3])] = row[0]
+                # Remove to not insert this evr
+                unique_evrs.remove((row[1], row[2], row[3]))
         self.logger.log("EVRs already in DB: %d" % len(evr_map))
 
         to_import = []
@@ -92,15 +93,16 @@ class PackageStore:
         checksums = set()
         for pkg in packages:
             checksums.add((checksum_types[pkg["checksum_type"]], pkg["checksum"]))
-        execute_values(cur,
-                       """select id, checksum_type_id, checksum from package
-                          inner join (values %s) t(checksum_type_id, checksum)
-                          using (checksum_type_id, checksum)
-                       """, list(checksums), page_size=len(checksums))
-        for row in cur.fetchall():
-            pkg_map[(row[1], row[2])] = row[0]
-            # Remove to not insert this package
-            checksums.remove((row[1], row[2]))
+        if checksums:
+            execute_values(cur,
+                           """select id, checksum_type_id, checksum from package
+                              inner join (values %s) t(checksum_type_id, checksum)
+                              using (checksum_type_id, checksum)
+                           """, list(checksums), page_size=len(checksums))
+            for row in cur.fetchall():
+                pkg_map[(row[1], row[2])] = row[0]
+                # Remove to not insert this package
+                checksums.remove((row[1], row[2]))
         self.logger.log("Packages already in DB: %d" % len(pkg_map))
         self.logger.log("Packages to import: %d" % len(checksums))
         if checksums:
