@@ -19,6 +19,7 @@ if __name__ == '__main__':
                         default="5432")
     parser.add_argument("-r", "--repo", action="append",
                         help="Sync given repository (can be specifed multiple times).")
+    parser.add_argument("--repofile", action="store", help="Read repository list from file.")
     args = parser.parse_args()
 
     # Setup DB connection parameters
@@ -28,8 +29,12 @@ if __name__ == '__main__':
     DatabaseHandler.db_host = args.db_host
     DatabaseHandler.db_port = args.db_port
 
+    repository_controller = RepositoryController()
     if args.repo:
-        repository_controller = RepositoryController()
         for repo_url in args.repo:
             repository_controller.add_repository(repo_url)
-        repository_controller.store()
+    if args.repofile:
+        with open(args.repofile, "r") as repo_file:
+            for line in repo_file.readlines():
+                repository_controller.add_repository(line)
+    repository_controller.store()
