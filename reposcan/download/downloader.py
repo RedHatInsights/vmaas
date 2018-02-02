@@ -5,12 +5,14 @@ from cli.logger import SimpleLogger
 
 CHUNK_SIZE = 1048576
 THREADS = 8
+VALID_HTTP_CODES = [200]
 
 
 class DownloadItem:
     def __init__(self, source_url=None, target_path=None):
         self.source_url = source_url
         self.target_path = target_path
+        self.status_code = None
 
 
 class FileDownloadThread(Thread):
@@ -20,14 +22,15 @@ class FileDownloadThread(Thread):
         self.session = requests.Session()
         self.logger = logger
 
-    def _download(self, source_url, target_path):
-        with open(target_path, "wb") as file_handle:
-            with self.session.get(source_url, stream=True) as response:
+    def _download(self, download_item):
+        with open(download_item.target_path, "wb") as file_handle:
+            with self.session.get(download_item.source_url, stream=True) as response:
                 while True:
                     chunk = response.raw.read(CHUNK_SIZE, decode_content=False)
                     if chunk == b"":
                         break
                     file_handle.write(chunk)
+                download_item.status_code = response.status_code
 
     def run(self):
         while not self.queue.empty():
@@ -35,7 +38,7 @@ class FileDownloadThread(Thread):
                 download_item = self.queue.get(block=False)
             except Empty:
                 break
-            self._download(download_item.source_url, download_item.target_path)
+            self._download(download_item)
             self.queue.task_done()
             self.logger.log("%s -> %s" % (download_item.source_url, download_item.target_path))
 

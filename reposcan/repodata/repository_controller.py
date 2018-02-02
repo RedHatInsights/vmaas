@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 from cli.logger import SimpleLogger
 from database.repository_store import RepositoryStore
-from download.downloader import FileDownloader, DownloadItem
+from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.primary import PrimaryMD
@@ -26,29 +26,42 @@ class RepositoryController:
         self.repository_batches = [[]]
 
     def _download_repomds(self, batch):
+        download_items = []
         for repository in batch:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
-            self.downloader.add(DownloadItem(
+            item = DownloadItem(
                 source_url=repomd_url,
                 target_path=os.path.join(repository.tmp_directory, "repomd.xml")
-            ))
+            )
+            # Save for future status code check
+            download_items.append(item)
+            self.downloader.add(item)
         self.downloader.run()
+        # Return failed downloads
+        return {item.target_path: item.status_code for item in download_items
+                if item.status_code not in VALID_HTTP_CODES}
 
-    def _read_repomds(self, batch):
+    def _read_repomds(self, batch, failed):
         for repository in batch:
-            repository.repomd = RepoMD(os.path.join(repository.tmp_directory, "repomd.xml"))
+            repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
+            if repomd_path not in failed:
+                repository.repomd = RepoMD(repomd_path)
+            else:
+                self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
+                                failed[repomd_path]))
 
     def _download_metadata(self, batch):
         for repository in batch:
-            try:
-                repository.md_files["primary_db"] = repository.repomd.get_metadata("primary_db")["location"]
-            except RepoMDTypeNotFound:
-                repository.md_files["primary"] = repository.repomd.get_metadata("primary")["location"]
-            try:
-                repository.md_files["updateinfo"] = repository.repomd.get_metadata("updateinfo")["location"]
-            except RepoMDTypeNotFound:
-                pass
+            if repository.repomd:
+                try:
+                    repository.md_files["primary_db"] = repository.repomd.get_metadata("primary_db")["location"]
+                except RepoMDTypeNotFound:
+                    repository.md_files["primary"] = repository.repomd.get_metadata("primary")["location"]
+                try:
+                    repository.md_files["updateinfo"] = repository.repomd.get_metadata("updateinfo")["location"]
+                except RepoMDTypeNotFound:
+                    pass
 
             for md_location in repository.md_files.values():
                 self.downloader.add(DownloadItem(
@@ -102,8 +115,8 @@ class RepositoryController:
 
     def store(self):
         for batch in self.repository_batches:
-            self._download_repomds(batch)
-            self._read_repomds(batch)
+            failed = self._download_repomds(batch)
+            self._read_repomds(batch, failed)
             self._download_metadata(batch)
             self._unpack_metadata(batch)
             for repository in batch:
