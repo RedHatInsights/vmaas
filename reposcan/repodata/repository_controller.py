@@ -14,6 +14,7 @@ from repodata.updateinfo import UpdateInfoMD
 from repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
+BATCH_SIZE = 100
 
 
 class RepositoryController:
@@ -22,10 +23,10 @@ class RepositoryController:
         self.downloader = FileDownloader()
         self.unpacker = FileUnpacker()
         self.repo_store = RepositoryStore()
-        self.repositories = []
+        self.repository_batches = [[]]
 
-    def _download_repomds(self):
-        for repository in self.repositories:
+    def _download_repomds(self, batch):
+        for repository in batch:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             self.downloader.add(DownloadItem(
@@ -34,12 +35,12 @@ class RepositoryController:
             ))
         self.downloader.run()
 
-    def _read_repomds(self):
-        for repository in self.repositories:
+    def _read_repomds(self, batch):
+        for repository in batch:
             repository.repomd = RepoMD(os.path.join(repository.tmp_directory, "repomd.xml"))
 
-    def _download_metadata(self):
-        for repository in self.repositories:
+    def _download_metadata(self, batch):
+        for repository in batch:
             try:
                 repository.md_files["primary_db"] = repository.repomd.get_metadata("primary_db")["location"]
             except RepoMDTypeNotFound:
@@ -56,8 +57,8 @@ class RepositoryController:
                 ))
         self.downloader.run()
 
-    def _unpack_metadata(self):
-        for repository in self.repositories:
+    def _unpack_metadata(self, batch):
+        for repository in batch:
             for md_type in repository.md_files:
                 self.unpacker.add(os.path.join(repository.tmp_directory,
                                                os.path.basename(repository.md_files[md_type])))
@@ -82,8 +83,8 @@ class RepositoryController:
         repository.primary = None
         repository.updateinfo = None
 
-    def clean_repodata(self):
-        for repository in self.repositories:
+    def clean_repodata(self, batch):
+        for repository in batch:
             if repository.tmp_directory:
                 shutil.rmtree(repository.tmp_directory)
                 repository.tmp_directory = None
@@ -92,15 +93,21 @@ class RepositoryController:
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.append(Repository(repo_url))
+        # Get last batch and append repository to it
+        last_batch = self.repository_batches[-1]
+        if len(last_batch) >= BATCH_SIZE:
+            last_batch = []
+            self.repository_batches.append(last_batch)
+        last_batch.append(Repository(repo_url))
 
     def store(self):
-        self._download_repomds()
-        self._read_repomds()
-        self._download_metadata()
-        self._unpack_metadata()
-        for repository in self.repositories:
-            self._load_metadata(repository)
-            self.repo_store.store(repository)
-            self._unload_metadata(repository)
-        self.clean_repodata()
+        for batch in self.repository_batches:
+            self._download_repomds(batch)
+            self._read_repomds(batch)
+            self._download_metadata(batch)
+            self._unpack_metadata(batch)
+            for repository in batch:
+                self._load_metadata(repository)
+                self.repo_store.store(repository)
+                self._unload_metadata(repository)
+            self.clean_repodata(batch)
