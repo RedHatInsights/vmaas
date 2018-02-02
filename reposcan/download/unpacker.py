@@ -46,4 +46,6 @@ class FileUnpacker:
         self.logger.log("Unpacking started.")
         for file_path in self.queue:
             self._unpack(file_path)
+        # Make queue empty to be able to reuse this class multiple times in one run
+        self.queue = []
         self.logger.log("Unpacking finished.")
