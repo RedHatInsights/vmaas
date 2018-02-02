@@ -111,6 +111,8 @@ class PackageStore:
                 if (checksum_types[pkg["checksum_type"]], pkg["checksum"]) in checksums:
                     import_data.append((pkg["name"], evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
                                         archs[pkg["arch"]], checksum_types[pkg["checksum_type"]], pkg["checksum"]))
+                    # Prevent duplicated insert when some package is multiple times in metadata
+                    checksums.remove((checksum_types[pkg["checksum_type"]], pkg["checksum"]))
             execute_values(cur,
                            """insert into package (name, evr_id, arch_id, checksum_type_id, checksum) values %s
                               returning id, checksum_type_id, checksum""",
