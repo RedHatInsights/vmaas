@@ -89,6 +89,7 @@ class RepositoryController:
                 repository.tmp_directory = None
 
     def add_repository(self, repo_url):
+        repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
         self.repositories.append(Repository(repo_url))
