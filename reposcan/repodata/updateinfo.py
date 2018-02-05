@@ -16,10 +16,20 @@ class UpdateInfoMD:
                 update["type"] = elem.get("type")
                 update["id"] = elem.find("id").text
                 update["title"] = elem.find("title").text
-                update["summary"] = elem.find("summary").text
-                update["rights"] = elem.find("rights").text
 
                 # Optional fields
+                summary = elem.find("summary")
+                if summary is not None:
+                    update["summary"] = summary.text
+                else:
+                    update["summary"] = None
+
+                rights = elem.find("rights")
+                if rights is not None:
+                    update["rights"] = rights.text
+                else:
+                    update["rights"] = None
+
                 description = elem.find("description")
                 if description is not None:
                     update["description"] = description.text
