@@ -13,6 +13,7 @@ class RepoMD:
     def __init__(self, filename):
         tree = eT.parse(filename)
         root = tree.getroot()
+        self.revision = int(root.find("repo:revision", NS).text.strip())
         self.data = {}
         for child in root.findall("repo:data", NS):
             data_type = child.get("type")
@@ -22,6 +23,9 @@ class RepoMD:
             checksum = child.find("repo:checksum", NS).text.strip()
             self.data[data_type] = {"location": location, "size": size,
                                     "checksum_type": checksum_type, "checksum": checksum}
+
+    def get_revision(self):
+        return self.revision
 
     def get_metadata(self, data_type):
         if data_type not in self.data:
