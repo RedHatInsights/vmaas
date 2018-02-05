@@ -10,6 +10,11 @@ class TestRepoMD(unittest.TestCase):
         self.repomd = RepoMD("test_data/repodata/repomd.xml")
         self.repomd_primary_only = RepoMD("test_data/repodata/repomd_primary_only.xml")
 
+    def test_revision(self):
+        self.assertIsInstance(self.repomd.get_revision(), int)
+        self.assertIsInstance(self.repomd_primary_only.get_revision(), int)
+        self.assertEqual(self.repomd.get_revision(), self.repomd_primary_only.get_revision())
+
     def _test_repomd(self, md):
         intended_fields = ["location", "size", "checksum_type", "checksum"]
         actual_fields = md.keys()

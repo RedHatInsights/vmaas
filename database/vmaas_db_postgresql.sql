@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS repo (
   name TEXT NOT NULL UNIQUE,
   product_id INT NULL,
   eol BOOLEAN NOT NULL,
+  revision TIMESTAMP WITH TIME ZONE NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT product_id
     FOREIGN KEY (product_id)
