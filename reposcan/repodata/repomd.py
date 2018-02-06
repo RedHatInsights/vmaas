@@ -17,9 +17,9 @@ class RepoMD:
         for child in root.findall("repo:data", NS):
             data_type = child.get("type")
             location = child.find("repo:location", NS).get("href")
-            size = int(child.find("repo:size", NS).text)
+            size = int(child.find("repo:size", NS).text.strip())
             checksum_type = child.find("repo:checksum", NS).get("type")
-            checksum = child.find("repo:checksum", NS).text
+            checksum = child.find("repo:checksum", NS).text.strip()
             self.data[data_type] = {"location": location, "size": size,
                                     "checksum_type": checksum_type, "checksum": checksum}
 

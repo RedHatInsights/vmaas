@@ -15,15 +15,15 @@ class PrimaryMD:
             elif elem.tag == "{%s}package" % NS["primary"] and event == "end":
                 if elem.get("type") == "rpm":
                     package = {}
-                    package["name"] = elem.find("primary:name", NS).text
+                    package["name"] = elem.find("primary:name", NS).text.strip()
                     evr = elem.find("primary:version", NS)
                     package["epoch"] = evr.get("epoch")
                     package["ver"] = evr.get("ver")
                     package["rel"] = evr.get("rel")
-                    package["arch"] = elem.find("primary:arch", NS).text
+                    package["arch"] = elem.find("primary:arch", NS).text.strip()
                     checksum = elem.find("primary:checksum", NS)
                     package["checksum_type"] = checksum.get("type")
-                    package["checksum"] = checksum.text
+                    package["checksum"] = checksum.text.strip()
                     self.packages.append(package)
                     # Clear the XML tree continuously
                     root.clear()
