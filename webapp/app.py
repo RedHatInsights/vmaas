@@ -6,12 +6,15 @@ import ujson
 import falcon
 import errata
 import sys
+import os
 
-DB_HOSTNAME = "vmaas_db"
 EXAMPLE_MSG = "Example:\ncurl -F file=@/path/to/file http://<FQDN>:8080/api/v1/plain/\n"
 
-cursor = errata.init_db(errata.DEFAULT_DB_NAME, errata.DEFAULT_DB_USER, errata.DEFAULT_DB_PASSWORD,
-                        DB_HOSTNAME, errata.DEFAULT_DB_PORT)
+cursor = errata.init_db(os.getenv('POSTGRES_DB', errata.DEFAULT_DB_NAME), 
+                        os.getenv('POSTGRES_USER', errata.DEFAULT_DB_USER),
+                        os.getenv('POSTGRES_PASSWORD', errata.DEFAULT_DB_PASSWORD),
+                        os.getenv('POSTGRES_HOST', 'vmaas_db'), 
+                        os.getenv('POSTGRES_PORT', errata.DEFAULT_DB_PORT))
 
 
 class MainHandler(tornado.web.RequestHandler):
