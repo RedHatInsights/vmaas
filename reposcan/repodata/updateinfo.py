@@ -14,25 +14,25 @@ class UpdateInfoMD:
                 update["status"] = elem.get("status")
                 update["version"] = elem.get("version")
                 update["type"] = elem.get("type")
-                update["id"] = elem.find("id").text
-                update["title"] = elem.find("title").text
+                update["id"] = elem.find("id").text.strip()
+                update["title"] = elem.find("title").text.strip()
 
                 # Optional fields
                 summary = elem.find("summary")
                 if summary is not None:
-                    update["summary"] = summary.text
+                    update["summary"] = summary.text.strip()
                 else:
                     update["summary"] = None
 
                 rights = elem.find("rights")
                 if rights is not None:
-                    update["rights"] = rights.text
+                    update["rights"] = rights.text.strip()
                 else:
                     update["rights"] = None
 
                 description = elem.find("description")
                 if description is not None:
-                    update["description"] = description.text
+                    update["description"] = description.text.strip()
                 else:
                     update["description"] = None
 
@@ -50,19 +50,19 @@ class UpdateInfoMD:
 
                 release = elem.find("release")
                 if release is not None:
-                    update["release"] = release.text
+                    update["release"] = release.text.strip()
                 else:
                     update["release"] = None
 
                 solution = elem.find("solution")
                 if solution is not None:
-                    update["solution"] = solution.text
+                    update["solution"] = solution.text.strip()
                 else:
                     update["solution"] = None
 
                 severity = elem.find("severity")
                 if severity is not None:
-                    update["severity"] = severity.text
+                    update["severity"] = severity.text.strip()
                 else:
                     update["severity"] = None
 
