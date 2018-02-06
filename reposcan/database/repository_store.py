@@ -18,8 +18,8 @@ class RepositoryStore:
         repo_id = cur.fetchone()
         if not repo_id:
             # FIXME: add product logic
-            cur.execute("insert into repo (name, revision, eol) values (%s, to_timestamp(%s), false) returning id",
-                        (repo_url, revision,))
+            cur.execute("insert into repo (name, url, revision, eol) values (%s, %s, to_timestamp(%s), false) returning id",
+                        (repo_url, repo_url, revision,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
