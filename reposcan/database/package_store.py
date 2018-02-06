@@ -3,6 +3,8 @@ from psycopg2.extras import execute_values
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
 
+CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
+
 
 class PackageStore:
     def __init__(self):
@@ -37,6 +39,9 @@ class PackageStore:
             checksums[row[1]] = row[0]
         missing_checksum_types = set()
         for pkg in packages:
+            # Same checksum types can be called differently in different repositories, unify them before import
+            if pkg["checksum_type"] in CHECKSUM_TYPE_ALIASES:
+                pkg["checksum_type"] = CHECKSUM_TYPE_ALIASES[pkg["checksum_type"]]
             if pkg["checksum_type"] not in checksums:
                 missing_checksum_types.add((pkg["checksum_type"],))
         self.logger.log("Checksum types missing in DB: %d" % len(missing_checksum_types))
