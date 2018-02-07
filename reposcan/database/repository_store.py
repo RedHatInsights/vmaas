@@ -12,6 +12,16 @@ class RepositoryStore:
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
 
+    def list_repositories(self):
+        cur = self.conn.cursor()
+        cur.execute("select id, name, url, revision from repo")
+        repos = {}
+        for row in cur.fetchall():
+            # repo_name -> repo_id, repo_url, repo_revision
+            repos[row[1]] = {"id": row[0], "url": row[2], "revision": row[3]}
+        cur.close()
+        return repos
+
     def _import_repository(self, repo_url, revision):
         cur = self.conn.cursor()
         cur.execute("select id from repo where name = %s", (repo_url,))
@@ -29,10 +39,10 @@ class RepositoryStore:
         return repo_id[0]
 
     def store(self, repository):
-        self.logger.log("Syncing repository: %s" % repository.repo_url)
         if repository.repomd:
+            self.logger.log("Syncing repository: %s" % repository.repo_url)
             repo_id = self._import_repository(repository.repo_url, repository.repomd.get_revision())
             self.package_store.store(repo_id, repository.list_packages())
             self.update_store.store(repo_id, repository.list_updates())
         else:
-            self.logger.log("Unable to sync repository.")
+            self.logger.log("Skipping repository: %s" % repository.repo_url)

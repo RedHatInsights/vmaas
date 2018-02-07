@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from cli.logger import SimpleLogger
@@ -24,6 +25,7 @@ class RepositoryController:
         self.unpacker = FileUnpacker()
         self.repo_store = RepositoryStore()
         self.repository_batches = [[]]
+        self.db_repositories = {}
 
     def _download_repomds(self, batch):
         download_items = []
@@ -46,7 +48,14 @@ class RepositoryController:
         for repository in batch:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             if repomd_path not in failed:
-                repository.repomd = RepoMD(repomd_path)
+                repomd = RepoMD(repomd_path)
+                db_revision = self.db_repositories[repository.repo_url]["revision"]
+                downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
+                if downloaded_revision > db_revision:
+                    repository.repomd = repomd
+                else:
+                    self.logger.log("Downloaded repo %s (%s) is not newer than repo in DB (%s)." %
+                                    (repository.repo_url, str(downloaded_revision), str(db_revision)))
             else:
                 self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
                                 failed[repomd_path]))
@@ -114,6 +123,8 @@ class RepositoryController:
         last_batch.append(Repository(repo_url))
 
     def store(self):
+        # Fetch current list of repositories from DB
+        self.db_repositories = self.repo_store.list_repositories()
         for batch in self.repository_batches:
             failed = self._download_repomds(batch)
             self._read_repomds(batch, failed)
