@@ -2,19 +2,19 @@
 
 ### Build a new image:
 
-```docker build -t vmaas_db/postgresql:latest .```
+```docker build -t vmaas_db_img .```
 
 ### Create a container:
 
-```docker create -it -p 5432:5432 --name vmaas_db vmaas_db/postgresql```
+```docker create -it -p 5432:5432 --name vmaas_db_ctr vmaas_db_img```
 
 ### Start a container:
 
-```docker start vmaas_db```
+```docker start vmaas_db_ctr```
 
 ### Command to connect to database
 
-```docker exec -it vmaas_db psql -U vmaas_user --dbname vmaas```
+```docker exec -it vmaas_db_ctr psql -U vmaas_user --dbname vmaas```
 
 OR
 
@@ -22,7 +22,7 @@ OR
 
 ### Command to open shell in container
 
-```docker exec -it vmaas_db bash```
+```docker exec -it vmaas_db_ctr bash```
 
 
 
