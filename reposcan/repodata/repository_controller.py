@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from cli.logger import SimpleLogger
+from common.batch_list import BatchList
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
@@ -15,7 +16,6 @@ from repodata.updateinfo import UpdateInfoMD
 from repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
-BATCH_SIZE = 100
 
 
 class RepositoryController:
@@ -24,12 +24,12 @@ class RepositoryController:
         self.downloader = FileDownloader()
         self.unpacker = FileUnpacker()
         self.repo_store = RepositoryStore()
-        self.repository_batches = [[]]
+        self.repositories = set()
         self.db_repositories = {}
 
-    def _download_repomds(self, batch):
+    def _download_repomds(self):
         download_items = []
-        for repository in batch:
+        for repository in self.repositories:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             item = DownloadItem(
@@ -44,8 +44,11 @@ class RepositoryController:
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
 
-    def _read_repomds(self, batch, failed):
-        for repository in batch:
+    def _read_repomds(self, failed):
+        """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
+           newer than metadata currently in DB.
+        """
+        for repository in self.repositories:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             if repomd_path not in failed:
                 repomd = RepoMD(repomd_path)
@@ -62,16 +65,18 @@ class RepositoryController:
 
     def _download_metadata(self, batch):
         for repository in batch:
-            if repository.repomd:
-                try:
-                    repository.md_files["primary_db"] = repository.repomd.get_metadata("primary_db")["location"]
-                except RepoMDTypeNotFound:
-                    repository.md_files["primary"] = repository.repomd.get_metadata("primary")["location"]
-                try:
-                    repository.md_files["updateinfo"] = repository.repomd.get_metadata("updateinfo")["location"]
-                except RepoMDTypeNotFound:
-                    pass
+            # primary_db has higher priority, use primary.xml if not found
+            try:
+                repository.md_files["primary_db"] = repository.repomd.get_metadata("primary_db")["location"]
+            except RepoMDTypeNotFound:
+                repository.md_files["primary"] = repository.repomd.get_metadata("primary")["location"]
+            # updateinfo.xml may be missing completely
+            try:
+                repository.md_files["updateinfo"] = repository.repomd.get_metadata("updateinfo")["location"]
+            except RepoMDTypeNotFound:
+                pass
 
+            # queue metadata files for download
             for md_location in repository.md_files.values():
                 self.downloader.add(DownloadItem(
                     source_url=urljoin(repository.repo_url, md_location),
@@ -110,24 +115,34 @@ class RepositoryController:
             if repository.tmp_directory:
                 shutil.rmtree(repository.tmp_directory)
                 repository.tmp_directory = None
+            self.repositories.remove(repository)
 
     def add_repository(self, repo_url):
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        # Get last batch and append repository to it
-        last_batch = self.repository_batches[-1]
-        if len(last_batch) >= BATCH_SIZE:
-            last_batch = []
-            self.repository_batches.append(last_batch)
-        last_batch.append(Repository(repo_url))
+        self.repositories.add(Repository(repo_url))
 
     def store(self):
         # Fetch current list of repositories from DB
         self.db_repositories = self.repo_store.list_repositories()
-        for batch in self.repository_batches:
-            failed = self._download_repomds(batch)
-            self._read_repomds(batch, failed)
+
+        # Download all repomd files first
+        failed = self._download_repomds()
+        self._read_repomds(failed)
+
+        # Filter all repositories without repomd attribute set (failed download, downloaded repomd is not newer)
+        batches = BatchList()
+        to_skip = []
+        for repository in self.repositories:
+            if repository.repomd:
+                batches.add_item(repository)
+            else:
+                to_skip.append(repository)
+        self.clean_repodata(to_skip)
+
+        # Download repositories in batches (unpacked metadata files can consume lot of disk space)
+        for batch in batches:
             self._download_metadata(batch)
             self._unpack_metadata(batch)
             for repository in batch:
