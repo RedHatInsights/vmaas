@@ -106,11 +106,14 @@ class RepositoryController:
         self.repositories.add(Repository(repo_url))
 
     def store(self):
+        self.logger.log("Checking %d repositories." % len(self.repositories))
+
         # Fetch current list of repositories from DB
         self.db_repositories = self.repo_store.list_repositories()
 
         # Download all repomd files first
         failed = self._download_repomds()
+        self.logger.log("%d repomd.xml files failed to download." % len(failed))
         self._read_repomds(failed)
 
         # Filter all repositories without repomd attribute set (failed download, downloaded repomd is not newer)
@@ -122,8 +125,10 @@ class RepositoryController:
             else:
                 to_skip.append(repository)
         self.clean_repodata(to_skip)
+        self.logger.log("%d repositories skipped." % len(to_skip))
+        self.logger.log("Syncing %d repositories." % sum(len(l) for l in batches))
 
-        # Download repositories in batches (unpacked metadata files can consume lot of disk space)
+        # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         for batch in batches:
             self._download_metadata(batch)
             self._unpack_metadata(batch)
