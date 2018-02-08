@@ -1,17 +1,22 @@
 # VMaaS Database population tool
 
-### Script usage:
-
-```./reposcan.py -U myuser -P mypass -d myschema -r https://mirrors.nic.cz/fedora/linux/updates/27/x86_64/ -r https://dl.fedoraproject.org/pub/epel/7/x86_64/```
-
 ### Build a new image:
 
-```docker build -t vmaas-reposcan reposcan```
+```docker build -t vmaas_reposcan_img .```
+
+### Create a container
+
+```docker create -it --link vmaas_db_ctr:database --name vmaas_reposcan_ctr vmaas_reposcan_img```
 
 ### Start a container:
 
-```docker run --name vmaas-reposcan --link vmaas-pg:database -ti vmaas-reposcan  bash```
+```docker start vmaas_reposcan_ctr```
 
-### Run reposcan in container:
+### Run bash in container:
+
+```docker exec -it vmaas_reposcan_ctr bash```
+
+
+### reposcan.py is starting with container, for manual run use:
 
 ```cd /vmaas-reposcan && ./reposcan.py -d $POSTGRES_DB -H $POSTGRES_HOST -U $POSTGRES_USER -P $POSTGRES_PASSWORD -r https://dl.fedoraproject.org/pub/fedora/linux/releases/25/Server/x86_64/os/```
