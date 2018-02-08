@@ -1,4 +1,7 @@
 from cli.logger import SimpleLogger
+from repodata.primary import PrimaryMD
+from repodata.primary_db import PrimaryDatabaseMD
+from repodata.updateinfo import UpdateInfoMD
 
 
 class Repository:
@@ -30,3 +33,16 @@ class Repository:
                 return [u for u in self.updateinfo.list_updates() if u["type"] == update_type]
             return self.updateinfo.list_updates()
         return []
+
+    def load_metadata(self):
+        for md_type in self.md_files:
+            if md_type == "primary_db":
+                self.primary = PrimaryDatabaseMD(self.md_files["primary_db"])
+            elif md_type == "primary":
+                self.primary = PrimaryMD(self.md_files["primary"])
+            elif md_type == "updateinfo":
+                self.updateinfo = UpdateInfoMD(self.md_files["updateinfo"])
+
+    def unload_metadata(self):
+        self.primary = None
+        self.updateinfo = None
