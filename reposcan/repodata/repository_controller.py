@@ -10,9 +10,6 @@ from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
-from repodata.primary import PrimaryMD
-from repodata.primary_db import PrimaryDatabaseMD
-from repodata.updateinfo import UpdateInfoMD
 from repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
@@ -95,21 +92,6 @@ class RepositoryController:
                     os.path.basename(repository.md_files[md_type])).rsplit(".", maxsplit=1)[0]
         self.unpacker.run()
 
-    @staticmethod
-    def _load_metadata(repository):
-        for md_type in repository.md_files:
-            if md_type == "primary_db":
-                repository.primary = PrimaryDatabaseMD(repository.md_files["primary_db"])
-            elif md_type == "primary":
-                repository.primary = PrimaryMD(repository.md_files["primary"])
-            elif md_type == "updateinfo":
-                repository.updateinfo = UpdateInfoMD(repository.md_files["updateinfo"])
-
-    @staticmethod
-    def _unload_metadata(repository):
-        repository.primary = None
-        repository.updateinfo = None
-
     def clean_repodata(self, batch):
         for repository in batch:
             if repository.tmp_directory:
@@ -146,7 +128,7 @@ class RepositoryController:
             self._download_metadata(batch)
             self._unpack_metadata(batch)
             for repository in batch:
-                self._load_metadata(repository)
+                repository.load_metadata()
                 self.repo_store.store(repository)
-                self._unload_metadata(repository)
+                repository.unload_metadata()
             self.clean_repodata(batch)
