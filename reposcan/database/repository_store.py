@@ -39,10 +39,7 @@ class RepositoryStore:
         return repo_id[0]
 
     def store(self, repository):
-        if repository.repomd:
-            self.logger.log("Syncing repository: %s" % repository.repo_url)
-            repo_id = self._import_repository(repository.repo_url, repository.repomd.get_revision())
-            self.package_store.store(repo_id, repository.list_packages())
-            self.update_store.store(repo_id, repository.list_updates())
-        else:
-            self.logger.log("Skipping repository: %s" % repository.repo_url)
+        self.logger.log("Syncing repository: %s" % repository.repo_url)
+        repo_id = self._import_repository(repository.repo_url, repository.repomd.get_revision())
+        self.package_store.store(repo_id, repository.list_packages())
+        self.update_store.store(repo_id, repository.list_updates())
