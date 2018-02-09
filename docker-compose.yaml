@@ -1,0 +1,35 @@
+version: '2'
+services:
+  database:
+    container_name: vmaas_database
+    build: ./database
+    image: vmaas_database_img
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: 'vmaas_user'
+      POSTGRES_PASSWORD: 'vmaas_passwd'
+      POSTGRES_DB: 'vmaas'
+    ports:
+      - 5432:5432
+
+  reposcan:
+    container_name: vmaas_reposcan
+    build: ./reposcan
+    image: vmaas_reposcan_img
+    restart: unless-stopped
+    depends_on:
+      - database
+    links:
+      - database
+
+  webapp:
+    container_name: vmaas_webapp
+    build: ./webapp
+    image: vmaas_webapp_img
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    links:
+      - database
