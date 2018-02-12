@@ -5,10 +5,8 @@ services:
     build: ./database
     image: vmaas_database_img
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: 'vmaas_user'
-      POSTGRES_PASSWORD: 'vmaas_passwd'
-      POSTGRES_DB: 'vmaas'
+    env_file:
+      - ./docker-compose.env
     ports:
       - 5432:5432
 
@@ -17,6 +15,8 @@ services:
     build: ./reposcan
     image: vmaas_reposcan_img
     restart: unless-stopped
+    env_file:
+      - ./docker-compose.env
     depends_on:
       - database
     links:
@@ -27,6 +27,8 @@ services:
     build: ./webapp
     image: vmaas_webapp_img
     restart: unless-stopped
+    env_file:
+      - ./docker-compose.env
     ports:
       - 8080:8080
     depends_on:

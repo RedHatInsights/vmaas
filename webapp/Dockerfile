@@ -1,6 +1,7 @@
 FROM centos:centos7
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
+# defaults; will be overwritten by docker-compose.env
 ENV POSTGRES_HOST=database
 ENV POSTGRES_PORT=5432
 ENV POSTGRES_USER=vmaas_user
