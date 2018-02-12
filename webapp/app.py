@@ -42,13 +42,48 @@ class JsonHandler(tornado.web.RequestHandler):
 
     def post(self):
         json_data = self.request.files['file'][0]['body']
+        response = {
+            'package_list': {},
+            'errata_list': {},
+            'repo_list': {},
+            'nevra_list': {},
+            'bugzilla_list': {},
+            'cve_list': {}
+        }
+
+        # fill response with packages
         try:
             data = ujson.loads(json_data)
             for pkg in sorted(set(data['package_list'])):
                 if pkg and pkg.strip():
-                    self.write(str(errata.process(pkg, cursor)))
+                    # put empty list of updates for a pkg
+                    # and then add real packages if they exist
+                    response['package_list'][pkg] = []
+
+                    update_pkgs = errata.process(pkg, cursor)
+                    for up_dict in update_pkgs:
+                        triple = []
+
+                        pack_name = up_dict['name']
+                        if up_dict['epoch'] != '0':
+                            pack_name += ':' + up_dict['epoch']
+                        pack_name += '-' + up_dict['version'] + '-' + up_dict['release']
+
+                        triple.append(pack_name)
+                        triple.append(up_dict['advisory_name'])
+                        triple.append(up_dict['repo_name'])
+
+                        response['package_list'][pkg].append(triple)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
+
+        # TODO: fill response with errata
+
+        # TODO: fill response with CVEs
+
+        # TODO: fill response with repos
+
+        self.write(ujson.dumps(response))
 
 
 class Application(tornado.web.Application):
