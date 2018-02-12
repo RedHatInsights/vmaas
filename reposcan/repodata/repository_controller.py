@@ -49,9 +49,14 @@ class RepositoryController:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             if repomd_path not in failed:
                 repomd = RepoMD(repomd_path)
-                db_revision = self.db_repositories[repository.repo_url]["revision"]
+                # Was repository already synced before?
+                if repository.repo_url in self.db_repositories:
+                    db_revision = self.db_repositories[repository.repo_url]["revision"]
+                else:
+                    db_revision = None
                 downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
-                if downloaded_revision > db_revision:
+                # Repository is synced for the first time or has newer revision
+                if db_revision is None or downloaded_revision > db_revision:
                     repository.repomd = repomd
                 else:
                     self.logger.log("Downloaded repo %s (%s) is not newer than repo in DB (%s)." %
