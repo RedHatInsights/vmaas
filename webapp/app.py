@@ -8,8 +8,12 @@ import errata
 import sys
 import os
 
-EXAMPLE_MSG = """Example: <br /> curl -F file=@/path/to/plaintext_file http://hostname:8080/api/v1/plain/ <br />
-                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/json/
+EXAMPLE_MSG = """Example of passing input data as a file: <br />
+                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/json/ <br /> <br />
+                 
+                 Example of passing imput data as a body of POST request: <br />
+                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/json/
+                 
               """
 
 cursor = errata.init_db(os.getenv('POSTGRES_DB', errata.DEFAULT_DB_NAME), 
@@ -41,7 +45,14 @@ class JsonHandler(tornado.web.RequestHandler):
         self.write('')
 
     def post(self):
-        json_data = self.request.files['file'][0]['body']
+        # extract input JSON from POST request
+        json_data = ''
+        # check if JSON is passed as a file or as a body of POST request
+        if self.request.files:
+            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
+        elif self.request.body:
+            json_data = self.request.body
+
         response = {
             'package_list': {},
             'errata_list': {},
