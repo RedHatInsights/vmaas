@@ -113,7 +113,7 @@ returns all advisories which are linked to the upgradeable packages and have ass
 """
 def get_erratas(cur, packages):
     the_sql = """
-    select e.name as advisory_name, pe.pkg_id from errata e join pkg_errata pe on e.id = pe.errata_id join errata_cve ec on e.id = ec.errata_id where pe.pkg_id in %(packages)s
+    select e.name as advisory_name, pe.pkg_id from errata e join pkg_errata pe on e.id = pe.errata_id where pe.pkg_id in %(packages)s and exists (select 1 from errata_cve where errata_id = e.id)
     """
     cur.execute(the_sql, {'packages' : packages})
     res = [_dict(x, cur.description) for x in cur.fetchall()]
@@ -124,7 +124,7 @@ similar to get_erratas with addition of repository and nevra of the package
 """
 def get_all(cur, packages):
     the_sql = """
-    select e.name as advisory_name, pe.pkg_id, evr.epoch, evr.version, evr.release, r.name as repo_name from errata e join pkg_errata pe on e.id = pe.errata_id join errata_cve ec on e.id = ec.errata_id left join package p on pe.pkg_id = p.id join evr on p.evr_id = evr.id left join pkg_repo pr on pr.pkg_id = p.id join repo r on r.id = pr.repo_id where pe.pkg_id in %(packages)s
+    select e.name as advisory_name, pe.pkg_id, evr.epoch, evr.version, evr.release, r.name as repo_name from errata e join pkg_errata pe on e.id = pe.errata_id left join package p on pe.pkg_id = p.id join evr on p.evr_id = evr.id left join pkg_repo pr on pr.pkg_id = p.id join repo r on r.id = pr.repo_id where pe.pkg_id in %(packages)s and exists (select 1 from errata_cve where errata_id = e.id)
     """
     cur.execute(the_sql, {'packages' : packages})
     res = [_dict(x, cur.description) for x in cur.fetchall()]
