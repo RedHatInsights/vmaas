@@ -20,4 +20,4 @@ RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
            /vmaas-reposcan/repodata/test 
 
 
-CMD ["bash", "/vmaas-reposcan/dummy_crawler.sh"]
+CMD ["/vmaas-reposcan/wait-for-postgres.sh", "/vmaas-reposcan/dummy_crawler.sh"]
