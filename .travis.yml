@@ -1,0 +1,17 @@
+branches:
+  only:
+    - master
+language: python
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+matrix:
+  allow_failures:
+    - python: "2.7"        
+notifications:
+  email: false
+install:
+  - pip install pylint psycopg2 requests
+script:
+  - /bin/bash reposcan/run_tests.sh
