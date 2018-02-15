@@ -2,7 +2,6 @@
 Unit test classes for repository module.
 """
 import unittest
-from repodata.repomd import RepoMD
 from repodata.primary import PrimaryMD
 from repodata.primary_db import PrimaryDatabaseMD
 from repodata.updateinfo import UpdateInfoMD
@@ -14,7 +13,6 @@ class TestRepository(unittest.TestCase):
     """Test Repository class."""
     def setUp(self):
         """Setup example files."""
-        repomd = RepoMD("test_data/repodata/repomd.xml")
         primary_db = PrimaryDatabaseMD("test_data/repodata/primary_db.sqlite")
         primary = PrimaryMD("test_data/repodata/primary.xml")
         updateinfo = UpdateInfoMD("test_data/repodata/updateinfo.xml")
