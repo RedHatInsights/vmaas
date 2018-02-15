@@ -11,7 +11,7 @@ THREADS = 8
 VALID_HTTP_CODES = [200]
 
 
-class DownloadItem:
+class DownloadItem: # pylint: disable=too-few-public-methods
     """
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
     and result HTTP status code of the download operation.
