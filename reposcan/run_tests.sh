@@ -29,7 +29,7 @@ $py_cmd -m unittest discover -v
 rc=$(($rc+$?))
 
 # Run pylint
-find . -iname '*.py' | xargs pylint
+find . -iname '*.py' | xargs pylint --rcfile=pylintrc
 rc=$(($rc+$?))
 
 exit $rc
