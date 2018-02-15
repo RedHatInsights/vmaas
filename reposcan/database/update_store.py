@@ -102,7 +102,8 @@ class UpdateStore:
             for pkg in update["pkglist"]:
                 nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
                 if nevra not in nevras_in_repo:
-                    self.logger.log("NEVRA associated with %s not found in repository: (%s)" % (update["id"], ",".join(nevra)))
+                    self.logger.log("NEVRA associated with %s not found in repository: (%s)" %
+                                    (update["id"], ",".join(nevra)))
                     continue
                 package_id = nevras_in_repo[nevra]
                 if update_id in update_to_packages and package_id in update_to_packages[update_id]:
