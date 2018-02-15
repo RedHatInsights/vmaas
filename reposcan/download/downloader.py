@@ -82,7 +82,7 @@ class FileDownloader:
             thread.start()
             threads.append(thread)
 
-        for i, t in enumerate(threads):
-            t.join()
+        for i, thread in enumerate(threads):
+            thread.join()
             self.logger.log("Stopping thread %d." % i)
         self.logger.log("Downloading finished.")
