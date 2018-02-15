@@ -1,24 +1,17 @@
 """
 Unit test classes for primary_db module.
 """
-import unittest
 from sqlite3 import OperationalError
 from repodata.primary_db import PrimaryDatabaseMD
 
+from repodata.test.test_primary import TestPrimaryMD
 
-class TestPrimaryDatabaseMD(unittest.TestCase):
+
+class TestPrimaryDatabaseMD(TestPrimaryMD):
     """Test PrimaryDatabaseMD class."""
     def setUp(self):
         """Setup example primary_db file."""
         self.primary_db = PrimaryDatabaseMD("test_data/repodata/primary_db.sqlite")
-
-    def _test_package(self, pkg):
-        intended_fields = ["name", "epoch", "ver", "rel", "arch", "checksum_type", "checksum"]
-        actual_fields = pkg.keys()
-        for field in intended_fields:
-            self.assertTrue(field in actual_fields)
-        for field in actual_fields:
-            self.assertTrue(field in intended_fields)
 
     def test_invalid_file(self):
         """Test case when file doesn't exist or is invalid."""
