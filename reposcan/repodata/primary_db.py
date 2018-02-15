@@ -1,7 +1,11 @@
+"""
+Module containing class for Primary SQLite metadata.
+"""
 import sqlite3
 
 
 class PrimaryDatabaseMD:
+    """Class parsing Primary SQLite. Takes filename in the constructor."""
     def __init__(self, filename):
         self.packages = []
         conn = sqlite3.connect(filename)
@@ -20,7 +24,9 @@ class PrimaryDatabaseMD:
         conn.close()
 
     def get_package_count(self):
+        """Returns count of packages in Primary SQLite file."""
         return len(self.packages)
 
     def list_packages(self):
+        """Returns list of parsed packages (list of dictionaries)."""
         return self.packages

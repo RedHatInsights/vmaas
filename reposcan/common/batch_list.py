@@ -1,3 +1,6 @@
+"""
+Module containing class for list of batches.
+"""
 DEFAULT_BATCH_SIZE = 100
 
 
@@ -12,9 +15,11 @@ class BatchList:
         return iter(self.batches)
 
     def clear(self):
+        """Clear all previously added items."""
         self.batches = []
 
     def add_item(self, item):
+        """Add item into the last batch. Create new batch if there is no batch or last batch is full."""
         if len(self.batches) > 0:
             last_batch = self.batches[-1]
         else:

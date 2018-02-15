@@ -1,3 +1,6 @@
+"""
+Module containing class for syncing set of repositories into the DB.
+"""
 import os
 import shutil
 import tempfile
@@ -16,6 +19,11 @@ REPOMD_PATH = "repodata/repomd.xml"
 
 
 class RepositoryController:
+    """
+    Class for importing/syncing set of repositories into the DB.
+    First, repomd from all repositories are downloaded and parsed.
+    Second, primary and updateinfo repodata from repositories needing update are downloaded, parsed and imported.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.downloader = FileDownloader()
@@ -98,6 +106,7 @@ class RepositoryController:
         self.unpacker.run()
 
     def clean_repodata(self, batch):
+        """Clean downloaded repodata of all repositories in batch."""
         for repository in batch:
             if repository.tmp_directory:
                 shutil.rmtree(repository.tmp_directory)
@@ -105,12 +114,14 @@ class RepositoryController:
             self.repositories.remove(repository)
 
     def add_repository(self, repo_url):
+        """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
         self.repositories.add(Repository(repo_url))
 
     def store(self):
+        """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""
         self.logger.log("Checking %d repositories." % len(self.repositories))
 
         # Fetch current list of repositories from DB

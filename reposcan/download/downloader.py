@@ -1,3 +1,6 @@
+"""
+Module containing classes for downloading files using HTTP.
+"""
 from threading import Thread
 from queue import Queue, Empty
 import requests
@@ -9,6 +12,10 @@ VALID_HTTP_CODES = [200]
 
 
 class DownloadItem:
+    """
+    Basic download structure storing source HTTP URL, target file path where to save downloaded file
+    and result HTTP status code of the download operation.
+    """
     def __init__(self, source_url=None, target_path=None):
         self.source_url = source_url
         self.target_path = target_path
@@ -16,6 +23,10 @@ class DownloadItem:
 
 
 class FileDownloadThread(Thread):
+    """
+    Single thread for downloading files. After it's created, it processes DownloadItem objects from queue shared
+    between all threads. Thread will end when shared queue is empty.
+    """
     def __init__(self, queue, logger):
         Thread.__init__(self)
         self.queue = queue
@@ -33,6 +44,7 @@ class FileDownloadThread(Thread):
                 download_item.status_code = response.status_code
 
     def run(self):
+        """Method executed after thread start. Downloads items from shared queue as long as there are any."""
         while not self.queue.empty():
             try:
                 download_item = self.queue.get(block=False)
@@ -46,14 +58,21 @@ class FileDownloadThread(Thread):
 
 
 class FileDownloader:
+    """
+    Main downloader class. Contains queue of items to download. Once download is triggered, certain number
+    of download threads is created. Downloader is waiting until download queue is empty and all child threads
+    are finished.
+    """
     def __init__(self):
         self.queue = Queue()
         self.logger = SimpleLogger()
 
     def add(self, download_item):
+        """Add DownloadItem object into the queue."""
         self.queue.put(download_item)
 
     def run(self):
+        """Start processing download queue using multiple threads."""
         self.logger.log("Downloading started.")
         threads = []
         for i in range(min(THREADS, self.queue.qsize())):

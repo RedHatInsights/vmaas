@@ -1,3 +1,6 @@
+"""
+Module containing classes for fetching/importing repositories from/into database.
+"""
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
 from database.package_store import PackageStore
@@ -5,6 +8,9 @@ from database.update_store import UpdateStore
 
 
 class RepositoryStore:
+    """
+    Class providing interface for listing repositories stored in DB and storing repositories one by one.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.repositories = []
@@ -13,6 +19,7 @@ class RepositoryStore:
         self.update_store = UpdateStore()
 
     def list_repositories(self):
+        """List repositories stored in DB. Dictionary with repository name as key is returned."""
         cur = self.conn.cursor()
         cur.execute("select id, name, url, revision from repo")
         repos = {}
@@ -39,6 +46,11 @@ class RepositoryStore:
         return repo_id[0]
 
     def store(self, repository):
+        """
+        Store single repository into DB.
+        First, basic repository info is processed, then all packages, then all updates.
+        Some steps may be skipped if given data doesn't exist or are already synced.
+        """
         self.logger.log("Syncing repository: %s" % repository.repo_url)
         repo_id = self._import_repository(repository.repo_url, repository.repomd.get_revision())
         self.package_store.store(repo_id, repository.list_packages())

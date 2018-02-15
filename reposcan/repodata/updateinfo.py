@@ -1,7 +1,11 @@
+"""
+Module containing class for UpdateInfo XML metadata.
+"""
 import xml.etree.ElementTree as eT
 
 
 class UpdateInfoMD:
+    """Class parsing UpdateInfo XML. Takes filename in the constructor."""
     def __init__(self, filename):
         self.updates = []
         root = None
@@ -92,4 +96,5 @@ class UpdateInfoMD:
                 root.clear()
 
     def list_updates(self):
+        """Returns list of parsed updates (list of dictionaries)."""
         return self.updates

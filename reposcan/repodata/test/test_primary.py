@@ -1,9 +1,13 @@
+"""
+Unit test classes for primary module.
+"""
 import unittest
 from xml.etree.ElementTree import ParseError
 from repodata.primary import PrimaryMD
 
 
 class TestPrimaryMD(unittest.TestCase):
+    """Test PrimaryMD class."""
     def setUp(self):
         """Setup example primary file."""
         self.primary = PrimaryMD("test_data/repodata/primary.xml")
@@ -17,12 +21,14 @@ class TestPrimaryMD(unittest.TestCase):
             self.assertTrue(field in intended_fields)
 
     def test_invalid_file(self):
+        """Test case when file doesn't exist or is invalid."""
         with self.assertRaises(FileNotFoundError):
             PrimaryMD("/file/does/not/exist")
         with self.assertRaises(ParseError):
             PrimaryMD("/dev/null")
 
     def test_packages(self):
+        """Test parsed package metadata fields and counts."""
         pkg_count = self.primary.get_package_count()
         packages = self.primary.list_packages()
         # Package count read from field and number of actually parsed packages should be same

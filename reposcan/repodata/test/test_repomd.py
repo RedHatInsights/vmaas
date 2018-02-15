@@ -1,9 +1,13 @@
+"""
+Unit test classes for repomd module.
+"""
 import unittest
 from xml.etree.ElementTree import ParseError
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 
 
 class TestRepoMD(unittest.TestCase):
+    """Test RepoMD class."""
     def setUp(self):
         """Setup two repomd files. First with all sections. Second with primary section only.
         """
@@ -11,6 +15,7 @@ class TestRepoMD(unittest.TestCase):
         self.repomd_primary_only = RepoMD("test_data/repodata/repomd_primary_only.xml")
 
     def test_revision(self):
+        """Test getting revision timestamp."""
         self.assertIsInstance(self.repomd.get_revision(), int)
         self.assertIsInstance(self.repomd_primary_only.get_revision(), int)
         self.assertEqual(self.repomd.get_revision(), self.repomd_primary_only.get_revision())
@@ -26,12 +31,14 @@ class TestRepoMD(unittest.TestCase):
         self.assertIsInstance(md["size"], int)
 
     def test_invalid_file(self):
+        """Test case when file doesn't exist or is invalid."""
         with self.assertRaises(FileNotFoundError):
             RepoMD("/file/does/not/exist")
         with self.assertRaises(ParseError):
             RepoMD("/dev/null")
 
     def test_get_primary(self):
+        """Test getting primary metadata info."""
         primary1 = self.repomd.get_metadata("primary")
         self._test_repomd(primary1)
 
@@ -39,6 +46,7 @@ class TestRepoMD(unittest.TestCase):
         self._test_repomd(primary2)
 
     def test_get_updateinfo(self):
+        """Test getting updateinfo metadata info."""
         updateinfo1 = self.repomd.get_metadata("updateinfo")
         self._test_repomd(updateinfo1)
 

@@ -1,9 +1,13 @@
+"""
+Unit test classes for primary_db module.
+"""
 import unittest
 from sqlite3 import OperationalError
 from repodata.primary_db import PrimaryDatabaseMD
 
 
 class TestPrimaryDatabaseMD(unittest.TestCase):
+    """Test PrimaryDatabaseMD class."""
     def setUp(self):
         """Setup example primary_db file."""
         self.primary_db = PrimaryDatabaseMD("test_data/repodata/primary_db.sqlite")
@@ -17,11 +21,13 @@ class TestPrimaryDatabaseMD(unittest.TestCase):
             self.assertTrue(field in intended_fields)
 
     def test_invalid_file(self):
+        """Test case when file doesn't exist or is invalid."""
         with self.assertRaises(OperationalError):
             PrimaryDatabaseMD("/file/does/not/exist")
             PrimaryDatabaseMD("/dev/null")
 
     def test_packages(self):
+        """Test parsed package metadata fields and counts."""
         self.assertGreater(self.primary_db.get_package_count(), 0)
         packages = self.primary_db.list_packages()
         # Test fields of packages in list
