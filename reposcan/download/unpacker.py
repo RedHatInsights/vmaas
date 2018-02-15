@@ -32,8 +32,7 @@ class FileUnpacker:
             return lzma.open
         elif file_path.endswith(".bz2"):
             return bz2.open
-        else:
-            return None
+        return None
 
     def _unpack(self, file_path):
         unpack_func = self._get_unpack_func(file_path)
