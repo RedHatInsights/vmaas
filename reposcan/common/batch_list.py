@@ -20,7 +20,7 @@ class BatchList:
 
     def add_item(self, item):
         """Add item into the last batch. Create new batch if there is no batch or last batch is full."""
-        if len(self.batches) > 0:
+        if self.batches:
             last_batch = self.batches[-1]
         else:
             last_batch = None
