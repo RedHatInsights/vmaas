@@ -7,7 +7,7 @@ from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
 
 
-class UpdateStore:
+class UpdateStore: # pylint: disable=too-few-public-methods
     """
     Class providing interface for storing updates and related info.
     All updates from repository are imported to the DB at once.

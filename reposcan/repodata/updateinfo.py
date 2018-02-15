@@ -4,7 +4,7 @@ Module containing class for UpdateInfo XML metadata.
 import xml.etree.ElementTree as eT
 
 
-class UpdateInfoMD:
+class UpdateInfoMD: # pylint: disable=too-few-public-methods
     """Class parsing UpdateInfo XML. Takes filename in the constructor."""
     def __init__(self, filename):
         self.updates = []
