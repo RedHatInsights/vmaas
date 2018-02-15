@@ -10,8 +10,8 @@ class PrimaryDatabaseMD:
         self.packages = []
         conn = sqlite3.connect(filename)
         conn.row_factory = sqlite3.Row
-        c = conn.cursor()
-        for row in c.execute("select name, epoch, version, release, arch, checksum_type, pkgid from packages"):
+        cur = conn.cursor()
+        for row in cur.execute("select name, epoch, version, release, arch, checksum_type, pkgid from packages"):
             self.packages.append({
                 "name": row["name"],
                 "epoch": row["epoch"],
