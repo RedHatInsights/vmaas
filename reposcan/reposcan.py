@@ -1,11 +1,16 @@
 #!/usr/bin/python3
+"""
+Main executable for reposcan tool. It allows to sync specified repositories into specified PostgreSQL database.
+"""
 
 from argparse import ArgumentParser
 
 from database.database_handler import DatabaseHandler
 from repodata.repository_controller import RepositoryController
 
-if __name__ == '__main__':
+
+def main():
+    """Main function."""
     parser = ArgumentParser()
     parser.add_argument("-d", "--db-name", action="store", help="Database name (default 'vmaas').",
                         default="vmaas")
@@ -38,3 +43,6 @@ if __name__ == '__main__':
             for line in repo_file.readlines():
                 repository_controller.add_repository(line)
     repository_controller.store()
+
+if __name__ == '__main__':
+    main()
