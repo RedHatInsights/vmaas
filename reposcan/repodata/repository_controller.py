@@ -71,7 +71,7 @@ class RepositoryController:
                                     (repository.repo_url, str(downloaded_revision), str(db_revision)))
             else:
                 self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
-                                failed[repomd_path]))
+                                                                        failed[repomd_path]))
 
     def _download_metadata(self, batch):
         for repository in batch:
