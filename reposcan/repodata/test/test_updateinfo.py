@@ -1,3 +1,6 @@
+"""
+Unit test classes for updateinfo module.
+"""
 import unittest
 from xml.etree.ElementTree import ParseError
 from repodata.updateinfo import UpdateInfoMD
@@ -6,6 +9,7 @@ KNOWN_UPDATE_TYPES = ["security", "bugfix", "enhancement", "newpackage"]
 
 
 class TestUpdateInfoMD(unittest.TestCase):
+    """Test UpdateInfoMD class."""
     def setUp(self):
         """Setup example updateinfo file."""
         self.updateinfo = UpdateInfoMD("test_data/repodata/updateinfo.xml")
@@ -48,12 +52,14 @@ class TestUpdateInfoMD(unittest.TestCase):
         self.assertTrue(update["type"] in KNOWN_UPDATE_TYPES)
 
     def test_invalid_file(self):
+        """Test case when file doesn't exist or is invalid."""
         with self.assertRaises(FileNotFoundError):
             UpdateInfoMD("/file/does/not/exist")
         with self.assertRaises(ParseError):
             UpdateInfoMD("/dev/null")
 
     def test_updates(self):
+        """Test parsed updates metadata fields and counts."""
         updates = self.updateinfo.list_updates()
         # Test fields of updates in list
         for update in updates:

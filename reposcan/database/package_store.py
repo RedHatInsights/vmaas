@@ -1,3 +1,6 @@
+"""
+Module containing classes for fetching/importing packages from/into database.
+"""
 from psycopg2.extras import execute_values
 
 from cli.logger import SimpleLogger
@@ -7,6 +10,10 @@ CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
 
 
 class PackageStore:
+    """
+    Class providing interface for storing packages and related info.
+    All packages from repository are imported to the DB at once.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.conn = DatabaseHandler.get_connection()
@@ -154,6 +161,9 @@ class PackageStore:
         self.conn.commit()
 
     def store(self, repo_id, packages):
+        """
+        Import all packages from repository into all related DB tables.
+        """
         self.logger.log("Syncing %d packages." % len(packages))
         package_map = self._populate_packages(packages)
         self._associate_packages(package_map, repo_id)

@@ -1,3 +1,6 @@
+"""
+Unit test classes for repository module.
+"""
 import unittest
 from repodata.repomd import RepoMD
 from repodata.primary import PrimaryMD
@@ -8,6 +11,7 @@ from repodata.test.test_updateinfo import KNOWN_UPDATE_TYPES
 
 
 class TestRepository(unittest.TestCase):
+    """Test Repository class."""
     def setUp(self):
         """Setup example files."""
         repomd = RepoMD("test_data/repodata/repomd.xml")
@@ -25,6 +29,7 @@ class TestRepository(unittest.TestCase):
         self.repository_primary_xml.updateinfo = updateinfo
 
     def test_counting(self):
+        """Test counts of packages from parsed primary and primary_db."""
         # Package count should be same in all repositories
         self.assertGreater(self.repository.get_package_count(), 0)
         self.assertGreater(self.repository_without_updateinfo.get_package_count(), 0)
@@ -47,5 +52,6 @@ class TestRepository(unittest.TestCase):
             self.assertEqual(self.repository_without_updateinfo.get_update_count(update_type=update_type), 0)
 
     def test_listing(self):
+        """Test package and update methods."""
         self.assertEqual(len(self.repository.list_packages()), self.repository.get_package_count())
         self.assertEqual(len(self.repository.list_updates()), self.repository.get_update_count())

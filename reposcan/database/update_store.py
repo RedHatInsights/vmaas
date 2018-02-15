@@ -1,3 +1,6 @@
+"""
+Module containing classes for fetching/importing updates from/into database.
+"""
 from psycopg2.extras import execute_values
 
 from cli.logger import SimpleLogger
@@ -5,6 +8,10 @@ from database.database_handler import DatabaseHandler
 
 
 class UpdateStore:
+    """
+    Class providing interface for storing updates and related info.
+    All updates from repository are imported to the DB at once.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.conn = DatabaseHandler.get_connection()
@@ -223,6 +230,9 @@ class UpdateStore:
         self.conn.commit()
 
     def store(self, repo_id, updates):
+        """
+        Import all updates from repository into all related DB tables.
+        """
         self.logger.log("Syncing %d updates." % len(updates))
         update_map = self._populate_updates(updates)
         self._associate_packages(updates, update_map, repo_id)

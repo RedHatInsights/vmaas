@@ -1,9 +1,14 @@
+"""
+Module containing class for Primary XML metadata.
+"""
+
 import xml.etree.ElementTree as eT
 
 NS = {"primary": "http://linux.duke.edu/metadata/common"}
 
 
 class PrimaryMD:
+    """Class parsing Primary XML. Takes filename in the constructor."""
     def __init__(self, filename):
         self.package_count = 0
         self.packages = []
@@ -29,7 +34,9 @@ class PrimaryMD:
                     root.clear()
 
     def get_package_count(self):
+        """Returns count of packages in Primary file."""
         return self.package_count
 
     def list_packages(self):
+        """Returns list of parsed packages (list of dictionaries)."""
         return self.packages

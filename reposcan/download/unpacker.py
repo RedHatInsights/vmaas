@@ -1,3 +1,6 @@
+"""
+Module containing classes for decompressing files.
+"""
 import os
 import gzip
 import lzma
@@ -8,11 +11,17 @@ CHUNK_SIZE = 1048576
 
 
 class FileUnpacker:
+    """
+    Class unpacking queued files.
+    Files to unpack are collected and then all unpacked at once into their locations.
+    Gz, Xz, Bz2 formats are supported.
+    """
     def __init__(self):
         self.queue = []
         self.logger = SimpleLogger()
 
     def add(self, file_path):
+        """Add compressed file path to queue."""
         self.queue.append(file_path)
 
     @staticmethod
@@ -43,6 +52,7 @@ class FileUnpacker:
             self.logger.log("%s skipped.")
 
     def run(self):
+        """Unpack all queued file paths."""
         self.logger.log("Unpacking started.")
         for file_path in self.queue:
             self._unpack(file_path)
