@@ -16,6 +16,47 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         self.logger = SimpleLogger()
         self.conn = DatabaseHandler.get_connection()
 
+    def _get_nevras_in_repo(self, repo_id):
+        cur = self.conn.cursor()
+        # Select all packages synced from current repository and save them to dict accessible by NEVRA
+        nevras_in_repo = {}
+        cur.execute("""select p.id, p.name, evr.epoch, evr.version, evr.release, a.name
+                               from package p inner join
+                                    evr on p.evr_id = evr.id inner join
+                                    arch a on p.arch_id = a.id inner join
+                                    pkg_repo pr on p.id = pr.pkg_id and pr.repo_id = %s""", (repo_id,))
+        for row in cur.fetchall():
+            nevras_in_repo[(row[1], row[2], row[3], row[4], row[5])] = row[0]
+        cur.close()
+        return nevras_in_repo
+
+    def _get_associations_todo(self, repo_id, updates, update_map, update_to_packages):
+        nevras_in_repo = self._get_nevras_in_repo(repo_id)
+        to_associate = []
+        for update in updates:
+            update_id = update_map[update["id"]]
+            for pkg in update["pkglist"]:
+                nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
+                if nevra not in nevras_in_repo:
+                    self.logger.log("NEVRA associated with %s not found in repository: (%s)" %
+                                    (update["id"], ",".join(nevra)))
+                    continue
+                package_id = nevras_in_repo[nevra]
+                if update_id in update_to_packages and package_id in update_to_packages[update_id]:
+                    # Already associated, remove from set
+                    update_to_packages[update_id].remove(package_id)
+                else:
+                    # Not associated -> associate
+                    to_associate.append((package_id, update_id))
+
+        # Disassociate rest of package IDs
+        to_disassociate = []
+        for update_id in update_to_packages:
+            for package_id in update_to_packages[update_id]:
+                to_disassociate.append((package_id, update_id))
+
+        return to_associate, to_disassociate
+
     def _populate_severities(self, updates):
         severities = {}
         cur = self.conn.cursor()
@@ -72,16 +113,6 @@ class UpdateStore: # pylint: disable=too-few-public-methods
 
     def _associate_packages(self, updates, update_map, repo_id):
         cur = self.conn.cursor()
-        # Select all packages synced from current repository and save them to dict accessible by NEVRA
-        nevras_in_repo = {}
-        cur.execute("""select p.id, p.name, evr.epoch, evr.version, evr.release, a.name
-                       from package p inner join
-                            evr on p.evr_id = evr.id inner join
-                            arch a on p.arch_id = a.id inner join
-                            pkg_repo pr on p.id = pr.pkg_id and pr.repo_id = %s""", (repo_id,))
-        for row in cur.fetchall():
-            nevras_in_repo[(row[1], row[2], row[3], row[4], row[5])] = row[0]
-
         # Select packages already associated with updates, from current repository only
         # Save them to dict: errata_id -> set(package_id)
         update_to_packages = {}
@@ -96,28 +127,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
                     update_to_packages[row[0]] = set()
                 update_to_packages[row[0]].add(row[1])
 
-        to_associate = []
-        for update in updates:
-            update_id = update_map[update["id"]]
-            for pkg in update["pkglist"]:
-                nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
-                if nevra not in nevras_in_repo:
-                    self.logger.log("NEVRA associated with %s not found in repository: (%s)" %
-                                    (update["id"], ",".join(nevra)))
-                    continue
-                package_id = nevras_in_repo[nevra]
-                if update_id in update_to_packages and package_id in update_to_packages[update_id]:
-                    # Already associated, remove from set
-                    update_to_packages[update_id].remove(package_id)
-                else:
-                    # Not associated -> associate
-                    to_associate.append((package_id, update_id))
-
-        # Disassociate rest of package IDs
-        to_disassociate = []
-        for update_id in update_to_packages:
-            for package_id in update_to_packages[update_id]:
-                to_disassociate.append((package_id, update_id))
+        to_associate, to_disassociate = self._get_associations_todo(repo_id, updates, update_map, update_to_packages)
 
         self.logger.log("New update-package associations: %d" % len(to_associate))
         self.logger.log("Update-package disassociations: %d" % len(to_disassociate))
