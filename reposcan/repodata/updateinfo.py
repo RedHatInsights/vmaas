@@ -22,53 +22,16 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods
                 update["title"] = elem.find("title").text.strip()
 
                 # Optional fields
-                summary = elem.find("summary")
-                if summary is not None:
-                    update["summary"] = summary.text.strip()
-                else:
-                    update["summary"] = None
-
-                rights = elem.find("rights")
-                if rights is not None:
-                    update["rights"] = rights.text.strip()
-                else:
-                    update["rights"] = None
-
-                description = elem.find("description")
-                if description is not None:
-                    update["description"] = description.text.strip()
-                else:
-                    update["description"] = None
-
-                issued = elem.find("issued")
-                if issued is not None:
-                    update["issued"] = issued.get("date")
-                else:
-                    update["issued"] = None
-
-                updated = elem.find("updated")
-                if updated is not None:
-                    update["updated"] = updated.get("date")
-                else:
-                    update["updated"] = None
-
-                release = elem.find("release")
-                if release is not None:
-                    update["release"] = release.text.strip()
-                else:
-                    update["release"] = None
-
-                solution = elem.find("solution")
-                if solution is not None:
-                    update["solution"] = solution.text.strip()
-                else:
-                    update["solution"] = None
-
-                severity = elem.find("severity")
-                if severity is not None:
-                    update["severity"] = severity.text.strip()
-                else:
-                    update["severity"] = None
+                text_elements = ["summary", "rights", "description", "release", "solution", "severity"]
+                date_elements = ["issued", "updated"]
+                for field in text_elements + date_elements:
+                    found = elem.find(field)
+                    if found is not None and field in text_elements:
+                        update[field] = found.text.strip()
+                    elif found is not None and field in date_elements:
+                        update[field] = found.get("date")
+                    else:
+                        update[field] = None
 
                 references = elem.find("references")
                 update["references"] = []
