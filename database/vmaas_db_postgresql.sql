@@ -303,4 +303,17 @@ CREATE TABLE IF NOT EXISTS errata_cve (
     REFERENCES cve (id)
 )TABLESPACE pg_default;
 
+-- -----------------------------------------------------
+-- Table vmaas.metadata
+-- -----------------------------------------------------
+-- This table holds different timestamps, checksums and
+-- other persistent data for vmaas processes.
+-- E.g. source timestamps for cve importer
+
+CREATE TABLE IF NOT EXISTS metadata (
+  id SERIAL,
+  key TEXT NOT NULL UNIQUE,
+  value TEXT NOT NULL,
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
 
