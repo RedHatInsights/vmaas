@@ -3,7 +3,7 @@ services:
   database:
     container_name: vmaas_database
     build: ./database
-    image: vmaas_database_img
+    image: vmaas/database
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
@@ -13,7 +13,7 @@ services:
   reposcan:
     container_name: vmaas_reposcan
     build: ./reposcan
-    image: vmaas_reposcan_img
+    image: vmaas/reposcan
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
@@ -25,7 +25,7 @@ services:
   webapp:
     container_name: vmaas_webapp
     build: ./webapp
-    image: vmaas_webapp_img
+    image: vmaas/webapp
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
