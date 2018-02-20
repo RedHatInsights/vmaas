@@ -2,11 +2,11 @@ FROM centos:centos7
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
 # defaults; will be overwritten by docker-compose.env
-ENV POSTGRES_HOST=database
-ENV POSTGRES_PORT=5432
-ENV POSTGRES_USER=vmaas_user
-ENV POSTGRES_PASSWORD=vmaas_passwd
-ENV POSTGRES_DB=vmaas
+ENV POSTGRESQL_HOST=database
+ENV POSTGRESQL_PORT=5432
+ENV POSTGRESQL_USER=vmaas_user
+ENV POSTGRESQL_PASSWORD=vmaas_passwd
+ENV POSTGRESQL_DATABASE=vmaas
 
 RUN yum -y update && yum -y install epel-release && yum -y install python-ujson python2-falcon python-tornado python-psycopg2 postgresql && rm -rf /var/cache/yum/*
 
