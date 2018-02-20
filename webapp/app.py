@@ -16,11 +16,11 @@ EXAMPLE_MSG = """Example of passing input data as a file: <br />
                  
               """
 
-cursor = errata.init_db(os.getenv('POSTGRES_DB', errata.DEFAULT_DB_NAME), 
-                        os.getenv('POSTGRES_USER', errata.DEFAULT_DB_USER),
-                        os.getenv('POSTGRES_PASSWORD', errata.DEFAULT_DB_PASSWORD),
-                        os.getenv('POSTGRES_HOST', 'vmaas_db'), 
-                        os.getenv('POSTGRES_PORT', errata.DEFAULT_DB_PORT))
+cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME), 
+                        os.getenv('POSTGRESQL_USER', errata.DEFAULT_DB_USER),
+                        os.getenv('POSTGRESQL_PASSWORD', errata.DEFAULT_DB_PASSWORD),
+                        os.getenv('POSTGRESQL_HOST', 'vmaas_db'), 
+                        os.getenv('POSTGRESQL_PORT', errata.DEFAULT_DB_PORT))
 
 
 class MainHandler(tornado.web.RequestHandler):

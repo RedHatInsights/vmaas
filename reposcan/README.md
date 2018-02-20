@@ -19,4 +19,4 @@
 
 ### reposcan.py is starting with container, for manual run use:
 
-```cd /vmaas-reposcan && ./reposcan.py -d $POSTGRES_DB -H $POSTGRES_HOST -U $POSTGRES_USER -P $POSTGRES_PASSWORD -r https://dl.fedoraproject.org/pub/fedora/linux/releases/25/Server/x86_64/os/```
+```cd /vmaas-reposcan && ./reposcan.py -d $POSTGRESQL_DATABASE -H $POSTGRESQL_HOST -U $POSTGRESQL_USER -P $POSTGRESQL_PASSWORD -r https://dl.fedoraproject.org/pub/fedora/linux/releases/25/Server/x86_64/os/```

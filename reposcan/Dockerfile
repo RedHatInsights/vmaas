@@ -1,11 +1,11 @@
 FROM fedora:27
 
 # defaults; will be overwritten by docker-compose.env
-ENV POSTGRES_HOST=database
-ENV POSTGRES_PORT=5432
-ENV POSTGRES_USER=vmaas_user
-ENV POSTGRES_PASSWORD=vmaas_passwd
-ENV POSTGRES_DB=vmaas
+ENV POSTGRESQL_HOST=database
+ENV POSTGRESQL_PORT=5432
+ENV POSTGRESQL_USER=vmaas_user
+ENV POSTGRESQL_PASSWORD=vmaas_passwd
+ENV POSTGRESQL_DATABASE=vmaas
 
 RUN yum install -y python3-psycopg2 python3-requests \
                    postgresql-libs postgresql \
