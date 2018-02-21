@@ -1,6 +1,8 @@
 version: '2'
 services:
   database:
+    labels:
+      kompose.volume.size: 1Gi
     container_name: vmaas_database
     build: ./database
     image: vmaas/database
@@ -9,6 +11,8 @@ services:
       - ./docker-compose.env
     ports:
       - 5432:5432
+    volumes:
+      - vmaas-db-data:/var/lib/pgsql/data
 
   reposcan:
     container_name: vmaas_reposcan
@@ -35,3 +39,5 @@ services:
       - database
     links:
       - database
+volumes:
+  vmaas-db-data:

@@ -31,6 +31,9 @@ Stop and remove containers (built images will persist)
 
 ```docker-compose down```
 
+Stop and remove containers and database data volume (built images will persist)
+
+```docker-compose down -v```
 
 ## Initial Setup
 
