@@ -3,25 +3,9 @@ Vulnerability Management as a Service
 
 ## Quick Command Guide
 
-### Build a service
+### Local deployment (development)
 
-```docker-compose build```
-
-### Managing containers
-
-All at once
-
-```docker-compose start```
-
-```docker-compose stop```
-
-Single service
-
-```docker-compose start database```
-
-```docker-compose stop database```
-
-### All-in-one command magic
+#### All-in-one command magic
 
 Build images and start containers
 
@@ -35,6 +19,40 @@ Stop and remove containers and database data volume (built images will persist)
 
 ```docker-compose down -v```
 
+#### Build images
+
+```docker-compose build```
+
+#### Managing containers
+
+All at once
+
+```docker-compose start```
+
+```docker-compose stop```
+
+Single service
+
+```docker-compose start database```
+
+```docker-compose stop database```
+
+### OpenShift deployment (stable)
+
+Login to OpenShift cluster and select target project
+
+```oc login <openshift URL>```
+
+```oc project my-project```
+
+Deploy latest builds from https://hub.docker.com/u/vmaas/
+
+```ansible-playbook openshift-deployment.yml --tags up```
+
+Delete deployment completely
+
+```ansible-playbook openshift-deployment.yml --tags down```
+
 ## Initial Setup
 
 This "Initial Setup" section was put together as I set up on my Fedora 27 system.  Your mileage may vary.
@@ -42,6 +60,10 @@ This "Initial Setup" section was put together as I set up on my Fedora 27 system
 ### Install docker and docker-compose
 
 ```sudo dnf install docker docker-compose```
+
+For OpenShift deployment install also following tools.
+
+```sudo dnf install origin-clients ansible kompose```
 
 Start docker.
 
