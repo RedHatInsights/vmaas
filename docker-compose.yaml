@@ -1,9 +1,9 @@
-version: '2'
+version: '3'
 services:
   database:
     labels:
       kompose.volume.size: 1Gi
-    container_name: vmaas_database
+    container_name: vmaas-database
     build: ./database
     image: vmaas/database
     restart: unless-stopped
@@ -15,7 +15,7 @@ services:
       - vmaas-db-data:/var/lib/pgsql/data
 
   reposcan:
-    container_name: vmaas_reposcan
+    container_name: vmaas-reposcan
     build: ./reposcan
     image: vmaas/reposcan
     restart: unless-stopped
@@ -27,7 +27,7 @@ services:
       - database
 
   webapp:
-    container_name: vmaas_webapp
+    container_name: vmaas-webapp
     build: ./webapp
     image: vmaas/webapp
     restart: unless-stopped
