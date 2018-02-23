@@ -100,9 +100,9 @@ class UpdateStore: # pylint: disable=too-few-public-methods
             import_data = []
             for update in updates:
                 if (update["id"],) in names:
-                    import_data.append((update["id"], update["title"], severity_map[str(update["severity"])]))
+                    import_data.append((update["id"], update["title"], severity_map[str(update["severity"])], update["description"],update["issued"], update["updated"], update["solution"]))
             execute_values(cur,
-                           """insert into errata (name, synopsis, severity_id) values %s
+                           """insert into errata (name, synopsis, severity_id, description, issued, updated, solution) values %s
                               returning id, name""",
                            import_data, page_size=len(import_data))
             for row in cur.fetchall():

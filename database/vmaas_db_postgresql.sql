@@ -28,11 +28,11 @@ create or replace function isdigit(ch CHAR)
     END ;
 $$ language 'plpgsql';
 
-    
+
     create or replace FUNCTION isalpha(ch CHAR)
     RETURNS BOOLEAN as $$
     BEGIN
-        if ascii(ch) between ascii('a') and ascii('z') or 
+        if ascii(ch) between ascii('a') and ascii('z') or
             ascii(ch) between ascii('A') and ascii('Z')
         then
             return TRUE;
@@ -43,9 +43,9 @@ $$ language 'plpgsql';
 
 
 create or replace FUNCTION isalphanum(ch CHAR)
-RETURNS BOOLEAN as $$ 
+RETURNS BOOLEAN as $$
 BEGIN
-    if ascii(ch) between ascii('a') and ascii('z') or 
+    if ascii(ch) between ascii('a') and ascii('z') or
         ascii(ch) between ascii('A') and ascii('Z') or
         ascii(ch) between ascii('0') and ascii('9')
     then
@@ -72,7 +72,7 @@ BEGIN
     then
         RAISE EXCEPTION 'VALUE_ERROR.';
     end if;
-  
+
     one := str1;
     <<segment_loop>>
     while one <> ''
@@ -99,7 +99,7 @@ BEGIN
             then segm1 := substr(one, 1, length(one) - length(str1));
             else segm1 := one;
             end if;
-                
+
             if segm1 = '' then return ver_array; end if; /* arbitrary */
             if isnum
             then
@@ -112,7 +112,7 @@ BEGIN
             one := str1;
         end;
     end loop segment_loop;
- 
+
     return ver_array;
 END ;
 $$ language 'plpgsql';
@@ -238,6 +238,10 @@ CREATE TABLE IF NOT EXISTS errata (
   name TEXT NOT NULL UNIQUE,
   synopsis TEXT NOT NULL,
   severity_id INT NOT NULL,
+  description TEXT NOT NULL,
+  solution TEXT,
+  issued TIMESTAMP NOT NULL,
+  updated TIMESTAMP NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
