@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+"""
+Main executable for cvescan tool. It allows to sync CVEs from NIST NVD web API.
+"""
+
 
 from argparse import ArgumentParser
 
@@ -6,6 +10,7 @@ from database.database_handler import DatabaseHandler
 from nistcve.cve_controller import CveRepoController
 
 def main():
+    """Main function."""
     parser = ArgumentParser()
     parser.add_argument("-d", "--db-name", action="store",
                         help="Database name (default 'vmaas').",

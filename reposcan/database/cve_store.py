@@ -1,3 +1,6 @@
+"""
+Module contains classes for fetching/importing CVE from/into database.
+"""
 from psycopg2.extras import execute_values
 
 from cli.logger import SimpleLogger
@@ -5,11 +8,17 @@ from database.database_handler import DatabaseHandler
 
 
 class CveStore:
+    """
+    Class interface for listing and storing CVEs in database.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.conn = DatabaseHandler.get_connection()
 
     def list_lastmodified(self):
+        """
+        List lastmodified times from database.
+        """
         lastmodified = {}
         cur = self.conn.cursor()
         cur.execute("select key, value from metadata where key like 'nistcve:'")
@@ -107,6 +116,9 @@ class CveStore:
         return cve_data
 
     def store(self, repo):
+        """
+        Store / update cve information in database.
+        """
         self.logger.log("Syncing %d CVEs." % repo.get_count())
         self._populate_cves(repo)
         self.logger.log("Syncing CVEs finished.")

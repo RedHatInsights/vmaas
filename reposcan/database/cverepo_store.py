@@ -1,9 +1,16 @@
+""""
+Module containing classes for fetching/importing cve list metadata from/into database.
+"""
+
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
 from database.cve_store import CveStore
 
 
 class CveRepoStore:
+    """
+    Interface to store cve list metadata (e.g lastmodified).
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.repo = []
@@ -11,6 +18,9 @@ class CveRepoStore:
         self.cve_store = CveStore()
 
     def list_lastmodified(self):
+        """
+        Fetch map of lastmodified dates for cve lists we've downloaded in the past.
+        """
         lastmodified = {}
         cur = self.conn.cursor()
         cur.execute("select key, value from metadata where key like 'nistcve:%'")
@@ -37,6 +47,9 @@ class CveRepoStore:
         return repo_id[0]
 
     def store(self, repo):
+        """
+        Store list of CVEs in the database.
+        """
         self.logger.log("Syncing CVE list: %s" % repo.label)
         self._import_repo(repo.label, repo.meta.get_lastmodified())
         self.logger.log("Syncing CVEs : %s" % repo.get_count())

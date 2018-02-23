@@ -1,3 +1,7 @@
+"""
+Module holds CVE list import workflow - downloading, unpacking, etc.
+"""
+
 import shutil
 import tempfile
 import time
@@ -14,6 +18,9 @@ from nistcve.cverepo import CveRepo
 YEAR_SINCE = 2017
 
 class CveRepoController:
+    """
+    Controls import/sync of CVE lists into the DB.
+    """
     def __init__(self):
         self.logger = SimpleLogger()
         self.downloader = FileDownloader()
@@ -39,8 +46,7 @@ class CveRepoController:
                 if item.status_code not in VALID_HTTP_CODES}
 
     def _read_meta(self, failed):
-        """Reads downloaded meta files and checks for updates.
-        """
+        """Reads downloaded meta files and checks for updates."""
         for repo in self.repos:
             meta_path = repo.meta_tmp()
             if meta_path not in failed:
@@ -72,6 +78,7 @@ class CveRepoController:
         self.unpacker.run()
 
     def clean_repo(self, batch):
+        """Clean downloaded files for given batch."""
         for repo in batch:
             if repo.tmp_directory:
                 shutil.rmtree(repo.tmp_directory)
@@ -79,6 +86,7 @@ class CveRepoController:
             self.repos.remove(repo)
 
     def add_repos(self):
+        """Generate urls for CVE lists to download."""
         # Fetch current list of repositories from DB
         self.db_lastmodified = self.cverepo_store.list_lastmodified()
 
@@ -94,6 +102,7 @@ class CveRepoController:
             self.repos.add(CveRepo(label))
 
     def store(self):
+        """Sync all queued CVE lists. Runs in batches due to disk space and memory usage."""
         self.logger.log("Checking %d CVE lists." % len(self.repos))
 
         # Download all repomd files first
