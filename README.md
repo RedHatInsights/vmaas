@@ -36,17 +36,11 @@ Stop and remove containers (built images will persist)
 
 This "Initial Setup" section was put together as I set up on my Fedora 27 system.  Your mileage may vary.
 
-### Install docker-compose
-```sudo dnf install docker-compose```
+### Install docker and docker-compose
 
-### Install and Set Up docker-ce
-This step came from [Get Docker CE for Fedora](https://docs.docker.com/install/linux/docker-ce/fedora/) docs.
+```sudo dnf install docker docker-compose```
 
-```sudo dnf install dnf-plugins-core```
-
-```sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo```
-
-```sudo dnf install docker-ce```
+Start docker.
 
 ```sudo systemctl start docker```
 
@@ -54,25 +48,37 @@ Make sure it's working...
 
 ```sudo docker run hello-world```
 
-If you get output that says "Hello from Docker!" you've successfully installed Docker.  Continue the set up...
+If you get output that says "Hello from Docker!" you've successfully
+installed Docker.  Continue the set up...
 
-Start docker at boot
+### Prepare Setup for Development
+
+Start docker at boot.
 
 ```sudo systemctl enable docker```
 
-Add your user to the docker group so you can run as your user
+Add docker group and your user to it.  This will allow you to run
+docker as your user.
+
+```sudo groupadd docker```
 
 ```sudo usermod -aG docker $USER```
 
 Now, reboot the system to pick up the changes to the docker group.
+Then log back in and test running docker as your user.
+
+```docker run hello-world```
+
+Look for "Hello from Docker!" again.
 
 ### First Run of VMaaS
 
-Clone the VMaaS git repo
+Clone the VMaaS git repo.
 
 ```git clone https://github.com/RedHatInsights/vmaas.git```
 
-Make sure postgresql isn't running locally... we need port 5432 available
+Make sure postgresql isn't running locally... we need port 5432
+available.  If anything is running on port 8080, stop that, too.
 
 ```sudo systemctl stop postgresql```
 
