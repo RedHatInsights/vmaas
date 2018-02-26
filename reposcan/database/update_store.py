@@ -104,8 +104,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
                                         update["description"], update["issued"],
                                         update["updated"], update["solution"]))
             execute_values(cur,
-               """insert into errata (name, synopsis, severity_id, description, issued, updated, solution) values %s
-                  returning id, name""",
+                           """insert into errata (name, synopsis, severity_id, description,
+                           issued, updated, solution) values %s returning id, name""",
                            import_data, page_size=len(import_data))
             for row in cur.fetchall():
                 update_map[row[1]] = row[0]
