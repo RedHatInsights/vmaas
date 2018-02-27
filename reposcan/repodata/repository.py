@@ -11,7 +11,8 @@ class Repository:
     """
     Class aggregating information about metadata files available in repository.
     """
-    def __init__(self, repo_url, ca_cert=None, cert=None, key=None):
+    # pylint: disable=too-many-arguments, too-many-instance-attributes
+    def __init__(self, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
         self.logger = SimpleLogger()
         self.repo_url = repo_url
         self.repomd = None
@@ -19,6 +20,7 @@ class Repository:
         self.updateinfo = None
         self.md_files = {}
         self.tmp_directory = None
+        self.cert_name = cert_name
         self.ca_cert = ca_cert
         self.cert = cert
         self.key = key
