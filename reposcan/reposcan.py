@@ -25,6 +25,7 @@ def main():
     parser.add_argument("-r", "--repo", action="append",
                         help="Sync given repository (can be specifed multiple times).")
     parser.add_argument("--repofile", action="store", help="Read repository list from file.")
+    parser.add_argument("--certname", action="store", help="Use specified cert name.")
     parser.add_argument("--cacert", action="store", help="Use specified cert to verify.")
     parser.add_argument("--cert", action="store", help="Use specified SSL client cert.")
     parser.add_argument("--key", action="store", help="Use specified SSL client key.")
@@ -40,11 +41,15 @@ def main():
     repository_controller = RepositoryController()
     if args.repo:
         for repo_url in args.repo:
-            repository_controller.add_repository(repo_url, ca_cert=args.cacert, cert=args.cert, key=args.key)
+            repository_controller.add_repository(repo_url, cert_name=args.certname, ca_cert=args.cacert,
+                                                 cert=args.cert, key=args.key)
     if args.repofile:
         with open(args.repofile, "r") as repo_file:
             for line in repo_file.readlines():
-                repository_controller.add_repository(line, ca_cert=args.cacert, cert=args.cert, key=args.key)
+                repository_controller.add_repository(line, cert_name=args.certname, ca_cert=args.cacert,
+                                                     cert=args.cert, key=args.key)
+    if not args.repo and not args.repofile:
+        repository_controller.add_synced_repositories()
     repository_controller.store()
 
 if __name__ == '__main__':

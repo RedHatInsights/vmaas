@@ -30,19 +30,26 @@ class RepositoryController:
         self.unpacker = FileUnpacker()
         self.repo_store = RepositoryStore()
         self.repositories = set()
-        self.db_repositories = {}
+        self.certs_tmp_directory = None
+        self.certs_files = {}
+
+    def _get_certs_tuple(self, name):
+        if name in self.certs_files:
+            return self.certs_files[name]["ca_cert"], self.certs_files[name]["cert"], self.certs_files[name]["key"]
+        return None, None, None
 
     def _download_repomds(self):
         download_items = []
         for repository in self.repositories:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
+            ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
             item = DownloadItem(
                 source_url=repomd_url,
                 target_path=os.path.join(repository.tmp_directory, "repomd.xml"),
-                ca_cert=repository.ca_cert,
-                cert=repository.cert,
-                key=repository.key
+                ca_cert=ca_cert,
+                cert=cert,
+                key=key
             )
             # Save for future status code check
             download_items.append(item)
@@ -56,13 +63,15 @@ class RepositoryController:
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
            newer than metadata currently in DB.
         """
+        # Fetch current list of repositories from DB
+        db_repositories = self.repo_store.list_repositories()
         for repository in self.repositories:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             if repomd_path not in failed:
                 repomd = RepoMD(repomd_path)
                 # Was repository already synced before?
-                if repository.repo_url in self.db_repositories:
-                    db_revision = self.db_repositories[repository.repo_url]["revision"]
+                if repository.repo_url in db_repositories:
+                    db_revision = db_repositories[repository.repo_url]["revision"]
                 else:
                     db_revision = None
                 downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
@@ -91,12 +100,13 @@ class RepositoryController:
 
             # queue metadata files for download
             for md_location in repository.md_files.values():
+                ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
                 self.downloader.add(DownloadItem(
                     source_url=urljoin(repository.repo_url, md_location),
                     target_path=os.path.join(repository.tmp_directory, os.path.basename(md_location)),
-                    ca_cert=repository.ca_cert,
-                    cert=repository.cert,
-                    key=repository.key
+                    ca_cert=ca_cert,
+                    cert=cert,
+                    key=key
                 ))
         self.downloader.run()
 
@@ -119,19 +129,66 @@ class RepositoryController:
                 repository.tmp_directory = None
             self.repositories.remove(repository)
 
-    def add_repository(self, repo_url, ca_cert=None, cert=None, key=None):
+    def _clean_certificate_cache(self):
+        if self.certs_tmp_directory:
+            shutil.rmtree(self.certs_tmp_directory)
+            self.certs_tmp_directory = None
+            self.certs_files = {}
+
+    def add_synced_repositories(self):
+        """Queue all previously synced repositories."""
+        repos = self.repo_store.list_repositories()
+        for repo_dict in repos.values():
+            self.repositories.add(Repository(repo_dict["url"], cert_name=repo_dict["cert_name"],
+                                             ca_cert=repo_dict["ca_cert"], cert=repo_dict["cert"],
+                                             key=repo_dict["key"]))
+
+    @staticmethod
+    def _read_certificate(ca_cert, cert, key):
+        cert_contents = []
+        for cert_file in [ca_cert, cert, key]:
+            if cert_file:
+                with open(cert_file, "r") as cert_content:
+                    cert_contents.append(cert_content.read())
+            else:
+                cert_contents.append(None)
+
+        return cert_contents[0], cert_contents[1], cert_contents[2]
+
+    # pylint: disable=too-many-arguments
+    def add_repository(self, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
+        ca_cert, cert, key = self._read_certificate(ca_cert, cert, key)
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_url, ca_cert=ca_cert, cert=cert, key=key))
+        self.repositories.add(Repository(repo_url, cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key))
+
+    def _write_certificate_cache(self):
+        certs = {}
+        for repository in self.repositories:
+            if repository.cert_name:
+                certs[repository.cert_name] = {"ca_cert": repository.ca_cert, "cert": repository.cert,
+                                               "key": repository.key}
+        if certs:
+            self.certs_tmp_directory = tempfile.mkdtemp(prefix="certs-")
+            for cert_name in certs:
+                self.certs_files[cert_name] = {}
+                for cert_type in ["ca_cert", "cert", "key"]:
+                    # Cert is not None
+                    if certs[cert_name][cert_type]:
+                        cert_path = os.path.join(self.certs_tmp_directory, "%s.%s" % (cert_name, cert_type))
+                        with open(cert_path, "w") as cert_file:
+                            cert_file.write(certs[cert_name][cert_type])
+                        self.certs_files[cert_name][cert_type] = cert_path
+                    else:
+                        self.certs_files[cert_name][cert_type] = None
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""
         self.logger.log("Checking %d repositories." % len(self.repositories))
 
-        # Fetch current list of repositories from DB
-        self.db_repositories = self.repo_store.list_repositories()
+        self._write_certificate_cache()
 
         # Download all repomd files first
         failed = self._download_repomds()
@@ -159,3 +216,5 @@ class RepositoryController:
                 self.repo_store.store(repository)
                 repository.unload_metadata()
             self.clean_repodata(batch)
+
+        self._clean_certificate_cache()
