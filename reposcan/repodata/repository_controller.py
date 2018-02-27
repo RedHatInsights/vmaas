@@ -39,7 +39,10 @@ class RepositoryController:
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             item = DownloadItem(
                 source_url=repomd_url,
-                target_path=os.path.join(repository.tmp_directory, "repomd.xml")
+                target_path=os.path.join(repository.tmp_directory, "repomd.xml"),
+                ca_cert=repository.ca_cert,
+                cert=repository.cert,
+                key=repository.key
             )
             # Save for future status code check
             download_items.append(item)
@@ -90,7 +93,10 @@ class RepositoryController:
             for md_location in repository.md_files.values():
                 self.downloader.add(DownloadItem(
                     source_url=urljoin(repository.repo_url, md_location),
-                    target_path=os.path.join(repository.tmp_directory, os.path.basename(md_location))
+                    target_path=os.path.join(repository.tmp_directory, os.path.basename(md_location)),
+                    ca_cert=repository.ca_cert,
+                    cert=repository.cert,
+                    key=repository.key
                 ))
         self.downloader.run()
 
@@ -113,12 +119,12 @@ class RepositoryController:
                 repository.tmp_directory = None
             self.repositories.remove(repository)
 
-    def add_repository(self, repo_url):
+    def add_repository(self, repo_url, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_url))
+        self.repositories.add(Repository(repo_url, ca_cert=ca_cert, cert=cert, key=key))
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""

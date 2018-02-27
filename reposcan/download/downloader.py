@@ -16,9 +16,13 @@ class DownloadItem: # pylint: disable=too-few-public-methods
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
     and result HTTP status code of the download operation.
     """
-    def __init__(self, source_url=None, target_path=None):
+    # pylint: disable=too-many-arguments
+    def __init__(self, source_url=None, target_path=None, ca_cert=None, cert=None, key=None):
         self.source_url = source_url
         self.target_path = target_path
+        self.ca_cert = ca_cert
+        self.cert = cert
+        self.key = key
         self.status_code = None
 
 
@@ -35,7 +39,19 @@ class FileDownloadThread(Thread):
 
     def _download(self, download_item):
         with open(download_item.target_path, "wb") as file_handle:
-            with self.session.get(download_item.source_url, stream=True) as response:
+            # Specify the CA bundle file or use the default value - True
+            if download_item.ca_cert:
+                verify = download_item.ca_cert
+            else:
+                verify = True
+            if download_item.cert:
+                if download_item.key:
+                    cert = (download_item.cert, download_item.key)
+                else:
+                    cert = download_item.cert
+            else:
+                cert = None
+            with self.session.get(download_item.source_url, verify=verify, cert=cert, stream=True) as response:
                 while True:
                     chunk = response.raw.read(CHUNK_SIZE, decode_content=False)
                     if chunk == b"":

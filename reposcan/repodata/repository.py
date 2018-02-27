@@ -11,7 +11,7 @@ class Repository:
     """
     Class aggregating information about metadata files available in repository.
     """
-    def __init__(self, repo_url):
+    def __init__(self, repo_url, ca_cert=None, cert=None, key=None):
         self.logger = SimpleLogger()
         self.repo_url = repo_url
         self.repomd = None
@@ -19,6 +19,9 @@ class Repository:
         self.updateinfo = None
         self.md_files = {}
         self.tmp_directory = None
+        self.ca_cert = ca_cert
+        self.cert = cert
+        self.key = key
 
     def get_package_count(self):
         """Returns package count in repository (from primary XML or SQLite if available)."""
