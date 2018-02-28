@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+import ujson
+import sys
+
+pack_dict = {
+    "package_list": []
+}
+
+for pack in sys.stdin:
+    pack_dict["package_list"].append(pack.strip())
+
+print ujson.dumps(pack_dict)
+
