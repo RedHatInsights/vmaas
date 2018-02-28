@@ -52,6 +52,8 @@ def splitFilename(filename):
         1:bar-9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
     """
 
+    isEpoch = True if filename.find(':') != -1 else False
+
     if filename[-4:] == '.rpm':
         filename = filename[:-4]
 
@@ -61,16 +63,21 @@ def splitFilename(filename):
     relIndex = filename[:archIndex].rfind('-')
     rel = filename[relIndex + 1:archIndex]
 
-    verIndex = filename[:relIndex].rfind('-')
+    if isEpoch:
+        verIndex = filename[:relIndex].rfind(':')
+    else:
+        verIndex = filename[:relIndex].rfind('-')
     ver = filename[verIndex + 1:relIndex]
 
-    epochIndex = filename.find(':')
-    if epochIndex == -1:
-        epoch = '0'
-    else:
-        epoch = filename[:epochIndex]
 
-    name = filename[epochIndex + 1:verIndex]
+    if isEpoch:
+        epochIndex = filename[:verIndex].rfind('-')
+        epoch = filename[epochIndex + 1:verIndex]
+    else:
+        epochIndex = verIndex
+        epoch = '0'
+
+    name = filename[:epochIndex]
     return name, ver, rel, epoch, arch
 
 def init_db(db_name, db_user, db_pass, db_host, db_port):
@@ -329,8 +336,12 @@ def process_list(cursor, packages_to_process):
     packages = cursor.fetchall()
     id2pakage_dict = {}
     for id, name, evr_id, arch_id in packages:
-        id2pakage_dict[id] = id2evr_dict[evr_id]['epoch'] + ':' + name + '-' + id2evr_dict[evr_id]['version'] + '-' + \
-        id2evr_dict[evr_id]['release'] + '.' + id2arch_dict[arch_id]
+        full_rpm_name = name + '-'
+        if id2evr_dict[evr_id]['epoch'] != '0':
+            full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
+        full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + id2arch_dict[arch_id]
+
+        id2pakage_dict[id] = full_rpm_name
 
     for pkg in auxiliary_dict:
         answer[pkg] = []
