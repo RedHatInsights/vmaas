@@ -21,6 +21,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
+    ports:
+      - 8081:8081
     depends_on:
       - database
     links:

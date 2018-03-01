@@ -143,22 +143,9 @@ class RepositoryController:
                                              ca_cert=repo_dict["ca_cert"], cert=repo_dict["cert"],
                                              key=repo_dict["key"]))
 
-    @staticmethod
-    def _read_certificate(ca_cert, cert, key):
-        cert_contents = []
-        for cert_file in [ca_cert, cert, key]:
-            if cert_file:
-                with open(cert_file, "r") as cert_content:
-                    cert_contents.append(cert_content.read())
-            else:
-                cert_contents.append(None)
-
-        return cert_contents[0], cert_contents[1], cert_contents[2]
-
     # pylint: disable=too-many-arguments
     def add_repository(self, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
-        ca_cert, cert, key = self._read_certificate(ca_cert, cert, key)
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
