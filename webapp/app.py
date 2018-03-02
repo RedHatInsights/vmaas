@@ -17,16 +17,16 @@ cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME)
 
 class DocHandler(tornado.web.RequestHandler):
     DOC_MSG = """Example of passing input data as a file: <br />
-                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/json/ <br /> <br />
+                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/updates/ <br /> <br />
 
                  Example of passing imput data as a body of POST request: <br />
-                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/json/
+                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/updates/
               """
     def get(self):
         self.write(self.DOC_MSG)
 
 
-class JsonHandler(tornado.web.RequestHandler):
+class UpdatesHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('')
 
@@ -40,27 +40,16 @@ class JsonHandler(tornado.web.RequestHandler):
             json_data = self.request.body
 
         response = {
-            'package_list': {},
-            'errata_list': {},
-            'repo_list': {},
-            'nevra_list': {},
-            'bugzilla_list': {},
-            'cve_list': {}
+            'update_list': {}
         }
 
         # fill response with packages
         try:
             data = ujson.loads(json_data)
             packages_to_process = data['package_list']
-            response['package_list'] = errata.process_list(cursor, packages_to_process)
+            response['update_list'] = errata.process_list(cursor, packages_to_process)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
-
-        # TODO: fill response with errata
-
-        # TODO: fill response with CVEs
-
-        # TODO: fill response with repos
 
         self.write(ujson.dumps(response))
 
@@ -69,7 +58,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/?", DocHandler),
-            (r"/api/v1/json/?", JsonHandler)
+            (r"/api/v1/updates/?", UpdatesHandler)
         ]
         tornado.web.Application.__init__(self, handlers)
 
