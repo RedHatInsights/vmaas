@@ -8,24 +8,22 @@ import errata
 import sys
 import os
 
-EXAMPLE_MSG = """Example of passing input data as a file: <br />
-                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/json/ <br /> <br />
-                 
-                 Example of passing imput data as a body of POST request: <br />
-                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/json/
-                 
-              """
-
-cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME), 
+cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME),
                         os.getenv('POSTGRESQL_USER', errata.DEFAULT_DB_USER),
                         os.getenv('POSTGRESQL_PASSWORD', errata.DEFAULT_DB_PASSWORD),
                         os.getenv('POSTGRESQL_HOST', 'vmaas_db'), 
                         os.getenv('POSTGRESQL_PORT', errata.DEFAULT_DB_PORT))
 
 
-class MainHandler(tornado.web.RequestHandler):
+class DocHandler(tornado.web.RequestHandler):
+    DOC_MSG = """Example of passing input data as a file: <br />
+                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/json/ <br /> <br />
+
+                 Example of passing imput data as a body of POST request: <br />
+                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/json/
+              """
     def get(self):
-        self.write(EXAMPLE_MSG)
+        self.write(self.DOC_MSG)
 
 
 class PlaintextHandler(tornado.web.RequestHandler):
@@ -82,7 +80,7 @@ class JsonHandler(tornado.web.RequestHandler):
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/?", MainHandler),
+            (r"/?", DocHandler),
             (r"/api/v1/plain/?", PlaintextHandler),
             (r"/api/v1/json/?", JsonHandler)
         ]
