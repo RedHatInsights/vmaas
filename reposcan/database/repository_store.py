@@ -51,13 +51,13 @@ class RepositoryStore:
         else:
             cert_id = None
         cur = self.conn.cursor()
-        cur.execute("select id from repo where name = %s", (repo.repo_url,))
+        cur.execute("select id from repo where name = %s", (repo.repo_name,))
         repo_id = cur.fetchone()
         if not repo_id:
             # FIXME: add product logic
             cur.execute("""insert into repo (name, url, revision, eol, certificate_id)
                         values (%s, %s, to_timestamp(%s), false, %s) returning id""",
-                        (repo.repo_url, repo.repo_url, repo.repomd.get_revision(), cert_id,))
+                        (repo.repo_name, repo.repo_url, repo.repomd.get_revision(), cert_id,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
@@ -73,7 +73,7 @@ class RepositoryStore:
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
-        self.logger.log("Syncing repository: %s" % repository.repo_url)
+        self.logger.log("Syncing repository: %s" % repository.repo_name)
         repo_id = self._import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())

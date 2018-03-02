@@ -70,8 +70,8 @@ class RepositoryController:
             if repomd_path not in failed:
                 repomd = RepoMD(repomd_path)
                 # Was repository already synced before?
-                if repository.repo_url in db_repositories:
-                    db_revision = db_repositories[repository.repo_url]["revision"]
+                if repository.repo_name in db_repositories:
+                    db_revision = db_repositories[repository.repo_name]["revision"]
                 else:
                     db_revision = None
                 downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
@@ -80,7 +80,7 @@ class RepositoryController:
                     repository.repomd = repomd
                 else:
                     self.logger.log("Downloaded repo %s (%s) is not newer than repo in DB (%s)." %
-                                    (repository.repo_url, str(downloaded_revision), str(db_revision)))
+                                    (repository.repo_name, str(downloaded_revision), str(db_revision)))
             else:
                 self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
                                                                         failed[repomd_path]))
@@ -138,18 +138,19 @@ class RepositoryController:
     def add_synced_repositories(self):
         """Queue all previously synced repositories."""
         repos = self.repo_store.list_repositories()
-        for repo_dict in repos.values():
-            self.repositories.add(Repository(repo_dict["url"], cert_name=repo_dict["cert_name"],
+        for repo_name, repo_dict in repos.items():
+            self.repositories.add(Repository(repo_name, repo_dict["url"], cert_name=repo_dict["cert_name"],
                                              ca_cert=repo_dict["ca_cert"], cert=repo_dict["cert"],
                                              key=repo_dict["key"]))
 
     # pylint: disable=too-many-arguments
-    def add_repository(self, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
+    def add_repository(self, repo_name, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_url, cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key))
+        self.repositories.add(Repository(repo_name, repo_url, cert_name=cert_name,
+                                         ca_cert=ca_cert, cert=cert, key=key))
 
     def _write_certificate_cache(self):
         certs = {}
