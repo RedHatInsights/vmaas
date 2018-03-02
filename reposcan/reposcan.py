@@ -37,8 +37,9 @@ def repo_sync_task(repos=None):
         if repos:
             # Sync repos from input
             for repo in repos:
-                url, cert_name, ca_cert, cert, key = repo
-                repository_controller.add_repository(url, cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key)
+                repo_name, repo_url, cert_name, ca_cert, cert, key = repo
+                repository_controller.add_repository(repo_name, repo_url, cert_name=cert_name,
+                                                     ca_cert=ca_cert, cert=cert, key=key)
         else:
             # Re-sync repos in DB
             repository_controller.add_synced_repositories()
@@ -152,8 +153,8 @@ class RepoSyncHandler(SyncHandler):
             else:
                 cert_name, ca_cert, cert, key = None, None, None, None
 
-            for repo in repo_group["repos"].values():
-                repos.append((repo, cert_name, ca_cert, cert, key))
+            for repo_name, repo_url in repo_group["repos"].items():
+                repos.append((repo_name, repo_url, cert_name, ca_cert, cert, key))
 
         return repos
 
