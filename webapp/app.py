@@ -26,18 +26,6 @@ class DocHandler(tornado.web.RequestHandler):
         self.write(self.DOC_MSG)
 
 
-class PlaintextHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write('')
-
-    def post(self):
-        plaintext_file = self.request.files['file'][0]['body']
-        contents = plaintext_file.split('\n')
-        for line in sorted(set(contents)):
-            if line and line.strip():
-                self.write(str(errata.process(line, cursor)))
-
-
 class JsonHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('')
@@ -81,7 +69,6 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/?", DocHandler),
-            (r"/api/v1/plain/?", PlaintextHandler),
             (r"/api/v1/json/?", JsonHandler)
         ]
         tornado.web.Application.__init__(self, handlers)
