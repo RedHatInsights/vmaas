@@ -49,7 +49,7 @@ def splitFilename(filename):
 
     Return a name, version, release, epoch, arch, e.g.::
         foo-1.0-1.i386.rpm returns foo, 1.0, 1, 0, i386
-        1:bar-9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
+        bar-1:9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
     """
 
     isEpoch = True if filename.find(':') != -1 else False
