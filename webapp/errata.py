@@ -354,7 +354,9 @@ def process_list(cursor, packages_to_process):
                     e_name = id2errata_dict[e_id]
                     r_id = errata_id2repo_id[e_id]
                     r_name = repoinfo_dict[r_id]['name']
-                    answer[pkg].append([id2pakage_dict[upd_pkg_id], e_name, r_name])
+                    answer[pkg].append({'package': id2pakage_dict[upd_pkg_id],
+                                        'erratum': e_name,
+                                        'repository': r_name})
         except KeyError:
             pass
 
