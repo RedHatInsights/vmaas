@@ -1,4 +1,7 @@
 # vmaas
+
+[![Build Status](https://travis-ci.org/RedHatInsights/vmaas.svg?branch=master)](https://travis-ci.org/RedHatInsights/vmaas)
+
 Vulnerability Management as a Service
 
 ## Quick Command Guide
