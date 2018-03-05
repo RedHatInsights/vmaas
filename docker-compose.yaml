@@ -15,6 +15,8 @@ services:
       - vmaas-db-data:/var/lib/pgsql/data
 
   reposcan:
+    labels:
+      kompose.volume.size: 5Gi
     container_name: vmaas-reposcan
     build: ./reposcan
     image: vmaas/reposcan
@@ -23,6 +25,8 @@ services:
       - ./docker-compose.env
     ports:
       - 8081:8081
+    volumes:
+      - vmaas-reposcan-tmp:/tmp
     depends_on:
       - database
     links:
@@ -43,3 +47,4 @@ services:
       - database
 volumes:
   vmaas-db-data:
+  vmaas-reposcan-tmp:
