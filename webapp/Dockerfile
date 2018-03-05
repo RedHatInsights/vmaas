@@ -8,7 +8,7 @@ ENV POSTGRESQL_USER=vmaas_user
 ENV POSTGRESQL_PASSWORD=vmaas_passwd
 ENV POSTGRESQL_DATABASE=vmaas
 
-RUN yum -y update && yum -y install epel-release && yum -y install python-ujson python2-falcon python-tornado python-psycopg2 postgresql && rm -rf /var/cache/yum/*
+RUN yum -y update && yum -y install python-ujson python-tornado python-psycopg2 postgresql && rm -rf /var/cache/yum/*
 
 ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
 ADD ./app.py /app/app.py
