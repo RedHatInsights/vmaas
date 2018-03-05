@@ -22,14 +22,12 @@ class TestRepoMD(unittest.TestCase):
         self.assertEqual(self.repomd.get_revision(), self.repomd_primary_only.get_revision())
 
     def _test_repomd(self, data):
-        intended_fields = ["location", "size", "checksum_type", "checksum"]
+        intended_fields = ["location", "checksum_type", "checksum"]
         actual_fields = data.keys()
         for field in intended_fields:
             self.assertTrue(field in actual_fields)
         for field in actual_fields:
             self.assertTrue(field in intended_fields)
-
-        self.assertIsInstance(data["size"], int)
 
     def test_invalid_file(self):
         """Test case when file doesn't exist or is invalid."""
