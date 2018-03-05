@@ -13,7 +13,8 @@ RUN yum -y update && yum -y install epel-release && yum -y install python-ujson 
 ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
 ADD ./app.py /app/app.py
 ADD ./updates.py /app/updates.py
+ADD ./entrypoint.sh /app/entrypoint.sh
 
 EXPOSE 8080
 
-CMD ["/app/wait-for-postgres.sh", "/app/app.py"]
+CMD ["/app/entrypoint.sh"]

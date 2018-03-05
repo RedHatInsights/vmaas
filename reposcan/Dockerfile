@@ -22,4 +22,4 @@ RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
 
 EXPOSE 8081
 
-CMD ["/vmaas-reposcan/wait-for-postgres.sh", "/vmaas-reposcan/reposcan.py"]
+CMD ["/vmaas-reposcan/entrypoint.sh"]
