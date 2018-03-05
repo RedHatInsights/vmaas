@@ -12,7 +12,6 @@ known issues
 
 from optparse import Option, OptionParser
 
-import decimal
 import psycopg2
 import sys
 import ujson
@@ -22,25 +21,6 @@ DEFAULT_DB_USER = "vmaas_user"
 DEFAULT_DB_PASSWORD = "vmaas_passwd"
 DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = 5432
-
-
-def _dict(row=None, description=None):
-  """
-  converts array into dict
-  @param row: array to be converted
-  @param description: array description which will be used as dict keys
-  """
-  if not description:
-    raise AttributeError('Need dictionary description')
-  data = {}
-  if row is None:
-    return None
-  for i in range(len(row)):
-    if isinstance(row[i], decimal.Decimal):
-      data[description[i][0]] = int(row[i])
-    else:
-      data[description[i][0]] = row[i]
-  return data
 
 
 def splitFilename(filename):
@@ -80,82 +60,10 @@ def splitFilename(filename):
     name = filename[:epochIndex]
     return name, ver, rel, epoch, arch
 
+
 def init_db(db_name, db_user, db_pass, db_host, db_port):
     connection = psycopg2.connect(database=db_name, user=db_user, password=db_pass, host=db_host, port=db_port)
     return connection.cursor()
-
-"""
-finds all repos that contain the RPM we're searching for
-"""
-def get_repos(cur, n, v, r, e, a):
-    the_sql = """
-        select repo_id, pkg_id
-        from pkg_repo
-        where (pkg_id in (select id from package where name = %(name)s
-        and evr_id = (select id from evr where epoch = %(epoch)s
-                      and version = %(version)s and release = %(release)s)
-        and arch_id = (select id from arch where name = %(arch)s)))
-        """
-    cur.execute(the_sql, {'name' : n, 'version' : v, 'release' : r, 'epoch' : e, 'arch' : a})
-    res = [_dict(x, cur.description) for x in cur.fetchall()]
-    return res
-
-"""
-finds all packages with higher nevra present in repos
-from RPM logic all packages with higher nevra are upgrades
-"""
-def get_result(cur, n, v, r, e, a, repos):
-    the_sql = """
-        select r.name, pr.pkg_id
-        from pkg_repo pr join repo r on pr.repo_id = r.id and r.id in %(repos)s
-        where pr.pkg_id in (select package.id from package join evr on package.evr_id = evr.id where package.name = %(name)s
-        and package.arch_id = (select id from arch where name = %(arch)s)
-        and evr.evr > (select evr from evr where (epoch = %(epoch)s and version = %(version)s and release = %(release)s)))
-    """
-    cur.execute(the_sql, {'name' : n, 'version' : v, 'release' : r, 'epoch' : e, 'arch' : a, 'repos' : repos})
-    res = [_dict(x, cur.description) for x in cur.fetchall()]
-    return res
-
-"""
-returns all advisories which are linked to the upgradeable packages and have associated any CVE
-"""
-def get_erratas(cur, packages):
-    the_sql = """
-    select e.name as advisory_name, pe.pkg_id from errata e join pkg_errata pe on e.id = pe.errata_id where pe.pkg_id in %(packages)s and exists (select 1 from errata_cve where errata_id = e.id)
-    """
-    cur.execute(the_sql, {'packages' : packages})
-    res = [_dict(x, cur.description) for x in cur.fetchall()]
-    return res
-
-"""
-similar to get_erratas with addition of repository and nevra of the package
-"""
-def get_all(cur, packages):
-    the_sql = """
-    select e.name as advisory_name, pe.pkg_id, evr.epoch, evr.version, evr.release, r.name as repo_name from errata e join pkg_errata pe on e.id = pe.errata_id left join package p on pe.pkg_id = p.id join evr on p.evr_id = evr.id left join pkg_repo pr on pr.pkg_id = p.id join repo r on r.id = pr.repo_id where pe.pkg_id in %(packages)s and exists (select 1 from errata_cve where errata_id = e.id)
-    """
-    cur.execute(the_sql, {'packages' : packages})
-    res = [_dict(x, cur.description) for x in cur.fetchall()]
-    return res
-
-def merge_dict(x, y):
-    z = x.copy()
-    z.update(y)
-    return z
-
-def process(filename, cursor):
-    n, v, r, e, a = splitFilename(filename)
-    if e == '':
-        e = None
-
-    try:
-        repos = get_repos(cursor, n, v, r, e, a)
-        packages = get_result(cursor, n, v, r, e, a, tuple(set([ x['repo_id'] for x in repos]) or set([None])))
-        #res = get_erratas(cursor, tuple(set([ x['pkg_id'] for x in packages]) or set([None])))
-        res = get_all(cursor, tuple(set([ x['pkg_id'] for x in packages]) or set([None])))
-    except AttributeError:
-        return []
-    return [ merge_dict(x, {'name' : n}) for x in res ]
 
 
 def process_list(cursor, packages_to_process):
