@@ -3,14 +3,14 @@
 from tornado.ioloop import IOLoop
 import tornado.web
 import ujson
-import errata
+import updates
 import os
 
-cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME),
-                        os.getenv('POSTGRESQL_USER', errata.DEFAULT_DB_USER),
-                        os.getenv('POSTGRESQL_PASSWORD', errata.DEFAULT_DB_PASSWORD),
+cursor = updates.init_db(os.getenv('POSTGRESQL_DATABASE', updates.DEFAULT_DB_NAME),
+                        os.getenv('POSTGRESQL_USER', updates.DEFAULT_DB_USER),
+                        os.getenv('POSTGRESQL_PASSWORD', updates.DEFAULT_DB_PASSWORD),
                         os.getenv('POSTGRESQL_HOST', 'vmaas_db'), 
-                        os.getenv('POSTGRESQL_PORT', errata.DEFAULT_DB_PORT))
+                        os.getenv('POSTGRESQL_PORT', updates.DEFAULT_DB_PORT))
 
 
 class DocHandler(tornado.web.RequestHandler):
@@ -45,7 +45,7 @@ class UpdatesHandler(tornado.web.RequestHandler):
         try:
             data = ujson.loads(json_data)
             packages_to_process = data['package_list']
-            response['update_list'] = errata.process_list(cursor, packages_to_process)
+            response['update_list'] = updates.process_list(cursor, packages_to_process)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
