@@ -159,6 +159,18 @@ def process(filename, cursor):
 
 
 def process_list(cursor, packages_to_process):
+    """
+    This method is looking for updates of a package, including name of package to update to,
+    associated erratum and repository this erratum is from.
+
+    :param cursor: psycopg2 connection cursor
+    :param packages_to_process: list of package to find updates for every of them
+
+    :returns: updates for a package in format of list of dictionaries {'package': <p_name>, 'erratum': <e_name>,
+    'repository': <r_name>}
+
+    """
+
     auxiliary_dict = {}
     answer = {}
 
