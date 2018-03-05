@@ -13,7 +13,7 @@ DEFAULT_DB_HOST = "localhost"
 DEFAULT_DB_PORT = 5432
 
 
-def splitFilename(filename):
+def split_filename(filename):
     """
     Pass in a standard style rpm fullname 
 
@@ -22,32 +22,32 @@ def splitFilename(filename):
         bar-1:9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
     """
 
-    isEpoch = True if filename.find(':') != -1 else False
+    is_epoch = True if filename.find(':') != -1 else False
 
     if filename[-4:] == '.rpm':
         filename = filename[:-4]
 
-    archIndex = filename.rfind('.')
-    arch = filename[archIndex + 1:]
+    arch_index = filename.rfind('.')
+    arch = filename[arch_index + 1:]
 
-    relIndex = filename[:archIndex].rfind('-')
-    rel = filename[relIndex + 1:archIndex]
+    rel_index = filename[:arch_index].rfind('-')
+    rel = filename[rel_index + 1:arch_index]
 
-    if isEpoch:
-        verIndex = filename[:relIndex].rfind(':')
+    if is_epoch:
+        ver_index = filename[:rel_index].rfind(':')
     else:
-        verIndex = filename[:relIndex].rfind('-')
-    ver = filename[verIndex + 1:relIndex]
+        ver_index = filename[:rel_index].rfind('-')
+    ver = filename[ver_index + 1:rel_index]
 
 
-    if isEpoch:
-        epochIndex = filename[:verIndex].rfind('-')
-        epoch = filename[epochIndex + 1:verIndex]
+    if is_epoch:
+        epoch_index = filename[:ver_index].rfind('-')
+        epoch = filename[epoch_index + 1:ver_index]
     else:
-        epochIndex = verIndex
+        epoch_index = ver_index
         epoch = '0'
 
-    name = filename[:epochIndex]
+    name = filename[:epoch_index]
     return name, ver, rel, epoch, arch
 
 
@@ -102,7 +102,7 @@ def process_list(cursor, packages_to_process):
 
         # process all packages form input
         if pkg not in auxiliary_dict:
-            n, v, r, e, a = splitFilename(str(pkg))
+            n, v, r, e, a = split_filename(str(pkg))
             auxiliary_dict[pkg] = {}  # create dictionary with aux data for pkg
 
             evr_key = e + ':' + v + ':' + r
@@ -131,7 +131,7 @@ def process_list(cursor, packages_to_process):
 
     pkg_ids = []
     for pkg in auxiliary_dict.keys():
-        n, v, r, e, a = splitFilename(str(pkg))
+        n, v, r, e, a = split_filename(str(pkg))
 
         try:
             key = str(n + ':' + str(auxiliary_dict[pkg]['evr_id']) + ':' + str(auxiliary_dict[pkg]['arch_id']))
@@ -173,7 +173,7 @@ def process_list(cursor, packages_to_process):
             names2ids[name] = [id]
 
     for pkg in auxiliary_dict.keys():
-        n, v, r, e, a = splitFilename(str(pkg))
+        n, v, r, e, a = split_filename(str(pkg))
 
         try:
             auxiliary_dict[pkg][n].extend(names2ids[n])
@@ -183,7 +183,7 @@ def process_list(cursor, packages_to_process):
     update_pkg_ids = []
 
     for pkg in auxiliary_dict:
-        n, v, r, e, a = splitFilename(str(pkg))
+        n, v, r, e, a = split_filename(str(pkg))
 
         if n in auxiliary_dict[pkg] and auxiliary_dict[pkg][n]:
             sql = """
@@ -274,7 +274,7 @@ def process_list(cursor, packages_to_process):
 
 
 def main():
-    optionsTable = [
+    options_table = [
         Option('-d', '--dbname', action='store', dest='db_name', default=DEFAULT_DB_NAME,
             help='database name to connect to (default: "rhnschema")'),
         Option('-U', '--username', action='store', dest='db_user', default=DEFAULT_DB_USER,
@@ -289,11 +289,11 @@ def main():
             help='read package names from file'),
     ]
 
-    optionParser = OptionParser(
+    option_parser = OptionParser(
         usage="Usage: %s [--dbname=<dbname>] [--username=<username>] [--password=<password>] [--host=<host>] [--port=<port>] rpm_name" % sys.argv[0],
-        option_list=optionsTable)
+        option_list=options_table)
 
-    options, unparsed = optionParser.parse_args(sys.argv[1:])
+    options, unparsed = option_parser.parse_args(sys.argv[1:])
 
     packages_to_process = []
 
