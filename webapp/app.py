@@ -3,9 +3,7 @@
 from tornado.ioloop import IOLoop
 import tornado.web
 import ujson
-import falcon
 import errata
-import sys
 import os
 
 cursor = errata.init_db(os.getenv('POSTGRESQL_DATABASE', errata.DEFAULT_DB_NAME),
