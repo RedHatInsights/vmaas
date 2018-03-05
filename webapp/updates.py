@@ -1,15 +1,5 @@
 #!/usr/bin/python -u
 
-"""
-known issues
-
-1. strictly follows architecture so things like upgrade from x86_64 to noarch are not possible
-2. doesn't follow obsoletes of packages
-3. looks only for advisories with CVE associated
-4. can be probably written in one select, split into multiple to improve readability of the alrgorithm
-5. can be optimized for performance
-"""
-
 from optparse import Option, OptionParser
 
 import psycopg2
