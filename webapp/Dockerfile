@@ -12,7 +12,7 @@ RUN yum -y update && yum -y install python-ujson python-tornado python-psycopg2 
 
 ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
 ADD ./app.py /app/app.py
-ADD ./errata.py /app/errata.py
+ADD ./updates.py /app/updates.py
 
 EXPOSE 8080
 
