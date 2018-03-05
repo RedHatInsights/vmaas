@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Variables from Travis CI environment
+set -e
 
+# Variables from Travis CI environment
 if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then
     echo "$DOCKER_PASSWORD" | docker login --password-stdin -u "$DOCKER_USER"
     SERVICES=$(docker-compose config --services)
