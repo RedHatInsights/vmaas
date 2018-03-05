@@ -1,4 +1,5 @@
 version: '3'
+
 services:
   database:
     labels:
@@ -29,8 +30,6 @@ services:
       - vmaas-reposcan-tmp:/tmp
     depends_on:
       - database
-    links:
-      - database
 
   webapp:
     container_name: vmaas-webapp
@@ -43,8 +42,7 @@ services:
       - 8080:8080
     depends_on:
       - database
-    links:
-      - database
+
 volumes:
   vmaas-db-data:
   vmaas-reposcan-tmp:

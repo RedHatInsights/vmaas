@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  database:
+    volumes:
+      - ./database:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+
+  reposcan:
+    volumes:
+      - ./reposcan:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+    command: ["sleep", "infinity"]
+
+  webapp:
+    volumes:
+      - ./webapp:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+    command: ["sleep", "infinity"]
