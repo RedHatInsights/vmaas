@@ -239,7 +239,10 @@ def process_list(cursor, packages_to_process):
     sql_result = cursor.fetchall()
     errata_id2repo_id = {}
     for errata_id, repo_id in sql_result:
-        errata_id2repo_id[errata_id] = repo_id
+        if errata_id not in errata_id2repo_id:
+            errata_id2repo_id[errata_id] = [repo_id]
+        else:
+            errata_id2repo_id[errata_id].append(repo_id)
 
     # Select all info about packages
     cursor.execute("SELECT id, name, evr_id, arch_id from package where id in %s;", [tuple(update_pkg_ids)])
@@ -255,20 +258,22 @@ def process_list(cursor, packages_to_process):
 
     for pkg in auxiliary_dict:
         answer[pkg] = []
-        try:
+
+        if 'update_id' in auxiliary_dict[pkg]:
             for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
+                for r_id in pkg_id2repo_id[upd_pkg_id]:
+                    # check if update package in the same repo with original one
+                    if r_id in auxiliary_dict[pkg]['repo_id']:
+                        errata_ids = pkg_id2errata_id[upd_pkg_id]
+                        for e_id in errata_ids:
+                            # check current errata in the same repo with update pkg
+                            if r_id in errata_id2repo_id[e_id]:
+                                e_name = id2errata_dict[e_id]
+                                r_name = repoinfo_dict[r_id]['name']
 
-                errata_ids = pkg_id2errata_id[upd_pkg_id]
-
-                for e_id in errata_ids:
-                    e_name = id2errata_dict[e_id]
-                    r_id = errata_id2repo_id[e_id]
-                    r_name = repoinfo_dict[r_id]['name']
-                    answer[pkg].append({'package': id2pakage_dict[upd_pkg_id],
-                                        'erratum': e_name,
-                                        'repository': r_name})
-        except KeyError:
-            pass
+                                answer[pkg].append({'package': id2pakage_dict[upd_pkg_id],
+                                                    'erratum': e_name,
+                                                    'repository': r_name})
 
     return answer
 
