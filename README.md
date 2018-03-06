@@ -1,4 +1,4 @@
-# vmaas
+# VMaaS
 
 [![Build Status](https://travis-ci.org/RedHatInsights/vmaas.svg?branch=master)](https://travis-ci.org/RedHatInsights/vmaas)
 
