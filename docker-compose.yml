@@ -6,7 +6,7 @@ services:
       kompose.volume.size: 1Gi
     container_name: vmaas-database
     build: ./database
-    image: vmaas/database
+    image: vmaas/database:latest
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
@@ -20,7 +20,7 @@ services:
       kompose.volume.size: 5Gi
     container_name: vmaas-reposcan
     build: ./reposcan
-    image: vmaas/reposcan
+    image: vmaas/reposcan:latest
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
@@ -34,7 +34,7 @@ services:
   webapp:
     container_name: vmaas-webapp
     build: ./webapp
-    image: vmaas/webapp
+    image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
       - ./docker-compose.env
