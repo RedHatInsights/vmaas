@@ -137,3 +137,26 @@ Build the images and start containers
 ```docker-compose up```
 
 Congratulations!
+
+
+### Developing / Debugging
+
+Build and start your container in "developer mode"
+
+```./scripts/devel-compose build --no-cache webapp```
+
+```./scripts/devel-compose up webapp```
+
+switch inside of the container
+
+```./scripts/devel-compose exec webapp bash```
+
+now your local git directory is mounted under ```/git``` in the container so any change
+you make you can immediatelly test.
+
+```[root@4cb6b50d0cb6 git]# python ./app.py```
+
+Note that by default container does NOT run the application (so you can run your own modificationtion)
+so if you want to run "original" (unmodified) application use
+
+```[root@4cb6b50d0cb6 git]# /app/entrypoint.sh```
