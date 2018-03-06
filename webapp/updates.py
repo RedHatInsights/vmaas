@@ -247,20 +247,26 @@ def process_list(cursor, packages_to_process):
     # Select all info about packages
     cursor.execute("SELECT id, name, evr_id, arch_id from package where id in %s;", [tuple(update_pkg_ids)])
     packages = cursor.fetchall()
-    id2pakage_dict = {}
+    pkg_id2full_name = {}
+    pkg_id2arch_id = {}
     for id, name, evr_id, arch_id in packages:
         full_rpm_name = name + '-'
         if id2evr_dict[evr_id]['epoch'] != '0':
             full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
         full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + id2arch_dict[arch_id]
 
-        id2pakage_dict[id] = full_rpm_name
+        pkg_id2full_name[id] = full_rpm_name
+        pkg_id2arch_id[id] = arch_id
 
     for pkg in auxiliary_dict:
         answer[pkg] = []
 
-        if 'update_id' in auxiliary_dict[pkg]:
-            for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
+        if 'update_id' not in auxiliary_dict[pkg]:
+            continue
+
+        for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
+            # FIXME: use compatibility tables instead of exact matching
+            if auxiliary_dict[pkg]['arch_id'] == pkg_id2arch_id[upd_pkg_id]:
                 for r_id in pkg_id2repo_id[upd_pkg_id]:
                     # check if update package in the same repo with original one
                     if r_id in auxiliary_dict[pkg]['repo_id']:
@@ -271,7 +277,7 @@ def process_list(cursor, packages_to_process):
                                 e_name = id2errata_dict[e_id]
                                 r_name = repoinfo_dict[r_id]['name']
 
-                                answer[pkg].append({'package': id2pakage_dict[upd_pkg_id],
+                                answer[pkg].append({'package': pkg_id2full_name[upd_pkg_id],
                                                     'erratum': e_name,
                                                     'repository': r_name})
 
