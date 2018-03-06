@@ -4,6 +4,26 @@
 
 Vulnerability Management as a Service
 
+## What Is This Thing?
+
+VMaaS is intended to be a microservice that has access to data connecting RPMs,
+repositories, errata, and CVEs, and can answer the question "What security changes do I
+have to apply to the following set of RPMs?"
+
+The goal is to have a common set of data, that can be updated from multiple sources, and
+accessed from an arbitrary number of web-service instances. To that end, `database`
+contains the docker-definitions for getting the data store up and running, `webapp` is the
+service that uses the data to answer a variety of vulnerability-related questions, and
+`reposcan` is an example of a plugin whose job is to fill the datastore with vulnerability
+information.
+
+## What ISN'T This Thing?
+
+VMaaS is **NOT** intended to be an inventory-management system. It doesn't 'remember'
+system profiles or containers, or manage inventory workflow in any way. An
+inventory-management system could use VMaaS as one source of 'health' information for the
+entities being managed.
+
 ## Quick Command Guide
 
 ### Local deployment (development)
