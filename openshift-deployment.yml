@@ -5,7 +5,7 @@
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, down."
+        msg: "You must run this playbook with tags! Available tags: up, down, update-images."
 
     - name: Get current project
       command: oc project
@@ -14,6 +14,7 @@
       tags:
         - up
         - down
+        - update-images
 
     - name: Print current project
       debug:
@@ -21,11 +22,17 @@
       tags:
         - up
         - down
+        - update-images
 
     - name: Create VMaaS
       shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc create -f -
       tags:
         - up
+
+    - name: Update VMaaS images
+      shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
+      tags:
+        - update-images
 
     - name: Delete VMaaS
       shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc delete -f -
