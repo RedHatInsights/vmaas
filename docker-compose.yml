@@ -17,7 +17,7 @@ services:
 
   reposcan:
     labels:
-      kompose.volume.size: 5Gi
+      kompose.volume.size: 4Gi
     container_name: vmaas-reposcan
     build: ./reposcan
     image: vmaas/reposcan:latest
