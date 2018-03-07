@@ -307,15 +307,41 @@ CREATE TABLE IF NOT EXISTS cve (
   name TEXT NOT NULL UNIQUE,
   description TEXT NULL,
   severity_id INT,
+  published_date TIMESTAMP,
+  modified_date TIMESTAMP,
   cvss3_score NUMERIC(5,3),
-  cwe TEXT,
   iava TEXT,
+  redhat_url TEXT,
+  secondary_url TEXT,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
     REFERENCES severity (id)
 )TABLESPACE pg_default;
 
+-- -----------------------------------------------------
+-- Table vmaas.cwe
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cwe (
+  id SERIAL,
+  name TEXT NOT NULL UNIQUE,
+  link TEXT NOT NULL,
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+-- -----------------------------------------------------
+-- Table vmaas.cve_cwe
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cve_cwe (
+  cve_id INT NOT NULL,
+  cwe_id INT NOT NULL,
+  UNIQUE (cve_id, cwe_id),
+  CONSTRAINT cve_id
+    FOREIGN KEY (cve_id)
+    REFERENCES cve (id),
+  CONSTRAINT cwe_id
+    FOREIGN KEY (cwe_id)
+    REFERENCES cwe (id)
+)TABLESPACE pg_default;
 
 -- -----------------------------------------------------
 -- Table vmaas.errata_cve

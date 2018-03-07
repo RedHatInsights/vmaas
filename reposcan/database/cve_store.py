@@ -1,11 +1,11 @@
 """
 Module contains classes for fetching/importing CVE from/into database.
 """
+from datetime import datetime
 from psycopg2.extras import execute_values
 
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
-
 
 class CveStore:
     """
@@ -51,6 +51,45 @@ class CveStore:
         self.conn.commit()
         return severities
 
+    def _populate_cwes(self, cursor, cve_data):
+        # pylint: disable=R0914
+        # Populate CWE table
+        cursor.execute("SELECT name, link FROM cwe")
+        already_in_db = cursor.fetchall()
+        cwe_list = []
+        for cve in cve_data.values():
+            for cwe in cve.get("cwe_list"):
+                cwe_list.append(tuple(cwe.values()))
+
+        import_set = set(cwe_list) - set(already_in_db)
+        self.logger.log("CWEs to import: %d" % len(import_set))
+        new_cwes = ()
+        if import_set:
+            execute_values(cursor, "INSERT INTO cwe (name, link) values %s returning name, id",
+                           list(import_set), page_size=len(list(import_set)))
+            new_cwes = cursor.fetchall()
+
+        # Populate cve_cwe mappings
+
+        mapping_set = []
+        for entry in cve_data.values():
+            cwe_names = [x.get("cwe_name") for x in entry.get("cwe_list")]
+            mapping_set.extend([(entry.get('id'), cwe_name) for cwe_name in cwe_names])
+
+        cwe_names = tuple(dict(mapping_set).values())
+        cursor.execute("SELECT name, id FROM cwe WHERE name IN %s", (cwe_names,))
+        # Some entries are not commited to DB yet, get them from last insert
+        result = dict(tuple(new_cwes) + tuple(cursor.fetchall()))
+        # Lookup IDs for missing cwes
+        cve_cwe_map = _map_name_to_id(set(mapping_set), result)
+        cursor.execute("SELECT cve_id, cwe_id FROM cve_cwe")
+        already_in_db = cursor.fetchall()
+        to_import = set(cve_cwe_map) - set(already_in_db)
+        self.logger.log("CVE to CWE mapping to import: %d" % len(to_import))
+        if to_import:
+            execute_values(cursor, "INSERT INTO cve_cwe (cve_id, cwe_id) values %s returning cve_id, cwe_id",
+                           list(to_import), page_size=len(to_import))
+
     def _populate_cves(self, repo):     # pylint: disable=too-many-locals
         severity_map = self._populate_severities(repo)
         cur = self.conn.cursor()
@@ -60,16 +99,24 @@ class CveStore:
 
             cve_desc_list = _dget(cve, "cve", "description", "description_data")
             severity = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
+            url_list = _dget(cve, "cve", "references", "reference_data")
+            modified_date = datetime.strptime(_dget(cve, "lastModifiedDate"), "%Y-%m-%dT%H:%MZ")
+            published_date = datetime.strptime(_dget(cve, "publishedDate"), "%Y-%m-%dT%H:%MZ")
             cwe_data = _dget(cve, "cve", "problemtype", "problemtype_data")
-            cwe_desc_list = _dget(cwe_data[0], "description")
-
+            cwe_list = _process_cwe_list(cwe_data)
+            redhat_url, secondary_url = _process_url_list(cve_name, url_list)
             cve_data[cve_name] = {
                 "description": _desc(cve_desc_list, "lang", "en", "value"),
                 "severity_id": severity_map[severity.capitalize()] if severity is not None else None,
                 "cvss3_score": _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseScore"),
-                "cwe": _desc(cwe_desc_list, "lang", "en", "value"),
+                "redhat_url": redhat_url,
+                "cwe_list": cwe_list,
+                "secondary_url": secondary_url,
+                "published_date": published_date,
+                "modified_date": modified_date,
                 "iava": None,
             }
+
 
         if cve_data:
             names = [(key,) for key in cve_data]
@@ -82,19 +129,22 @@ class CveStore:
                 cve_data[row[1]]["id"] = row[0]
                 # Remove to not insert this CVE
 
-        to_import = [(name, values["description"], values["severity_id"],
-                      values["cvss3_score"], values["cwe"], values["iava"])
+        to_import = [(name, values["description"], values["severity_id"], values["published_date"],
+                      values["modified_date"], values["cvss3_score"], values["iava"],
+                      values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" not in values]
         self.logger.log("CVEs to import: %d" % len(to_import))
-        to_update = [(values["id"], name, values["description"], values["severity_id"],
-                      values["cvss3_score"], values["cwe"], values["iava"])
+        to_update = [(values["id"], name, values["description"], values["severity_id"], values["published_date"],
+                      values["modified_date"], values["cvss3_score"], values["iava"],
+                      values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" in values]
+
         self.logger.log("CVEs to update: %d" % len(to_update))
 
         if to_import:
             execute_values(cur,
-                           """insert into cve (name, description, severity_id, cvss3_score, cwe, iava)
-                              values %s returning id, name""",
+                           """insert into cve (name, description, severity_id, published_date, modified_date,
+                              cvss3_score, iava, redhat_url, secondary_url) values %s returning id, name""",
                            list(to_import), page_size=len(to_import))
             for row in cur.fetchall():
                 cve_data[row[1]]["id"] = row[0]
@@ -104,13 +154,18 @@ class CveStore:
                            """update cve set name = v.name,
                                              description = v.description,
                                              severity_id = v.severity_id,
+                                             published_date = v.published_date,
+                                             modified_date = v.modified_date,
+                                             redhat_url = v.redhat_url,
+                                             secondary_url = v.secondary_url,
                                              cvss3_score = v.cvss3_score,
-                                             cwe = v.cwe,
                                              iava = v.iava
                               from (values %s)
-                              as v(id, name, description, severity_id, cvss3_score, cwe, iava)
+                              as v(id, name, description, severity_id, published_date, modified_date, cvss3_score,
+                              iava, redhat_url, secondary_url)
                               where cve.id = v.id """,
                            list(to_update), page_size=len(to_update))
+        self._populate_cwes(cur, cve_data)
         cur.close()
         self.conn.commit()
         return cve_data
@@ -142,3 +197,35 @@ def _desc(dlist, lang_key, lang_val, desc_key):
         if item[lang_key] == lang_val:
             return item[desc_key]
     return None
+
+def _process_url_list(name, url_list):
+    redhat_url = ""
+    secondary_url = ""
+    url_list = [item for item in url_list if url_list is not None]
+    for item in url_list:
+        if secondary_url == "" and item["url"] is not None:
+            secondary_url = item["url"]
+        if "redhat" in item["url"]:  # try to determine Red Hat CVE, suboptimal, but works so far
+            redhat_url = "https://access.redhat.com/security/cve/" + str.lower(name)
+    return redhat_url, secondary_url
+
+
+def _process_cwe_list(cwe_data):
+    cwe_list = []
+    cwe_exclusion_list = ["NVD-CWE-noinfo", "NVD-CWE-Other"]
+    for cwe in cwe_data:
+        description_list = cwe["description"]
+        for description in description_list:
+            if all(x != description["value"] for x in cwe_exclusion_list):
+                cwe_id = int(description["value"][4:])  # strip CWE-
+                cwe_link = "http://cwe.mitre.org/data/definitions/%i.html" % cwe_id
+                cwe_name = "CWE-%i" % cwe_id
+                cwe_list.append(dict(cwe_name=cwe_name, link=cwe_link))
+    return cwe_list
+
+def _map_name_to_id(mapping_set, result):
+    cve_cwe_map = []
+    # construct (cve_id,cwe_name)->(cve_id,cwe_id)
+    for item in mapping_set:
+        cve_cwe_map.append((item[0], result.get(item[1])))
+    return cve_cwe_map
