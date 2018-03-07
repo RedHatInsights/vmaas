@@ -15,7 +15,7 @@ DEFAULT_DB_PORT = 5432
 
 def split_filename(filename):
     """
-    Pass in a standard style rpm fullname 
+    Pass in a standard style rpm fullname
 
     Return a name, version, release, epoch, arch, e.g.::
         foo-1.0-1.i386.rpm returns foo, 1.0, 1, 0, i386
@@ -264,22 +264,28 @@ def process_list(cursor, packages_to_process):
         if 'update_id' not in auxiliary_dict[pkg]:
             continue
 
-        for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
-            # FIXME: use compatibility tables instead of exact matching
-            if auxiliary_dict[pkg]['arch_id'] == pkg_id2arch_id[upd_pkg_id]:
-                for r_id in pkg_id2repo_id[upd_pkg_id]:
-                    # check if update package in the same repo with original one
-                    if r_id in auxiliary_dict[pkg]['repo_id']:
-                        errata_ids = pkg_id2errata_id[upd_pkg_id]
-                        for e_id in errata_ids:
-                            # check current errata in the same repo with update pkg
-                            if r_id in errata_id2repo_id[e_id]:
-                                e_name = id2errata_dict[e_id]
-                                r_name = repoinfo_dict[r_id]['name']
+        # Some pkgs don't have associated errata (eg, original-repo-content) - skip
+        # resulting KeyError
+        try:
+            for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
+                # FIXME: use compatibility tables instead of exact matching
+                if auxiliary_dict[pkg]['arch_id'] == pkg_id2arch_id[upd_pkg_id]:
+                    for r_id in pkg_id2repo_id[upd_pkg_id]:
+                        # check if update package in the same repo with original one
+                        if r_id in auxiliary_dict[pkg]['repo_id']:
+                            errata_ids = pkg_id2errata_id[upd_pkg_id]
+                            for e_id in errata_ids:
+                                # check current errata in the same repo with update pkg
+                                if r_id in errata_id2repo_id[e_id]:
+                                    e_name = id2errata_dict[e_id]
+                                    r_name = repoinfo_dict[r_id]['name']
 
-                                answer[pkg].append({'package': pkg_id2full_name[upd_pkg_id],
-                                                    'erratum': e_name,
-                                                    'repository': r_name})
+                                    answer[pkg].append({
+                                        'package': pkg_id2full_name[upd_pkg_id],
+                                        'erratum': e_name,
+                                        'repository': r_name})
+        except KeyError:
+            pass
 
     return answer
 
