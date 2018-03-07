@@ -3,6 +3,7 @@
 set -e
 
 RELEASE_BRANCH="master"
+DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 # Variables from Travis CI environment
 if [[ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then
@@ -14,8 +15,11 @@ if [[ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" && "$TRAVIS_PULL_REQUEST" == "false"
     # Find changed services
     for service in $SERVICES; do
         for file in $CHANGED_FILES; do
-            if echo "$file" | grep "^$service/"; then
-                echo "Service $service changed."
+            if [ "$file" == "$DOCKER_COMPOSE_FILE" ]; then
+                echo "$file changed, need to rebuild all images."
+                CHANGED_SERVICES+="$service "
+            elif echo "$file" | grep "^$service/"; then
+                echo "Service $service changed by file $file."
                 CHANGED_SERVICES+="$service "
             fi
         done
