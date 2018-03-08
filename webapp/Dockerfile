@@ -14,6 +14,7 @@ ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
 ADD ./app.py /app/app.py
 ADD ./database.py /app/database.py
 ADD ./updates.py /app/updates.py
+ADD ./cve.py /app/cve.py
 ADD ./entrypoint.sh /app/entrypoint.sh
 
 EXPOSE 8080

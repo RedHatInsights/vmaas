@@ -7,6 +7,7 @@ import os
 
 from database import Database
 import updates
+import cve
 
 cursor = Database().cursor()
 
@@ -56,11 +57,22 @@ class UpdatesHandler(JsonHandler):
         return updates.process_list(cursor, data)
 
 
+class CVEHandler(JsonHandler):
+    def process_string(self, data):
+        return cve.process_list(cursor, {'cve_list': [data]})
+
+    def process_list(self, data):
+        return cve.process_list(cursor, data)
+
+
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/?", DocHandler),
-            (r"/api/v1/updates/?", UpdatesHandler)
+            (r"/api/v1/updates/?", UpdatesHandler),
+            (r"/api/v1/cves/?", CVEHandler),
+            (r"/api/v1/cves/[a-zA-Z0-9*-]+/?", CVEHandler)
+
         ]
         tornado.web.Application.__init__(self, handlers)
 

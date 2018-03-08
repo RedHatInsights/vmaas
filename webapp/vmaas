@@ -6,6 +6,7 @@ import sys
 
 from database import Database
 import updates
+import cve
 
 def arg_parser():
     parser = argparse.ArgumentParser(description='VMaas test cli')
@@ -25,6 +26,10 @@ def arg_parser():
     updates_parser.add_argument('--pkgfile', action='store', dest='pkgfile',
             help='read package names from file'),
     updates_parser.add_argument('pkgnames', action='store', nargs='*')
+    cve_parser = subcommands.add_parser('cves', help='list details for CVEs')
+    cve_parser.add_argument('--cvefile', action='store', dest='cvefile',
+                                help='read CVE names from file'),
+    cve_parser.add_argument('cvenames', action='store', nargs='*')
 
     return parser.parse_args()
 
@@ -32,6 +37,7 @@ def main():
     options = arg_parser()
 
     packages_to_process = []
+    cves_to_process = []
 
     if options.command == 'updates':
         if options.pkgfile:
@@ -49,6 +55,24 @@ def main():
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
         answer = updates.process_list(cursor, packages_to_process)
+        print(ujson.dumps(answer))
+
+    if options.command == 'cves':
+        if options.cvefile:
+            with open(options.pkgfile, "r") as cve_file:
+                data = ujson.loads(cve_file.read())
+                cves_to_process.extend(set(data['cve_list']))
+
+        if options.cvenames:
+            cves_to_process.extend(options.cvenames)
+
+        if not (options.cvefile or options.cvenames):
+            print("Missing CVE name or CVE list file. Exiting.")
+            sys.exit(1)
+
+        cursor = Database(options.db_name, options.db_user, options.db_pass,
+                          options.db_host, options.db_port).cursor()
+        answer = cve.process_list(cursor, {"cve_list":cves_to_process})
         print(ujson.dumps(answer))
 
 if __name__ == '__main__':
