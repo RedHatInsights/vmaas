@@ -43,10 +43,10 @@ class JsonHandler(tornado.web.RequestHandler):
         try:
             data = ujson.loads(json_data)
             response = self.process_list(data)
+            self.write(ujson.dumps(response))
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
-        self.write(ujson.dumps(response))
 
 class UpdatesHandler(JsonHandler):
     def process_string(self, data):
