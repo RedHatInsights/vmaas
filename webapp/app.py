@@ -26,7 +26,15 @@ class DocHandler(tornado.web.RequestHandler):
 
 class UpdatesHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write('')
+        index = self.request.uri.rfind('/')
+        package = self.request.uri[index + 1:]
+
+        response = {
+            'update_list': {}
+        }
+        
+        response['update_list'] = updates.process_list(cursor, [package])
+        self.write(ujson.dumps(response))
 
     def post(self):
         # extract input JSON from POST request
