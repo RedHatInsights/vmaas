@@ -1,11 +1,7 @@
 #!/usr/bin/python -u
 
-from optparse import Option, OptionParser
-
 import sys
 import ujson
-
-from database import Database
 
 def split_filename(filename):
     """
