@@ -13,7 +13,7 @@ if [[ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" && "$TRAVIS_PULL_REQUEST" == "false"
         COMMIT_RANGE="$TRAVIS_COMMIT_RANGE"
     else
         # $TRAVIS_COMMIT_RANGE is empty for builds triggered by the initial commit of a new branch
-        COMMIT_RANGE="HEAD..master"
+        COMMIT_RANGE="HEAD..HEAD~1"
     fi
     CHANGED_FILES=$(git diff --name-only $COMMIT_RANGE)
     CHANGED_SERVICES=""
