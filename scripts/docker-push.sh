@@ -9,7 +9,13 @@ DOCKER_COMPOSE_FILE="docker-compose.yml"
 if [[ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then
     echo "$DOCKER_PASSWORD" | docker login --password-stdin -u "$DOCKER_USER"
     SERVICES=$(docker-compose config --services)
-    CHANGED_FILES=$(git diff --name-only $TRAVIS_COMMIT_RANGE)
+    if [ "$TRAVIS_COMMIT_RANGE" != "" ]; then
+        COMMIT_RANGE="$TRAVIS_COMMIT_RANGE"
+    else
+        # $TRAVIS_COMMIT_RANGE is empty for builds triggered by the initial commit of a new branch
+        COMMIT_RANGE="HEAD..master"
+    fi
+    CHANGED_FILES=$(git diff --name-only $COMMIT_RANGE)
     CHANGED_SERVICES=""
 
     # Find changed services
