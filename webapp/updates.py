@@ -45,7 +45,7 @@ def split_filename(filename):
     return name, ver, rel, epoch, arch
 
 
-def process_list(cursor, packages_to_process):
+def process_list(cursor, data):
     """
     This method is looking for updates of a package, including name of package to update to,
     associated erratum and repository this erratum is from.
@@ -58,6 +58,7 @@ def process_list(cursor, packages_to_process):
 
     """
 
+    packages_to_process = data['package_list']
     auxiliary_dict = {}
     answer = {}
 
@@ -272,5 +273,8 @@ def process_list(cursor, packages_to_process):
                                         'package': pkg_id2full_name[upd_pkg_id],
                                         'erratum': e_name,
                                         'repository': r_name})
-    return answer
+    response = {
+        'update_list': answer,
+    }
+    return response
 
