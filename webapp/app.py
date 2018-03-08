@@ -3,14 +3,12 @@
 from tornado.ioloop import IOLoop
 import tornado.web
 import ujson
-import updates
 import os
 
-cursor = updates.init_db(os.getenv('POSTGRESQL_DATABASE', updates.DEFAULT_DB_NAME),
-                        os.getenv('POSTGRESQL_USER', updates.DEFAULT_DB_USER),
-                        os.getenv('POSTGRESQL_PASSWORD', updates.DEFAULT_DB_PASSWORD),
-                        os.getenv('POSTGRESQL_HOST', 'vmaas_db'), 
-                        os.getenv('POSTGRESQL_PORT', updates.DEFAULT_DB_PORT))
+from database import Database
+import updates
+
+cursor = Database().cursor()
 
 
 class DocHandler(tornado.web.RequestHandler):
