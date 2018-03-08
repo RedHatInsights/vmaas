@@ -42,7 +42,7 @@ class JsonHandler(tornado.web.RequestHandler):
         # fill response with packages
         try:
             data = ujson.loads(json_data)
-            response = updates.process_list(cursor, data)
+            response = self.process_list(data)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
