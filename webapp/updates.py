@@ -2,16 +2,10 @@
 
 from optparse import Option, OptionParser
 
-import psycopg2
 import sys
 import ujson
 
-DEFAULT_DB_NAME = "vmaas"
-DEFAULT_DB_USER = "vmaas_user"
-DEFAULT_DB_PASSWORD = "vmaas_passwd"
-DEFAULT_DB_HOST = "localhost"
-DEFAULT_DB_PORT = 5432
-
+from database import Database
 
 def split_filename(filename):
     """
@@ -49,11 +43,6 @@ def split_filename(filename):
 
     name = filename[:epoch_index]
     return name, ver, rel, epoch, arch
-
-
-def init_db(db_name, db_user, db_pass, db_host, db_port):
-    connection = psycopg2.connect(database=db_name, user=db_user, password=db_pass, host=db_host, port=db_port)
-    return connection.cursor()
 
 
 def process_list(cursor, packages_to_process):
@@ -288,15 +277,15 @@ def process_list(cursor, packages_to_process):
 
 def main():
     options_table = [
-        Option('-d', '--dbname', action='store', dest='db_name', default=DEFAULT_DB_NAME,
+        Option('-d', '--dbname', action='store', dest='db_name', default=None,
             help='database name to connect to (default: "rhnschema")'),
-        Option('-U', '--username', action='store', dest='db_user', default=DEFAULT_DB_USER,
+        Option('-U', '--username', action='store', dest='db_user', default=None,
             help='database user name (default: "rhnuser")'),
-        Option('-W', '--password', action='store', dest='db_pass', default=DEFAULT_DB_PASSWORD,
+        Option('-W', '--password', action='store', dest='db_pass', default=None,
             help='password to use (default: "rhnuser")'),
-        Option('--host', action='store', dest='db_host', default=DEFAULT_DB_HOST,
+        Option('--host', action='store', dest='db_host', default=None,
             help='database server host or socket directory (default: "local socket")'),
-        Option('-p', '--port', action='store', dest='db_port', default=DEFAULT_DB_PORT,
+        Option('-p', '--port', action='store', dest='db_port', default=None,
             help='database server port (default: "5432")'),
         Option('--pkgfile', action='store', dest='pkgfile',
             help='read package names from file'),
@@ -321,7 +310,8 @@ def main():
         print("Missing rpm_name or package list file. Exiting.")
         sys.exit(1)
 
-    cursor = init_db(options.db_name, options.db_user, options.db_pass, options.db_host, options.db_port)
+    cursor = Database(options.db_name, options.db_user, options.db_pass,
+                      options.db_host, options.db_port).cursor()
     answer = process_list(cursor, packages_to_process)
     print(ujson.dumps(answer))
 
