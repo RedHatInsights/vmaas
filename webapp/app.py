@@ -22,16 +22,12 @@ class DocHandler(tornado.web.RequestHandler):
         self.write(self.DOC_MSG)
 
 
-class UpdatesHandler(tornado.web.RequestHandler):
+class JsonHandler(tornado.web.RequestHandler):
     def get(self):
         index = self.request.uri.rfind('/')
-        package = self.request.uri[index + 1:]
+        name = self.request.uri[index + 1:]
 
-        response = {
-            'update_list': {}
-        }
-        
-        response['update_list'] = updates.process_list(cursor, [package])
+        response = self.process_string(name)
         self.write(ujson.dumps(response))
 
     def post(self):
@@ -43,19 +39,21 @@ class UpdatesHandler(tornado.web.RequestHandler):
         elif self.request.body:
             json_data = self.request.body
 
-        response = {
-            'update_list': {}
-        }
-
         # fill response with packages
         try:
             data = ujson.loads(json_data)
-            packages_to_process = data['package_list']
-            response['update_list'] = updates.process_list(cursor, packages_to_process)
+            response = updates.process_list(cursor, data)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
         self.write(ujson.dumps(response))
+
+class UpdatesHandler(JsonHandler):
+    def process_string(self, data):
+        return updates.process_list(cursor, {'package_list': [data]})
+
+    def process_list(self, data):
+        return updates.process_list(cursor, data)
 
 
 class Application(tornado.web.Application):
