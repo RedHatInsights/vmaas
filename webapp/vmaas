@@ -1,0 +1,55 @@
+#!/usr/bin/python -u
+
+import argparse
+import ujson
+import sys
+
+from database import Database
+import updates
+
+def arg_parser():
+    parser = argparse.ArgumentParser(description='VMaas test cli')
+    parser.add_argument('-d', '--dbname', action='store', dest='db_name', default=None,
+            help='database name to connect to'),
+    parser.add_argument('-U', '--username', action='store', dest='db_user', default=None,
+            help='database user name)'),
+    parser.add_argument('-W', '--password', action='store', dest='db_pass', default=None,
+            help='password to use)'),
+    parser.add_argument('--host', action='store', dest='db_host', default=None,
+            help='database server host or socket directory'),
+    parser.add_argument('-p', '--port', action='store', dest='db_port', default=None,
+            help='database server port'),
+
+    subcommands = parser.add_subparsers(dest='command')
+    updates_parser = subcommands.add_parser('updates', help='list updates for set of rpms')
+    updates_parser.add_argument('--pkgfile', action='store', dest='pkgfile',
+            help='read package names from file'),
+    updates_parser.add_argument('pkgnames', action='store', nargs='*')
+
+    return parser.parse_args()
+
+def main():
+    options = arg_parser()
+
+    packages_to_process = []
+
+    if options.command == 'updates':
+        if options.pkgfile:
+            with open(options.pkgfile, "r") as package_file:
+                data = ujson.loads(package_file.read())
+                packages_to_process.extend(set(data['package_list']))
+
+        if options.pkgnames:
+            packages_to_process.extend(options.pkgnames)
+
+        if not (options.pkgfile or options.pkgnames):
+            print("Missing rpm_name or package list file. Exiting.")
+            sys.exit(1)
+
+        cursor = Database(options.db_name, options.db_user, options.db_pass,
+                          options.db_host, options.db_port).cursor()
+        answer = updates.process_list(cursor, packages_to_process)
+        print(ujson.dumps(answer))
+
+if __name__ == '__main__':
+    main()
