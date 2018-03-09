@@ -188,6 +188,21 @@ CREATE TABLE IF NOT EXISTS product (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.content_set
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS content_set (
+  id SERIAL,
+  label TEXT NOT NULL UNIQUE,
+  name TEXT NULL,
+  product_id INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT product_id
+    FOREIGN KEY (product_id)
+    REFERENCES product (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.certificate
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS certificate (
@@ -208,14 +223,14 @@ CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
   name TEXT NOT NULL UNIQUE,
   url TEXT NOT NULL,
-  product_id INT NULL,
+  content_set_id INT NULL,
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NOT NULL,
   certificate_id INT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT product_id
-    FOREIGN KEY (product_id)
-    REFERENCES product (id),
+  CONSTRAINT content_set_id
+    FOREIGN KEY (content_set_id)
+    REFERENCES content_set (id),
   CONSTRAINT certificate_id
     FOREIGN KEY (certificate_id)
     REFERENCES certificate (id)
