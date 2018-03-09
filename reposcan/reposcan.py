@@ -14,6 +14,7 @@ import ujson
 
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
+from database.product_store import ProductStore
 from nistcve.cve_controller import CveRepoController
 from repodata.repository_controller import RepositoryController
 
@@ -29,17 +30,23 @@ def init_db():
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
-def repo_sync_task(repos=None):
+def repo_sync_task(products=None, repos=None):
     """Function to start syncing all repositories from input list or from database."""
     try:
         init_db()
         repository_controller = RepositoryController()
+        if products:
+            product_store = ProductStore()
+            product_store.store(products)
+            # Reference imported content set to associate with repositories
+            repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
+
         if repos:
             # Sync repos from input
             for repo in repos:
-                repo_name, repo_url, cert_name, ca_cert, cert, key = repo
-                repository_controller.add_repository(repo_name, repo_url, cert_name=cert_name,
-                                                     ca_cert=ca_cert, cert=cert, key=key)
+                repo_name, repo_url, content_set, cert_name, ca_cert, cert, key = repo
+                repository_controller.add_repository(repo_name, repo_url, content_set=content_set,
+                                                     cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key)
         else:
             # Re-sync repos in DB
             repository_controller.add_synced_repositories()
@@ -133,7 +140,9 @@ class RepoSyncHandler(SyncHandler):
 
     task_type = "Repo"
 
-    def _parse_repo_list(self):
+    def _parse_input_list(self):
+        # pylint: disable=too-many-locals
+        products = {}
         repos = []
         json_data = ""
         # check if JSON is passed as a file or as a body of POST request
@@ -153,10 +162,21 @@ class RepoSyncHandler(SyncHandler):
             else:
                 cert_name, ca_cert, cert, key = None, None, None, None
 
-            for repo_name, repo_url in repo_group["repos"].items():
-                repos.append((repo_name, repo_url, cert_name, ca_cert, cert, key))
+            # Repository list without product and content set information
+            if "repos" in repo_group:
+                for repo_name, repo_url in repo_group["repos"].items():
+                    repos.append((repo_name, repo_url, None, cert_name, ca_cert, cert, key))
+            # Repository list with product and content set information
+            if "products" in repo_group:
+                for product_id, product in repo_group["products"].items():
+                    product_id = int(product_id)
+                    products[product_id] = {"name": product["name"], "content_sets": {}}
+                    for content_set_label, content_set in product["content_sets"].items():
+                        products[product_id]["content_sets"][content_set_label] = content_set["name"]
+                        for repo_name, repo_url in content_set["repos"].items():
+                            repos.append((repo_name, repo_url, content_set_label, cert_name, ca_cert, cert, key))
 
-        return repos
+        return products, repos
 
     def get(self, *args, **kwargs):
         """Sync repositories stored in DB."""
@@ -165,14 +185,16 @@ class RepoSyncHandler(SyncHandler):
     def post(self, *args, **kwargs):
         """Sync repositories listed in request."""
         try:
-            repos = self._parse_repo_list()
+            products, repos = self._parse_input_list()
         except: # pylint: disable=bare-except
+            products = None
             repos = None
             LOGGER.log(traceback.format_exc())
             self.set_status(400)
             self.write(str(ResponseMsg("Incorrect JSON format.", success=False)))
         if repos:
-            self.start_task(self.task_type, repo_sync_task, self.on_complete, (), {"repos": repos})
+            self.start_task(self.task_type, repo_sync_task, self.on_complete, (),
+                            {"products": products, "repos": repos})
 
     def on_complete(self, res):
         """Callback after worker finishes."""

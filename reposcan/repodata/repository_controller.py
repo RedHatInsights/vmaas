@@ -139,17 +139,19 @@ class RepositoryController:
         """Queue all previously synced repositories."""
         repos = self.repo_store.list_repositories()
         for repo_name, repo_dict in repos.items():
-            self.repositories.add(Repository(repo_name, repo_dict["url"], cert_name=repo_dict["cert_name"],
-                                             ca_cert=repo_dict["ca_cert"], cert=repo_dict["cert"],
-                                             key=repo_dict["key"]))
+            # Reference content_set_label -> content set id
+            self.repo_store.content_set_to_db_id[repo_dict["content_set"]] = repo_dict["content_set_id"]
+            self.repositories.add(Repository(repo_name, repo_dict["url"], content_set=repo_dict["content_set"],
+                                             cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
+                                             cert=repo_dict["cert"], key=repo_dict["key"]))
 
     # pylint: disable=too-many-arguments
-    def add_repository(self, repo_name, repo_url, cert_name=None, ca_cert=None, cert=None, key=None):
+    def add_repository(self, repo_name, repo_url, content_set=None, cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_name, repo_url, cert_name=cert_name,
+        self.repositories.add(Repository(repo_name, repo_url, content_set=content_set, cert_name=cert_name,
                                          ca_cert=ca_cert, cert=cert, key=key))
 
     def _write_certificate_cache(self):
