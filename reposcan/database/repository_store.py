@@ -12,21 +12,34 @@ class RepositoryStore:
     Class providing interface for listing repositories stored in DB and storing repositories one by one.
     """
     def __init__(self):
+        self.content_set_to_db_id = {}
         self.logger = SimpleLogger()
         self.conn = DatabaseHandler.get_connection()
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
 
+    def set_content_set_db_mapping(self, content_set_to_db_id):
+        """Set content set to DB is mapping from product_store"""
+        self.content_set_to_db_id = content_set_to_db_id
+
+    def _get_content_set_id(self, repo):
+        if repo.content_set in self.content_set_to_db_id:
+            return self.content_set_to_db_id[repo.content_set]
+        return None
+
     def list_repositories(self):
         """List repositories stored in DB. Dictionary with repository name as key is returned."""
         cur = self.conn.cursor()
-        cur.execute("""select r.id, r.name, r.url, r.revision, c.name, c.ca_cert, c.cert, c.key from repo r
-                    left join certificate c on r.certificate_id = c.id""")
+        cur.execute("""select r.id, r.name, r.url, r.revision, cs.id, cs.label, c.name, c.ca_cert, c.cert, c.key
+                       from repo r
+                       left join certificate c on r.certificate_id = c.id
+                       left join content_set cs on r.content_set_id = cs.id""")
         repos = {}
         for row in cur.fetchall():
             # repo_name -> repo_id, repo_url, repo_revision
-            repos[row[1]] = {"id": row[0], "url": row[2], "revision": row[3],
-                             "cert_name": row[4], "ca_cert": row[5], "cert": row[6], "key": row[7]}
+            repos[row[1]] = {"id": row[0], "url": row[2], "revision": row[3], "content_set_id": row[4],
+                             "content_set": row[5], "cert_name": row[6], "ca_cert": row[7], "cert": row[8],
+                             "key": row[9]}
         cur.close()
         return repos
 
@@ -53,16 +66,16 @@ class RepositoryStore:
         cur = self.conn.cursor()
         cur.execute("select id from repo where name = %s", (repo.repo_name,))
         repo_id = cur.fetchone()
+        content_set_id = self._get_content_set_id(repo)
         if not repo_id:
-            # FIXME: add product logic
-            cur.execute("""insert into repo (name, url, revision, eol, certificate_id)
-                        values (%s, %s, to_timestamp(%s), false, %s) returning id""",
-                        (repo.repo_name, repo.repo_url, repo.repomd.get_revision(), cert_id,))
+            cur.execute("""insert into repo (name, url, revision, eol, certificate_id, content_set_id)
+                        values (%s, %s, to_timestamp(%s), false, %s, %s) returning id""",
+                        (repo.repo_name, repo.repo_url, repo.repomd.get_revision(), cert_id, content_set_id,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
-            cur.execute("update repo set revision = to_timestamp(%s), certificate_id = %s where id = %s",
-                        (repo.repomd.get_revision(), cert_id, repo_id[0],))
+            cur.execute("""update repo set revision = to_timestamp(%s), certificate_id = %s, content_set_id = %s
+                        where id = %s""", (repo.repomd.get_revision(), cert_id, content_set_id, repo_id[0],))
         cur.close()
         self.conn.commit()
         return repo_id[0]
