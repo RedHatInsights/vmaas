@@ -65,7 +65,7 @@ def process_list(cursor, data):
     provided_repo_names = None
 
     if 'repository_list' in data:
-        provided_repo_names = data['repo_list']
+        provided_repo_names = data['repository_list']
         provided_repo_ids = []
         cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
         for id_tuple in cursor.fetchall():
