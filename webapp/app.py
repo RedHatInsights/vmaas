@@ -45,6 +45,13 @@ class JsonHandler(tornado.web.RequestHandler):
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
+    def process_list(self, data):
+        """ Method to process list of input data. """
+        raise NotImplementedError("abstract method")
+
+    def process_string(self, data):
+        """ Method to process a single input data. """
+        raise NotImplementedError("abstract method")
 
 class UpdatesHandler(JsonHandler):
     """ /updates API handler """
