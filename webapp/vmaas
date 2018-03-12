@@ -61,32 +61,26 @@ def read_data(data_file, data_list, key):
 def main():
     options = arg_parser()
 
-    data = {}
+    answer = {}
+    cursor = Database(options.db_name, options.db_user, options.db_pass,
+                      options.db_host, options.db_port).cursor()
 
     if options.command == 'updates':
         data = read_data(options.pkgfile, options.pkgnames, "package_list")
 
-        cursor = Database(options.db_name, options.db_user, options.db_pass,
-                          options.db_host, options.db_port).cursor()
         answer = updates.process_list(cursor, data)
-        print(ujson.dumps(answer))
 
-    if options.command == 'cves':
+    elif options.command == 'cves':
         data = read_data(options.cvefile, options.cvenames, "cve_list")
 
-        cursor = Database(options.db_name, options.db_user, options.db_pass,
-                          options.db_host, options.db_port).cursor()
         answer = cve.process_list(cursor, data)
-        print(ujson.dumps(answer))
 
-    if options.command == 'repos':
+    elif options.command == 'repos':
         data = read_data(options.repofile, options.reponames, "repository_list")
 
-        cursor = Database(options.db_name, options.db_user, options.db_pass,
-                          options.db_host, options.db_port).cursor()
-
         answer = RepoAPI(cursor).process_list(data)
-        print(ujson.dumps(answer))
+
+    print(ujson.dumps(answer))
 
 if __name__ == '__main__':
     main()
