@@ -41,24 +41,30 @@ def arg_parser():
 
     return parser.parse_args()
 
+def read_data(data_file, data_list, key):
+    if not (data_file or data_list):
+        print("Missing input arguments or file. Exiting.")
+        sys.exit(1)
+
+    data = {}
+    if data_file:
+        with open(data_file, "r") as content:
+            data = ujson.loads(content.read())
+
+    if data_list:
+        if key not in data:
+            data[key] = []
+        data[key].extend(data_list)
+
+    return data
+
 def main():
     options = arg_parser()
 
     data = {}
 
     if options.command == 'updates':
-        if options.pkgfile:
-            with open(options.pkgfile, "r") as package_file:
-                data = ujson.loads(package_file.read())
-
-        if options.pkgnames:
-            if "package_list" not in data:
-                data["package_list"] = []
-            data["package_list"].extend(options.pkgnames)
-
-        if not (options.pkgfile or options.pkgnames):
-            print("Missing rpm_name or package list file. Exiting.")
-            sys.exit(1)
+        data = read_data(options.pkgfile, options.pkgnames, "package_list")
 
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
@@ -66,18 +72,7 @@ def main():
         print(ujson.dumps(answer))
 
     if options.command == 'cves':
-        if options.cvefile:
-            with open(options.pkgfile, "r") as cve_file:
-                data = ujson.loads(cve_file.read())
-
-        if options.cvenames:
-            if "cve_list" not in data:
-                data["cve_list"] = []
-            data["cve_list"].extend(options.cveames)
-
-        if not (options.cvefile or options.cvenames):
-            print("Missing CVE name or CVE list file. Exiting.")
-            sys.exit(1)
+        data = read_data(options.cvefile, options.cvenames, "cve_list")
 
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
@@ -85,18 +80,7 @@ def main():
         print(ujson.dumps(answer))
 
     if options.command == 'repos':
-        if options.repofile:
-            with open(options.repofile, "r") as repo_file:
-                data = ujson.loads(repo_file.read())
-
-        if options.reponames:
-            if "repository_list" not in data:
-                data["repository_list"] = []
-            data["repository_list"].extend(options.reponames)
-
-        if not (options.repofile or options.reponames):
-            print("Missing repo name or repo list file. Exiting.")
-            sys.exit(1)
+        data = read_data(options.repofile, options.reponames, "repository_list")
 
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
