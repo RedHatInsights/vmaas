@@ -1,5 +1,10 @@
 
+"""
+Module to handle /repos API calls.
+"""
+
 class RepoAPI:
+    """ Main /repos API class."""
     def __init__(self, cursor):
         self.cursor = cursor
 

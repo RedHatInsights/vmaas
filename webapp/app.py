@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+Main web API module
+"""
 
 from tornado.ioloop import IOLoop
 import tornado.web
@@ -12,6 +15,9 @@ from errata import ErrataAPI
 
 
 class JsonHandler(tornado.web.RequestHandler):
+    """
+    Parent class to parse input json data given a a data or a file.
+    """
     def get(self):
         index = self.request.uri.rfind('/')
         name = self.request.uri[index + 1:]
@@ -40,6 +46,7 @@ class JsonHandler(tornado.web.RequestHandler):
 
 
 class UpdatesHandler(JsonHandler):
+    """ /updates API handler """
     def process_string(self, data):
         return self.application.updatesapi.process_list({'package_list': [data]})
 
@@ -47,6 +54,7 @@ class UpdatesHandler(JsonHandler):
         return self.application.updatesapi.process_list(data)
 
 class CVEHandler(JsonHandler):
+    """ /cves API handler """
     def process_string(self, data):
         return self.application.cveapi.process_list({'cve_list': [data]})
 
@@ -54,6 +62,7 @@ class CVEHandler(JsonHandler):
         return self.application.cveapi.process_list(data)
 
 class ReposHandler(JsonHandler):
+    """ /repos API handler """
     def process_string(self, data):
         return self.application.repoapi.process_list({'repository_list': [data]})
 
@@ -61,6 +70,7 @@ class ReposHandler(JsonHandler):
         return self.application.repoapi.process_list(data)
 
 class ErrataHandler(JsonHandler):
+    """ /errata API handler """
     def process_string(self, data):
         return self.application.errataapi.process_list({'errata_list': [data]})
 
@@ -69,6 +79,7 @@ class ErrataHandler(JsonHandler):
 
 
 class Application(tornado.web.Application):
+    """ main webserver application class """
     def __init__(self):
         handlers = [
             (r"/api/v1/updates/?", UpdatesHandler),  # POST request
@@ -89,6 +100,7 @@ class Application(tornado.web.Application):
 
 
 def main():
+    """ Main application loop. """
     app = Application()
     app.listen(8080)
     IOLoop.instance().start()

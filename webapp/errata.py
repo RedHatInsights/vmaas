@@ -27,10 +27,12 @@ class Errata:
         setattr(self, "mydict", mydict)
 
     def set_cve_names(self, cve_name_list):
+        """ Put CVE list into erratum. """
         mydict = self.get_val("mydict")
         mydict["cve_list"] = cve_name_list
 
     def set_packages(self, package_list):
+        """ Put package list into erratum. """
         mydict = self.get_val("mydict")
         mydict["package_list"] = package_list
 
@@ -46,6 +48,7 @@ class Errata:
         return value
 
 class ErrataAPI:
+    """ Main /errata API class. """
     def __init__(self, cursor):
         self.cursor = cursor
 
