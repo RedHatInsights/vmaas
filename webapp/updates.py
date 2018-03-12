@@ -1,6 +1,10 @@
 #!/usr/bin/python -u
 
 
+"""
+Module to handle /updates API calls.
+"""
+
 def split_filename(filename):
     """
     Pass in a standard style rpm fullname
@@ -40,6 +44,7 @@ def split_filename(filename):
 
 
 class UpdatesAPI:
+    """ Main /updates API class. """
     def __init__(self, cursor):
         self.cursor = cursor
 

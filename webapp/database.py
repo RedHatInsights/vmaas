@@ -1,3 +1,6 @@
+"""
+Module to handle database connections.
+"""
 import os
 import psycopg2
 
@@ -5,6 +8,8 @@ def _set_val(value, envname, default):
     return value if value is not None else os.getenv(envname, default)
 
 class Database:
+    """ Database handler class. """
+    # pylint: disable=too-few-public-methods
     DEFAULT_NAME = "vmaas"
     DEFAULT_USER = "vmaas_user"
     DEFAULT_PASSWORD = "vmaas_passwd"
@@ -26,4 +31,5 @@ class Database:
         self.connection.set_session(readonly=True, autocommit=True)
 
     def cursor(self):
+        """ Returns cursor object connected to the database."""
         return self.connection.cursor()

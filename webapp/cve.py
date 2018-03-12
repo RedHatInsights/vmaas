@@ -36,6 +36,7 @@ class CVE:
         return value
 
 class CveAPI:
+    """ Main /cves API class. """
     def __init__(self, cursor):
         self.cursor = cursor
 
