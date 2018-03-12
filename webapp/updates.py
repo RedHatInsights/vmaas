@@ -144,7 +144,7 @@ class UpdatesAPI:
                 nevra2pkg_id[key].append(id)
 
         pkg_ids = []
-        for pkg in auxiliary_dict.keys():
+        for pkg in auxiliary_dict:
             n, v, r, e, a = split_filename(str(pkg))
 
             try:
@@ -172,7 +172,7 @@ class UpdatesAPI:
             else:
                 pkg_id2repo_id[pkg_id] = [repo_id]
 
-        for pkg in auxiliary_dict.keys():
+        for pkg in auxiliary_dict:
             try:
                 for pkg_id in auxiliary_dict[pkg]['pkg_id']:
                     auxiliary_dict[pkg]['repo_id'].extend(pkg_id2repo_id[pkg_id])
@@ -189,7 +189,7 @@ class UpdatesAPI:
             else:
                 names2ids[name] = [id]
 
-        for pkg in auxiliary_dict.keys():
+        for pkg in auxiliary_dict:
             n, v, r, e, a = split_filename(str(pkg))
 
             try:
