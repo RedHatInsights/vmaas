@@ -56,6 +56,7 @@ class UpdatesAPI:
         'repository': <r_name>}
 
         """
+        # pylint: disable=invalid-name
 
         packages_to_process = data['package_list']
         auxiliary_dict = {}
