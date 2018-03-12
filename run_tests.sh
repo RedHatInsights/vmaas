@@ -1,8 +1,14 @@
 #!/usr/bin/bash
 
+TESTDIR=$1
+if [ ! -d "$TESTDIR" ] ; then
+    echo "usage: $(basename $0) <testdir>" >&2
+    exit 1
+fi
+
 (
 # Go to script's directory
-cd $(dirname $0)
+cd "$TESTDIR"
 
 rc=0
 
@@ -29,9 +35,8 @@ $py_cmd -m unittest discover -v
 rc=$(($rc+$?))
 
 # Run pylint
-find . -iname '*.py' | xargs pylint --rcfile=pylintrc
+find . -iname '*.py' | xargs pylint --rcfile=../pylintrc
 rc=$(($rc+$?))
 
 exit $rc
 )
-
