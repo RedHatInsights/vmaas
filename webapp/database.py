@@ -17,6 +17,7 @@ class Database:
     DEFAULT_PORT = 5432
 
     def __init__(self, db_name=None, db_user=None, db_pass=None, db_host=None, db_port=None):
+        # pylint: disable=too-many-arguments
         self.name = _set_val(db_name, 'POSTGRESQL_DATABASE', self.DEFAULT_NAME)
         self.user = _set_val(db_user, 'POSTGRESQL_USER', self.DEFAULT_USER)
         self.password = _set_val(db_pass, 'POSTGRESQL_PASSWORD', self.DEFAULT_PASSWORD)
