@@ -3,9 +3,10 @@
 Main web API module
 """
 
+import json
+
 from tornado.ioloop import IOLoop
 import tornado.web
-import json
 
 from database import Database
 from cve import CveAPI
