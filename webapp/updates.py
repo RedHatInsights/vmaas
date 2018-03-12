@@ -1,6 +1,3 @@
-#!/usr/bin/python -u
-
-
 """
 Module to handle /updates API calls.
 """
