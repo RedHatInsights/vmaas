@@ -61,6 +61,17 @@ def process_list(cursor, data):
     if not packages_to_process:
         return answer
 
+    provided_repo_ids = None
+    provided_repo_names = None
+
+    if 'repository_list' in data:
+        provided_repo_names = data['repo_list']
+        provided_repo_ids = []
+        cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
+        for id_tuple in cursor.fetchall():
+            for id in id_tuple:
+                provided_repo_ids.append(id)
+
     # Select all evrs and put them into dictionary
     cursor.execute("SELECT id, epoch, version, release from evr")
     evrs = cursor.fetchall()
@@ -255,7 +266,9 @@ def process_list(cursor, data):
             if auxiliary_dict[pkg]['arch_id'] == pkg_id2arch_id[upd_pkg_id]:
                 for r_id in pkg_id2repo_id[upd_pkg_id]:
                     # check if update package in the same repo with original one
-                    if r_id in auxiliary_dict[pkg]['repo_id']:
+                    # and if the list of repositories for updates is provided, also check repo id in this list
+                    if r_id in auxiliary_dict[pkg]['repo_id'] and \
+                            (provided_repo_ids is None or r_id in provided_repo_ids):
                         # Some pkgs don't have associated errata (eg, original-repo-content)
                         if upd_pkg_id in pkg_id2errata_id:
                             errata_ids = pkg_id2errata_id[upd_pkg_id]
@@ -272,5 +285,9 @@ def process_list(cursor, data):
     response = {
         'update_list': answer,
     }
+
+    if provided_repo_ids is not None:
+        response.update({'repository_list': provided_repo_names})
+
     return response
 
