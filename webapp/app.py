@@ -6,9 +6,9 @@ import ujson
 import os
 
 from database import Database
+from cve import CveAPI
 from repos import RepoAPI
 import updates
-import cve
 
 cursor = Database().cursor()
 
@@ -59,10 +59,10 @@ class UpdatesHandler(JsonHandler):
 
 class CVEHandler(JsonHandler):
     def process_string(self, data):
-        return cve.process_list(cursor, {'cve_list': [data]})
+        return self.application.cveapi.process_list({'cve_list': [data]})
 
     def process_list(self, data):
-        return cve.process_list(cursor, data)
+        return self.application.cveapi.process_list(data)
 
 class ReposHandler(JsonHandler):
     def process_string(self, data):
@@ -82,6 +82,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/repos/?", ReposHandler),
             (r"/api/v1/repos/[a-zA-Z0-9*-]+/?", ReposHandler)
         ]
+        self.cveapi = CveAPI(cursor)
         self.repoapi = RepoAPI(cursor)
         tornado.web.Application.__init__(self, handlers)
 
