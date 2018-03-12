@@ -36,17 +36,17 @@ def arg_parser():
 def main():
     options = arg_parser()
 
-    packages_to_process = []
-    cves_to_process = []
+    data = {}
 
     if options.command == 'updates':
         if options.pkgfile:
             with open(options.pkgfile, "r") as package_file:
                 data = ujson.loads(package_file.read())
-                packages_to_process.extend(set(data['package_list']))
 
         if options.pkgnames:
-            packages_to_process.extend(options.pkgnames)
+            if "package_list" not in data:
+                data["package_list"] = []
+            data["package_list"].extend(options.pkgnames)
 
         if not (options.pkgfile or options.pkgnames):
             print("Missing rpm_name or package list file. Exiting.")
@@ -54,17 +54,18 @@ def main():
 
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
-        answer = updates.process_list(cursor, packages_to_process)
+        answer = updates.process_list(cursor, data)
         print(ujson.dumps(answer))
 
     if options.command == 'cves':
         if options.cvefile:
             with open(options.pkgfile, "r") as cve_file:
                 data = ujson.loads(cve_file.read())
-                cves_to_process.extend(set(data['cve_list']))
 
         if options.cvenames:
-            cves_to_process.extend(options.cvenames)
+            if "cve_list" not in data:
+                data["cve_list"] = []
+            data["cve_list"].extend(options.cveames)
 
         if not (options.cvefile or options.cvenames):
             print("Missing CVE name or CVE list file. Exiting.")
@@ -72,7 +73,7 @@ def main():
 
         cursor = Database(options.db_name, options.db_user, options.db_pass,
                           options.db_host, options.db_port).cursor()
-        answer = cve.process_list(cursor, {"cve_list":cves_to_process})
+        answer = cve.process_list(cursor, data)
         print(ujson.dumps(answer))
 
 if __name__ == '__main__':
