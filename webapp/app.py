@@ -15,6 +15,7 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 
 
+# pylint: disable=abstract-method
 class JsonHandler(tornado.web.RequestHandler):
     """
     Parent class to parse input json data given a a data or a file.
