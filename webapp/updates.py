@@ -132,7 +132,8 @@ class UpdatesAPI:
             return response
 
         # Select all packages with given evrs ids and put them into dictionary
-        self.cursor.execute("select id, name, evr_id, arch_id from package where evr_id in %s;",  [tuple(packages_evrids)])
+        self.cursor.execute("select id, name, evr_id, arch_id from package where evr_id in %s;",
+                            [tuple(packages_evrids)])
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
         for id, name, evr_id, arch_id in packs:
@@ -172,11 +173,11 @@ class UpdatesAPI:
                 pkg_id2repo_id[pkg_id] = [repo_id]
 
         for pkg in auxiliary_dict.keys():
-                try:
-                    for pkg_id in auxiliary_dict[pkg]['pkg_id']:
-                        auxiliary_dict[pkg]['repo_id'].extend(pkg_id2repo_id[pkg_id])
-                except KeyError:
-                    pass
+            try:
+                for pkg_id in auxiliary_dict[pkg]['pkg_id']:
+                    auxiliary_dict[pkg]['repo_id'].extend(pkg_id2repo_id[pkg_id])
+            except KeyError:
+                pass
 
         self.cursor.execute("select name, id from package where name in %s;", [tuple(packages_names)])
         sql_result = self.cursor.fetchall()
@@ -310,4 +311,3 @@ class UpdatesAPI:
 
 
         return response
-

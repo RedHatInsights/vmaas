@@ -24,11 +24,11 @@ class Database:
         self.host = _set_val(db_host, 'POSTGRESQL_HOST', self.DEFAULT_HOST)
         self.port = _set_val(db_port, 'POSTGRESQL_PORT', self.DEFAULT_PORT)
 
-        self.connection=psycopg2.connect(database=self.name,
-                                         user=self.user,
-                                         password=self.password,
-                                         host=self.host,
-                                         port=self.port)
+        self.connection = psycopg2.connect(database=self.name,
+                                           user=self.user,
+                                           password=self.password,
+                                           host=self.host,
+                                           port=self.port)
         self.connection.set_session(readonly=True, autocommit=True)
 
     def cursor(self):
