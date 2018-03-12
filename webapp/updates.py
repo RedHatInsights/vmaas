@@ -74,27 +74,27 @@ class UpdatesAPI:
                 provided_repo_ids = []
                 self.cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
                 for id_tuple in self.cursor.fetchall():
-                    for id in id_tuple:
-                        provided_repo_ids.append(id)
+                    for oid in id_tuple:
+                        provided_repo_ids.append(oid)
 
         # Select all evrs and put them into dictionary
         self.cursor.execute("SELECT id, epoch, version, release from evr")
         evrs = self.cursor.fetchall()
         evr2id_dict = {}
         id2evr_dict = {}
-        for id, e, v, r in evrs:
+        for oid, e, v, r in evrs:
             key = e + ':' + v + ':' + r
-            evr2id_dict[key] = id
-            id2evr_dict[id] = {'epoch': e, 'version': v, 'release': r}
+            evr2id_dict[key] = oid
+            id2evr_dict[oid] = {'epoch': e, 'version': v, 'release': r}
 
         # Select all archs and put them into dictionary
         self.cursor.execute("SELECT id, name from arch")
         archs = self.cursor.fetchall()
         arch2id_dict = {}
         id2arch_dict = {}
-        for id, name in archs:
-            arch2id_dict[name] = id
-            id2arch_dict[id] = name
+        for oid, name in archs:
+            arch2id_dict[name] = oid
+            id2arch_dict[oid] = name
 
         packages_names = []
         packages_evrids = []
@@ -136,12 +136,12 @@ class UpdatesAPI:
                             [tuple(packages_evrids)])
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
-        for id, name, evr_id, arch_id in packs:
+        for oid, name, evr_id, arch_id in packs:
             key = name + ':' + str(evr_id) + ':' + str(arch_id)
             if key not in nevra2pkg_id:
-                nevra2pkg_id[key] = [id]
+                nevra2pkg_id[key] = [oid]
             else:
-                nevra2pkg_id[key].append(id)
+                nevra2pkg_id[key].append(oid)
 
         pkg_ids = []
         for pkg in auxiliary_dict:
@@ -182,12 +182,12 @@ class UpdatesAPI:
         self.cursor.execute("select name, id from package where name in %s;", [tuple(packages_names)])
         sql_result = self.cursor.fetchall()
         names2ids = {}
-        for name, id in sql_result:
+        for name, oid in sql_result:
 
             if name in names2ids:
-                names2ids[name].append(id)
+                names2ids[name].append(oid)
             else:
-                names2ids[name] = [id]
+                names2ids[name] = [oid]
 
         for pkg in auxiliary_dict:
             n, v, r, e, a = split_filename(str(pkg))
@@ -210,16 +210,16 @@ class UpdatesAPI:
                 self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][n]),
                                           auxiliary_dict[pkg]['evr_id']])
 
-                for id in self.cursor.fetchall():
-                    auxiliary_dict[pkg]['update_id'].append(id[0])
-                    update_pkg_ids.append(id[0])
+                for oid in self.cursor.fetchall():
+                    auxiliary_dict[pkg]['update_id'].append(oid[0])
+                    update_pkg_ids.append(oid[0])
 
         # Select all info about repos
         self.cursor.execute("select id, name, url from repo where id in %s;", [tuple(repo_ids)])
         all_repos = self.cursor.fetchall()
         repoinfo_dict = {}
-        for id, name, url in all_repos:
-            repoinfo_dict[id] = {'name': name, 'url': url}
+        for oid, name, url in all_repos:
+            repoinfo_dict[oid] = {'name': name, 'url': url}
 
         pkg_id2repo_id = {}
         pkg_id2errata_id = {}
@@ -253,15 +253,15 @@ class UpdatesAPI:
                                 [tuple(update_pkg_ids)])
             packages = self.cursor.fetchall()
 
-            for id, name, evr_id, arch_id in packages:
+            for oid, name, evr_id, arch_id in packages:
                 full_rpm_name = name + '-'
                 if id2evr_dict[evr_id]['epoch'] != '0':
                     full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
                 full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + \
                                  id2arch_dict[arch_id]
 
-                pkg_id2full_name[id] = full_rpm_name
-                pkg_id2arch_id[id] = arch_id
+                pkg_id2full_name[oid] = full_rpm_name
+                pkg_id2arch_id[oid] = arch_id
 
         if all_errata:
             # Select all info about errata
@@ -269,9 +269,9 @@ class UpdatesAPI:
             errata = self.cursor.fetchall()
             id2errata_dict = {}
             all_errata_id = []
-            for id, name in errata:
-                id2errata_dict[id] = name
-                all_errata_id.append(id)
+            for oid, name in errata:
+                id2errata_dict[oid] = name
+                all_errata_id.append(oid)
 
             self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s;", [tuple(all_errata_id)])
             sql_result = self.cursor.fetchall()

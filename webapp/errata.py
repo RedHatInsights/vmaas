@@ -7,9 +7,9 @@ class Errata:
     Class to hold Erratum attributes
     """
 
-    def __init__(self, id, name, synopsis, severity, description, solution, issued, updated):
+    def __init__(self, oid, name, synopsis, severity, description, solution, issued, updated):
         setattr(self, "name", name)
-        setattr(self, "id", id)
+        setattr(self, "id", oid)
         mydict = {}
         mydict["type"] = None
         mydict["issued"] = str(issued)
@@ -52,14 +52,14 @@ class ErrataAPI:
     def __init__(self, cursor):
         self.cursor = cursor
 
-    def get_cve_names_for_erratum_id(self, id):
+    def get_cve_names_for_erratum_id(self, oid):
         """
         Get the list of cves for the given erratum id
         """
         cve_query = """SELECT name FROM cve
                          JOIN errata_cve ON cve_id = cve.id
                         WHERE errata_cve.errata_id = %s"""
-        self.cursor.execute(cve_query, (id,))
+        self.cursor.execute(cve_query, (oid,))
         cve_names = self.cursor.fetchall()
         cve_name_list = []
         for cve_name in cve_names:
@@ -77,7 +77,7 @@ class ErrataAPI:
         package_name += "%s-%s.%s" % (version, release, arch)
         return package_name
 
-    def get_package_list_for_erratum_id(self, id):
+    def get_package_list_for_erratum_id(self, oid):
         """
         Get the list of packages for the given erratum id
         """
@@ -87,7 +87,7 @@ class ErrataAPI:
                          JOIN evr ON evr.id = package.evr_id
                          JOIN arch ON arch.id = package.arch_id
                         WHERE pkg_errata.errata_id = %s"""
-        self.cursor.execute(pkg_query, (id,))
+        self.cursor.execute(pkg_query, (oid,))
         result = self.cursor.fetchall()
         package_list = []
         for name, epoch, version, release, arch in result:
@@ -122,10 +122,10 @@ class ErrataAPI:
         errata = self.cursor.fetchall()
 
         erratum_list = []
-        for id, name, synopsis, severity, description, solution, issued, updated in errata:
-            new_erratum = Errata(id, name, synopsis, severity, description, solution, issued, updated)
-            new_erratum.set_cve_names(self.get_cve_names_for_erratum_id(id))
-            new_erratum.set_packages(self.get_package_list_for_erratum_id(id))
+        for oid, name, synopsis, severity, description, solution, issued, updated in errata:
+            new_erratum = Errata(oid, name, synopsis, severity, description, solution, issued, updated)
+            new_erratum.set_cve_names(self.get_cve_names_for_erratum_id(oid))
+            new_erratum.set_packages(self.get_package_list_for_erratum_id(oid))
             erratum_list.append(new_erratum)
 
         errata_dict = {}
