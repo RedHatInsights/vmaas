@@ -222,8 +222,11 @@ CREATE TABLE IF NOT EXISTS certificate (
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
   label TEXT NOT NULL UNIQUE,
+  name TEXT NULL,
   url TEXT NOT NULL,
   content_set_id INT NULL,
+  arch_id INT NULL,
+  releasever TEXT NULL,
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NOT NULL,
   certificate_id INT NULL,
@@ -231,6 +234,9 @@ CREATE TABLE IF NOT EXISTS repo (
   CONSTRAINT content_set_id
     FOREIGN KEY (content_set_id)
     REFERENCES content_set (id),
+  CONSTRAINT arch_id
+    FOREIGN KEY (arch_id)
+    REFERENCES arch (id),
   CONSTRAINT certificate_id
     FOREIGN KEY (certificate_id)
     REFERENCES certificate (id)
