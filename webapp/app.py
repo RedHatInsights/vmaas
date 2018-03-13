@@ -6,11 +6,10 @@ import ujson
 import os
 
 from database import Database
+from cve import CveAPI
 from repos import RepoAPI
-import updates
-import cve
-
-cursor = Database().cursor()
+from updates import UpdatesAPI
+from errata import ErrataAPI
 
 
 class DocHandler(tornado.web.RequestHandler):
@@ -52,17 +51,17 @@ class JsonHandler(tornado.web.RequestHandler):
 
 class UpdatesHandler(JsonHandler):
     def process_string(self, data):
-        return updates.process_list(cursor, {'package_list': [data]})
+        return self.application.updatesapi.process_list({'package_list': [data]})
 
     def process_list(self, data):
-        return updates.process_list(cursor, data)
+        return self.application.updatesapi.process_list(data)
 
 class CVEHandler(JsonHandler):
     def process_string(self, data):
-        return cve.process_list(cursor, {'cve_list': [data]})
+        return self.application.cveapi.process_list({'cve_list': [data]})
 
     def process_list(self, data):
-        return cve.process_list(cursor, data)
+        return self.application.cveapi.process_list(data)
 
 class ReposHandler(JsonHandler):
     def process_string(self, data):
@@ -71,18 +70,32 @@ class ReposHandler(JsonHandler):
     def process_list(self, data):
         return self.application.repoapi.process_list(data)
 
+class ErrataHandler(JsonHandler):
+    def process_string(self, data):
+        return self.application.errataapi.process_list({'errata_list': [data]})
+
+    def process_list(self, data):
+        return self.application.errataapi.process_list(data)
+
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/?", DocHandler),
-            (r"/api/v1/updates/?", UpdatesHandler),
+            (r"/api/v1/updates/?", UpdatesHandler),  # POST request
+            (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
             (r"/api/v1/cves/?", CVEHandler),
             (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandler),
             (r"/api/v1/repos/?", ReposHandler),
             (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandler)
+            (r"/api/v1/errata/?", ErrataHandler),  # POST request
+            (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
+        cursor = Database().cursor()
+        self.updatesapi = UpdatesAPI(cursor)
+        self.cveapi = CveAPI(cursor)
         self.repoapi = RepoAPI(cursor)
+        self.errataapi = ErrataAPI(cursor)
         tornado.web.Application.__init__(self, handlers)
 
 
