@@ -78,9 +78,9 @@ class Application(tornado.web.Application):
             (r"/?", DocHandler),
             (r"/api/v1/updates/?", UpdatesHandler),
             (r"/api/v1/cves/?", CVEHandler),
-            (r"/api/v1/cves/[a-zA-Z0-9*-]+/?", CVEHandler),
+            (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandler),
             (r"/api/v1/repos/?", ReposHandler),
-            (r"/api/v1/repos/[a-zA-Z0-9*-_]+/?", ReposHandler)
+            (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandler)
         ]
         self.repoapi = RepoAPI(cursor)
         tornado.web.Application.__init__(self, handlers)
