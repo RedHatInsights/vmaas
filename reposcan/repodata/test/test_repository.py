@@ -17,12 +17,12 @@ class TestRepository(unittest.TestCase):
         primary = PrimaryMD("test_data/repodata/primary.xml")
         updateinfo = UpdateInfoMD("test_data/repodata/updateinfo.xml")
 
-        self.repository = Repository("repo_name", "repo_url")
+        self.repository = Repository("repo_label", "repo_url")
         self.repository.primary = primary_db
         self.repository.updateinfo = updateinfo
-        self.repository_without_updateinfo = Repository("repo_name", "repo_url")
+        self.repository_without_updateinfo = Repository("repo_label", "repo_url")
         self.repository_without_updateinfo.primary = primary_db
-        self.repository_primary_xml = Repository("repo_name", "repo_url")
+        self.repository_primary_xml = Repository("repo_label", "repo_url")
         self.repository_primary_xml.primary = primary
         self.repository_primary_xml.updateinfo = updateinfo
 

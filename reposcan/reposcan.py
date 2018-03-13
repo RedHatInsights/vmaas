@@ -44,8 +44,8 @@ def repo_sync_task(products=None, repos=None):
         if repos:
             # Sync repos from input
             for repo in repos:
-                repo_name, repo_url, content_set, cert_name, ca_cert, cert, key = repo
-                repository_controller.add_repository(repo_name, repo_url, content_set=content_set,
+                repo_label, repo_url, content_set, cert_name, ca_cert, cert, key = repo
+                repository_controller.add_repository(repo_label, repo_url, content_set=content_set,
                                                      cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key)
         else:
             # Re-sync repos in DB
@@ -164,8 +164,8 @@ class RepoSyncHandler(SyncHandler):
 
             # Repository list without product and content set information
             if "repos" in repo_group:
-                for repo_name, repo_url in repo_group["repos"].items():
-                    repos.append((repo_name, repo_url, None, cert_name, ca_cert, cert, key))
+                for repo_label, repo_url in repo_group["repos"].items():
+                    repos.append((repo_label, repo_url, None, cert_name, ca_cert, cert, key))
             # Repository list with product and content set information
             if "products" in repo_group:
                 for product_id, product in repo_group["products"].items():
@@ -173,8 +173,8 @@ class RepoSyncHandler(SyncHandler):
                     products[product_id] = {"name": product["name"], "content_sets": {}}
                     for content_set_label, content_set in product["content_sets"].items():
                         products[product_id]["content_sets"][content_set_label] = content_set["name"]
-                        for repo_name, repo_url in content_set["repos"].items():
-                            repos.append((repo_name, repo_url, content_set_label, cert_name, ca_cert, cert, key))
+                        for repo_label, repo_url in content_set["repos"].items():
+                            repos.append((repo_label, repo_url, content_set_label, cert_name, ca_cert, cert, key))
 
         return products, repos
 

@@ -36,8 +36,8 @@ def arg_parser():
 
     cve_parser = subcommands.add_parser('repos', help='list details for repos')
     cve_parser.add_argument('--repofile', action='store', dest='repofile',
-                                help='read repo names from file'),
-    cve_parser.add_argument('reponames', action='store', nargs='*')
+                                help='read repo labels from file'),
+    cve_parser.add_argument('repolabels', action='store', nargs='*')
 
     return parser.parse_args()
 
@@ -76,7 +76,7 @@ def main():
         answer = CveAPI(cursor).process_list(data)
 
     elif options.command == 'repos':
-        data = read_data(options.repofile, options.reponames, "repository_list")
+        data = read_data(options.repofile, options.repolabels, "repository_list")
 
         answer = RepoAPI(cursor).process_list(data)
 
