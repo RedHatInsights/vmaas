@@ -4,6 +4,7 @@ Module to handle /repos API calls.
 
 class RepoAPI:
     """ Main /repos API class."""
+    # pylint: disable=too-few-public-methods
     def __init__(self, cursor):
         self.cursor = cursor
 
