@@ -85,9 +85,9 @@ class Application(tornado.web.Application):
             (r"/api/v1/updates/?", UpdatesHandler),  # POST request
             (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
             (r"/api/v1/cves/?", CVEHandler),
-            (r"/api/v1/cves/[a-zA-Z0-9*-]+/?", CVEHandler),
+            (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandler),
             (r"/api/v1/repos/?", ReposHandler),
-            (r"/api/v1/repos/[a-zA-Z0-9*-_]+/?", ReposHandler),
+            (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandler)
             (r"/api/v1/errata/?", ErrataHandler),  # POST request
             (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
