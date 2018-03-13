@@ -38,23 +38,73 @@ JSON list of repositories have following format:
     "cert": "<CLIENT CERTIFICATE>",
     "key": "<CLIENT KEY>"
   },
-  "repos": {
-    "rhel-7-server-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/",
-    "rhel-7-server-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/os/",
-    "rhel-7-server-optional-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/optional/os/",
-    "rhel-7-server-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/optional/os/",
-    "rhel-6-server-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/",
-    "rhel-6-server-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/os/",
-    "rhel-6-server-optional-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/optional/os/",
-    "rhel-6-server-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/optional/os/",
-    "rhel-7-workstation-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/os/",
-    "rhel-7-workstation-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/os/",
-    "rhel-7-workstation-optional-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/optional/os/",
-    "rhel-7-workstation-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/optional/os/",
-    "rhel-6-workstation-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/os/",
-    "rhel-6-workstation-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/os/",
-    "rhel-6-workstation-optional-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/optional/os/",
-    "rhel-6-workstation-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/optional/os/"
+  "products": {
+    "69": {
+      "name": "Red Hat Enterprise Linux Server",
+      "content_sets": {
+        "rhel-7-server-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
+          "repos": {
+            "rhel-7-server-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/",
+            "rhel-7-server-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/os/"
+          }
+        },
+        "rhel-7-server-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Server - Optional (RPMs)",
+          "repos": {
+            "rhel-7-server-optional-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/optional/os/",
+            "rhel-7-server-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/optional/os/"
+          }
+        },
+        "rhel-6-server-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Server (RPMs)",
+          "repos": {
+            "rhel-6-server-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/",
+            "rhel-6-server-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/os/"
+          }
+        },
+        "rhel-6-server-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Server - Optional (RPMs)",
+          "repos": {
+            "rhel-6-server-optional-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/optional/os/",
+            "rhel-6-server-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/optional/os/"
+          }
+        }
+      }
+    },
+    "71": {
+      "name": "Red Hat Enterprise Linux Workstation",
+      "content_sets": {
+        "rhel-7-workstation-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
+          "repos": {
+            "rhel-7-workstation-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/os/",
+            "rhel-7-workstation-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/os/"
+          }
+        },
+        "rhel-7-workstation-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Workstation - Optional (RPMs)",
+          "repos": {
+            "rhel-7-workstation-optional-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/optional/os/",
+            "rhel-7-workstation-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/optional/os/"
+          }
+        },
+        "rhel-6-workstation-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Workstation (RPMs)",
+          "repos": {
+            "rhel-6-workstation-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/os/",
+            "rhel-6-workstation-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/os/"
+          }
+        },
+        "rhel-6-workstation-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Workstation - Optional (RPMs)",
+          "repos": {
+            "rhel-6-workstation-optional-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/optional/os/",
+            "rhel-6-workstation-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/optional/os/"
+          }
+        }
+      }
+    }
   }
 },
 {
