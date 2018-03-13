@@ -44,6 +44,31 @@ class UpdatesAPI(object):
     """ Main /updates API class. """
     def __init__(self, cursor):
         self.cursor = cursor
+        self.evr2id_dict = {}
+        self.id2evr_dict = {}
+        self.arch2id_dict = {}
+        self.id2arch_dict = {}
+
+        self.prepare()
+
+    def prepare(self):
+        """ Read ahead table of keys. """
+        # Select all evrs and put them into dictionary
+        # pylint: disable=invalid-name
+        self.cursor.execute("SELECT id, epoch, version, release from evr")
+        evrs = self.cursor.fetchall()
+        for oid, e, v, r in evrs:
+            key = e + ':' + v + ':' + r
+            self.evr2id_dict[key] = oid
+            self.id2evr_dict[oid] = {'epoch': e, 'version': v, 'release': r}
+
+        # Select all archs and put them into dictionary
+        self.cursor.execute("SELECT id, name from arch")
+        archs = self.cursor.fetchall()
+        for oid, name in archs:
+            self.arch2id_dict[name] = oid
+            self.id2arch_dict[oid] = name
+
 
     def process_list(self, data):
         """
@@ -78,25 +103,6 @@ class UpdatesAPI(object):
                     for oid in id_tuple:
                         provided_repo_ids.append(oid)
 
-        # Select all evrs and put them into dictionary
-        self.cursor.execute("SELECT id, epoch, version, release from evr")
-        evrs = self.cursor.fetchall()
-        evr2id_dict = {}
-        id2evr_dict = {}
-        for oid, e, v, r in evrs:
-            key = e + ':' + v + ':' + r
-            evr2id_dict[key] = oid
-            id2evr_dict[oid] = {'epoch': e, 'version': v, 'release': r}
-
-        # Select all archs and put them into dictionary
-        self.cursor.execute("SELECT id, name from arch")
-        archs = self.cursor.fetchall()
-        arch2id_dict = {}
-        id2arch_dict = {}
-        for oid, name in archs:
-            arch2id_dict[name] = oid
-            id2arch_dict[oid] = name
-
         packages_names = []
         packages_evrids = []
 
@@ -110,14 +116,14 @@ class UpdatesAPI(object):
                 answer[pkg] = []          # fill answer with empty data
 
                 evr_key = e + ':' + v + ':' + r
-                if evr_key in evr2id_dict:
+                if evr_key in self.evr2id_dict:
                     packages_names.append(n)
                     auxiliary_dict[pkg][n] = []
 
-                    evr_id = evr2id_dict[evr_key]
+                    evr_id = self.evr2id_dict[evr_key]
                     packages_evrids.append(evr_id)
                     auxiliary_dict[pkg]['evr_id'] = evr_id
-                    auxiliary_dict[pkg]['arch_id'] = arch2id_dict[a]
+                    auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[a]
                     auxiliary_dict[pkg]['repo_id'] = []
                     auxiliary_dict[pkg]['pkg_id'] = []
                     auxiliary_dict[pkg]['update_id'] = []
@@ -256,10 +262,11 @@ class UpdatesAPI(object):
 
             for oid, name, evr_id, arch_id in packages:
                 full_rpm_name = name + '-'
-                if id2evr_dict[evr_id]['epoch'] != '0':
-                    full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
-                full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + \
-                                 id2arch_dict[arch_id]
+                if self.id2evr_dict[evr_id]['epoch'] != '0':
+                    full_rpm_name += self.id2evr_dict[evr_id]['epoch'] + ':'
+                full_rpm_name += self.id2evr_dict[evr_id]['version'] + '-' + \
+                                 self.id2evr_dict[evr_id]['release'] + '.' + \
+                                 self.id2arch_dict[arch_id]
 
                 pkg_id2full_name[oid] = full_rpm_name
                 pkg_id2arch_id[oid] = arch_id
