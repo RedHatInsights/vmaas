@@ -16,6 +16,7 @@ class RepoAPI:
         :returns: json response with repository details
         """
         repos = data['repository_list']
+        response = {}
         if not repos:
             return response
 
@@ -27,7 +28,6 @@ class RepoAPI:
                 "url": url,
             }
 
-        response = {
-            'repository_list': repolist,
-        }
+        response['repository_list'] = repolist
+
         return response
