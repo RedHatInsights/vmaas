@@ -12,9 +12,9 @@ class Repository:
     Class aggregating information about metadata files available in repository.
     """
     # pylint: disable=too-many-arguments, too-many-instance-attributes
-    def __init__(self, repo_name, repo_url, content_set=None, cert_name=None, ca_cert=None, cert=None, key=None):
+    def __init__(self, repo_label, repo_url, content_set=None, cert_name=None, ca_cert=None, cert=None, key=None):
         self.logger = SimpleLogger()
-        self.repo_name = repo_name
+        self.repo_label = repo_label
         self.repo_url = repo_url
         self.repomd = None
         self.primary = None

@@ -23,9 +23,9 @@ class RepoAPI(object):
 
         repolist = {}
         # Select all packages with given evrs ids and put them into dictionary
-        self.cursor.execute("select name, url from repo where name in %s;", [tuple(repos)])
-        for name, url in self.cursor.fetchall():
-            repolist[name] = {
+        self.cursor.execute("select label, url from repo where label in %s;", [tuple(repos)])
+        for label, url in self.cursor.fetchall():
+            repolist[label] = {
                 "url": url,
             }
 

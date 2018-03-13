@@ -28,15 +28,15 @@ class RepositoryStore:
         return None
 
     def list_repositories(self):
-        """List repositories stored in DB. Dictionary with repository name as key is returned."""
+        """List repositories stored in DB. Dictionary with repository label as key is returned."""
         cur = self.conn.cursor()
-        cur.execute("""select r.id, r.name, r.url, r.revision, cs.id, cs.label, c.name, c.ca_cert, c.cert, c.key
+        cur.execute("""select r.id, r.label, r.url, r.revision, cs.id, cs.label, c.name, c.ca_cert, c.cert, c.key
                        from repo r
                        left join certificate c on r.certificate_id = c.id
                        left join content_set cs on r.content_set_id = cs.id""")
         repos = {}
         for row in cur.fetchall():
-            # repo_name -> repo_id, repo_url, repo_revision
+            # repo_label -> repo_id, repo_url, repo_revision
             repos[row[1]] = {"id": row[0], "url": row[2], "revision": row[3], "content_set_id": row[4],
                              "content_set": row[5], "cert_name": row[6], "ca_cert": row[7], "cert": row[8],
                              "key": row[9]}
@@ -64,13 +64,13 @@ class RepositoryStore:
         else:
             cert_id = None
         cur = self.conn.cursor()
-        cur.execute("select id from repo where name = %s", (repo.repo_name,))
+        cur.execute("select id from repo where label = %s", (repo.repo_label,))
         repo_id = cur.fetchone()
         content_set_id = self._get_content_set_id(repo)
         if not repo_id:
-            cur.execute("""insert into repo (name, url, revision, eol, certificate_id, content_set_id)
+            cur.execute("""insert into repo (label, url, revision, eol, certificate_id, content_set_id)
                         values (%s, %s, to_timestamp(%s), false, %s, %s) returning id""",
-                        (repo.repo_name, repo.repo_url, repo.repomd.get_revision(), cert_id, content_set_id,))
+                        (repo.repo_label, repo.repo_url, repo.repomd.get_revision(), cert_id, content_set_id,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
@@ -86,7 +86,7 @@ class RepositoryStore:
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
-        self.logger.log("Syncing repository: %s" % repository.repo_name)
+        self.logger.log("Syncing repository: %s" % repository.repo_label)
         repo_id = self._import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())

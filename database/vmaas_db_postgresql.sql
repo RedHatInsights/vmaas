@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS certificate (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  label TEXT NOT NULL UNIQUE,
   url TEXT NOT NULL,
   content_set_id INT NULL,
   eol BOOLEAN NOT NULL,

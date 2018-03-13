@@ -79,7 +79,7 @@ class UpdatesAPI(object):
         :param packages_to_process: list of package to find updates for every of them
 
         :returns: updates for a package in format of list of dictionaries {'package': <p_name>, 'erratum': <e_name>,
-        'repository': <r_name>}
+        'repository': <r_label>}
 
         """
         # pylint: disable=invalid-name
@@ -92,14 +92,14 @@ class UpdatesAPI(object):
             return answer
 
         provided_repo_ids = None
-        provided_repo_names = None
+        provided_repo_labels = None
 
         if 'repository_list' in data:
-            provided_repo_names = data['repository_list']
+            provided_repo_labels = data['repository_list']
 
-            if provided_repo_names:
+            if provided_repo_labels:
                 provided_repo_ids = []
-                self.cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
+                self.cursor.execute("select id from repo where label in %s;", [tuple(provided_repo_labels)])
                 for id_tuple in self.cursor.fetchall():
                     for oid in id_tuple:
                         provided_repo_ids.append(oid)
@@ -134,7 +134,7 @@ class UpdatesAPI(object):
         }
 
         if provided_repo_ids is not None:
-            response.update({'repository_list': provided_repo_names})
+            response.update({'repository_list': provided_repo_labels})
 
         if not packages_evrids:
             return response
@@ -223,11 +223,11 @@ class UpdatesAPI(object):
                     update_pkg_ids.append(oid[0])
 
         # Select all info about repos
-        self.cursor.execute("select id, name, url from repo where id in %s;", [tuple(repo_ids)])
+        self.cursor.execute("select id, label, url from repo where id in %s;", [tuple(repo_ids)])
         all_repos = self.cursor.fetchall()
         repoinfo_dict = {}
-        for oid, name, url in all_repos:
-            repoinfo_dict[oid] = {'name': name, 'url': url}
+        for oid, label, url in all_repos:
+            repoinfo_dict[oid] = {'label': label, 'url': url}
 
         pkg_id2repo_id = {}
         pkg_id2errata_id = {}
@@ -324,11 +324,11 @@ class UpdatesAPI(object):
                                         # check current errata in the same repo with update pkg
                                         if r_id in errata_id2repo_id[e_id]:
                                             e_name = id2errata_dict[e_id]
-                                            r_name = repoinfo_dict[r_id]['name']
+                                            r_label = repoinfo_dict[r_id]['label']
 
                                             response['update_list'][pkg].append({
                                                 'package': pkg_id2full_name[upd_pkg_id],
                                                 'erratum': e_name,
-                                                'repository': r_name})
+                                                'repository': r_label})
 
         return response
