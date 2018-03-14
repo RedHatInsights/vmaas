@@ -4,6 +4,7 @@ Main web API module
 """
 
 import json
+import traceback
 
 from tornado.ioloop import IOLoop
 import tornado.web
@@ -44,6 +45,7 @@ class JsonHandler(tornado.web.RequestHandler):
             self.write(response)
             self.flush()
         except ValueError:
+            traceback.print_exc()
             self.set_status(400, reason='Error: malformed input JSON.')
 
     def process_list(self, data):
