@@ -9,33 +9,31 @@ class Errata(object):
 
     def __init__(self, oid, name, synopsis, summary, errata_type, severity, description, solution, issued, updated):
         #pylint: disable=too-many-arguments
-        setattr(self, "name", name)
-        setattr(self, "id", oid)
-        mydict = {}
-        mydict["type"] = errata_type
-        mydict["issued"] = str(issued)
-        mydict["synopsis"] = synopsis
-        mydict["description"] = description
-        mydict["solution"] = solution
-        mydict["severity"] = severity
-        mydict["summary"] = summary
-        mydict["updated"] = str(updated)
-        mydict["url"] = "https://access.redhat.com/errata/%s" % name
-        mydict["bugzilla_list"] = []
-        mydict["cve_list"] = []
-        mydict["package_list"] = []
-        mydict["reference_list"] = []
-        setattr(self, "mydict", mydict)
+        self.name = name
+        self.oid = oid
+        self.data = {
+            "type": errata_type,
+            "issued": str(issued),
+            "synopsis": synopsis,
+            "description": description,
+            "solution": solution,
+            "severity": severity,
+            "summary": summary,
+            "updated": str(updated),
+            "url": "https://access.redhat.com/errata/%s" % name,
+            "bugzilla_list": [],
+            "cve_list": [],
+            "package_list": [],
+            "reference_list": [],
+        }
 
     def set_cve_names(self, cve_name_list):
         """ Put CVE list into erratum. """
-        mydict = self.get_val("mydict")
-        mydict["cve_list"] = cve_name_list
+        self.data["cve_list"] = cve_name_list
 
     def set_packages(self, package_list):
         """ Put package list into erratum. """
-        mydict = self.get_val("mydict")
-        mydict["package_list"] = package_list
+        self.data["package_list"] = package_list
 
     def get_val(self, attr_name):
         """
@@ -43,10 +41,7 @@ class Errata(object):
         :param attr_name: attr_name
         :return: attribute
         """
-        value = None
-        if attr_name in vars(self):
-            value = getattr(self, attr_name)
-        return value
+        return getattr(self, attr_name, None)
 
 class ErrataAPI(object):
     """ Main /errata API class. """
