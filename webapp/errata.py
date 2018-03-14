@@ -2,6 +2,8 @@
 Module contains classes for returning errata data from DB
 """
 
+from utils import join_packagename
+
 class Errata(object):
     """
     Class to hold Erratum attributes
@@ -62,17 +64,6 @@ class ErrataAPI(object):
             cve_name_list.append(cve_name[0])
         return cve_name_list
 
-    @staticmethod
-    def build_package_name(name, epoch, version, release, arch):
-        """
-        Build a package name from the separate NEVRA parts
-        """
-        package_name = name + "-"
-        if int(epoch) > 0:
-            package_name += "%s:" % epoch
-        package_name += "%s-%s.%s" % (version, release, arch)
-        return package_name
-
     def get_package_list_for_erratum_id(self, oid):
         """
         Get the list of packages for the given erratum id
@@ -87,7 +78,7 @@ class ErrataAPI(object):
         result = self.cursor.fetchall()
         package_list = []
         for name, epoch, version, release, arch in result:
-            package_list.append(self.build_package_name(name, epoch, version, release, arch))
+            package_list.append(join_packagename(name, epoch, version, release, arch))
         return package_list
 
     def process_list(self, data):

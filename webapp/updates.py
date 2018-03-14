@@ -2,6 +2,8 @@
 Module to handle /updates API calls.
 """
 
+from utils import join_packagename
+
 def split_filename(filename):
     """
     Pass in a standard style rpm fullname
@@ -262,12 +264,11 @@ class UpdatesAPI(object):
             packages = self.cursor.fetchall()
 
             for oid, name, evr_id, arch_id in packages:
-                full_rpm_name = name + '-'
-                if self.id2evr_dict[evr_id]['epoch'] != '0':
-                    full_rpm_name += self.id2evr_dict[evr_id]['epoch'] + ':'
-                full_rpm_name += self.id2evr_dict[evr_id]['version'] + '-' + \
-                                 self.id2evr_dict[evr_id]['release'] + '.' + \
-                                 self.id2arch_dict[arch_id]
+                full_rpm_name = join_packagename(name,
+                                                 self.id2evr_dict[evr_id]['epoch'],
+                                                 self.id2evr_dict[evr_id]['version'],
+                                                 self.id2evr_dict[evr_id]['release'],
+                                                 self.id2arch_dict[arch_id])
 
                 pkg_id2full_name[oid] = full_rpm_name
                 pkg_id2arch_id[oid] = arch_id
