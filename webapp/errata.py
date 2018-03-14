@@ -53,10 +53,10 @@ class ErrataAPI:
         """
         Get the list of cves for the given erratum id
         """
-        cve_query = "SELECT name FROM cve"
-        cve_query += " JOIN errata_cve ON cve_id = cve.id"
-        cve_query += " WHERE errata_cve.errata_id = %s" % str(id)
-        self.cursor.execute(cve_query)
+        cve_query = """SELECT name FROM cve
+                         JOIN errata_cve ON cve_id = cve.id
+                        WHERE errata_cve.errata_id = %s"""
+        self.cursor.execute(cve_query, (id,))
         cve_names = self.cursor.fetchall()
         cve_name_list = []
         for cve_name in cve_names:
@@ -78,13 +78,13 @@ class ErrataAPI:
         """
         Get the list of packages for the given erratum id
         """
-        pkg_query = "SELECT package.name, evr.epoch, evr.version, evr.release, arch.name"
-        pkg_query += " FROM pkg_errata"
-        pkg_query += " JOIN package ON package.id = pkg_errata.pkg_id"
-        pkg_query += " JOIN evr ON evr.id = package.evr_id"
-        pkg_query += " JOIN arch ON arch.id = package.arch_id"
-        pkg_query += " WHERE pkg_errata.errata_id = %s" % str(id)
-        self.cursor.execute(pkg_query)
+        pkg_query = """SELECT package.name, evr.epoch, evr.version, evr.release, arch.name
+                         FROM pkg_errata
+                         JOIN package ON package.id = pkg_errata.pkg_id
+                         JOIN evr ON evr.id = package.evr_id
+                         JOIN arch ON arch.id = package.arch_id
+                        WHERE pkg_errata.errata_id = %s"""
+        self.cursor.execute(pkg_query, (id,))
         result = self.cursor.fetchall()
         package_list = []
         for name, epoch, version, release, arch in result:
@@ -110,11 +110,11 @@ class ErrataAPI:
             return answer
 
         # Select all errata in request
-        errata_query = "SELECT errata.id, errata.name, synopsis, severity.name, description,"
-        errata_query += " solution, issued, updated"
-        errata_query += " FROM errata"
-        errata_query += " LEFT JOIN severity ON severity_id = severity.id"
-        errata_query += " WHERE errata.name IN %s"
+        errata_query = """SELECT errata.id, errata.name, synopsis, severity.name, description,
+                                 solution, issued, updated
+                            FROM errata
+                            LEFT JOIN severity ON severity_id = severity.id
+                           WHERE errata.name IN %s"""
         self.cursor.execute(errata_query, [tuple(errata_to_process)])
         errata = self.cursor.fetchall()
 

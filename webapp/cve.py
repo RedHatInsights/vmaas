@@ -56,11 +56,11 @@ class CveAPI:
             return answer
 
         # Select all cves in request
-        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "severity.name", "published_date",
-                        "modified_date", "iava", "description"]
-        cve_query = "SELECT %s from cve" % ', '.join(column for column in column_names)
-        cve_query = cve_query + " LEFT JOIN severity ON severity_id = severity.id"
-        cve_query = cve_query + " WHERE cve.name IN %s"
+        cve_query = """SELECT cve.id, cve.redhat_url, cve.secondary_url, cve.name, severity.name,
+                              cve.published_date, cve.modified_date, cve.iava, cve.description
+                         FROM cve
+                         LEFT JOIN severity ON cve.severity_id = severity.id
+                        WHERE cve.name IN %s"""
         self.cursor.execute(cve_query, [tuple(cves_to_process)])
         cves = self.cursor.fetchall()
         cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
@@ -81,7 +81,10 @@ class CveAPI:
         """
         if not ids:
             return []
-        query = "SELECT cve_id, cwe.name, cwe.link FROM cve_cwe map JOIN cwe ON map.cwe_id = cwe.id WHERE map.cve_id IN %s"
+        query = """SELECT cve_id, cwe.name, cwe.link
+                     FROM cve_cwe map
+                     JOIN cwe ON map.cwe_id = cwe.id
+                    WHERE map.cve_id IN %s"""
         self.cursor.execute(query, [tuple(ids)])
         return self.cursor.fetchall()
 

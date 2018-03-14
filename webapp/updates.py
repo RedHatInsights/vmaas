@@ -182,15 +182,16 @@ class UpdatesAPI:
 
         update_pkg_ids = []
 
+        sql = """SELECT package.id
+                   FROM package
+                   JOIN evr ON package.evr_id = evr.id
+                  WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
         for pkg in auxiliary_dict:
             n, v, r, e, a = split_filename(str(pkg))
 
             if n in auxiliary_dict[pkg] and auxiliary_dict[pkg][n]:
-                sql = """
-                select package.id from package join evr on package.evr_id = evr.id where package.id in %s and evr.evr > (select evr from evr where id = %s);
-                """ % ('%s', str(auxiliary_dict[pkg]['evr_id']))
-
-                self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][n])])
+                self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][n]),
+                                          auxiliary_dict[pkg]['evr_id']])
 
                 for id in self.cursor.fetchall():
                     auxiliary_dict[pkg]['update_id'].append(id[0])
