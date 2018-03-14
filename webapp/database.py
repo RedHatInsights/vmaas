@@ -7,7 +7,7 @@ import psycopg2
 def _set_val(value, envname, default):
     return value if value is not None else os.getenv(envname, default)
 
-class Database:
+class Database(object):
     """ Database handler class. """
     # pylint: disable=too-few-public-methods
     DEFAULT_NAME = "vmaas"
