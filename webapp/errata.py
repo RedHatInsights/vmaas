@@ -8,6 +8,7 @@ class Errata(object):
     """
 
     def __init__(self, oid, name, synopsis, severity, description, solution, issued, updated):
+        #pylint: disable=too-many-arguments
         setattr(self, "name", name)
         setattr(self, "id", oid)
         mydict = {}
@@ -95,6 +96,7 @@ class ErrataAPI(object):
         return package_list
 
     def process_list(self, data):
+        #pylint: disable=too-many-locals
         """
         This method returns details for given set of Errata.
 
