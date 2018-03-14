@@ -29,7 +29,7 @@ class JsonHandler(tornado.web.RequestHandler):
         name = self.request.uri[index + 1:]
 
         response = self.process_string(name)
-        self.write(ujson.dumps(response))
+        self.write(response)
 
     def post(self):
         # extract input JSON from POST request
@@ -44,7 +44,7 @@ class JsonHandler(tornado.web.RequestHandler):
         try:
             data = ujson.loads(json_data)
             response = self.process_list(data)
-            self.write(ujson.dumps(response))
+            self.write(response)
         except ValueError:
             self.set_status(400, reason='Error: malformed input JSON.')
 
