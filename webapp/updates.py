@@ -2,44 +2,7 @@
 Module to handle /updates API calls.
 """
 
-from utils import join_packagename
-
-def split_filename(filename):
-    """
-    Pass in a standard style rpm fullname
-
-    Return a name, version, release, epoch, arch, e.g.::
-        foo-1.0-1.i386.rpm returns foo, 1.0, 1, 0, i386
-        bar-1:9-123a.ia64.rpm returns bar, 9, 123a, 1, ia64
-    """
-
-    is_epoch = True if filename.find(':') != -1 else False
-
-    if filename[-4:] == '.rpm':
-        filename = filename[:-4]
-
-    arch_index = filename.rfind('.')
-    arch = filename[arch_index + 1:]
-
-    rel_index = filename[:arch_index].rfind('-')
-    rel = filename[rel_index + 1:arch_index]
-
-    if is_epoch:
-        ver_index = filename[:rel_index].rfind(':')
-    else:
-        ver_index = filename[:rel_index].rfind('-')
-    ver = filename[ver_index + 1:rel_index]
-
-
-    if is_epoch:
-        epoch_index = filename[:ver_index].rfind('-')
-        epoch = filename[epoch_index + 1:ver_index]
-    else:
-        epoch_index = ver_index
-        epoch = '0'
-
-    name = filename[:epoch_index]
-    return name, ver, rel, epoch, arch
+from utils import join_packagename, split_packagename
 
 
 class UpdatesAPI(object):
@@ -85,7 +48,6 @@ class UpdatesAPI(object):
 
         """
         # pylint: disable=invalid-name
-
         packages_to_process = data['package_list']
         auxiliary_dict = {}
         answer = {}
@@ -114,7 +76,7 @@ class UpdatesAPI(object):
 
             # process all packages form input
             if pkg not in auxiliary_dict:
-                n, v, r, e, a = split_filename(str(pkg))
+                n, e, v, r, a = split_packagename(str(pkg))
                 auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
                 answer[pkg] = []          # fill answer with empty data
 
@@ -155,7 +117,7 @@ class UpdatesAPI(object):
 
         pkg_ids = []
         for pkg in auxiliary_dict:
-            n, v, r, e, a = split_filename(str(pkg))
+            n, e, v, r, a = split_packagename(str(pkg))
 
             try:
                 key = str(n + ':' + str(auxiliary_dict[pkg]['evr_id']) + ':' + str(auxiliary_dict[pkg]['arch_id']))
@@ -200,7 +162,7 @@ class UpdatesAPI(object):
                 names2ids[name] = [oid]
 
         for pkg in auxiliary_dict:
-            n, v, r, e, a = split_filename(str(pkg))
+            n, e, v, r, a = split_packagename(str(pkg))
 
             try:
                 auxiliary_dict[pkg][n].extend(names2ids[n])
@@ -214,7 +176,7 @@ class UpdatesAPI(object):
                    JOIN evr ON package.evr_id = evr.id
                   WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
         for pkg in auxiliary_dict:
-            n, v, r, e, a = split_filename(str(pkg))
+            n, e, v, r, a = split_packagename(str(pkg))
 
             if n in auxiliary_dict[pkg] and auxiliary_dict[pkg][n]:
                 self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][n]),
