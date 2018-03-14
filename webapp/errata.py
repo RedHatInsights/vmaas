@@ -129,7 +129,7 @@ class ErrataAPI(object):
             erratum_list.append(new_erratum)
 
         errata_dict = {}
-        for e in erratum_list:
-            errata_dict[e.get_val("name")] = e.get_val("mydict")
+        for erratum in erratum_list:
+            errata_dict[erratum.get_val("name")] = erratum.get_val("mydict")
         answer["errata_list"] = errata_dict
         return answer
