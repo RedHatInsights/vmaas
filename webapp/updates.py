@@ -23,7 +23,7 @@ class UpdatesAPI(object):
         self.cursor.execute("SELECT id, epoch, version, release from evr")
         evrs = self.cursor.fetchall()
         for oid, e, v, r in evrs:
-            key = e + ':' + v + ':' + r
+            key = "%s:%s:%s" % (e, v, r)
             self.evr2id_dict[key] = oid
             self.id2evr_dict[oid] = {'epoch': e, 'version': v, 'release': r}
 
@@ -80,7 +80,7 @@ class UpdatesAPI(object):
                 auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
                 answer[pkg] = []          # fill answer with empty data
 
-                evr_key = e + ':' + v + ':' + r
+                evr_key = "%s:%s:%s" % (e, v, r)
                 if evr_key in self.evr2id_dict and a in self.arch2id_dict:
                     packages_names.append(n)
                     auxiliary_dict[pkg][n] = []
@@ -109,7 +109,7 @@ class UpdatesAPI(object):
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
         for oid, name, evr_id, arch_id in packs:
-            key = name + ':' + str(evr_id) + ':' + str(arch_id)
+            key = "%s:%s:%s" % (name, evr_id, arch_id)
             if key not in nevra2pkg_id:
                 nevra2pkg_id[key] = [oid]
             else:
@@ -120,7 +120,7 @@ class UpdatesAPI(object):
             n, e, v, r, a = split_packagename(str(pkg))
 
             try:
-                key = str(n + ':' + str(auxiliary_dict[pkg]['evr_id']) + ':' + str(auxiliary_dict[pkg]['arch_id']))
+                key = "%s:%s:%s" % (n, auxiliary_dict[pkg]['evr_id'], auxiliary_dict[pkg]['arch_id'])
                 pkg_ids.extend(nevra2pkg_id[key])
                 auxiliary_dict[pkg]['pkg_id'].extend(nevra2pkg_id[key])
             except KeyError:
