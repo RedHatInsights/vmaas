@@ -19,7 +19,7 @@ class JsonHandler(tornado.web.RequestHandler):
     """
     Parent class to parse input json data given a a data or a file.
     """
-    def get(self):
+    def get(self, *args, **kwargs):
         index = self.request.uri.rfind('/')
         name = self.request.uri[index + 1:]
 
@@ -27,7 +27,7 @@ class JsonHandler(tornado.web.RequestHandler):
         self.write(response)
         self.flush()
 
-    def post(self):
+    def post(self, *args, **kwargs):
         # extract input JSON from POST request
         json_data = ''
         # check if JSON is passed as a file or as a body of POST request
