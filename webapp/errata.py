@@ -2,7 +2,7 @@
 Module contains classes for returning errata data from DB
 """
 
-class Errata:
+class Errata(object):
     """
     Class to hold Erratum attributes
     """
@@ -47,7 +47,7 @@ class Errata:
             value = getattr(self, attr_name)
         return value
 
-class ErrataAPI:
+class ErrataAPI(object):
     """ Main /errata API class. """
     def __init__(self, cursor):
         self.cursor = cursor

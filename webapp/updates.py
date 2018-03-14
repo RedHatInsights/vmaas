@@ -40,7 +40,7 @@ def split_filename(filename):
     return name, ver, rel, epoch, arch
 
 
-class UpdatesAPI:
+class UpdatesAPI(object):
     """ Main /updates API class. """
     def __init__(self, cursor):
         self.cursor = cursor

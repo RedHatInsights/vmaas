@@ -3,7 +3,7 @@ Module contains functions and CVE class for returning data from DB
 """
 
 
-class CVE:
+class CVE(object):
     """
     Class to hold CVE attributes
     """
@@ -35,7 +35,7 @@ class CVE:
             value = getattr(self, attr_name)
         return value
 
-class CveAPI:
+class CveAPI(object):
     """ Main /cves API class. """
     def __init__(self, cursor):
         self.cursor = cursor
