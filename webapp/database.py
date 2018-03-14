@@ -23,6 +23,7 @@ class Database:
                                          password=self.password,
                                          host=self.host,
                                          port=self.port)
+        self.connection.set_session(readonly=True, autocommit=True)
 
     def cursor(self):
         return self.connection.cursor()
