@@ -71,6 +71,7 @@ class UpdatesAPI(object):
 
 
     def process_list(self, data):
+        #pylint: disable=too-many-locals,too-many-branches,too-many-statements,too-many-nested-blocks
         """
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
