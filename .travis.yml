@@ -15,7 +15,7 @@ matrix:
 notifications:
   email: false
 install:
-  - pip install pylint psycopg2 requests ujson tornado
+  - pip install pylint psycopg2 requests tornado
 script:
   - /bin/bash reposcan/run_tests.sh
 jobs:

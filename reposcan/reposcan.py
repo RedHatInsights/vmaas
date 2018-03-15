@@ -7,10 +7,10 @@ into specified PostgreSQL database.
 import os
 from multiprocessing.pool import Pool
 import traceback
+import json
 
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application
-import ujson
 
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
@@ -105,7 +105,7 @@ class ResponseMsg: # pylint: disable=too-few-public-methods
         self.success = success
 
     def __repr__(self):
-        return ujson.dumps({"success": self.success, "msg": self.msg})
+        return json.dumps({"success": self.success, "msg": self.msg})
 
 
 class SyncHandler(RequestHandler):
@@ -151,7 +151,7 @@ class RepoSyncHandler(SyncHandler):
         elif self.request.body:
             json_data = self.request.body
 
-        data = ujson.loads(json_data)
+        data = json.loads(json_data)
         for repo_group in data:
             # Entitlement cert is optional
             if "entitlement_cert" in repo_group:

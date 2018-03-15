@@ -8,8 +8,7 @@ ENV POSTGRESQL_PASSWORD=vmaas_passwd
 ENV POSTGRESQL_DATABASE=vmaas
 
 RUN yum install -y python3-psycopg2 python3-requests \
-                   python3-tornado python3-ujson \
-                   postgresql-libs postgresql \
+                   python3-tornado postgresql-libs postgresql \
     && rm -rf /var/cache/yum/*
 
 # copy application to directory in a container
