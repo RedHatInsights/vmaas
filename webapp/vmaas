@@ -5,8 +5,8 @@ import json
 import sys
 
 from database import Database
-import updates
-import cve
+from updates import UpdatesAPI
+from cve import CveAPI
 from repos import RepoAPI
 
 def arg_parser():
@@ -68,12 +68,12 @@ def main():
     if options.command == 'updates':
         data = read_data(options.pkgfile, options.pkgnames, "package_list")
 
-        answer = updates.process_list(cursor, data)
+        answer = UpdatesAPI(cursor).process_list(data)
 
     elif options.command == 'cves':
         data = read_data(options.cvefile, options.cvenames, "cve_list")
 
-        answer = cve.process_list(cursor, data)
+        answer = CveAPI(cursor).process_list(data)
 
     elif options.command == 'repos':
         data = read_data(options.repofile, options.reponames, "repository_list")
