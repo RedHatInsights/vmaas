@@ -1,5 +1,3 @@
-import sys
-import ujson
 
 class RepoAPI:
     def __init__(self, cursor):

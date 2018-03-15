@@ -2,8 +2,7 @@
 
 from tornado.ioloop import IOLoop
 import tornado.web
-import ujson
-import os
+import json
 
 from database import Database
 from cve import CveAPI
@@ -42,7 +41,7 @@ class JsonHandler(tornado.web.RequestHandler):
 
         # fill response with packages
         try:
-            data = ujson.loads(json_data)
+            data = json.loads(json_data)
             response = self.process_list(data)
             self.write(response)
         except ValueError:

@@ -1,7 +1,5 @@
 #!/usr/bin/python -u
 
-import sys
-import ujson
 
 def split_filename(filename):
     """
