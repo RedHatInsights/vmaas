@@ -56,11 +56,12 @@ class CveAPI:
             return answer
 
         # Select all cves in request
-        cve_query = """SELECT cve.id, cve.redhat_url, cve.secondary_url, cve.name, severity.name,
-                              cve.published_date, cve.modified_date, cve.iava, cve.description
+        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "severity.name", "published_date",
+                        "modified_date", "iava", "description"]
+        cve_query = """SELECT {columns}
                          FROM cve
                          LEFT JOIN severity ON cve.severity_id = severity.id
-                        WHERE cve.name IN %s"""
+                        WHERE cve.name IN %s""".format(columns=', '.join(column_names))
         self.cursor.execute(cve_query, [tuple(cves_to_process)])
         cves = self.cursor.fetchall()
         cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
