@@ -1,7 +1,7 @@
 #!/usr/bin/python -u
 
 import argparse
-import ujson
+import json
 import sys
 
 from database import Database
@@ -49,7 +49,7 @@ def read_data(data_file, data_list, key):
     data = {}
     if data_file:
         with open(data_file, "r") as content:
-            data = ujson.loads(content.read())
+            data = json.loads(content.read())
 
     if data_list:
         if key not in data:
@@ -80,7 +80,7 @@ def main():
 
         answer = RepoAPI(cursor).process_list(data)
 
-    print(ujson.dumps(answer))
+    print(json.dumps(answer))
 
 if __name__ == '__main__':
     main()
