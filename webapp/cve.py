@@ -105,7 +105,6 @@ class CveAPI:
                 "impact": cve.get_val("severity.name"),
                 "public_date": cve.get_val("published_date"),
                 "modified_date": cve.get_val("modified_date"),
-                "iava": cve.get_val("iava"),
                 "cwe_list": cve.get_val("cwe"),
                 "description": cve.get_val("description"),
             }
