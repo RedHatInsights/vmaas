@@ -77,8 +77,29 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         self.conn.commit()
         return severities
 
+    def _populate_errata_types(self, updates):
+        errata_types = {}
+        cur = self.conn.cursor()
+        cur.execute("select id, name from errata_type")
+        for row in cur.fetchall():
+            errata_types[row[1]] = row[0]
+        missing_errata_types = set()
+        for update in updates:
+            if str(update["type"]) not in errata_types:
+                missing_errata_types.add((str(update["type"]),))
+        self.logger.log("Errata_types missing in DB: %d" % len(missing_errata_types))
+        if missing_errata_types:
+            execute_values(cur, "insert into errata_type (name) values %s returning id, name",
+                           missing_errata_types, page_size=len(missing_errata_types))
+            for row in cur.fetchall():
+                errata_types[row[1]] = row[0]
+        cur.close()
+        self.conn.commit()
+        return errata_types
+
     def _populate_updates(self, updates):
         severity_map = self._populate_severities(updates)
+        errata_type_map = self._populate_errata_types(updates)
         cur = self.conn.cursor()
         update_map = {}
         names = set()
@@ -100,12 +121,16 @@ class UpdateStore: # pylint: disable=too-few-public-methods
             import_data = []
             for update in updates:
                 if (update["id"],) in names:
-                    import_data.append((update["id"], update["title"], severity_map[str(update["severity"])],
-                                        update["description"], update["issued"],
-                                        update["updated"], update["solution"]))
+                    import_data.append((update["id"], update["title"],
+                                        severity_map[str(update["severity"])],
+                                        errata_type_map[str(update["type"])],
+                                        update["summary"], update["description"],
+                                        update["issued"], update["updated"],
+                                        update["solution"]))
             execute_values(cur,
-                           """insert into errata (name, synopsis, severity_id, description,
-                           issued, updated, solution) values %s returning id, name""",
+                           """insert into errata (name, synopsis, severity_id,
+                           errata_type_id, summary, description, issued, updated,
+                           solution) values %s returning id, name""",
                            import_data, page_size=len(import_data))
             for row in cur.fetchall():
                 update_map[row[1]] = row[0]

@@ -7,18 +7,18 @@ class Errata(object):
     Class to hold Erratum attributes
     """
 
-    def __init__(self, oid, name, synopsis, severity, description, solution, issued, updated):
+    def __init__(self, oid, name, synopsis, summary, errata_type, severity, description, solution, issued, updated):
         #pylint: disable=too-many-arguments
         setattr(self, "name", name)
         setattr(self, "id", oid)
         mydict = {}
-        mydict["type"] = None
+        mydict["type"] = errata_type
         mydict["issued"] = str(issued)
         mydict["synopsis"] = synopsis
         mydict["description"] = description
         mydict["solution"] = solution
         mydict["severity"] = severity
-        mydict["summary"] = None
+        mydict["summary"] = summary
         mydict["updated"] = str(updated)
         mydict["url"] = "https://access.redhat.com/errata/%s" % name
         mydict["bugzilla_list"] = []
@@ -115,17 +115,20 @@ class ErrataAPI(object):
             return answer
 
         # Select all errata in request
-        errata_query = """SELECT errata.id, errata.name, synopsis, severity.name, description,
-                                 solution, issued, updated
+        errata_query = """SELECT errata.id, errata.name, synopsis, summary, errata_type.name,
+                                 severity.name, description, solution, issued, updated
                             FROM errata
-                            LEFT JOIN severity ON severity_id = severity.id
+                            JOIN errata_type ON errata_type_id = errata_type.id
+                            JOIN severity ON severity_id = severity.id
                            WHERE errata.name IN %s"""
         self.cursor.execute(errata_query, [tuple(errata_to_process)])
         errata = self.cursor.fetchall()
 
         erratum_list = []
-        for oid, name, synopsis, severity, description, solution, issued, updated in errata:
-            new_erratum = Errata(oid, name, synopsis, severity, description, solution, issued, updated)
+        for (oid, name, synopsis, summary, errata_type, severity,
+             description, solution, issued, updated) in errata:
+            new_erratum = Errata(oid, name, synopsis, summary, errata_type,
+                                 severity, description, solution, issued, updated)
             new_erratum.set_cve_names(self.get_cve_names_for_erratum_id(oid))
             new_erratum.set_packages(self.get_package_list_for_erratum_id(oid))
             erratum_list.append(new_erratum)
