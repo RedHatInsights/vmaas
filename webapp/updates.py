@@ -282,7 +282,8 @@ class UpdatesAPI(object):
                 id2errata_dict[oid] = name
                 all_errata_id.append(oid)
 
-            self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s;", [tuple(all_errata_id)])
+            self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s",
+                                [tuple(all_errata_id)])
             sql_result = self.cursor.fetchall()
             errata_id2repo_id = {}
             for errata_id, repo_id in sql_result:
