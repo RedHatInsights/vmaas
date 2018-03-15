@@ -54,14 +54,18 @@ class CveStore:
     def _populate_cwes(self, cursor, cve_data):
         # pylint: disable=R0914
         # Populate CWE table
-        cursor.execute("SELECT name, link FROM cwe")
-        already_in_db = cursor.fetchall()
+        cursor.execute("SELECT name, id FROM cwe")
+        cwe_name_id = cursor.fetchall()
+        cwe_name = [cwe[0] for cwe in cwe_name_id]
         cwe_list = []
+        cwe_link_map = dict()
         for cve in cve_data.values():
-            for cwe in cve.get("cwe_list"):
-                cwe_list.append(tuple(cwe.values()))
+            for cwe in cve["cwe_list"]:
+                cwe_list.append(cwe['cwe_name'])
+                cwe_link_map[cwe['cwe_name']] = cwe['link']
 
-        import_set = set(cwe_list) - set(already_in_db)
+        import_set = set(cwe_list) - set(cwe_name)
+        import_set = [(name, cwe_link_map[name]) for name in import_set]
         self.logger.log("CWEs to import: %d" % len(import_set))
         new_cwes = ()
         if import_set:
@@ -70,21 +74,17 @@ class CveStore:
             new_cwes = cursor.fetchall()
 
         # Populate cve_cwe mappings
-
         mapping_set = []
         for entry in cve_data.values():
-            cwe_names = [x.get("cwe_name") for x in entry.get("cwe_list")]
-            mapping_set.extend([(entry.get('id'), cwe_name) for cwe_name in cwe_names])
+            cwe_names = [x["cwe_name"] for x in entry["cwe_list"]]
+            mapping_set.extend([(entry['id'], cwe_name) for cwe_name in cwe_names])
 
-        cwe_names = tuple(dict(mapping_set).values())
-        cursor.execute("SELECT name, id FROM cwe WHERE name IN %s", (cwe_names,))
         # Some entries are not commited to DB yet, get them from last insert
-        result = dict(tuple(new_cwes) + tuple(cursor.fetchall()))
+        all_cwes = dict(tuple(new_cwes) + tuple(cwe_name_id))
         # Lookup IDs for missing cwes
-        cve_cwe_map = _map_name_to_id(set(mapping_set), result)
+        cve_cwe_map = _map_name_to_id(set(mapping_set), all_cwes)
         cursor.execute("SELECT cve_id, cwe_id FROM cve_cwe")
-        already_in_db = cursor.fetchall()
-        to_import = set(cve_cwe_map) - set(already_in_db)
+        to_import = set(cve_cwe_map) - set(cursor.fetchall())
         self.logger.log("CVE to CWE mapping to import: %d" % len(to_import))
         if to_import:
             execute_values(cursor, "INSERT INTO cve_cwe (cve_id, cwe_id) values %s returning cve_id, cwe_id",
@@ -227,5 +227,5 @@ def _map_name_to_id(mapping_set, result):
     cve_cwe_map = []
     # construct (cve_id,cwe_name)->(cve_id,cwe_id)
     for item in mapping_set:
-        cve_cwe_map.append((item[0], result.get(item[1])))
+        cve_cwe_map.append((item[0], result[item[1]]))
     return cve_cwe_map
