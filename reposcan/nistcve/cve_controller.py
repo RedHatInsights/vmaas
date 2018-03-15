@@ -126,7 +126,7 @@ class CveRepoController:
         for batch in batches:
             self._download_json(batch)
             self._unpack_json(batch)
-            for repo in batch:
+            for repo in sorted(batch, key=lambda repo: repo.label):
                 repo.load_json()
                 self.cverepo_store.store(repo)
                 repo.unload_json()
