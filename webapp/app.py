@@ -11,17 +11,6 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 
 
-class DocHandler(tornado.web.RequestHandler):
-    DOC_MSG = """Example of passing input data as a file: <br />
-                 curl -F file=@/path/to/json_file http://hostname:8080/api/v1/updates/ <br /> <br />
-
-                 Example of passing imput data as a body of POST request: <br />
-                 curl -d "@/path/to/json_file" -H "Content-Type: application/json" -X POST http://hostname:8080/api/v1/updates/
-              """
-    def get(self):
-        self.write(self.DOC_MSG)
-
-
 class JsonHandler(tornado.web.RequestHandler):
     def get(self):
         index = self.request.uri.rfind('/')
@@ -82,7 +71,6 @@ class ErrataHandler(JsonHandler):
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/?", DocHandler),
             (r"/api/v1/updates/?", UpdatesHandler),  # POST request
             (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
             (r"/api/v1/cves/?", CVEHandler),
