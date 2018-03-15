@@ -264,6 +264,16 @@ CREATE TABLE IF NOT EXISTS severity (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.errata_type
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS errata_type (
+  id SERIAL,
+  name TEXT NOT NULL UNIQUE,
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.errata
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata (
@@ -271,6 +281,8 @@ CREATE TABLE IF NOT EXISTS errata (
   name TEXT NOT NULL UNIQUE,
   synopsis TEXT NOT NULL,
   severity_id INT NOT NULL,
+  errata_type_id INT NOT NULL,
+  summary TEXT NOT NULL,
   description TEXT NOT NULL,
   solution TEXT,
   issued TIMESTAMP NOT NULL,
@@ -278,7 +290,10 @@ CREATE TABLE IF NOT EXISTS errata (
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
-    REFERENCES severity (id)
+    REFERENCES severity (id),
+  CONSTRAINT errata_type_id
+    FOREIGN KEY (errata_type_id)
+    REFERENCES errata_type (id)
 )TABLESPACE pg_default;
 
 
