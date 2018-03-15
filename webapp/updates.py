@@ -67,11 +67,13 @@ class UpdatesAPI:
 
         if 'repository_list' in data:
             provided_repo_names = data['repository_list']
-            provided_repo_ids = []
-            self.cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
-            for id_tuple in self.cursor.fetchall():
-                for id in id_tuple:
-                    provided_repo_ids.append(id)
+
+            if provided_repo_names:
+                provided_repo_ids = []
+                self.cursor.execute("select id from repo where name in %s;", [tuple(provided_repo_names)])
+                for id_tuple in self.cursor.fetchall():
+                    for id in id_tuple:
+                        provided_repo_ids.append(id)
 
         # Select all evrs and put them into dictionary
         self.cursor.execute("SELECT id, epoch, version, release from evr")
@@ -101,7 +103,8 @@ class UpdatesAPI:
             # process all packages form input
             if pkg not in auxiliary_dict:
                 n, v, r, e, a = split_filename(str(pkg))
-                auxiliary_dict[pkg] = {}  # create dictionary with aux data for pkg
+                auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
+                answer[pkg] = []          # fill answer with empty data
 
                 evr_key = e + ':' + v + ':' + r
                 if evr_key in evr2id_dict:
@@ -115,6 +118,16 @@ class UpdatesAPI:
                     auxiliary_dict[pkg]['repo_id'] = []
                     auxiliary_dict[pkg]['pkg_id'] = []
                     auxiliary_dict[pkg]['update_id'] = []
+
+        response = {
+            'update_list': answer,
+        }
+
+        if provided_repo_ids is not None:
+            response.update({'repository_list': provided_repo_names})
+
+        if not packages_evrids:
+            return response
 
         # Select all packages with given evrs ids and put them into dictionary
         self.cursor.execute("select id, name, evr_id, arch_id from package where evr_id in %s;",  [tuple(packages_evrids)])
@@ -137,6 +150,9 @@ class UpdatesAPI:
                 auxiliary_dict[pkg]['pkg_id'].extend(nevra2pkg_id[key])
             except KeyError:
                 pass
+
+        if not pkg_ids:
+            return response
 
         # Select all repo_id and add mapping to package id
         self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(pkg_ids)])
@@ -202,64 +218,69 @@ class UpdatesAPI:
         for id, name, url in all_repos:
             repoinfo_dict[id] = {'name': name, 'url': url}
 
-        # Select all info about pkg_id to repo_id
-        self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(update_pkg_ids)])
-        all_pkg_repos = self.cursor.fetchall()
         pkg_id2repo_id = {}
-        for pkg_id, repo_id in all_pkg_repos:
-
-            if pkg_id not in pkg_id2repo_id:
-                pkg_id2repo_id[pkg_id] = [repo_id]
-            else:
-                pkg_id2repo_id[pkg_id].append(repo_id)
-
-        # Select all info about pkg_id to errata_id
-        self.cursor.execute("select pkg_id, errata_id from pkg_errata where pkg_id in %s;", [tuple(update_pkg_ids)])
-        all_pkg_errata = self.cursor.fetchall()
         pkg_id2errata_id = {}
-        all_errata = []
-        for pkg_id, errata_id in all_pkg_errata:
-            all_errata.append(errata_id)
-            if pkg_id not in pkg_id2errata_id:
-                pkg_id2errata_id[pkg_id] = [errata_id]
-            else:
-                pkg_id2errata_id[pkg_id].append(errata_id)
-
-        # Select all info about errata
-        self.cursor.execute("SELECT id, name from errata where id in %s;", [tuple(all_errata)])
-        errata = self.cursor.fetchall()
-        id2errata_dict = {}
-        all_errata_id = []
-        for id, name in errata:
-            id2errata_dict[id] = name
-            all_errata_id.append(id)
-
-        self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s;", [tuple(all_errata_id)])
-        sql_result = self.cursor.fetchall()
-        errata_id2repo_id = {}
-        for errata_id, repo_id in sql_result:
-            if errata_id not in errata_id2repo_id:
-                errata_id2repo_id[errata_id] = [repo_id]
-            else:
-                errata_id2repo_id[errata_id].append(repo_id)
-
-        # Select all info about packages
-        self.cursor.execute("SELECT id, name, evr_id, arch_id from package where id in %s;", [tuple(update_pkg_ids)])
-        packages = self.cursor.fetchall()
         pkg_id2full_name = {}
         pkg_id2arch_id = {}
-        for id, name, evr_id, arch_id in packages:
-            full_rpm_name = name + '-'
-            if id2evr_dict[evr_id]['epoch'] != '0':
-                full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
-            full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + id2arch_dict[arch_id]
+        all_errata = []
 
-            pkg_id2full_name[id] = full_rpm_name
-            pkg_id2arch_id[id] = arch_id
+        if update_pkg_ids:
+            # Select all info about pkg_id to repo_id for update packages
+            self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(update_pkg_ids)])
+            all_pkg_repos = self.cursor.fetchall()
+            for pkg_id, repo_id in all_pkg_repos:
 
+                if pkg_id not in pkg_id2repo_id:
+                    pkg_id2repo_id[pkg_id] = [repo_id]
+                else:
+                    pkg_id2repo_id[pkg_id].append(repo_id)
+
+            # Select all info about pkg_id to errata_id
+            self.cursor.execute("select pkg_id, errata_id from pkg_errata where pkg_id in %s;", [tuple(update_pkg_ids)])
+            all_pkg_errata = self.cursor.fetchall()
+            for pkg_id, errata_id in all_pkg_errata:
+                all_errata.append(errata_id)
+                if pkg_id not in pkg_id2errata_id:
+                    pkg_id2errata_id[pkg_id] = [errata_id]
+                else:
+                    pkg_id2errata_id[pkg_id].append(errata_id)
+
+            # Select full info about all update packages
+            self.cursor.execute("SELECT id, name, evr_id, arch_id from package where id in %s;",
+                                [tuple(update_pkg_ids)])
+            packages = self.cursor.fetchall()
+
+            for id, name, evr_id, arch_id in packages:
+                full_rpm_name = name + '-'
+                if id2evr_dict[evr_id]['epoch'] != '0':
+                    full_rpm_name += id2evr_dict[evr_id]['epoch'] + ':'
+                full_rpm_name += id2evr_dict[evr_id]['version'] + '-' + id2evr_dict[evr_id]['release'] + '.' + \
+                                 id2arch_dict[arch_id]
+
+                pkg_id2full_name[id] = full_rpm_name
+                pkg_id2arch_id[id] = arch_id
+
+        if all_errata:
+            # Select all info about errata
+            self.cursor.execute("SELECT id, name from errata where id in %s;", [tuple(all_errata)])
+            errata = self.cursor.fetchall()
+            id2errata_dict = {}
+            all_errata_id = []
+            for id, name in errata:
+                id2errata_dict[id] = name
+                all_errata_id.append(id)
+
+            self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s;", [tuple(all_errata_id)])
+            sql_result = self.cursor.fetchall()
+            errata_id2repo_id = {}
+            for errata_id, repo_id in sql_result:
+                if errata_id not in errata_id2repo_id:
+                    errata_id2repo_id[errata_id] = [repo_id]
+                else:
+                    errata_id2repo_id[errata_id].append(repo_id)
+
+        # Fill the result answer with update information
         for pkg in auxiliary_dict:
-            answer[pkg] = []
-
             if 'update_id' not in auxiliary_dict[pkg]:
                 continue
 
@@ -280,16 +301,11 @@ class UpdatesAPI:
                                         e_name = id2errata_dict[e_id]
                                         r_name = repoinfo_dict[r_id]['name']
 
-                                        answer[pkg].append({
+                                        response['update_list'][pkg].append({
                                             'package': pkg_id2full_name[upd_pkg_id],
                                             'erratum': e_name,
                                             'repository': r_name})
-        response = {
-            'update_list': answer,
-        }
 
-        if provided_repo_ids is not None:
-            response.update({'repository_list': provided_repo_names})
 
         return response
 
