@@ -292,6 +292,16 @@ class UpdatesAPI(object):
                 else:
                     errata_id2repo_id[errata_id].append(repo_id)
 
+            self.cursor.execute("SELECT errata_id, cve_id from errata_cve where errata_id in %s",
+                                [tuple(all_errata_id)])
+            sql_result = self.cursor.fetchall()
+            errata_id2cve_id = {}
+            for errata_id, cve_id in sql_result:
+                if errata_id not in errata_id2cve_id:
+                    errata_id2cve_id[errata_id] = [cve_id]
+                else:
+                    errata_id2cve_id[errata_id].append(cve_id)
+
         # Fill the result answer with update information
         for pkg in auxiliary_dict:
             if 'update_id' not in auxiliary_dict[pkg]:
@@ -309,15 +319,16 @@ class UpdatesAPI(object):
                             if upd_pkg_id in pkg_id2errata_id:
                                 errata_ids = pkg_id2errata_id[upd_pkg_id]
                                 for e_id in errata_ids:
-                                    # check current errata in the same repo with update pkg
-                                    if r_id in errata_id2repo_id[e_id]:
-                                        e_name = id2errata_dict[e_id]
-                                        r_name = repoinfo_dict[r_id]['name']
+                                    # check current erratum has some linked cve
+                                    if e_id in errata_id2cve_id and errata_id2cve_id[e_id]:
+                                        # check current errata in the same repo with update pkg
+                                        if r_id in errata_id2repo_id[e_id]:
+                                            e_name = id2errata_dict[e_id]
+                                            r_name = repoinfo_dict[r_id]['name']
 
-                                        response['update_list'][pkg].append({
-                                            'package': pkg_id2full_name[upd_pkg_id],
-                                            'erratum': e_name,
-                                            'repository': r_name})
-
+                                            response['update_list'][pkg].append({
+                                                'package': pkg_id2full_name[upd_pkg_id],
+                                                'erratum': e_name,
+                                                'repository': r_name})
 
         return response
