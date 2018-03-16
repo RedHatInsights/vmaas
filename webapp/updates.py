@@ -117,7 +117,7 @@ class UpdatesAPI(object):
                 answer[pkg] = []          # fill answer with empty data
 
                 evr_key = e + ':' + v + ':' + r
-                if evr_key in self.evr2id_dict:
+                if evr_key in self.evr2id_dict and a in self.arch2id_dict:
                     packages_names.append(n)
                     auxiliary_dict[pkg][n] = []
 
