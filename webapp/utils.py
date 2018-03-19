@@ -31,3 +31,11 @@ def split_packagename(filename):
     name, _, epoch, version, release, arch = match.groups()
     epoch = int(epoch) if epoch is not None else 0
     return name, epoch, version, release, arch
+
+class ListDict(dict):
+    """Dictionary which can cummulate multiple values for the same key into a list."""
+    def __setitem__(self, key, value):
+        if key not in self:
+            dict.__setitem__(self, key, [])
+        if not value in self[key]:
+            self[key].append(value)
