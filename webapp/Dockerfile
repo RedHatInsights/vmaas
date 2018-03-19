@@ -15,6 +15,6 @@ ADD ./entrypoint.sh /app/
 ADD ./*.py /app/
 ADD ./vmaas /app/
 
-EXPOSE 8080
+EXPOSE 8079 8080
 
 CMD ["/app/entrypoint.sh"]
