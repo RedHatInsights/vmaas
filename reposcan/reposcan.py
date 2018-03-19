@@ -132,8 +132,9 @@ class SyncHandler(RequestHandler):
 
     @staticmethod
     def _notify_webapp():
-        webapp_url = os.getenv('WEBAPP_API_URL', "http://webapp:8080")
-        refresh_url = "%s/api/internal/refresh" % webapp_url
+        webapp_url = os.getenv('WEBAPP_API_URL', "http://webapp")
+        webapp_port = os.getenv('WEBAPP_API_PORT_INTERNAL', 8079)
+        refresh_url = "%s:%s/api/internal/refresh" % (webapp_url, webapp_port)
         try:
             response = requests.get(refresh_url)
             if response.status_code not in VALID_HTTP_CODES or not json.loads(response.text)["success"]:

@@ -16,6 +16,9 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 
+INTERNAL_API_PORT = 8079
+PUBLIC_API_PORT = 8080
+
 
 # pylint: disable=abstract-method
 class RefreshHandler(tornado.web.RequestHandler):
@@ -23,17 +26,23 @@ class RefreshHandler(tornado.web.RequestHandler):
     Class to refresh cached data in handlers.
     """
     def get(self, *args, **kwargs):
-        try:
-            self.application.updatesapi.prepare()
-            msg = "Cached data refreshed."
-            print(msg)
-            sys.stdout.flush()
-            self.write({"success": True, "msg": msg})
-        except: # pylint: disable=bare-except
-            traceback.print_exc()
-            self.write({"success": False, "msg": "Unable to refresh cached data."})
-        finally:
-            self.flush()
+        # There could be authentication instead of this simple check in future
+        accessed_port = int(self.request.host.split(':')[1])
+        if accessed_port == INTERNAL_API_PORT:
+            try:
+                self.application.updatesapi.prepare()
+                msg = "Cached data refreshed."
+                print(msg)
+                sys.stdout.flush()
+                self.write({"success": True, "msg": msg})
+            except: # pylint: disable=bare-except
+                traceback.print_exc()
+                self.set_status(500)
+                self.write({"success": False, "msg": "Unable to refresh cached data."})
+        else:
+            self.set_status(403)
+            self.write({"success": False, "msg": "This API can be called internally only."})
+        self.flush()
 
 # pylint: disable=abstract-method
 class JsonHandler(tornado.web.RequestHandler):
@@ -133,7 +142,8 @@ class Application(tornado.web.Application):
 def main():
     """ Main application loop. """
     app = Application()
-    app.listen(8080)
+    app.listen(INTERNAL_API_PORT)
+    app.listen(PUBLIC_API_PORT)
     IOLoop.instance().start()
 
 if __name__ == '__main__':
