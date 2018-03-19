@@ -37,6 +37,15 @@ class Errata(object):
         """ Put package list into erratum. """
         self.data["package_list"] = package_list
 
+    def set_bugzillas(self, bugzilla_list):
+        """Put bugzilla list into erratum."""
+        self.data["bugzilla_list"] = bugzilla_list
+
+    def set_other_refs(self, other_refs_list):
+        """Put other references into erratum."""
+        self.data["reference_list"] = other_refs_list
+
+
 class ErrataAPI(object):
     """ Main /errata API class. """
     def __init__(self, cursor):
@@ -72,6 +81,23 @@ class ErrataAPI(object):
         for name, epoch, version, release, arch in result:
             package_list.append(join_packagename(name, epoch, version, release, arch))
         return package_list
+
+    def get_references_list_for_erratum_id(self, oid):
+        """
+        Get the list of references (bugzilla and other) for the given erratum id
+        """
+        bugzilla_list = []
+        other_refs_list = []
+        refs_query = """SELECT type, name FROM errata_refs
+                        WHERE errata_id = %s"""
+        self.cursor.execute(refs_query, (oid,))
+        results = self.cursor.fetchall()
+        for type, name in results:
+            if type == 'bugzilla':
+                bugzilla_list.append(name)
+            else:
+                other_refs_list.append(name)
+        return bugzilla_list, other_refs_list
 
     def process_list(self, data):
         #pylint: disable=too-many-locals
@@ -109,6 +135,9 @@ class ErrataAPI(object):
                                  severity, description, solution, issued, updated)
             new_erratum.set_cve_names(self.get_cve_names_for_erratum_id(oid))
             new_erratum.set_packages(self.get_package_list_for_erratum_id(oid))
+            bugzilla_list, other_refs_list = self.get_references_list_for_erratum_id(oid)
+            new_erratum.set_bugzillas(bugzilla_list)
+            new_erratum.set_other_refs(other_refs_list)
             erratum_list.append(new_erratum)
 
         errata_dict = {}
