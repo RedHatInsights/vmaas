@@ -37,14 +37,6 @@ class Errata(object):
         """ Put package list into erratum. """
         self.data["package_list"] = package_list
 
-    def get_val(self, attr_name):
-        """
-        Return Erratum attribute or None
-        :param attr_name: attr_name
-        :return: attribute
-        """
-        return getattr(self, attr_name, None)
-
 class ErrataAPI(object):
     """ Main /errata API class. """
     def __init__(self, cursor):
@@ -121,6 +113,6 @@ class ErrataAPI(object):
 
         errata_dict = {}
         for erratum in erratum_list:
-            errata_dict[erratum.get_val("name")] = erratum.get_val("mydict")
+            errata_dict[erratum.name] = erratum.data
         answer["errata_list"] = errata_dict
         return answer
