@@ -39,6 +39,7 @@ services:
     env_file:
       - ./docker-compose.env
     ports:
+      - 8079
       - 8080:8080
     depends_on:
       - database
