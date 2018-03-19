@@ -395,6 +395,19 @@ CREATE TABLE IF NOT EXISTS errata_cve (
 )TABLESPACE pg_default;
 
 -- -----------------------------------------------------
+-- Table vmaas.errata_refs
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS errata_refs (
+  errata_id INT NOT NULL,
+  type TEXT NOT NULL,
+  name TEXT NOT NULL,
+  UNIQUE (errata_id, type, name),
+  CONSTRAINT errata_id
+    FOREIGN KEY (errata_id)
+    REFERENCES errata (id)
+)TABLESPACE pg_default;
+
+-- -----------------------------------------------------
 -- Table vmaas.metadata
 -- -----------------------------------------------------
 -- This table holds different timestamps, checksums and

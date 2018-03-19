@@ -267,6 +267,41 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         cur.close()
         self.conn.commit()
 
+    def _associate_refs(self, updates, update_map):
+        cur = self.conn.cursor()
+        refs_to_add = set()
+        refs_to_remove = []
+        existing_refs_count = 0
+        for update in updates:
+            for reference in update["references"]:
+                if reference["type"] == "bugzilla" or reference["type"] == "other":
+                    if reference["id"]:  # many 'other' refs have no id
+                        ref_name = reference["id"]
+                        if reference["type"] == "other":
+                            ref_name += "-%s" % update["id"]
+                        refs_to_add.add((update_map[update["id"]], reference["type"], ref_name))
+        if refs_to_add:
+            cur.execute("select errata_id, type, name from errata_refs where errata_id in %s",
+                        (tuple(update_map.values()),))
+            for row in cur.fetchall():
+                if (row[0], row[1], row[2]) in refs_to_add:
+                    refs_to_add.remove((row[0], row[1], row[2]))
+                    existing_refs_count += 1
+                else:
+                    refs_to_remove.append((row[0], row[1], row[2]))
+        self.logger.log("refs already in DB: %d" % existing_refs_count)
+        self.logger.log("refs to import: %d" % len(refs_to_add))
+        self.logger.log("refs to disassociate: %d" % len(refs_to_remove))
+        if refs_to_add:
+            execute_values(cur,
+                           "insert into errata_refs (errata_id, type, name) values %s",
+                           list(refs_to_add), page_size=len(refs_to_add))
+        if refs_to_remove:
+            cur.execute("delete from errata_refs where (errata_id, type, name) in %s",
+                        (tuple(refs_to_remove),))
+        cur.close()
+        self.conn.commit()
+
     def store(self, repo_id, updates):
         """
         Import all updates from repository into all related DB tables.
@@ -277,4 +312,5 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         self._associate_updates(update_map, repo_id)
         cve_map = self._populate_cves(updates)
         self._associate_cves(updates, update_map, cve_map)
+        self._associate_refs(updates, update_map)
         self.logger.log("Syncing updates finished.")
