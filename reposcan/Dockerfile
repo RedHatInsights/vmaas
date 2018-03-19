@@ -6,6 +6,7 @@ ENV POSTGRESQL_PORT=5432
 ENV POSTGRESQL_USER=vmaas_user
 ENV POSTGRESQL_PASSWORD=vmaas_passwd
 ENV POSTGRESQL_DATABASE=vmaas
+ENV WEBAPP_API_URL=http://webapp:8080
 
 RUN yum install -y python3-psycopg2 python3-requests \
                    python3-tornado postgresql-libs postgresql \

@@ -3,6 +3,7 @@
 Main web API module
 """
 
+import sys
 import json
 import traceback
 
@@ -15,6 +16,24 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 
+
+# pylint: disable=abstract-method
+class RefreshHandler(tornado.web.RequestHandler):
+    """
+    Class to refresh cached data in handlers.
+    """
+    def get(self, *args, **kwargs):
+        try:
+            self.application.updatesapi.prepare()
+            msg = "Cached data refreshed."
+            print(msg)
+            sys.stdout.flush()
+            self.write({"success": True, "msg": msg})
+        except: # pylint: disable=bare-except
+            traceback.print_exc()
+            self.write({"success": False, "msg": "Unable to refresh cached data."})
+        finally:
+            self.flush()
 
 # pylint: disable=abstract-method
 class JsonHandler(tornado.web.RequestHandler):
@@ -93,6 +112,7 @@ class Application(tornado.web.Application):
     """ main webserver application class """
     def __init__(self):
         handlers = [
+            (r"/api/internal/refresh/?", RefreshHandler),  # GET request
             (r"/api/v1/updates/?", UpdatesHandler),  # POST request
             (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
             (r"/api/v1/cves/?", CVEHandler),
