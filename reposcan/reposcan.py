@@ -9,12 +9,14 @@ from multiprocessing.pool import Pool
 import traceback
 import json
 
+import requests
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application
 
 from cli.logger import SimpleLogger
 from database.database_handler import DatabaseHandler
 from database.product_store import ProductStore
+from download.downloader import VALID_HTTP_CODES
 from nistcve.cve_controller import CveRepoController
 from repodata.repository_controller import RepositoryController
 
@@ -129,10 +131,23 @@ class SyncHandler(RequestHandler):
             self.write(str(ResponseMsg(msg, success=False)))
 
     @staticmethod
-    def finish_task(task_type, task_result):
+    def _notify_webapp():
+        webapp_url = os.getenv('WEBAPP_API_URL', "http://webapp:8080")
+        refresh_url = "%s/api/internal/refresh" % webapp_url
+        try:
+            response = requests.get(refresh_url)
+            if response.status_code not in VALID_HTTP_CODES or not json.loads(response.text)["success"]:
+                LOGGER.errlog("Response from %s: %s" % (refresh_url, response.text))
+        except requests.RequestException:
+            LOGGER.errlog(traceback.format_exc())
+            LOGGER.errlog("Unable to connect to %s." % refresh_url)
+
+    def finish_task(self, task_type, task_result):
         """Mark current task as finished."""
         LOGGER.log("%s sync task finished: %s." % (task_type, task_result))
         SyncTask.finish()
+        # Notify webapp to update it's cache
+        self._notify_webapp()
 
 
 class RepoSyncHandler(SyncHandler):
