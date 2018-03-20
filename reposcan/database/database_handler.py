@@ -27,3 +27,9 @@ class DatabaseHandler:
         if cls.connection is not None:
             cls.connection.close()
             cls.connection = None
+
+    @classmethod
+    def rollback(cls):
+        """Rollback any pending transaction."""
+        if cls.connection is not None:
+            cls.connection.rollback()
