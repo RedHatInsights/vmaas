@@ -62,8 +62,8 @@ class RepoCache(object):
 class RepoAPI(object):
     """ Main /repos API class."""
     # pylint: disable=too-few-public-methods
-    def __init__(self, cursor):
-        self.cache = RepoCache(cursor)
+    def __init__(self, repocache):
+        self.cache = repocache
 
     def process_list(self, data):
         """
