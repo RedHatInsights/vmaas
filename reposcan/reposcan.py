@@ -55,6 +55,7 @@ def repo_sync_task(products=None, repos=None):
         repository_controller.store()
     except: # pylint: disable=bare-except
         LOGGER.log(traceback.format_exc())
+        DatabaseHandler.rollback()
         return "ERROR"
     return "OK"
 
@@ -68,6 +69,7 @@ def cve_sync_task():
         controller.store()
     except: # pylint: disable=bare-except
         LOGGER.log(traceback.format_exc())
+        DatabaseHandler.rollback()
         return "ERROR"
     return "OK"
 
