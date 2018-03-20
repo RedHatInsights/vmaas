@@ -8,6 +8,7 @@ ENV POSTGRESQL_PASSWORD=vmaas_passwd
 ENV POSTGRESQL_DATABASE=vmaas
 ENV WEBAPP_API_URL=http://webapp
 ENV WEBAPP_API_PORT_INTERNAL=8079
+ENV REPOSCAN_SYNC_INTERVAL_MINUTES=720
 
 RUN yum install -y python3-psycopg2 python3-requests \
                    python3-tornado postgresql-libs postgresql \
