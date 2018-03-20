@@ -164,7 +164,8 @@ class CveStore:
                               as v(id, name, description, severity_id, published_date, modified_date, cvss3_score,
                               iava, redhat_url, secondary_url)
                               where cve.id = v.id """,
-                           list(to_update), page_size=len(to_update))
+                           list(to_update), page_size=len(to_update),
+                           template=b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s)")
         self._populate_cwes(cur, cve_data)
         cur.close()
         self.conn.commit()
