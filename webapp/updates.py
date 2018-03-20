@@ -275,7 +275,7 @@ class UpdatesAPI(object):
                         # check current erratum has some linked cve and it is in the same repo with update pkg
                         if e_id in errata_id2cve_id and errata_id2cve_id[e_id] and r_id in errata_id2repo_id[e_id]:
                             e_name = id2errata_dict[e_id]
-                            r_label = repoinfo_dict[r_id]['label']
+                            r_label = self.repocache.id2label(r_id)
 
                             response['update_list'][pkg].append({
                                 'package': pkg_id2full_name[upd_pkg_id],
