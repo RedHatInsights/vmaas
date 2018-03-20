@@ -29,21 +29,21 @@ class Errata(object):
             "reference_list": [],
         }
 
-    def set_cve_names(self, cve_name_list):
-        """ Put CVE list into erratum. """
-        self.data["cve_list"] = cve_name_list
+    def add_cve(self, cve):
+        """ Put CVE into cve_list. """
+        self.data["cve_list"].append(cve)
 
-    def set_packages(self, package_list):
-        """ Put package list into erratum. """
-        self.data["package_list"] = package_list
+    def add_package(self, package):
+        """ Put package into package_list. """
+        self.data["package_list"].append(package)
 
-    def set_bugzillas(self, bugzilla_list):
-        """Put bugzilla list into erratum."""
-        self.data["bugzilla_list"] = bugzilla_list
+    def add_bugzilla(self, bugzilla):
+        """Put bugzilla into bugzilla_list. """
+        self.data["bugzilla_list"].append(bugzilla)
 
-    def set_other_refs(self, other_refs_list):
-        """Put other references into erratum."""
-        self.data["reference_list"] = other_refs_list
+    def add_reference(self, reference):
+        """Put reference into reference_list. """
+        self.data["reference_list"].append(reference)
 
 
 class ErrataAPI(object):
@@ -51,53 +51,49 @@ class ErrataAPI(object):
     def __init__(self, cursor):
         self.cursor = cursor
 
-    def get_cve_names_for_erratum_id(self, oid):
+    def set_cves_for_errata(self, errata_map):
         """
-        Get the list of cves for the given erratum id
+        Populate the errata in the given errata_map with each erratum's
+        list of cves.
         """
-        cve_query = """SELECT name FROM cve
+        cve_query = """SELECT errata_cve.errata_id, cve.name FROM cve
                          JOIN errata_cve ON cve_id = cve.id
-                        WHERE errata_cve.errata_id = %s"""
-        self.cursor.execute(cve_query, (oid,))
-        cve_names = self.cursor.fetchall()
-        cve_name_list = []
-        for cve_name in cve_names:
-            cve_name_list.append(cve_name[0])
-        return cve_name_list
+                        WHERE errata_cve.errata_id IN %s"""
+        self.cursor.execute(cve_query, [tuple(errata_map.keys())])
+        results = self.cursor.fetchall()
+        for erratum_id, cve_name in results:
+            errata_map[erratum_id].add_cve(cve_name)
 
-    def get_package_list_for_erratum_id(self, oid):
+    def set_packages_for_errata(self, errata_map):
         """
-        Get the list of packages for the given erratum id
+        Populate the errata in the given errata_map with each erratum's
+        list of packages.
         """
-        pkg_query = """SELECT package.name, evr.epoch, evr.version, evr.release, arch.name
+        pkg_query = """SELECT pkg_errata.errata_id, package.name, evr.epoch, evr.version, evr.release, arch.name
                          FROM pkg_errata
                          JOIN package ON package.id = pkg_errata.pkg_id
                          JOIN evr ON evr.id = package.evr_id
                          JOIN arch ON arch.id = package.arch_id
-                        WHERE pkg_errata.errata_id = %s"""
-        self.cursor.execute(pkg_query, (oid,))
-        result = self.cursor.fetchall()
-        package_list = []
-        for name, epoch, version, release, arch in result:
-            package_list.append(join_packagename(name, epoch, version, release, arch))
-        return package_list
-
-    def get_references_list_for_erratum_id(self, oid):
-        """
-        Get the list of references (bugzilla and other) for the given erratum id
-        """
-        bugzilla_list = []
-        other_refs_list = []
-        refs_query = """SELECT type, name FROM errata_refs
-                        WHERE errata_id = %s"""
-        self.cursor.execute(refs_query, (oid,))
+                        WHERE pkg_errata.errata_id IN %s"""
+        self.cursor.execute(pkg_query, [tuple(errata_map.keys())])
         results = self.cursor.fetchall()
-        for type, name in results:
-            if type == 'bugzilla':
-                bugzilla_list.append(name)
+        for erratum_id, name, epoch, version, release, arch in results:
+            errata_map[erratum_id].add_package(join_packagename(name, epoch, version, release, arch))
+
+    def set_references_for_errata(self, errata_map):
+        """
+        Populate the errata in the given errata_map with each erratum's
+        list of references (bugzilla and other).
+        """
+        refs_query = """SELECT errata_id, type, name FROM errata_refs
+                        WHERE errata_id IN %s"""
+        self.cursor.execute(refs_query, [tuple(errata_map.keys())])
+        results = self.cursor.fetchall()
+        for erratum_id, ref_type, name in results:
+            if ref_type == 'bugzilla':
+                errata_map[erratum_id].add_bugzilla(name)
             else:
-                other_refs_list.append(name)
-        return bugzilla_list, other_refs_list
+                errata_map[erratum_id].add_reference(name)
 
     def process_list(self, data):
         #pylint: disable=too-many-locals
@@ -128,20 +124,20 @@ class ErrataAPI(object):
         self.cursor.execute(errata_query, [tuple(errata_to_process)])
         errata = self.cursor.fetchall()
 
-        erratum_list = []
+        errata_map = {}
         for (oid, name, synopsis, summary, errata_type, severity,
              description, solution, issued, updated) in errata:
             new_erratum = Errata(oid, name, synopsis, summary, errata_type,
                                  severity, description, solution, issued, updated)
-            new_erratum.set_cve_names(self.get_cve_names_for_erratum_id(oid))
-            new_erratum.set_packages(self.get_package_list_for_erratum_id(oid))
-            bugzilla_list, other_refs_list = self.get_references_list_for_erratum_id(oid)
-            new_erratum.set_bugzillas(bugzilla_list)
-            new_erratum.set_other_refs(other_refs_list)
-            erratum_list.append(new_erratum)
+            errata_map[oid] = new_erratum
 
-        errata_dict = {}
-        for erratum in erratum_list:
-            errata_dict[erratum.name] = erratum.data
-        answer["errata_list"] = errata_dict
-        return answer
+        if errata_map:
+            self.set_cves_for_errata(errata_map)
+            self.set_packages_for_errata(errata_map)
+            self.set_references_for_errata(errata_map)
+
+        response_dict = {}
+        for erratum in errata_map.values():
+            response_dict[erratum.name] = erratum.data
+        #answer["errata_list"] = response_dict
+        return {"errata_list": response_dict}
