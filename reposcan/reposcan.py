@@ -10,7 +10,7 @@ import traceback
 import json
 
 import requests
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
 
 from cli.logger import SimpleLogger
@@ -74,6 +74,11 @@ def cve_sync_task():
     return "OK"
 
 
+def all_sync_task():
+    """Function to start syncing all repositories from database + all CVEs."""
+    return "%s, %s" % (repo_sync_task(), cve_sync_task())
+
+
 class SyncTask:
     """
     Static class providing methods for managing sync worker.
@@ -118,19 +123,22 @@ class SyncHandler(RequestHandler):
         """Handles streamed data."""
         pass
 
-    def start_task(self, task_type, task_func, task_callback, args, kwargs): # pylint: disable=too-many-arguments
+    @staticmethod
+    def start_task(task_type, task_func, task_callback, args, kwargs): # pylint: disable=too-many-arguments
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
             msg = "%s sync task started." % task_type
             LOGGER.log(msg)
             SyncTask.start(task_func, task_callback, args, kwargs)
-            self.write(str(ResponseMsg(msg)))
+            status_code = 200
+            status_msg = str(ResponseMsg(msg))
         else:
             msg = "%s sync request ignored. Another sync task already in progress." % task_type
             LOGGER.log(msg)
             # Too Many Requests
-            self.set_status(429)
-            self.write(str(ResponseMsg(msg, success=False)))
+            status_code = 429
+            status_msg = str(ResponseMsg(msg, success=False))
+        return status_code, status_msg
 
     @staticmethod
     def _notify_webapp():
@@ -145,12 +153,13 @@ class SyncHandler(RequestHandler):
             LOGGER.errlog(traceback.format_exc())
             LOGGER.errlog("Unable to connect to %s." % refresh_url)
 
-    def finish_task(self, task_type, task_result):
+    @staticmethod
+    def finish_task(task_type, task_result):
         """Mark current task as finished."""
         LOGGER.log("%s sync task finished: %s." % (task_type, task_result))
         SyncTask.finish()
         # Notify webapp to update it's cache
-        self._notify_webapp()
+        SyncHandler._notify_webapp()
 
 
 class RepoSyncHandler(SyncHandler):
@@ -198,7 +207,10 @@ class RepoSyncHandler(SyncHandler):
 
     def get(self, *args, **kwargs):
         """Sync repositories stored in DB."""
-        self.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
+        status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
 
     def post(self, *args, **kwargs):
         """Sync repositories listed in request."""
@@ -210,13 +222,18 @@ class RepoSyncHandler(SyncHandler):
             LOGGER.log(traceback.format_exc())
             self.set_status(400)
             self.write(str(ResponseMsg("Incorrect JSON format.", success=False)))
+            self.flush()
         if repos:
-            self.start_task(self.task_type, repo_sync_task, self.on_complete, (),
-                            {"products": products, "repos": repos})
+            status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (),
+                                                             {"products": products, "repos": repos})
+            self.set_status(status_code)
+            self.write(status_msg)
+            self.flush()
 
-    def on_complete(self, res):
+    @staticmethod
+    def on_complete(res):
         """Callback after worker finishes."""
-        self.finish_task(self.task_type, res)
+        SyncHandler.finish_task(RepoSyncHandler.task_type, res)
 
 
 class CveSyncHandler(SyncHandler):
@@ -226,25 +243,59 @@ class CveSyncHandler(SyncHandler):
 
     def get(self, *args, **kwargs):
         """Sync CVEs."""
-        self.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
+        status_code, status_msg = SyncHandler.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
 
-    def on_complete(self, res):
+    @staticmethod
+    def on_complete(res):
         """Callback after worker finishes."""
-        self.finish_task(self.task_type, res)
+        SyncHandler.finish_task(CveSyncHandler.task_type, res)
+
+
+class AllSyncHandler(SyncHandler):
+    """Handler for repo + CVE sync API."""
+
+    task_type = "%s + %s" % (RepoSyncHandler.task_type, CveSyncHandler.task_type)
+
+    def get(self, *args, **kwargs):
+        """Sync repos + CVEs."""
+        status_code, status_msg = SyncHandler.start_task(self.task_type, all_sync_task, self.on_complete, (), {})
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
+
+    @staticmethod
+    def on_complete(res):
+        """Callback after worker finishes."""
+        SyncHandler.finish_task(AllSyncHandler.task_type, res)
 
 
 class ReposcanApplication(Application):
     """Class defining API handlers."""
     def __init__(self):
         handlers = [
+            (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
         ]
         Application.__init__(self, handlers)
 
 
+def periodic_sync():
+    """Function running both repo and CVE sync."""
+    LOGGER.log("Periodic sync started.")
+    SyncHandler.start_task(AllSyncHandler.task_type, all_sync_task, AllSyncHandler.on_complete, (), {})
+
+
 def main():
     """Main entrypoint."""
+    sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', 720)) * 60000
+    if sync_interval > 0:
+        PeriodicCallback(periodic_sync, sync_interval).start()
+    else:
+        LOGGER.log("Periodic syncing disabled.")
     app = ReposcanApplication()
     app.listen(8081)
     IOLoop.instance().start()
