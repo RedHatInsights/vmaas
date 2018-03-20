@@ -181,8 +181,8 @@ CREATE TABLE IF NOT EXISTS package (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS product (
   id SERIAL,
-  redhat_eng_product_id INT NOT NULL UNIQUE,
-  name TEXT NULL,
+  name TEXT NOT NULL UNIQUE,
+  redhat_eng_product_id INT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
