@@ -57,9 +57,17 @@ class RepoCache(object):
         """Repository label->[id,...] mapping."""
         return [repo.oid for repo in self.cache_label.get(label, [])]
 
+    def get_by_id(self, oid):
+        """Complete repository data for given id."""
+        return self.cache_id.get(oid, None)
+
     def get_by_label(self, label):
         """Complete repository data for given label."""
         return self.cache_label.get(label, None)
+
+    def all_ids(self):
+        """IDs of all known repositories."""
+        return self.cache_id.keys()
 
 
 class RepoAPI(object):

@@ -54,17 +54,26 @@ class UpdatesAPI(object):
         if not packages_to_process:
             return answer
 
-        provided_repo_ids = None
+        repo_ids = None
         provided_repo_labels = None
-
         if 'repository_list' in data:
             provided_repo_labels = data['repository_list']
 
             if provided_repo_labels:
-                provided_repo_ids = []
+                repo_ids = []
+                for label in provided_repo_labels:
+                    repo_ids.extend(self.repocache.label2ids(label))
+        else:
+            repo_ids = self.repocache.all_ids()
 
-                for label in data['repository_list']:
-                    provided_repo_ids.extend(self.repocache.label2ids(label))
+        releasever = data.get('releasever', None)
+        if releasever is not None:
+            repo_ids = [oid for oid in repo_ids
+                        if self.repocache.get_by_id(oid)['releasever'] == releasever]
+        basearch = data.get('basearch', None)
+        if basearch is not None:
+            repo_ids = [oid for oid in repo_ids
+                        if self.repocache.get_by_id(oid)['basearch'] == basearch]
 
         packages_names = []
         packages_evrids = []
@@ -95,7 +104,11 @@ class UpdatesAPI(object):
             'update_list': answer,
         }
 
-        if provided_repo_ids is not None:
+        if releasever is not None:
+            response['relasever'] = releasever
+        if basearch is not None:
+            response['basearch'] = basearch
+        if provided_repo_labels is not None:
             response.update({'repository_list': provided_repo_labels})
 
         if not packages_evrids:
@@ -266,8 +279,7 @@ class UpdatesAPI(object):
                 for r_id in pkg_id2repo_id[upd_pkg_id]:
                     # check if update package in the same repo with original one
                     # and if the list of repositories for updates is provided, also check repo id in this list
-                    if r_id not in auxiliary_dict[pkg]['repo_id'] or \
-                            (provided_repo_ids is not None and r_id not in provided_repo_ids):
+                    if r_id not in auxiliary_dict[pkg]['repo_id'] or r_id not in repo_ids:
                         continue
 
                     errata_ids = pkg_id2errata_id[upd_pkg_id]
