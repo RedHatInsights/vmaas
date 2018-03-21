@@ -19,24 +19,23 @@ class UpdatesAPI(object):
     def prepare(self):
         """ Read ahead table of keys. """
         # Select all evrs and put them into dictionary
-        # pylint: disable=invalid-name
         self.cursor.execute("SELECT id, epoch, version, release from evr")
         evrs = self.cursor.fetchall()
-        for oid, e, v, r in evrs:
-            key = "%s:%s:%s" % (e, v, r)
-            self.evr2id_dict[key] = oid
-            self.id2evr_dict[oid] = {'epoch': e, 'version': v, 'release': r}
+        for evr_id, evr_epoch, evr_ver, evr_rel in evrs:
+            key = "%s:%s:%s" % (evr_epoch, evr_ver, evr_rel)
+            self.evr2id_dict[key] = evr_id
+            self.id2evr_dict[evr_id] = {'epoch': evr_epoch, 'version': evr_ver, 'release': evr_rel}
 
         # Select all archs and put them into dictionary
         self.cursor.execute("SELECT id, name from arch")
         archs = self.cursor.fetchall()
-        for oid, name in archs:
-            self.arch2id_dict[name] = oid
-            self.id2arch_dict[oid] = name
+        for arch_id, arch_name in archs:
+            self.arch2id_dict[arch_name] = arch_id
+            self.id2arch_dict[arch_id] = arch_name
 
 
     def process_list(self, data):
-        #pylint: disable=too-many-locals,too-many-branches,too-many-statements,too-many-nested-blocks
+        #pylint: disable=too-many-locals,too-many-statements,too-many-nested-blocks
         """
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
@@ -47,7 +46,6 @@ class UpdatesAPI(object):
         'repository': <r_label>}
 
         """
-        # pylint: disable=invalid-name
         packages_to_process = data['package_list']
         auxiliary_dict = {}
         answer = {}
@@ -76,19 +74,19 @@ class UpdatesAPI(object):
 
             # process all packages form input
             if pkg not in auxiliary_dict:
-                n, e, v, r, a = split_packagename(str(pkg))
+                pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
                 auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
                 answer[pkg] = []          # fill answer with empty data
 
-                evr_key = "%s:%s:%s" % (e, v, r)
-                if evr_key in self.evr2id_dict and a in self.arch2id_dict:
-                    packages_names.append(n)
-                    auxiliary_dict[pkg][n] = []
+                evr_key = "%s:%s:%s" % (pkg_epoch, pkg_ver, pkg_rel)
+                if evr_key in self.evr2id_dict and pkg_arch in self.arch2id_dict:
+                    packages_names.append(pkg_name)
+                    auxiliary_dict[pkg][pkg_name] = []
 
                     evr_id = self.evr2id_dict[evr_key]
                     packages_evrids.append(evr_id)
                     auxiliary_dict[pkg]['evr_id'] = evr_id
-                    auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[a]
+                    auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[pkg_arch]
                     auxiliary_dict[pkg]['repo_id'] = []
                     auxiliary_dict[pkg]['pkg_id'] = []
                     auxiliary_dict[pkg]['update_id'] = []
@@ -117,10 +115,10 @@ class UpdatesAPI(object):
 
         pkg_ids = []
         for pkg in auxiliary_dict:
-            n, e, v, r, a = split_packagename(str(pkg))
+            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
 
             try:
-                key = "%s:%s:%s" % (n, auxiliary_dict[pkg]['evr_id'], auxiliary_dict[pkg]['arch_id'])
+                key = "%s:%s:%s" % (pkg_name, auxiliary_dict[pkg]['evr_id'], auxiliary_dict[pkg]['arch_id'])
                 pkg_ids.extend(nevra2pkg_id[key])
                 auxiliary_dict[pkg]['pkg_id'].extend(nevra2pkg_id[key])
             except KeyError:
@@ -162,10 +160,10 @@ class UpdatesAPI(object):
                 names2ids[name] = [oid]
 
         for pkg in auxiliary_dict:
-            n, e, v, r, a = split_packagename(str(pkg))
+            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
 
             try:
-                auxiliary_dict[pkg][n].extend(names2ids[n])
+                auxiliary_dict[pkg][pkg_name].extend(names2ids[pkg_name])
             except KeyError:
                 pass
 
@@ -176,10 +174,10 @@ class UpdatesAPI(object):
                    JOIN evr ON package.evr_id = evr.id
                   WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
         for pkg in auxiliary_dict:
-            n, e, v, r, a = split_packagename(str(pkg))
+            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
 
-            if n in auxiliary_dict[pkg] and auxiliary_dict[pkg][n]:
-                self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][n]),
+            if pkg_name in auxiliary_dict[pkg] and auxiliary_dict[pkg][pkg_name]:
+                self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][pkg_name]),
                                           auxiliary_dict[pkg]['evr_id']])
 
                 for oid in self.cursor.fetchall():
