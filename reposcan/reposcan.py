@@ -190,11 +190,10 @@ class RepoSyncHandler(SyncHandler):
                 cert_name, ca_cert, cert, key = None, None, None, None
 
             # Repository list with product and content set information
-            for product_id, product in repo_group["products"].items():
-                product_id = int(product_id)
-                products[product_id] = {"name": product["name"], "content_sets": {}}
+            for product_name, product in repo_group["products"].items():
+                products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
                 for content_set_label, content_set in product["content_sets"].items():
-                    products[product_id]["content_sets"][content_set_label] = content_set["name"]
+                    products[product_name]["content_sets"][content_set_label] = content_set["name"]
                     for repo_label, repo_url in content_set["repos"].items():
                         repos.append((repo_label, repo_url, content_set_label, cert_name, ca_cert, cert, key))
 
