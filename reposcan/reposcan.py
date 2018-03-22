@@ -189,19 +189,14 @@ class RepoSyncHandler(SyncHandler):
             else:
                 cert_name, ca_cert, cert, key = None, None, None, None
 
-            # Repository list without product and content set information
-            if "repos" in repo_group:
-                for repo_label, repo_url in repo_group["repos"].items():
-                    repos.append((repo_label, repo_url, None, cert_name, ca_cert, cert, key))
             # Repository list with product and content set information
-            if "products" in repo_group:
-                for product_id, product in repo_group["products"].items():
-                    product_id = int(product_id)
-                    products[product_id] = {"name": product["name"], "content_sets": {}}
-                    for content_set_label, content_set in product["content_sets"].items():
-                        products[product_id]["content_sets"][content_set_label] = content_set["name"]
-                        for repo_label, repo_url in content_set["repos"].items():
-                            repos.append((repo_label, repo_url, content_set_label, cert_name, ca_cert, cert, key))
+            for product_id, product in repo_group["products"].items():
+                product_id = int(product_id)
+                products[product_id] = {"name": product["name"], "content_sets": {}}
+                for content_set_label, content_set in product["content_sets"].items():
+                    products[product_id]["content_sets"][content_set_label] = content_set["name"]
+                    for repo_label, repo_url in content_set["repos"].items():
+                        repos.append((repo_label, repo_url, content_set_label, cert_name, ca_cert, cert, key))
 
         return products, repos
 
