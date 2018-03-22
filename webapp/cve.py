@@ -30,10 +30,8 @@ class CVE(object):
         :param attr_name: attr_name
         :return: attribute
         """
-        value = None
-        if attr_name in vars(self):
-            value = getattr(self, attr_name)
-        return value
+        value = getattr(self, attr_name, "")
+        return value if value is not None else ""
 
 class CveAPI(object):
     """ Main /cves API class. """
@@ -57,8 +55,8 @@ class CveAPI(object):
             return answer
 
         # Select all cves in request
-        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "severity.name", "published_date",
-                        "modified_date", "iava", "description"]
+        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "severity.name",
+                        "published_date", "modified_date", "iava", "description"]
         cve_query = """SELECT {columns}
                          FROM cve
                          LEFT JOIN severity ON cve.severity_id = severity.id
@@ -108,6 +106,7 @@ class CveAPI(object):
                 "public_date": str(cve.get_val("published_date")),
                 "modified_date": str(cve.get_val("modified_date")),
                 "cwe_list": cve.get_val("cwe"),
+                "cvss3_score": str(cve.get_val("cvss3_score")),
                 "description": cve.get_val("description"),
             }
         return response
