@@ -1,0 +1,82 @@
+[{
+  "entitlement_cert": {
+    "name": "RHSM-CDN",
+    "ca_cert": "<CA CERTIFICATE>",
+    "cert": "<CLIENT CERTIFICATE>",
+    "key": "<CLIENT KEY>"
+  },
+  "products": {
+    "Red Hat Enterprise Linux Server": {
+      "redhat_eng_product_id": 69,
+      "content_sets": {
+        "rhel-7-server-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Server", "7.4"]
+        },
+        "rhel-7-server-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Server - Optional (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/7/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Server", "7.4"]
+        },
+        "rhel-6-server-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Server (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/6/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Server", "6.9"]
+        },
+        "rhel-6-server-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Server - Optional (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/6/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Server", "6.9"]
+        }
+      }
+    },
+    "Red Hat Enterprise Linux Workstation": {
+      "redhat_eng_product_id": 71,
+      "content_sets": {
+        "rhel-7-workstation-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Workstation", "7.4"]
+        },
+        "rhel-7-workstation-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Workstation - Optional (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/7/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Workstation", "7.4"]
+        },
+        "rhel-6-workstation-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Workstation (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/6/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Workstation", "6.9"]
+        },
+        "rhel-6-workstation-optional-rpms": {
+          "name": "Red Hat Enterprise Linux 6 Workstation - Optional (RPMs)",
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/6/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Workstation", "6.9"]
+        }
+      }
+    }
+  }
+},
+{
+  "products": {
+    "Fedora": {
+      "content_sets": {
+        "updates": {
+          "name": "Fedora Updates",
+          "baseurl": "https://mirrors.nic.cz/fedora/linux/updates/$releasever/$basearch/",
+          "basearch": ["x86_64"],
+          "releasever": ["27"]
+        }
+      }
+    }
+  }
+}]
