@@ -41,11 +41,10 @@ class UpdatesAPI(object):
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
 
-        :param packages_to_process: list of package to find updates for every of them
+        :param data: input json, must contain package_list to find updates for them
 
-        :returns: updates for a package in format of list of dictionaries {'package': <p_name>, 'erratum': <e_name>,
-        'repository': <r_label>}
-
+        :returns: json with updates_list as a list of dictionaries
+                  {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
         packages_to_process = data['package_list']
         response = {
