@@ -39,78 +39,78 @@ JSON list of repositories have following format:
     "key": "<CLIENT KEY>"
   },
   "products": {
-    "69": {
-      "name": "Red Hat Enterprise Linux Server",
+    "Red Hat Enterprise Linux Server": {
+      "redhat_eng_product_id": 69,
       "content_sets": {
         "rhel-7-server-rpms": {
           "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
-          "repos": {
-            "rhel-7-server-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/",
-            "rhel-7-server-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Server", "7.4"]
         },
         "rhel-7-server-optional-rpms": {
           "name": "Red Hat Enterprise Linux 7 Server - Optional (RPMs)",
-          "repos": {
-            "rhel-7-server-optional-rpms__7Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/optional/os/",
-            "rhel-7-server-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/optional/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/7/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Server", "7.4"]
         },
         "rhel-6-server-rpms": {
           "name": "Red Hat Enterprise Linux 6 Server (RPMs)",
-          "repos": {
-            "rhel-6-server-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/",
-            "rhel-6-server-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/6/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Server", "6.9"]
         },
         "rhel-6-server-optional-rpms": {
           "name": "Red Hat Enterprise Linux 6 Server - Optional (RPMs)",
-          "repos": {
-            "rhel-6-server-optional-rpms__6Server__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/optional/os/",
-            "rhel-6-server-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/server/6/6.9/x86_64/optional/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/server/6/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Server", "6.9"]
         }
       }
     },
-    "71": {
-      "name": "Red Hat Enterprise Linux Workstation",
+    "Red Hat Enterprise Linux Workstation": {
+      "redhat_eng_product_id": 71,
       "content_sets": {
         "rhel-7-workstation-rpms": {
           "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
-          "repos": {
-            "rhel-7-workstation-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/os/",
-            "rhel-7-workstation-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Workstation", "7.4"]
         },
         "rhel-7-workstation-optional-rpms": {
           "name": "Red Hat Enterprise Linux 7 Workstation - Optional (RPMs)",
-          "repos": {
-            "rhel-7-workstation-optional-rpms__7Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/optional/os/",
-            "rhel-7-workstation-optional-rpms__7_DOT_4__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/optional/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/7/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Workstation", "7.4"]
         },
         "rhel-6-workstation-rpms": {
           "name": "Red Hat Enterprise Linux 6 Workstation (RPMs)",
-          "repos": {
-            "rhel-6-workstation-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/os/",
-            "rhel-6-workstation-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/6/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Workstation", "6.9"]
         },
         "rhel-6-workstation-optional-rpms": {
           "name": "Red Hat Enterprise Linux 6 Workstation - Optional (RPMs)",
-          "repos": {
-            "rhel-6-workstation-optional-rpms__6Workstation__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6Workstation/x86_64/optional/os/",
-            "rhel-6-workstation-optional-rpms__6_DOT_9__x86_64": "https://cdn.redhat.com/content/dist/rhel/workstation/6/6.9/x86_64/optional/os/"
-          }
+          "baseurl": "https://cdn.redhat.com/content/dist/rhel/workstation/6/$releasever/$basearch/optional/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["6Workstation", "6.9"]
         }
       }
     }
   }
 },
 {
-  "repos": {
-    "fedora-26-updates": "https://mirrors.nic.cz/fedora/linux/updates/26/x86_64/",
-    "fedora-27-updates": "https://mirrors.nic.cz/fedora/linux/updates/27/x86_64/"
+  "products": {
+    "Fedora": {
+      "content_sets": {
+        "updates": {
+          "name": "Fedora Updates",
+          "baseurl": "https://mirrors.nic.cz/fedora/linux/updates/$releasever/$basearch/",
+          "basearch": ["x86_64"],
+          "releasever": ["27"]
+        }
+      }
+    }
   }
 }]
 ```
@@ -124,6 +124,8 @@ Example commands:
 `$ curl -X GET http://127.0.0.1:8081/api/v1/sync/repo`
 
 `$ curl -X GET http://127.0.0.1:8081/api/v1/sync/cve`
+
+`$ curl -X GET http://127.0.0.1:8081/api/v1/sync`
 
 This allows to control the reposcan container manually.
 
