@@ -96,6 +96,7 @@ class UpdatesAPI(object):
 
                     evr_id = self.evr2id_dict[evr_key]
                     packages_evrids.append(evr_id)
+                    auxiliary_dict[pkg]['name'] = pkg_name
                     auxiliary_dict[pkg]['evr_id'] = evr_id
                     auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[pkg_arch]
                     auxiliary_dict[pkg]['repo_id'] = []
@@ -128,10 +129,10 @@ class UpdatesAPI(object):
 
         pkg_ids = []
         for pkg in auxiliary_dict:
-            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
-
             try:
-                key = "%s:%s:%s" % (pkg_name, auxiliary_dict[pkg]['evr_id'], auxiliary_dict[pkg]['arch_id'])
+                key = "%s:%s:%s" % (auxiliary_dict[pkg]['name'],
+                                    auxiliary_dict[pkg]['evr_id'],
+                                    auxiliary_dict[pkg]['arch_id'])
                 pkg_ids.extend(nevra2pkg_id[key])
                 auxiliary_dict[pkg]['pkg_id'].extend(nevra2pkg_id[key])
             except KeyError:
@@ -169,9 +170,8 @@ class UpdatesAPI(object):
                 names2ids[name] = [oid]
 
         for pkg in auxiliary_dict:
-            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
-
             try:
+                pkg_name = auxiliary_dict[pkg]['name']
                 auxiliary_dict[pkg][pkg_name].extend(names2ids[pkg_name])
             except KeyError:
                 pass
@@ -183,15 +183,15 @@ class UpdatesAPI(object):
                    JOIN evr ON package.evr_id = evr.id
                   WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
         for pkg in auxiliary_dict:
-            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
+            if auxiliary_dict[pkg]:
+                pkg_name = auxiliary_dict[pkg]['name']
+                if pkg_name in auxiliary_dict[pkg] and auxiliary_dict[pkg][pkg_name]:
+                    self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][pkg_name]),
+                                              auxiliary_dict[pkg]['evr_id']])
 
-            if pkg_name in auxiliary_dict[pkg] and auxiliary_dict[pkg][pkg_name]:
-                self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][pkg_name]),
-                                          auxiliary_dict[pkg]['evr_id']])
-
-                for oid in self.cursor.fetchall():
-                    auxiliary_dict[pkg]['update_id'].append(oid[0])
-                    update_pkg_ids.append(oid[0])
+                    for oid in self.cursor.fetchall():
+                        auxiliary_dict[pkg]['update_id'].append(oid[0])
+                        update_pkg_ids.append(oid[0])
 
         pkg_id2repo_id = {}
         pkg_id2errata_id = {}
