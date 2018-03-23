@@ -167,6 +167,23 @@ class RepoSyncHandler(SyncHandler):
 
     task_type = "Repo"
 
+    @staticmethod
+    def _content_set_to_repos(content_set):
+        baseurl = content_set["baseurl"]
+        basearches = content_set["basearch"]
+        releasevers = content_set["releasever"]
+
+        # (repo_url, basearch, releasever)
+        repos = [(baseurl, None, None)]
+        # Replace basearch
+        repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
+                 for basearch in basearches for repo in repos]
+        # Replace releasever
+        repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
+                 for releasever in releasevers for repo in repos]
+
+        return repos
+
     def _parse_input_list(self):
         # pylint: disable=too-many-locals
         products = {}
@@ -194,8 +211,9 @@ class RepoSyncHandler(SyncHandler):
                 products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
                 for content_set_label, content_set in product["content_sets"].items():
                     products[product_name]["content_sets"][content_set_label] = content_set["name"]
-                    for repo_label, repo_url in content_set["repos"].items():
-                        repos.append((repo_label, repo_url, content_set_label, cert_name, ca_cert, cert, key))
+                    for repo_url, basearch, releasever in self._content_set_to_repos(content_set):
+                        repos.append((repo_url, content_set_label, basearch, releasever,
+                                      cert_name, ca_cert, cert, key))
 
         return products, repos
 
