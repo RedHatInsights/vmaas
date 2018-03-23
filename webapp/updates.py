@@ -126,10 +126,7 @@ class UpdatesAPI(object):
         nevra2pkg_id = {}
         for oid, name, evr_id, arch_id in packs:
             key = "%s:%s:%s" % (name, evr_id, arch_id)
-            if key not in nevra2pkg_id:
-                nevra2pkg_id[key] = [oid]
-            else:
-                nevra2pkg_id[key].append(oid)
+            nevra2pkg_id.setdefault(key, []).append(oid)
 
         pkg_ids = []
         for pkg in auxiliary_dict:
@@ -151,10 +148,7 @@ class UpdatesAPI(object):
         pkg_id2repo_id = {}
 
         for pkg_id, repo_id in pack_repo_ids:
-            if pkg_id in pkg_id2repo_id:
-                pkg_id2repo_id[pkg_id].append(repo_id)
-            else:
-                pkg_id2repo_id[pkg_id] = [repo_id]
+            pkg_id2repo_id.setdefault(pkg_id, []).append(repo_id)
 
         for pkg in auxiliary_dict:
             try:
@@ -167,11 +161,7 @@ class UpdatesAPI(object):
         sql_result = self.cursor.fetchall()
         names2ids = {}
         for name, oid in sql_result:
-
-            if name in names2ids:
-                names2ids[name].append(oid)
-            else:
-                names2ids[name] = [oid]
+            names2ids.setdefault(name, []).append(oid)
 
         for pkg in auxiliary_dict:
             try:
@@ -208,21 +198,14 @@ class UpdatesAPI(object):
             self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(update_pkg_ids)])
             all_pkg_repos = self.cursor.fetchall()
             for pkg_id, repo_id in all_pkg_repos:
-
-                if pkg_id not in pkg_id2repo_id:
-                    pkg_id2repo_id[pkg_id] = [repo_id]
-                else:
-                    pkg_id2repo_id[pkg_id].append(repo_id)
+                pkg_id2repo_id.setdefault(pkg_id, []).append(repo_id)
 
             # Select all info about pkg_id to errata_id
             self.cursor.execute("select pkg_id, errata_id from pkg_errata where pkg_id in %s;", [tuple(update_pkg_ids)])
             all_pkg_errata = self.cursor.fetchall()
             for pkg_id, errata_id in all_pkg_errata:
                 all_errata.append(errata_id)
-                if pkg_id not in pkg_id2errata_id:
-                    pkg_id2errata_id[pkg_id] = [errata_id]
-                else:
-                    pkg_id2errata_id[pkg_id].append(errata_id)
+                pkg_id2errata_id.setdefault(pkg_id, []).append(errata_id)
 
             # Select full info about all update packages
             self.cursor.execute("SELECT id, name, evr_id, arch_id from package where id in %s;",
@@ -254,20 +237,14 @@ class UpdatesAPI(object):
             sql_result = self.cursor.fetchall()
             errata_id2repo_id = {}
             for errata_id, repo_id in sql_result:
-                if errata_id not in errata_id2repo_id:
-                    errata_id2repo_id[errata_id] = [repo_id]
-                else:
-                    errata_id2repo_id[errata_id].append(repo_id)
+                errata_id2repo_id.setdefault(errata_id, []).append(repo_id)
 
             self.cursor.execute("SELECT errata_id, cve_id from errata_cve where errata_id in %s",
                                 [tuple(all_errata_id)])
             sql_result = self.cursor.fetchall()
             errata_id2cve_id = {}
             for errata_id, cve_id in sql_result:
-                if errata_id not in errata_id2cve_id:
-                    errata_id2cve_id[errata_id] = [cve_id]
-                else:
-                    errata_id2cve_id[errata_id].append(cve_id)
+                errata_id2cve_id.setdefault(errata_id, []).append(cve_id)
 
         # Fill the result answer with update information
         for pkg in auxiliary_dict:
