@@ -48,11 +48,14 @@ class UpdatesAPI(object):
 
         """
         packages_to_process = data['package_list']
+        response = {
+            'update_list': {},
+        }
         auxiliary_dict = {}
         answer = {}
 
         if not packages_to_process:
-            return answer
+            return response
 
         repo_ids = None
         provided_repo_labels = None
@@ -100,9 +103,7 @@ class UpdatesAPI(object):
                     auxiliary_dict[pkg]['pkg_id'] = []
                     auxiliary_dict[pkg]['update_id'] = []
 
-        response = {
-            'update_list': answer,
-        }
+        response['update_list'] = answer
 
         if releasever is not None:
             response['relasever'] = releasever
