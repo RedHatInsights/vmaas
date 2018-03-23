@@ -56,6 +56,7 @@ class UpdatesAPI(object):
         if not packages_to_process:
             return response
 
+        # Read list of repositories
         repo_ids = None
         provided_repo_labels = None
         if 'repository_list' in data:
@@ -68,18 +69,21 @@ class UpdatesAPI(object):
         else:
             repo_ids = self.repocache.all_ids()
 
+        # Filter out repositories of different releasever
         releasever = data.get('releasever', None)
         if releasever is not None:
             repo_ids = [oid for oid in repo_ids
                         if self.repocache.get_by_id(oid)['releasever'] == releasever]
+
+        # Filter out repositories of different basearch
         basearch = data.get('basearch', None)
         if basearch is not None:
             repo_ids = [oid for oid in repo_ids
                         if self.repocache.get_by_id(oid)['basearch'] == basearch]
 
+        # Parse input list of packages and create empty update list (answer) for them
         packages_names = []
         packages_evrids = []
-
         for pkg in packages_to_process:
             pkg = str(pkg)
 
