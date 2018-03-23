@@ -7,8 +7,9 @@ from utils import join_packagename, split_packagename
 
 class UpdatesAPI(object):
     """ Main /updates API class. """
-    def __init__(self, cursor):
+    def __init__(self, cursor, repocache):
         self.cursor = cursor
+        self.repocache = repocache
         self.evr2id_dict = {}
         self.id2evr_dict = {}
         self.arch2id_dict = {}
@@ -61,10 +62,9 @@ class UpdatesAPI(object):
 
             if provided_repo_labels:
                 provided_repo_ids = []
-                self.cursor.execute("select id from repo where label in %s;", [tuple(provided_repo_labels)])
-                for id_tuple in self.cursor.fetchall():
-                    for oid in id_tuple:
-                        provided_repo_ids.append(oid)
+
+                for label in data['repository_list']:
+                    provided_repo_ids.extend(self.repocache.label2ids(label))
 
         packages_names = []
         packages_evrids = []
@@ -132,11 +132,7 @@ class UpdatesAPI(object):
         pack_repo_ids = self.cursor.fetchall()
         pkg_id2repo_id = {}
 
-        repo_ids = []
-
         for pkg_id, repo_id in pack_repo_ids:
-            repo_ids.append(repo_id)
-
             if pkg_id in pkg_id2repo_id:
                 pkg_id2repo_id[pkg_id].append(repo_id)
             else:
@@ -183,13 +179,6 @@ class UpdatesAPI(object):
                 for oid in self.cursor.fetchall():
                     auxiliary_dict[pkg]['update_id'].append(oid[0])
                     update_pkg_ids.append(oid[0])
-
-        # Select all info about repos
-        self.cursor.execute("select id, label, url from repo where id in %s;", [tuple(repo_ids)])
-        all_repos = self.cursor.fetchall()
-        repoinfo_dict = {}
-        for oid, label, url in all_repos:
-            repoinfo_dict[oid] = {'label': label, 'url': url}
 
         pkg_id2repo_id = {}
         pkg_id2errata_id = {}
@@ -286,7 +275,7 @@ class UpdatesAPI(object):
                         # check current erratum has some linked cve and it is in the same repo with update pkg
                         if e_id in errata_id2cve_id and errata_id2cve_id[e_id] and r_id in errata_id2repo_id[e_id]:
                             e_name = id2errata_dict[e_id]
-                            r_label = repoinfo_dict[r_id]['label']
+                            r_label = self.repocache.id2label(r_id)
 
                             response['update_list'][pkg].append({
                                 'package': pkg_id2full_name[upd_pkg_id],

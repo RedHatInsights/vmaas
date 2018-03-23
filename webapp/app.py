@@ -12,7 +12,7 @@ import tornado.web
 
 from database import Database
 from cve import CveAPI
-from repos import RepoAPI
+from repos import RepoAPI, RepoCache
 from updates import UpdatesAPI
 from errata import ErrataAPI
 
@@ -132,9 +132,10 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
         cursor = Database().cursor()
-        self.updatesapi = UpdatesAPI(cursor)
+        repocache = RepoCache(cursor)
+        self.updatesapi = UpdatesAPI(cursor, repocache)
         self.cveapi = CveAPI(cursor)
-        self.repoapi = RepoAPI(cursor)
+        self.repoapi = RepoAPI(repocache)
         self.errataapi = ErrataAPI(cursor)
         tornado.web.Application.__init__(self, handlers)
 
