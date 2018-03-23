@@ -70,8 +70,9 @@ class RepositoryController:
             if repomd_path not in failed:
                 repomd = RepoMD(repomd_path)
                 # Was repository already synced before?
-                if repository.repo_label in db_repositories:
-                    db_revision = db_repositories[repository.repo_label]["revision"]
+                repository_key = (repository.content_set, repository.basearch, repository.releasever)
+                if repository_key in db_repositories:
+                    db_revision = db_repositories[repository_key]["revision"]
                 else:
                     db_revision = None
                 downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
@@ -80,7 +81,7 @@ class RepositoryController:
                     repository.repomd = repomd
                 else:
                     self.logger.log("Downloaded repo %s (%s) is not newer than repo in DB (%s)." %
-                                    (repository.repo_label, str(downloaded_revision), str(db_revision)))
+                                    (", ".join(repository_key), str(downloaded_revision), str(db_revision)))
             else:
                 self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
                                                                         failed[repomd_path]))
@@ -138,20 +139,21 @@ class RepositoryController:
     def add_synced_repositories(self):
         """Queue all previously synced repositories."""
         repos = self.repo_store.list_repositories()
-        for repo_label, repo_dict in repos.items():
+        for (content_set, basearch, releasever), repo_dict in repos.items():
             # Reference content_set_label -> content set id
-            self.repo_store.content_set_to_db_id[repo_dict["content_set"]] = repo_dict["content_set_id"]
-            self.repositories.add(Repository(repo_label, repo_dict["url"], content_set=repo_dict["content_set"],
+            self.repo_store.content_set_to_db_id[content_set] = repo_dict["content_set_id"]
+            self.repositories.add(Repository(repo_dict["url"], content_set, basearch, releasever,
                                              cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
                                              cert=repo_dict["cert"], key=repo_dict["key"]))
 
     # pylint: disable=too-many-arguments
-    def add_repository(self, repo_label, repo_url, content_set=None, cert_name=None, ca_cert=None, cert=None, key=None):
+    def add_repository(self, repo_url, content_set, basearch, releasever,
+                       cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_label, repo_url, content_set=content_set, cert_name=cert_name,
+        self.repositories.add(Repository(repo_url, content_set, basearch, releasever, cert_name=cert_name,
                                          ca_cert=ca_cert, cert=cert, key=key))
 
     def _write_certificate_cache(self):

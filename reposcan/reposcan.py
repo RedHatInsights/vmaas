@@ -46,9 +46,9 @@ def repo_sync_task(products=None, repos=None):
         if repos:
             # Sync repos from input
             for repo in repos:
-                repo_label, repo_url, content_set, cert_name, ca_cert, cert, key = repo
-                repository_controller.add_repository(repo_label, repo_url, content_set=content_set,
-                                                     cert_name=cert_name, ca_cert=ca_cert, cert=cert, key=key)
+                repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key = repo
+                repository_controller.add_repository(repo_url, content_set, basearch, releasever, cert_name=cert_name,
+                                                     ca_cert=ca_cert, cert=cert, key=key)
         else:
             # Re-sync repos in DB
             repository_controller.add_synced_repositories()
