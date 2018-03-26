@@ -5,6 +5,7 @@ from datetime import datetime
 from psycopg2.extras import execute_values
 
 from cli.logger import SimpleLogger
+from common.utc import UTC
 from database.database_handler import DatabaseHandler
 
 class CveStore:
@@ -100,8 +101,8 @@ class CveStore:
             cve_desc_list = _dget(cve, "cve", "description", "description_data")
             severity = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
             url_list = _dget(cve, "cve", "references", "reference_data")
-            modified_date = datetime.strptime(_dget(cve, "lastModifiedDate"), "%Y-%m-%dT%H:%MZ")
-            published_date = datetime.strptime(_dget(cve, "publishedDate"), "%Y-%m-%dT%H:%MZ")
+            modified_date = datetime.strptime(_dget(cve, "lastModifiedDate"), "%Y-%m-%dT%H:%MZ").replace(tzinfo=UTC)
+            published_date = datetime.strptime(_dget(cve, "publishedDate"), "%Y-%m-%dT%H:%MZ").replace(tzinfo=UTC)
             cwe_data = _dget(cve, "cve", "problemtype", "problemtype_data")
             cwe_list = _process_cwe_list(cwe_data)
             redhat_url, secondary_url = _process_url_list(cve_name, url_list)
