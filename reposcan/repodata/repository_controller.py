@@ -4,11 +4,11 @@ Module containing class for syncing set of repositories into the DB.
 import os
 import shutil
 import tempfile
-from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 from cli.logger import SimpleLogger
 from common.batch_list import BatchList
+
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
@@ -75,7 +75,7 @@ class RepositoryController:
                     db_revision = db_repositories[repository_key]["revision"]
                 else:
                     db_revision = None
-                downloaded_revision = datetime.fromtimestamp(repomd.get_revision(), tz=timezone.utc)
+                downloaded_revision = repomd.get_revision()
                 # Repository is synced for the first time or has newer revision
                 if db_revision is None or downloaded_revision > db_revision:
                     repository.repomd = repomd
