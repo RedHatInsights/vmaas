@@ -31,6 +31,7 @@ class RefreshHandler(tornado.web.RequestHandler):
         if accessed_port == INTERNAL_API_PORT:
             try:
                 self.application.updatesapi.prepare()
+                self.application.repocache.prepare()
                 msg = "Cached data refreshed."
                 print(msg)
                 sys.stdout.flush()
@@ -132,10 +133,10 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
         cursor = Database().cursor()
-        repocache = RepoCache(cursor)
-        self.updatesapi = UpdatesAPI(cursor, repocache)
+        self.repocache = RepoCache(cursor)
+        self.updatesapi = UpdatesAPI(cursor, self.repocache)
         self.cveapi = CveAPI(cursor)
-        self.repoapi = RepoAPI(repocache)
+        self.repoapi = RepoAPI(self.repocache)
         self.errataapi = ErrataAPI(cursor)
         tornado.web.Application.__init__(self, handlers)
 
