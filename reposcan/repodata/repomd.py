@@ -1,7 +1,10 @@
 """
 Module containing class for Repo XML metadata.
 """
+from datetime import datetime
 import xml.etree.ElementTree as eT
+
+from common.utc import UTC
 
 NS = {"repo": "http://linux.duke.edu/metadata/repo"}
 
@@ -16,7 +19,7 @@ class RepoMD:
     def __init__(self, filename):
         tree = eT.parse(filename)
         root = tree.getroot()
-        self.revision = int(root.find("repo:revision", NS).text.strip())
+        self.revision = datetime.fromtimestamp(int(root.find("repo:revision", NS).text.strip()), tz=UTC)
         self.data = {}
         for child in root.findall("repo:data", NS):
             data_type = child.get("type")

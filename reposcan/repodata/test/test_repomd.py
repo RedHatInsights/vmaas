@@ -1,6 +1,7 @@
 """
 Unit test classes for repomd module.
 """
+from datetime import datetime
 import unittest
 from xml.etree.ElementTree import ParseError
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
@@ -16,8 +17,8 @@ class TestRepoMD(unittest.TestCase):
 
     def test_revision(self):
         """Test getting revision timestamp."""
-        self.assertIsInstance(self.repomd.get_revision(), int)
-        self.assertIsInstance(self.repomd_primary_only.get_revision(), int)
+        self.assertIsInstance(self.repomd.get_revision(), datetime)
+        self.assertIsInstance(self.repomd_primary_only.get_revision(), datetime)
         self.assertEqual(self.repomd.get_revision(), self.repomd_primary_only.get_revision())
 
     def _test_repomd(self, data):

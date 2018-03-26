@@ -85,13 +85,13 @@ class RepositoryStore:
         if not repo_id:
             cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
                                              revision, eol, certificate_id)
-                        values (%s, %s, %s, %s, to_timestamp(%s), false, %s) returning id""",
+                        values (%s, %s, %s, %s, %s, false, %s) returning id""",
                         (repo.repo_url, content_set_id, basearch_id, repo.releasever,
                          repo.repomd.get_revision(), cert_id,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
-            cur.execute("""update repo set revision = to_timestamp(%s), certificate_id = %s, content_set_id = %s,
+            cur.execute("""update repo set revision = %s, certificate_id = %s, content_set_id = %s,
                                            basearch_id = %s, releasever = %s
                         where id = %s""", (repo.repomd.get_revision(), cert_id, content_set_id, basearch_id,
                                            repo.releasever, repo_id[0],))
