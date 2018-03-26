@@ -222,6 +222,7 @@ class RepoSyncHandler(SyncHandler):
         status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
+        self.set_header('Content-Type', 'application/json')
         self.flush()
 
     def post(self, *args, **kwargs):
@@ -233,13 +234,16 @@ class RepoSyncHandler(SyncHandler):
             repos = None
             LOGGER.log(traceback.format_exc())
             self.set_status(400)
+
             self.write(str(ResponseMsg("Incorrect JSON format.", success=False)))
+            self.set_header('Content-Type', 'application/json')
             self.flush()
         if repos:
             status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (),
                                                              {"products": products, "repos": repos})
             self.set_status(status_code)
             self.write(status_msg)
+            self.set_header('Content-Type', 'application/json')
             self.flush()
 
     @staticmethod
@@ -258,6 +262,7 @@ class CveSyncHandler(SyncHandler):
         status_code, status_msg = SyncHandler.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
+        self.set_header('Content-Type', 'application/json')
         self.flush()
 
     @staticmethod
@@ -276,6 +281,7 @@ class AllSyncHandler(SyncHandler):
         status_code, status_msg = SyncHandler.start_task(self.task_type, all_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
+        self.set_header('Content-Type', 'application/json')
         self.flush()
 
     @staticmethod
