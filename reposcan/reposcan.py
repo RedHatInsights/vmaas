@@ -107,14 +107,15 @@ class SyncTask:
         return cls._running
 
 
-class ResponseMsg: # pylint: disable=too-few-public-methods
-    """Object used as API response to user, represented as JSON string."""
+class ResponseJson(dict): # pylint: disable=too-few-public-methods
+    """Object used as API response to user, represented as JSON"""
     def __init__(self, msg, success=True):
-        self.msg = msg
-        self.success = success
+        super(ResponseJson, self).__init__()
+        self['msg'] = msg
+        self['success'] = success
 
     def __repr__(self):
-        return json.dumps({"success": self.success, "msg": self.msg})
+        return json.dumps(self)
 
 
 class SyncHandler(RequestHandler):
@@ -131,13 +132,13 @@ class SyncHandler(RequestHandler):
             LOGGER.log(msg)
             SyncTask.start(task_func, task_callback, args, kwargs)
             status_code = 200
-            status_msg = str(ResponseMsg(msg))
+            status_msg = ResponseJson(msg)
         else:
             msg = "%s sync request ignored. Another sync task already in progress." % task_type
             LOGGER.log(msg)
             # Too Many Requests
             status_code = 429
-            status_msg = str(ResponseMsg(msg, success=False))
+            status_msg = ResponseJson(msg, success=False)
         return status_code, status_msg
 
     @staticmethod
@@ -233,7 +234,8 @@ class RepoSyncHandler(SyncHandler):
             repos = None
             LOGGER.log(traceback.format_exc())
             self.set_status(400)
-            self.write(str(ResponseMsg("Incorrect JSON format.", success=False)))
+
+            self.write(ResponseJson("Incorrect JSON format.", success=False))
             self.flush()
         if repos:
             status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (),
