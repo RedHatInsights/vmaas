@@ -290,8 +290,8 @@ CREATE TABLE IF NOT EXISTS errata (
   summary TEXT NOT NULL,
   description TEXT NOT NULL,
   solution TEXT,
-  issued TIMESTAMP NOT NULL,
-  updated TIMESTAMP NOT NULL,
+  issued TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated TIMESTAMP WITH TIME ZONE NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
@@ -342,8 +342,8 @@ CREATE TABLE IF NOT EXISTS cve (
   name TEXT NOT NULL UNIQUE,
   description TEXT NULL,
   severity_id INT,
-  published_date TIMESTAMP,
-  modified_date TIMESTAMP,
+  published_date TIMESTAMP WITH TIME ZONE NULL,
+  modified_date TIMESTAMP WITH TIME ZONE NULL,
   cvss3_score NUMERIC(5,3),
   iava TEXT,
   redhat_url TEXT,
