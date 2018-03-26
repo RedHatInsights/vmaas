@@ -1,7 +1,17 @@
 """
 Module containing class for UpdateInfo XML metadata.
 """
+from datetime import datetime
+import re
 import xml.etree.ElementTree as eT
+
+from common.utc import UTC
+
+DATETIME_PATTERNS = {
+    "%Y-%m-%d %H:%M:%S": re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"),
+    "%Y-%m-%d %H:%M:%S UTC": re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC$"),
+    "%Y-%m-%d": re.compile(r"^\d{4}-\d{2}-\d{2}$"),
+}
 
 
 class UpdateInfoMD: # pylint: disable=too-few-public-methods
@@ -29,7 +39,7 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods
                     if found is not None and field in text_elements:
                         update[field] = found.text.strip()
                     elif found is not None and field in date_elements:
-                        update[field] = found.get("date")
+                        update[field] = self._get_dt(found.get("date"))
                     else:
                         update[field] = None
 
@@ -57,6 +67,13 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods
                 self.updates.append(update)
                 # Clear the XML tree continuously
                 root.clear()
+
+    @staticmethod
+    def _get_dt(str_value):
+        for datetime_format, pattern in DATETIME_PATTERNS.items():
+            if pattern.match(str_value):
+                return datetime.strptime(str_value, datetime_format).replace(tzinfo=UTC)
+        raise ValueError("Unknown datetime format: %s" % str_value)
 
     def list_updates(self):
         """Returns list of parsed updates (list of dictionaries)."""
