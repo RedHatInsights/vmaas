@@ -27,14 +27,15 @@ class RepoCache(object):
                                       r.url,
                                       a.name as basearch_name,
                                       r.releasever,
-                                      p.name as product_name
+                                      p.name as product_name,
+                                      r.revision
                                  FROM repo r
                                  JOIN content_set cs ON cs.id = r.content_set_id
                                  JOIN arch a ON a.id = r.basearch_id
                                  JOIN product p ON p.id = cs.product_id
                                  """)
 
-        for oid, label, name, url, basearch, releasever, product in self.cursor.fetchall():
+        for oid, label, name, url, basearch, releasever, product, revision in self.cursor.fetchall():
             repo_obj = RepoDict(oid, {
                 "label": label,
                 "name": name,
@@ -42,6 +43,7 @@ class RepoCache(object):
                 "basearch": basearch,
                 "releasever": releasever,
                 "product": product,
+                "revision": str(revision),
                 })
             self.cache_id[oid] = repo_obj
             self.cache_label[label] = repo_obj
