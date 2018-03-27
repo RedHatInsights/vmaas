@@ -2,7 +2,8 @@
 Module to handle /repos API calls.
 """
 
-from utils import ListDict
+from utils import ListDict, format_datetime
+
 
 class RepoDict(dict):
     """Dictionary to hold repository data, the extra id attribute
@@ -43,7 +44,7 @@ class RepoCache(object):
                 "basearch": basearch,
                 "releasever": releasever,
                 "product": product,
-                "revision": str(revision),
+                "revision": format_datetime(revision),
                 })
             self.cache_id[oid] = repo_obj
             self.cache_label[label] = repo_obj

@@ -2,6 +2,7 @@
 Set of functions and precedures shared between different modules.
 """
 
+from datetime import datetime
 import re
 
 def join_packagename(name, epoch, version, release, arch):
@@ -31,6 +32,14 @@ def split_packagename(filename):
     name, _, epoch, version, release, arch = match.groups()
     epoch = int(epoch) if epoch is not None else 0
     return name, epoch, version, release, arch
+
+
+def format_datetime(datetime_obj):
+    """Try to format object to ISO 8601 if object is datetime."""
+    if isinstance(datetime_obj, datetime):
+        return datetime_obj.isoformat()
+    return str(datetime_obj)
+
 
 class ListDict(dict):
     """Dictionary which can cummulate multiple values for the same key into a list."""
