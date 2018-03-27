@@ -29,7 +29,7 @@ create or replace function isdigit(ch CHAR)
 $$ language 'plpgsql';
 
 
-    create or replace FUNCTION isalpha(ch CHAR)
+create or replace FUNCTION isalpha(ch CHAR)
     RETURNS BOOLEAN as $$
     BEGIN
         if ascii(ch) between ascii('a') and ascii('z') or
@@ -55,6 +55,12 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+create or replace FUNCTION empty(t TEXT)
+RETURNS BOOLEAN as $$
+BEGIN
+    return t ~ '^[[:space:]]*$';
+END;
+$$ language 'plpgsql';
 
 create or replace FUNCTION rpmver_array (string1 IN VARCHAR)
 RETURNS evr_array_item[] as $$
@@ -123,9 +129,9 @@ $$ language 'plpgsql';
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS evr (
   id SERIAL,
-  epoch TEXT NOT NULL,
-  version TEXT NOT NULL,
-  release TEXT NOT NULL,
+  epoch TEXT NOT NULL, CHECK (NOT empty(epoch)),
+  version TEXT NOT NULL, CHECK (NOT empty(version)),
+  release TEXT NOT NULL, CHECK (NOT empty(release)),
   evr evr_t NOT NULL,
   UNIQUE (epoch, version, release),
   PRIMARY KEY (id)
@@ -137,7 +143,7 @@ CREATE TABLE IF NOT EXISTS evr (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS checksum_type (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -147,7 +153,7 @@ CREATE TABLE IF NOT EXISTS checksum_type (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS arch (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -157,10 +163,10 @@ CREATE TABLE IF NOT EXISTS arch (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS package (
   id SERIAL,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL, CHECK (NOT empty(name)),
   evr_id INT NOT NULL,
   arch_id INT NOT NULL,
-  checksum TEXT NOT NULL,
+  checksum TEXT NOT NULL, CHECK (NOT empty(checksum)),
   checksum_type_id INT NOT NULL,
   UNIQUE (checksum_type_id, checksum),
   PRIMARY KEY (id),
@@ -181,7 +187,7 @@ CREATE TABLE IF NOT EXISTS package (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS product (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   redhat_eng_product_id INT NULL UNIQUE,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
@@ -192,8 +198,8 @@ CREATE TABLE IF NOT EXISTS product (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS content_set (
   id SERIAL,
-  label TEXT NOT NULL UNIQUE,
-  name TEXT NULL,
+  label TEXT NOT NULL UNIQUE, CHECK (NOT empty(label)),
+  name TEXT NULL, CHECK (NOT empty(name)),
   product_id INT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT product_id
@@ -207,10 +213,10 @@ CREATE TABLE IF NOT EXISTS content_set (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS certificate (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
-  ca_cert TEXT NOT NULL,
-  cert TEXT NULL,
-  key TEXT NULL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  ca_cert TEXT NOT NULL, CHECK (NOT empty(ca_cert)),
+  cert TEXT NULL, CHECK (NOT empty(cert)),
+  key TEXT NULL, CHECK (NOT empty(key)),
   CONSTRAINT cert_key CHECK(key IS NULL OR cert IS NOT NULL),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
@@ -221,10 +227,10 @@ CREATE TABLE IF NOT EXISTS certificate (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
-  url TEXT NOT NULL,
+  url TEXT NOT NULL, CHECK (NOT empty(url)),
   content_set_id INT NOT NULL,
   basearch_id INT NOT NULL,
-  releasever TEXT NOT NULL,
+  releasever TEXT NOT NULL, CHECK (NOT empty(releasever)),
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NOT NULL,
   certificate_id INT NULL,
@@ -263,7 +269,7 @@ CREATE TABLE IF NOT EXISTS pkg_repo (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS severity (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -273,7 +279,7 @@ CREATE TABLE IF NOT EXISTS severity (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata_type (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
@@ -283,13 +289,13 @@ CREATE TABLE IF NOT EXISTS errata_type (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
-  synopsis TEXT NOT NULL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  synopsis TEXT NOT NULL, CHECK (NOT empty(synopsis)),
   severity_id INT NOT NULL,
   errata_type_id INT NOT NULL,
-  summary TEXT NOT NULL,
-  description TEXT NOT NULL,
-  solution TEXT,
+  summary TEXT NOT NULL, CHECK (NOT empty(summary)),
+  description TEXT NOT NULL, CHECK (NOT empty(description)),
+  solution TEXT, CHECK (NOT empty(solution)),
   issued TIMESTAMP WITH TIME ZONE NOT NULL,
   updated TIMESTAMP WITH TIME ZONE NOT NULL,
   PRIMARY KEY (id),
@@ -339,15 +345,15 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
-  description TEXT NULL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  description TEXT NULL, CHECK (NOT empty(description)),
   severity_id INT,
   published_date TIMESTAMP WITH TIME ZONE NULL,
   modified_date TIMESTAMP WITH TIME ZONE NULL,
   cvss3_score NUMERIC(5,3),
-  iava TEXT,
-  redhat_url TEXT,
-  secondary_url TEXT,
+  iava TEXT, CHECK (NOT empty(iava)),
+  redhat_url TEXT, CHECK (NOT empty(redhat_url)),
+  secondary_url TEXT, CHECK (NOT empty(secondary_url)),
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
@@ -359,8 +365,8 @@ CREATE TABLE IF NOT EXISTS cve (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cwe (
   id SERIAL,
-  name TEXT NOT NULL UNIQUE,
-  link TEXT NOT NULL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  link TEXT NOT NULL, CHECK (NOT empty(link)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 -- -----------------------------------------------------
@@ -398,8 +404,8 @@ CREATE TABLE IF NOT EXISTS errata_cve (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata_refs (
   errata_id INT NOT NULL,
-  type TEXT NOT NULL,
-  name TEXT NOT NULL,
+  type TEXT NOT NULL, CHECK (NOT empty(type)),
+  name TEXT NOT NULL, CHECK (NOT empty(name)),
   UNIQUE (errata_id, type, name),
   CONSTRAINT errata_id
     FOREIGN KEY (errata_id)
@@ -415,8 +421,8 @@ CREATE TABLE IF NOT EXISTS errata_refs (
 
 CREATE TABLE IF NOT EXISTS metadata (
   id SERIAL,
-  key TEXT NOT NULL UNIQUE,
-  value TEXT NOT NULL,
+  key TEXT NOT NULL UNIQUE, CHECK (NOT empty(key)),
+  value TEXT NOT NULL, CHECK (NOT empty(value)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 

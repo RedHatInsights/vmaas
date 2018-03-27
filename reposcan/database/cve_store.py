@@ -201,11 +201,11 @@ def _desc(dlist, lang_key, lang_val, desc_key):
     return None
 
 def _process_url_list(name, url_list):
-    redhat_url = ""
-    secondary_url = ""
+    redhat_url = None
+    secondary_url = None
     url_list = [item for item in url_list if url_list is not None]
     for item in url_list:
-        if secondary_url == "" and item["url"] is not None:
+        if not secondary_url and item["url"]: # isn't None or empty-str
             secondary_url = item["url"]
         if "redhat" in item["url"]:  # try to determine Red Hat CVE, suboptimal, but works so far
             redhat_url = "https://access.redhat.com/security/cve/" + str.lower(name)
