@@ -103,7 +103,8 @@ class UpdatesAPI(object):
                     auxiliary_dict[pkg]['name'] = pkg_name
                     auxiliary_dict[pkg]['evr_id'] = evr_id
                     auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[pkg_arch]
-                    auxiliary_dict[pkg]['repo_id'] = []
+                    auxiliary_dict[pkg]['repo_releasevers'] = []
+                    auxiliary_dict[pkg]['product_repo_id'] = []
                     auxiliary_dict[pkg]['pkg_id'] = []
                     auxiliary_dict[pkg]['update_id'] = []
 
@@ -153,7 +154,12 @@ class UpdatesAPI(object):
         for pkg in auxiliary_dict.values():
             try:
                 for pkg_id in pkg['pkg_id']:
-                    pkg['repo_id'].extend(pkg_id2repo_id[pkg_id])
+                    pkg['repo_releasevers'].extend(
+                        [self.repocache.get_by_id(repo_id)['releasever'] for repo_id in pkg_id2repo_id[pkg_id]])
+                    # Find updates in repositories provided by same product
+                    product_ids = set([self.repocache.id2productid(repo_id) for repo_id in pkg_id2repo_id[pkg_id]])
+                    for product_id in product_ids:
+                        pkg['product_repo_id'].extend(self.repocache.productid2ids(product_id))
             except KeyError:
                 pass
 
@@ -258,9 +264,11 @@ class UpdatesAPI(object):
                     continue
 
                 for r_id in pkg_id2repo_id[upd_pkg_id]:
-                    # check if update package in the same repo with original one
+                    # check if update package is in repo provided by same product and releasever is same
                     # and if the list of repositories for updates is provided, also check repo id in this list
-                    if r_id not in auxiliary_dict[pkg]['repo_id'] or r_id not in repo_ids:
+                    if r_id not in auxiliary_dict[pkg]['product_repo_id'] or r_id not in repo_ids or \
+                            self.repocache.get_by_id(r_id)['releasever'] not in \
+                                    auxiliary_dict[pkg]['repo_releasevers']:
                         continue
 
                     errata_ids = pkg_id2errata_id[upd_pkg_id]
