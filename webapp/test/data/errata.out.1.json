@@ -1,7 +1,16 @@
 {
     "errata_list": {
         "RHSA-2018:0151": {
-            "bugzilla_list": [],
+            "bugzilla_list": [
+                "1284450",
+                "1442086",
+                "1493435",
+                "1501215",
+                "1504574",
+                "1519778",
+                "1519780",
+                "1519781"
+            ],
             "cve_list": [
                 "CVE-2015-8539",
                 "CVE-2017-12192",
@@ -25,7 +34,14 @@
                 "perf-3.10.0-693.17.1.el7.x86_64",
                 "python-perf-3.10.0-693.17.1.el7.x86_64"
             ],
-            "reference_list": [],
+            "reference_list": [
+                "classification-RHSA-2018:0151",
+                "ref_0-RHSA-2018:0151",
+                "ref_1-RHSA-2018:0151",
+                "ref_2-RHSA-2018:0151",
+                "ref_3-RHSA-2018:0151",
+                "ref_4-RHSA-2018:0151"
+            ],
             "severity": "Important",
             "solution": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258\n\nThe system must be rebooted for this update to take effect.",
             "summary": "An update for kernel is now available for Red Hat Enterprise Linux 7.\n\nRed Hat Product Security has rated this update as having a security impact of Important. A Common Vulnerability Scoring System (CVSS) base score, which gives a detailed severity rating, is available for each vulnerability from the CVE link(s) in the References section.",
@@ -35,7 +51,10 @@
             "url": "https://access.redhat.com/errata/RHSA-2018:0151"
         },
         "RHSA-2018:0395": {
-            "bugzilla_list": [],
+            "bugzilla_list": [
+                "1464473",
+                "1500380"
+            ],
             "cve_list": [
                 "CVE-2017-12188",
                 "CVE-2017-7518"
@@ -56,7 +75,10 @@
                 "perf-3.10.0-693.21.1.el7.x86_64",
                 "python-perf-3.10.0-693.21.1.el7.x86_64"
             ],
-            "reference_list": [],
+            "reference_list": [
+                "classification-RHSA-2018:0395",
+                "ref_0-RHSA-2018:0395"
+            ],
             "severity": "Important",
             "solution": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258\n\nThe system must be rebooted for this update to take effect.",
             "summary": "An update for kernel is now available for Red Hat Enterprise Linux 7.\n\nRed Hat Product Security has rated this update as having a security impact of Important. A Common Vulnerability Scoring System (CVSS) base score, which gives a detailed severity rating, is available for each vulnerability from the CVE link(s) in the References section.",
@@ -66,7 +88,10 @@
             "url": "https://access.redhat.com/errata/RHSA-2018:0395"
         },
         "RHSA-2018:0483": {
-            "bugzilla_list": [],
+            "bugzilla_list": [
+                "1549960",
+                "1549961"
+            ],
             "cve_list": [
                 "CVE-2018-5732",
                 "CVE-2018-5733"
@@ -82,7 +107,11 @@
                 "dhcp-libs-12:4.2.5-58.el7_4.3.i686",
                 "dhcp-libs-12:4.2.5-58.el7_4.3.x86_64"
             ],
-            "reference_list": [],
+            "reference_list": [
+                "classification-RHSA-2018:0483",
+                "ref_0-RHSA-2018:0483",
+                "ref_1-RHSA-2018:0483"
+            ],
             "severity": "Important",
             "solution": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
             "summary": "An update for dhcp is now available for Red Hat Enterprise Linux 7.\n\nRed Hat Product Security has rated this update as having a security impact of Important. A Common Vulnerability Scoring System (CVSS) base score, which gives a detailed severity rating, is available for each vulnerability from the CVE link(s) in the References section.",

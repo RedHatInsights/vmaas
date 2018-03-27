@@ -244,126 +244,126 @@
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "kernel-3.10.0-693.11.6.el7.x86_64": [
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "kernel-devel-3.10.0-693.11.1.el7.x86_64": [
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0151",
                 "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0395",
                 "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "kexec-tools-2.0.14-17.2.el7.x86_64": [],
@@ -633,44 +633,44 @@
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "php-common-5.4.16-43.el7_4.x86_64": [
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-common-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-common-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-common-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0406",
                 "package": "php-common-5.4.16-43.el7_4.1.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "pidgin-2.10.11-5.el7.x86_64": [],
@@ -838,44 +838,44 @@
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "ruby-2.0.0.648-33.el7_4.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "ruby-2.0.0.648-33.el7_4.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "ruby-2.0.0.648-33.el7_4.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "ruby-2.0.0.648-33.el7_4.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "rubygem-psych-2.0.0-30.el7.x86_64": [
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0378",
                 "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "samba-common-4.6.2-12.el7_4.noarch": [],
@@ -895,7 +895,28 @@
         "skopeo-containers-0.1.26-2.dev.git2e8377a.el7.centos.x86_64": [],
         "skypeforlinux-8.11.0.4-1.x86_64": [],
         "slang-2.2.4-11.el7.x86_64": [],
-        "slf4j-1.7.4-3.el7.noarch": [],
+        "slf4j-1.7.4-3.el7.noarch": [
+            {
+                "erratum": "RHSA-2018:0592",
+                "package": "slf4j-1.7.4-4.el7_4.noarch",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0592",
+                "package": "slf4j-1.7.4-4.el7_4.noarch",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0592",
+                "package": "slf4j-1.7.4-4.el7_4.noarch",
+                "repository": "rhel-7-workstation-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0592",
+                "package": "slf4j-1.7.4-4.el7_4.noarch",
+                "repository": "rhel-7-workstation-rpms"
+            }
+        ],
         "smc-fonts-common-6.0-7.el7.noarch": [],
         "snappy-1.1.0-3.el7.x86_64": [],
         "sox-14.4.1-6.el7.x86_64": [],
@@ -917,44 +938,44 @@
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-219-42.el7_4.7.x86_64",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-219-42.el7_4.7.x86_64",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-219-42.el7_4.7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-219-42.el7_4.7.x86_64",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "systemd-libs-219-42.el7_4.4.i686": [
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-libs-219-42.el7_4.7.i686",
-                "repository": "rhel-7-server-rpms__7Server__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-libs-219-42.el7_4.7.i686",
-                "repository": "rhel-7-server-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-server-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-libs-219-42.el7_4.7.i686",
-                "repository": "rhel-7-workstation-rpms__7Workstation__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             },
             {
                 "erratum": "RHSA-2018:0260",
                 "package": "systemd-libs-219-42.el7_4.7.i686",
-                "repository": "rhel-7-workstation-rpms__7_DOT_4__x86_64"
+                "repository": "rhel-7-workstation-rpms"
             }
         ],
         "tagsoup-1.2.1-8.el7.noarch": [],
