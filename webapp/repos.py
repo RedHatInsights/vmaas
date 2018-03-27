@@ -18,6 +18,8 @@ class RepoCache(object):
         self.cursor = cursor
         self.cache_id = {}
         self.cache_label = ListDict()
+        self.cache_repo_product_id = {}
+        self.cache_product_repo_id = ListDict()
         self.prepare()
 
     def prepare(self):
@@ -29,6 +31,7 @@ class RepoCache(object):
                                       a.name as basearch_name,
                                       r.releasever,
                                       p.name as product_name,
+                                      p.id as product_id,
                                       r.revision
                                  FROM repo r
                                  JOIN content_set cs ON cs.id = r.content_set_id
@@ -36,7 +39,7 @@ class RepoCache(object):
                                  JOIN product p ON p.id = cs.product_id
                                  """)
 
-        for oid, label, name, url, basearch, releasever, product, revision in self.cursor.fetchall():
+        for oid, label, name, url, basearch, releasever, product, product_id, revision in self.cursor.fetchall():
             repo_obj = RepoDict(oid, {
                 "label": label,
                 "name": name,
@@ -48,6 +51,10 @@ class RepoCache(object):
                 })
             self.cache_id[oid] = repo_obj
             self.cache_label[label] = repo_obj
+            # repo_id -> product_id
+            self.cache_repo_product_id[oid] = product_id
+            # product_id -> [repo_id]
+            self.cache_product_repo_id[product_id] = oid
 
     def id2label(self, oid):
         """Repository id->label mapping."""
@@ -68,6 +75,14 @@ class RepoCache(object):
     def all_ids(self):
         """IDs of all known repositories."""
         return self.cache_id.keys()
+
+    def id2productid(self, oid):
+        """Repository id -> Product id mapping."""
+        return self.cache_repo_product_id.get(oid, None)
+
+    def productid2ids(self, product_id):
+        """Product id -> [repo_id,...] mapping."""
+        return self.cache_product_repo_id.get(product_id, [])
 
 
 class RepoAPI(object):
