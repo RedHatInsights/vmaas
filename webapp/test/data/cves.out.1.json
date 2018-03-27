@@ -13,11 +13,13 @@
         "synopsis": "CVE-2010-3080"
     },
     "CVE-2016-0253": {
-        "cvss3_score": "",
-        "cwe_list": [],
+        "cvss3_score": "5.400",
+        "cwe_list": [
+            "CWE-79"
+        ],
         "description": "Cross-site scripting (XSS) vulnerability in IBM Financial Transaction Manager (FTM) for ACH Services for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013, Financial Transaction Manager (FTM) for Check Services for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013, and Financial Transaction Manager (FTM) for Corporate Payment Services (CPS) for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013 allows remote attackers to inject arbitrary web script or HTML via unspecified vectors. IBM X-Force ID: 110562.",
-        "impact": "",
-        "modified_date": "2018-03-09 19:29:00",
+        "impact": "Medium",
+        "modified_date": "2018-03-26 18:12:00",
         "public_date": "2018-03-09 19:29:00",
         "redhat_url": "",
         "secondary_url": "http://www-01.ibm.com/support/docview.wss?uid=swg21977245",

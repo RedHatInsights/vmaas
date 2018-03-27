@@ -119,9 +119,72 @@
         "kde-runtime-drkonqi-4.10.5-8.el7.x86_64": [],
         "kdepimlibs-4.10.5-4.el7.x86_64": [],
         "keepass-2.34-1.el7.x86_64": [],
-        "kernel-3.10.0-693.11.1.el7.x86_64": [],
-        "kernel-3.10.0-693.11.6.el7.x86_64": [],
-        "kernel-devel-3.10.0-693.11.1.el7.x86_64": [],
+        "kernel-3.10.0-693.11.1.el7.x86_64": [
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
+        "kernel-3.10.0-693.11.6.el7.x86_64": [
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
+        "kernel-devel-3.10.0-693.11.1.el7.x86_64": [
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0151",
+                "package": "kernel-devel-3.10.0-693.17.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0395",
+                "package": "kernel-devel-3.10.0-693.21.1.el7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
         "kexec-tools-2.0.14-17.2.el7.x86_64": [],
         "keyutils-1.5.8-3.el7.x86_64": [],
         "keyutils-libs-devel-1.5.8-3.el7.x86_64": [],
@@ -146,8 +209,30 @@
         "root-multiproc-6.10.08-1.el7.x86_64": [],
         "root-physics-6.10.08-1.el7.x86_64": [],
         "rpmdevtools-8.3-5.el7.noarch": [],
-        "ruby-2.0.0.648-30.el7.x86_64": [],
-        "rubygem-psych-2.0.0-30.el7.x86_64": [],
+        "ruby-2.0.0.648-30.el7.x86_64": [
+            {
+                "erratum": "RHSA-2018:0378",
+                "package": "ruby-2.0.0.648-33.el7_4.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0378",
+                "package": "ruby-2.0.0.648-33.el7_4.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
+        "rubygem-psych-2.0.0-30.el7.x86_64": [
+            {
+                "erratum": "RHSA-2018:0378",
+                "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0378",
+                "package": "rubygem-psych-2.0.0-33.el7_4.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
         "samba-common-4.6.2-12.el7_4.noarch": [],
         "samba-common-libs-4.6.2-12.el7_4.x86_64": [],
         "sbc-1.0-5.el7.x86_64": [],
@@ -183,8 +268,30 @@
         "system-config-language-1.4.0-9.el7.noarch": [],
         "system-config-printer-libs-1.4.1-19.el7.noarch": [],
         "system-config-users-1.3.5-2.el7.noarch": [],
-        "systemd-219-42.el7_4.4.x86_64": [],
-        "systemd-libs-219-42.el7_4.4.i686": [],
+        "systemd-219-42.el7_4.4.x86_64": [
+            {
+                "erratum": "RHSA-2018:0260",
+                "package": "systemd-219-42.el7_4.7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0260",
+                "package": "systemd-219-42.el7_4.7.x86_64",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
+        "systemd-libs-219-42.el7_4.4.i686": [
+            {
+                "erratum": "RHSA-2018:0260",
+                "package": "systemd-libs-219-42.el7_4.7.i686",
+                "repository": "rhel-7-server-rpms"
+            },
+            {
+                "erratum": "RHSA-2018:0260",
+                "package": "systemd-libs-219-42.el7_4.7.i686",
+                "repository": "rhel-7-server-rpms"
+            }
+        ],
         "xcb-util-0.4.0-2.el7.x86_64": [],
         "xchat-2.8.8-23.el7.x86_64": [],
         "xerces-j2-2.11.0-17.el7_0.noarch": [],
