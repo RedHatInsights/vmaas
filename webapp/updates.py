@@ -84,6 +84,8 @@ class UpdatesAPI(object):
         # Parse input list of packages and create empty update list (answer) for them
         packages_names = []
         packages_evrids = []
+        name2text = {}
+
         for pkg in packages_to_process:
             pkg = str(pkg)
 
@@ -91,7 +93,7 @@ class UpdatesAPI(object):
             if pkg not in auxiliary_dict:
                 pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
                 auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
-                answer[pkg] = []          # fill answer with empty data
+                answer[pkg] = {}          # fill answer with empty data
 
                 evr_key = "%s:%s:%s" % (pkg_epoch, pkg_ver, pkg_rel)
                 if evr_key in self.evr2id_dict and pkg_arch in self.arch2id_dict:
@@ -120,11 +122,12 @@ class UpdatesAPI(object):
             return response
 
         # Select all packages with given evrs ids and put them into dictionary
-        self.cursor.execute("select id, name, evr_id, arch_id from package where evr_id in %s;",
+        self.cursor.execute("select id, name, evr_id, arch_id, summary, description from package where evr_id in %s;",
                             [tuple(packages_evrids)])
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
-        for oid, name, evr_id, arch_id in packs:
+        for oid, name, evr_id, arch_id, summary, description in packs:
+            name2text[name] = {'summary':summary, 'description':description}
             key = "%s:%s:%s" % (name, evr_id, arch_id)
             nevra2pkg_id.setdefault(key, []).append(oid)
 
@@ -248,8 +251,16 @@ class UpdatesAPI(object):
 
         # Fill the result answer with update information
         for pkg in auxiliary_dict:
+            # Grab summary/description for this pkg-name
+            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
+            if pkg_name and pkg_name in name2text:
+                response['update_list'][pkg]['summary'] = name2text[pkg_name]['summary']
+                response['update_list'][pkg]['description'] = name2text[pkg_name]['description']
+
             if 'update_id' not in auxiliary_dict[pkg]:
                 continue
+
+            response['update_list'][pkg]['available_updates'] = []
 
             for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
                 # FIXME: use compatibility tables instead of exact matching
@@ -270,9 +281,10 @@ class UpdatesAPI(object):
                             e_name = id2errata_dict[e_id]
                             r_label = self.repocache.id2label(r_id)
 
-                            response['update_list'][pkg].append({
+                            response['update_list'][pkg]['available_updates'].append({
                                 'package': pkg_id2full_name[upd_pkg_id],
                                 'erratum': e_name,
-                                'repository': r_label})
+                                'repository': r_label,
+                                })
 
         return response

@@ -162,6 +162,8 @@ CREATE TABLE IF NOT EXISTS package (
   arch_id INT NOT NULL,
   checksum TEXT NOT NULL,
   checksum_type_id INT NOT NULL,
+  summary TEXT NULL,
+  description TEXT NULL,
   UNIQUE (checksum_type_id, checksum),
   PRIMARY KEY (id),
   CONSTRAINT evr_id

@@ -26,6 +26,8 @@ class PrimaryMD:
                     package["ver"] = evr.get("ver")
                     package["rel"] = evr.get("rel")
                     package["arch"] = elem.find("primary:arch", NS).text.strip()
+                    package["summary"] = elem.find("primary:summary", NS).text.strip()
+                    package["description"] = elem.find("primary:description", NS).text.strip()
                     checksum = elem.find("primary:checksum", NS)
                     package["checksum_type"] = checksum.get("type")
                     package["checksum"] = checksum.text.strip()

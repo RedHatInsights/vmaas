@@ -11,13 +11,15 @@ class PrimaryDatabaseMD:
         conn = sqlite3.connect(filename)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        for row in cur.execute("select name, epoch, version, release, arch, checksum_type, pkgid from packages"):
+        for row in cur.execute("select name, epoch, version, release, arch, summary, description, checksum_type, pkgid from packages"):
             self.packages.append({
                 "name": row["name"],
                 "epoch": row["epoch"],
                 "ver": row["version"],
                 "rel": row["release"],
                 "arch": row["arch"],
+                "summary": row["summary"],
+                "description": row["description"],
                 "checksum_type": row["checksum_type"],
                 "checksum": row["pkgid"]
             })
