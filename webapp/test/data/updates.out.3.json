@@ -2,1404 +2,1404 @@
     "update_list": {
         "kernel-2.6.32-131.0.15.el6.x86_64": [
             {
-                "erratum": "RHSA-2012:1366",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1366",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1366",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1366",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1849",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1849",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1849",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1849",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0830",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0830",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0830",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0830",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2795",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.10.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2795",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.10.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2795",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.10.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2795",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.10.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0481",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.13.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0481",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.13.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0481",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.13.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0481",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.13.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1051",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.14.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1051",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.14.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1051",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.14.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1051",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.14.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0855",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0855",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0855",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0855",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:3200",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.16.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:3200",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.16.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:3200",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.16.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:3200",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.16.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0307",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.15.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0307",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.15.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0307",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.15.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0307",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.15.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0293",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0293",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0293",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0293",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1156",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1156",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1156",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1156",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1465",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-131.21.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1465",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-131.21.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1465",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.21.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1465",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.21.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0862",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0862",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0862",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0862",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0744",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0744",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0744",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0744",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1406",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1406",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1406",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1406",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0087",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.8.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0087",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.8.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0087",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.8.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0087",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.8.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0715",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-573.26.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0715",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-573.26.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0715",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.26.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0715",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.26.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1304",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.9.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1304",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.9.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1304",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.9.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1304",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.9.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1843",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.1.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1843",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.1.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1843",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.1.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1843",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.1.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0981",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.23.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0981",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.23.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0981",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.23.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0981",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.23.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0494",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-573.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0494",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-573.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0494",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:0494",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2681",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.10.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2681",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.10.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2681",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.10.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2681",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.10.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0911",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0911",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0911",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0911",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.11.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0771",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.20.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0771",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.20.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0771",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.20.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0771",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.20.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0475",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0475",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0475",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0475",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0328",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.11.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0328",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.11.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0328",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.11.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0328",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.11.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:2636",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-573.12.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:2636",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-573.12.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:2636",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.12.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:2636",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.12.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0052",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.4.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0052",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.4.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0052",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.4.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0052",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.4.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2105",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2105",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2105",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2105",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.6.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0630",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0630",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0630",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0630",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.2.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:0928",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-131.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:0928",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-131.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:0928",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:0928",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1997",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.3.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1997",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.3.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1997",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.3.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1997",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.3.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0817",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0817",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0817",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0817",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0924",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.20.5.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0924",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.20.5.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0924",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.20.5.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0924",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.20.5.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2006",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2006",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2006",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:2006",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.6.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0567",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.0.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0567",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.0.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0567",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.0.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0567",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.0.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1664",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.4.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1664",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.4.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1664",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.4.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2016:1664",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.4.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0571",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0571",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0571",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:0571",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1723",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.6.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1723",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.6.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1723",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.6.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1723",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.6.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0892",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.1.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0892",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.1.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0892",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.1.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:0892",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.1.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1645",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1645",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1645",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1645",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1350",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-131.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1350",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-131.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1350",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1350",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.17.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0223",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0223",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0223",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:0223",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.22.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2863",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2863",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2863",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:2863",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.13.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1392",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1392",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1392",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1392",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.el6.x86_64"
+                "erratum": "RHSA-2011:0836",
+                "package": "kernel-2.6.32-131.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2011:0836",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-131.2.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2011:0836",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-131.2.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2011:0836",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.2.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2011:0836",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.2.1.el6.x86_64"
+                "erratum": "RHSA-2011:0928",
+                "package": "kernel-2.6.32-131.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2015:1221",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.30.3.el6.x86_64"
+                "erratum": "RHSA-2011:0928",
+                "package": "kernel-2.6.32-131.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2015:1221",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.30.3.el6.x86_64"
+                "erratum": "RHSA-2011:0928",
+                "package": "kernel-2.6.32-131.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2015:1221",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.30.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1221",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.30.3.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1530",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1530",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1530",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2011:1530",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1801",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.1.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1801",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.1.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1801",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.1.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1801",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.1.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1081",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.23.4.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1081",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.23.4.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1081",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.23.4.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1081",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.23.4.el6.x86_64"
+                "erratum": "RHSA-2011:0928",
+                "package": "kernel-2.6.32-131.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2011:1189",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-131.12.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.12.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2011:1189",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-131.12.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.12.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2011:1189",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.12.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.12.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2011:1189",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-131.12.1.el6.x86_64"
+                "package": "kernel-2.6.32-131.12.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2016:2766",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.11.1.el6.x86_64"
+                "erratum": "RHSA-2011:1350",
+                "package": "kernel-2.6.32-131.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2016:2766",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.11.1.el6.x86_64"
+                "erratum": "RHSA-2011:1350",
+                "package": "kernel-2.6.32-131.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2016:2766",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.11.1.el6.x86_64"
+                "erratum": "RHSA-2011:1350",
+                "package": "kernel-2.6.32-131.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2016:2766",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.11.1.el6.x86_64"
+                "erratum": "RHSA-2011:1350",
+                "package": "kernel-2.6.32-131.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2017:1372",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.3.1.el6.x86_64"
+                "erratum": "RHSA-2011:1465",
+                "package": "kernel-2.6.32-131.21.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2017:1372",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.3.1.el6.x86_64"
+                "erratum": "RHSA-2011:1465",
+                "package": "kernel-2.6.32-131.21.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2017:1372",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.3.1.el6.x86_64"
+                "erratum": "RHSA-2011:1465",
+                "package": "kernel-2.6.32-131.21.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2017:1372",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.3.1.el6.x86_64"
+                "erratum": "RHSA-2011:1465",
+                "package": "kernel-2.6.32-131.21.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2013:1436",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.23.2.el6.x86_64"
+                "erratum": "RHSA-2011:1530",
+                "package": "kernel-2.6.32-220.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2013:1436",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.23.2.el6.x86_64"
+                "erratum": "RHSA-2011:1530",
+                "package": "kernel-2.6.32-220.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2013:1436",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.23.2.el6.x86_64"
+                "erratum": "RHSA-2011:1530",
+                "package": "kernel-2.6.32-220.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2013:1436",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.23.2.el6.x86_64"
+                "erratum": "RHSA-2011:1530",
+                "package": "kernel-2.6.32-220.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2017:0036",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-642.13.1.el6.x86_64"
+                "erratum": "RHSA-2011:1849",
+                "package": "kernel-2.6.32-220.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2017:0036",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-642.13.1.el6.x86_64"
+                "erratum": "RHSA-2011:1849",
+                "package": "kernel-2.6.32-220.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2017:0036",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.13.1.el6.x86_64"
+                "erratum": "RHSA-2011:1849",
+                "package": "kernel-2.6.32-220.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2017:0036",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-642.13.1.el6.x86_64"
+                "erratum": "RHSA-2011:1849",
+                "package": "kernel-2.6.32-220.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2012:1426",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.14.1.el6.x86_64"
+                "erratum": "RHSA-2012:0052",
+                "package": "kernel-2.6.32-220.4.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2012:1426",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.14.1.el6.x86_64"
+                "erratum": "RHSA-2012:0052",
+                "package": "kernel-2.6.32-220.4.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2012:1426",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.14.1.el6.x86_64"
+                "erratum": "RHSA-2012:0052",
+                "package": "kernel-2.6.32-220.4.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2012:1426",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.14.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0674",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.12.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0674",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.12.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0674",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.12.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:0674",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.12.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1173",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.18.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1173",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.18.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1173",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.18.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2013:1173",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.18.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1623",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-573.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1623",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-573.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1623",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.3.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1623",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.3.1.el6.x86_64"
+                "erratum": "RHSA-2012:0052",
+                "package": "kernel-2.6.32-220.4.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0350",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.7.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.7.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0350",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.7.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.7.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0350",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.7.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.7.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0350",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.7.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.7.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0481",
+                "package": "kernel-2.6.32-220.13.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0481",
+                "package": "kernel-2.6.32-220.13.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0481",
+                "package": "kernel-2.6.32-220.13.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0481",
+                "package": "kernel-2.6.32-220.13.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0571",
+                "package": "kernel-2.6.32-220.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0571",
+                "package": "kernel-2.6.32-220.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0571",
+                "package": "kernel-2.6.32-220.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:0571",
+                "package": "kernel-2.6.32-220.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0743",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-220.23.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.23.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0743",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-220.23.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.23.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0743",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.23.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.23.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2012:0743",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-220.23.1.el6.x86_64"
+                "package": "kernel-2.6.32-220.23.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2015:0864",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-504.16.2.el6.x86_64"
+                "erratum": "RHSA-2012:0862",
+                "package": "kernel-2.6.32-279.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
-                "erratum": "RHSA-2015:0864",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-504.16.2.el6.x86_64"
+                "erratum": "RHSA-2012:0862",
+                "package": "kernel-2.6.32-279.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
-                "erratum": "RHSA-2015:0864",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.16.2.el6.x86_64"
+                "erratum": "RHSA-2012:0862",
+                "package": "kernel-2.6.32-279.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
-                "erratum": "RHSA-2015:0864",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-504.16.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1272",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-573.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1272",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-573.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1272",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2015:1272",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-573.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2018:0169",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.20.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2018:0169",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.20.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2018:0169",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.20.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2018:0169",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.20.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1486",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-696.3.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1486",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-696.3.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1486",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.3.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2017:1486",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-696.3.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1580",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.19.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1580",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.19.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1580",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.19.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2012:1580",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.19.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1167",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.29.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1167",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.29.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1167",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.29.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:1167",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.29.2.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0159",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-431.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0159",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-431.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0159",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.5.1.el6.x86_64"
-            },
-            {
-                "erratum": "RHSA-2014:0159",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-431.5.1.el6.x86_64"
+                "erratum": "RHSA-2012:0862",
+                "package": "kernel-2.6.32-279.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:1064",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-279.1.1.el6.x86_64"
+                "package": "kernel-2.6.32-279.1.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2012:1064",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-279.1.1.el6.x86_64"
+                "package": "kernel-2.6.32-279.1.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2012:1064",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.1.1.el6.x86_64"
+                "package": "kernel-2.6.32-279.1.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2012:1064",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-279.1.1.el6.x86_64"
+                "package": "kernel-2.6.32-279.1.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1156",
+                "package": "kernel-2.6.32-279.5.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1156",
+                "package": "kernel-2.6.32-279.5.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1156",
+                "package": "kernel-2.6.32-279.5.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1156",
+                "package": "kernel-2.6.32-279.5.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1304",
+                "package": "kernel-2.6.32-279.9.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1304",
+                "package": "kernel-2.6.32-279.9.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1304",
+                "package": "kernel-2.6.32-279.9.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1304",
+                "package": "kernel-2.6.32-279.9.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1366",
+                "package": "kernel-2.6.32-279.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1366",
+                "package": "kernel-2.6.32-279.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1366",
+                "package": "kernel-2.6.32-279.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1366",
+                "package": "kernel-2.6.32-279.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1426",
+                "package": "kernel-2.6.32-279.14.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1426",
+                "package": "kernel-2.6.32-279.14.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1426",
+                "package": "kernel-2.6.32-279.14.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1426",
+                "package": "kernel-2.6.32-279.14.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1580",
+                "package": "kernel-2.6.32-279.19.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1580",
+                "package": "kernel-2.6.32-279.19.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1580",
+                "package": "kernel-2.6.32-279.19.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2012:1580",
+                "package": "kernel-2.6.32-279.19.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0223",
+                "package": "kernel-2.6.32-279.22.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0223",
+                "package": "kernel-2.6.32-279.22.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0223",
+                "package": "kernel-2.6.32-279.22.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0223",
+                "package": "kernel-2.6.32-279.22.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2013:0496",
-                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64",
-                "package": "kernel-2.6.32-358.el6.x86_64"
+                "package": "kernel-2.6.32-358.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
             },
             {
                 "erratum": "RHSA-2013:0496",
-                "repository": "rhel-6-server-rpms__6Server__x86_64",
-                "package": "kernel-2.6.32-358.el6.x86_64"
+                "package": "kernel-2.6.32-358.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
             },
             {
                 "erratum": "RHSA-2013:0496",
-                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.el6.x86_64"
+                "package": "kernel-2.6.32-358.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
             },
             {
                 "erratum": "RHSA-2013:0496",
-                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64",
-                "package": "kernel-2.6.32-358.el6.x86_64"
+                "package": "kernel-2.6.32-358.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0567",
+                "package": "kernel-2.6.32-358.0.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0567",
+                "package": "kernel-2.6.32-358.0.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0567",
+                "package": "kernel-2.6.32-358.0.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0567",
+                "package": "kernel-2.6.32-358.0.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0630",
+                "package": "kernel-2.6.32-358.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0630",
+                "package": "kernel-2.6.32-358.2.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0630",
+                "package": "kernel-2.6.32-358.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0630",
+                "package": "kernel-2.6.32-358.2.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0744",
+                "package": "kernel-2.6.32-358.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0744",
+                "package": "kernel-2.6.32-358.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0744",
+                "package": "kernel-2.6.32-358.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0744",
+                "package": "kernel-2.6.32-358.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0830",
+                "package": "kernel-2.6.32-358.6.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0830",
+                "package": "kernel-2.6.32-358.6.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0830",
+                "package": "kernel-2.6.32-358.6.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0830",
+                "package": "kernel-2.6.32-358.6.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0911",
+                "package": "kernel-2.6.32-358.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0911",
+                "package": "kernel-2.6.32-358.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0911",
+                "package": "kernel-2.6.32-358.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:0911",
+                "package": "kernel-2.6.32-358.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1051",
+                "package": "kernel-2.6.32-358.14.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1051",
+                "package": "kernel-2.6.32-358.14.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1051",
+                "package": "kernel-2.6.32-358.14.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1051",
+                "package": "kernel-2.6.32-358.14.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1173",
+                "package": "kernel-2.6.32-358.18.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1173",
+                "package": "kernel-2.6.32-358.18.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1173",
+                "package": "kernel-2.6.32-358.18.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1173",
+                "package": "kernel-2.6.32-358.18.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1436",
+                "package": "kernel-2.6.32-358.23.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1436",
+                "package": "kernel-2.6.32-358.23.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1436",
+                "package": "kernel-2.6.32-358.23.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1436",
+                "package": "kernel-2.6.32-358.23.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1645",
+                "package": "kernel-2.6.32-431.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1645",
+                "package": "kernel-2.6.32-431.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1645",
+                "package": "kernel-2.6.32-431.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1645",
+                "package": "kernel-2.6.32-431.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1801",
+                "package": "kernel-2.6.32-431.1.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1801",
+                "package": "kernel-2.6.32-431.1.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1801",
+                "package": "kernel-2.6.32-431.1.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2013:1801",
+                "package": "kernel-2.6.32-431.1.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0159",
+                "package": "kernel-2.6.32-431.5.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0159",
+                "package": "kernel-2.6.32-431.5.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0159",
+                "package": "kernel-2.6.32-431.5.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0159",
+                "package": "kernel-2.6.32-431.5.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0328",
+                "package": "kernel-2.6.32-431.11.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0328",
+                "package": "kernel-2.6.32-431.11.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0328",
+                "package": "kernel-2.6.32-431.11.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0328",
+                "package": "kernel-2.6.32-431.11.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0475",
+                "package": "kernel-2.6.32-431.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0475",
+                "package": "kernel-2.6.32-431.17.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0475",
+                "package": "kernel-2.6.32-431.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0475",
+                "package": "kernel-2.6.32-431.17.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0771",
+                "package": "kernel-2.6.32-431.20.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0771",
+                "package": "kernel-2.6.32-431.20.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0771",
+                "package": "kernel-2.6.32-431.20.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0771",
+                "package": "kernel-2.6.32-431.20.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0924",
+                "package": "kernel-2.6.32-431.20.5.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0924",
+                "package": "kernel-2.6.32-431.20.5.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0924",
+                "package": "kernel-2.6.32-431.20.5.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0924",
+                "package": "kernel-2.6.32-431.20.5.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0981",
+                "package": "kernel-2.6.32-431.23.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0981",
+                "package": "kernel-2.6.32-431.23.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0981",
+                "package": "kernel-2.6.32-431.23.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:0981",
+                "package": "kernel-2.6.32-431.23.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1167",
+                "package": "kernel-2.6.32-431.29.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1167",
+                "package": "kernel-2.6.32-431.29.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1167",
+                "package": "kernel-2.6.32-431.29.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1167",
+                "package": "kernel-2.6.32-431.29.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1392",
+                "package": "kernel-2.6.32-504.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1392",
+                "package": "kernel-2.6.32-504.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1392",
+                "package": "kernel-2.6.32-504.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1392",
+                "package": "kernel-2.6.32-504.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1843",
+                "package": "kernel-2.6.32-504.1.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1843",
+                "package": "kernel-2.6.32-504.1.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1843",
+                "package": "kernel-2.6.32-504.1.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1843",
+                "package": "kernel-2.6.32-504.1.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1997",
+                "package": "kernel-2.6.32-504.3.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1997",
+                "package": "kernel-2.6.32-504.3.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1997",
+                "package": "kernel-2.6.32-504.3.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2014:1997",
+                "package": "kernel-2.6.32-504.3.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0087",
+                "package": "kernel-2.6.32-504.8.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0087",
+                "package": "kernel-2.6.32-504.8.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0087",
+                "package": "kernel-2.6.32-504.8.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0087",
+                "package": "kernel-2.6.32-504.8.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0674",
+                "package": "kernel-2.6.32-504.12.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0674",
+                "package": "kernel-2.6.32-504.12.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0674",
+                "package": "kernel-2.6.32-504.12.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0674",
+                "package": "kernel-2.6.32-504.12.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0864",
+                "package": "kernel-2.6.32-504.16.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0864",
+                "package": "kernel-2.6.32-504.16.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0864",
+                "package": "kernel-2.6.32-504.16.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:0864",
+                "package": "kernel-2.6.32-504.16.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1081",
+                "package": "kernel-2.6.32-504.23.4.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1081",
+                "package": "kernel-2.6.32-504.23.4.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1081",
+                "package": "kernel-2.6.32-504.23.4.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1081",
+                "package": "kernel-2.6.32-504.23.4.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1221",
+                "package": "kernel-2.6.32-504.30.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1221",
+                "package": "kernel-2.6.32-504.30.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1221",
+                "package": "kernel-2.6.32-504.30.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1221",
+                "package": "kernel-2.6.32-504.30.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1272",
+                "package": "kernel-2.6.32-573.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1272",
+                "package": "kernel-2.6.32-573.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1272",
+                "package": "kernel-2.6.32-573.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1272",
+                "package": "kernel-2.6.32-573.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1623",
+                "package": "kernel-2.6.32-573.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1623",
+                "package": "kernel-2.6.32-573.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1623",
+                "package": "kernel-2.6.32-573.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:1623",
+                "package": "kernel-2.6.32-573.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:2636",
+                "package": "kernel-2.6.32-573.12.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:2636",
+                "package": "kernel-2.6.32-573.12.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:2636",
+                "package": "kernel-2.6.32-573.12.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2015:2636",
+                "package": "kernel-2.6.32-573.12.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0494",
+                "package": "kernel-2.6.32-573.22.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0494",
+                "package": "kernel-2.6.32-573.22.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0494",
+                "package": "kernel-2.6.32-573.22.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0494",
+                "package": "kernel-2.6.32-573.22.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0715",
+                "package": "kernel-2.6.32-573.26.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0715",
+                "package": "kernel-2.6.32-573.26.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0715",
+                "package": "kernel-2.6.32-573.26.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0715",
+                "package": "kernel-2.6.32-573.26.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0855",
+                "package": "kernel-2.6.32-642.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0855",
+                "package": "kernel-2.6.32-642.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0855",
+                "package": "kernel-2.6.32-642.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:0855",
+                "package": "kernel-2.6.32-642.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1406",
+                "package": "kernel-2.6.32-642.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1406",
+                "package": "kernel-2.6.32-642.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1406",
+                "package": "kernel-2.6.32-642.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1406",
+                "package": "kernel-2.6.32-642.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1664",
+                "package": "kernel-2.6.32-642.4.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1664",
+                "package": "kernel-2.6.32-642.4.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1664",
+                "package": "kernel-2.6.32-642.4.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:1664",
+                "package": "kernel-2.6.32-642.4.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2006",
+                "package": "kernel-2.6.32-642.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2006",
+                "package": "kernel-2.6.32-642.6.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2006",
+                "package": "kernel-2.6.32-642.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2006",
+                "package": "kernel-2.6.32-642.6.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2105",
+                "package": "kernel-2.6.32-642.6.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2105",
+                "package": "kernel-2.6.32-642.6.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2105",
+                "package": "kernel-2.6.32-642.6.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2105",
+                "package": "kernel-2.6.32-642.6.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2766",
+                "package": "kernel-2.6.32-642.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2766",
+                "package": "kernel-2.6.32-642.11.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2766",
+                "package": "kernel-2.6.32-642.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2016:2766",
+                "package": "kernel-2.6.32-642.11.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0036",
+                "package": "kernel-2.6.32-642.13.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0036",
+                "package": "kernel-2.6.32-642.13.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0036",
+                "package": "kernel-2.6.32-642.13.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0036",
+                "package": "kernel-2.6.32-642.13.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0293",
+                "package": "kernel-2.6.32-642.13.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0293",
+                "package": "kernel-2.6.32-642.13.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0293",
+                "package": "kernel-2.6.32-642.13.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0293",
+                "package": "kernel-2.6.32-642.13.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0307",
+                "package": "kernel-2.6.32-642.15.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0307",
+                "package": "kernel-2.6.32-642.15.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0307",
+                "package": "kernel-2.6.32-642.15.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0307",
+                "package": "kernel-2.6.32-642.15.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0817",
+                "package": "kernel-2.6.32-696.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0817",
+                "package": "kernel-2.6.32-696.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0817",
+                "package": "kernel-2.6.32-696.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0817",
+                "package": "kernel-2.6.32-696.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0892",
+                "package": "kernel-2.6.32-696.1.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0892",
+                "package": "kernel-2.6.32-696.1.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0892",
+                "package": "kernel-2.6.32-696.1.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:0892",
+                "package": "kernel-2.6.32-696.1.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1372",
+                "package": "kernel-2.6.32-696.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1372",
+                "package": "kernel-2.6.32-696.3.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1372",
+                "package": "kernel-2.6.32-696.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1372",
+                "package": "kernel-2.6.32-696.3.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1486",
+                "package": "kernel-2.6.32-696.3.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1486",
+                "package": "kernel-2.6.32-696.3.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1486",
+                "package": "kernel-2.6.32-696.3.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1486",
+                "package": "kernel-2.6.32-696.3.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1723",
+                "package": "kernel-2.6.32-696.6.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1723",
+                "package": "kernel-2.6.32-696.6.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1723",
+                "package": "kernel-2.6.32-696.6.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:1723",
+                "package": "kernel-2.6.32-696.6.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2681",
+                "package": "kernel-2.6.32-696.10.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2681",
+                "package": "kernel-2.6.32-696.10.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2681",
+                "package": "kernel-2.6.32-696.10.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2681",
+                "package": "kernel-2.6.32-696.10.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2795",
+                "package": "kernel-2.6.32-696.10.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2795",
+                "package": "kernel-2.6.32-696.10.3.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2795",
+                "package": "kernel-2.6.32-696.10.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2795",
+                "package": "kernel-2.6.32-696.10.3.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2863",
+                "package": "kernel-2.6.32-696.13.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2863",
+                "package": "kernel-2.6.32-696.13.2.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2863",
+                "package": "kernel-2.6.32-696.13.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:2863",
+                "package": "kernel-2.6.32-696.13.2.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:3200",
+                "package": "kernel-2.6.32-696.16.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:3200",
+                "package": "kernel-2.6.32-696.16.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:3200",
+                "package": "kernel-2.6.32-696.16.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2017:3200",
+                "package": "kernel-2.6.32-696.16.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2018:0169",
+                "package": "kernel-2.6.32-696.20.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6Server__x86_64"
+            },
+            {
+                "erratum": "RHSA-2018:0169",
+                "package": "kernel-2.6.32-696.20.1.el6.x86_64",
+                "repository": "rhel-6-server-rpms__6_DOT_9__x86_64"
+            },
+            {
+                "erratum": "RHSA-2018:0169",
+                "package": "kernel-2.6.32-696.20.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6Workstation__x86_64"
+            },
+            {
+                "erratum": "RHSA-2018:0169",
+                "package": "kernel-2.6.32-696.20.1.el6.x86_64",
+                "repository": "rhel-6-workstation-rpms__6_DOT_9__x86_64"
             }
         ]
     }
