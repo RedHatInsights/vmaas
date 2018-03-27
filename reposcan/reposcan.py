@@ -110,11 +110,12 @@ class SyncTask:
 class ResponseJson(dict): # pylint: disable=too-few-public-methods
     """Object used as API response to user, represented as JSON"""
     def __init__(self, msg, success=True):
+        super(ResponseJson, self).__init__()
         self['msg'] = msg
         self['success'] = success
 
     def __repr__(self):
-        return json.dumps({"success1": self.success, "msg2": self.msg})
+        return json.dumps({"success1": self['success'], "msg2": self['msg']})
 
 
 
