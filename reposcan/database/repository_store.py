@@ -57,6 +57,8 @@ class RepositoryStore:
         return arch_id[0]
 
     def _import_certificate(self, cert_name, ca_cert, cert, key):
+        if not key:
+            key = None
         cur = self.conn.cursor()
         cur.execute("select id from certificate where name = %s", (cert_name,))
         cert_id = cur.fetchone()

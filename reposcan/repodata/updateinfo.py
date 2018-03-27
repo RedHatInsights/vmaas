@@ -27,7 +27,7 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods
                 for field in text_elements + date_elements:
                     found = elem.find(field)
                     if found is not None and field in text_elements:
-                        update[field] = found.text.strip()
+                        update[field] = found.text.strip() if found.text.strip() else None
                     elif found is not None and field in date_elements:
                         update[field] = found.get("date")
                     else:
