@@ -129,13 +129,13 @@ class UpdatesAPI(object):
             nevra2pkg_id.setdefault(key, []).append(oid)
 
         pkg_ids = []
-        for pkg in auxiliary_dict:
+        for pkg in auxiliary_dict.values():
             try:
-                key = "%s:%s:%s" % (auxiliary_dict[pkg]['name'],
-                                    auxiliary_dict[pkg]['evr_id'],
-                                    auxiliary_dict[pkg]['arch_id'])
+                key = "%s:%s:%s" % (pkg['name'],
+                                    pkg['evr_id'],
+                                    pkg['arch_id'])
                 pkg_ids.extend(nevra2pkg_id[key])
-                auxiliary_dict[pkg]['pkg_id'].extend(nevra2pkg_id[key])
+                pkg['pkg_id'].extend(nevra2pkg_id[key])
             except KeyError:
                 pass
 
@@ -150,10 +150,10 @@ class UpdatesAPI(object):
         for pkg_id, repo_id in pack_repo_ids:
             pkg_id2repo_id.setdefault(pkg_id, []).append(repo_id)
 
-        for pkg in auxiliary_dict:
+        for pkg in auxiliary_dict.values():
             try:
-                for pkg_id in auxiliary_dict[pkg]['pkg_id']:
-                    auxiliary_dict[pkg]['repo_id'].extend(pkg_id2repo_id[pkg_id])
+                for pkg_id in pkg['pkg_id']:
+                    pkg['repo_id'].extend(pkg_id2repo_id[pkg_id])
             except KeyError:
                 pass
 
@@ -163,10 +163,10 @@ class UpdatesAPI(object):
         for name, oid in sql_result:
             names2ids.setdefault(name, []).append(oid)
 
-        for pkg in auxiliary_dict:
+        for pkg in auxiliary_dict.values():
             try:
-                pkg_name = auxiliary_dict[pkg]['name']
-                auxiliary_dict[pkg][pkg_name].extend(names2ids[pkg_name])
+                pkg_name = pkg['name']
+                pkg[pkg_name].extend(names2ids[pkg_name])
             except KeyError:
                 pass
 
@@ -176,15 +176,15 @@ class UpdatesAPI(object):
                    FROM package
                    JOIN evr ON package.evr_id = evr.id
                   WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
-        for pkg in auxiliary_dict:
-            if auxiliary_dict[pkg]:
-                pkg_name = auxiliary_dict[pkg]['name']
-                if pkg_name in auxiliary_dict[pkg] and auxiliary_dict[pkg][pkg_name]:
-                    self.cursor.execute(sql, [tuple(auxiliary_dict[pkg][pkg_name]),
-                                              auxiliary_dict[pkg]['evr_id']])
+        for pkg in auxiliary_dict.values():
+            if pkg:
+                pkg_name = pkg['name']
+                if pkg_name in pkg and pkg[pkg_name]:
+                    self.cursor.execute(sql, [tuple(pkg[pkg_name]),
+                                              pkg['evr_id']])
 
                     for oid in self.cursor.fetchall():
-                        auxiliary_dict[pkg]['update_id'].append(oid[0])
+                        pkg['update_id'].append(oid[0])
                         update_pkg_ids.append(oid[0])
 
         pkg_id2repo_id = {}
