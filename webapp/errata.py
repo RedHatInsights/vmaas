@@ -2,7 +2,8 @@
 Module contains classes for returning errata data from DB
 """
 
-from utils import join_packagename
+from utils import format_datetime, join_packagename
+
 
 class Errata(object):
     """
@@ -15,13 +16,13 @@ class Errata(object):
         self.oid = oid
         self.data = {
             "type": errata_type,
-            "issued": str(issued),
+            "issued": format_datetime(issued),
             "synopsis": synopsis,
             "description": description,
             "solution": solution,
             "severity": severity,
             "summary": summary,
-            "updated": str(updated),
+            "updated": format_datetime(updated),
             "url": "https://access.redhat.com/errata/%s" % name,
             "bugzilla_list": [],
             "cve_list": [],
