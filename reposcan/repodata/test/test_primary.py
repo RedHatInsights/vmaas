@@ -13,7 +13,7 @@ class TestPrimaryMD(unittest.TestCase):
         self.primary = PrimaryMD("test_data/repodata/primary.xml")
 
     def _test_package(self, pkg):
-        intended_fields = ["name", "epoch", "ver", "rel", "arch", "checksum_type", "checksum"]
+        intended_fields = ["name", "epoch", "ver", "rel", "arch", "summary", "description", "checksum_type", "checksum"]
         actual_fields = pkg.keys()
         for field in intended_fields:
             self.assertTrue(field in actual_fields)
