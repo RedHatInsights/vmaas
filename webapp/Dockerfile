@@ -8,7 +8,11 @@ ENV POSTGRESQL_USER=vmaas_user
 ENV POSTGRESQL_PASSWORD=vmaas_passwd
 ENV POSTGRESQL_DATABASE=vmaas
 
-RUN yum -y update && yum -y install yum-plugin-copr && yum -y copr enable jdobes/vmaas-libs && yum -y install python-tornado python-psycopg2 python2-apispec postgresql && rm -rf /var/cache/yum/*
+RUN yum -y update \
+    && yum -y install yum-plugin-copr \
+    && yum -y copr enable jdobes/vmaas-libs \
+    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil \
+    && rm -rf /var/cache/yum/*
 
 ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
 ADD ./entrypoint.sh /app/

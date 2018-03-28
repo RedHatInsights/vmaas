@@ -13,6 +13,7 @@ ENV REPOSCAN_SYNC_INTERVAL_MINUTES=720
 RUN dnf install -y dnf-plugins-core && dnf copr enable -y jdobes/vmaas-libs \
     && dnf install -y python3-apispec python3-psycopg2 python3-requests \
                       python3-tornado postgresql-libs postgresql \
+                      python3-dateutil \
     && rm -rf /var/cache/dnf/*
 
 # copy application to directory in a container
