@@ -98,9 +98,9 @@ class CveAPI(object):
         :param cve_list: which cves to show
         :return: JSON ready dictionary
         """
-        response = {}
+        resp_cve_list = {}
         for cve in cve_list:
-            response[cve.get_val("cve.name")] = {
+            resp_cve_list[cve.get_val("cve.name")] = {
                 "redhat_url": cve.get_val("redhat_url"),
                 "secondary_url": cve.get_val("secondary_url"),
                 "synopsis": cve.get_val("cve.name"),
@@ -111,4 +111,5 @@ class CveAPI(object):
                 "cvss3_score": str(cve.get_val("cvss3_score")),
                 "description": cve.get_val("description"),
             }
+        response = {"cve_list": resp_cve_list}
         return response
