@@ -91,6 +91,7 @@ class RepoAPI(object):
     def __init__(self, repocache):
         self.cache = repocache
 
+    # pylint: disable=no-self-use
     def is_empty(self, data):
         """
         Checks for null/empty/blank list on input
@@ -106,12 +107,16 @@ class RepoAPI(object):
         :returns: json response with repository details
         """
         repos = data['repository_list'] if not self.is_empty(data) else self.cache.cache_label
-        repolist = {}
-        for label in repos:
-            repolist[label] = self.cache.get_by_label(label)
 
-        response = {
-            'repository_list': repolist,
-        }
+        response = {'repository_list': None}
+
+        if self.is_empty(data):
+            response['repository_list'] = self.cache.cache_label.keys()
+        else:
+            repolist = {}
+            repos = data['repository_list']
+            for label in repos:
+                repolist[label] = self.cache.get_by_label(label)
+            response['repository_list'] = repolist
 
         return response
