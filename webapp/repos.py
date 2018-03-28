@@ -105,7 +105,7 @@ class RepoAPI(object):
 
         :returns: json response with repository details
         """
-        repos = data['repository_list'] if not self.is_empty(data) else self.cache.cache_label;
+        repos = data['repository_list'] if not self.is_empty(data) else self.cache.cache_label
         repolist = {}
         for label in repos:
             repolist[label] = self.cache.get_by_label(label)
