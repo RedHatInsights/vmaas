@@ -115,8 +115,7 @@ class ResponseJson(dict): # pylint: disable=too-few-public-methods
         self['success'] = success
 
     def __repr__(self):
-        return json.dumps({"success1": self['success'], "msg2": self['msg']})
-
+        return json.dumps(self)
 
 
 class SyncHandler(RequestHandler):
