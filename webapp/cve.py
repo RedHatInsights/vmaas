@@ -2,7 +2,7 @@
 Module contains functions and CVE class for returning data from DB
 """
 
-from utils import format_datetime
+from utils import format_datetime, parse_datetime
 
 
 class CVE(object):
@@ -51,6 +51,7 @@ class CveAPI(object):
         """
 
         cves_to_process = data["cve_list"]
+        modified_since = data.get("modified_since", None)
         cves_to_process = filter(None, cves_to_process)
         answer = {}
         if not cves_to_process:
@@ -63,7 +64,11 @@ class CveAPI(object):
                          FROM cve
                          LEFT JOIN severity ON cve.severity_id = severity.id
                         WHERE cve.name IN %s""".format(columns=', '.join(column_names))
-        self.cursor.execute(cve_query, [tuple(cves_to_process)])
+        cve_query_params = [tuple(cves_to_process)]
+        if modified_since:
+            cve_query += " and cve.modified_date >= %s"
+            cve_query_params.append(parse_datetime(modified_since))
+        self.cursor.execute(cve_query, cve_query_params)
         cves = self.cursor.fetchall()
         cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
         CVE.cve_cwe_map = cwe_map
@@ -72,7 +77,7 @@ class CveAPI(object):
             cve = CVE(cve_entry, column_names)
             cve_list.append(cve)
 
-        return self.construct_answer(cve_list)
+        return self.construct_answer(cve_list, modified_since)
 
 
     def get_cve_cwe_map(self, ids):
@@ -92,7 +97,7 @@ class CveAPI(object):
 
 
     @staticmethod
-    def construct_answer(cve_list):
+    def construct_answer(cve_list, modified_since):
         """
         Final dictionary generation
         :param cve_list: which cves to show
@@ -112,4 +117,6 @@ class CveAPI(object):
                 "description": cve.get_val("description"),
             }
         response = {"cve_list": resp_cve_list}
+        if modified_since:
+            response["modified_since"] = modified_since
         return response

@@ -2,8 +2,9 @@
 Set of functions and precedures shared between different modules.
 """
 
-from datetime import datetime
 import re
+from datetime import datetime
+from dateutil import parser as dateutil_parser
 
 def join_packagename(name, epoch, version, release, arch):
     """
@@ -40,6 +41,9 @@ def format_datetime(datetime_obj):
         return datetime_obj.isoformat()
     return str(datetime_obj)
 
+def parse_datetime(date):
+    """Parse date from string in ISO format."""
+    return dateutil_parser.parse(date)
 
 class ListDict(dict):
     """Dictionary which can cummulate multiple values for the same key into a list."""
