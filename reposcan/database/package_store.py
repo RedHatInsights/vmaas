@@ -122,11 +122,14 @@ class PackageStore: # pylint: disable=too-few-public-methods
             for pkg in packages:
                 if (checksum_types[pkg["checksum_type"]], pkg["checksum"]) in checksums:
                     import_data.append((pkg["name"], evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
-                                        archs[pkg["arch"]], checksum_types[pkg["checksum_type"]], pkg["checksum"]))
+                                        archs[pkg["arch"]], checksum_types[pkg["checksum_type"]],
+                                        pkg["checksum"], pkg["summary"], pkg["description"]))
                     # Prevent duplicated insert when some package is multiple times in metadata
                     checksums.remove((checksum_types[pkg["checksum_type"]], pkg["checksum"]))
             execute_values(cur,
-                           """insert into package (name, evr_id, arch_id, checksum_type_id, checksum) values %s
+                           """insert into package
+                              (name, evr_id, arch_id, checksum_type_id, checksum, summary, description)
+                              values %s
                               returning id, checksum_type_id, checksum""",
                            import_data, page_size=len(import_data))
             for row in cur.fetchall():
