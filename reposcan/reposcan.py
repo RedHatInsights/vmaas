@@ -134,8 +134,14 @@ class ApiSpecHandler(RequestHandler):
         """Handles streamed data."""
         pass
 
-    def get(self, *args, **kwargs):
-        """Get Apispec."""
+    def get(self):
+        """Get API specification.
+           ---
+           description: Get API specification
+           responses:
+             200:
+               description: OpenAPI/Swagger 2.0 specification JSON returned
+        """
         self.set_header("Access-Control-Allow-Origin", "*")
         self.write(SPEC.to_dict())
 
@@ -240,15 +246,33 @@ class RepoSyncHandler(SyncHandler):
 
         return products, repos
 
-    def get(self, *args, **kwargs):
-        """Sync repositories stored in DB."""
+    def get(self):
+        """Sync repositories stored in DB.
+           ---
+           description: Sync repositories stored in DB
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
 
-    def post(self, *args, **kwargs):
-        """Sync repositories listed in request."""
+    def post(self):
+        """Sync repositories listed in request.
+           ---
+           description: Sync repositories listed in request
+           responses:
+             200:
+               description: Sync started
+             400:
+               description: Invalid input JSON format
+             429:
+               description: Another sync is already in progress
+        """
         try:
             products, repos = self._parse_input_list()
         except: # pylint: disable=bare-except
@@ -277,8 +301,16 @@ class CveSyncHandler(SyncHandler):
 
     task_type = "CVE"
 
-    def get(self, *args, **kwargs):
-        """Sync CVEs."""
+    def get(self):
+        """Sync CVEs.
+           ---
+           description: Sync CVE lists
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
@@ -295,8 +327,16 @@ class AllSyncHandler(SyncHandler):
 
     task_type = "%s + %s" % (RepoSyncHandler.task_type, CveSyncHandler.task_type)
 
-    def get(self, *args, **kwargs):
-        """Sync repos + CVEs."""
+    def get(self):
+        """Sync repos + CVEs.
+           ---
+           description: Sync repositories stored in DB and CVE lists
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, all_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
