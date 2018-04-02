@@ -9,6 +9,7 @@ from multiprocessing.pool import Pool
 import traceback
 import json
 
+from apispec import APISpec
 import requests
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
@@ -21,6 +22,15 @@ from nistcve.cve_controller import CveRepoController
 from repodata.repository_controller import RepositoryController
 
 LOGGER = SimpleLogger()
+
+SPEC = APISpec(
+    title='VMaaS Reposcan',
+    version='1',
+    plugins=(
+        'apispec.ext.tornado',
+    ),
+    basePath="/api/v1",
+)
 
 
 def init_db():
@@ -116,6 +126,24 @@ class ResponseJson(dict): # pylint: disable=too-few-public-methods
 
     def __repr__(self):
         return json.dumps(self)
+
+
+class ApiSpecHandler(RequestHandler):
+    """Handler class providing API specification."""
+    def data_received(self, chunk):
+        """Handles streamed data."""
+        pass
+
+    def get(self): # pylint: disable=arguments-differ
+        """Get API specification.
+           ---
+           description: Get API specification
+           responses:
+             200:
+               description: OpenAPI/Swagger 2.0 specification JSON returned
+        """
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.write(SPEC.to_dict())
 
 
 class SyncHandler(RequestHandler):
@@ -218,15 +246,33 @@ class RepoSyncHandler(SyncHandler):
 
         return products, repos
 
-    def get(self, *args, **kwargs):
-        """Sync repositories stored in DB."""
+    def get(self): # pylint: disable=arguments-differ
+        """Sync repositories stored in DB.
+           ---
+           description: Sync repositories stored in DB
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
 
-    def post(self, *args, **kwargs):
-        """Sync repositories listed in request."""
+    def post(self): # pylint: disable=arguments-differ
+        """Sync repositories listed in request.
+           ---
+           description: Sync repositories listed in request
+           responses:
+             200:
+               description: Sync started
+             400:
+               description: Invalid input JSON format
+             429:
+               description: Another sync is already in progress
+        """
         try:
             products, repos = self._parse_input_list()
         except: # pylint: disable=bare-except
@@ -255,8 +301,16 @@ class CveSyncHandler(SyncHandler):
 
     task_type = "CVE"
 
-    def get(self, *args, **kwargs):
-        """Sync CVEs."""
+    def get(self): # pylint: disable=arguments-differ
+        """Sync CVEs.
+           ---
+           description: Sync CVE lists
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
@@ -273,8 +327,16 @@ class AllSyncHandler(SyncHandler):
 
     task_type = "%s + %s" % (RepoSyncHandler.task_type, CveSyncHandler.task_type)
 
-    def get(self, *args, **kwargs):
-        """Sync repos + CVEs."""
+    def get(self): # pylint: disable=arguments-differ
+        """Sync repos + CVEs.
+           ---
+           description: Sync repositories stored in DB and CVE lists
+           responses:
+             200:
+               description: Sync started
+             429:
+               description: Another sync is already in progress
+        """
         status_code, status_msg = SyncHandler.start_task(self.task_type, all_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
         self.write(status_msg)
@@ -290,10 +352,16 @@ class ReposcanApplication(Application):
     """Class defining API handlers."""
     def __init__(self):
         handlers = [
+            (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
         ]
+        # Register public API handlers to apispec
+        for handler in handlers:
+            if handler[0].startswith(r"/api/v1/"):
+                SPEC.add_path(urlspec=handler)
+
         Application.__init__(self, handlers)
 
 
