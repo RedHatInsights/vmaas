@@ -15,7 +15,7 @@ matrix:
 notifications:
   email: false
 install:
-  - pip install pylint psycopg2 requests tornado
+  - pip install pylint psycopg2 requests tornado apispec
 script:
   - /bin/bash run_tests.sh reposcan
   - /bin/bash run_tests.sh webapp
