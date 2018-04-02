@@ -44,6 +44,18 @@ services:
     depends_on:
       - database
 
+  apidoc:
+    container_name: vmaas-apidoc
+    image: swaggerapi/swagger-ui:v3.13.2
+    restart: unless-stopped
+    environment:
+      - API_URLS=[{url:'http://localhost:8080/api/v1/apispec', name:'webapp'},{url:'http://localhost:8081/api/v1/apispec', name:'reposcan'}]
+    ports:
+      - 8000:8080
+    depends_on:
+      - reposcan
+      - webapp
+
 volumes:
   vmaas-db-data:
   vmaas-reposcan-tmp:
