@@ -119,6 +119,8 @@ class UpdatesHandler(JsonHandler):
     def process_list(self, data):
         return self.application.updatesapi.process_list(data)
 
+
+class UpdatesHandlerGet(UpdatesHandler):
     def get(self):
         """
         ---
@@ -129,6 +131,8 @@ class UpdatesHandler(JsonHandler):
         """
         self.process_get()
 
+
+class UpdatesHandlerPost(UpdatesHandler):
     def post(self):
         """
         ---
@@ -150,6 +154,8 @@ class CVEHandler(JsonHandler):
     def process_list(self, data):
         return self.application.cveapi.process_list(data)
 
+
+class CVEHandlerGet(CVEHandler):
     def get(self):
         """
         ---
@@ -160,6 +166,8 @@ class CVEHandler(JsonHandler):
         """
         self.process_get()
 
+
+class CVEHandlerPost(CVEHandler):
     def post(self):
         """
         ---
@@ -181,6 +189,8 @@ class ReposHandler(JsonHandler):
     def process_list(self, data):
         return self.application.repoapi.process_list(data)
 
+
+class ReposHandlerGet(ReposHandler):
     def get(self):
         """
         ---
@@ -191,6 +201,8 @@ class ReposHandler(JsonHandler):
         """
         self.process_get()
 
+
+class ReposHandlerPost(ReposHandler):
     def post(self):
         """
         ---
@@ -212,6 +224,8 @@ class ErrataHandler(JsonHandler):
     def process_list(self, data):
         return self.application.errataapi.process_list(data)
 
+
+class ErrataHandlerGet(ErrataHandler):
     def get(self):
         """
         ---
@@ -222,6 +236,8 @@ class ErrataHandler(JsonHandler):
         """
         self.process_get()
 
+
+class ErrataHandlerPost(ErrataHandler):
     def post(self):
         """
         ---
@@ -241,14 +257,14 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/api/internal/refresh/?", RefreshHandler),  # GET request
             (r"/api/v1/apispec/?", ApiSpecHandler),
-            (r"/api/v1/updates/?", UpdatesHandler),  # POST request
-            (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
-            (r"/api/v1/cves/?", CVEHandler),
-            (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandler),
-            (r"/api/v1/repos/?", ReposHandler),
-            (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandler),
-            (r"/api/v1/errata/?", ErrataHandler),  # POST request
-            (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
+            (r"/api/v1/updates/?", UpdatesHandlerPost),
+            (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandlerGet),
+            (r"/api/v1/cves/?", CVEHandlerPost),
+            (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandlerGet),
+            (r"/api/v1/repos/?", ReposHandlerPost),
+            (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandlerGet),
+            (r"/api/v1/errata/?", ErrataHandlerPost),
+            (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandlerGet)
         ]
         # Register public API handlers to apispec
         for handler in handlers:
