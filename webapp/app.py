@@ -75,7 +75,7 @@ class JsonHandler(tornado.web.RequestHandler):
     """
     Parent class to parse input json data given a a data or a file.
     """
-    def get(self, *args, **kwargs):
+    def process_get(self):
         index = self.request.uri.rfind('/')
         name = self.request.uri[index + 1:]
 
@@ -83,7 +83,7 @@ class JsonHandler(tornado.web.RequestHandler):
         self.write(response)
         self.flush()
 
-    def post(self, *args, **kwargs):
+    def process_post(self):
         # extract input JSON from POST request
         json_data = ''
         # check if JSON is passed as a file or as a body of POST request
@@ -110,6 +110,7 @@ class JsonHandler(tornado.web.RequestHandler):
         """ Method to process a single input data. """
         raise NotImplementedError("abstract method")
 
+
 class UpdatesHandler(JsonHandler):
     """ /updates API handler """
     def process_string(self, data):
@@ -117,6 +118,29 @@ class UpdatesHandler(JsonHandler):
 
     def process_list(self, data):
         return self.application.updatesapi.process_list(data)
+
+    def get(self):
+        """
+        ---
+        description: List security updates for single package NEVRA
+        responses:
+          200:
+            description: Return list of security updates for single package NEVRA
+        """
+        self.process_get()
+
+    def post(self):
+        """
+        ---
+        description: List security updates for list of package NEVRAs
+        responses:
+          200:
+            description: Return list of security updates for list of package NEVRAs
+          400:
+            description: Invalid input JSON format
+        """
+        self.process_post()
+
 
 class CVEHandler(JsonHandler):
     """ /cves API handler """
@@ -126,6 +150,29 @@ class CVEHandler(JsonHandler):
     def process_list(self, data):
         return self.application.cveapi.process_list(data)
 
+    def get(self):
+        """
+        ---
+        description: Get details about single CVE
+        responses:
+          200:
+            description: Return details about single CVE
+        """
+        self.process_get()
+
+    def post(self):
+        """
+        ---
+        description: Get details about list of CVEs
+        responses:
+          200:
+            description: Return details about list of CVEs
+          400:
+            description: Invalid input JSON format
+        """
+        self.process_post()
+
+
 class ReposHandler(JsonHandler):
     """ /repos API handler """
     def process_string(self, data):
@@ -134,6 +181,29 @@ class ReposHandler(JsonHandler):
     def process_list(self, data):
         return self.application.repoapi.process_list(data)
 
+    def get(self):
+        """
+        ---
+        description: Get details about single repository
+        responses:
+          200:
+            description: Return details about single repository
+        """
+        self.process_get()
+
+    def post(self):
+        """
+        ---
+        description: Get details about list of repositories
+        responses:
+          200:
+            description: Return details about list of repositories
+          400:
+            description: Invalid input JSON format
+        """
+        self.process_post()
+
+
 class ErrataHandler(JsonHandler):
     """ /errata API handler """
     def process_string(self, data):
@@ -141,6 +211,28 @@ class ErrataHandler(JsonHandler):
 
     def process_list(self, data):
         return self.application.errataapi.process_list(data)
+
+    def get(self):
+        """
+        ---
+        description: Get details about single erratum
+        responses:
+          200:
+            description: Return details about single erratum
+        """
+        self.process_get()
+
+    def post(self):
+        """
+        ---
+        description: Get details about list of errata
+        responses:
+          200:
+            description: Return details about list of errata
+          400:
+            description: Invalid input JSON format
+        """
+        self.process_post()
 
 
 class Application(tornado.web.Application):
