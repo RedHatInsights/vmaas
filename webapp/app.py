@@ -280,12 +280,13 @@ class Application(tornado.web.Application):
         for handler in handlers:
             if handler[0].startswith(r"/api/v1/"):
                 SPEC.add_path(urlspec=handler)
-        cursor = Database().cursor()
+        db_instance = Database()
+        cursor = db_instance.cursor()
         self.repocache = RepoCache(cursor)
         self.updatesapi = UpdatesAPI(cursor, self.repocache)
         self.cveapi = CveAPI(cursor)
         self.repoapi = RepoAPI(self.repocache)
-        self.errataapi = ErrataAPI(cursor)
+        self.errataapi = ErrataAPI(db_instance)
         tornado.web.Application.__init__(self, handlers)
 
 
