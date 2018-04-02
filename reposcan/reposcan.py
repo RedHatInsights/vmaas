@@ -9,6 +9,7 @@ from multiprocessing.pool import Pool
 import traceback
 import json
 
+from apispec import APISpec
 import requests
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
@@ -21,6 +22,15 @@ from nistcve.cve_controller import CveRepoController
 from repodata.repository_controller import RepositoryController
 
 LOGGER = SimpleLogger()
+
+SPEC = APISpec(
+    title='VMaaS Reposcan',
+    version='1',
+    plugins=(
+        'apispec.ext.tornado',
+    ),
+    basePath="/api/v1",
+)
 
 
 def init_db():
@@ -116,6 +126,18 @@ class ResponseJson(dict): # pylint: disable=too-few-public-methods
 
     def __repr__(self):
         return json.dumps(self)
+
+
+class ApiSpecHandler(RequestHandler):
+    """Handler class providing API specification."""
+    def data_received(self, chunk):
+        """Handles streamed data."""
+        pass
+
+    def get(self, *args, **kwargs):
+        """Get Apispec."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.write(SPEC.to_dict())
 
 
 class SyncHandler(RequestHandler):
@@ -290,10 +312,16 @@ class ReposcanApplication(Application):
     """Class defining API handlers."""
     def __init__(self):
         handlers = [
+            (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
         ]
+        # Register public API handlers to apispec
+        for handler in handlers:
+            if handler[0].startswith(r"/api/v1/"):
+                SPEC.add_path(urlspec=handler)
+
         Application.__init__(self, handlers)
 
 
