@@ -7,6 +7,7 @@ import sys
 import json
 import traceback
 
+from apispec import APISpec
 from tornado.ioloop import IOLoop
 import tornado.web
 
@@ -18,6 +19,30 @@ from errata import ErrataAPI
 
 INTERNAL_API_PORT = 8079
 PUBLIC_API_PORT = 8080
+
+SPEC = APISpec(
+    title='VMaaS Webapp',
+    version='1',
+    plugins=(
+        'apispec.ext.tornado',
+    ),
+    basePath="/api/v1",
+)
+
+
+# pylint: disable=abstract-method
+class ApiSpecHandler(tornado.web.RequestHandler):
+    """Handler class providing API specification."""
+    def get(self):
+        """Get API specification.
+           ---
+           description: Get API specification
+           responses:
+             200:
+               description: OpenAPI/Swagger 2.0 specification JSON returned
+        """
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.write(SPEC.to_dict())
 
 
 # pylint: disable=abstract-method
@@ -123,6 +148,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/api/internal/refresh/?", RefreshHandler),  # GET request
+            (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/updates/?", UpdatesHandler),  # POST request
             (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandler),  # GET request with package name
             (r"/api/v1/cves/?", CVEHandler),
@@ -132,6 +158,10 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/?", ErrataHandler),  # POST request
             (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
+        # Register public API handlers to apispec
+        for handler in handlers:
+            if handler[0].startswith(r"/api/v1/"):
+                SPEC.add_path(urlspec=handler)
         cursor = Database().cursor()
         self.repocache = RepoCache(cursor)
         self.updatesapi = UpdatesAPI(cursor, self.repocache)
