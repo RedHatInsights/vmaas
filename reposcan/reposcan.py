@@ -134,7 +134,7 @@ class ApiSpecHandler(RequestHandler):
         """Handles streamed data."""
         pass
 
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Get API specification.
            ---
            description: Get API specification
@@ -246,7 +246,7 @@ class RepoSyncHandler(SyncHandler):
 
         return products, repos
 
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Sync repositories stored in DB.
            ---
            description: Sync repositories stored in DB
@@ -261,7 +261,7 @@ class RepoSyncHandler(SyncHandler):
         self.write(status_msg)
         self.flush()
 
-    def post(self):
+    def post(self): # pylint: disable=arguments-differ
         """Sync repositories listed in request.
            ---
            description: Sync repositories listed in request
@@ -301,7 +301,7 @@ class CveSyncHandler(SyncHandler):
 
     task_type = "CVE"
 
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Sync CVEs.
            ---
            description: Sync CVE lists
@@ -327,7 +327,7 @@ class AllSyncHandler(SyncHandler):
 
     task_type = "%s + %s" % (RepoSyncHandler.task_type, CveSyncHandler.task_type)
 
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Sync repos + CVEs.
            ---
            description: Sync repositories stored in DB and CVE lists

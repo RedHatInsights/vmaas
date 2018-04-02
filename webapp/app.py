@@ -33,7 +33,7 @@ SPEC = APISpec(
 # pylint: disable=abstract-method
 class ApiSpecHandler(tornado.web.RequestHandler):
     """Handler class providing API specification."""
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Get API specification.
            ---
            description: Get API specification
@@ -50,7 +50,7 @@ class RefreshHandler(tornado.web.RequestHandler):
     """
     Class to refresh cached data in handlers.
     """
-    def get(self, *args, **kwargs):
+    def get(self): # pylint: disable=arguments-differ
         # There could be authentication instead of this simple check in future
         accessed_port = int(self.request.host.split(':')[1])
         if accessed_port == INTERNAL_API_PORT:
@@ -76,6 +76,7 @@ class JsonHandler(tornado.web.RequestHandler):
     Parent class to parse input json data given a a data or a file.
     """
     def process_get(self):
+        """Process GET request."""
         index = self.request.uri.rfind('/')
         name = self.request.uri[index + 1:]
 
@@ -84,6 +85,7 @@ class JsonHandler(tornado.web.RequestHandler):
         self.flush()
 
     def process_post(self):
+        """Process POST request."""
         # extract input JSON from POST request
         json_data = ''
         # check if JSON is passed as a file or as a body of POST request
@@ -121,7 +123,8 @@ class UpdatesHandler(JsonHandler):
 
 
 class UpdatesHandlerGet(UpdatesHandler):
-    def get(self):
+    """Handler for processing /updates GET requests."""
+    def get(self): # pylint: disable=arguments-differ
         """
         ---
         description: List security updates for single package NEVRA
@@ -133,7 +136,8 @@ class UpdatesHandlerGet(UpdatesHandler):
 
 
 class UpdatesHandlerPost(UpdatesHandler):
-    def post(self):
+    """Handler for processing /updates POST requests."""
+    def post(self): # pylint: disable=arguments-differ
         """
         ---
         description: List security updates for list of package NEVRAs
@@ -156,7 +160,8 @@ class CVEHandler(JsonHandler):
 
 
 class CVEHandlerGet(CVEHandler):
-    def get(self):
+    """Handler for processing /cves GET requests."""
+    def get(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single CVE
@@ -168,7 +173,8 @@ class CVEHandlerGet(CVEHandler):
 
 
 class CVEHandlerPost(CVEHandler):
-    def post(self):
+    """Handler for processing /cves POST requests."""
+    def post(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about list of CVEs
@@ -191,7 +197,8 @@ class ReposHandler(JsonHandler):
 
 
 class ReposHandlerGet(ReposHandler):
-    def get(self):
+    """Handler for processing /repos GET requests."""
+    def get(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single repository
@@ -203,7 +210,8 @@ class ReposHandlerGet(ReposHandler):
 
 
 class ReposHandlerPost(ReposHandler):
-    def post(self):
+    """Handler for processing /repos POST requests."""
+    def post(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about list of repositories
@@ -226,7 +234,8 @@ class ErrataHandler(JsonHandler):
 
 
 class ErrataHandlerGet(ErrataHandler):
-    def get(self):
+    """Handler for processing /errata GET requests."""
+    def get(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single erratum
@@ -238,7 +247,8 @@ class ErrataHandlerGet(ErrataHandler):
 
 
 class ErrataHandlerPost(ErrataHandler):
-    def post(self):
+    """Handler for processing /errata POST requests."""
+    def post(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about list of errata
