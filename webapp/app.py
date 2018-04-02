@@ -132,12 +132,13 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/?", ErrataHandler),  # POST request
             (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandler) # GET request
         ]
-        cursor = Database().cursor()
+        db = Database()
+        cursor = db.cursor()
         self.repocache = RepoCache(cursor)
         self.updatesapi = UpdatesAPI(cursor, self.repocache)
         self.cveapi = CveAPI(cursor)
         self.repoapi = RepoAPI(self.repocache)
-        self.errataapi = ErrataAPI(cursor)
+        self.errataapi = ErrataAPI(db)
         tornado.web.Application.__init__(self, handlers)
 
 

@@ -3,6 +3,7 @@ Module to handle database connections.
 """
 import os
 import psycopg2
+import psycopg2.extras
 
 def _set_val(value, envname, default):
     return value if value is not None else os.getenv(envname, default)
@@ -34,3 +35,9 @@ class Database(object):
     def cursor(self):
         """ Returns cursor object connected to the database."""
         return self.connection.cursor()
+
+    def dictcursor(self):
+        """
+        Returns cursor object connected to the database that returns dictionary.
+        """
+        return self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
