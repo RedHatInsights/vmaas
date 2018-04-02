@@ -10,9 +10,10 @@ ENV WEBAPP_API_URL=http://webapp
 ENV WEBAPP_API_PORT_INTERNAL=8079
 ENV REPOSCAN_SYNC_INTERVAL_MINUTES=720
 
-RUN yum install -y python3-psycopg2 python3-requests \
-                   python3-tornado postgresql-libs postgresql \
-    && rm -rf /var/cache/yum/*
+RUN dnf install -y dnf-plugins-core && dnf copr enable -y jdobes/vmaas-libs \
+    && dnf install -y python3-apispec python3-psycopg2 python3-requests \
+                      python3-tornado postgresql-libs postgresql \
+    && rm -rf /var/cache/dnf/*
 
 # copy application to directory in a container
 ADD . /vmaas-reposcan/
