@@ -50,6 +50,8 @@ services:
     build: ./apidoc
     image: vmaas/apidoc:latest
     restart: unless-stopped
+    env_file:
+      - ./conf/apidoc.env
     ports:
       - 8000:8080
     depends_on:
