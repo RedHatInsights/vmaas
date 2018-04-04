@@ -4,6 +4,8 @@ Module to handle /updates API calls.
 
 from utils import join_packagename, split_packagename
 
+SECURITY_ERRATA_TYPE = 'security'
+
 
 class UpdatesAPI(object):
     """ Main /updates API class. """
@@ -14,6 +16,7 @@ class UpdatesAPI(object):
         self.id2evr_dict = {}
         self.arch2id_dict = {}
         self.id2arch_dict = {}
+        self.id2erratatype_dict = {}
 
         self.prepare()
 
@@ -34,6 +37,10 @@ class UpdatesAPI(object):
             self.arch2id_dict[arch_name] = arch_id
             self.id2arch_dict[arch_id] = arch_name
 
+        # Select all errata types and put them into dictionary
+        self.cursor.execute("SELECT id, name from errata_type")
+        for type_id, type_name in self.cursor.fetchall():
+            self.id2erratatype_dict[type_id] = type_name
 
     def process_list(self, data):
         #pylint: disable=too-many-locals,too-many-statements,too-many-branches
@@ -233,12 +240,14 @@ class UpdatesAPI(object):
 
         if all_errata:
             # Select all info about errata
-            self.cursor.execute("SELECT id, name from errata where id in %s;", [tuple(all_errata)])
+            self.cursor.execute("SELECT id, name, errata_type_id from errata where id in %s;", [tuple(all_errata)])
             errata = self.cursor.fetchall()
             id2errata_dict = {}
+            eid2erratatypeid_dict = {}
             all_errata_id = []
-            for oid, name in errata:
+            for oid, name, errata_type_id in errata:
                 id2errata_dict[oid] = name
+                eid2erratatypeid_dict[oid] = errata_type_id
                 all_errata_id.append(oid)
 
             self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s",
@@ -284,8 +293,11 @@ class UpdatesAPI(object):
 
                     errata_ids = pkg_id2errata_id[upd_pkg_id]
                     for e_id in errata_ids:
-                        # check current erratum has some linked cve and it is in the same repo with update pkg
-                        if e_id in errata_id2cve_id and errata_id2cve_id[e_id] and r_id in errata_id2repo_id[e_id]:
+                        # check current erratum is security or has some linked cve
+                        # and it is in the same repo with update pkg
+                        if (self.id2erratatype_dict[eid2erratatypeid_dict[e_id]] == SECURITY_ERRATA_TYPE
+                                or e_id in errata_id2cve_id and errata_id2cve_id[e_id]) \
+                                and r_id in errata_id2repo_id[e_id]:
                             e_name = id2errata_dict[e_id]
                             r_label = self.repocache.id2label(r_id)
 
