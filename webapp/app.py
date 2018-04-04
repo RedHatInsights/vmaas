@@ -75,11 +75,8 @@ class JsonHandler(tornado.web.RequestHandler):
     """
     Parent class to parse input json data given a a data or a file.
     """
-    def process_get(self):
+    def process_get(self, name=None):
         """Process GET request."""
-        index = self.request.uri.rfind('/')
-        name = self.request.uri[index + 1:]
-
         response = self.process_string(name)
         self.write(response)
         self.flush()
@@ -124,7 +121,7 @@ class UpdatesHandler(JsonHandler):
 
 class UpdatesHandlerGet(UpdatesHandler):
     """Handler for processing /updates GET requests."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
         description: List security updates for single package NEVRA
@@ -132,7 +129,7 @@ class UpdatesHandlerGet(UpdatesHandler):
           200:
             description: Return list of security updates for single package NEVRA
         """
-        self.process_get()
+        self.process_get(name=nevra)
 
 
 class UpdatesHandlerPost(UpdatesHandler):
@@ -161,7 +158,7 @@ class CVEHandler(JsonHandler):
 
 class CVEHandlerGet(CVEHandler):
     """Handler for processing /cves GET requests."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self, cve=None): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single CVE
@@ -169,7 +166,7 @@ class CVEHandlerGet(CVEHandler):
           200:
             description: Return details about single CVE
         """
-        self.process_get()
+        self.process_get(name=cve)
 
 
 class CVEHandlerPost(CVEHandler):
@@ -198,7 +195,7 @@ class ReposHandler(JsonHandler):
 
 class ReposHandlerGet(ReposHandler):
     """Handler for processing /repos GET requests."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self, repo=None): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single repository
@@ -206,7 +203,7 @@ class ReposHandlerGet(ReposHandler):
           200:
             description: Return details about single repository
         """
-        self.process_get()
+        self.process_get(name=repo)
 
 
 class ReposHandlerPost(ReposHandler):
@@ -235,7 +232,7 @@ class ErrataHandler(JsonHandler):
 
 class ErrataHandlerGet(ErrataHandler):
     """Handler for processing /errata GET requests."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self, erratum=None): # pylint: disable=arguments-differ
         """
         ---
         description: Get details about single erratum
@@ -243,7 +240,7 @@ class ErrataHandlerGet(ErrataHandler):
           200:
             description: Return details about single erratum
         """
-        self.process_get()
+        self.process_get(name=erratum)
 
 
 class ErrataHandlerPost(ErrataHandler):
@@ -268,13 +265,13 @@ class Application(tornado.web.Application):
             (r"/api/internal/refresh/?", RefreshHandler),  # GET request
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
-            (r"/api/v1/updates/[a-zA-Z0-9-._:]+", UpdatesHandlerGet),
+            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9-._:]+)", UpdatesHandlerGet),
             (r"/api/v1/cves/?", CVEHandlerPost),
-            (r"/api/v1/cves/[a-zA-Z0-9*-]+", CVEHandlerGet),
+            (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9*-]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
-            (r"/api/v1/repos/[a-zA-Z0-9*-_]+", ReposHandlerGet),
+            (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9*-_]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
-            (r"/api/v1/errata/[a-zA-Z0-9*-:]+", ErrataHandlerGet)
+            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9*-:]+)", ErrataHandlerGet)
         ]
         # Register public API handlers to apispec
         for handler in handlers:
