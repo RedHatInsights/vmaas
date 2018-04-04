@@ -17,6 +17,7 @@ class UpdatesAPI(object):
         self.arch2id_dict = {}
         self.id2arch_dict = {}
         self.id2erratatype_dict = {}
+        self.arch_compat = {}
 
         self.prepare()
 
@@ -41,6 +42,12 @@ class UpdatesAPI(object):
         self.cursor.execute("SELECT id, name from errata_type")
         for type_id, type_name in self.cursor.fetchall():
             self.id2erratatype_dict[type_id] = type_name
+
+        # Select information about archs compatibility
+        self.cursor.execute("SELECT from_arch_id, to_arch_id from arch_compatibility")
+        for from_arch_id, to_arch_id in self.cursor.fetchall():
+            self.arch_compat.setdefault(from_arch_id, []).append(to_arch_id)
+
 
     def process_list(self, data):
         #pylint: disable=too-many-locals,too-many-statements,too-many-branches
@@ -278,8 +285,7 @@ class UpdatesAPI(object):
             response['update_list'][pkg]['available_updates'] = []
 
             for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
-                # FIXME: use compatibility tables instead of exact matching
-                if auxiliary_dict[pkg]['arch_id'] != pkg_id2arch_id[upd_pkg_id] or \
+                if pkg_id2arch_id[upd_pkg_id] not in self.arch_compat[auxiliary_dict[pkg]['arch_id']] or \
                                 upd_pkg_id not in pkg_id2errata_id:
                     continue
 
