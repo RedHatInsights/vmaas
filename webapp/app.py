@@ -31,8 +31,20 @@ SPEC = APISpec(
 )
 
 
-# pylint: disable=abstract-method
-class ApiSpecHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
+    """Base handler setting CORS headers."""
+    def data_received(self, chunk):
+        pass
+
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "Content-Type")
+
+    def options(self): # pylint: disable=arguments-differ
+        self.finish()
+
+
+class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
     def get(self): # pylint: disable=arguments-differ
         """Get API specification.
@@ -42,12 +54,10 @@ class ApiSpecHandler(tornado.web.RequestHandler):
              200:
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
-        self.set_header("Access-Control-Allow-Origin", "*")
         self.write(SPEC.to_dict())
 
 
-# pylint: disable=abstract-method
-class RefreshHandler(tornado.web.RequestHandler):
+class RefreshHandler(BaseHandler):
     """
     Class to refresh cached data in handlers.
     """
@@ -71,8 +81,8 @@ class RefreshHandler(tornado.web.RequestHandler):
             self.write({"success": False, "msg": "This API can be called internally only."})
         self.flush()
 
-# pylint: disable=abstract-method
-class JsonHandler(tornado.web.RequestHandler):
+
+class JsonHandler(BaseHandler):
     """
     Parent class to parse input json data given a a data or a file.
     """
