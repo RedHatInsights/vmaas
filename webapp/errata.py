@@ -81,10 +81,10 @@ class ErrataAPI(object):
 
         errata_to_process = data["errata_list"]
         errata_to_process = filter(None, errata_to_process)
-        answer = {}
+        response = {"errata_list": {}}
 
         if not errata_to_process:
-            return answer
+            return response
 
         # Select all errata in request
         errata_query = """SELECT errata.id as oid,
@@ -124,4 +124,5 @@ class ErrataAPI(object):
             self.set_packages_for_errata(errata_map)
             self.set_references_for_errata(errata_map)
 
-        return {"errata_list": response_dict}
+        response["errata_list"] = response_dict
+        return response
