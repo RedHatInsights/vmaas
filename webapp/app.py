@@ -265,13 +265,13 @@ class Application(tornado.web.Application):
             (r"/api/internal/refresh/?", RefreshHandler),  # GET request
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
-            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9-._:]+)", UpdatesHandlerGet),
+            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
             (r"/api/v1/cves/?", CVEHandlerPost),
-            (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9*-]+)", CVEHandlerGet),
+            (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9%*-]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
-            (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9*-_]+)", ReposHandlerGet),
+            (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-_]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
-            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9*-:]+)", ErrataHandlerGet)
+            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:]+)", ErrataHandlerGet)
         ]
         # Register public API handlers to apispec
         for handler in handlers:
