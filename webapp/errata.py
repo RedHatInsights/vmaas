@@ -2,7 +2,7 @@
 Module contains classes for returning errata data from DB
 """
 
-from utils import format_datetime, join_packagename
+from utils import format_datetime, parse_datetime, join_packagename
 
 
 class ErrataAPI(object):
@@ -79,9 +79,12 @@ class ErrataAPI(object):
 
         """
 
+        modified_since = data.get("modified_since", None)
         errata_to_process = data["errata_list"]
         errata_to_process = filter(None, errata_to_process)
         response = {"errata_list": {}}
+        if modified_since:
+            response["modified_since"] = modified_since
 
         if not errata_to_process:
             return response
@@ -101,7 +104,11 @@ class ErrataAPI(object):
                             JOIN errata_type ON errata_type_id = errata_type.id
                             JOIN severity ON severity_id = severity.id
                            WHERE errata.name IN %s"""
-        self.cursor.execute(errata_query, [tuple(errata_to_process)])
+        errata_query_params = [tuple(errata_to_process)]
+        if modified_since:
+            errata_query += " and errata.updated >= %s"
+            errata_query_params.append(parse_datetime(modified_since))
+        self.cursor.execute(errata_query, errata_query_params)
         errata_results = self.cursor.fetchall()
 
         errata_map = {} # map keyed on oid for populating lists in errata
