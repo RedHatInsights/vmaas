@@ -30,6 +30,7 @@ SPEC = APISpec(
         'apispec.ext.tornado',
     ),
     basePath="/api/v1",
+    schemes=["http"],
 )
 
 
