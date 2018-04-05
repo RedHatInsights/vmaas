@@ -255,6 +255,8 @@ class RepoSyncHandler(SyncHandler):
                description: Sync started
              429:
                description: Another sync is already in progress
+           tags:
+             - sync
         """
         status_code, status_msg = SyncHandler.start_task(self.task_type, repo_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
@@ -277,6 +279,8 @@ class RepoSyncHandler(SyncHandler):
                description: Invalid input JSON format
              429:
                description: Another sync is already in progress
+           tags:
+             - sync
         """
         try:
             products, repos = self._parse_input_list()
@@ -315,6 +319,8 @@ class CveSyncHandler(SyncHandler):
                description: Sync started
              429:
                description: Another sync is already in progress
+           tags:
+             - sync
         """
         status_code, status_msg = SyncHandler.start_task(self.task_type, cve_sync_task, self.on_complete, (), {})
         self.set_status(status_code)
@@ -341,6 +347,8 @@ class AllSyncHandler(SyncHandler):
                description: Sync started
              429:
                description: Another sync is already in progress
+           tags:
+             - sync
         """
         status_code, status_msg = SyncHandler.start_task(self.task_type, all_sync_task, self.on_complete, (), {})
         self.set_status(status_code)

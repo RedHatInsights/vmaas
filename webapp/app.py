@@ -134,6 +134,8 @@ class UpdatesHandlerGet(UpdatesHandler):
         responses:
           200:
             description: Return list of security updates for single package NEVRA
+        tags:
+          - updates
         """
         self.process_get(name=nevra)
 
@@ -154,6 +156,8 @@ class UpdatesHandlerPost(UpdatesHandler):
             description: Return list of security updates for list of package NEVRAs
           400:
             description: Invalid input JSON format
+        tags:
+          - updates
         """
         self.process_post()
 
@@ -182,6 +186,8 @@ class CVEHandlerGet(CVEHandler):
         responses:
           200:
             description: Return details about single CVE
+        tags:
+          - cves
         """
         self.process_get(name=cve)
 
@@ -202,6 +208,8 @@ class CVEHandlerPost(CVEHandler):
             description: Return details about list of CVEs
           400:
             description: Invalid input JSON format
+        tags:
+          - cves
         """
         self.process_post()
 
@@ -230,6 +238,8 @@ class ReposHandlerGet(ReposHandler):
         responses:
           200:
             description: Return details about single repository
+        tags:
+          - repos
         """
         self.process_get(name=repo)
 
@@ -250,6 +260,8 @@ class ReposHandlerPost(ReposHandler):
             description: Return details about list of repositories
           400:
             description: Invalid input JSON format
+        tags:
+          - repos
         """
         self.process_post()
 
@@ -278,6 +290,8 @@ class ErrataHandlerGet(ErrataHandler):
         responses:
           200:
             description: Return details about single erratum
+        tags:
+          - errata
         """
         self.process_get(name=erratum)
 
@@ -298,6 +312,8 @@ class ErrataHandlerPost(ErrataHandler):
             description: Return details about list of errata
           400:
             description: Invalid input JSON format
+        tags:
+          - errata
         """
         self.process_post()
 
