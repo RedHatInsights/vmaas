@@ -129,12 +129,21 @@ class ResponseJson(dict): # pylint: disable=too-few-public-methods
         return json.dumps(self)
 
 
-class ApiSpecHandler(RequestHandler):
-    """Handler class providing API specification."""
+class BaseHandler(RequestHandler):
+    """Base handler setting CORS headers."""
     def data_received(self, chunk):
-        """Handles streamed data."""
         pass
 
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "Content-Type")
+
+    def options(self): # pylint: disable=arguments-differ
+        self.finish()
+
+
+class ApiSpecHandler(BaseHandler):
+    """Handler class providing API specification."""
     def get(self): # pylint: disable=arguments-differ
         """Get API specification.
            ---
@@ -143,15 +152,11 @@ class ApiSpecHandler(RequestHandler):
              200:
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
-        self.set_header("Access-Control-Allow-Origin", "*")
         self.write(SPEC.to_dict())
 
 
-class SyncHandler(RequestHandler):
+class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
-    def data_received(self, chunk):
-        """Handles streamed data."""
-        pass
 
     @staticmethod
     def start_task(task_type, task_func, task_callback, args, kwargs): # pylint: disable=too-many-arguments
