@@ -259,6 +259,8 @@ class RepoSyncHandler(SyncHandler):
            responses:
              200:
                description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
              429:
                description: Another sync is already in progress
            tags:
@@ -278,9 +280,71 @@ class RepoSyncHandler(SyncHandler):
                description: Input JSON
                required: True
                in: body
+               schema:
+                 type: array
+                 items:
+                   type: object
+                   properties:
+                     entitlement_cert:
+                       type: object
+                       properties:
+                         name:
+                           type: string
+                           example: RHSM-CDN
+                         ca_cert:
+                           type: string
+                         cert:
+                           type: string
+                         key:
+                           type: string
+                       required:
+                         - name
+                         - ca_cert
+                     products:
+                       type: object
+                       properties:
+                         Red Hat Enterprise Linux Server:
+                           type: object
+                           properties:
+                             redhat_eng_product_id:
+                               type: integer
+                               example: 69
+                             content_sets:
+                               type: object
+                               properties:
+                                 rhel-6-server-rpms:
+                                   type: object
+                                   properties:
+                                     name:
+                                       type: string
+                                       example: Red Hat Enterprise Linux 6 Server (RPMs)
+                                     baseurl:
+                                       type: string
+                                       example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+                                     basearch:
+                                       type: array
+                                       items:
+                                         type: string
+                                         example: x86_64
+                                     releasever:
+                                       type: array
+                                       items:
+                                         type: string
+                                         example: 6Server
+                                   required:
+                                     - name
+                                     - baseurl
+                                     - basearch
+                                     - releasever
+                           required:
+                             - content_sets
+                   required:
+                     - products
            responses:
              200:
                description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
              400:
                description: Invalid input JSON format
              429:
@@ -323,6 +387,8 @@ class CveSyncHandler(SyncHandler):
            responses:
              200:
                description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
              429:
                description: Another sync is already in progress
            tags:
@@ -351,6 +417,8 @@ class AllSyncHandler(SyncHandler):
            responses:
              200:
                description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
              429:
                description: Another sync is already in progress
            tags:
@@ -367,6 +435,16 @@ class AllSyncHandler(SyncHandler):
         SyncHandler.finish_task(AllSyncHandler.task_type, res)
 
 
+def setup_apispec(handlers):
+    """Setup definitions and handlers for apispec."""
+    SPEC.definition("StatusResponse", properties={"success": {"type": "boolean"},
+                                                  "msg": {"type": "string", "example": "Repo sync task started."}})
+    # Register public API handlers to apispec
+    for handler in handlers:
+        if handler[0].startswith(r"/api/v1/"):
+            SPEC.add_path(urlspec=handler)
+
+
 class ReposcanApplication(Application):
     """Class defining API handlers."""
     def __init__(self):
@@ -376,11 +454,7 @@ class ReposcanApplication(Application):
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
         ]
-        # Register public API handlers to apispec
-        for handler in handlers:
-            if handler[0].startswith(r"/api/v1/"):
-                SPEC.add_path(urlspec=handler)
-
+        setup_apispec(handlers)
         Application.__init__(self, handlers)
 
 
