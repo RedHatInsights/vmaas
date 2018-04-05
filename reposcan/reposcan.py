@@ -265,6 +265,11 @@ class RepoSyncHandler(SyncHandler):
         """Sync repositories listed in request.
            ---
            description: Sync repositories listed in request
+           parameters:
+             - name: body
+               description: Input JSON
+               required: True
+               in: body
            responses:
              200:
                description: Sync started

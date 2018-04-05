@@ -125,6 +125,12 @@ class UpdatesHandlerGet(UpdatesHandler):
         """
         ---
         description: List security updates for single package NEVRA
+        parameters:
+          - name: nevra
+            description: Package NEVRA
+            required: True
+            type: string
+            in: path
         responses:
           200:
             description: Return list of security updates for single package NEVRA
@@ -138,6 +144,11 @@ class UpdatesHandlerPost(UpdatesHandler):
         """
         ---
         description: List security updates for list of package NEVRAs
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
         responses:
           200:
             description: Return list of security updates for list of package NEVRAs
@@ -162,6 +173,12 @@ class CVEHandlerGet(CVEHandler):
         """
         ---
         description: Get details about single CVE
+        parameters:
+          - name: cve
+            description: CVE name
+            required: True
+            type: string
+            in: path
         responses:
           200:
             description: Return details about single CVE
@@ -175,6 +192,11 @@ class CVEHandlerPost(CVEHandler):
         """
         ---
         description: Get details about list of CVEs
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
         responses:
           200:
             description: Return details about list of CVEs
@@ -199,6 +221,12 @@ class ReposHandlerGet(ReposHandler):
         """
         ---
         description: Get details about single repository
+        parameters:
+          - name: repo
+            description: Repository name
+            required: True
+            type: string
+            in: path
         responses:
           200:
             description: Return details about single repository
@@ -212,6 +240,11 @@ class ReposHandlerPost(ReposHandler):
         """
         ---
         description: Get details about list of repositories
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
         responses:
           200:
             description: Return details about list of repositories
@@ -236,6 +269,12 @@ class ErrataHandlerGet(ErrataHandler):
         """
         ---
         description: Get details about single erratum
+        parameters:
+          - name: erratum
+            description: Errata advisory name
+            required: True
+            type: string
+            in: path
         responses:
           200:
             description: Return details about single erratum
@@ -249,6 +288,11 @@ class ErrataHandlerPost(ErrataHandler):
         """
         ---
         description: Get details about list of errata
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
         responses:
           200:
             description: Return details about list of errata
