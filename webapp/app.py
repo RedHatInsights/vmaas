@@ -251,6 +251,9 @@ class CVEHandlerPost(CVEHandler):
                   items:
                     type: string
                     example: CVE-2017-5715
+                modified_since:
+                  type: string
+                  example: "2018-04-05T01:23:45+02:00"
               required:
                 - cve_list
         responses:
@@ -385,6 +388,9 @@ class ErrataHandlerPost(ErrataHandler):
                   items:
                     type: string
                     example: RHSA-2018:0512
+                modified_since:
+                  type: string
+                  example: "2018-04-05T01:23:45+02:00"
               required:
                 - errata_list
         responses:
@@ -514,7 +520,11 @@ def setup_apispec(handlers):
                     }
                 }
             }
-        }
+        },
+        "modified_since": {
+            "type": "string",
+            "example": "2018-04-05T01:23:45+02:00"
+        },
     })
     SPEC.definition("ReposResponse", properties={
         "repository_list": {
@@ -633,7 +643,11 @@ def setup_apispec(handlers):
                     }
                 }
             }
-        }
+        },
+        "modified_since": {
+            "type": "string",
+            "example": "2018-04-05T01:23:45+02:00"
+        },
     })
     # Register public API handlers to apispec
     for handler in handlers:
