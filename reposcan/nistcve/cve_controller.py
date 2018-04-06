@@ -52,7 +52,9 @@ class CveRepoController:
             if meta_path not in failed:
                 meta = CveMeta(meta_path)
                 # already synced before?
-                db_lastmodified = dateutil_parser.parse(self.db_lastmodified.get(repo.label, None))
+                db_lastmodified = self.db_lastmodified.get(repo.label, None)
+                if db_lastmodified is not None:
+                    db_lastmodified = dateutil_parser.parse(db_lastmodified)
                 meta_lastmodified = dateutil_parser.parse(meta.get_lastmodified())
                 # synced for the first time or has newer revision
                 if (db_lastmodified is None
