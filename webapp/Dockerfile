@@ -10,7 +10,7 @@ ENV POSTGRESQL_DATABASE=vmaas
 
 RUN yum -y update \
     && yum -y install yum-plugin-copr \
-    && yum -y copr enable jdobes/vmaas-libs \
+    && yum -y copr enable @vmaas/libs \
     && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil \
     && rm -rf /var/cache/yum/*
 
