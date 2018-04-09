@@ -286,7 +286,7 @@ class UpdatesAPI(object):
 
             for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
                 if pkg_id2arch_id[upd_pkg_id] not in self.arch_compat[auxiliary_dict[pkg]['arch_id']] or \
-                                upd_pkg_id not in pkg_id2errata_id:
+                                upd_pkg_id not in pkg_id2errata_id or upd_pkg_id not in pkg_id2repo_id:
                     continue
 
                 for r_id in pkg_id2repo_id[upd_pkg_id]:
