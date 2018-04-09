@@ -1,7 +1,6 @@
 """
 Module containing class for aggregating repository metadata.
 """
-from cli.logger import SimpleLogger
 from repodata.primary import PrimaryMD
 from repodata.primary_db import PrimaryDatabaseMD
 from repodata.updateinfo import UpdateInfoMD
@@ -13,7 +12,6 @@ class Repository:
     """
     # pylint: disable=too-many-arguments, too-many-instance-attributes
     def __init__(self, repo_url, content_set, basearch, releasever, cert_name=None, ca_cert=None, cert=None, key=None):
-        self.logger = SimpleLogger()
         self.repo_url = repo_url
         self.repomd = None
         self.primary = None

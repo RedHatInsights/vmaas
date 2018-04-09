@@ -3,7 +3,7 @@ Module containing classes for fetching/importing updates from/into database.
 """
 from psycopg2.extras import execute_values
 
-from cli.logger import SimpleLogger
+from common.logging import get_logger
 from database.database_handler import DatabaseHandler
 
 
@@ -13,7 +13,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
     All updates from repository are imported to the DB at once.
     """
     def __init__(self):
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
 
     def _get_nevras_in_repo(self, repo_id):
@@ -38,8 +38,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
             for pkg in update["pkglist"]:
                 nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
                 if nevra not in nevras_in_repo:
-                    self.logger.log("NEVRA associated with %s not found in repository: (%s)" %
-                                    (update["id"], ",".join(nevra)))
+                    self.logger.debug("NEVRA associated with %s not found in repository: (%s)",
+                                      update["id"], ",".join(nevra))
                     continue
                 package_id = nevras_in_repo[nevra]
                 if update_id in update_to_packages and package_id in update_to_packages[update_id]:
@@ -67,7 +67,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         for update in updates:
             if str(update["severity"]) not in severities:
                 missing_severities.add((str(update["severity"]),))
-        self.logger.log("Severities missing in DB: %d" % len(missing_severities))
+        self.logger.debug("Severities missing in DB: %d", len(missing_severities))
         if missing_severities:
             execute_values(cur, "insert into severity (name) values %s returning id, name",
                            missing_severities, page_size=len(missing_severities))
@@ -87,7 +87,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         for update in updates:
             if str(update["type"]) not in errata_types:
                 missing_errata_types.add((str(update["type"]),))
-        self.logger.log("Errata_types missing in DB: %d" % len(missing_errata_types))
+        self.logger.debug("Errata_types missing in DB: %d", len(missing_errata_types))
         if missing_errata_types:
             execute_values(cur, "insert into errata_type (name) values %s returning id, name",
                            missing_errata_types, page_size=len(missing_errata_types))
@@ -115,8 +115,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
                 update_map[row[1]] = row[0]
                 # Remove to not insert this update
                 names.remove((row[1],))
-        self.logger.log("Updates already in DB: %d" % len(update_map))
-        self.logger.log("Updates to import: %d" % len(names))
+        self.logger.debug("Updates already in DB: %d", len(update_map))
+        self.logger.debug("Updates to import: %d", len(names))
         if names:
             import_data = []
             for update in updates:
@@ -156,8 +156,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
 
         to_associate, to_disassociate = self._get_associations_todo(repo_id, updates, update_map, update_to_packages)
 
-        self.logger.log("New update-package associations: %d" % len(to_associate))
-        self.logger.log("Update-package disassociations: %d" % len(to_disassociate))
+        self.logger.debug("New update-package associations: %d", len(to_associate))
+        self.logger.debug("Update-package disassociations: %d", len(to_disassociate))
 
         if to_associate:
             execute_values(cur, "insert into pkg_errata (pkg_id, errata_id) values %s",
@@ -175,15 +175,15 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         cur.execute("select errata_id from errata_repo where repo_id = %s", (repo_id,))
         for row in cur.fetchall():
             associated_with_repo.add(row[0])
-        self.logger.log("Updates associated with repository: %d" % len(associated_with_repo))
+        self.logger.debug("Updates associated with repository: %d", len(associated_with_repo))
         to_associate = []
         for update_id in update_map.values():
             if update_id in associated_with_repo:
                 associated_with_repo.remove(update_id)
             else:
                 to_associate.append(update_id)
-        self.logger.log("New updates to associate with repository: %d" % len(to_associate))
-        self.logger.log("Updates to disassociate with repository: %d" % len(associated_with_repo))
+        self.logger.debug("New updates to associate with repository: %d", len(to_associate))
+        self.logger.debug("Updates to disassociate with repository: %d", len(associated_with_repo))
         if to_associate:
             execute_values(cur, "insert into errata_repo (repo_id, errata_id) values %s",
                            [(repo_id, update_id) for update_id in to_associate], page_size=len(to_associate))
@@ -212,8 +212,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
                 cve_map[row[1]] = row[0]
                 # Remove to not insert this CVE
                 names.remove((row[1],))
-        self.logger.log("CVEs already in DB: %d" % len(cve_map))
-        self.logger.log("CVEs to import: %d" % len(names))
+        self.logger.debug("CVEs already in DB: %d", len(cve_map))
+        self.logger.debug("CVEs to import: %d", len(names))
         if names:
             execute_values(cur,
                            """insert into cve (name) values %s
@@ -254,8 +254,8 @@ class UpdateStore: # pylint: disable=too-few-public-methods
             for cve_id in update_to_cves[update_id]:
                 to_disassociate.append((update_id, cve_id))
 
-        self.logger.log("New update-CVE associations: %d" % len(to_associate))
-        self.logger.log("Update-CVE disassociations: %d" % len(to_disassociate))
+        self.logger.debug("New update-CVE associations: %d", len(to_associate))
+        self.logger.debug("Update-CVE disassociations: %d", len(to_disassociate))
 
         if to_associate:
             execute_values(cur, "insert into errata_cve (errata_id, cve_id) values %s",
@@ -289,9 +289,9 @@ class UpdateStore: # pylint: disable=too-few-public-methods
                     existing_refs_count += 1
                 else:
                     refs_to_remove.append((row[0], row[1], row[2]))
-        self.logger.log("refs already in DB: %d" % existing_refs_count)
-        self.logger.log("refs to import: %d" % len(refs_to_add))
-        self.logger.log("refs to disassociate: %d" % len(refs_to_remove))
+        self.logger.debug("Refs already in DB: %d", existing_refs_count)
+        self.logger.debug("Refs to import: %d", len(refs_to_add))
+        self.logger.debug("Refs to disassociate: %d", len(refs_to_remove))
         if refs_to_add:
             execute_values(cur,
                            "insert into errata_refs (errata_id, type, name) values %s",
@@ -306,11 +306,11 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         """
         Import all updates from repository into all related DB tables.
         """
-        self.logger.log("Syncing %d updates." % len(updates))
+        self.logger.info("Syncing %d updates.", len(updates))
         update_map = self._populate_updates(updates)
         self._associate_packages(updates, update_map, repo_id)
         self._associate_updates(update_map, repo_id)
         cve_map = self._populate_cves(updates)
         self._associate_cves(updates, update_map, cve_map)
         self._associate_refs(updates, update_map)
-        self.logger.log("Syncing updates finished.")
+        self.logger.info("Syncing updates finished.")

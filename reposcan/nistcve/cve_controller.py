@@ -6,9 +6,9 @@ import shutil
 import tempfile
 import time
 
-from cli.logger import SimpleLogger
 from common.batch_list import BatchList
 from common.dateutil import parse_datetime
+from common.logging import get_logger
 from database.cverepo_store import CveRepoStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
@@ -17,12 +17,13 @@ from nistcve.cverepo import CveRepo
 
 YEAR_SINCE = 2002
 
+
 class CveRepoController:
     """
     Controls import/sync of CVE lists into the DB.
     """
     def __init__(self):
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
         self.downloader = FileDownloader()
         self.unpacker = FileUnpacker()
         self.cverepo_store = CveRepoStore()
@@ -60,11 +61,10 @@ class CveRepoController:
                         or meta_lastmodified > db_lastmodified):
                     repo.meta = meta
                 else:
-                    self.logger.log("Cve list '%s' has not been updated (since %s)." %
-                                    (repo.label, str(db_lastmodified)))
+                    self.logger.info("Cve list '%s' has not been updated (since %s).",
+                                     repo.label, str(db_lastmodified))
             else:
-                self.logger.log("Download failed: %s (HTTP CODE %d)" % (repo.meta_url(),
-                                                                        failed[meta_path]))
+                self.logger.warning("Download failed: %s (HTTP CODE %d)", repo.meta_url(), failed[meta_path])
 
     def _download_json(self, batch):
         for repo in batch:
@@ -103,11 +103,12 @@ class CveRepoController:
 
     def store(self):
         """Sync all queued CVE lists. Runs in batches due to disk space and memory usage."""
-        self.logger.log("Checking %d CVE lists." % len(self.repos))
+        self.logger.info("Checking %d CVE lists.", len(self.repos))
 
         # Download all repomd files first
         failed = self._download_meta()
-        self.logger.log("%d meta files failed to download." % len(failed))
+        if failed:
+            self.logger.warning("%d meta files failed to download.", len(failed))
         self._read_meta(failed)
 
         # filter out failed / unchanged lists
@@ -119,8 +120,8 @@ class CveRepoController:
             else:
                 to_skip.append(repo)
         self.clean_repo(to_skip)
-        self.logger.log("%d CVE lists skipped." % len(to_skip))
-        self.logger.log("Syncing %d CVE lists." % sum(len(l) for l in batches))
+        self.logger.info("%d CVE lists skipped.", len(to_skip))
+        self.logger.info("Syncing %d CVE lists.", sum(len(l) for l in batches))
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         for batch in batches:

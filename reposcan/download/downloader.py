@@ -3,8 +3,10 @@ Module containing classes for downloading files using HTTP.
 """
 from threading import Thread
 from queue import Queue, Empty
+
 import requests
-from cli.logger import SimpleLogger
+
+from common.logging import get_logger
 
 CHUNK_SIZE = 1048576
 THREADS = 8
@@ -68,7 +70,7 @@ class FileDownloadThread(Thread):
                 break
             self._download(download_item)
             self.queue.task_done()
-            self.logger.log("%s -> %s" % (download_item.source_url, download_item.target_path))
+            self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
 
         self.session.close()
 
@@ -81,7 +83,7 @@ class FileDownloader:
     """
     def __init__(self):
         self.queue = Queue()
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
 
     def add(self, download_item):
         """Add DownloadItem object into the queue."""
@@ -89,10 +91,10 @@ class FileDownloader:
 
     def run(self):
         """Start processing download queue using multiple threads."""
-        self.logger.log("Downloading started.")
+        self.logger.info("Downloading started.")
         threads = []
         for i in range(min(THREADS, self.queue.qsize())):
-            self.logger.log("Starting thread %d." % i)
+            self.logger.debug("Starting thread %d.", i)
             thread = FileDownloadThread(self.queue, self.logger)
             thread.setDaemon(True)
             thread.start()
@@ -100,5 +102,5 @@ class FileDownloader:
 
         for i, thread in enumerate(threads):
             thread.join()
-            self.logger.log("Stopping thread %d." % i)
-        self.logger.log("Downloading finished.")
+            self.logger.debug("Stopping thread %d.", i)
+        self.logger.info("Downloading finished.")

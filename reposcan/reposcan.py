@@ -14,14 +14,14 @@ import requests
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
 
-from cli.logger import SimpleLogger
+from common.logging import get_logger, init_logging
 from database.database_handler import DatabaseHandler
 from database.product_store import ProductStore
 from download.downloader import VALID_HTTP_CODES
 from nistcve.cve_controller import CveRepoController
 from repodata.repository_controller import RepositoryController
 
-LOGGER = SimpleLogger()
+LOGGER = get_logger(__name__)
 
 SPEC = APISpec(
     title='VMaaS Reposcan',
@@ -46,6 +46,7 @@ def init_db():
 def repo_sync_task(products=None, repos=None):
     """Function to start syncing all repositories from input list or from database."""
     try:
+        init_logging()
         init_db()
         repository_controller = RepositoryController()
         if products:
@@ -65,7 +66,7 @@ def repo_sync_task(products=None, repos=None):
             repository_controller.add_synced_repositories()
         repository_controller.store()
     except: # pylint: disable=bare-except
-        LOGGER.log(traceback.format_exc())
+        LOGGER.error(traceback.format_exc())
         DatabaseHandler.rollback()
         return "ERROR"
     return "OK"
@@ -74,12 +75,13 @@ def repo_sync_task(products=None, repos=None):
 def cve_sync_task():
     """Function to start syncing all CVEs."""
     try:
+        init_logging()
         init_db()
         controller = CveRepoController()
         controller.add_repos()
         controller.store()
     except: # pylint: disable=bare-except
-        LOGGER.log(traceback.format_exc())
+        LOGGER.error(traceback.format_exc())
         DatabaseHandler.rollback()
         return "ERROR"
     return "OK"
@@ -163,13 +165,13 @@ class SyncHandler(BaseHandler):
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
             msg = "%s sync task started." % task_type
-            LOGGER.log(msg)
+            LOGGER.info(msg)
             SyncTask.start(task_func, task_callback, args, kwargs)
             status_code = 200
             status_msg = ResponseJson(msg)
         else:
             msg = "%s sync request ignored. Another sync task already in progress." % task_type
-            LOGGER.log(msg)
+            LOGGER.info(msg)
             # Too Many Requests
             status_code = 429
             status_msg = ResponseJson(msg, success=False)
@@ -183,15 +185,15 @@ class SyncHandler(BaseHandler):
         try:
             response = requests.get(refresh_url)
             if response.status_code not in VALID_HTTP_CODES or not json.loads(response.text)["success"]:
-                LOGGER.errlog("Response from %s: %s" % (refresh_url, response.text))
+                LOGGER.error("Response from %s: %s", refresh_url, response.text)
         except requests.RequestException:
-            LOGGER.errlog(traceback.format_exc())
-            LOGGER.errlog("Unable to connect to %s." % refresh_url)
+            LOGGER.error(traceback.format_exc())
+            LOGGER.error("Unable to connect to %s.", refresh_url)
 
     @staticmethod
     def finish_task(task_type, task_result):
         """Mark current task as finished."""
-        LOGGER.log("%s sync task finished: %s." % (task_type, task_result))
+        LOGGER.info("%s sync task finished: %s.", task_type, task_result)
         SyncTask.finish()
         # Notify webapp to update it's cache
         SyncHandler._notify_webapp()
@@ -357,7 +359,7 @@ class RepoSyncHandler(SyncHandler):
         except: # pylint: disable=bare-except
             products = None
             repos = None
-            LOGGER.log(traceback.format_exc())
+            LOGGER.warning(traceback.format_exc())
             self.set_status(400)
 
             self.write(ResponseJson("Incorrect JSON format.", success=False))
@@ -460,17 +462,18 @@ class ReposcanApplication(Application):
 
 def periodic_sync():
     """Function running both repo and CVE sync."""
-    LOGGER.log("Periodic sync started.")
+    LOGGER.info("Periodic sync started.")
     SyncHandler.start_task(AllSyncHandler.task_type, all_sync_task, AllSyncHandler.on_complete, (), {})
 
 
 def main():
     """Main entrypoint."""
+    init_logging()
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', 720)) * 60000
     if sync_interval > 0:
         PeriodicCallback(periodic_sync, sync_interval).start()
     else:
-        LOGGER.log("Periodic syncing disabled.")
+        LOGGER.info("Periodic syncing disabled.")
     app = ReposcanApplication()
     app.listen(8081)
     IOLoop.instance().start()

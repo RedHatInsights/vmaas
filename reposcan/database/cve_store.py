@@ -3,16 +3,17 @@ Module contains classes for fetching/importing CVE from/into database.
 """
 from psycopg2.extras import execute_values
 
-from cli.logger import SimpleLogger
 from common.dateutil import parse_datetime
+from common.logging import get_logger
 from database.database_handler import DatabaseHandler
+
 
 class CveStore:
     """
     Class interface for listing and storing CVEs in database.
     """
     def __init__(self):
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
 
     def list_lastmodified(self):
@@ -41,7 +42,7 @@ class CveStore:
                 severity = severity.capitalize()
                 if severity not in severities:
                     missing_severities.add((severity,))
-        self.logger.log("Severities missing in DB: %d" % len(missing_severities))
+        self.logger.debug("Severities missing in DB: %d", len(missing_severities))
         if missing_severities:
             execute_values(cur, "insert into severity (name) values %s returning id, name",
                            missing_severities, page_size=len(missing_severities))
@@ -66,7 +67,7 @@ class CveStore:
 
         import_set = set(cwe_list) - set(cwe_name)
         import_set = [(name, cwe_link_map[name]) for name in import_set]
-        self.logger.log("CWEs to import: %d" % len(import_set))
+        self.logger.debug("CWEs to import: %d", len(import_set))
         new_cwes = ()
         if import_set:
             execute_values(cursor, "INSERT INTO cwe (name, link) values %s returning name, id",
@@ -85,7 +86,7 @@ class CveStore:
         cve_cwe_map = _map_name_to_id(set(mapping_set), all_cwes)
         cursor.execute("SELECT cve_id, cwe_id FROM cve_cwe")
         to_import = set(cve_cwe_map) - set(cursor.fetchall())
-        self.logger.log("CVE to CWE mapping to import: %d" % len(to_import))
+        self.logger.debug("CVE to CWE mapping to import: %d", len(to_import))
         if to_import:
             execute_values(cursor, "INSERT INTO cve_cwe (cve_id, cwe_id) values %s returning cve_id, cwe_id",
                            list(to_import), page_size=len(to_import))
@@ -133,13 +134,13 @@ class CveStore:
                       values["modified_date"], values["cvss3_score"], values["iava"],
                       values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" not in values]
-        self.logger.log("CVEs to import: %d" % len(to_import))
+        self.logger.debug("CVEs to import: %d", len(to_import))
         to_update = [(values["id"], name, values["description"], values["severity_id"], values["published_date"],
                       values["modified_date"], values["cvss3_score"], values["iava"],
                       values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" in values]
 
-        self.logger.log("CVEs to update: %d" % len(to_update))
+        self.logger.debug("CVEs to update: %d", len(to_update))
 
         if to_import:
             execute_values(cur,
@@ -175,9 +176,9 @@ class CveStore:
         """
         Store / update cve information in database.
         """
-        self.logger.log("Syncing %d CVEs." % repo.get_count())
+        self.logger.info("Syncing %d CVEs.", repo.get_count())
         self._populate_cves(repo)
-        self.logger.log("Syncing CVEs finished.")
+        self.logger.info("Syncing CVEs finished.")
 
 
 def _dget(struct, *keys):

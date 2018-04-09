@@ -4,18 +4,17 @@ Module aggregating CVE list metadata.
 
 import os.path
 
-from cli.logger import SimpleLogger
 from nistcve.cvejson import CveJson
 
 API_VERSION = '1.0'
 URL = 'https://static.nvd.nist.gov/feeds/json/cve/{apiver}/nvdcve-{apiver}-{label}.{ext}'
+
 
 class CveRepo:
     """
     Class aggregating CVE list metadata.
     """
     def __init__(self, label):
-        self.logger = SimpleLogger()
         self.label = label
         self.meta = None
         self.json = None
