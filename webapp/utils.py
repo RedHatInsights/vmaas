@@ -43,6 +43,8 @@ def format_datetime(datetime_obj):
 
 def parse_datetime(date):
     """Parse date from string in ISO format."""
+    if date is None:
+        return None
     return dateutil_parser.parse(date)
 
 class ListDict(dict):

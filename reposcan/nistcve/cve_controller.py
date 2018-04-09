@@ -5,10 +5,10 @@ Module holds CVE list import workflow - downloading, unpacking, etc.
 import shutil
 import tempfile
 import time
-from dateutil import parser as dateutil_parser
 
 from cli.logger import SimpleLogger
 from common.batch_list import BatchList
+from common.dateutil import parse_datetime
 from database.cverepo_store import CveRepoStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
@@ -52,10 +52,8 @@ class CveRepoController:
             if meta_path not in failed:
                 meta = CveMeta(meta_path)
                 # already synced before?
-                db_lastmodified = self.db_lastmodified.get(repo.label, None)
-                if db_lastmodified is not None:
-                    db_lastmodified = dateutil_parser.parse(db_lastmodified)
-                meta_lastmodified = dateutil_parser.parse(meta.get_lastmodified())
+                db_lastmodified = parse_datetime(self.db_lastmodified.get(repo.label, None))
+                meta_lastmodified = parse_datetime(meta.get_lastmodified())
                 # synced for the first time or has newer revision
                 if (db_lastmodified is None
                         or meta_lastmodified is None
