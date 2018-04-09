@@ -3,7 +3,7 @@ Module containing classes for fetching/importing packages from/into database.
 """
 from psycopg2.extras import execute_values
 
-from cli.logger import SimpleLogger
+from common.logging import get_logger
 from database.database_handler import DatabaseHandler
 
 CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
@@ -15,7 +15,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
     All packages from repository are imported to the DB at once.
     """
     def __init__(self):
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
 
     def _populate_archs(self, packages):
@@ -28,7 +28,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
         for pkg in packages:
             if pkg["arch"] not in archs:
                 missing_archs.add((pkg["arch"],))
-        self.logger.log("Architectures missing in DB: %d" % len(missing_archs))
+        self.logger.debug("Architectures missing in DB: %d", len(missing_archs))
         if missing_archs:
             execute_values(cur, "insert into arch (name) values %s returning id, name",
                            missing_archs, page_size=len(missing_archs))
@@ -51,7 +51,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
                 pkg["checksum_type"] = CHECKSUM_TYPE_ALIASES[pkg["checksum_type"]]
             if pkg["checksum_type"] not in checksums:
                 missing_checksum_types.add((pkg["checksum_type"],))
-        self.logger.log("Checksum types missing in DB: %d" % len(missing_checksum_types))
+        self.logger.debug("Checksum types missing in DB: %d", len(missing_checksum_types))
         if missing_checksum_types:
             execute_values(cur, "insert into checksum_type (name) values %s returning id, name",
                            missing_checksum_types, page_size=len(missing_checksum_types))
@@ -67,7 +67,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
         unique_evrs = set()
         for pkg in packages:
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
-        self.logger.log("Unique EVRs in repository: %d" % len(unique_evrs))
+        self.logger.debug("Unique EVRs in repository: %d", len(unique_evrs))
         if unique_evrs:
             execute_values(cur,
                            """select id, epoch, version, release from evr
@@ -78,12 +78,12 @@ class PackageStore: # pylint: disable=too-few-public-methods
                 evr_map[(row[1], row[2], row[3])] = row[0]
                 # Remove to not insert this evr
                 unique_evrs.remove((row[1], row[2], row[3]))
-        self.logger.log("EVRs already in DB: %d" % len(evr_map))
+        self.logger.debug("EVRs already in DB: %d", len(evr_map))
 
         to_import = []
         for (epoch, version, release) in unique_evrs:
             to_import.append((epoch, version, release, epoch, version, release))
-        self.logger.log("EVRs to import: %d" % len(to_import))
+        self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
             execute_values(cur,
                            """insert into evr (epoch, version, release, evr) values %s
@@ -115,8 +115,8 @@ class PackageStore: # pylint: disable=too-few-public-methods
                 pkg_map[(row[1], row[2])] = row[0]
                 # Remove to not insert this package
                 checksums.remove((row[1], row[2]))
-        self.logger.log("Packages already in DB: %d" % len(pkg_map))
-        self.logger.log("Packages to import: %d" % len(checksums))
+        self.logger.debug("Packages already in DB: %d", len(pkg_map))
+        self.logger.debug("Packages to import: %d", len(checksums))
         if checksums:
             import_data = []
             for pkg in packages:
@@ -144,15 +144,15 @@ class PackageStore: # pylint: disable=too-few-public-methods
         cur.execute("select pkg_id from pkg_repo where repo_id = %s", (repo_id,))
         for row in cur.fetchall():
             associated_with_repo.add(row[0])
-        self.logger.log("Packages associated with repository: %d" % len(associated_with_repo))
+        self.logger.debug("Packages associated with repository: %d", len(associated_with_repo))
         to_associate = []
         for pkg_id in pkg_map.values():
             if pkg_id in associated_with_repo:
                 associated_with_repo.remove(pkg_id)
             else:
                 to_associate.append(pkg_id)
-        self.logger.log("New packages to associate with repository: %d" % len(to_associate))
-        self.logger.log("Packages to disassociate with repository: %d" % len(associated_with_repo))
+        self.logger.debug("New packages to associate with repository: %d", len(to_associate))
+        self.logger.debug("Packages to disassociate with repository: %d", len(associated_with_repo))
         if to_associate:
             execute_values(cur, "insert into pkg_repo (repo_id, pkg_id) values %s",
                            [(repo_id, pkg_id) for pkg_id in to_associate], page_size=len(to_associate))
@@ -167,7 +167,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
         """
         Import all packages from repository into all related DB tables.
         """
-        self.logger.log("Syncing %d packages." % len(packages))
+        self.logger.info("Syncing %d packages.", len(packages))
         package_map = self._populate_packages(packages)
         self._associate_packages(package_map, repo_id)
-        self.logger.log("Syncing packages finished.")
+        self.logger.info("Syncing packages finished.")

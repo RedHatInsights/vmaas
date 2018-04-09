@@ -5,7 +5,8 @@ import os
 import gzip
 import lzma
 import bz2
-from cli.logger import SimpleLogger
+
+from common.logging import get_logger
 
 CHUNK_SIZE = 1048576
 
@@ -18,7 +19,7 @@ class FileUnpacker:
     """
     def __init__(self):
         self.queue = []
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
 
     def add(self, file_path):
         """Add compressed file path to queue."""
@@ -46,15 +47,15 @@ class FileUnpacker:
                             break
                         unpacked.write(chunk)
             os.unlink(file_path)
-            self.logger.log("%s -> %s" % (file_path, unpacked_file_path))
+            self.logger.info("%s -> %s", file_path, unpacked_file_path)
         else:
-            self.logger.log("%s skipped.")
+            self.logger.info("%s skipped.", file_path)
 
     def run(self):
         """Unpack all queued file paths."""
-        self.logger.log("Unpacking started.")
+        self.logger.info("Unpacking started.")
         for file_path in self.queue:
             self._unpack(file_path)
         # Make queue empty to be able to reuse this class multiple times in one run
         self.queue = []
-        self.logger.log("Unpacking finished.")
+        self.logger.info("Unpacking finished.")

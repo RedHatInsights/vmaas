@@ -6,8 +6,8 @@ import shutil
 import tempfile
 from urllib.parse import urljoin
 
-from cli.logger import SimpleLogger
 from common.batch_list import BatchList
+from common.logging import get_logger
 
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
@@ -25,7 +25,7 @@ class RepositoryController:
     Second, primary and updateinfo repodata from repositories needing update are downloaded, parsed and imported.
     """
     def __init__(self):
-        self.logger = SimpleLogger()
+        self.logger = get_logger(__name__)
         self.downloader = FileDownloader()
         self.unpacker = FileUnpacker()
         self.repo_store = RepositoryStore()
@@ -80,11 +80,11 @@ class RepositoryController:
                 if db_revision is None or downloaded_revision > db_revision:
                     repository.repomd = repomd
                 else:
-                    self.logger.log("Downloaded repo %s (%s) is not newer than repo in DB (%s)." %
-                                    (", ".join(repository_key), str(downloaded_revision), str(db_revision)))
+                    self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
+                                     ", ".join(repository_key), str(downloaded_revision), str(db_revision))
             else:
-                self.logger.log("Download failed: %s (HTTP CODE %d)" % (urljoin(repository.repo_url, REPOMD_PATH),
-                                                                        failed[repomd_path]))
+                self.logger.warning("Download failed: %s (HTTP CODE %d)", urljoin(repository.repo_url, REPOMD_PATH),
+                                    failed[repomd_path])
 
     def _download_metadata(self, batch):
         for repository in batch:
@@ -178,13 +178,14 @@ class RepositoryController:
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""
-        self.logger.log("Checking %d repositories." % len(self.repositories))
+        self.logger.info("Checking %d repositories.", len(self.repositories))
 
         self._write_certificate_cache()
 
         # Download all repomd files first
         failed = self._download_repomds()
-        self.logger.log("%d repomd.xml files failed to download." % len(failed))
+        if failed:
+            self.logger.warning("%d repomd.xml files failed to download.", len(failed))
         self._read_repomds(failed)
 
         # Filter all repositories without repomd attribute set (failed download, downloaded repomd is not newer)
@@ -196,8 +197,8 @@ class RepositoryController:
             else:
                 to_skip.append(repository)
         self.clean_repodata(to_skip)
-        self.logger.log("%d repositories skipped." % len(to_skip))
-        self.logger.log("Syncing %d repositories." % sum(len(l) for l in batches))
+        self.logger.info("%d repositories skipped.", len(to_skip))
+        self.logger.info("Syncing %d repositories.", sum(len(l) for l in batches))
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         for batch in batches:
