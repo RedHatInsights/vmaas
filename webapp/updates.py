@@ -98,7 +98,7 @@ class UpdatesAPI(object):
         # Parse input list of packages and create empty update list (answer) for them
         packages_names = []
         packages_evrids = []
-        name2text = {}
+        nevra2text = {}
 
         for pkg in packages_to_process:
             pkg = str(pkg)
@@ -142,8 +142,8 @@ class UpdatesAPI(object):
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
         for oid, name, evr_id, arch_id, summary, description in packs:
-            name2text[name] = {'summary':summary, 'description':description}
             key = "%s:%s:%s" % (name, evr_id, arch_id)
+            nevra2text[key] = {'summary':summary, 'description':description}
             nevra2pkg_id.setdefault(key, []).append(oid)
 
         pkg_ids = []
@@ -275,12 +275,16 @@ class UpdatesAPI(object):
         for pkg in auxiliary_dict:
             # Grab summary/description for this pkg-name
             pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
-            if pkg_name and pkg_name in name2text:
-                response['update_list'][pkg]['summary'] = name2text[pkg_name]['summary']
-                response['update_list'][pkg]['description'] = name2text[pkg_name]['description']
 
             if 'update_id' not in auxiliary_dict[pkg]:
                 continue
+
+            key = "%s:%s:%s" % (auxiliary_dict[pkg]['name'],
+                                auxiliary_dict[pkg]['evr_id'],
+                                auxiliary_dict[pkg]['arch_id'])
+            if key in nevra2text:
+                response['update_list'][pkg]['summary'] = nevra2text[key]['summary']
+                response['update_list'][pkg]['description'] = nevra2text[key]['description']
 
             response['update_list'][pkg]['available_updates'] = []
 
