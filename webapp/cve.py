@@ -66,7 +66,8 @@ class CveAPI(object):
                         WHERE cve.name IN %s""".format(columns=', '.join(column_names))
         cve_query_params = [tuple(cves_to_process)]
         if modified_since:
-            cve_query += " and cve.modified_date >= %s"
+            cve_query += " and (cve.modified_date >= %s or cve.published_date >= %s)"
+            cve_query_params.append(parse_datetime(modified_since))
             cve_query_params.append(parse_datetime(modified_since))
         self.cursor.execute(cve_query, cve_query_params)
         cves = self.cursor.fetchall()
