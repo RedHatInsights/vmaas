@@ -4,12 +4,13 @@ Module containing classes for downloading files using HTTP.
 from threading import Thread
 from queue import Queue, Empty
 
+import os
 import requests
 
 from common.logging import get_logger
 
-CHUNK_SIZE = 1048576
-THREADS = 8
+DEFAULT_CHUNK_SIZE = 1048576
+DEFAULT_THREADS = 8
 VALID_HTTP_CODES = [200]
 
 
@@ -38,6 +39,7 @@ class FileDownloadThread(Thread):
         self.queue = queue
         self.session = requests.Session()
         self.logger = logger
+        self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
 
     def _download(self, download_item):
         with open(download_item.target_path, "wb") as file_handle:
@@ -55,7 +57,7 @@ class FileDownloadThread(Thread):
                 cert = None
             with self.session.get(download_item.source_url, verify=verify, cert=cert, stream=True) as response:
                 while True:
-                    chunk = response.raw.read(CHUNK_SIZE, decode_content=False)
+                    chunk = response.raw.read(self.chunk_size, decode_content=False)
                     if chunk == b"":
                         break
                     file_handle.write(chunk)
@@ -84,6 +86,7 @@ class FileDownloader:
     def __init__(self):
         self.queue = Queue()
         self.logger = get_logger(__name__)
+        self.num_threads = int(os.getenv('THREADS', DEFAULT_THREADS))
 
     def add(self, download_item):
         """Add DownloadItem object into the queue."""
@@ -93,7 +96,7 @@ class FileDownloader:
         """Start processing download queue using multiple threads."""
         self.logger.info("Downloading started.")
         threads = []
-        for i in range(min(THREADS, self.queue.qsize())):
+        for i in range(min(self.num_threads, self.queue.qsize())):
             self.logger.debug("Starting thread %d.", i)
             thread = FileDownloadThread(self.queue, self.logger)
             thread.setDaemon(True)

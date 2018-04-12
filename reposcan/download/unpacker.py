@@ -8,7 +8,8 @@ import bz2
 
 from common.logging import get_logger
 
-CHUNK_SIZE = 1048576
+DEFAULT_CHUNK_SIZE = 1048576
+
 
 
 class FileUnpacker:
@@ -20,6 +21,7 @@ class FileUnpacker:
     def __init__(self):
         self.queue = []
         self.logger = get_logger(__name__)
+        self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
 
     def add(self, file_path):
         """Add compressed file path to queue."""
@@ -42,7 +44,7 @@ class FileUnpacker:
                 unpacked_file_path = file_path.rsplit(".", maxsplit=1)[0]
                 with open(unpacked_file_path, "wb") as unpacked:
                     while True:
-                        chunk = packed.read(CHUNK_SIZE)
+                        chunk = packed.read(self.chunk_size)
                         if chunk == b"":
                             break
                         unpacked.write(chunk)
