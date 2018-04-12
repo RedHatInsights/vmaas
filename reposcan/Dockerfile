@@ -10,6 +10,10 @@ ENV WEBAPP_API_URL=http://webapp
 ENV WEBAPP_API_PORT_INTERNAL=8079
 ENV REPOSCAN_SYNC_INTERVAL_MINUTES=720
 ENV LOGGING_LEVEL=INFO
+ENV THREADS=8
+ENV CHUNK_SIZE=1048576
+ENV DEFAULT_BATCH_SIZE=100
+ENV YEAR_SINCE=2002
 
 RUN dnf install -y dnf-plugins-core && dnf copr enable -y @vmaas/libs \
     && dnf install -y python3-apispec python3-psycopg2 python3-requests \
@@ -23,7 +27,7 @@ ADD . /vmaas-reposcan/
 # remove some unnecesary files
 RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
            /vmaas-reposcan/test_data /vmaas-reposcan/run_tests.sh \
-           /vmaas-reposcan/repodata/test 
+           /vmaas-reposcan/repodata/test
 
 EXPOSE 8081
 

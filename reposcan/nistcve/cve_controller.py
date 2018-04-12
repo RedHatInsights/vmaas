@@ -2,6 +2,7 @@
 Module holds CVE list import workflow - downloading, unpacking, etc.
 """
 
+import os
 import shutil
 import tempfile
 import time
@@ -15,7 +16,7 @@ from download.unpacker import FileUnpacker
 from nistcve.cvemeta import CveMeta
 from nistcve.cverepo import CveRepo
 
-YEAR_SINCE = 2002
+DEFAULT_YEAR_SINCE = 2002
 
 
 class CveRepoController:
@@ -29,6 +30,7 @@ class CveRepoController:
         self.cverepo_store = CveRepoStore()
         self.repos = set()
         self.db_lastmodified = {}
+        self.year_since = int(os.getenv('YEAR_SINCE', DEFAULT_YEAR_SINCE))
 
     def _download_meta(self):
         download_items = []
@@ -91,7 +93,7 @@ class CveRepoController:
         self.db_lastmodified = self.cverepo_store.list_lastmodified()
 
         # CVE files for single years should be used only for initial load
-        labels = [str(y) for y in range(YEAR_SINCE, int(time.strftime("%Y"))+1)]
+        labels = [str(y) for y in range(self.year_since, int(time.strftime("%Y"))+1)]
         for label in labels:
             if label not in self.db_lastmodified:
                 self.repos.add(CveRepo(label))
