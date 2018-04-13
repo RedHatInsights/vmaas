@@ -466,13 +466,17 @@ CREATE TABLE IF NOT EXISTS pkg_repo (
 
 
 -- -----------------------------------------------------
--- Table vmaas.severity
+-- Table vmaas.errata_severity
+-- from https://access.redhat.com/security/updates/classification
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS severity (
+CREATE TABLE IF NOT EXISTS errata_severity (
   id SERIAL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
+
+INSERT INTO errata_severity (name) VALUES
+  ('None'), ('Low'), ('Moderate'), ('Important'), ('Critical');
 
 
 -- -----------------------------------------------------
@@ -502,7 +506,7 @@ CREATE TABLE IF NOT EXISTS errata (
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
-    REFERENCES severity (id),
+    REFERENCES errata_severity (id),
   CONSTRAINT errata_type_id
     FOREIGN KEY (errata_type_id)
     REFERENCES errata_type (id)
@@ -542,13 +546,27 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.cve_impact
+-- from https://nvd.nist.gov/vuln-metrics
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cve_impact (
+  id SERIAL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+INSERT INTO cve_impact (name) VALUES
+  ('None'), ('Low'), ('Medium'), ('High'), ('Critical');
+
+
+-- -----------------------------------------------------
 -- Table vmaas.cve
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   description TEXT NULL, CHECK (NOT empty(description)),
-  severity_id INT,
+  impact_id INT,
   published_date TIMESTAMP WITH TIME ZONE NULL,
   modified_date TIMESTAMP WITH TIME ZONE NULL,
   cvss3_score NUMERIC(5,3),
@@ -556,9 +574,9 @@ CREATE TABLE IF NOT EXISTS cve (
   redhat_url TEXT, CHECK (NOT empty(redhat_url)),
   secondary_url TEXT, CHECK (NOT empty(secondary_url)),
   PRIMARY KEY (id),
-  CONSTRAINT severity_id
-    FOREIGN KEY (severity_id)
-    REFERENCES severity (id)
+  CONSTRAINT impact_id
+    FOREIGN KEY (impact_id)
+    REFERENCES cve_impact (id)
 )TABLESPACE pg_default;
 
 -- -----------------------------------------------------

@@ -58,11 +58,11 @@ class CveAPI(object):
             return answer
 
         # Select all cves in request
-        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "severity.name",
+        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "cve_impact.name",
                         "published_date", "modified_date", "iava", "description"]
         cve_query = """SELECT {columns}
                          FROM cve
-                         LEFT JOIN severity ON cve.severity_id = severity.id
+                         LEFT JOIN cve_impact ON cve.impact_id = cve_impact.id
                         WHERE cve.name IN %s""".format(columns=', '.join(column_names))
         cve_query_params = [tuple(cves_to_process)]
         if modified_since:
@@ -109,7 +109,7 @@ class CveAPI(object):
                 "redhat_url": cve.get_val("redhat_url"),
                 "secondary_url": cve.get_val("secondary_url"),
                 "synopsis": cve.get_val("cve.name"),
-                "impact": cve.get_val("severity.name"),
+                "impact": cve.get_val("cve_impact.name"),
                 "public_date": format_datetime(cve.get_val("published_date")),
                 "modified_date": format_datetime(cve.get_val("modified_date")),
                 "cwe_list": cve.get_val("cwe"),

@@ -29,28 +29,15 @@ class CveStore:
         cur.close()
         return lastmodified
 
-    def _populate_severities(self, repo):
-        severities = {}
+    def _populate_cve_impacts(self, repo):
+        cve_impacts = {}
         cur = self.conn.cursor()
-        cur.execute("select id, name from severity")
+        cur.execute("select id, name from cve_impact")
         for row in cur.fetchall():
-            severities[row[1]] = row[0]
-        missing_severities = set()
-        for cve in repo.list_cves():
-            severity = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
-            if severity is not None:
-                severity = severity.capitalize()
-                if severity not in severities:
-                    missing_severities.add((severity,))
-        self.logger.debug("Severities missing in DB: %d", len(missing_severities))
-        if missing_severities:
-            execute_values(cur, "insert into severity (name) values %s returning id, name",
-                           missing_severities, page_size=len(missing_severities))
-            for row in cur.fetchall():
-                severities[row[1]] = row[0]
+            cve_impacts[row[1]] = row[0]
         cur.close()
         self.conn.commit()
-        return severities
+        return cve_impacts
 
     def _populate_cwes(self, cursor, cve_data):
         # pylint: disable=R0914
@@ -92,14 +79,14 @@ class CveStore:
                            list(to_import), page_size=len(to_import))
 
     def _populate_cves(self, repo):     # pylint: disable=too-many-locals
-        severity_map = self._populate_severities(repo)
+        cve_impact_map = self._populate_cve_impacts(repo)
         cur = self.conn.cursor()
         cve_data = {}
         for cve in repo.list_cves():
             cve_name = _dget(cve, "cve", "CVE_data_meta", "ID")
 
             cve_desc_list = _dget(cve, "cve", "description", "description_data")
-            severity = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
+            impact = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
             url_list = _dget(cve, "cve", "references", "reference_data")
             modified_date = parse_datetime(_dget(cve, "lastModifiedDate"))
             published_date = parse_datetime(_dget(cve, "publishedDate"))
@@ -108,7 +95,7 @@ class CveStore:
             redhat_url, secondary_url = _process_url_list(cve_name, url_list)
             cve_data[cve_name] = {
                 "description": _desc(cve_desc_list, "lang", "en", "value"),
-                "severity_id": severity_map[severity.capitalize()] if severity is not None else None,
+                "impact_id": cve_impact_map[impact.capitalize()] if impact is not None else None,
                 "cvss3_score": _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseScore"),
                 "redhat_url": redhat_url,
                 "cwe_list": cwe_list,
@@ -130,12 +117,12 @@ class CveStore:
                 cve_data[row[1]]["id"] = row[0]
                 # Remove to not insert this CVE
 
-        to_import = [(name, values["description"], values["severity_id"], values["published_date"],
+        to_import = [(name, values["description"], values["impact_id"], values["published_date"],
                       values["modified_date"], values["cvss3_score"], values["iava"],
                       values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" not in values]
         self.logger.debug("CVEs to import: %d", len(to_import))
-        to_update = [(values["id"], name, values["description"], values["severity_id"], values["published_date"],
+        to_update = [(values["id"], name, values["description"], values["impact_id"], values["published_date"],
                       values["modified_date"], values["cvss3_score"], values["iava"],
                       values["redhat_url"], values["secondary_url"])
                      for name, values in cve_data.items() if "id" in values]
@@ -144,7 +131,7 @@ class CveStore:
 
         if to_import:
             execute_values(cur,
-                           """insert into cve (name, description, severity_id, published_date, modified_date,
+                           """insert into cve (name, description, impact_id, published_date, modified_date,
                               cvss3_score, iava, redhat_url, secondary_url) values %s returning id, name""",
                            list(to_import), page_size=len(to_import))
             for row in cur.fetchall():
@@ -154,7 +141,7 @@ class CveStore:
             execute_values(cur,
                            """update cve set name = v.name,
                                              description = v.description,
-                                             severity_id = v.severity_id,
+                                             impact_id = v.impact_id,
                                              published_date = v.published_date,
                                              modified_date = v.modified_date,
                                              redhat_url = v.redhat_url,
@@ -162,7 +149,7 @@ class CveStore:
                                              cvss3_score = v.cvss3_score,
                                              iava = v.iava
                               from (values %s)
-                              as v(id, name, description, severity_id, published_date, modified_date, cvss3_score,
+                              as v(id, name, description, impact_id, published_date, modified_date, cvss3_score,
                               iava, redhat_url, secondary_url)
                               where cve.id = v.id """,
                            list(to_update), page_size=len(to_update),
