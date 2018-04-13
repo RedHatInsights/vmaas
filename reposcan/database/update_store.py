@@ -57,22 +57,12 @@ class UpdateStore: # pylint: disable=too-few-public-methods
 
         return to_associate, to_disassociate
 
-    def _populate_severities(self, updates):
+    def _populate_errata_severities(self, updates):
         severities = {}
         cur = self.conn.cursor()
-        cur.execute("select id, name from severity")
+        cur.execute("select id, name from errata_severity")
         for row in cur.fetchall():
             severities[row[1]] = row[0]
-        missing_severities = set()
-        for update in updates:
-            if str(update["severity"]) not in severities:
-                missing_severities.add((str(update["severity"]),))
-        self.logger.debug("Severities missing in DB: %d", len(missing_severities))
-        if missing_severities:
-            execute_values(cur, "insert into severity (name) values %s returning id, name",
-                           missing_severities, page_size=len(missing_severities))
-            for row in cur.fetchall():
-                severities[row[1]] = row[0]
         cur.close()
         self.conn.commit()
         return severities
@@ -98,7 +88,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         return errata_types
 
     def _populate_updates(self, updates):
-        severity_map = self._populate_severities(updates)
+        errata_severity_map = self._populate_errata_severities(updates)
         errata_type_map = self._populate_errata_types(updates)
         cur = self.conn.cursor()
         update_map = {}
@@ -122,7 +112,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
             for update in updates:
                 if (update["id"],) in names:
                     import_data.append((update["id"], update["title"],
-                                        severity_map[str(update["severity"])],
+                                        errata_severity_map[str(update["severity"])],
                                         errata_type_map[str(update["type"])],
                                         update["summary"], update["description"],
                                         update["issued"], update["updated"],

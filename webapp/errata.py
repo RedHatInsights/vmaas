@@ -95,14 +95,14 @@ class ErrataAPI(object):
                                  synopsis,
                                  summary,
                                  errata_type.name as type,
-                                 severity.name as severity,
+                                 errata_severity.name as severity,
                                  description,
                                  solution,
                                  issued,
                                  updated
                             FROM errata
                             JOIN errata_type ON errata_type_id = errata_type.id
-                            JOIN severity ON severity_id = severity.id
+                            JOIN errata_severity ON severity_id = errata_severity.id
                            WHERE errata.name IN %s"""
         errata_query_params = [tuple(errata_to_process)]
         if modified_since:
