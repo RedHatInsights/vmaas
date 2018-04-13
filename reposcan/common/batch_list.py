@@ -12,7 +12,7 @@ class BatchList:
         # If batch-size not specified, use setting from env or default if unset
         if max_batch_size == -1:
             max_batch_size = os.getenv('BATCH_SIZE', DEFAULT_BATCH_SIZE)
-        self.max_batch_size = max_batch_size
+        self.max_batch_size = int(max_batch_size)
         self.batches = []
 
     def __iter__(self):
