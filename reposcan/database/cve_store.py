@@ -29,7 +29,7 @@ class CveStore:
         cur.close()
         return lastmodified
 
-    def _populate_cve_impacts(self, repo):
+    def _populate_cve_impacts(self):
         cve_impacts = {}
         cur = self.conn.cursor()
         cur.execute("select id, name from cve_impact")
@@ -79,7 +79,7 @@ class CveStore:
                            list(to_import), page_size=len(to_import))
 
     def _populate_cves(self, repo):     # pylint: disable=too-many-locals
-        cve_impact_map = self._populate_cve_impacts(repo)
+        cve_impact_map = self._populate_cve_impacts()
         cur = self.conn.cursor()
         cve_data = {}
         for cve in repo.list_cves():

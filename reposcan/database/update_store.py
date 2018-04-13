@@ -57,7 +57,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
 
         return to_associate, to_disassociate
 
-    def _populate_errata_severities(self, updates):
+    def _populate_errata_severities(self):
         severities = {}
         cur = self.conn.cursor()
         cur.execute("select id, name from errata_severity")
@@ -88,7 +88,7 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         return errata_types
 
     def _populate_updates(self, updates):
-        errata_severity_map = self._populate_errata_severities(updates)
+        errata_severity_map = self._populate_errata_severities()
         errata_type_map = self._populate_errata_types(updates)
         cur = self.conn.cursor()
         update_map = {}
