@@ -14,7 +14,7 @@ DATETIME_PATTERNS = {
 }
 
 
-class UpdateInfoMD: # pylint: disable=too-few-public-methods
+class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
     """Class parsing UpdateInfo XML. Takes filename in the constructor."""
     def __init__(self, filename):
         self.updates = []
@@ -36,8 +36,9 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods
                 date_elements = ["issued", "updated"]
                 for field in text_elements + date_elements:
                     found = elem.find(field)
-                    if found is not None and field in text_elements:
-                        update[field] = found.text.strip() if found.text.strip() else None
+                    if found is not None and field in text_elements and found.text is not None:
+                        content = found.text.strip()
+                        update[field] = content if content else None
                     elif found is not None and field in date_elements:
                         update[field] = self._get_dt(found.get("date"))
                     else:
