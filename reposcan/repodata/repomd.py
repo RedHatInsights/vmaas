@@ -19,7 +19,12 @@ class RepoMD:
     def __init__(self, filename):
         tree = eT.parse(filename)
         root = tree.getroot()
-        self.revision = datetime.fromtimestamp(int(root.find("repo:revision", NS).text.strip()), tz=UTC)
+        revision = root.find("repo:revision", NS)
+        if revision is not None:
+            revision = int(revision.text.strip())
+        else:
+            revision = 0
+        self.revision = datetime.fromtimestamp(revision, tz=UTC)
         self.data = {}
         for child in root.findall("repo:data", NS):
             data_type = child.get("type")
