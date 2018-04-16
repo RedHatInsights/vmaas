@@ -470,13 +470,13 @@ CREATE TABLE IF NOT EXISTS pkg_repo (
 -- from https://access.redhat.com/security/updates/classification
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata_severity (
-  id SERIAL,
+  id INT NOT NULL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
-INSERT INTO errata_severity (name) VALUES
-  ('None'), ('Low'), ('Moderate'), ('Important'), ('Critical');
+INSERT INTO errata_severity (id, name) VALUES
+  (1, 'None'), (2, 'Low'), (3, 'Moderate'), (4, 'Important'), (5, 'Critical');
 
 
 -- -----------------------------------------------------
@@ -550,13 +550,13 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 -- from https://nvd.nist.gov/vuln-metrics
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve_impact (
-  id SERIAL,
+  id INT NOT NULL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
-INSERT INTO cve_impact (name) VALUES
-  ('None'), ('Low'), ('Medium'), ('High'), ('Critical');
+INSERT INTO cve_impact (id, name) VALUES
+  (0, 'NotSet'), (1, 'None'), (2, 'Low'), (3, 'Medium'), (4, 'High'), (5, 'Critical');
 
 
 -- -----------------------------------------------------
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS cve (
   id SERIAL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   description TEXT NULL, CHECK (NOT empty(description)),
-  impact_id INT,
+  impact_id INT NOT NULL DEFAULT 0,
   published_date TIMESTAMP WITH TIME ZONE NULL,
   modified_date TIMESTAMP WITH TIME ZONE NULL,
   cvss3_score NUMERIC(5,3),
