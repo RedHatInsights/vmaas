@@ -87,6 +87,8 @@ class CveStore:
 
             cve_desc_list = _dget(cve, "cve", "description", "description_data")
             impact = _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseSeverity")
+            if impact is None:
+                impact = _dget(cve, "impact", "baseMetricV2", "severity")
             url_list = _dget(cve, "cve", "references", "reference_data")
             modified_date = parse_datetime(_dget(cve, "lastModifiedDate"))
             published_date = parse_datetime(_dget(cve, "publishedDate"))
