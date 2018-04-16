@@ -6,8 +6,8 @@ import os.path
 
 from nistcve.cvejson import CveJson
 
-API_VERSION = '1.0'
-URL = 'https://static.nvd.nist.gov/feeds/json/cve/{apiver}/nvdcve-{apiver}-{label}.{ext}'
+URL = os.getenv('NIST_CVE_URL',
+                'https://static.nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-{label}.{ext}')
 
 
 class CveRepo:
@@ -42,11 +42,11 @@ class CveRepo:
 
     def meta_url(self):
         """Format URL of meta file."""
-        return URL.format(apiver=API_VERSION, label=self.label, ext='meta')
+        return URL.format(label=self.label, ext='meta')
 
     def json_url(self):
         """Format URL of json file."""
-        return URL.format(apiver=API_VERSION, label=self.label, ext='json.gz')
+        return URL.format(label=self.label, ext='json.gz')
 
     def meta_tmp(self):
         """Local path to cached meta file."""
