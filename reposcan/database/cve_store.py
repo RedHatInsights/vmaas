@@ -97,7 +97,7 @@ class CveStore:
             redhat_url, secondary_url = _process_url_list(cve_name, url_list)
             cve_data[cve_name] = {
                 "description": _desc(cve_desc_list, "lang", "en", "value"),
-                "impact_id": cve_impact_map[impact.capitalize()] if impact is not None else None,
+                "impact_id": cve_impact_map[impact.capitalize()] if impact is not None else cve_impact_map['NotSet'],
                 "cvss3_score": _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseScore"),
                 "redhat_url": redhat_url,
                 "cwe_list": cwe_list,
