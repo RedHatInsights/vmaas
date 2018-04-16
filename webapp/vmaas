@@ -84,7 +84,7 @@ def main():
     elif options.command == 'cves':
         data = read_data(options.cvefile, options.cvenames, "cve_list")
 
-        answer = CveAPI(cursor, repocache).process_list(data)
+        answer = CveAPI(cursor).process_list(data)
 
     elif options.command == 'repos':
         data = read_data(options.repofile, options.repolabels, "repository_list")
