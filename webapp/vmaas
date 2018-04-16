@@ -1,4 +1,5 @@
 #!/usr/bin/python -u
+from __future__ import print_function
 
 import argparse
 import json
@@ -8,9 +9,12 @@ from database import Database
 from updates import UpdatesAPI
 from cve import CveAPI
 from repos import RepoAPI, RepoCache
+from psycopg2 import OperationalError
+
+parser = argparse.ArgumentParser(description='VMaas test cli')
+
 
 def arg_parser():
-    parser = argparse.ArgumentParser(description='VMaas test cli')
     parser.add_argument('-d', '--dbname', action='store', dest='db_name', default=None,
             help='database name to connect to'),
     parser.add_argument('-U', '--username', action='store', dest='db_user', default=None,
@@ -43,7 +47,7 @@ def arg_parser():
 
 def read_data(data_file, data_list, key):
     if not (data_file or data_list):
-        print("Missing input arguments or file. Exiting.")
+        print("Missing input arguments or file. Exiting.", file=sys.stderr)
         sys.exit(1)
 
     data = {}
@@ -62,8 +66,13 @@ def main():
     options = arg_parser()
 
     answer = {}
-    cursor = Database(options.db_name, options.db_user, options.db_pass,
+    try:
+        cursor = Database(options.db_name, options.db_user, options.db_pass,
                       options.db_host, options.db_port).cursor()
+    except OperationalError as e:
+        print('ERROR: ' + e.message, file=sys.stderr)
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     repocache = RepoCache(cursor)
 
