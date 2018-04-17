@@ -50,25 +50,33 @@ class CveAPI(object):
 
         """
 
-        cves_to_process = data["cve_list"]
+        cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
-        cves_to_process = filter(None, cves_to_process)
         answer = {}
         if not cves_to_process:
             return answer
 
+        cves_to_process = filter(None, cves_to_process)
         # Select all cves in request
         column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "cve_impact.name",
                         "published_date", "modified_date", "iava", "description"]
         cve_query = """SELECT {columns}
                          FROM cve
                          LEFT JOIN cve_impact ON cve.impact_id = cve_impact.id
-                        WHERE cve.name IN %s""".format(columns=', '.join(column_names))
-        cve_query_params = [tuple(cves_to_process)]
+                        WHERE""".format(columns=', '.join(column_names))
+
+        if len(cves_to_process) == 1:
+            cve_query += " cve.name ~ %s"
+            cve_query_params = cves_to_process
+        else:
+            cve_query += " cve.name IN %s"
+            cve_query_params = [tuple(cves_to_process)]
+
         if modified_since:
             cve_query += " and (cve.modified_date >= %s or cve.published_date >= %s)"
             cve_query_params.append(parse_datetime(modified_since))
             cve_query_params.append(parse_datetime(modified_since))
+
         self.cursor.execute(cve_query, cve_query_params)
         cves = self.cursor.fetchall()
         cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
