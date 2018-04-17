@@ -2,10 +2,11 @@
 Module contains functions for returning last-modified data from the DB
 """
 
-from utils import format_datetime, parse_datetime
+from utils import format_datetime
 
 class DBChange(object):
     """ Main /dbchange API class. """
+    # pylint: disable=too-few-public-methods
     def __init__(self, database):
         self.cursor = database.dictcursor()
 
