@@ -87,7 +87,7 @@ class DBChangeHandler(BaseHandler):
     """
     Class to return last-updated information from VMaaS DB
     """
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """
         ---
         description: Get last-updated-times for VMaaS DB
