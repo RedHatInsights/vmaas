@@ -123,6 +123,38 @@ BEGIN
 END ;
 $$ language 'plpgsql';
 
+create or replace FUNCTION errata_changed()
+RETURNS TRIGGER as $$
+BEGIN
+    update dbchange set errata_changes = CURRENT_TIMESTAMP;
+    return NULL;
+END;
+$$ language 'plpgsql';
+
+create or replace FUNCTION repos_changed()
+RETURNS TRIGGER as $$
+BEGIN
+    update dbchange set repository_changes = CURRENT_TIMESTAMP;
+    return NULL;
+END;
+$$ language 'plpgsql';
+
+create or replace FUNCTION cves_changed()
+RETURNS TRIGGER as $$
+BEGIN
+    update dbchange set cve_changes = CURRENT_TIMESTAMP;
+    return NULL;
+END;
+$$ language 'plpgsql';
+
+create or replace FUNCTION last_change()
+RETURNS TRIGGER as $$
+BEGIN
+    update dbchange set last_change = CURRENT_TIMESTAMP;
+    return NULL;
+END;
+$$ language 'plpgsql';
+
 
 -- -----------------------------------------------------
 -- Table vmaas.evr
@@ -447,6 +479,9 @@ CREATE TABLE IF NOT EXISTS repo (
     FOREIGN KEY (certificate_id)
     REFERENCES certificate (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER repo_changed AFTER INSERT OR UPDATE OR DELETE ON repo
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE repos_changed();
 
 
 -- -----------------------------------------------------
@@ -463,6 +498,9 @@ CREATE TABLE IF NOT EXISTS pkg_repo (
     FOREIGN KEY (repo_id)
     REFERENCES repo (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER pkg_repo_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_repo
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE repos_changed();
 
 
 -- -----------------------------------------------------
@@ -511,6 +549,9 @@ CREATE TABLE IF NOT EXISTS errata (
     FOREIGN KEY (errata_type_id)
     REFERENCES errata_type (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER errata_changed AFTER INSERT OR UPDATE OR DELETE ON errata
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
 
 
 -- -----------------------------------------------------
@@ -527,6 +568,9 @@ CREATE TABLE IF NOT EXISTS errata_repo (
     FOREIGN KEY (repo_id)
     REFERENCES repo (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER errata_repo AFTER INSERT OR UPDATE OR DELETE ON errata_repo
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
 
 
 -- -----------------------------------------------------
@@ -543,6 +587,9 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
     FOREIGN KEY (errata_id)
     REFERENCES errata (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
 
 
 -- -----------------------------------------------------
@@ -578,6 +625,9 @@ CREATE TABLE IF NOT EXISTS cve (
     FOREIGN KEY (impact_id)
     REFERENCES cve_impact (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER cve_changed AFTER INSERT OR UPDATE OR DELETE ON cve
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cves_changed();
 
 -- -----------------------------------------------------
 -- Table vmaas.cwe
@@ -602,6 +652,9 @@ CREATE TABLE IF NOT EXISTS cve_cwe (
     FOREIGN KEY (cwe_id)
     REFERENCES cwe (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER cve_cwe_changed AFTER INSERT OR UPDATE OR DELETE ON cve_cwe
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cves_changed();
 
 -- -----------------------------------------------------
 -- Table vmaas.errata_cve
@@ -617,6 +670,9 @@ CREATE TABLE IF NOT EXISTS errata_cve (
     FOREIGN KEY (cve_id)
     REFERENCES cve (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER errata_cve_changed AFTER INSERT OR UPDATE OR DELETE ON errata_cve
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
 
 -- -----------------------------------------------------
 -- Table vmaas.errata_refs
@@ -630,6 +686,9 @@ CREATE TABLE IF NOT EXISTS errata_refs (
     FOREIGN KEY (errata_id)
     REFERENCES errata (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER errata_refs_changed AFTER INSERT OR UPDATE OR DELETE ON errata_refs
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
 
 -- -----------------------------------------------------
 -- Table vmaas.metadata
@@ -645,3 +704,17 @@ CREATE TABLE IF NOT EXISTS metadata (
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
+-- Table vmaas.dbchange
+-- This table is updated by database triggers on changes to errata, cve, or repo entities
+-- It provides a shortcut for external users to be able to tell if there is any 'new' data
+-- since they last talked to the db
+CREATE TABLE IF NOT EXISTS  dbchange (
+  errata_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cve_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  repository_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+)TABLESPACE pg_default;
+CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cve_changes, repository_changes ON dbchange
+  FOR EACH STATEMENT EXECUTE PROCEDURE last_change();
+INSERT INTO dbchange (errata_changes, cve_changes, repository_changes)
+  VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

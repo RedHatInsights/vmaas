@@ -16,6 +16,7 @@ from cve import CveAPI
 from repos import RepoAPI, RepoCache
 from updates import UpdatesAPI
 from errata import ErrataAPI
+from dbchange import DBChange
 
 INTERNAL_API_PORT = 8079
 PUBLIC_API_PORT = 8080
@@ -81,6 +82,27 @@ class RefreshHandler(BaseHandler):
             self.write({"success": False, "msg": "This API can be called internally only."})
         self.flush()
 
+
+class DBChangeHandler(BaseHandler):
+    """
+    Class to return last-updated information from VMaaS DB
+    """
+    def get(self):
+        """
+        ---
+        description: Get last-updated-times for VMaaS DB
+        responses:
+          200:
+            description: Return last-update timestamps for errata, repos, cves, and the db as a whole
+            schema:
+              $ref: "#/definitions/DBChangeResponse"
+        tags:
+          - dbchange
+        """
+        results = self.application.dbchange.process()
+        self.set_status(200)
+        self.write(results)
+        self.flush()
 
 class JsonHandler(BaseHandler):
     """
@@ -649,6 +671,29 @@ def setup_apispec(handlers):
             "example": "2018-04-05T01:23:45+02:00"
         },
     })
+    SPEC.definition("DBChangeResponse", properties={
+        "dbchange": {
+            "type": "object",
+            "properties": {
+                "errata_changes": {
+                    "type": "string",
+                    "example": "2018-04-16 20:07:58.500192+00"
+                    },
+                "cve_changes": {
+                    "type": "string",
+                    "example": "2018-04-16 20:06:47.214266+00"
+                    },
+                "repository_changes": {
+                    "type": "string",
+                    "example": "2018-04-16 20:07:55.01395+00"
+                    },
+                "last_change": {
+                    "type": "string",
+                    "example": "2018-04-16 20:07:58.500192+00"
+                    }
+                }
+            }
+    })
     # Register public API handlers to apispec
     for handler in handlers:
         if handler[0].startswith(r"/api/v1/"):
@@ -668,7 +713,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/repos/?", ReposHandlerPost),
             (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-_]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
-            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:]+)", ErrataHandlerGet)
+            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:]+)", ErrataHandlerGet),
+            (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
         ]
         setup_apispec(handlers)
         db_instance = Database()
@@ -678,6 +724,7 @@ class Application(tornado.web.Application):
         self.cveapi = CveAPI(cursor)
         self.repoapi = RepoAPI(self.repocache)
         self.errataapi = ErrataAPI(db_instance)
+        self.dbchange = DBChange(db_instance)
         tornado.web.Application.__init__(self, handlers)
 
 
