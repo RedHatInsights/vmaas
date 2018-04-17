@@ -60,7 +60,7 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
                     for pkg in pkglist.find("collection").findall("package"):
                         update["pkglist"].append({
                             "name": pkg.get("name"),
-                            "epoch": pkg.get("epoch"),
+                            "epoch": pkg.get("epoch", "0"),
                             "ver": pkg.get("version"),
                             "rel": pkg.get("release"),
                             "arch": pkg.get("arch")
