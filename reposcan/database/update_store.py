@@ -35,8 +35,9 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
-            for pkg in update["pkglist"]:
-                nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
+            nevras = set([(pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
+                          for pkg in update["pkglist"]])
+            for nevra in nevras:
                 if nevra not in nevras_in_repo:
                     self.logger.debug("NEVRA associated with %s not found in repository: (%s)",
                                       update["id"], ",".join(nevra))
