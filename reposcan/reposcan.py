@@ -43,35 +43,6 @@ def init_db():
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
-def repo_sync_task(products=None, repos=None):
-    """Function to start syncing all repositories from input list or from database."""
-    try:
-        init_logging()
-        init_db()
-        repository_controller = RepositoryController()
-        if products:
-            product_store = ProductStore()
-            product_store.store(products)
-            # Reference imported content set to associate with repositories
-            repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
-
-        if repos:
-            # Sync repos from input
-            for repo in repos:
-                repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key = repo
-                repository_controller.add_repository(repo_url, content_set, basearch, releasever, cert_name=cert_name,
-                                                     ca_cert=ca_cert, cert=cert, key=key)
-        else:
-            # Re-sync repos in DB
-            repository_controller.add_synced_repositories()
-        repository_controller.store()
-    except: # pylint: disable=bare-except
-        LOGGER.error(traceback.format_exc())
-        DatabaseHandler.rollback()
-        return "ERROR"
-    return "OK"
-
-
 def cve_sync_task():
     """Function to start syncing all CVEs."""
     try:
@@ -89,7 +60,7 @@ def cve_sync_task():
 
 def all_sync_task():
     """Function to start syncing all repositories from database + all CVEs."""
-    return "%s, %s" % (repo_sync_task(), cve_sync_task())
+    return "%s, %s" % (RepoSyncHandler.run_task(), cve_sync_task())
 
 
 class SyncTask:
@@ -163,12 +134,12 @@ class SyncHandler(BaseHandler):
     task_type = None
 
     @classmethod
-    def start_task(cls, task_func, *args, **kwargs):
+    def start_task(cls, *args, **kwargs):
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
             msg = "%s sync task started." % cls.task_type
             LOGGER.info(msg)
-            SyncTask.start(task_func, cls.finish_task, *args, **kwargs)
+            SyncTask.start(cls.run_task, cls.finish_task, *args, **kwargs)
             status_code = 200
             status_msg = ResponseJson(msg)
         else:
@@ -191,6 +162,11 @@ class SyncHandler(BaseHandler):
         except requests.RequestException:
             LOGGER.error(traceback.format_exc())
             LOGGER.error("Unable to connect to %s.", refresh_url)
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Run synchronization task."""
+        raise NotImplementedError("abstract method")
 
     @classmethod
     def finish_task(cls, task_result):
@@ -270,7 +246,7 @@ class RepoSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(repo_sync_task)
+        status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
@@ -367,11 +343,41 @@ class RepoSyncHandler(SyncHandler):
             self.write(ResponseJson("Incorrect JSON format.", success=False))
             self.flush()
         if repos:
-            status_code, status_msg = self.start_task(repo_sync_task,
-                                                      products=products, repos=repos)
+            status_code, status_msg = self.start_task(products=products, repos=repos)
             self.set_status(status_code)
             self.write(status_msg)
             self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing all repositories from input list or from database."""
+        products = kwargs.get('products', None)
+        repos = kwargs.get('repos', None)
+        try:
+            init_logging()
+            init_db()
+            repository_controller = RepositoryController()
+            if products:
+                product_store = ProductStore()
+                product_store.store(products)
+                # Reference imported content set to associate with repositories
+                repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
+
+            if repos:
+                # Sync repos from input
+                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
+                    repository_controller.add_repository(repo_url, content_set, basearch, releasever,
+                                                         cert_name=cert_name, ca_cert=ca_cert,
+                                                         cert=cert, key=key)
+            else:
+                # Re-sync repos in DB
+                repository_controller.add_synced_repositories()
+            repository_controller.store()
+        except: # pylint: disable=bare-except
+            LOGGER.error(traceback.format_exc())
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
 
 
 class CveSyncHandler(SyncHandler):
