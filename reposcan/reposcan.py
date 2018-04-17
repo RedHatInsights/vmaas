@@ -163,12 +163,12 @@ class SyncHandler(BaseHandler):
     task_type = None
 
     @classmethod
-    def start_task(cls, task_func, task_callback, args, kwargs):
+    def start_task(cls, task_func, args, kwargs):
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
             msg = "%s sync task started." % cls.task_type
             LOGGER.info(msg)
-            SyncTask.start(task_func, task_callback, args, kwargs)
+            SyncTask.start(task_func, cls.finish_task, args, kwargs)
             status_code = 200
             status_msg = ResponseJson(msg)
         else:
@@ -270,7 +270,7 @@ class RepoSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(repo_sync_task, self.on_complete, (), {})
+        status_code, status_msg = self.start_task(repo_sync_task, (), {})
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
@@ -367,15 +367,11 @@ class RepoSyncHandler(SyncHandler):
             self.write(ResponseJson("Incorrect JSON format.", success=False))
             self.flush()
         if repos:
-            status_code, status_msg = self.start_task(repo_sync_task, self.on_complete, (),
+            status_code, status_msg = self.start_task(repo_sync_task, (),
                                                       {"products": products, "repos": repos})
             self.set_status(status_code)
             self.write(status_msg)
             self.flush()
-
-    def on_complete(self, res):
-        """Callback after worker finishes."""
-        self.finish_task(res)
 
 
 class CveSyncHandler(SyncHandler):
@@ -397,14 +393,10 @@ class CveSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(cve_sync_task, self.on_complete, (), {})
+        status_code, status_msg = self.start_task(cve_sync_task, (), {})
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
-
-    def on_complete(self, res):
-        """Callback after worker finishes."""
-        self.finish_task(res)
 
 
 class AllSyncHandler(SyncHandler):
@@ -426,14 +418,10 @@ class AllSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(all_sync_task, self.on_complete, (), {})
+        status_code, status_msg = self.start_task(all_sync_task, (), {})
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
-
-    def on_complete(self, res):
-        """Callback after worker finishes."""
-        self.finish_task(res)
 
 
 def setup_apispec(handlers):
@@ -462,7 +450,7 @@ class ReposcanApplication(Application):
 def periodic_sync():
     """Function running both repo and CVE sync."""
     LOGGER.info("Periodic sync started.")
-    AllSyncHandler.start_task(all_sync_task, AllSyncHandler.on_complete, (), {})
+    AllSyncHandler.start_task(all_sync_task, (), {})
 
 
 def main():
