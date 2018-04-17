@@ -43,11 +43,6 @@ def init_db():
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
-def all_sync_task():
-    """Function to start syncing all repositories from database + all CVEs."""
-    return "%s, %s" % (RepoSyncHandler.run_task(), CveSyncHandler.run_task())
-
-
 class SyncTask:
     """
     Static class providing methods for managing sync worker.
@@ -424,11 +419,15 @@ class AllSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(all_sync_task)
+        status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
 
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing all repositories from database + all CVEs."""
+        return "%s, %s" % (RepoSyncHandler.run_task(), CveSyncHandler.run_task())
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
@@ -456,7 +455,7 @@ class ReposcanApplication(Application):
 def periodic_sync():
     """Function running both repo and CVE sync."""
     LOGGER.info("Periodic sync started.")
-    AllSyncHandler.start_task(all_sync_task)
+    AllSyncHandler.start_task()
 
 
 def main():
