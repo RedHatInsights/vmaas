@@ -56,14 +56,15 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
 
                 pkglist = elem.find("pkglist")
                 update["pkglist"] = []
-                for pkg in pkglist.find("collection").findall("package"):
-                    update["pkglist"].append({
-                        "name": pkg.get("name"),
-                        "epoch": pkg.get("epoch"),
-                        "ver": pkg.get("version"),
-                        "rel": pkg.get("release"),
-                        "arch": pkg.get("arch")
-                    })
+                if pkglist is not None:
+                    for pkg in pkglist.find("collection").findall("package"):
+                        update["pkglist"].append({
+                            "name": pkg.get("name"),
+                            "epoch": pkg.get("epoch"),
+                            "ver": pkg.get("version"),
+                            "rel": pkg.get("release"),
+                            "arch": pkg.get("arch")
+                        })
 
                 self.updates.append(update)
                 # Clear the XML tree continuously
