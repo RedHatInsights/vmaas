@@ -43,24 +43,9 @@ def init_db():
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
-def cve_sync_task():
-    """Function to start syncing all CVEs."""
-    try:
-        init_logging()
-        init_db()
-        controller = CveRepoController()
-        controller.add_repos()
-        controller.store()
-    except: # pylint: disable=bare-except
-        LOGGER.error(traceback.format_exc())
-        DatabaseHandler.rollback()
-        return "ERROR"
-    return "OK"
-
-
 def all_sync_task():
     """Function to start syncing all repositories from database + all CVEs."""
-    return "%s, %s" % (RepoSyncHandler.run_task(), cve_sync_task())
+    return "%s, %s" % (RepoSyncHandler.run_task(), CveSyncHandler.run_task())
 
 
 class SyncTask:
@@ -399,10 +384,25 @@ class CveSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        status_code, status_msg = self.start_task(cve_sync_task)
+        status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
         self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing all CVEs."""
+        try:
+            init_logging()
+            init_db()
+            controller = CveRepoController()
+            controller.add_repos()
+            controller.store()
+        except: # pylint: disable=bare-except
+            LOGGER.error(traceback.format_exc())
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
 
 
 class AllSyncHandler(SyncHandler):
