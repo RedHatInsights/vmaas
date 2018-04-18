@@ -12,8 +12,8 @@ class Database(object):
     """ Database handler class. """
     # pylint: disable=too-few-public-methods
     DEFAULT_NAME = "vmaas"
-    DEFAULT_USER = "vmaas_user"
-    DEFAULT_PASSWORD = "vmaas_passwd"
+    DEFAULT_USER = "vmaas_reader"
+    DEFAULT_PASSWORD = "vmaas_reader_pwd"
     DEFAULT_HOST = "vmaas-database"
     DEFAULT_PORT = 5432
 

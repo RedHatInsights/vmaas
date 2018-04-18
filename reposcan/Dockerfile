@@ -3,8 +3,8 @@ FROM fedora:27
 # defaults; will be overwritten by docker-compose.env
 ENV POSTGRESQL_HOST=database
 ENV POSTGRESQL_PORT=5432
-ENV POSTGRESQL_USER=vmaas_user
-ENV POSTGRESQL_PASSWORD=vmaas_passwd
+ENV POSTGRESQL_USER=vmaas_writer
+ENV POSTGRESQL_PASSWORD=vmaas_writer_pwd
 ENV POSTGRESQL_DATABASE=vmaas
 ENV WEBAPP_API_URL=http://webapp
 ENV WEBAPP_API_PORT_INTERNAL=8079

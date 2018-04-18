@@ -1,14 +1,17 @@
 # Dockerfile uses postgresql 9.6 latest image
-# with applied vmaas database schema 
+# with applied vmaas database schema
 FROM centos/postgresql-96-centos7
 
 # Maintener
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
-ENV POSTGRESQL_USER 'vmaas_user'
-ENV POSTGRESQL_PASSWORD 'vmaas_passwd'
-ENV POSTGRESQL_DATABASE 'vmaas' 
+ENV POSTGRESQL_USER 'vmaas_admin'
+ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
+ENV POSTGRESQL_DATABASE 'vmaas'
+ENV POSTGRESQL_WRITER_PASSWORD 'vmaas_writer_pwd'
+ENV POSTGRESQL_READER_PASSWORD 'vmaas_reader_pwd'
 
 ADD ./vmaas_db_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
+ADD ./vmaas_user_create_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
 ADD ./init_schema.sh ${CONTAINER_SCRIPTS_PATH}/start/
 
