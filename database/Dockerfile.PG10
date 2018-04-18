@@ -1,15 +1,18 @@
 # Dockerfile uses default postgresql latest image
-# with applied vmaas database schema 
+# with applied vmaas database schema
 FROM postgres
 
 # Maintener
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
-ENV POSTGRES_USER 'vmaas_user'
-ENV POSTGRES_PASSWORD 'vmaas_passwd'
-ENV POSTGRES_DB 'vmaas' 
+ENV POSTGRES_USER 'vmaas_admin'
+ENV POSTGRES_PASSWORD 'vmaas_admin_pwd'
+ENV POSTGRES_DB 'vmaas'
+ENV POSTGRESQL_WRITER_PASSWORD 'vmaas_writer_pwd'
+ENV POSTGRESQL_READER_PASSWORD 'vmaas_reader_pwd'
 
 ADD ./vmaas_db_postgresql.sql /docker-entrypoint-initdb.d/
+ADD ./vmaas_user_create_postgresql.sql /docker-entrypoint-initdb.d/
 
 # Expose port
 EXPOSE 5432

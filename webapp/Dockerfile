@@ -4,8 +4,8 @@ MAINTAINER Gennadii Altukhov <galt@redhat.com>
 # defaults; will be overwritten by docker-compose.env
 ENV POSTGRESQL_HOST=database
 ENV POSTGRESQL_PORT=5432
-ENV POSTGRESQL_USER=vmaas_user
-ENV POSTGRESQL_PASSWORD=vmaas_passwd
+ENV POSTGRESQL_USER=vmaas_reader
+ENV POSTGRESQL_PASSWORD=vmaas_reader_pwd
 ENV POSTGRESQL_DATABASE=vmaas
 
 RUN yum -y update \

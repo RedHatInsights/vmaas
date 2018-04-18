@@ -762,3 +762,12 @@ CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cve_changes, reposito
   FOR EACH STATEMENT EXECUTE PROCEDURE last_change();
 INSERT INTO dbchange (errata_changes, cve_changes, repository_changes)
   VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- -----------------------------------------------------
+-- vmaas users permission setup:
+-- vmaas_writer - has rights to INSERT/UPDATE/DELETE; used by reposcan
+-- vmaas_reader - has SELECT only; used by webapp
+-- -----------------------------------------------------
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO vmaas_writer;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO vmaas_writer;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO vmaas_reader;
