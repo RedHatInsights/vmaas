@@ -43,34 +43,6 @@ def init_db():
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
-class SyncTask:
-    """
-    Static class providing methods for managing sync worker.
-    Limit to single DB worker.
-    """
-    _running = False
-    workers = Pool(1)
-
-    @classmethod
-    def start(cls, func, callback, *args, **kwargs):
-        """Start specified function with given parameters in separate worker."""
-        cls._running = True
-
-        def _callback(result):
-            IOLoop.instance().add_callback(lambda: callback(result))
-        cls.workers.apply_async(func, args, kwargs, _callback)
-
-    @classmethod
-    def finish(cls):
-        """Mark work as done."""
-        cls._running = False
-
-    @classmethod
-    def is_running(cls):
-        """Return True when some sync is running."""
-        return cls._running
-
-
 class ResponseJson(dict): # pylint: disable=too-few-public-methods
     """Object used as API response to user, represented as JSON"""
     def __init__(self, msg, success=True):
@@ -106,7 +78,6 @@ class ApiSpecHandler(BaseHandler):
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
         self.write(SPEC.to_dict())
-
 
 class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
@@ -437,6 +408,34 @@ def setup_apispec(handlers):
     for handler in handlers:
         if handler[0].startswith(r"/api/v1/"):
             SPEC.add_path(urlspec=handler)
+
+
+class SyncTask:
+    """
+    Static class providing methods for managing sync worker.
+    Limit to single DB worker.
+    """
+    _running = False
+    workers = Pool(1)
+
+    @classmethod
+    def start(cls, func, callback, *args, **kwargs):
+        """Start specified function with given parameters in separate worker."""
+        cls._running = True
+
+        def _callback(result):
+            IOLoop.instance().add_callback(lambda: callback(result))
+        cls.workers.apply_async(func, args, kwargs, _callback)
+
+    @classmethod
+    def finish(cls):
+        """Mark work as done."""
+        cls._running = False
+
+    @classmethod
+    def is_running(cls):
+        """Return True when some sync is running."""
+        return cls._running
 
 
 class ReposcanApplication(Application):
