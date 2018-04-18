@@ -83,8 +83,8 @@ class RepositoryController:
                     self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
                                      ", ".join(repository_key), str(downloaded_revision), str(db_revision))
             else:
-                self.logger.warning("Download failed: %s (HTTP CODE %d)", urljoin(repository.repo_url, REPOMD_PATH),
-                                    failed[repomd_path])
+                self.logger.warning("Download failed: %s %s", urljoin(repository.repo_url, REPOMD_PATH),
+                                    ('(HTTP CODE %d)' % failed[repomd_path]) if failed[repomd_path] is not None else '')
 
     def _download_metadata(self, batch):
         for repository in batch:

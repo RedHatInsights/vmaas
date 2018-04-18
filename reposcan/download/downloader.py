@@ -7,6 +7,8 @@ from queue import Queue, Empty
 import os
 import requests
 
+from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
+
 from common.logging import get_logger
 
 DEFAULT_CHUNK_SIZE = 1048576
@@ -70,9 +72,12 @@ class FileDownloadThread(Thread):
                 download_item = self.queue.get(block=False)
             except Empty:
                 break
-            self._download(download_item)
+            try:
+                self._download(download_item)
+                self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
+            except ConnectionError as connect_error:
+                self.logger.error("Error downloading %s - %s", download_item.source_url, connect_error)
             self.queue.task_done()
-            self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
 
         self.session.close()
 
