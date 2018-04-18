@@ -502,6 +502,8 @@ CREATE TRIGGER pkg_repo_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_repo
   FOR EACH STATEMENT
   EXECUTE PROCEDURE repos_changed();
 
+CREATE INDEX ON pkg_repo(repo_id);
+
 
 -- -----------------------------------------------------
 -- Table vmaas.errata_severity
@@ -572,6 +574,8 @@ CREATE TRIGGER errata_repo AFTER INSERT OR UPDATE OR DELETE ON errata_repo
   FOR EACH STATEMENT
   EXECUTE PROCEDURE errata_changed();
 
+CREATE INDEX ON errata_repo(repo_id);
+
 
 -- -----------------------------------------------------
 -- Table vmaas.pkg_errata
@@ -590,6 +594,8 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
   FOR EACH STATEMENT
   EXECUTE PROCEDURE errata_changed();
+
+CREATE INDEX ON pkg_errata(errata_id);
 
 
 -- -----------------------------------------------------
@@ -656,6 +662,9 @@ CREATE TRIGGER cve_cwe_changed AFTER INSERT OR UPDATE OR DELETE ON cve_cwe
   FOR EACH STATEMENT
   EXECUTE PROCEDURE cves_changed();
 
+CREATE INDEX ON cve_cwe(cwe_id);
+
+
 -- -----------------------------------------------------
 -- Table vmaas.errata_cve
 -- -----------------------------------------------------
@@ -673,6 +682,9 @@ CREATE TABLE IF NOT EXISTS errata_cve (
 CREATE TRIGGER errata_cve_changed AFTER INSERT OR UPDATE OR DELETE ON errata_cve
   FOR EACH STATEMENT
   EXECUTE PROCEDURE errata_changed();
+
+CREATE INDEX ON errata_cve(cve_id);
+
 
 -- -----------------------------------------------------
 -- Table vmaas.errata_refs
