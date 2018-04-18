@@ -1,10 +1,13 @@
 """
 Module containing classes for downloading files using HTTP.
 """
+import os
 from threading import Thread
 from queue import Queue, Empty
+import traceback
 
-import os
+from urllib3.exceptions import ProtocolError
+
 import requests
 
 from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
@@ -13,6 +16,7 @@ from common.logging import get_logger
 
 DEFAULT_CHUNK_SIZE = 1048576
 DEFAULT_THREADS = 8
+DEFAULT_RETRY_COUNT = 3
 VALID_HTTP_CODES = [200]
 
 
@@ -42,6 +46,7 @@ class FileDownloadThread(Thread):
         self.session = requests.Session()
         self.logger = logger
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
+        self.retry_count = int(os.getenv('RETRY_COUNT', DEFAULT_RETRY_COUNT))
 
     def _download(self, download_item):
         with open(download_item.target_path, "wb") as file_handle:
@@ -65,6 +70,17 @@ class FileDownloadThread(Thread):
                     file_handle.write(chunk)
                 download_item.status_code = response.status_code
 
+    def _retry_download(self, download_item):
+        for _ in range(self.retry_count):
+            try:
+                self._download(download_item)
+                self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
+                break
+            except (ProtocolError, ConnectionError):
+                self.logger.warning("Download failed: %s", download_item.source_url)
+                self.logger.debug(traceback.format_exc())
+                download_item.status_code = -1
+
     def run(self):
         """Method executed after thread start. Downloads items from shared queue as long as there are any."""
         while not self.queue.empty():
@@ -72,11 +88,7 @@ class FileDownloadThread(Thread):
                 download_item = self.queue.get(block=False)
             except Empty:
                 break
-            try:
-                self._download(download_item)
-                self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
-            except ConnectionError as connect_error:
-                self.logger.error("Error downloading %s - %s", download_item.source_url, connect_error)
+            self._retry_download(download_item)
             self.queue.task_done()
 
         self.session.close()

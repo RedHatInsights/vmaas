@@ -14,6 +14,7 @@ ENV THREADS=8
 ENV CHUNK_SIZE=1048576
 ENV BATCH_SIZE=100
 ENV YEAR_SINCE=2002
+ENV RETRY_COUNT=3
 
 RUN dnf install -y dnf-plugins-core && dnf copr enable -y @vmaas/libs \
     && dnf install -y python3-apispec python3-psycopg2 python3-requests \
