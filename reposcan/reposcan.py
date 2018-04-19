@@ -110,9 +110,8 @@ class SyncHandler(BaseHandler):
             response = requests.get(refresh_url)
             if response.status_code not in VALID_HTTP_CODES or not json.loads(response.text)["success"]:
                 LOGGER.error("Response from %s: %s", refresh_url, response.text)
-        except requests.RequestException:
-            LOGGER.error(traceback.format_exc())
-            LOGGER.error("Unable to connect to %s.", refresh_url)
+        except requests.RequestException as req_exception:
+            LOGGER.error("Unable to connect to %s - %s", refresh_url, req_exception)
 
     @staticmethod
     def run_task(*args, **kwargs):
