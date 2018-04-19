@@ -17,6 +17,16 @@ class PackageStore: # pylint: disable=too-few-public-methods
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
+        self.evr_map = self._prepare_evr_map()
+
+    def _prepare_evr_map(self):
+        evr_map = {}
+        cur = self.conn.cursor()
+        cur.execute("SELECT id, epoch, version, release from evr")
+        for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
+            evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
+        self.conn.commit()
+        return evr_map
 
     def _populate_archs(self, packages):
         archs = {}
@@ -63,26 +73,16 @@ class PackageStore: # pylint: disable=too-few-public-methods
 
     def _populate_evrs(self, packages):
         cur = self.conn.cursor()
-        evr_map = {}
         unique_evrs = set()
         for pkg in packages:
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
         self.logger.debug("Unique EVRs in repository: %d", len(unique_evrs))
-        if unique_evrs:
-            execute_values(cur,
-                           """select id, epoch, version, release from evr
-                           inner join (values %s) t(epoch, version, release)
-                           using (epoch, version, release)""",
-                           list(unique_evrs), page_size=len(unique_evrs))
-            for row in cur.fetchall():
-                evr_map[(row[1], row[2], row[3])] = row[0]
-                # Remove to not insert this evr
-                unique_evrs.remove((row[1], row[2], row[3]))
-        self.logger.debug("EVRs already in DB: %d", len(evr_map))
-
         to_import = []
-        for (epoch, version, release) in unique_evrs:
-            to_import.append((epoch, version, release, epoch, version, release))
+        if unique_evrs:
+            for epoch, version, release in unique_evrs:
+                if (epoch, version, release) not in self.evr_map:
+                    to_import.append((epoch, version, release, epoch, version, release))
+
         self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
             execute_values(cur,
@@ -91,15 +91,14 @@ class PackageStore: # pylint: disable=too-few-public-methods
                            to_import, template=b"(%s, %s, %s, (%s, rpmver_array(%s), rpmver_array(%s)))",
                            page_size=len(to_import))
             for row in cur.fetchall():
-                evr_map[(row[1], row[2], row[3])] = row[0]
+                self.evr_map[(row[1], row[2], row[3])] = row[0]
         cur.close()
         self.conn.commit()
-        return evr_map
 
     def _populate_packages(self, packages):
         archs = self._populate_archs(packages)
         checksum_types = self._populate_checksum_types(packages)
-        evr_map = self._populate_evrs(packages)
+        self._populate_evrs(packages)
         cur = self.conn.cursor()
         pkg_map = {}
         checksums = set()
@@ -121,7 +120,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
             import_data = []
             for pkg in packages:
                 if (checksum_types[pkg["checksum_type"]], pkg["checksum"]) in checksums:
-                    import_data.append((pkg["name"], evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
+                    import_data.append((pkg["name"], self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
                                         archs[pkg["arch"]], checksum_types[pkg["checksum_type"]],
                                         pkg["checksum"], pkg["summary"], pkg["description"]))
                     # Prevent duplicated insert when some package is multiple times in metadata
