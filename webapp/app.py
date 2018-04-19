@@ -213,17 +213,17 @@ class CVEHandlerGet(CVEHandler):
     def get(self, cve=None): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about single CVE
+        description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
         parameters:
-          - name: cve
-            description: CVE name
+          - name: cve_pattern
+            description: CVE name or POSIX regular expression pattern
             required: True
             type: string
             in: path
-            example: CVE-2017-5715
+            example: CVE-2017-5715, CVE-2017-571[1-5], CVE-2017-5.*
         responses:
           200:
-            description: Return details about single CVE
+            description: Return details about CVEs
             schema:
               $ref: "#/definitions/CvesResponse"
         tags:
@@ -237,7 +237,8 @@ class CVEHandlerPost(CVEHandler):
     def post(self): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about list of CVEs
+        description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE
+         names can be provided OR one POSIX regular expression.
         parameters:
           - name: body
             description: Input JSON
@@ -250,7 +251,7 @@ class CVEHandlerPost(CVEHandler):
                   type: array
                   items:
                     type: string
-                    example: CVE-2017-5715
+                    example: CVE-2017-57.*
                 modified_since:
                   type: string
                   example: "2018-04-05T01:23:45+02:00"
@@ -664,7 +665,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
             (r"/api/v1/cves/?", CVEHandlerPost),
-            (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9%*-]+)", CVEHandlerGet),
+            (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9%*-.+?\[\]]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
             (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-_]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
