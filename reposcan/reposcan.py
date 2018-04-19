@@ -19,6 +19,7 @@ from database.database_handler import DatabaseHandler
 from database.product_store import ProductStore
 from download.downloader import VALID_HTTP_CODES
 from nistcve.cve_controller import CveRepoController
+from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
@@ -370,13 +371,54 @@ class CveSyncHandler(SyncHandler):
         return "OK"
 
 
+class CvemapSyncHandler(SyncHandler):
+    """Handler for CVE sync API."""
+
+    task_type = "CVEmap"
+
+    def get(self): # pylint: disable=arguments-differ
+        """Sync CVEmap.
+           ---
+           description: Sync CVE map
+           responses:
+             200:
+               description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
+             429:
+               description: Another sync is already in progress
+           tags:
+             - sync
+        """
+        status_code, status_msg = self.start_task()
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing all CVEs."""
+        try:
+            init_logging()
+            init_db()
+            controller = CvemapController()
+            controller.store()
+        except: # pylint: disable=bare-except
+            LOGGER.error(traceback.format_exc())
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
+
+
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s" % (RepoSyncHandler.task_type, CveSyncHandler.task_type)
+    task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
+                                  CvemapSyncHandler.task_type,
+                                  CveSyncHandler.task_type)
 
     def get(self): # pylint: disable=arguments-differ
-        """Sync repos + CVEs.
+        """Sync repos + CVEs + CVEmap.
            ---
            description: Sync repositories stored in DB and CVE lists
            responses:
@@ -397,7 +439,9 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s" % (RepoSyncHandler.run_task(), CveSyncHandler.run_task())
+        return "%s, %s, %s" % (RepoSyncHandler.run_task(),
+                               CvemapSyncHandler.run_task(),
+                               CveSyncHandler.run_task())
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
@@ -445,6 +489,7 @@ class ReposcanApplication(Application):
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
+            (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
         ]
         setup_apispec(handlers)
         Application.__init__(self, handlers)
