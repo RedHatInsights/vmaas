@@ -306,7 +306,8 @@ class ReposHandlerGet(ReposHandler):
     def get(self, repo=None): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about a repository or repository-expression. It is allowed to use POSIX regular expression as a pattern for repository names.
+        description: Get details about a repository or repository-expression. It is allowed to use POSIX regular
+         expression as a pattern for repository names.
         parameters:
           - name: repo
             description: Repository name or POSIX regular expression pattern
@@ -330,7 +331,8 @@ class ReposHandlerPost(ReposHandler):
     def post(self): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about list of repositories. "repository_list" can be either a list of repository names, OR a single POSIX regular expression.
+        description: Get details about list of repositories. "repository_list" can be either a list of repository
+         names, OR a single POSIX regular expression.
         parameters:
           - name: body
             description: Input JSON
