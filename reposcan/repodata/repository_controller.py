@@ -59,7 +59,7 @@ class RepositoryController:
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
 
-    def _read_repomds(self, failed):
+    def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
            newer than metadata currently in DB.
         """
@@ -67,26 +67,33 @@ class RepositoryController:
         db_repositories = self.repo_store.list_repositories()
         for repository in self.repositories:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
-            if repomd_path not in failed:
-                repomd = RepoMD(repomd_path)
-                # Was repository already synced before?
-                repository_key = (repository.content_set, repository.basearch, repository.releasever)
-                if repository_key in db_repositories:
-                    db_revision = db_repositories[repository_key]["revision"]
-                else:
-                    db_revision = None
-                downloaded_revision = repomd.get_revision()
-                # Repository is synced for the first time or has newer revision
-                if db_revision is None or downloaded_revision > db_revision:
-                    repository.repomd = repomd
-                else:
-                    self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
-                                     ", ".join(repository_key), str(downloaded_revision), str(db_revision))
+            repomd = RepoMD(repomd_path)
+            # Was repository already synced before?
+            repository_key = (repository.content_set, repository.basearch, repository.releasever)
+            if repository_key in db_repositories:
+                db_revision = db_repositories[repository_key]["revision"]
             else:
-                self.logger.warning("Download failed: %s %s", urljoin(repository.repo_url, REPOMD_PATH),
-                                    ('(HTTP CODE %d)' % failed[repomd_path]) if failed[repomd_path] is not None else '')
+                db_revision = None
+            downloaded_revision = repomd.get_revision()
+            # Repository is synced for the first time or has newer revision
+            if db_revision is None or downloaded_revision > db_revision:
+                repository.repomd = repomd
+            else:
+                self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
+                                 ", ".join(repository_key), str(downloaded_revision), str(db_revision))
+
+    def _repo_download_failed(self, repo, failed_items):
+        failed = False
+        for md_path in list(repo.md_files.values()) + [REPOMD_PATH]:
+            local_path = os.path.join(repo.tmp_directory, os.path.basename(md_path))
+            if local_path in failed_items:
+                failed = True
+                self.logger.warning("Download failed: %s (HTTP CODE %d)", urljoin(repo.repo_url, md_path),
+                                    failed_items[local_path])
+        return failed
 
     def _download_metadata(self, batch):
+        download_items = []
         for repository in batch:
             # primary_db has higher priority, use primary.xml if not found
             try:
@@ -102,14 +109,19 @@ class RepositoryController:
             # queue metadata files for download
             for md_location in repository.md_files.values():
                 ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
-                self.downloader.add(DownloadItem(
+                item = DownloadItem(
                     source_url=urljoin(repository.repo_url, md_location),
                     target_path=os.path.join(repository.tmp_directory, os.path.basename(md_location)),
                     ca_cert=ca_cert,
                     cert=cert,
                     key=key
-                ))
+                )
+                download_items.append(item)
+                self.downloader.add(item)
         self.downloader.run()
+        # Return failed downloads
+        return {item.target_path: item.status_code for item in download_items
+                if item.status_code not in VALID_HTTP_CODES}
 
     def _unpack_metadata(self, batch):
         for repository in batch:
@@ -186,8 +198,10 @@ class RepositoryController:
         failed = self._download_repomds()
         if failed:
             self.logger.warning("%d repomd.xml files failed to download.", len(failed))
-        self._read_repomds(failed)
+            failed_repos = [repo for repo in self.repositories if self._repo_download_failed(repo, failed)]
+            self.clean_repodata(failed_repos)
 
+        self._read_repomds()
         # Filter all repositories without repomd attribute set (failed download, downloaded repomd is not newer)
         batches = BatchList()
         to_skip = []
@@ -202,7 +216,12 @@ class RepositoryController:
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         for batch in batches:
-            self._download_metadata(batch)
+            failed = self._download_metadata(batch)
+            if failed:
+                self.logger.warning("%d metadata files failed to download.", len(failed))
+                failed_repos = [repo for repo in batch if self._repo_download_failed(repo, failed)]
+                self.clean_repodata(failed_repos)
+                batch = [repo for repo in batch if repo not in failed_repos]
             self._unpack_metadata(batch)
             for repository in batch:
                 repository.load_metadata()
