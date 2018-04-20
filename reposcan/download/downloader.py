@@ -40,13 +40,14 @@ class FileDownloadThread(Thread):
     Single thread for downloading files. After it's created, it processes DownloadItem objects from queue shared
     between all threads. Thread will end when shared queue is empty.
     """
-    def __init__(self, queue, logger):
+    def __init__(self, queue, logger, headers_only=False):
         Thread.__init__(self)
         self.queue = queue
         self.session = requests.Session()
         self.logger = logger
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
         self.retry_count = int(os.getenv('RETRY_COUNT', DEFAULT_RETRY_COUNT))
+        self.headers_only = headers_only
 
     def _download(self, download_item):
         with open(download_item.target_path, "wb") as file_handle:
@@ -62,13 +63,22 @@ class FileDownloadThread(Thread):
                     cert = download_item.cert
             else:
                 cert = None
-            with self.session.get(download_item.source_url, verify=verify, cert=cert, stream=True) as response:
-                while True:
-                    chunk = response.raw.read(self.chunk_size, decode_content=False)
-                    if chunk == b"":
-                        break
-                    file_handle.write(chunk)
-                download_item.status_code = response.status_code
+
+            req_args = {'url': download_item.source_url, 'verify': verify, 'cert': cert, 'stream': True}
+            if self.headers_only:
+                with self.session.head(**req_args) as response:
+                    headers = ["%s:%s" % (key, value)
+                               for key, value in response.headers.items()]
+                    file_handle.write(bytearray("\n".join(headers).encode('utf8')))
+                    download_item.status_code = response.status_code
+            else:
+                with self.session.get(**req_args) as response:
+                    while True:
+                        chunk = response.raw.read(self.chunk_size, decode_content=False)
+                        if chunk == b"":
+                            break
+                        file_handle.write(chunk)
+                    download_item.status_code = response.status_code
 
     def _retry_download(self, download_item):
         for _ in range(self.retry_count):
@@ -109,13 +119,13 @@ class FileDownloader:
         """Add DownloadItem object into the queue."""
         self.queue.put(download_item)
 
-    def run(self):
+    def run(self, headers_only=False):
         """Start processing download queue using multiple threads."""
         self.logger.info("Downloading started.")
         threads = []
         for i in range(min(self.num_threads, self.queue.qsize())):
             self.logger.debug("Starting thread %d.", i)
-            thread = FileDownloadThread(self.queue, self.logger)
+            thread = FileDownloadThread(self.queue, self.logger, headers_only)
             thread.setDaemon(True)
             thread.start()
             threads.append(thread)
