@@ -80,8 +80,7 @@ class ErrataAPI(object):
         """
 
         modified_since = data.get("modified_since", None)
-        errata_to_process = data["errata_list"]
-        errata_to_process = filter(None, errata_to_process)
+        errata_to_process = data.get("errata_list", None)
         response = {"errata_list": {}}
         if modified_since:
             response["modified_since"] = modified_since
@@ -89,6 +88,7 @@ class ErrataAPI(object):
         if not errata_to_process:
             return response
 
+        errata_to_process = filter(None, errata_to_process)
         # Select all errata in request
         errata_query = """SELECT errata.id as oid,
                                  errata.name as name,
@@ -103,8 +103,14 @@ class ErrataAPI(object):
                             FROM errata
                             JOIN errata_type ON errata_type_id = errata_type.id
                             JOIN errata_severity ON severity_id = errata_severity.id
-                           WHERE errata.name IN %s"""
-        errata_query_params = [tuple(errata_to_process)]
+                           WHERE"""
+
+        if len(errata_to_process) == 1:
+            errata_query += " errata.name ~ %s"
+            errata_query_params = errata_to_process
+        else:
+            errata_query += " errata.name IN %s"
+            errata_query_params = [tuple(errata_to_process)]
         if modified_since:
             errata_query += " and errata.updated >= %s"
             errata_query_params.append(parse_datetime(modified_since))

@@ -373,17 +373,18 @@ class ErrataHandlerGet(ErrataHandler):
     def get(self, erratum=None): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about single erratum
+        description: Get details about errata. It is possible to use POSIX regular
+         expression as a pattern for errata names.
         parameters:
-          - name: erratum
-            description: Errata advisory name
+          - name: errata_pattern
+            description: Errata advisory name or POSIX regular expression pattern
             required: True
             type: string
             in: path
-            example: RHSA-2018:0512
+            example: RHSA-2018:0512, RHSA-2018:051[1-5], RH.*
         responses:
           200:
-            description: Return details about single erratum
+            description: Return details about errata
             schema:
               $ref: "#/definitions/ErrataResponse"
         tags:
@@ -397,7 +398,8 @@ class ErrataHandlerPost(ErrataHandler):
     def post(self): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about list of errata
+        description: Get details about errata with additional parameters. "errata_list"
+         parameter can be either a list of errata names OR a single POSIX regular expression.
         parameters:
           - name: body
             description: Input JSON
@@ -410,7 +412,7 @@ class ErrataHandlerPost(ErrataHandler):
                   type: array
                   items:
                     type: string
-                    example: RHSA-2018:0512
+                    example: RHSA-2018:05.*
                 modified_since:
                   type: string
                   example: "2018-04-05T01:23:45+02:00"
@@ -714,7 +716,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/repos/?", ReposHandlerPost),
             (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-_]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
-            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:]+)", ErrataHandlerGet),
+            (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
             (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
         ]
         setup_apispec(handlers)
