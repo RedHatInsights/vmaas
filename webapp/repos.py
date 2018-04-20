@@ -88,8 +88,22 @@ class RepoCache(object):
 class RepoAPI(object):
     """ Main /repos API class."""
     # pylint: disable=too-few-public-methods
-    def __init__(self, repocache):
+    def __init__(self, cursor, repocache):
         self.cache = repocache
+        self.cursor = cursor
+
+    def find_repos_by_regex(self, repo_regex):
+        """
+        Returns list of repositories (content_set labels) matching a provided regex
+
+        :param repo_regex: string containing a POSIX regular expression
+
+        :returns: list of repository-labels matching the provided regex
+        """
+        repo_query = """SELECT label FROM content_set WHERE label ~ %s"""
+        self.cursor.execute(repo_query, [repo_regex])
+        repos = [x[0] for x in self.cursor.fetchall()]
+        return repos
 
     def process_list(self, data):
         """
@@ -99,8 +113,15 @@ class RepoAPI(object):
 
         :returns: json response with repository details
         """
-        repos = data['repository_list']
+        repos = data.get('repository_list', None)
         repolist = {}
+        if not repos:
+            return repolist
+
+        if len(repos) == 1:
+            # treat single-label like a regex, get all matching names
+            repos = self.find_repos_by_regex(repos[0])
+
         for label in repos:
             repolist[label] = self.cache.get_by_label(label)
 

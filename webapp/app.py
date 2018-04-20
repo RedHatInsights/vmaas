@@ -237,7 +237,7 @@ class CVEHandlerGet(CVEHandler):
         ---
         description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
         parameters:
-          - name: cve_pattern
+          - name: cve
             description: CVE name or POSIX regular expression pattern
             required: True
             type: string
@@ -306,17 +306,17 @@ class ReposHandlerGet(ReposHandler):
     def get(self, repo=None): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about single repository
+        description: Get details about a repository or repository-expression. It is allowed to use POSIX regular expression as a pattern for repository names.
         parameters:
           - name: repo
-            description: Repository name
+            description: Repository name or POSIX regular expression pattern
             required: True
             type: string
             in: path
-            example: rhel-6-server-rpms
+            example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
         responses:
           200:
-            description: Return details about single repository
+            description: Return details about repository or repositories that match the expression
             schema:
               $ref: "#/definitions/ReposResponse"
         tags:
@@ -330,7 +330,7 @@ class ReposHandlerPost(ReposHandler):
     def post(self): # pylint: disable=arguments-differ
         """
         ---
-        description: Get details about list of repositories
+        description: Get details about list of repositories. "repository_list" can be either a list of repository names, OR a single POSIX regular expression.
         parameters:
           - name: body
             description: Input JSON
@@ -343,7 +343,7 @@ class ReposHandlerPost(ReposHandler):
                   type: array
                   items:
                     type: string
-                    example: rhel-6-server-rpms
+                    example: rhel-6-server-rpms, rhel-7-sever-rpms
               required:
                 - repository_list
         responses:
@@ -712,7 +712,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/cves/?", CVEHandlerPost),
             (r"/api/v1/cves/(?P<cve>[a-zA-Z0-9%*-.+?\[\]]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
-            (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-_]+)", ReposHandlerGet),
+            (r"/api/v1/repos/(?P<repo>[a-zA-Z0-9%*-.+?\[\]]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
             (r"/api/v1/errata/(?P<erratum>[a-zA-Z0-9%*-:]+)", ErrataHandlerGet),
             (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
@@ -723,7 +723,7 @@ class Application(tornado.web.Application):
         self.repocache = RepoCache(cursor)
         self.updatesapi = UpdatesAPI(cursor, self.repocache)
         self.cveapi = CveAPI(cursor)
-        self.repoapi = RepoAPI(self.repocache)
+        self.repoapi = RepoAPI(cursor, self.repocache)
         self.errataapi = ErrataAPI(db_instance)
         self.dbchange = DBChange(db_instance)
         tornado.web.Application.__init__(self, handlers)
