@@ -4,7 +4,7 @@ Module containing class for Repo XML metadata.
 from datetime import datetime
 import xml.etree.ElementTree as eT
 
-from common.string import strip
+from common.string import text_strip
 from common.utc import UTC
 
 NS = {"repo": "http://linux.duke.edu/metadata/repo"}
@@ -22,7 +22,7 @@ class RepoMD:
         root = tree.getroot()
         revision = root.find("repo:revision", NS)
         if revision is not None:
-            revision = int(strip(revision.text))
+            revision = int(text_strip(revision))
         else:
             revision = 0
         self.revision = datetime.fromtimestamp(revision, tz=UTC)
@@ -31,7 +31,7 @@ class RepoMD:
             data_type = child.get("type")
             location = child.find("repo:location", NS).get("href")
             checksum_type = child.find("repo:checksum", NS).get("type")
-            checksum = strip(child.find("repo:checksum", NS).text)
+            checksum = text_strip(child.find("repo:checksum", NS))
             self.data[data_type] = {"location": location, "checksum_type": checksum_type, "checksum": checksum}
 
     def get_revision(self):

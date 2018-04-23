@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import xml.etree.ElementTree as eT
 
-from common.string import strip
+from common.string import text_strip
 from common.utc import UTC
 
 DATETIME_PATTERNS = {
@@ -29,8 +29,8 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
                 update["status"] = elem.get("status")
                 update["version"] = elem.get("version")
                 update["type"] = elem.get("type")
-                update["id"] = strip(elem.find("id").text)
-                update["title"] = strip(elem.find("title").text)
+                update["id"] = text_strip(elem.find("id"))
+                update["title"] = text_strip(elem.find("title"))
 
                 # Optional fields
                 text_elements = ["summary", "rights", "description", "release", "solution", "severity"]
@@ -38,7 +38,7 @@ class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
                 for field in text_elements + date_elements:
                     found = elem.find(field)
                     if found is not None and field in text_elements:
-                        content = strip(found.text)
+                        content = text_strip(found)
                         update[field] = content if content else None
                     elif found is not None and field in date_elements:
                         update[field] = self._get_dt(found.get("date"))
