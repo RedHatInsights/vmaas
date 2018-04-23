@@ -3,7 +3,7 @@ version: '3'
 services:
   database:
     labels:
-      kompose.volume.size: 1Gi
+      kompose.volume.size: 5Gi
     container_name: vmaas-database
     build: ./database
     image: vmaas/database:latest
@@ -17,7 +17,7 @@ services:
 
   reposcan:
     labels:
-      kompose.volume.size: 4Gi
+      kompose.volume.size: 10Gi
     container_name: vmaas-reposcan
     build: ./reposcan
     image: vmaas/reposcan:latest
