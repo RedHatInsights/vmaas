@@ -3,8 +3,8 @@ Utilities for string operations.
 """
 
 
-def strip(text):
-    """Strip text but check if it's None."""
-    if text is None:
+def text_strip(elem):
+    """Stripped text of element but check if it's None."""
+    if elem is None or elem.text is None:
         return None
-    return text.strip()
+    return elem.text.strip()
