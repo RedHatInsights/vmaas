@@ -378,7 +378,7 @@ class ErrataHandlerGet(ErrataHandler):
         description: Get details about errata. It is possible to use POSIX regular
          expression as a pattern for errata names.
         parameters:
-          - name: errata_pattern
+          - name: erratum
             description: Errata advisory name or POSIX regular expression pattern
             required: True
             type: string
