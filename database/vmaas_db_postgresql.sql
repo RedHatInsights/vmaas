@@ -390,11 +390,21 @@ INSERT INTO arch_compatibility (from_arch_id, to_arch_id)
 
 
 -- -----------------------------------------------------
+-- Table vmaas.package_name
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS package_name (
+  id SERIAL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.package
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS package (
   id SERIAL,
-  name TEXT NOT NULL, CHECK (NOT empty(name)),
+  name_id INT NOT NULL,
   evr_id INT NOT NULL,
   arch_id INT NOT NULL,
   checksum TEXT NOT NULL, CHECK (NOT empty(checksum)),
@@ -403,6 +413,9 @@ CREATE TABLE IF NOT EXISTS package (
   description TEXT NULL, CHECK (NOT empty(description)),
   UNIQUE (checksum_type_id, checksum),
   PRIMARY KEY (id),
+  CONSTRAINT name_id
+    FOREIGN KEY (name_id)
+    REFERENCES package_name (id),
   CONSTRAINT evr_id
     FOREIGN KEY (evr_id)
     REFERENCES evr (id),
@@ -413,6 +426,9 @@ CREATE TABLE IF NOT EXISTS package (
     FOREIGN KEY (checksum_type_id)
     REFERENCES checksum_type (id)
 )TABLESPACE pg_default;
+
+CREATE INDEX ON package(name_id);
+CREATE INDEX ON package(evr_id);
 
 
 -- -----------------------------------------------------
