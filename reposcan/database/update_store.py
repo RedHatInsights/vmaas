@@ -20,8 +20,9 @@ class UpdateStore: # pylint: disable=too-few-public-methods
         cur = self.conn.cursor()
         # Select all packages synced from current repository and save them to dict accessible by NEVRA
         nevras_in_repo = {}
-        cur.execute("""select p.id, p.name, evr.epoch, evr.version, evr.release, a.name
+        cur.execute("""select p.id, pn.name, evr.epoch, evr.version, evr.release, a.name
                                from package p inner join
+                                    package_name pn on p.name_id = pn.id inner join
                                     evr on p.evr_id = evr.id inner join
                                     arch a on p.arch_id = a.id inner join
                                     pkg_repo pr on p.id = pr.pkg_id and pr.repo_id = %s""", (repo_id,))
