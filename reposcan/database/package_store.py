@@ -17,7 +17,29 @@ class PackageStore: # pylint: disable=too-few-public-methods
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
+        self.arch_map = self._prepare_arch_map()
+        self.checksum_type_map = self._prepare_checksum_type_map()
         self.evr_map = self._prepare_evr_map()
+        self.package_name_map = self._prepare_package_name_map()
+        self.package_map = self._prepare_package_map()
+
+    def _prepare_arch_map(self):
+        arch_map = {}
+        cur = self.conn.cursor()
+        cur.execute("SELECT id, name from arch")
+        for arch_id, name in cur.fetchall():
+            arch_map[name] = arch_id
+        self.conn.commit()
+        return arch_map
+
+    def _prepare_checksum_type_map(self):
+        checksum_type_map = {}
+        cur = self.conn.cursor()
+        cur.execute("SELECT id, name from checksum_type")
+        for ct_id, name in cur.fetchall():
+            checksum_type_map[name] = ct_id
+        self.conn.commit()
+        return checksum_type_map
 
     def _prepare_evr_map(self):
         evr_map = {}
@@ -28,60 +50,65 @@ class PackageStore: # pylint: disable=too-few-public-methods
         self.conn.commit()
         return evr_map
 
-    def _populate_archs(self, packages):
-        archs = {}
+    def _prepare_package_name_map(self):
+        package_name_map = {}
         cur = self.conn.cursor()
-        cur.execute("select id, name from arch")
-        for row in cur.fetchall():
-            archs[row[1]] = row[0]
-        missing_archs = set()
-        for pkg in packages:
-            if pkg["arch"] not in archs:
-                missing_archs.add((pkg["arch"],))
-        self.logger.debug("Architectures missing in DB: %d", len(missing_archs))
-        if missing_archs:
+        cur.execute("SELECT id, name from package_name")
+        for name_id, name in cur.fetchall():
+            package_name_map[name] = name_id
+        self.conn.commit()
+        return package_name_map
+
+    def _prepare_package_map(self):
+        package_map = {}
+        cur = self.conn.cursor()
+        cur.execute("SELECT id, checksum_type_id, checksum from package")
+        for pkg_id, checksum_type_id, checksum in cur.fetchall():
+            package_map[(checksum_type_id, checksum)] = pkg_id
+        self.conn.commit()
+        return package_map
+
+    def _populate_archs(self, unique_archs):
+        cur = self.conn.cursor()
+        self.logger.debug("Unique architectures in repository: %d", len(unique_archs))
+        to_import = []
+        for name in unique_archs:
+            if name not in self.arch_map:
+                to_import.append((name,))
+
+        self.logger.debug("Architectures to import: %d", len(to_import))
+        if to_import:
             execute_values(cur, "insert into arch (name) values %s returning id, name",
-                           missing_archs, page_size=len(missing_archs))
-            for row in cur.fetchall():
-                archs[row[1]] = row[0]
+                           to_import, page_size=len(to_import))
+            for arch_id, name in cur.fetchall():
+                self.arch_map[name] = arch_id
         cur.close()
         self.conn.commit()
-        return archs
 
-    def _populate_checksum_types(self, packages):
-        checksums = {}
+    def _populate_checksum_types(self, unique_checksum_types):
         cur = self.conn.cursor()
-        cur.execute("select id, name from checksum_type")
-        for row in cur.fetchall():
-            checksums[row[1]] = row[0]
-        missing_checksum_types = set()
-        for pkg in packages:
-            # Same checksum types can be called differently in different repositories, unify them before import
-            if pkg["checksum_type"] in CHECKSUM_TYPE_ALIASES:
-                pkg["checksum_type"] = CHECKSUM_TYPE_ALIASES[pkg["checksum_type"]]
-            if pkg["checksum_type"] not in checksums:
-                missing_checksum_types.add((pkg["checksum_type"],))
-        self.logger.debug("Checksum types missing in DB: %d", len(missing_checksum_types))
-        if missing_checksum_types:
+        self.logger.debug("Unique checksum types in repository: %d", len(unique_checksum_types))
+        to_import = []
+        for name in unique_checksum_types:
+            if name not in self.checksum_type_map:
+                to_import.append((name,))
+
+        self.logger.debug("Checksum types to import: %d", len(to_import))
+        if to_import:
             execute_values(cur, "insert into checksum_type (name) values %s returning id, name",
-                           missing_checksum_types, page_size=len(missing_checksum_types))
-            for row in cur.fetchall():
-                checksums[row[1]] = row[0]
+                           to_import, page_size=len(to_import))
+            for ct_id, name in cur.fetchall():
+                self.checksum_type_map[name] = ct_id
         cur.close()
         self.conn.commit()
-        return checksums
 
-    def _populate_evrs(self, packages):
+    def _populate_evrs(self, unique_evrs):
         cur = self.conn.cursor()
-        unique_evrs = set()
-        for pkg in packages:
-            unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
         self.logger.debug("Unique EVRs in repository: %d", len(unique_evrs))
         to_import = []
-        if unique_evrs:
-            for epoch, version, release in unique_evrs:
-                if (epoch, version, release) not in self.evr_map:
-                    to_import.append((epoch, version, release, epoch, version, release))
+        for epoch, version, release in unique_evrs:
+            if (epoch, version, release) not in self.evr_map:
+                to_import.append((epoch, version, release, epoch, version, release))
 
         self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
@@ -90,54 +117,79 @@ class PackageStore: # pylint: disable=too-few-public-methods
                            returning id, epoch, version, release""",
                            to_import, template=b"(%s, %s, %s, (%s, rpmver_array(%s), rpmver_array(%s)))",
                            page_size=len(to_import))
-            for row in cur.fetchall():
-                self.evr_map[(row[1], row[2], row[3])] = row[0]
+            for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
+                self.evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
         cur.close()
         self.conn.commit()
+
+    def _populate_package_names(self, unique_names):
+        cur = self.conn.cursor()
+        self.logger.debug("Unique package names in repository: %d", len(unique_names))
+        to_import = []
+        for name in unique_names:
+            if name not in self.package_name_map:
+                to_import.append((name,))
+
+        self.logger.debug("Package names to import: %d", len(to_import))
+        if to_import:
+            execute_values(cur,
+                           """insert into package_name (name) values %s returning id, name""",
+                           to_import, page_size=len(to_import))
+            for name_id, name in cur.fetchall():
+                self.package_name_map[name] = name_id
+        cur.close()
+        self.conn.commit()
+
+    def _populate_dependent_tables(self, packages):
+        unique_archs = set()
+        unique_checksum_types = set()
+        unique_evrs = set()
+        unique_names = set()
+        for pkg in packages:
+            unique_archs.add(pkg["arch"])
+            if pkg["checksum_type"] in CHECKSUM_TYPE_ALIASES:
+                pkg["checksum_type"] = CHECKSUM_TYPE_ALIASES[pkg["checksum_type"]]
+            unique_checksum_types.add(pkg["checksum_type"])
+            unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
+            unique_names.add(pkg["name"])
+        self._populate_archs(unique_archs)
+        self._populate_checksum_types(unique_checksum_types)
+        self._populate_evrs(unique_evrs)
+        self._populate_package_names(unique_names)
 
     def _populate_packages(self, packages):
-        archs = self._populate_archs(packages)
-        checksum_types = self._populate_checksum_types(packages)
-        self._populate_evrs(packages)
+        self._populate_dependent_tables(packages)
         cur = self.conn.cursor()
-        pkg_map = {}
-        checksums = set()
+        unique_packages = {}
         for pkg in packages:
-            checksums.add((checksum_types[pkg["checksum_type"]], pkg["checksum"]))
-        if checksums:
-            execute_values(cur,
-                           """select id, checksum_type_id, checksum from package
-                              inner join (values %s) t(checksum_type_id, checksum)
-                              using (checksum_type_id, checksum)
-                           """, list(checksums), page_size=len(checksums))
-            for row in cur.fetchall():
-                pkg_map[(row[1], row[2])] = row[0]
-                # Remove to not insert this package
-                checksums.remove((row[1], row[2]))
-        self.logger.debug("Packages already in DB: %d", len(pkg_map))
-        self.logger.debug("Packages to import: %d", len(checksums))
-        if checksums:
-            import_data = []
-            for pkg in packages:
-                if (checksum_types[pkg["checksum_type"]], pkg["checksum"]) in checksums:
-                    import_data.append((pkg["name"], self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
-                                        archs[pkg["arch"]], checksum_types[pkg["checksum_type"]],
-                                        pkg["checksum"], pkg["summary"], pkg["description"]))
-                    # Prevent duplicated insert when some package is multiple times in metadata
-                    checksums.remove((checksum_types[pkg["checksum_type"]], pkg["checksum"]))
+            unique_packages[(self.checksum_type_map[pkg["checksum_type"]], pkg["checksum"])] = \
+                (self.package_name_map[pkg["name"]], self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
+                 self.arch_map[pkg["arch"]], self.checksum_type_map[pkg["checksum_type"]],
+                 pkg["checksum"], pkg["summary"], pkg["description"])
+        package_ids = []
+        to_import = []
+        for checksum_type_id, checksum in unique_packages:
+            if (checksum_type_id, checksum) not in self.package_map:
+                to_import.append(unique_packages[(checksum_type_id, checksum)])
+            else:
+                package_ids.append(self.package_map[(checksum_type_id, checksum)])
+
+        self.logger.debug("Packages to import: %d", len(to_import))
+        if to_import:
             execute_values(cur,
                            """insert into package
-                              (name, evr_id, arch_id, checksum_type_id, checksum, summary, description)
+                              (name_id, evr_id, arch_id, checksum_type_id, checksum, summary, description)
                               values %s
                               returning id, checksum_type_id, checksum""",
-                           import_data, page_size=len(import_data))
-            for row in cur.fetchall():
-                pkg_map[(row[1], row[2])] = row[0]
+                           to_import, page_size=len(to_import))
+            for pkg_id, checksum_type_id, checksum in cur.fetchall():
+                self.package_map[(checksum_type_id, checksum)] = pkg_id
+                package_ids.append(pkg_id)
         cur.close()
         self.conn.commit()
-        return pkg_map
+        return package_ids
 
-    def _associate_packages(self, pkg_map, repo_id):
+    def _associate_packages(self, package_ids, repo_id):
         cur = self.conn.cursor()
         associated_with_repo = set()
         cur.execute("select pkg_id from pkg_repo where repo_id = %s", (repo_id,))
@@ -145,7 +197,7 @@ class PackageStore: # pylint: disable=too-few-public-methods
             associated_with_repo.add(row[0])
         self.logger.debug("Packages associated with repository: %d", len(associated_with_repo))
         to_associate = []
-        for pkg_id in pkg_map.values():
+        for pkg_id in package_ids:
             if pkg_id in associated_with_repo:
                 associated_with_repo.remove(pkg_id)
             else:
@@ -167,6 +219,6 @@ class PackageStore: # pylint: disable=too-few-public-methods
         Import all packages from repository into all related DB tables.
         """
         self.logger.info("Syncing %d packages.", len(packages))
-        package_map = self._populate_packages(packages)
-        self._associate_packages(package_map, repo_id)
+        package_ids = self._populate_packages(packages)
+        self._associate_packages(package_ids, repo_id)
         self.logger.info("Syncing packages finished.")
