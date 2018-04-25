@@ -27,16 +27,14 @@ class UpdatesAPI(object):
         """ Read ahead table of keys. """
         # Select all evrs and put them into dictionary
         self.cursor.execute("SELECT id, epoch, version, release from evr")
-        evrs = self.cursor.fetchall()
-        for evr_id, evr_epoch, evr_ver, evr_rel in evrs:
+        for evr_id, evr_epoch, evr_ver, evr_rel in self.cursor.fetchall():
             key = "%s:%s:%s" % (evr_epoch, evr_ver, evr_rel)
             self.evr2id_dict[key] = evr_id
             self.id2evr_dict[evr_id] = {'epoch': evr_epoch, 'version': evr_ver, 'release': evr_rel}
 
         # Select all archs and put them into dictionary
         self.cursor.execute("SELECT id, name from arch")
-        archs = self.cursor.fetchall()
-        for arch_id, arch_name in archs:
+        for arch_id, arch_name in self.cursor.fetchall():
             self.arch2id_dict[arch_name] = arch_id
             self.id2arch_dict[arch_id] = arch_name
 
@@ -147,8 +145,9 @@ class UpdatesAPI(object):
             return response
 
         # Select all packages with given evrs ids and put them into dictionary
-        self.cursor.execute("select id, name_id, evr_id, arch_id, summary, description from package where evr_id in %s;",
-                            [tuple(packages_evrids)])
+        self.cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
+                               from package where evr_id in %s
+                            """, [tuple(packages_evrids)])
         packs = self.cursor.fetchall()
         nevra2pkg_id = {}
         for oid, name_id, evr_id, arch_id, summary, description in packs:
