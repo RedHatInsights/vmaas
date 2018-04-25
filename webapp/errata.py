@@ -31,13 +31,14 @@ class ErrataAPI(object):
         list of packages.
         """
         pkg_query = """SELECT pkg_errata.errata_id as erratum_id,
-                              package.name as name,
+                              package_name.name as name,
                               evr.epoch as epoch,
                               evr.version as version,
                               evr.release as release,
                               arch.name as arch
                          FROM pkg_errata
                          JOIN package ON package.id = pkg_errata.pkg_id
+                         JOIN package_name ON package_name.id = package.name_id
                          JOIN evr ON evr.id = package.evr_id
                          JOIN arch ON arch.id = package.arch_id
                         WHERE pkg_errata.errata_id IN %s"""
