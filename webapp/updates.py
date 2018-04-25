@@ -127,7 +127,7 @@ class UpdatesAPI(object):
         response['update_list'] = answer
 
         if releasever is not None:
-            response['relasever'] = releasever
+            response['releasever'] = releasever
         if basearch is not None:
             response['basearch'] = basearch
         if provided_repo_labels is not None:
