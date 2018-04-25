@@ -9,7 +9,7 @@ services:
     image: vmaas/database:latest
     restart: unless-stopped
     env_file:
-      - ./conf/database-connection.env
+      - ./conf/database-connection-admin.env
     ports:
       - 5432:5432
     volumes:
@@ -23,7 +23,7 @@ services:
     image: vmaas/reposcan:latest
     restart: unless-stopped
     env_file:
-      - ./conf/database-connection.env
+      - ./conf/database-connection-writer.env
       - ./conf/reposcan.env
     ports:
       - 8081:8081
@@ -38,7 +38,7 @@ services:
     image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
-      - ./conf/database-connection.env
+      - ./conf/database-connection-reader.env
     ports:
       - 8079
       - 8080:8080
