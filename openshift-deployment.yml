@@ -5,10 +5,11 @@
     apidoc_container_port: 8080
     webapp_container_port: 8080
     reposcan_container_port: 8081
+    apidoc_config_map: apidoc-conf-apidoc-env
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images, configure-apidoc."
 
     - name: Get current project
       command: oc project
@@ -20,6 +21,7 @@
         - update-images
         - routes-up
         - routes-down
+        - configure-apidoc
 
     - name: Print current project
       debug:
@@ -30,6 +32,7 @@
         - update-images
         - routes-up
         - routes-down
+        - configure-apidoc
 
     - name: Create VMaaS
       shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc create -f -
@@ -41,6 +44,26 @@
       tags:
         - up
         - routes-up
+
+    - name: Get exposed reposcan URL
+      shell: oc get route reposcan | tail -n 1 | awk '{print $2}'
+      register: reposcan_url
+      tags:
+        - up
+        - configure-apidoc
+
+    - name: Get exposed webapp URL
+      shell: oc get route webapp | tail -n 1 | awk '{print $2}'
+      register: webapp_url
+      tags:
+        - up
+        - configure-apidoc
+
+    - name: Configure API documentation
+      shell: oc patch configmap {{ apidoc_config_map }} --patch '{"data":{"API_URLS":"[{\"url\":\"http://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"http://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest apidoc
+      tags:
+        - up
+        - configure-apidoc
 
     - name: Update VMaaS images
       shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
