@@ -625,8 +625,20 @@ CREATE TABLE IF NOT EXISTS cve_impact (
 )TABLESPACE pg_default;
 
 INSERT INTO cve_impact (id, name) VALUES
-  (0, 'NotSet'), (1, 'None'), (2, 'Low'), (3, 'Medium'), (4, 'High'), (5, 'Critical');
+  (0, 'NotSet'), (1, 'None'), (2, 'Low'), (3, 'Medium'), (4, 'Moderate'),
+  (5, 'Important'), (6, 'High'), (7, 'Critical');
 
+-- -----------------------------------------------------
+-- Table vmaas.cve_source
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cve_source (
+  id INT NOT NULL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+INSERT INTO cve_source (id, name) VALUES
+  (1, 'Red Hat'), (2, 'NIST');
 
 -- -----------------------------------------------------
 -- Table vmaas.cve
@@ -642,10 +654,14 @@ CREATE TABLE IF NOT EXISTS cve (
   iava TEXT, CHECK (NOT empty(iava)),
   redhat_url TEXT, CHECK (NOT empty(redhat_url)),
   secondary_url TEXT, CHECK (NOT empty(secondary_url)),
+  source_id INT,
   PRIMARY KEY (id),
   CONSTRAINT impact_id
     FOREIGN KEY (impact_id)
-    REFERENCES cve_impact (id)
+    REFERENCES cve_impact (id),
+  CONSTRAINT cve_source_id
+    FOREIGN KEY (source_id)
+    REFERENCES cve_source (id)
 )TABLESPACE pg_default;
 CREATE TRIGGER cve_changed AFTER INSERT OR UPDATE OR DELETE ON cve
   FOR EACH STATEMENT
