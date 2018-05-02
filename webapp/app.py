@@ -60,7 +60,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if endpoint == '/cves':
             result = CveAPI(cursor).process_list(data)
         elif endpoint == '/updates':
-            result = UpdatesAPI(cursor, self.updatescache, self.repocache).process_list(data)
+            result = UpdatesAPI(self.updatescache, self.repocache).process_list(data)
         elif endpoint == '/repos':
             result = RepoAPI(cursor, self.repocache).process_list(data)
         elif endpoint == '/errata':
@@ -784,7 +784,7 @@ class Application(tornado.web.Application):
         setup_apispec(handlers)
         db_instance = Database()
         cursor = db_instance.cursor()
-        BaseHandler.updatescache = UpdatesCache(cursor)
+        BaseHandler.updatescache = UpdatesCache(db_instance)
         BaseHandler.repocache = RepoCache(cursor)
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None

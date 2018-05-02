@@ -3,9 +3,10 @@ Module to handle /updates API calls.
 """
 
 from jsonschema import validate
+
+from database import NamedCursor
 from utils import join_packagename, split_packagename
 
-SECURITY_ERRATA_TYPE = 'security'
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -22,149 +23,280 @@ JSON_SCHEMA = {
     }
 }
 
-class RpmVerArray(object):
-    """ Class for processing rpm version and release values for
-        comparison to other rpm version and release values. """
-    def __init__(self, value):
-        self.value = value
-        self.remaining_value = value
-        self.ver_array = []
-        self.current_array_index = 0
-
-    def _parse_next_tuple(self):
-        while self.remaining_value and not self.remaining_value[0].isalnum():
-            self.remaining_value = self.remaining_value[1:]
-        if not self.remaining_value:
-            return None
-        if self.remaining_value[0].isdigit():
-            indx = 1
-            while len(self.remaining_value) > indx and self.remaining_value[indx].isdigit():
-                indx += 1
-            numval = int(self.remaining_value[:indx])
-            self.remaining_value = self.remaining_value[indx:]
-            return (numval,)
-        indx = 1
-        while len(self.remaining_value) > indx and self.remaining_value[indx].isalpha():
-            indx += 1
-        alphaval = self.remaining_value[:indx]
-        self.remaining_value = self.remaining_value[indx:]
-        return (0, alphaval)
-
-    def next_value(self):
-        """ Get the next value/tuple."""
-        if len(self.ver_array) > self.current_array_index:
-            value = self.ver_array[self.current_array_index]
-            self.current_array_index += 1
-            return value
-        if self.remaining_value:
-            value = self._parse_next_tuple()
-            if value:
-                self.ver_array.append(value)
-                self.current_array_index += 1
-                return value
-        return None
-
-    def reset(self):
-        """ Reset this instance so it starts from the first tuple.  This does
-            not cause the initial value to be reparsed, again."""
-        self.current_array_index = 0
-
-
-class EvrComparator(object):
-    """ Class that compares EVR values. """
-    def __init__(self, epoch, version, release):
-        self.epoch = int(epoch)
-        self.ver_array = RpmVerArray(version)
-        self.rel_array = RpmVerArray(release)
-
-    @staticmethod
-    def compare_arrays(array1, array2):
-        """ Compare two RpmVerArray instances. """
-        array1.reset()
-        array2.reset()
-        retval = 0
-        while retval == 0:
-            tup1 = array1.next_value()
-            tup2 = array2.next_value()
-            if not tup1 and not tup2:
-                return 0
-            if tup1 and not tup2:
-                return 1
-            if not tup1 and tup2:
-                return -1
-            retval = (tup1 > tup2) - (tup1 < tup2)
-        return retval
-
-    def compare_to(self, evr_comparator):
-        """Return -1, 0 or 1 if self is less than, same as, or greater than
-           the specified evr_comparator, respectively."""
-        if self.epoch < evr_comparator.epoch:
-            return -1
-        if self.epoch > evr_comparator.epoch:
-            return 1
-        retval = self.compare_arrays(self.ver_array, evr_comparator.ver_array)
-        if retval == 0:
-            retval = self.compare_arrays(self.rel_array, evr_comparator.rel_array)
-        return retval
 
 class UpdatesCache(object):
     """Cache which hold updates mappings."""
-    # pylint: disable=too-few-public-methods
-    def __init__(self, cursor):
-        self.cursor = cursor
-        self.evr2id_dict = {}
-        self.id2evr_dict = {}
-        self.arch2id_dict = {}
-        self.id2arch_dict = {}
-        self.id2erratatype_dict = {}
-        self.packagename2id_dict = {}
-        self.id2packagename_dict = {}
+    # pylint: disable=too-few-public-methods, too-many-instance-attributes, too-many-locals
+    def __init__(self, db_instance):
+        self.db_instance = db_instance
+        self.packagename2id = {}
+        self.id2packagename = {}
+        self.updates = {}
+        self.updates_index = {}
+        self.evr2id = {}
+        self.id2evr = {}
+        self.arch2id = {}
+        self.id2arch = {}
         self.arch_compat = {}
-
+        self.package_details = {}
+        self.pkgid2repoids = {}
+        self.errataid2name = {}
+        self.pkgid2errataids = {}
+        self.errataid2repoids = {}
         self.prepare()
 
     def prepare(self):
         """ Read ahead table of keys. """
+
+        # Select all package names (only for package names with ever received sec. update)
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select distinct pn.id, pn.name
+                              from package_name pn inner join
+                                   package p on pn.id = p.name_id inner join
+                                   pkg_errata pe on p.id = pe.pkg_id inner join
+                                   errata e on pe.errata_id = e.id inner join
+                                   errata_type et on e.errata_type_id = et.id left join
+                                   errata_cve ec on e.id = ec.errata_id
+                              where et.name = 'security' or ec.cve_id is not null
+                           """)
+            for name_id, pkg_name in cursor:
+                self.packagename2id[pkg_name] = name_id
+                self.id2packagename[name_id] = pkg_name
+
+        # Select ordered updates lists for previously selected package names
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select p.name_id, p.id, p.evr_id, p.arch_id
+                              from package p inner join 
+                                   evr on p.evr_id = evr.id
+                              where p.name_id in %s
+                              order by p.name_id, evr.evr
+                           """, [tuple(self.packagename2id.values())])
+            index_cnt = {}
+            for name_id, pkg_id, evr_id, arch_id in cursor:
+                idx = index_cnt.get(name_id, 0)
+                self.updates.setdefault(name_id, []).append(pkg_id)
+                self.updates_index.setdefault(name_id, {}).setdefault((evr_id, arch_id), []).append(idx)
+                idx += 1
+                index_cnt[name_id] = idx
+
         # Select all evrs and put them into dictionary
-        self.cursor.execute("SELECT id, epoch, version, release from evr")
-        for evr_id, evr_epoch, evr_ver, evr_rel in self.cursor.fetchall():
-            key = "%s:%s:%s" % (evr_epoch, evr_ver, evr_rel)
-            self.evr2id_dict[key] = evr_id
-            self.id2evr_dict[evr_id] = {'epoch': evr_epoch, 'version': evr_ver, 'release': evr_rel}
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("select id, epoch, version, release from evr")
+            for evr_id, epoch, ver, rel in cursor:
+                self.evr2id[(epoch, ver, rel)] = evr_id
+                self.id2evr[evr_id] = (epoch, ver, rel)
 
         # Select all archs and put them into dictionary
-        self.cursor.execute("SELECT id, name from arch")
-        for arch_id, arch_name in self.cursor.fetchall():
-            self.arch2id_dict[arch_name] = arch_id
-            self.id2arch_dict[arch_id] = arch_name
-
-        # Select all errata types and put them into dictionary
-        self.cursor.execute("SELECT id, name from errata_type")
-        for type_id, type_name in self.cursor.fetchall():
-            self.id2erratatype_dict[type_id] = type_name
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("select id, name from arch")
+            for arch_id, name in cursor:
+                self.arch2id[name] = arch_id
+                self.id2arch[arch_id] = name
 
         # Select information about archs compatibility
-        self.cursor.execute("SELECT from_arch_id, to_arch_id from arch_compatibility")
-        for from_arch_id, to_arch_id in self.cursor.fetchall():
-            self.arch_compat.setdefault(from_arch_id, []).append(to_arch_id)
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("select from_arch_id, to_arch_id from arch_compatibility")
+            for from_arch_id, to_arch_id in cursor:
+                self.arch_compat.setdefault(from_arch_id, set()).add(to_arch_id)
 
-        # Select all package names
-        self.cursor.execute("SELECT id, name from package_name")
-        for name_id, pkg_name in self.cursor.fetchall():
-            self.packagename2id_dict[pkg_name] = name_id
-            self.id2packagename_dict[name_id] = pkg_name
+        # Select details about packages (for previously selected package names)
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
+                              from package
+                              where name_id in %s
+                           """, [tuple(self.packagename2id.values())])
+            for pkg_id, name_id, evr_id, arch_id, summary, description in cursor:
+                self.package_details[pkg_id] = (name_id, evr_id, arch_id, summary, description)
+
+        # Select package ID to repo IDs mapping
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select pkg_id, repo_id
+                              from pkg_repo
+                              where pkg_id in %s
+                           """, [tuple(self.package_details.keys())])
+            for pkg_id, repo_id in cursor:
+                self.pkgid2repoids.setdefault(pkg_id, []).append(repo_id)
+
+        # Select errata ID to name mapping
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select distinct e.id, e.name
+                              from errata e inner join
+                                   errata_type et on e.errata_type_id = et.id left join
+                                   errata_cve ec on e.id = ec.errata_id
+                              where et.name = 'security' or ec.cve_id is not null
+                           """)
+            for errata_id, errata_name in cursor:
+                self.errataid2name[errata_id] = errata_name
+
+        # Select package ID to errata IDs mapping, only for relevant errata
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select pkg_id, errata_id
+                              from pkg_errata
+                              where errata_id in %s
+                           """, [tuple(self.errataid2name.keys())])
+            for pkg_id, errata_id in cursor:
+                self.pkgid2errataids.setdefault(pkg_id, set()).add(errata_id)
+
+        # Select errata ID to repo IDs mapping, only for relevant errata
+        with NamedCursor(self.db_instance, name="updates-cache") as cursor:
+            cursor.execute("""select errata_id, repo_id
+                              from errata_repo
+                              where errata_id in %s
+                           """, [tuple(self.errataid2name.keys())])
+            for errata_id, repo_id in cursor:
+                self.errataid2repoids.setdefault(errata_id, set()).add(repo_id)
 
 
 class UpdatesAPI(object):
-    """ Main /updates API class. """
+    """ Main /updates API class."""
     # pylint: disable=too-few-public-methods
-    def __init__(self, cursor, updatescache, repocache):
-        self.cursor = cursor
+    def __init__(self, updatescache, repocache):
         self.updatescache = updatescache
         self.repocache = repocache
 
+    def _process_repositories(self, data, response):
+        # Read list of repositories
+        repo_list = data.get('repository_list', None)
+        if repo_list is not None:
+            repo_ids = []
+            for label in repo_list:
+                repo_ids.extend(self.repocache.label2ids(label))
+            response['repository_list'] = repo_list
+        else:
+            repo_ids = self.repocache.all_ids()
+
+        # Filter out repositories of different releasever
+        releasever = data.get('releasever', None)
+        if releasever is not None:
+            repo_ids = [oid for oid in repo_ids
+                        if self.repocache.get_by_id(oid)['releasever'] == releasever]
+            response['releasever'] = releasever
+
+        # Filter out repositories of different basearch
+        basearch = data.get('basearch', None)
+        if basearch is not None:
+            repo_ids = [oid for oid in repo_ids
+                        if self.repocache.get_by_id(oid)['basearch'] == basearch]
+            response['basearch'] = basearch
+
+        return set(repo_ids)
+
+    def _process_input_packages(self, data, response):
+        """Parse input NEVRAs and filter out unknown (or without updates) package names."""
+        packages_to_process = data.get('package_list', None)
+        filtered_packages_to_process = {}
+        if packages_to_process is not None:
+            for pkg in packages_to_process:
+                response['update_list'][pkg] = {}
+                name, epoch, ver, rel, arch = split_packagename(pkg)
+                if name in self.updatescache.packagename2id:
+                    if self.updatescache.packagename2id[name] in self.updatescache.updates_index:
+                        filtered_packages_to_process[pkg] = {'parsed_nevra': (name, epoch, ver, rel, arch)}
+        return filtered_packages_to_process
+
+    def _get_related_products(self, original_package_repo_ids):
+        product_ids = set()
+        for original_package_repo_id in original_package_repo_ids:
+            product_ids.add(self.repocache.id2productid(original_package_repo_id))
+        return product_ids
+
+    def _get_valid_releasevers(self, original_package_repo_ids):
+        valid_releasevers = set()
+        for original_package_repo_id in original_package_repo_ids:
+            valid_releasevers.add(self.repocache.get_by_id(original_package_repo_id)['releasever'])
+        return valid_releasevers
+
+    # pylint: disable=too-many-arguments
+    def _get_repositories(self, product_ids, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
+        repo_ids = []
+        errata_repo_ids = set()
+        for errata_id in errata_ids:
+            for repo_id in self.updatescache.errataid2repoids[errata_id]:
+                errata_repo_ids.add(repo_id)
+
+        for repo_id in self.updatescache.pkgid2repoids[update_pkg_id]:
+            if repo_id in available_repo_ids \
+                    and self.repocache.id2productid(repo_id) in product_ids \
+                    and repo_id in errata_repo_ids \
+                    and self.repocache.get_by_id(repo_id)['releasever'] in valid_releasevers:
+                repo_ids.append(repo_id)
+
+        return repo_ids
+
+    def _build_nevra(self, update_pkg_id):
+        name_id, evr_id, arch_id, _, _ = self.updatescache.package_details[update_pkg_id]
+        name = self.updatescache.id2packagename[name_id]
+        epoch, ver, rel = self.updatescache.id2evr[evr_id]
+        arch = self.updatescache.id2arch[arch_id]
+        return join_packagename(name, epoch, ver, rel, arch)
+
+    def _process_updates(self, packages_to_process, available_repo_ids, response):
+        # pylint: disable=too-many-locals
+        for pkg, pkg_dict in packages_to_process.items():
+            name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
+            name_id = self.updatescache.packagename2id[name]
+            evr_id = self.updatescache.evr2id.get((epoch, ver, rel), None)
+            arch_id = self.updatescache.arch2id.get(arch, None)
+            current_version_indexes = self.updatescache.updates_index[name_id].get((evr_id, arch_id), [])
+
+            # Package with given NEVRA not found in cache/DB
+            if not current_version_indexes:
+                continue
+
+            current_version_pkg_ids = set()
+            pkg_id = None
+            for current_version_index in current_version_indexes:
+                pkg_id = self.updatescache.updates[name_id][current_version_index]
+                current_version_pkg_ids.add(pkg_id)
+
+            _, _, current_version_arch_id, summary, description = \
+                self.updatescache.package_details[pkg_id]
+            response['update_list'][pkg]['summary'] = summary
+            response['update_list'][pkg]['description'] = description
+            response['update_list'][pkg]['available_updates'] = []
+
+            # No updates found for given NEVRA
+            last_version_pkg_id = self.updatescache.updates[name_id][-1]
+            if last_version_pkg_id in current_version_pkg_ids:
+                continue
+
+            # Get associated product IDs
+            original_package_repo_ids = set()
+            for current_version_pkg_id in current_version_pkg_ids:
+                original_package_repo_ids.update(self.updatescache.pkgid2repoids[current_version_pkg_id])
+            product_ids = self._get_related_products(original_package_repo_ids)
+            valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
+
+            # Get candidate package IDs
+            update_pkg_ids = self.updatescache.updates[name_id][current_version_indexes[-1] + 1:]
+
+            for update_pkg_id in update_pkg_ids:
+                # Filter out packages without errata
+                if update_pkg_id not in self.updatescache.pkgid2errataids:
+                    continue
+
+                # Filter arch compatibility
+                _, _, updated_version_arch_id, _, _ = self.updatescache.package_details[update_pkg_id]
+                if (updated_version_arch_id != current_version_arch_id
+                        and updated_version_arch_id not in self.updatescache.arch_compat[current_version_arch_id]):
+                    continue
+
+                errata_ids = self.updatescache.pkgid2errataids.get(update_pkg_id, set())
+                repo_ids = self._get_repositories(product_ids, update_pkg_id, errata_ids, available_repo_ids,
+                                                  valid_releasevers)
+                nevra = self._build_nevra(update_pkg_id)
+                for repo_id in repo_ids:
+                    repo_details = self.repocache.get_by_id(repo_id)
+                    for errata_id in errata_ids:
+                        response['update_list'][pkg]['available_updates'].append({
+                            'package': nevra,
+                            'erratum': self.updatescache.errataid2name[errata_id],
+                            'repository': repo_details['label'],
+                            'basearch': repo_details['basearch'],
+                            'releasever': repo_details['releasever']
+                        })
+
     def process_list(self, data):
-        #pylint: disable=too-many-locals,too-many-statements,too-many-branches
         """
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
@@ -176,261 +308,20 @@ class UpdatesAPI(object):
         """
         validate(data, JSON_SCHEMA)
 
-        packages_to_process = data['package_list']
         response = {
             'update_list': {},
         }
-        auxiliary_dict = {}
-        answer = {}
+
+        # Return empty update list in case of empty input package list
+        packages_to_process = self._process_input_packages(data, response)
 
         if not packages_to_process:
             return response
 
-        # Read list of repositories
-        repo_ids = None
-        provided_repo_labels = None
-        if 'repository_list' in data:
-            provided_repo_labels = data['repository_list']
+        # Get list of valid repository IDs based on input paramaters
+        available_repo_ids = self._process_repositories(data, response)
 
-            if provided_repo_labels:
-                repo_ids = []
-                for label in provided_repo_labels:
-                    repo_ids.extend(self.repocache.label2ids(label))
-        else:
-            repo_ids = self.repocache.all_ids()
-
-        # Filter out repositories of different releasever
-        releasever = data.get('releasever', None)
-        if releasever is not None:
-            repo_ids = [oid for oid in repo_ids
-                        if self.repocache.get_by_id(oid)['releasever'] == releasever]
-
-        # Filter out repositories of different basearch
-        basearch = data.get('basearch', None)
-        if basearch is not None:
-            repo_ids = [oid for oid in repo_ids
-                        if self.repocache.get_by_id(oid)['basearch'] == basearch]
-
-        # Parse input list of packages and create empty update list (answer) for them
-        packages_nameids = []
-        packages_evrids = []
-        nevra2text = {}
-        name_id2pkgs = {}
-
-        for pkg in packages_to_process:
-            pkg = str(pkg)
-
-            # process all packages form input
-            if pkg not in auxiliary_dict:
-                pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
-                auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
-                answer[pkg] = {}          # fill answer with empty data
-
-                auxiliary_dict[pkg]['pkg_epoch'] = pkg_epoch
-                auxiliary_dict[pkg]['pkg_ver'] = pkg_ver
-                auxiliary_dict[pkg]['pkg_rel'] = pkg_rel
-
-                evr_key = "%s:%s:%s" % (pkg_epoch, pkg_ver, pkg_rel)
-                if evr_key in self.updatescache.evr2id_dict and pkg_arch in self.updatescache.arch2id_dict and \
-                                pkg_name in self.updatescache.packagename2id_dict:
-                    pkg_name_id = self.updatescache.packagename2id_dict[pkg_name]
-                    packages_nameids.append(pkg_name_id)
-                    auxiliary_dict[pkg][pkg_name_id] = []
-                    name_id2pkgs.setdefault(pkg_name_id, []).append(auxiliary_dict[pkg])
-
-                    evr_id = self.updatescache.evr2id_dict[evr_key]
-                    packages_evrids.append(evr_id)
-                    auxiliary_dict[pkg]['name_id'] = pkg_name_id
-                    auxiliary_dict[pkg]['evr_id'] = evr_id
-                    auxiliary_dict[pkg]['arch_id'] = self.updatescache.arch2id_dict[pkg_arch]
-                    auxiliary_dict[pkg]['repo_releasevers'] = []
-                    auxiliary_dict[pkg]['product_repo_id'] = []
-                    auxiliary_dict[pkg]['pkg_id'] = []
-                    auxiliary_dict[pkg]['update_id'] = []
-
-        response['update_list'] = answer
-
-        if releasever is not None:
-            response['releasever'] = releasever
-        if basearch is not None:
-            response['basearch'] = basearch
-        if provided_repo_labels is not None:
-            response.update({'repository_list': provided_repo_labels})
-
-        if not packages_evrids:
-            return response
-
-        # Select all packages with given evrs ids and put them into dictionary
-        self.cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
-                               from package where evr_id in %s
-                            """, [tuple(packages_evrids)])
-        packs = self.cursor.fetchall()
-        nevra2pkg_id = {}
-        for oid, name_id, evr_id, arch_id, summary, description in packs:
-            key = "%s:%s:%s" % (name_id, evr_id, arch_id)
-            nevra2text[key] = {'summary':summary, 'description':description}
-            nevra2pkg_id.setdefault(key, []).append(oid)
-
-        pkg_ids = []
-        for pkg in auxiliary_dict.values():
-            try:
-                key = "%s:%s:%s" % (pkg['name_id'],
-                                    pkg['evr_id'],
-                                    pkg['arch_id'])
-                pkg_ids.extend(nevra2pkg_id[key])
-                pkg['pkg_id'].extend(nevra2pkg_id[key])
-            except KeyError:
-                pass
-
-        if not pkg_ids:
-            return response
-
-        # Select all repo_id and add mapping to package id
-        self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(pkg_ids)])
-        pack_repo_ids = self.cursor.fetchall()
-        pkg_id2repo_id = {}
-
-        for pkg_id, repo_id in pack_repo_ids:
-            pkg_id2repo_id.setdefault(pkg_id, []).append(repo_id)
-
-        for pkg in auxiliary_dict.values():
-            try:
-                for pkg_id in pkg['pkg_id']:
-                    pkg['repo_releasevers'].extend(
-                        [self.repocache.get_by_id(repo_id)['releasever'] for repo_id in pkg_id2repo_id[pkg_id]])
-                    # Find updates in repositories provided by same product
-                    product_ids = set([self.repocache.id2productid(repo_id) for repo_id in pkg_id2repo_id[pkg_id]])
-                    for product_id in product_ids:
-                        pkg['product_repo_id'].extend(self.repocache.productid2ids(product_id))
-            except KeyError:
-                pass
-
-        update_pkg_ids = []
-
-        sql = """SELECT package.id, package.name_id, package.evr_id,
-                        evr.epoch, evr.version, evr.release
-                   FROM package
-                   JOIN evr on package.evr_id = evr.id
-                  WHERE package.name_id in %s"""
-        self.cursor.execute(sql, [tuple(packages_nameids)])
-        sql_result = self.cursor.fetchall()
-        for oid, name_id, evr_id, evr_epoch, evr_ver, evr_rel in sql_result:
-            evr_comparator = EvrComparator(evr_epoch, evr_ver, evr_rel)
-            for pkg in name_id2pkgs[name_id]:
-                if 'evr_id' in pkg and pkg['evr_id'] != evr_id:
-                    if 'evr_comparator' not in pkg:
-                        pkg['evr_comparator'] = EvrComparator(pkg['pkg_epoch'], pkg['pkg_ver'], pkg['pkg_rel'])
-                    if pkg['evr_comparator'].compare_to(evr_comparator) < 0:
-                        pkg['update_id'].append(oid)
-                        update_pkg_ids.append(oid)
-
-        pkg_id2repo_id = {}
-        pkg_id2errata_id = {}
-        pkg_id2full_name = {}
-        pkg_id2arch_id = {}
-        all_errata = []
-
-        if update_pkg_ids:
-            # Select all info about pkg_id to repo_id for update packages
-            self.cursor.execute("select pkg_id, repo_id from pkg_repo where pkg_id in %s;", [tuple(update_pkg_ids)])
-            all_pkg_repos = self.cursor.fetchall()
-            for pkg_id, repo_id in all_pkg_repos:
-                pkg_id2repo_id.setdefault(pkg_id, []).append(repo_id)
-
-            # Select all info about pkg_id to errata_id
-            self.cursor.execute("select pkg_id, errata_id from pkg_errata where pkg_id in %s;", [tuple(update_pkg_ids)])
-            all_pkg_errata = self.cursor.fetchall()
-            for pkg_id, errata_id in all_pkg_errata:
-                all_errata.append(errata_id)
-                pkg_id2errata_id.setdefault(pkg_id, []).append(errata_id)
-
-            # Select full info about all update packages
-            self.cursor.execute("SELECT id, name_id, evr_id, arch_id from package where id in %s;",
-                                [tuple(update_pkg_ids)])
-            packages = self.cursor.fetchall()
-
-            for oid, name_id, evr_id, arch_id in packages:
-                full_rpm_name = join_packagename(self.updatescache.id2packagename_dict[name_id],
-                                                 self.updatescache.id2evr_dict[evr_id]['epoch'],
-                                                 self.updatescache.id2evr_dict[evr_id]['version'],
-                                                 self.updatescache.id2evr_dict[evr_id]['release'],
-                                                 self.updatescache.id2arch_dict[arch_id])
-
-                pkg_id2full_name[oid] = full_rpm_name
-                pkg_id2arch_id[oid] = arch_id
-
-        if all_errata:
-            # Select all info about errata
-            self.cursor.execute("SELECT id, name, errata_type_id from errata where id in %s;", [tuple(all_errata)])
-            errata = self.cursor.fetchall()
-            id2errata_dict = {}
-            eid2erratatypeid_dict = {}
-            all_errata_id = []
-            for oid, name, errata_type_id in errata:
-                id2errata_dict[oid] = name
-                eid2erratatypeid_dict[oid] = errata_type_id
-                all_errata_id.append(oid)
-
-            self.cursor.execute("SELECT errata_id, repo_id from errata_repo where errata_id in %s",
-                                [tuple(all_errata_id)])
-            sql_result = self.cursor.fetchall()
-            errata_id2repo_id = {}
-            for errata_id, repo_id in sql_result:
-                errata_id2repo_id.setdefault(errata_id, []).append(repo_id)
-
-            self.cursor.execute("SELECT errata_id, cve_id from errata_cve where errata_id in %s",
-                                [tuple(all_errata_id)])
-            sql_result = self.cursor.fetchall()
-            errata_id2cve_id = {}
-            for errata_id, cve_id in sql_result:
-                errata_id2cve_id.setdefault(errata_id, []).append(cve_id)
-
-        # Fill the result answer with update information
-        for pkg in auxiliary_dict:
-            # Grab summary/description for this pkg-name
-            pkg_name, pkg_epoch, pkg_ver, pkg_rel, pkg_arch = split_packagename(str(pkg))
-
-            if 'update_id' not in auxiliary_dict[pkg]:
-                continue
-
-            key = "%s:%s:%s" % (auxiliary_dict[pkg]['name_id'],
-                                auxiliary_dict[pkg]['evr_id'],
-                                auxiliary_dict[pkg]['arch_id'])
-            if key in nevra2text:
-                response['update_list'][pkg]['summary'] = nevra2text[key]['summary']
-                response['update_list'][pkg]['description'] = nevra2text[key]['description']
-
-            response['update_list'][pkg]['available_updates'] = []
-
-            for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
-                if pkg_id2arch_id[upd_pkg_id] not in self.updatescache.arch_compat[auxiliary_dict[pkg]['arch_id']] or \
-                                upd_pkg_id not in pkg_id2errata_id or upd_pkg_id not in pkg_id2repo_id:
-                    continue
-
-                for r_id in pkg_id2repo_id[upd_pkg_id]:
-                    # check if update package is in repo provided by same product and releasever is same
-                    # and if the list of repositories for updates is provided, also check repo id in this list
-                    if r_id not in auxiliary_dict[pkg]['product_repo_id'] or r_id not in repo_ids or \
-                            self.repocache.get_by_id(r_id)['releasever'] not in \
-                                    auxiliary_dict[pkg]['repo_releasevers']:
-                        continue
-
-                    errata_ids = pkg_id2errata_id[upd_pkg_id]
-                    for e_id in errata_ids:
-                        # check current erratum is security or has some linked cve
-                        # and it is in the same repo with update pkg
-                        if (self.updatescache.id2erratatype_dict[eid2erratatypeid_dict[e_id]] == SECURITY_ERRATA_TYPE
-                                or e_id in errata_id2cve_id and errata_id2cve_id[e_id]) \
-                                and r_id in errata_id2repo_id[e_id]:
-                            e_name = id2errata_dict[e_id]
-                            r_dict = self.repocache.get_by_id(r_id)
-
-                            response['update_list'][pkg]['available_updates'].append({
-                                'package': pkg_id2full_name[upd_pkg_id],
-                                'erratum': e_name,
-                                'repository': r_dict['label'],
-                                'basearch': r_dict['basearch'],
-                                'releasever': r_dict['releasever'],
-                                })
+        # Process updated packages, errata and fill the response
+        self._process_updates(packages_to_process, available_repo_ids, response)
 
         return response
