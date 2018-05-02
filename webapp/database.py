@@ -30,14 +30,27 @@ class Database(object):
                                            password=self.password,
                                            host=self.host,
                                            port=self.port)
-        self.connection.set_session(readonly=True, autocommit=True)
+        self.connection.set_session(readonly=True)
 
-    def cursor(self):
+    def cursor(self, name=None):
         """ Returns cursor object connected to the database."""
-        return self.connection.cursor()
+        return self.connection.cursor(name=name)
 
     def dictcursor(self):
         """
         Returns cursor object connected to the database that returns dictionary.
         """
         return self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+
+class NamedCursor(object):
+    """Wrapper class for named cursor."""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, db_connection, name="default"):
+        self.cursor = db_connection.cursor(name=name)
+
+    def __enter__(self):
+        return self.cursor
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()

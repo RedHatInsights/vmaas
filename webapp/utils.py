@@ -10,7 +10,7 @@ def join_packagename(name, epoch, version, release, arch):
     """
     Build a package name from the separate NEVRA parts
     """
-    epoch = str(epoch) + ':' if int(epoch) else ''
+    epoch = ("%s:" % epoch) if int(epoch) else ''
     return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
 NEVRA_RE = re.compile(r'(.*)-(([0-9]+):)?([^-]+)-([^-]+)\.([a-z0-9_]+)')
@@ -31,7 +31,8 @@ def split_packagename(filename):
         return '', '', '', '', ''
 
     name, _, epoch, version, release, arch = match.groups()
-    epoch = int(epoch) if epoch is not None else 0
+    if epoch is None:
+        epoch = '0'
     return name, epoch, version, release, arch
 
 
