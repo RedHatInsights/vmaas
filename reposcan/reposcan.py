@@ -38,7 +38,7 @@ def init_db():
     """Setup DB connection parameters"""
     DatabaseHandler.db_name = os.getenv('POSTGRESQL_DATABASE', "vmaas")
     DatabaseHandler.db_user = os.getenv('POSTGRESQL_USER', "vmaas_writer")
-    DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_passwd")
+    DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
     DatabaseHandler.db_host = os.getenv('POSTGRESQL_HOST', "database")
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
