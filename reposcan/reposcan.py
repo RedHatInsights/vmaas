@@ -10,14 +10,13 @@ import traceback
 import json
 
 from apispec import APISpec
-import requests
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
+from tornado.websocket import WebSocketHandler
 
 from common.logging import get_logger, init_logging
 from database.database_handler import DatabaseHandler
 from database.product_store import ProductStore
-from download.downloader import VALID_HTTP_CODES
 from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
@@ -42,6 +41,24 @@ def init_db():
     DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
     DatabaseHandler.db_host = os.getenv('POSTGRESQL_HOST', "database")
     DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
+
+
+class NotificationHandler(WebSocketHandler):
+    """Websocket handler to send messages to subscribed clients."""
+    connections = set()
+
+    def open(self):
+        self.connections.add(self)
+
+    def data_received(self, chunk):
+        pass
+
+    def on_message(self, message):
+        """We don't need to handle any incoming messages."""
+        pass
+
+    def on_close(self):
+        self.connections.remove(self)
 
 
 class ResponseJson(dict): # pylint: disable=too-few-public-methods
@@ -103,16 +120,9 @@ class SyncHandler(BaseHandler):
         return status_code, status_msg
 
     @staticmethod
-    def _notify_webapp():
-        webapp_url = os.getenv('WEBAPP_API_URL', "http://webapp")
-        webapp_port = os.getenv('WEBAPP_API_PORT_INTERNAL', 8079)
-        refresh_url = "%s:%s/api/internal/refresh" % (webapp_url, webapp_port)
-        try:
-            response = requests.get(refresh_url)
-            if response.status_code not in VALID_HTTP_CODES or not json.loads(response.text)["success"]:
-                LOGGER.error("Response from %s: %s", refresh_url, response.text)
-        except requests.RequestException as req_exception:
-            LOGGER.error("Unable to connect to %s - %s", refresh_url, req_exception)
+    def _notify_webapps():
+        for client in NotificationHandler.connections:
+            client.write_message("refresh-cache")
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -124,8 +134,8 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         LOGGER.info("%s sync task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
-        # Notify webapp to update it's cache
-        SyncHandler._notify_webapp()
+        # Notify webapps to update it's cache
+        SyncHandler._notify_webapps()
 
 
 class RepoSyncHandler(SyncHandler):
@@ -485,6 +495,7 @@ class ReposcanApplication(Application):
     """Class defining API handlers."""
     def __init__(self):
         handlers = [
+            (r"/notifications/?", NotificationHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
