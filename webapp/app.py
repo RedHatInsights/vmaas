@@ -18,6 +18,8 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
 
+from jsonschema.exceptions import ValidationError
+
 INTERNAL_API_PORT = 8079
 PUBLIC_API_PORT = 8080
 
@@ -130,9 +132,13 @@ class JsonHandler(BaseHandler):
             response = self.process_list(data)
             self.write(response)
             self.flush()
-        except ValueError:
-            traceback.print_exc()
-            self.set_status(400, reason='Error: malformed input JSON.')
+        except ValidationError as validerr:
+            errstr = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+            self.set_status(400, reason=errstr)
+            print('ValidationError: ' + errstr)
+        except ValueError as valuerr:
+            print('ValueError: ' + str(valuerr))
+            self.set_status(400, reason=str(valuerr))
 
     def process_list(self, data):
         """ Method to process list of input data. """
