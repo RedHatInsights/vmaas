@@ -7,20 +7,26 @@ import os
 import sys
 import json
 import traceback
+from concurrent.futures import ThreadPoolExecutor
+
+
+from tornado.ioloop import IOLoop, PeriodicCallback
+from tornado.concurrent import run_on_executor
+from tornado.websocket import websocket_connect
+import tornado.web
+
 
 from apispec import APISpec
-from tornado.ioloop import IOLoop, PeriodicCallback
-import tornado.web
-from tornado.websocket import websocket_connect
-
 from database import Database
 from cve import CveAPI
 from repos import RepoAPI, RepoCache
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
+import gen
 
 PUBLIC_API_PORT = 8080
+MAX_WORKERS = 16
 
 SPEC = APISpec(
     title='VMaaS Webapp',
@@ -37,6 +43,34 @@ WEBSOCKET_RECONNECT_INTERVAL = 60
 
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
+
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+
+    @run_on_executor
+    def background_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
+        """Process in the background DB request."""
+
+        db_instance = Database()
+        cursor = db_instance.cursor()
+        repocache = RepoCache(cursor)
+
+        result = None
+
+        if endpoint == '/cves':
+            result = CveAPI(cursor).process_list(data)
+        elif endpoint == '/updates':
+            result = UpdatesAPI(cursor, repocache).process_list(data)
+        elif endpoint == '/repos':
+            result = RepoAPI(cursor, repocache).process_list(data)
+        elif endpoint == '/errata':
+            result = ErrataAPI(db_instance).process_list(data)
+        elif endpoint == '/dbchange':
+            result = DBChange(db_instance).process()
+        elif endpoint == '/apispec':
+            result = SPEC.to_dict()
+
+        return result
+
     def data_received(self, chunk):
         pass
 
@@ -47,9 +81,45 @@ class BaseHandler(tornado.web.RequestHandler):
     def options(self): # pylint: disable=arguments-differ
         self.finish()
 
+    def send_response(self, data='', code=200):
+        """
+        ---
+        description: Send API response to a client.
+        parameters:
+          - name: data
+            description: Data to send to a client
+            required: False
+          - name: code
+            description: HTTP return code
+            required: False
+        """
+        self.set_status(code)
+        self.write(data)
+        self.flush()
+        self.finish()  # need to run finish() manually for async method
+
+    def get_post_data(self):
+        """extract input JSON from POST request"""
+        json_data = ''
+
+        # check if JSON is passed as a file or as a body of POST request
+        if self.request.files:
+            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
+        elif self.request.body:
+            json_data = self.request.body
+
+        try:
+            data = json.loads(json_data)
+        except ValueError:
+            traceback.print_exc()
+            data = None
+        return data
+
 
 class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
+
+    @gen.coroutine
     def get(self): # pylint: disable=arguments-differ
         """Get API specification.
            ---
@@ -58,13 +128,16 @@ class ApiSpecHandler(BaseHandler):
              200:
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
-        self.write(SPEC.to_dict())
+        result = yield self.background_process(endpoint='/apispec')
+        IOLoop.instance().add_callback(self.send_response, result)
 
 
 class DBChangeHandler(BaseHandler):
     """
     Class to return last-updated information from VMaaS DB
     """
+
+    @gen.coroutine
     def get(self): # pylint: disable=arguments-differ
         """
         ---
@@ -77,61 +150,14 @@ class DBChangeHandler(BaseHandler):
         tags:
           - dbchange
         """
-        results = self.application.dbchange.process()
-        self.set_status(200)
-        self.write(results)
-        self.flush()
-
-class JsonHandler(BaseHandler):
-    """
-    Parent class to parse input json data given a a data or a file.
-    """
-    def process_get(self, name=None):
-        """Process GET request."""
-        response = self.process_string(name)
-        self.write(response)
-        self.flush()
-
-    def process_post(self):
-        """Process POST request."""
-        # extract input JSON from POST request
-        json_data = ''
-        # check if JSON is passed as a file or as a body of POST request
-        if self.request.files:
-            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
-        elif self.request.body:
-            json_data = self.request.body
-
-        # fill response with packages
-        try:
-            data = json.loads(json_data)
-            response = self.process_list(data)
-            self.write(response)
-            self.flush()
-        except ValueError:
-            traceback.print_exc()
-            self.set_status(400, reason='Error: malformed input JSON.')
-
-    def process_list(self, data):
-        """ Method to process list of input data. """
-        raise NotImplementedError("abstract method")
-
-    def process_string(self, data):
-        """ Method to process a single input data. """
-        raise NotImplementedError("abstract method")
+        results = yield self.background_process(endpoint='/dbchange')
+        IOLoop.instance().add_callback(self.send_response, results)
 
 
-class UpdatesHandler(JsonHandler):
-    """ /updates API handler """
-    def process_string(self, data):
-        return self.application.updatesapi.process_list({'package_list': [data]})
-
-    def process_list(self, data):
-        return self.application.updatesapi.process_list(data)
-
-
-class UpdatesHandlerGet(UpdatesHandler):
+class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
+
+    @gen.coroutine
     def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
@@ -151,11 +177,14 @@ class UpdatesHandlerGet(UpdatesHandler):
         tags:
           - updates
         """
-        self.process_get(name=nevra)
+        res = yield self.background_process(endpoint='/updates', data={'package_list': [nevra]})
+        IOLoop.instance().add_callback(self.send_response, res)
 
 
-class UpdatesHandlerPost(UpdatesHandler):
+class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
+
+    @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -196,21 +225,22 @@ class UpdatesHandlerPost(UpdatesHandler):
         tags:
           - updates
         """
-        self.process_post()
+
+        data = self.get_post_data()
+        if data:
+            res = yield self.background_process(endpoint='/updates', data=data)
+            code = 200
+        else:
+            res = 'Error: malformed input JSON.'
+            code = 400
+        IOLoop.instance().add_callback(self.send_response, res, code)
 
 
-class CVEHandler(JsonHandler):
-    """ /cves API handler """
-    def process_string(self, data):
-        return self.application.cveapi.process_list({'cve_list': [data]})
-
-    def process_list(self, data):
-        return self.application.cveapi.process_list(data)
-
-
-class CVEHandlerGet(CVEHandler):
+class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
-    def get(self, cve=None): # pylint: disable=arguments-differ
+
+    @gen.coroutine
+    def get(self, cve=None):  # pylint: disable=arguments-differ
         """
         ---
         description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
@@ -229,11 +259,14 @@ class CVEHandlerGet(CVEHandler):
         tags:
           - cves
         """
-        self.process_get(name=cve)
+        res = yield self.background_process(endpoint='/cves', data={'cve_list': [cve]})
+        IOLoop.instance().add_callback(self.send_response, res)
 
 
-class CVEHandlerPost(CVEHandler):
+class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
+
+    @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -267,21 +300,22 @@ class CVEHandlerPost(CVEHandler):
         tags:
           - cves
         """
-        self.process_post()
+
+        data = self.get_post_data()
+        if data:
+            res = yield self.background_process(endpoint='/cves', data=data)
+            code = 200
+        else:
+            res = 'Error: malformed input JSON.'
+            code = 400
+        IOLoop.instance().add_callback(self.send_response, res, code)
 
 
-class ReposHandler(JsonHandler):
-    """ /repos API handler """
-    def process_string(self, data):
-        return self.application.repoapi.process_list({'repository_list': [data]})
-
-    def process_list(self, data):
-        return self.application.repoapi.process_list(data)
-
-
-class ReposHandlerGet(ReposHandler):
+class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
-    def get(self, repo=None): # pylint: disable=arguments-differ
+
+    @gen.coroutine
+    def get(self, repo=None):  # pylint: disable=arguments-differ
         """
         ---
         description: Get details about a repository or repository-expression. It is allowed to use POSIX regular
@@ -301,11 +335,14 @@ class ReposHandlerGet(ReposHandler):
         tags:
           - repos
         """
-        self.process_get(name=repo)
+        res = yield self.background_process(endpoint='/repos', data={'repository_list': [repo]})
+        IOLoop.instance().add_callback(self.send_response, res)
 
 
-class ReposHandlerPost(ReposHandler):
+class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
+
+    @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -336,20 +373,20 @@ class ReposHandlerPost(ReposHandler):
         tags:
           - repos
         """
-        self.process_post()
+        data = self.get_post_data()
+        if data:
+            res = yield self.background_process(endpoint='/repos', data=data)
+            code = 200
+        else:
+            res = 'Error: malformed input JSON.'
+            code = 400
+        IOLoop.instance().add_callback(self.send_response, res, code)
 
 
-class ErrataHandler(JsonHandler):
-    """ /errata API handler """
-    def process_string(self, data):
-        return self.application.errataapi.process_list({'errata_list': [data]})
-
-    def process_list(self, data):
-        return self.application.errataapi.process_list(data)
-
-
-class ErrataHandlerGet(ErrataHandler):
+class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
+
+    @gen.coroutine
     def get(self, erratum=None): # pylint: disable=arguments-differ
         """
         ---
@@ -370,11 +407,14 @@ class ErrataHandlerGet(ErrataHandler):
         tags:
           - errata
         """
-        self.process_get(name=erratum)
+        res = yield self.background_process(endpoint='/errata', data={'errata_list': [erratum]})
+        IOLoop.instance().add_callback(self.send_response, res)
 
 
-class ErrataHandlerPost(ErrataHandler):
-    """Handler for processing /errata POST requests."""
+class ErrataHandlerPost(BaseHandler):
+    """ /errata API handler """
+
+    @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -408,7 +448,14 @@ class ErrataHandlerPost(ErrataHandler):
         tags:
           - errata
         """
-        self.process_post()
+        data = self.get_post_data()
+        if data:
+            res = yield self.background_process(endpoint='/errata', data=data)
+            code = 200
+        else:
+            res = 'Error: malformed input JSON.'
+            code = 400
+        IOLoop.instance().add_callback(self.send_response, res, code)
 
 
 def setup_apispec(handlers):
@@ -703,10 +750,6 @@ class Application(tornado.web.Application):
         cursor = db_instance.cursor()
         self.repocache = RepoCache(cursor)
         self.updatesapi = UpdatesAPI(cursor, self.repocache)
-        self.cveapi = CveAPI(cursor)
-        self.repoapi = RepoAPI(cursor, self.repocache)
-        self.errataapi = ErrataAPI(db_instance)
-        self.dbchange = DBChange(db_instance)
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None
         self._websocket_reconnect()
