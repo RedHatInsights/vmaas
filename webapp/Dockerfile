@@ -13,7 +13,8 @@ ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
 RUN yum -y update \
     && yum -y install yum-plugin-copr \
     && yum -y copr enable @vmaas/libs \
-    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil \
+    && yum -y install epel-release \
+    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures \
     && rm -rf /var/cache/yum/*
 
 ADD ./wait-for-services.sh /app/wait-for-services.sh
