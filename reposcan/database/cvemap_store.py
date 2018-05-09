@@ -46,10 +46,6 @@ class CvemapStore(CveStoreCommon):
                                  join (values %s) t(name)
                                 using (name)""", cve_names, page_size=len(cve_names))
         for row in cur.fetchall():
-            if row[2] is not None and row[2] != rh_source_id:
-                # different source, do not touch!
-                del cve_data[row[1]]
-                continue
             cve_data[row[1]]["id"] = row[0]
 
         to_import = []
