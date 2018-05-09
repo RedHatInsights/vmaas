@@ -33,6 +33,9 @@ SPEC = APISpec(
     schemes=["http"],
 )
 
+WEBSOCKET_PING_INTERVAL = 60
+WEBSOCKET_TIMEOUT = 300
+
 
 def init_db():
     """Setup DB connection parameters"""
@@ -47,8 +50,19 @@ class NotificationHandler(WebSocketHandler):
     """Websocket handler to send messages to subscribed clients."""
     connections = set()
 
-    def open(self):
+    def __init__(self, application, request, **kwargs):
+        super(NotificationHandler, self).__init__(application, request, **kwargs)
+        self.last_pong = None
+        self.timeout_callback = None
+
+    def open(self, *args, **kwargs):
         self.connections.add(self)
+        # Set last pong timestamp to current timestamp and ping client
+        self.last_pong = IOLoop.current().time()
+        self.ping(b"")
+        # Start periodic callback checking time since last received pong
+        self.timeout_callback = PeriodicCallback(self.timeout_check, WEBSOCKET_PING_INTERVAL * 1000)
+        self.timeout_callback.start()
 
     def data_received(self, chunk):
         pass
@@ -58,7 +72,20 @@ class NotificationHandler(WebSocketHandler):
         pass
 
     def on_close(self):
+        self.timeout_callback.stop()
         self.connections.remove(self)
+
+    def timeout_check(self):
+        """Check time since we received last pong. Send ping again."""
+        now = IOLoop.current().time()
+        if now - self.last_pong > WEBSOCKET_TIMEOUT:
+            self.close(1000, "Connection timed out.")
+            return
+        self.ping(b"")
+
+    def on_pong(self, data):
+        """Pong received from client."""
+        self.last_pong = IOLoop.current().time()
 
 
 class ResponseJson(dict): # pylint: disable=too-few-public-methods
