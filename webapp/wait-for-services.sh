@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-# wait-for-postgres.sh
+# wait-for-services.sh
 # modified version from https://docs.docker.com/compose/startup-order/
 
 set -e
@@ -11,5 +11,10 @@ until PGPASSWORD="$POSTGRESQL_PASSWORD" psql -h "$POSTGRESQL_HOST" -U "$POSTGRES
   sleep 1
 done
 
->&2 echo "PostgreSQL is up - executing command"
+until curl http://reposcan:8081/api/v1/apispec &>/dev/null; do
+  >&2 echo "Reposcan API is unavailable - sleeping"
+  sleep 1
+done
+
+>&2 echo "Everything is up - executing command"
 exec $cmd

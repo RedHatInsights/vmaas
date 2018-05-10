@@ -16,7 +16,7 @@ RUN yum -y update \
     && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil \
     && rm -rf /var/cache/yum/*
 
-ADD ./wait-for-postgres.sh /app/wait-for-postgres.sh
+ADD ./wait-for-services.sh /app/wait-for-services.sh
 ADD ./entrypoint.sh /app/
 ADD ./*.py /app/
 ADD ./vmaas /app/
