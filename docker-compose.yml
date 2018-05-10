@@ -39,11 +39,12 @@ services:
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-reader.env
+      - ./conf/webapp.env
     ports:
-      - 8079
       - 8080:8080
     depends_on:
       - database
+      - reposcan
 
   apidoc:
     container_name: vmaas-apidoc

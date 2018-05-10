@@ -8,6 +8,8 @@ ENV POSTGRESQL_USER=vmaas_reader
 ENV POSTGRESQL_PASSWORD=vmaas_reader_pwd
 ENV POSTGRESQL_DATABASE=vmaas
 
+ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
+
 RUN yum -y update \
     && yum -y install yum-plugin-copr \
     && yum -y copr enable @vmaas/libs \
@@ -19,6 +21,6 @@ ADD ./entrypoint.sh /app/
 ADD ./*.py /app/
 ADD ./vmaas /app/
 
-EXPOSE 8079 8080
+EXPOSE 8080
 
 CMD ["/app/entrypoint.sh"]

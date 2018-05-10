@@ -3,13 +3,15 @@
 Main web API module
 """
 
+import os
 import sys
 import json
 import traceback
 
 from apispec import APISpec
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.web
+from tornado.websocket import websocket_connect
 
 from database import Database
 from cve import CveAPI
@@ -18,7 +20,6 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
 
-INTERNAL_API_PORT = 8079
 PUBLIC_API_PORT = 8080
 
 SPEC = APISpec(
@@ -30,6 +31,8 @@ SPEC = APISpec(
     basePath="/api/v1",
     schemes=["http"],
 )
+
+WEBSOCKET_RECONNECT_INTERVAL = 60
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -56,31 +59,6 @@ class ApiSpecHandler(BaseHandler):
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
         self.write(SPEC.to_dict())
-
-
-class RefreshHandler(BaseHandler):
-    """
-    Class to refresh cached data in handlers.
-    """
-    def get(self): # pylint: disable=arguments-differ
-        # There could be authentication instead of this simple check in future
-        accessed_port = int(self.request.host.split(':')[1])
-        if accessed_port == INTERNAL_API_PORT:
-            try:
-                self.application.updatesapi.prepare()
-                self.application.repocache.prepare()
-                msg = "Cached data refreshed."
-                print(msg)
-                sys.stdout.flush()
-                self.write({"success": True, "msg": msg})
-            except: # pylint: disable=bare-except
-                traceback.print_exc()
-                self.set_status(500)
-                self.write({"success": False, "msg": "Unable to refresh cached data."})
-        else:
-            self.set_status(403)
-            self.write({"success": False, "msg": "This API can be called internally only."})
-        self.flush()
 
 
 class DBChangeHandler(BaseHandler):
@@ -709,7 +687,6 @@ class Application(tornado.web.Application):
     """ main webserver application class """
     def __init__(self):
         handlers = [
-            (r"/api/internal/refresh/?", RefreshHandler),  # GET request
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
@@ -730,13 +707,59 @@ class Application(tornado.web.Application):
         self.repoapi = RepoAPI(cursor, self.repocache)
         self.errataapi = ErrataAPI(db_instance)
         self.dbchange = DBChange(db_instance)
+        self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
+        self.reposcan_websocket = None
+        self._websocket_reconnect()
+        self.reconnect_callback = PeriodicCallback(self._websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
+        self.reconnect_callback.start()
         tornado.web.Application.__init__(self, handlers)
+
+    def _refresh_cache(self):
+        self.updatesapi.prepare()
+        self.repocache.prepare()
+        print("Cached data refreshed.")
+        sys.stdout.flush()
+
+    def _websocket_reconnect(self):
+        """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
+        if self.reposcan_websocket is None:
+            websocket_connect(self.reposcan_websocket_url, on_message_callback=self._read_websocket_message,
+                              callback=self._websocket_connect_status)
+
+    def _websocket_connect_status(self, future):
+        """Check if connection attempt succeeded."""
+        try:
+            result = future.result()
+        except: # pylint: disable=bare-except
+            result = None
+
+        if result is None:
+            # TODO: print the traceback as debug message when we use logging module instead of prints here
+            print("Unable to connect to: %s" % self.reposcan_websocket_url)
+            sys.stdout.flush()
+        else:
+            print("Connected to: %s" % self.reposcan_websocket_url)
+            sys.stdout.flush()
+
+        self.reposcan_websocket = result
+
+    def _read_websocket_message(self, message):
+        """Read incoming websocket messages."""
+        if message is not None:
+            if message == "refresh-cache":
+                self._refresh_cache()
+        else:
+            print("Connection to %s closed: %s (%s)" % (self.reposcan_websocket_url,
+                                                        self.reposcan_websocket.close_reason,
+                                                        self.reposcan_websocket.close_code))
+            sys.stdout.flush()
+            self.reposcan_websocket = None
+
 
 
 def main():
     """ Main application loop. """
     app = Application()
-    app.listen(INTERNAL_API_PORT)
     app.listen(PUBLIC_API_PORT)
     IOLoop.instance().start()
 
