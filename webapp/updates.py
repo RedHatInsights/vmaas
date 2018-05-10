@@ -2,8 +2,8 @@
 Module to handle /updates API calls.
 """
 
-from utils import join_packagename, split_packagename
 from jsonschema import validate
+from utils import join_packagename, split_packagename
 
 SECURITY_ERRATA_TYPE = 'security'
 

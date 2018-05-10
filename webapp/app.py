@@ -7,6 +7,7 @@ import sys
 import json
 import traceback
 
+from jsonschema.exceptions import ValidationError
 from apispec import APISpec
 from tornado.ioloop import IOLoop
 import tornado.web
@@ -17,8 +18,6 @@ from repos import RepoAPI, RepoCache
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
-
-from jsonschema.exceptions import ValidationError
 
 INTERNAL_API_PORT = 8079
 PUBLIC_API_PORT = 8080
