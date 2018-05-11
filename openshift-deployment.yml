@@ -11,28 +11,32 @@
       fail:
         msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images, configure-apidoc."
 
-    - name: Get current project
-      command: oc project
+    - name: Get current Git branch
+      command: git rev-parse --abbrev-ref HEAD
       changed_when: False
-      register: oc_project_out
+      register: git_branch_name
       tags:
-        - up
-        - down
-        - update-images
-        - routes-up
-        - routes-down
-        - configure-apidoc
+        - always
 
-    - name: Print current project
-      debug:
-        msg: "{{ oc_project_out.stdout }}"
+    - name: Get current OpenShift project
+      command: oc project -q
+      changed_when: False
+      register: oc_project_name
       tags:
-        - up
-        - down
-        - update-images
-        - routes-up
-        - routes-down
-        - configure-apidoc
+        - always
+
+    - name: Confirm source Git branch and target OpenShift project
+      pause: prompt="Please confirm you want to deploy Git branch '{{ git_branch_name.stdout }}' into OpenShift project '{{ oc_project_name.stdout }}'. Type 'yes' or 'no'"
+      register: oc_project_decision
+      tags:
+        - always
+
+    - name: Cancel playbook execution
+      fail:
+        msg: "Playbook execution canceled."
+      when: not (oc_project_decision.user_input | bool)
+      tags:
+        - always
 
     - name: Create VMaaS
       shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc create -f -
