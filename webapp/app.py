@@ -184,6 +184,7 @@ class UpdatesHandlerGet(BaseHandler):
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
+    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -266,6 +267,7 @@ class CVEHandlerGet(BaseHandler):
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
+    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -342,6 +344,7 @@ class ReposHandlerGet(BaseHandler):
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
+    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -414,6 +417,7 @@ class ErrataHandlerGet(BaseHandler):
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
+    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
