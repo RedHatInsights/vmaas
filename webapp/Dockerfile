@@ -14,7 +14,7 @@ RUN yum -y update \
     && yum -y install yum-plugin-copr \
     && yum -y copr enable @vmaas/libs \
     && yum -y install epel-release \
-    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures \
+    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures python2-jsonschema \
     && rm -rf /var/cache/yum/*
 
 ADD ./wait-for-services.sh /app/wait-for-services.sh

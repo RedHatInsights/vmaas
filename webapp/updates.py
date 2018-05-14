@@ -2,9 +2,25 @@
 Module to handle /updates API calls.
 """
 
+from jsonschema import validate
 from utils import join_packagename, split_packagename
 
 SECURITY_ERRATA_TYPE = 'security'
+
+JSON_SCHEMA = {
+    'type' : 'object',
+    'required': ['package_list'],
+    'properties' : {
+        'package_list': {
+            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
+            },
+        'repository_list': {
+            'type': 'array', 'items': {'type' : 'string'}
+            },
+        'releasever' : {'type' : 'string'},
+        'basearch' : {'type' : 'string'}
+    }
+}
 
 
 class UpdatesAPI(object):
@@ -66,6 +82,8 @@ class UpdatesAPI(object):
         :returns: json with updates_list as a list of dictionaries
                   {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
+        validate(data, JSON_SCHEMA)
+
         packages_to_process = data['package_list']
         response = {
             'update_list': {},

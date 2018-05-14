@@ -6,10 +6,10 @@ Main web API module
 import os
 import sys
 import json
-import traceback
 from concurrent.futures import ThreadPoolExecutor
 
 
+from jsonschema.exceptions import ValidationError
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.concurrent import run_on_executor
 from tornado.websocket import websocket_connect
@@ -111,7 +111,6 @@ class BaseHandler(tornado.web.RequestHandler):
         try:
             data = json.loads(json_data)
         except ValueError:
-            traceback.print_exc()
             data = None
         return data
 
@@ -227,13 +226,21 @@ class UpdatesHandlerPost(BaseHandler):
           - updates
         """
 
+        code = 400
         data = self.get_post_data()
         if data:
-            res = yield self.background_process(endpoint='/updates', data=data)
-            code = 200
+            try:
+                res = yield self.background_process(endpoint='/updates', data=data)
+                code = 200
+            except ValidationError as validerr:
+                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                print('ValidationError: ' + res)
+            except ValueError as valuerr:
+                res = str(valuerr)
+                print('ValueError: ' + res)
         else:
             res = 'Error: malformed input JSON.'
-            code = 400
+            print(res)
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -303,13 +310,21 @@ class CVEHandlerPost(BaseHandler):
           - cves
         """
 
+        code = 400
         data = self.get_post_data()
         if data:
-            res = yield self.background_process(endpoint='/cves', data=data)
-            code = 200
+            try:
+                res = yield self.background_process(endpoint='/cves', data=data)
+                code = 200
+            except ValidationError as validerr:
+                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                print('ValidationError: ' + res)
+            except ValueError as valuerr:
+                res = str(valuerr)
+                print('ValueError: ' + res)
         else:
             res = 'Error: malformed input JSON.'
-            code = 400
+            print(res)
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -376,13 +391,21 @@ class ReposHandlerPost(BaseHandler):
         tags:
           - repos
         """
+        code = 400
         data = self.get_post_data()
         if data:
-            res = yield self.background_process(endpoint='/repos', data=data)
-            code = 200
+            try:
+                res = yield self.background_process(endpoint='/repos', data=data)
+                code = 200
+            except ValidationError as validerr:
+                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                print('ValidationError: ' + res)
+            except ValueError as valuerr:
+                res = str(valuerr)
+                print('ValueError: ' + res)
         else:
             res = 'Error: malformed input JSON.'
-            code = 400
+            print(res)
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -452,13 +475,21 @@ class ErrataHandlerPost(BaseHandler):
         tags:
           - errata
         """
+        code = 400
         data = self.get_post_data()
         if data:
-            res = yield self.background_process(endpoint='/errata', data=data)
-            code = 200
+            try:
+                res = yield self.background_process(endpoint='/errata', data=data)
+                code = 200
+            except ValidationError as validerr:
+                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                print('ValidationError: ' + res)
+            except ValueError as valuerr:
+                res = str(valuerr)
+                print('ValueError: ' + res)
         else:
             res = 'Error: malformed input JSON.'
-            code = 400
+            print(res)
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
