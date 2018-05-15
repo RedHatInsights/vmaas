@@ -22,6 +22,90 @@ JSON_SCHEMA = {
     }
 }
 
+class RpmVerArray(object):
+    """ Class for processing rpm version and release values for
+        comparison to other rpm version and release values. """
+    def __init__(self, value):
+        self.value = value
+        self.remaining_value = value
+        self.ver_array = []
+        self.current_array_index = 0
+
+    def _parse_next_tuple(self):
+        while self.remaining_value and not self.remaining_value[0].isalnum():
+            self.remaining_value = self.remaining_value[1:]
+        if not self.remaining_value:
+            return None
+        if self.remaining_value[0].isdigit():
+            indx = 1
+            while len(self.remaining_value) > indx and self.remaining_value[indx].isdigit():
+                indx += 1
+            numval = int(self.remaining_value[:indx])
+            self.remaining_value = self.remaining_value[indx:]
+            return (numval,)
+        indx = 1
+        while len(self.remaining_value) > indx and self.remaining_value[indx].isalpha():
+            indx += 1
+        alphaval = self.remaining_value[:indx]
+        self.remaining_value = self.remaining_value[indx:]
+        return (0, alphaval)
+
+    def next_value(self):
+        """ Get the next value/tuple."""
+        if len(self.ver_array) > self.current_array_index:
+            value = self.ver_array[self.current_array_index]
+            self.current_array_index += 1
+            return value
+        if self.remaining_value:
+            value = self._parse_next_tuple()
+            if value:
+                self.ver_array.append(value)
+                self.current_array_index += 1
+                return value
+        return None
+
+    def reset(self):
+        """ Reset this instance so it starts from the first tuple.  This does
+            not cause the initial value to be reparsed, again."""
+        self.current_array_index = 0
+
+
+class EvrComparator(object):
+    """ Class that compares EVR values. """
+    def __init__(self, epoch, version, release):
+        self.epoch = int(epoch)
+        self.ver_array = RpmVerArray(version)
+        self.rel_array = RpmVerArray(release)
+
+    @staticmethod
+    def compare_arrays(array1, array2):
+        """ Compare two RpmVerArray instances. """
+        array1.reset()
+        array2.reset()
+        retval = 0
+        while retval == 0:
+            tup1 = array1.next_value()
+            tup2 = array2.next_value()
+            if not tup1 and not tup2:
+                return 0
+            if tup1 and not tup2:
+                return 1
+            if not tup1 and tup2:
+                return -1
+            retval = (tup1 > tup2) - (tup1 < tup2)
+        return retval
+
+    def compare_to(self, evr_comparator):
+        """Return -1, 0 or 1 if self is less than, same as, or greater than
+           the specified evr_comparator, respectively."""
+        if self.epoch < evr_comparator.epoch:
+            return -1
+        if self.epoch > evr_comparator.epoch:
+            return 1
+        retval = self.compare_arrays(self.ver_array, evr_comparator.ver_array)
+        if retval == 0:
+            retval = self.compare_arrays(self.rel_array, evr_comparator.rel_array)
+        return retval
 
 class UpdatesCache(object):
     """Cache which hold updates mappings."""
@@ -131,6 +215,7 @@ class UpdatesAPI(object):
         packages_nameids = []
         packages_evrids = []
         nevra2text = {}
+        name_id2pkgs = {}
 
         for pkg in packages_to_process:
             pkg = str(pkg)
@@ -141,12 +226,17 @@ class UpdatesAPI(object):
                 auxiliary_dict[pkg] = {}  # fill auxiliary dictionary with empty data for every package
                 answer[pkg] = {}          # fill answer with empty data
 
+                auxiliary_dict[pkg]['pkg_epoch'] = pkg_epoch
+                auxiliary_dict[pkg]['pkg_ver'] = pkg_ver
+                auxiliary_dict[pkg]['pkg_rel'] = pkg_rel
+
                 evr_key = "%s:%s:%s" % (pkg_epoch, pkg_ver, pkg_rel)
                 if evr_key in self.updatescache.evr2id_dict and pkg_arch in self.updatescache.arch2id_dict and \
                                 pkg_name in self.updatescache.packagename2id_dict:
                     pkg_name_id = self.updatescache.packagename2id_dict[pkg_name]
                     packages_nameids.append(pkg_name_id)
                     auxiliary_dict[pkg][pkg_name_id] = []
+                    name_id2pkgs.setdefault(pkg_name_id, []).append(auxiliary_dict[pkg])
 
                     evr_id = self.updatescache.evr2id_dict[evr_key]
                     packages_evrids.append(evr_id)
@@ -215,35 +305,24 @@ class UpdatesAPI(object):
             except KeyError:
                 pass
 
-        self.cursor.execute("select name_id, id from package where name_id in %s;", [tuple(packages_nameids)])
-        sql_result = self.cursor.fetchall()
-        names2ids = {}
-        for name_id, oid in sql_result:
-            names2ids.setdefault(name_id, []).append(oid)
-
-        for pkg in auxiliary_dict.values():
-            try:
-                pkg_name_id = pkg['name_id']
-                pkg[pkg_name_id].extend(names2ids[pkg_name_id])
-            except KeyError:
-                pass
-
         update_pkg_ids = []
 
-        sql = """SELECT package.id
+        sql = """SELECT package.id, package.name_id, package.evr_id,
+                        evr.epoch, evr.version, evr.release
                    FROM package
-                   JOIN evr ON package.evr_id = evr.id
-                  WHERE package.id in %s and evr.evr > (select evr from evr where id = %s)"""
-        for pkg in auxiliary_dict.values():
-            if pkg:
-                pkg_name_id = pkg['name_id']
-                if pkg_name_id in pkg and pkg[pkg_name_id]:
-                    self.cursor.execute(sql, [tuple(pkg[pkg_name_id]),
-                                              pkg['evr_id']])
-
-                    for oid in self.cursor.fetchall():
-                        pkg['update_id'].append(oid[0])
-                        update_pkg_ids.append(oid[0])
+                   JOIN evr on package.evr_id = evr.id
+                  WHERE package.name_id in %s"""
+        self.cursor.execute(sql, [tuple(packages_nameids)])
+        sql_result = self.cursor.fetchall()
+        for oid, name_id, evr_id, evr_epoch, evr_ver, evr_rel in sql_result:
+            evr_comparator = EvrComparator(evr_epoch, evr_ver, evr_rel)
+            for pkg in name_id2pkgs[name_id]:
+                if 'evr_id' in pkg and pkg['evr_id'] != evr_id:
+                    if 'evr_comparator' not in pkg:
+                        pkg['evr_comparator'] = EvrComparator(pkg['pkg_epoch'], pkg['pkg_ver'], pkg['pkg_rel'])
+                    if pkg['evr_comparator'].compare_to(evr_comparator) < 0:
+                        pkg['update_id'].append(oid)
+                        update_pkg_ids.append(oid)
 
         pkg_id2repo_id = {}
         pkg_id2errata_id = {}
