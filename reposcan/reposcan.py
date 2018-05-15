@@ -15,7 +15,7 @@ from tornado.web import RequestHandler, Application
 from tornado.websocket import WebSocketHandler
 
 from common.logging import get_logger, init_logging
-from database.database_handler import DatabaseHandler
+from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
@@ -35,15 +35,6 @@ SPEC = APISpec(
 
 WEBSOCKET_PING_INTERVAL = 60
 WEBSOCKET_TIMEOUT = 300
-
-
-def init_db():
-    """Setup DB connection parameters"""
-    DatabaseHandler.db_name = os.getenv('POSTGRESQL_DATABASE', "vmaas")
-    DatabaseHandler.db_user = os.getenv('POSTGRESQL_USER', "vmaas_writer")
-    DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
-    DatabaseHandler.db_host = os.getenv('POSTGRESQL_HOST', "database")
-    DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
 
 
 class NotificationHandler(WebSocketHandler):
