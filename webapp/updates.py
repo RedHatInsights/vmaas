@@ -23,11 +23,11 @@ JSON_SCHEMA = {
 }
 
 
-class UpdatesAPI(object):
-    """ Main /updates API class. """
-    def __init__(self, cursor, repocache):
+class UpdatesCache(object):
+    """Cache which hold updates mappings."""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, cursor):
         self.cursor = cursor
-        self.repocache = repocache
         self.evr2id_dict = {}
         self.id2evr_dict = {}
         self.arch2id_dict = {}
@@ -70,6 +70,14 @@ class UpdatesAPI(object):
             self.packagename2id_dict[pkg_name] = name_id
             self.id2packagename_dict[name_id] = pkg_name
 
+
+class UpdatesAPI(object):
+    """ Main /updates API class. """
+    # pylint: disable=too-few-public-methods
+    def __init__(self, cursor, updatescache, repocache):
+        self.cursor = cursor
+        self.updatescache = updatescache
+        self.repocache = repocache
 
     def process_list(self, data):
         #pylint: disable=too-many-locals,too-many-statements,too-many-branches
@@ -134,17 +142,17 @@ class UpdatesAPI(object):
                 answer[pkg] = {}          # fill answer with empty data
 
                 evr_key = "%s:%s:%s" % (pkg_epoch, pkg_ver, pkg_rel)
-                if evr_key in self.evr2id_dict and pkg_arch in self.arch2id_dict and \
-                                pkg_name in self.packagename2id_dict:
-                    pkg_name_id = self.packagename2id_dict[pkg_name]
+                if evr_key in self.updatescache.evr2id_dict and pkg_arch in self.updatescache.arch2id_dict and \
+                                pkg_name in self.updatescache.packagename2id_dict:
+                    pkg_name_id = self.updatescache.packagename2id_dict[pkg_name]
                     packages_nameids.append(pkg_name_id)
                     auxiliary_dict[pkg][pkg_name_id] = []
 
-                    evr_id = self.evr2id_dict[evr_key]
+                    evr_id = self.updatescache.evr2id_dict[evr_key]
                     packages_evrids.append(evr_id)
                     auxiliary_dict[pkg]['name_id'] = pkg_name_id
                     auxiliary_dict[pkg]['evr_id'] = evr_id
-                    auxiliary_dict[pkg]['arch_id'] = self.arch2id_dict[pkg_arch]
+                    auxiliary_dict[pkg]['arch_id'] = self.updatescache.arch2id_dict[pkg_arch]
                     auxiliary_dict[pkg]['repo_releasevers'] = []
                     auxiliary_dict[pkg]['product_repo_id'] = []
                     auxiliary_dict[pkg]['pkg_id'] = []
@@ -263,11 +271,11 @@ class UpdatesAPI(object):
             packages = self.cursor.fetchall()
 
             for oid, name_id, evr_id, arch_id in packages:
-                full_rpm_name = join_packagename(self.id2packagename_dict[name_id],
-                                                 self.id2evr_dict[evr_id]['epoch'],
-                                                 self.id2evr_dict[evr_id]['version'],
-                                                 self.id2evr_dict[evr_id]['release'],
-                                                 self.id2arch_dict[arch_id])
+                full_rpm_name = join_packagename(self.updatescache.id2packagename_dict[name_id],
+                                                 self.updatescache.id2evr_dict[evr_id]['epoch'],
+                                                 self.updatescache.id2evr_dict[evr_id]['version'],
+                                                 self.updatescache.id2evr_dict[evr_id]['release'],
+                                                 self.updatescache.id2arch_dict[arch_id])
 
                 pkg_id2full_name[oid] = full_rpm_name
                 pkg_id2arch_id[oid] = arch_id
@@ -316,7 +324,7 @@ class UpdatesAPI(object):
             response['update_list'][pkg]['available_updates'] = []
 
             for upd_pkg_id in auxiliary_dict[pkg]['update_id']:
-                if pkg_id2arch_id[upd_pkg_id] not in self.arch_compat[auxiliary_dict[pkg]['arch_id']] or \
+                if pkg_id2arch_id[upd_pkg_id] not in self.updatescache.arch_compat[auxiliary_dict[pkg]['arch_id']] or \
                                 upd_pkg_id not in pkg_id2errata_id or upd_pkg_id not in pkg_id2repo_id:
                     continue
 
@@ -332,7 +340,7 @@ class UpdatesAPI(object):
                     for e_id in errata_ids:
                         # check current erratum is security or has some linked cve
                         # and it is in the same repo with update pkg
-                        if (self.id2erratatype_dict[eid2erratatypeid_dict[e_id]] == SECURITY_ERRATA_TYPE
+                        if (self.updatescache.id2erratatype_dict[eid2erratatypeid_dict[e_id]] == SECURITY_ERRATA_TYPE
                                 or e_id in errata_id2cve_id and errata_id2cve_id[e_id]) \
                                 and r_id in errata_id2repo_id[e_id]:
                             e_name = id2errata_dict[e_id]

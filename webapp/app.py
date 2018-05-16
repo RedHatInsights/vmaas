@@ -20,7 +20,7 @@ from apispec import APISpec
 from database import Database
 from cve import CveAPI
 from repos import RepoAPI, RepoCache
-from updates import UpdatesAPI
+from updates import UpdatesAPI, UpdatesCache
 from errata import ErrataAPI
 from dbchange import DBChange
 import gen
@@ -45,6 +45,8 @@ class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
 
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+    repocache = None
+    updatescache = None
 
     @run_on_executor
     def background_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
@@ -52,16 +54,15 @@ class BaseHandler(tornado.web.RequestHandler):
 
         db_instance = Database()
         cursor = db_instance.cursor()
-        repocache = RepoCache(cursor)
 
         result = None
 
         if endpoint == '/cves':
             result = CveAPI(cursor).process_list(data)
         elif endpoint == '/updates':
-            result = UpdatesAPI(cursor, repocache).process_list(data)
+            result = UpdatesAPI(cursor, self.updatescache, self.repocache).process_list(data)
         elif endpoint == '/repos':
-            result = RepoAPI(cursor, repocache).process_list(data)
+            result = RepoAPI(cursor, self.repocache).process_list(data)
         elif endpoint == '/errata':
             result = ErrataAPI(db_instance).process_list(data)
         elif endpoint == '/dbchange':
@@ -783,8 +784,8 @@ class Application(tornado.web.Application):
         setup_apispec(handlers)
         db_instance = Database()
         cursor = db_instance.cursor()
-        self.repocache = RepoCache(cursor)
-        self.updatesapi = UpdatesAPI(cursor, self.repocache)
+        BaseHandler.updatescache = UpdatesCache(cursor)
+        BaseHandler.repocache = RepoCache(cursor)
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None
         self._websocket_reconnect()
@@ -792,9 +793,10 @@ class Application(tornado.web.Application):
         self.reconnect_callback.start()
         tornado.web.Application.__init__(self, handlers)
 
-    def _refresh_cache(self):
-        self.updatesapi.prepare()
-        self.repocache.prepare()
+    @staticmethod
+    def _refresh_cache():
+        BaseHandler.updatescache.prepare()
+        BaseHandler.repocache.prepare()
         print("Cached data refreshed.")
         sys.stdout.flush()
 
