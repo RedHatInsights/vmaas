@@ -17,6 +17,7 @@ from tornado.websocket import WebSocketHandler
 from common.logging import get_logger, init_logging
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
+from exporter import DUMP, main as export_data
 from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
@@ -438,12 +439,49 @@ class CvemapSyncHandler(SyncHandler):
         return "OK"
 
 
+class ExporterHandler(SyncHandler):
+    """Handler for Export sync API."""
+
+    task_type = "Export"
+
+    def get(self): # pylint: disable=arguments-differ
+        """Export disk dump.
+           ---
+           description: Export disk dump
+           responses:
+             200:
+               description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
+             429:
+               description: Another sync is already in progress
+           tags:
+             - sync
+        """
+        status_code, status_msg = self.start_task()
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start exporting disk dump."""
+        try:
+            export_data(DUMP)
+        except: # pylint: disable=bare-except
+            LOGGER.error(traceback.format_exc())
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
+
+
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
-                                  CvemapSyncHandler.task_type,
-                                  CveSyncHandler.task_type)
+    task_type = "%s + %s + %s + %s" % (RepoSyncHandler.task_type,
+                                       CvemapSyncHandler.task_type,
+                                       CveSyncHandler.task_type,
+                                       ExporterHandler.task_type)
 
     def get(self): # pylint: disable=arguments-differ
         """Sync repos + CVEs + CVEmap.
@@ -467,9 +505,10 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s" % (RepoSyncHandler.run_task(),
-                               CvemapSyncHandler.run_task(),
-                               CveSyncHandler.run_task())
+        return "%s, %s, %s, %s" % (RepoSyncHandler.run_task(),
+                                   CvemapSyncHandler.run_task(),
+                                   CveSyncHandler.run_task(),
+                                   ExporterHandler.run_task())
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
@@ -516,6 +555,7 @@ class ReposcanApplication(Application):
             (r"/notifications/?", NotificationHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
+            (r"/api/v1/sync/export/?", ExporterHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
             (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
