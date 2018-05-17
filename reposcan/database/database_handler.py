@@ -5,6 +5,18 @@ import os
 import psycopg2
 
 
+class NamedCursor:
+    """Wrapper class for named cursor."""
+    # pylint: disable=too-few-public-methods
+    def __init__(self, db_connection, name="default"):
+        self.cursor = db_connection.cursor(name=name)
+
+    def __enter__(self):
+        return self.cursor
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+
 class DatabaseHandler:
     """Static class maintaining single PostgreSQL connection."""
     db_name = None
