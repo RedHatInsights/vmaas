@@ -29,6 +29,7 @@ services:
       - 8081:8081
     volumes:
       - vmaas-reposcan-tmp:/tmp
+      - vmaas-dump-data:/data:z
     depends_on:
       - database
 
@@ -42,6 +43,8 @@ services:
       - ./conf/webapp.env
     ports:
       - 8080:8080
+    volumes:
+      - vmaas-dump-data:/data:z
     depends_on:
       - database
       - reposcan
@@ -61,4 +64,5 @@ services:
 
 volumes:
   vmaas-db-data:
+  vmaas-dump-data:
   vmaas-reposcan-tmp:
