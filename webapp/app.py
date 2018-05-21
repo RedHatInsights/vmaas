@@ -18,9 +18,10 @@ import tornado.web
 
 from apispec import APISpec
 from database import Database
+from cache import Cache
 from cve import CveAPI
 from repos import RepoAPI, RepoCache
-from updates import UpdatesAPI, UpdatesCache
+from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
 import gen
@@ -60,7 +61,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if endpoint == '/cves':
             result = CveAPI(cursor).process_list(data)
         elif endpoint == '/updates':
-            result = UpdatesAPI(self.updatescache, self.repocache).process_list(data)
+            result = UpdatesAPI(self.cache).process_list(data)
         elif endpoint == '/repos':
             result = RepoAPI(cursor, self.repocache).process_list(data)
         elif endpoint == '/errata':
@@ -784,7 +785,7 @@ class Application(tornado.web.Application):
         setup_apispec(handlers)
         db_instance = Database()
         cursor = db_instance.cursor()
-        BaseHandler.updatescache = UpdatesCache(db_instance)
+        BaseHandler.cache = Cache()
         BaseHandler.repocache = RepoCache(cursor)
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None
@@ -795,7 +796,7 @@ class Application(tornado.web.Application):
 
     @staticmethod
     def _refresh_cache():
-        BaseHandler.updatescache.prepare()
+        BaseHandler.cache.reload()
         BaseHandler.repocache.prepare()
         print("Cached data refreshed.")
         sys.stdout.flush()
