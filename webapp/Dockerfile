@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM fedora:27
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
 # defaults; will be overwritten by docker-compose.env
@@ -10,12 +10,11 @@ ENV POSTGRESQL_DATABASE=vmaas
 
 ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
 
-RUN curl -o /etc/yum.repos.d/group_vmaas-libs-epel-7.repo https://copr.fedorainfracloud.org/coprs/g/vmaas/libs/repo/epel-7/group_vmaas-libs-epel-7.repo
-
-RUN yum -y update \
-    && yum -y install epel-release \
-    && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures python2-jsonschema \
-    && rm -rf /var/cache/yum/*
+RUN dnf -y update \
+    && dnf install -y dnf-plugins-core \
+    && dnf copr enable -y @vmaas/libs \
+    && dnf -y install python3-tornado python3-psycopg2 python3-apispec postgresql python3-dateutil python3-jsonschema \
+    && rm -rf /var/cache/dnf/*
 
 ADD ./wait-for-services.sh /app/wait-for-services.sh
 ADD ./entrypoint.sh /app/
