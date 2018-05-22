@@ -1,4 +1,4 @@
-FROM fedora:27
+FROM fedora:28
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
 # defaults; will be overwritten by docker-compose.env
