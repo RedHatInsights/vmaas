@@ -89,7 +89,7 @@ class ErrataAPI(object):
         if not errata_to_process:
             return response
 
-        errata_to_process = filter(None, errata_to_process)
+        errata_to_process = list(filter(None, errata_to_process))
         # Select all errata in request
         errata_query = """SELECT errata.id as oid,
                                  errata.name as name,

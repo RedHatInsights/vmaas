@@ -56,7 +56,7 @@ class CveAPI(object):
         if not cves_to_process:
             return answer
 
-        cves_to_process = filter(None, cves_to_process)
+        cves_to_process = list(filter(None, cves_to_process))
         # Select all cves in request
         column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "cve_impact.name",
                         "published_date", "modified_date", "iava", "description"]
