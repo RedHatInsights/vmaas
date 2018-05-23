@@ -10,9 +10,9 @@ ENV POSTGRESQL_DATABASE=vmaas
 
 ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
 
+RUN curl -o /etc/yum.repos.d/group_vmaas-libs-epel-7.repo https://copr.fedorainfracloud.org/coprs/g/vmaas/libs/repo/epel-7/group_vmaas-libs-epel-7.repo
+
 RUN yum -y update \
-    && yum -y install yum-plugin-copr \
-    && yum -y copr enable @vmaas/libs \
     && yum -y install epel-release \
     && yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures python2-jsonschema \
     && rm -rf /var/cache/yum/*
