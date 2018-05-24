@@ -211,15 +211,17 @@ class UpdatesAPI(object):
         repo_ids = []
         errata_repo_ids = set()
         for errata_id in errata_ids:
-            for repo_id in self.updatescache.errataid2repoids[errata_id]:
-                errata_repo_ids.add(repo_id)
+            if errata_id in self.updatescache.errataid2repoids:
+                for repo_id in self.updatescache.errataid2repoids[errata_id]:
+                    errata_repo_ids.add(repo_id)
 
-        for repo_id in self.updatescache.pkgid2repoids[update_pkg_id]:
-            if repo_id in available_repo_ids \
-                    and self.repocache.id2productid(repo_id) in product_ids \
-                    and repo_id in errata_repo_ids \
-                    and self.repocache.get_by_id(repo_id)['releasever'] in valid_releasevers:
-                repo_ids.append(repo_id)
+        if update_pkg_id in self.updatescache.pkgid2repoids:
+            for repo_id in self.updatescache.pkgid2repoids[update_pkg_id]:
+                if repo_id in available_repo_ids \
+                        and self.repocache.id2productid(repo_id) in product_ids \
+                        and repo_id in errata_repo_ids \
+                        and self.repocache.get_by_id(repo_id)['releasever'] in valid_releasevers:
+                    repo_ids.append(repo_id)
 
         return repo_ids
 
