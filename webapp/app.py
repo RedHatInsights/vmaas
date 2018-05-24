@@ -47,7 +47,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
     repocache = None
-    updatescache = None
+    cache = None
 
     @run_on_executor
     def background_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
