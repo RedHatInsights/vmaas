@@ -235,14 +235,25 @@ class UpdatesHandlerPost(BaseHandler):
                 res = yield self.background_process(endpoint='/updates', data=data)
                 code = 200
             except ValidationError as validerr:
-                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                if validerr.absolute_path:
+                    res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                else:
+                    res = '%s' % validerr.message
                 print('ValidationError: ' + res)
+                sys.stdout.flush()
             except ValueError as valuerr:
                 res = str(valuerr)
                 print('ValueError: ' + res)
+                sys.stdout.flush()
+            except: # pylint: disable=bare-except
+                res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
+                code = 500
+                print(res)
+                sys.stdout.flush()
         else:
             res = 'Error: malformed input JSON.'
             print(res)
+            sys.stdout.flush()
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -319,14 +330,25 @@ class CVEHandlerPost(BaseHandler):
                 res = yield self.background_process(endpoint='/cves', data=data)
                 code = 200
             except ValidationError as validerr:
-                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                if validerr.absolute_path:
+                    res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                else:
+                    res = '%s' % validerr.message
                 print('ValidationError: ' + res)
+                sys.stdout.flush()
             except ValueError as valuerr:
                 res = str(valuerr)
                 print('ValueError: ' + res)
+                sys.stdout.flush()
+            except: # pylint: disable=bare-except
+                res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
+                code = 500
+                print(res)
+                sys.stdout.flush()
         else:
             res = 'Error: malformed input JSON.'
             print(res)
+            sys.stdout.flush()
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -400,14 +422,25 @@ class ReposHandlerPost(BaseHandler):
                 res = yield self.background_process(endpoint='/repos', data=data)
                 code = 200
             except ValidationError as validerr:
-                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                if validerr.absolute_path:
+                    res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                else:
+                    res = '%s' % validerr.message
                 print('ValidationError: ' + res)
+                sys.stdout.flush()
             except ValueError as valuerr:
                 res = str(valuerr)
                 print('ValueError: ' + res)
+                sys.stdout.flush()
+            except: # pylint: disable=bare-except
+                res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
+                code = 500
+                print(res)
+                sys.stdout.flush()
         else:
             res = 'Error: malformed input JSON.'
             print(res)
+            sys.stdout.flush()
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
@@ -484,14 +517,25 @@ class ErrataHandlerPost(BaseHandler):
                 res = yield self.background_process(endpoint='/errata', data=data)
                 code = 200
             except ValidationError as validerr:
-                res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                if validerr.absolute_path:
+                    res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
+                else:
+                    res = '%s' % validerr.message
                 print('ValidationError: ' + res)
+                sys.stdout.flush()
             except ValueError as valuerr:
                 res = str(valuerr)
                 print('ValueError: ' + res)
+                sys.stdout.flush()
+            except: # pylint: disable=bare-except
+                res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
+                code = 500
+                print(res)
+                sys.stdout.flush()
         else:
             res = 'Error: malformed input JSON.'
             print(res)
+            sys.stdout.flush()
         IOLoop.instance().add_callback(self.send_response, res, code)
 
 
