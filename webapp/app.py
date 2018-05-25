@@ -20,7 +20,7 @@ from apispec import APISpec
 from database import Database
 from cache import Cache
 from cve import CveAPI
-from repos import RepoAPI, RepoCache
+from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
@@ -46,7 +46,6 @@ class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
 
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-    repocache = None
     cache = None
 
     @run_on_executor
@@ -63,7 +62,7 @@ class BaseHandler(tornado.web.RequestHandler):
         elif endpoint == '/updates':
             result = UpdatesAPI(self.cache).process_list(data)
         elif endpoint == '/repos':
-            result = RepoAPI(cursor, self.repocache).process_list(data)
+            result = RepoAPI(self.cache).process_list(data)
         elif endpoint == '/errata':
             result = ErrataAPI(db_instance).process_list(data)
         elif endpoint == '/dbchange':
@@ -783,10 +782,7 @@ class Application(tornado.web.Application):
             (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
         ]
         setup_apispec(handlers)
-        db_instance = Database()
-        cursor = db_instance.cursor()
         BaseHandler.cache = Cache()
-        BaseHandler.repocache = RepoCache(cursor)
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None
         self._websocket_reconnect()
@@ -797,7 +793,6 @@ class Application(tornado.web.Application):
     @staticmethod
     def _refresh_cache():
         BaseHandler.cache.reload()
-        BaseHandler.repocache.prepare()
         print("Cached data refreshed.")
         sys.stdout.flush()
 
