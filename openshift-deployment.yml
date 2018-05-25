@@ -1,7 +1,6 @@
 ---
 - hosts: all
   vars:
-    app_name: vmaas
     apidoc_container_port: 8080
     webapp_container_port: 8080
     reposcan_container_port: 8081
@@ -39,7 +38,7 @@
         - always
 
     - name: Create VMaaS
-      shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc create -f -
+      shell: kompose --provider openshift convert -o - | ./scripts/openshift_setup.py | oc create -f -
       tags:
         - up
 
@@ -82,6 +81,6 @@
       ignore_errors: True
 
     - name: Delete VMaaS
-      shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc delete -f -
+      shell: kompose --provider openshift convert -o - | ./scripts/openshift_setup.py | oc delete -f -
       tags:
         - down
