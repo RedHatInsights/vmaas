@@ -79,6 +79,7 @@
       tags:
         - down
         - routes-down
+      ignore_errors: True
 
     - name: Delete VMaaS
       shell: kompose --provider openshift convert -o - | ./scripts/openshift_app_label.py {{ app_name }} | oc delete -f -
