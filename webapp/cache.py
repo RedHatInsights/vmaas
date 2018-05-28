@@ -3,9 +3,11 @@ Module to cache data from file dump.
 """
 
 import dbm
+import os
 import shelve
 
 DUMP = '/data/vmaas.dbm'
+REMOTE_DUMP = 'rsync://reposcan/data/vmaas.dbm'
 
 # repo_detail indexes
 REPO_LABEL = 0
@@ -22,9 +24,26 @@ class Cache(object):
     # pylint: disable=too-many-instance-attributes
     def __init__(self, filename=DUMP):
         self.filename = filename
+        self.packagename2id = {}
+        self.id2packagename = {}
+        self.updates = {}
+        self.updates_index = {}
+        self.evr2id = {}
+        self.id2evr = {}
+        self.arch2id = {}
+        self.id2arch = {}
+        self.arch_compat = {}
+        self.package_details = {}
+        self.repo_detail = {}
+        self.repolabel2ids = {}
+        self.productid2repoids = {}
+        self.pkgid2repoids = {}
+        self.errataid2name = {}
+        self.pkgid2errataids = {}
+        self.errataid2repoids = {}
         self.reload()
 
-    def reload(self):
+    def clear(self):
         """Clear dictionaries and load new data."""
         self.packagename2id = {}
         self.id2packagename = {}
@@ -43,7 +62,17 @@ class Cache(object):
         self.errataid2name = {}
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
-        self.load(self.filename)
+
+    def reload(self):
+        """Update data and reload dictionaries."""
+        if self.download():
+            self.clear()
+            self.load(self.filename)
+
+    @staticmethod
+    def download():
+        """Download new version of data."""
+        return not os.system("rsync -a --quiet %s %s" % (REMOTE_DUMP, DUMP))
 
     def load(self, filename):
         """Load data from shelve file into dictionaries."""

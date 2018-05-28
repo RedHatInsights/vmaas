@@ -43,8 +43,6 @@ services:
       - ./conf/webapp.env
     ports:
       - 8080:8080
-    volumes:
-      - vmaas-dump-data:/data:z
     depends_on:
       - database
       - reposcan
