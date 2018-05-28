@@ -17,11 +17,12 @@ ENV RETRY_COUNT=3
 RUN dnf install -y dnf-plugins-core && dnf copr enable -y @vmaas/libs \
     && dnf install -y python3-apispec python3-psycopg2 python3-requests \
                       python3-tornado postgresql-libs postgresql \
-                      python3-dateutil \
+                      python3-dateutil rsync \
     && rm -rf /var/cache/dnf/*
 
 # copy application to directory in a container
 ADD . /vmaas-reposcan/
+ADD rsyncd.conf /etc/
 
 # remove some unnecesary files
 RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
