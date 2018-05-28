@@ -70,6 +70,7 @@ class BaseHandler(tornado.web.RequestHandler):
         elif endpoint == '/apispec':
             result = SPEC.to_dict()
 
+        db_instance.connection.close()
         return result
 
     def data_received(self, chunk):
