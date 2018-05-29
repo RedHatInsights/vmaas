@@ -35,10 +35,14 @@ class CVE(object):
         value = getattr(self, attr_name, "")
         return value if value is not None else ""
 
+
 class CveAPI(object):
     """ Main /cves API class. """
-    def __init__(self, cursor):
+    def __init__(self, cursor, items_per_page=5000):
         self.cursor = cursor
+        self.page_size = items_per_page
+        self.pages = 1
+        self.page = 1
 
     def process_list(self, data):
         """
@@ -52,9 +56,12 @@ class CveAPI(object):
 
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
-        answer = {}
-        if not cves_to_process:
-            return answer
+        self.page = data.get("page", self.page)
+        self.page_size = data.get("page_size", self.page_size)
+        cve_list = []
+
+        if not cves_to_process or self.page <= 0:
+            return self.construct_answer(cve_list, modified_since)
 
         cves_to_process = list(filter(None, cves_to_process))
         # Select all cves in request
@@ -65,29 +72,50 @@ class CveAPI(object):
                          LEFT JOIN cve_impact ON cve.impact_id = cve_impact.id
                         WHERE""".format(columns=', '.join(column_names))
 
+        # Count number of CVEs in the DB
+        cve_number_query = """SELECT count(cve.id)
+                         FROM cve
+                         LEFT JOIN cve_impact ON cve.impact_id = cve_impact.id
+                        WHERE"""
+
         if len(cves_to_process) == 1:
             cve_query += " cve.name ~ %s"
+            cve_number_query += " cve.name ~ %s"
             cve_query_params = cves_to_process
         else:
             cve_query += " cve.name IN %s"
+            cve_number_query += " cve.name IN %s"
             cve_query_params = [tuple(cves_to_process)]
 
         if modified_since:
             cve_query += " and (cve.modified_date >= %s or cve.published_date >= %s)"
+            cve_number_query += " and (cve.modified_date >= %s or cve.published_date >= %s)"
             cve_query_params.append(parse_datetime(modified_since))
             cve_query_params.append(parse_datetime(modified_since))
 
+        # count number of pages in response
+        self.cursor.execute(cve_number_query, cve_query_params)
+        cves = self.cursor.fetchall()[0][0]  # get entire number of CVEs in the DB
+        self.pages = cves / self.page_size   # update number of pages
+        if cves % self.page_size > 0:
+            self.pages += 1
+
+        if self.page > self.pages:
+            return self.construct_answer(cve_list, modified_since)
+        else:
+            cve_query += " ORDER BY cve.id LIMIT %s OFFSET %s"
+            cve_query_params.append(self.page_size)
+            cve_query_params.append(self.page_size * (self.page - 1))
+
         self.cursor.execute(cve_query, cve_query_params)
         cves = self.cursor.fetchall()
-        cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
-        CVE.cve_cwe_map = cwe_map
-        cve_list = []
+        CVE.cve_cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
+
         for cve_entry in cves:
             cve = CVE(cve_entry, column_names)
             cve_list.append(cve)
 
         return self.construct_answer(cve_list, modified_since)
-
 
     def get_cve_cwe_map(self, ids):
         """
@@ -104,9 +132,7 @@ class CveAPI(object):
         self.cursor.execute(query, [tuple(ids)])
         return self.cursor.fetchall()
 
-
-    @staticmethod
-    def construct_answer(cve_list, modified_since):
+    def construct_answer(self, cve_list, modified_since):
         """
         Final dictionary generation
         :param cve_list: which cves to show
@@ -128,4 +154,8 @@ class CveAPI(object):
         response = {"cve_list": resp_cve_list}
         if modified_since:
             response["modified_since"] = modified_since
+
+        response["page"] = self.page
+        response["pages"] = self.pages
+        response["page_size"] = self.page_size
         return response
