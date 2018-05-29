@@ -29,6 +29,6 @@ RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
            /vmaas-reposcan/test_data /vmaas-reposcan/run_tests.sh \
            /vmaas-reposcan/repodata/test
 
-EXPOSE 8081
+EXPOSE 8081 8730
 
 CMD ["/vmaas-reposcan/entrypoint.sh"]
