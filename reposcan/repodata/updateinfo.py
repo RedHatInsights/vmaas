@@ -15,7 +15,7 @@ DATETIME_PATTERNS = {
 }
 
 
-class UpdateInfoMD: # pylint: disable=too-few-public-methods, too-many-locals
+class UpdateInfoMD:
     """Class parsing UpdateInfo XML. Takes filename in the constructor."""
     def __init__(self, filename):
         self.updates = []

@@ -20,12 +20,11 @@ DEFAULT_RETRY_COUNT = 3
 VALID_HTTP_CODES = [200]
 
 
-class DownloadItem: # pylint: disable=too-few-public-methods
+class DownloadItem:
     """
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
     and result HTTP status code of the download operation.
     """
-    # pylint: disable=too-many-arguments
     def __init__(self, source_url=None, target_path=None, ca_cert=None, cert=None, key=None):
         self.source_url = source_url
         self.target_path = target_path

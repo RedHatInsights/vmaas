@@ -7,7 +7,7 @@ from common.logging import get_logger
 from database.database_handler import DatabaseHandler
 
 
-class ProductStore: # pylint: disable=too-few-public-methods
+class ProductStore:
     """
     Class providing interface for storing product info.
     """
