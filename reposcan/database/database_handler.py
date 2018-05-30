@@ -7,7 +7,6 @@ import psycopg2
 
 class NamedCursor:
     """Wrapper class for named cursor."""
-    # pylint: disable=too-few-public-methods
     def __init__(self, db_connection, name="default"):
         self.cursor = db_connection.cursor(name=name)
 

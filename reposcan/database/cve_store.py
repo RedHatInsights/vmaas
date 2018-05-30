@@ -23,7 +23,7 @@ class CveStore(CveStoreCommon):
         cur.close()
         return lastmodified
 
-    def _populate_cves(self, repo):     # pylint: disable=too-many-locals
+    def _populate_cves(self, repo):
         cve_impact_map = self._populate_cve_impacts()
         nist_source_id = self._get_source_id('NIST')
         cur = self.conn.cursor()

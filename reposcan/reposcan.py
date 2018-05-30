@@ -80,7 +80,7 @@ class NotificationHandler(WebSocketHandler):
         self.last_pong = IOLoop.current().time()
 
 
-class ResponseJson(dict): # pylint: disable=too-few-public-methods
+class ResponseJson(dict):
     """Object used as API response to user, represented as JSON"""
     def __init__(self, msg, success=True):
         super(ResponseJson, self).__init__()
@@ -180,7 +180,6 @@ class RepoSyncHandler(SyncHandler):
         return repos
 
     def _parse_input_list(self):
-        # pylint: disable=too-many-locals
         products = {}
         repos = []
         json_data = ""

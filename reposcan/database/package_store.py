@@ -9,7 +9,7 @@ from database.database_handler import DatabaseHandler
 CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
 
 
-class PackageStore: # pylint: disable=too-few-public-methods
+class PackageStore:
     """
     Class providing interface for storing packages and related info.
     All packages from repository are imported to the DB at once.

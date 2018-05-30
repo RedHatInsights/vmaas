@@ -26,7 +26,6 @@ JSON_SCHEMA = {
 
 class UpdatesAPI(object):
     """ Main /updates API class."""
-    # pylint: disable=too-few-public-methods
     def __init__(self, cache):
         self.cache = cache
 
@@ -82,7 +81,6 @@ class UpdatesAPI(object):
             valid_releasevers.add(self.cache.repo_detail[original_package_repo_id][REPO_RELEASEVER])
         return valid_releasevers
 
-    # pylint: disable=too-many-arguments
     def _get_repositories(self, product_ids, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
         repo_ids = []
         errata_repo_ids = set()
@@ -107,7 +105,6 @@ class UpdatesAPI(object):
         return join_packagename(name, epoch, ver, rel, arch)
 
     def _process_updates(self, packages_to_process, available_repo_ids, response):
-        # pylint: disable=too-many-locals
         for pkg, pkg_dict in packages_to_process.items():
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.cache.packagename2id[name]

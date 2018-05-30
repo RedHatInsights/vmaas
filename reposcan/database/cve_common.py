@@ -7,7 +7,7 @@ from common.logging import get_logger
 from database.database_handler import DatabaseHandler
 
 
-class CveStoreCommon: # pylint: disable=too-few-public-methods
+class CveStoreCommon:
     """
     Class interface for listing and storing CVEs in database.
     """

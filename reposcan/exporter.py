@@ -113,7 +113,6 @@ class DataDump:
 
     def dump_repo(self, dump):
         """Select repo mappings"""
-        # pylint: disable=too-many-locals
 
         # Select repo detail mapping
         with self._named_cursor() as cursor:
