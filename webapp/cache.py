@@ -7,7 +7,7 @@ import os
 import shelve
 
 DUMP = '/data/vmaas.dbm'
-REMOTE_DUMP = 'rsync://reposcan/data/vmaas.dbm'
+REMOTE_DUMP = 'rsync://reposcan:8730/data/vmaas.dbm'
 
 # repo_detail indexes
 REPO_LABEL = 0
