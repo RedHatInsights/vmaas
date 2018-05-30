@@ -9,11 +9,11 @@ class CVE(object):
     """
     Class to hold CVE attributes
     """
-    cve_cwe_map = None
 
-    def __init__(self, cve_entry, column_names):
+    def __init__(self, cve_entry, column_names, ccmap):
         for col_name in column_names:
             setattr(self, col_name, cve_entry[column_names.index(col_name)])
+        self.cve_cwe_map = ccmap
         self.cwe = self.associate_cwes()
 
     def associate_cwes(self):
@@ -22,8 +22,8 @@ class CVE(object):
         :return:
         """
         cwe_map = []
-        if CVE.cve_cwe_map is not None:
-            cwe_map = [item[1] for item in CVE.cve_cwe_map if self.get_val("cve.id") == item[0]]
+        if self.cve_cwe_map is not None:
+            cwe_map = [item[1] for item in self.cve_cwe_map if self.get_val("cve.id") == item[0]]
         return cwe_map
 
     def get_val(self, attr_name):
@@ -80,10 +80,9 @@ class CveAPI(object):
         self.cursor.execute(cve_query, cve_query_params)
         cves = self.cursor.fetchall()
         cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
-        CVE.cve_cwe_map = cwe_map
         cve_list = []
         for cve_entry in cves:
-            cve = CVE(cve_entry, column_names)
+            cve = CVE(cve_entry, column_names, cwe_map)
             cve_list.append(cve)
 
         return self.construct_answer(cve_list, modified_since)
