@@ -9,6 +9,7 @@ ENV POSTGRESQL_PASSWORD=vmaas_reader_pwd
 ENV POSTGRESQL_DATABASE=vmaas
 
 ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
+ENV MAX_VMAAS_SERVERS=2
 
 RUN dnf -y update \
     && dnf install -y dnf-plugins-core \
