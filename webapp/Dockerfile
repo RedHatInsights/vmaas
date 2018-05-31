@@ -23,6 +23,9 @@ ADD ./entrypoint.sh /app/
 ADD ./*.py /app/
 ADD ./vmaas /app/
 
+RUN adduser --gid 0 -d /app --no-create-home -c 'VMAAS user' vmaas
+USER vmaas
+
 EXPOSE 8080
 
 CMD ["/app/entrypoint.sh"]
