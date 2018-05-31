@@ -116,6 +116,7 @@ class ApiSpecHandler(BaseHandler):
         """
         self.write(SPEC.to_dict())
 
+
 class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
 
@@ -151,10 +152,13 @@ class SyncHandler(BaseHandler):
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
-        LOGGER.info("%s sync task finished: %s.", cls.task_type, task_result)
-        SyncTask.finish()
+        if cls != ExporterHandler:
+            # Export dump
+            ExporterHandler.run_task()
         # Notify webapps to update it's cache
         SyncHandler._notify_webapps()
+        LOGGER.info("%s sync task finished: %s.", cls.task_type, task_result)
+        SyncTask.finish()
 
 
 class RepoSyncHandler(SyncHandler):
@@ -477,10 +481,9 @@ class ExporterHandler(SyncHandler):
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s + %s" % (RepoSyncHandler.task_type,
-                                       CvemapSyncHandler.task_type,
-                                       CveSyncHandler.task_type,
-                                       ExporterHandler.task_type)
+    task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
+                                  CvemapSyncHandler.task_type,
+                                  CveSyncHandler.task_type)
 
     def get(self): # pylint: disable=arguments-differ
         """Sync repos + CVEs + CVEmap.
@@ -504,10 +507,9 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s, %s" % (RepoSyncHandler.run_task(),
-                                   CvemapSyncHandler.run_task(),
-                                   CveSyncHandler.run_task(),
-                                   ExporterHandler.run_task())
+        return "%s, %s, %s" % (RepoSyncHandler.run_task(),
+                               CvemapSyncHandler.run_task(),
+                               CveSyncHandler.run_task())
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
