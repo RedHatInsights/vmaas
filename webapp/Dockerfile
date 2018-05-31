@@ -17,7 +17,7 @@ RUN dnf -y update \
                 python3-jsonschema rsync \
     && rm -rf /var/cache/dnf/*
 
-RUN mkdir /data
+RUN install -m 1777 -d /data
 ADD ./wait-for-services.sh /app/wait-for-services.sh
 ADD ./entrypoint.sh /app/
 ADD ./*.py /app/
