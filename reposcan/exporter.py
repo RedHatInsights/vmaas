@@ -35,6 +35,7 @@ class DataDump:
             self.dump_package_details(dump)
             self.dump_repo(dump)
             self.dump_errata(dump)
+            self.dump_cves(dump)
 
     def dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
@@ -192,6 +193,39 @@ class DataDump:
                     errataid2repoids.setdefault("errataid2repoids:%s" % errata_id,
                                                 set()).add(repo_id)
                 dump.update(errataid2repoids)
+
+    def dump_cves(self, dump):
+        """Select cve details"""
+        # Select CWE to CVE mapping
+        cveid2cwe = {}
+        with self._named_cursor() as cursor:
+            cursor.execute("""select cve_id, cwe.name
+                                from cve_cwe
+                                join cwe on cve_cwe.cwe_id = cwe.id
+                           """)
+            for cve_id, cwe in cursor:
+                cveid2cwe.setdefault(cve_id, []).append(cwe)
+
+        # Select errata ID to name mapping
+        with self._named_cursor() as cursor:
+            cursor.execute("""select cve.id,
+                                     cve.name,
+                                     cve.redhat_url,
+                                     cve.secondary_url,
+                                     cve.cvss3_score,
+                                     cve_impact.name as impact,
+                                     cve.published_date,
+                                     cve.modified_date,
+                                     cve.iava,
+                                     cve.description
+                                from cve
+                           left join cve_impact on cve.impact_id = cve_impact.id
+                           """)
+            for cve_id, name, redhat_url, secondary_url, cvss3_score, impact, \
+                published_date, modified_date, iava, description in cursor:
+                dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, impact,
+                                                published_date, modified_date, iava, description,
+                                                cveid2cwe.get(cve_id, []))
 
 
 def main(filename):

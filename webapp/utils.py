@@ -47,3 +47,7 @@ def parse_datetime(date):
     if date is None:
         return None
     return dateutil_parser.parse(date)
+
+def none2empty(value):
+    """Convert None to empty string."""
+    return value if value is not None else ""

@@ -19,6 +19,17 @@ REPO_PRODUCT = 5
 REPO_PRODUCT_ID = 6
 REPO_REVISION = 7
 
+# cve detail indexes
+CVE_REDHAT_URL = 0
+CVE_SECONDARY_URL = 1
+CVE_CVSS3_SCORE = 2
+CVE_IMPACT = 3
+CVE_PUBLISHED_DATE = 4
+CVE_MODIFIED_DATE = 5
+CVE_IAVA = 6
+CVE_DESCRIPTION = 7
+CVE_CWE = 8
+
 class Cache(object):
     """ Cache class. """
     # pylint: disable=too-many-instance-attributes
@@ -41,6 +52,7 @@ class Cache(object):
         self.errataid2name = {}
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
+        self.cve_detail = {}
         self.reload()
 
     def clear(self):
@@ -62,6 +74,7 @@ class Cache(object):
         self.errataid2name = {}
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
+        self.cve_detail = {}
 
     def reload(self):
         """Update data and reload dictionaries."""
@@ -119,5 +132,7 @@ class Cache(object):
                 self.pkgid2errataids[int(key)] = data[item]
             elif relation == "errataid2repoids":
                 self.errataid2repoids[int(key)] = data[item]
+            elif relation == "cve_detail":
+                self.cve_detail[key] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
