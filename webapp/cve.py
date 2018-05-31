@@ -2,43 +2,27 @@
 Module contains functions and CVE class for returning data from DB
 """
 
-from utils import format_datetime, parse_datetime
+import re
 
+from utils import format_datetime, parse_datetime, none2empty
+from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
+                  CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_DESCRIPTION
 
-class CVE(object):
-    """
-    Class to hold CVE attributes
-    """
-
-    def __init__(self, cve_entry, column_names, ccmap):
-        for col_name in column_names:
-            setattr(self, col_name, cve_entry[column_names.index(col_name)])
-        self.cve_cwe_map = ccmap
-        self.cwe = self.associate_cwes()
-
-    def associate_cwes(self):
-        """
-        Assigns cve to cwe and creates a list
-        :return:
-        """
-        cwe_map = []
-        if self.cve_cwe_map is not None:
-            cwe_map = [item[1] for item in self.cve_cwe_map if self.get_val("cve.id") == item[0]]
-        return cwe_map
-
-    def get_val(self, attr_name):
-        """
-        Return CVE attribute or None
-        :param attr_name: attr_name
-        :return: attribute
-        """
-        value = getattr(self, attr_name, "")
-        return value if value is not None else ""
 
 class CveAPI(object):
     """ Main /cves API class. """
-    def __init__(self, cursor):
-        self.cursor = cursor
+    def __init__(self, cache):
+        self.cache = cache
+
+    def find_cves_by_regex(self, regex):
+        """Returns list of CVEs matching a provided regex."""
+        return [label for label in self.cache.cve_detail if re.match(regex, label)]
+
+    @staticmethod
+    def filter_by_modified_since(cve_list, modified_since):
+        """Filter CVEs according to modified/published date."""
+        return [cve for cve in cve_list
+                if cve["modified_date"] >= modified_since or cve["published_date"] >= modified_since]
 
     def process_list(self, data):
         """
@@ -52,79 +36,38 @@ class CveAPI(object):
 
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
+        modified_since_dt = parse_datetime(modified_since)
+
         answer = {}
         if not cves_to_process:
             return answer
 
         cves_to_process = list(filter(None, cves_to_process))
-        # Select all cves in request
-        column_names = ["cve.id", "redhat_url", "secondary_url", "cve.name", "cvss3_score", "cve_impact.name",
-                        "published_date", "modified_date", "iava", "description"]
-        cve_query = """SELECT {columns}
-                         FROM cve
-                         LEFT JOIN cve_impact ON cve.impact_id = cve_impact.id
-                        WHERE""".format(columns=', '.join(column_names))
-
         if len(cves_to_process) == 1:
-            cve_query += " cve.name ~ %s"
-            cve_query_params = cves_to_process
-        else:
-            cve_query += " cve.name IN %s"
-            cve_query_params = [tuple(cves_to_process)]
+            # treat single-label like a regex, get all matching names
+            cves_to_process = self.find_cves_by_regex(cves_to_process[0])
 
-        if modified_since:
-            cve_query += " and (cve.modified_date >= %s or cve.published_date >= %s)"
-            cve_query_params.append(parse_datetime(modified_since))
-            cve_query_params.append(parse_datetime(modified_since))
+        cve_list = {}
+        for cve in cves_to_process:
+            cve_detail = self.cache.cve_detail.get(cve, None)
+            if not cve_detail:
+                continue
+            if modified_since and (cve_detail[CVE_MODIFIED_DATE] < modified_since_dt
+                                   and cve_detail[CVE_PUBLISHED_DATE] < modified_since_dt):
+                continue
 
-        self.cursor.execute(cve_query, cve_query_params)
-        cves = self.cursor.fetchall()
-        cwe_map = self.get_cve_cwe_map([cve[column_names.index("cve.id")] for cve in cves])  # generate cve ids
-        cve_list = []
-        for cve_entry in cves:
-            cve = CVE(cve_entry, column_names, cwe_map)
-            cve_list.append(cve)
-
-        return self.construct_answer(cve_list, modified_since)
-
-
-    def get_cve_cwe_map(self, ids):
-        """
-        For givers CVE ids find CWE in DB
-        :param ids: CVE ids
-        :return: cve_cwe mapping
-        """
-        if not ids:
-            return []
-        query = """SELECT cve_id, cwe.name, cwe.link
-                     FROM cve_cwe map
-                     JOIN cwe ON map.cwe_id = cwe.id
-                    WHERE map.cve_id IN %s"""
-        self.cursor.execute(query, [tuple(ids)])
-        return self.cursor.fetchall()
-
-
-    @staticmethod
-    def construct_answer(cve_list, modified_since):
-        """
-        Final dictionary generation
-        :param cve_list: which cves to show
-        :return: JSON ready dictionary
-        """
-        resp_cve_list = {}
-        for cve in cve_list:
-            resp_cve_list[cve.get_val("cve.name")] = {
-                "redhat_url": cve.get_val("redhat_url"),
-                "secondary_url": cve.get_val("secondary_url"),
-                "synopsis": cve.get_val("cve.name"),
-                "impact": cve.get_val("cve_impact.name"),
-                "public_date": format_datetime(cve.get_val("published_date")),
-                "modified_date": format_datetime(cve.get_val("modified_date")),
-                "cwe_list": cve.get_val("cwe"),
-                "cvss3_score": str(cve.get_val("cvss3_score")),
-                "description": cve.get_val("description"),
+            cve_list[cve] = {
+                "redhat_url": none2empty(cve_detail[CVE_REDHAT_URL]),
+                "secondary_url": none2empty(cve_detail[CVE_SECONDARY_URL]),
+                "synopsis": cve,
+                "impact": none2empty(cve_detail[CVE_IMPACT]),
+                "public_date": none2empty(format_datetime(cve_detail[CVE_PUBLISHED_DATE])),
+                "modified_date": none2empty(format_datetime(cve_detail[CVE_MODIFIED_DATE])),
+                "cwe_list": none2empty(cve_detail[CVE_CWE]),
+                "cvss3_score": str(none2empty(cve_detail[CVE_CVSS3_SCORE])),
+                "description": none2empty(cve_detail[CVE_DESCRIPTION]),
             }
-        response = {"cve_list": resp_cve_list}
+        response = {"cve_list": cve_list}
         if modified_since:
             response["modified_since"] = modified_since
         return response

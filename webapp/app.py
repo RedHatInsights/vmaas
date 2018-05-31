@@ -50,11 +50,10 @@ class BaseHandler(tornado.web.RequestHandler):
         """Process in the background DB request."""
 
         db_instance = Database()
-        cursor = db_instance.cursor()
         result = None
 
         if endpoint == '/cves':
-            result = CveAPI(cursor).process_list(data)
+            result = CveAPI(self.db_cache).process_list(data)
         elif endpoint == '/repos':
             result = self.repo_api.process_list(data)
         elif endpoint == '/errata':
