@@ -6,12 +6,10 @@ Main web API module
 import os
 import sys
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 
 from jsonschema.exceptions import ValidationError
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.concurrent import run_on_executor
 from tornado.websocket import websocket_connect
 import tornado.web
 
@@ -27,7 +25,7 @@ from dbchange import DBChange
 import gen
 
 PUBLIC_API_PORT = 8080
-MAX_WORKERS = 16
+MAX_SERVERS = 2
 
 SPEC = APISpec(
     title='VMaaS Webapp',
@@ -41,28 +39,24 @@ SPEC = APISpec(
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
-
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
 
-    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-    cache = None
+    db_cache = None
+    updates_api = None
+    repo_api = None
 
-    @run_on_executor
-    def background_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
+    def api_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
         """Process in the background DB request."""
 
         db_instance = Database()
         cursor = db_instance.cursor()
-
         result = None
 
         if endpoint == '/cves':
             result = CveAPI(cursor).process_list(data)
-        elif endpoint == '/updates':
-            result = UpdatesAPI(self.cache).process_list(data)
         elif endpoint == '/repos':
-            result = RepoAPI(self.cache).process_list(data)
+            result = self.repo_api.process_list(data)
         elif endpoint == '/errata':
             result = ErrataAPI(db_instance).process_list(data)
         elif endpoint == '/dbchange':
@@ -82,23 +76,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def options(self): # pylint: disable=arguments-differ
         self.finish()
-
-    def send_response(self, data='', code=200):
-        """
-        ---
-        description: Send API response to a client.
-        parameters:
-          - name: data
-            description: Data to send to a client
-            required: False
-          - name: code
-            description: HTTP return code
-            required: False
-        """
-        self.set_status(code)
-        self.write(data)
-        self.flush()
-        self.finish()  # need to run finish() manually for async method
 
     def get_post_data(self):
         """extract input JSON from POST request"""
@@ -129,8 +106,9 @@ class ApiSpecHandler(BaseHandler):
              200:
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
-        result = yield self.background_process(endpoint='/apispec')
-        IOLoop.instance().add_callback(self.send_response, result)
+        result = self.api_process(endpoint='/apispec')
+        self.write(result)
+        yield self.flush()
 
 
 class DBChangeHandler(BaseHandler):
@@ -151,8 +129,9 @@ class DBChangeHandler(BaseHandler):
         tags:
           - dbchange
         """
-        results = yield self.background_process(endpoint='/dbchange')
-        IOLoop.instance().add_callback(self.send_response, results)
+        result = self.api_process(endpoint='/dbchange')
+        self.write(result)
+        yield self.flush()
 
 
 class UpdatesHandlerGet(BaseHandler):
@@ -178,14 +157,14 @@ class UpdatesHandlerGet(BaseHandler):
         tags:
           - updates
         """
-        res = yield self.background_process(endpoint='/updates', data={'package_list': [nevra]})
-        IOLoop.instance().add_callback(self.send_response, res)
+        result = self.updates_api.process_list({'package_list': [nevra]})
+        self.write(result)
+        yield self.flush()
 
 
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -232,7 +211,7 @@ class UpdatesHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = yield self.background_process(endpoint='/updates', data=data)
+                res = self.updates_api.process_list(data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -254,7 +233,10 @@ class UpdatesHandlerPost(BaseHandler):
             res = 'Error: malformed input JSON.'
             print(res)
             sys.stdout.flush()
-        IOLoop.instance().add_callback(self.send_response, res, code)
+
+        self.set_status(code)
+        self.write(res)
+        yield self.flush()
 
 
 class CVEHandlerGet(BaseHandler):
@@ -280,14 +262,14 @@ class CVEHandlerGet(BaseHandler):
         tags:
           - cves
         """
-        res = yield self.background_process(endpoint='/cves', data={'cve_list': [cve]})
-        IOLoop.instance().add_callback(self.send_response, res)
+        res = self.api_process(endpoint='/cves', data={'cve_list': [cve]})
+        self.write(res)
+        yield self.flush()
 
 
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -327,7 +309,7 @@ class CVEHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = yield self.background_process(endpoint='/cves', data=data)
+                res = self.api_process(endpoint='/cves', data=data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -349,7 +331,10 @@ class CVEHandlerPost(BaseHandler):
             res = 'Error: malformed input JSON.'
             print(res)
             sys.stdout.flush()
-        IOLoop.instance().add_callback(self.send_response, res, code)
+
+        self.set_status(code)
+        self.write(res)
+        yield self.flush()
 
 
 class ReposHandlerGet(BaseHandler):
@@ -376,14 +361,14 @@ class ReposHandlerGet(BaseHandler):
         tags:
           - repos
         """
-        res = yield self.background_process(endpoint='/repos', data={'repository_list': [repo]})
-        IOLoop.instance().add_callback(self.send_response, res)
+        res = self.api_process(endpoint='/repos', data={'repository_list': [repo]})
+        self.write(res)
+        yield self.flush()
 
 
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -419,7 +404,7 @@ class ReposHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = yield self.background_process(endpoint='/repos', data=data)
+                res = self.api_process(endpoint='/repos', data=data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -441,7 +426,10 @@ class ReposHandlerPost(BaseHandler):
             res = 'Error: malformed input JSON.'
             print(res)
             sys.stdout.flush()
-        IOLoop.instance().add_callback(self.send_response, res, code)
+
+        self.set_status(code)
+        self.write(res)
+        yield self.flush()
 
 
 class ErrataHandlerGet(BaseHandler):
@@ -468,14 +456,14 @@ class ErrataHandlerGet(BaseHandler):
         tags:
           - errata
         """
-        res = yield self.background_process(endpoint='/errata', data={'errata_list': [erratum]})
-        IOLoop.instance().add_callback(self.send_response, res)
+        res = self.api_process(endpoint='/errata', data={'errata_list': [erratum]})
+        self.write(res)
+        yield self.flush()
 
 
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
-    @tornado.web.asynchronous
     @gen.coroutine
     def post(self): # pylint: disable=arguments-differ
         """
@@ -514,7 +502,7 @@ class ErrataHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = yield self.background_process(endpoint='/errata', data=data)
+                res = self.api_process(endpoint='/errata', data=data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -536,7 +524,9 @@ class ErrataHandlerPost(BaseHandler):
             res = 'Error: malformed input JSON.'
             print(res)
             sys.stdout.flush()
-        IOLoop.instance().add_callback(self.send_response, res, code)
+        self.set_status(code)
+        self.write(res)
+        yield self.flush()
 
 
 def setup_apispec(handlers):
@@ -826,22 +816,21 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
             (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
         ]
+
+        tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
+
         setup_apispec(handlers)
-        BaseHandler.cache = Cache()
         self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
         self.reposcan_websocket = None
-        self._websocket_reconnect()
-        self.reconnect_callback = PeriodicCallback(self._websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
-        self.reconnect_callback.start()
-        tornado.web.Application.__init__(self, handlers)
+        self.reconnect_callback = None
 
     @staticmethod
     def _refresh_cache():
-        BaseHandler.cache.reload()
+        BaseHandler.db_cache.reload()
         print("Cached data refreshed.")
         sys.stdout.flush()
 
-    def _websocket_reconnect(self):
+    def websocket_reconnect(self):
         """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
         if self.reposcan_websocket is None:
             websocket_connect(self.reposcan_websocket_url, on_message_callback=self._read_websocket_message,
@@ -877,12 +866,27 @@ class Application(tornado.web.Application):
             self.reposcan_websocket = None
 
 
-
 def main():
-    """ Main application loop. """
-    app = Application()
-    app.listen(PUBLIC_API_PORT)
+    """ The main function. It creates VmaaS application, servers, run everything."""
+
+    vmaas_app = Application()
+
+    server = tornado.httpserver.HTTPServer(vmaas_app)
+    server.bind(PUBLIC_API_PORT)
+    server.start(int(os.getenv("MAX_VMAAS_SERVERS", MAX_SERVERS)))  # start forking here
+
+    # The rest stuff must be done only after forking
+    BaseHandler.db_cache = Cache()
+    BaseHandler.updates_api = UpdatesAPI(BaseHandler.db_cache)
+    BaseHandler.repo_api = RepoAPI(BaseHandler.db_cache)
+
+    vmaas_app.websocket_reconnect()
+    vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
+    vmaas_app.reconnect_callback.start()
+
     IOLoop.instance().start()
+
+
 
 if __name__ == '__main__':
     main()
