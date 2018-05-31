@@ -29,6 +29,10 @@ RUN rm -rf /vmaas-reposcan/Dockerfile /vmaas-reposcan/README.md \
            /vmaas-reposcan/test_data /vmaas-reposcan/run_tests.sh \
            /vmaas-reposcan/repodata/test
 
+RUN install -d -m 775 -g root /data
+RUN adduser --gid 0 -d /vmaas-reposcan --no-create-home -c 'VMAAS user' vmaas
+USER vmaas
+
 EXPOSE 8081 8730
 
 CMD ["/vmaas-reposcan/entrypoint.sh"]
