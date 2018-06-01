@@ -55,25 +55,26 @@ class DataDump:
 
     def dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
-        with self._named_cursor() as cursor:
-            cursor.execute("""select p.name_id, p.id, p.evr_id, p.arch_id
-                                from package p
-                          inner join evr on p.evr_id = evr.id
-                               where p.name_id in %s
-                               order by p.name_id, evr.evr
-                            """, [tuple(self.packagename_ids)])
-            index_cnt = {}
-            updates = {}
-            updates_index = {}
-            for name_id, pkg_id, evr_id, arch_id in cursor:
-                idx = index_cnt.get(name_id, 0)
-                updates.setdefault("updates:%s" % name_id, []).append(pkg_id)
-                updates_index.setdefault("updates_index:%s" % name_id,
-                                         {}).setdefault((evr_id, arch_id), []).append(idx)
-                idx += 1
-                index_cnt[name_id] = idx
-            dump.update(updates)
-            dump.update(updates_index)
+        if self.packagename_ids:
+            with self._named_cursor() as cursor:
+                cursor.execute("""select p.name_id, p.id, p.evr_id, p.arch_id
+                                    from package p
+                              inner join evr on p.evr_id = evr.id
+                                   where p.name_id in %s
+                                   order by p.name_id, evr.evr
+                                """, [tuple(self.packagename_ids)])
+                index_cnt = {}
+                updates = {}
+                updates_index = {}
+                for name_id, pkg_id, evr_id, arch_id in cursor:
+                    idx = index_cnt.get(name_id, 0)
+                    updates.setdefault("updates:%s" % name_id, []).append(pkg_id)
+                    updates_index.setdefault("updates_index:%s" % name_id,
+                                             {}).setdefault((evr_id, arch_id), []).append(idx)
+                    idx += 1
+                    index_cnt[name_id] = idx
+                dump.update(updates)
+                dump.update(updates_index)
 
     def dump_evr(self, dump):
         """Select all evrs and put them into dictionary"""
@@ -102,14 +103,15 @@ class DataDump:
 
     def dump_package_details(self, dump):
         """Select details about packages (for previously selected package names)"""
-        with self._named_cursor() as cursor:
-            cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
-                                from package
-                               where name_id in %s
-                           """, [tuple(self.packagename_ids)])
-            for pkg_id, name_id, evr_id, arch_id, summary, description in cursor:
-                dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, summary, description)
-                self.package_ids.append(pkg_id)
+        if self.packagename_ids:
+            with self._named_cursor() as cursor:
+                cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
+                                    from package
+                                   where name_id in %s
+                               """, [tuple(self.packagename_ids)])
+                for pkg_id, name_id, evr_id, arch_id, summary, description in cursor:
+                    dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, summary, description)
+                    self.package_ids.append(pkg_id)
 
     def dump_repo(self, dump):
         """Select repo mappings"""
@@ -142,16 +144,17 @@ class DataDump:
             dump.update(repolabel2ids)
             dump.update(productid2repoids)
 
-        # Select package ID to repo IDs mapping
-        with self._named_cursor() as cursor:
-            cursor.execute("""select pkg_id, repo_id
-                                from pkg_repo
-                               where pkg_id in %s
-                           """, [tuple(self.package_ids)])
-            pkgid2repoids = {}
-            for pkg_id, repo_id in cursor:
-                pkgid2repoids.setdefault("pkgid2repoids:%s" % pkg_id, []).append(repo_id)
-            dump.update(pkgid2repoids)
+        if self.package_ids:
+            # Select package ID to repo IDs mapping
+            with self._named_cursor() as cursor:
+                cursor.execute("""select pkg_id, repo_id
+                                    from pkg_repo
+                                   where pkg_id in %s
+                               """, [tuple(self.package_ids)])
+                pkgid2repoids = {}
+                for pkg_id, repo_id in cursor:
+                    pkgid2repoids.setdefault("pkgid2repoids:%s" % pkg_id, []).append(repo_id)
+                dump.update(pkgid2repoids)
 
     def dump_errata(self, dump):
         """Select errata mappings"""
@@ -167,28 +170,29 @@ class DataDump:
                 dump["errataid2name:%s" % errata_id] = errata_name
                 self.errata_ids.append(errata_id)
 
-        # Select package ID to errata IDs mapping, only for relevant errata
-        with self._named_cursor() as cursor:
-            cursor.execute("""select pkg_id, errata_id
-                                from pkg_errata
-                               where errata_id in %s
-                            """, [tuple(self.errata_ids)])
-            pkgid2errataids = {}
-            for pkg_id, errata_id in cursor:
-                pkgid2errataids.setdefault("pkgid2errataids:%s" % pkg_id, set()).add(errata_id)
-            dump.update(pkgid2errataids)
+        if self.errata_ids:
+            # Select package ID to errata IDs mapping, only for relevant errata
+            with self._named_cursor() as cursor:
+                cursor.execute("""select pkg_id, errata_id
+                                    from pkg_errata
+                                   where errata_id in %s
+                                """, [tuple(self.errata_ids)])
+                pkgid2errataids = {}
+                for pkg_id, errata_id in cursor:
+                    pkgid2errataids.setdefault("pkgid2errataids:%s" % pkg_id, set()).add(errata_id)
+                dump.update(pkgid2errataids)
 
-        # Select errata ID to repo IDs mapping, only for relevant errata
-        with self._named_cursor() as cursor:
-            cursor.execute("""select errata_id, repo_id
-                                from errata_repo
-                               where errata_id in %s
-                            """, [tuple(self.errata_ids)])
-            errataid2repoids = {}
-            for errata_id, repo_id in cursor:
-                errataid2repoids.setdefault("errataid2repoids:%s" % errata_id,
-                                            set()).add(repo_id)
-            dump.update(errataid2repoids)
+            # Select errata ID to repo IDs mapping, only for relevant errata
+            with self._named_cursor() as cursor:
+                cursor.execute("""select errata_id, repo_id
+                                    from errata_repo
+                                   where errata_id in %s
+                                """, [tuple(self.errata_ids)])
+                errataid2repoids = {}
+                for errata_id, repo_id in cursor:
+                    errataid2repoids.setdefault("errataid2repoids:%s" % errata_id,
+                                                set()).add(repo_id)
+                dump.update(errataid2repoids)
 
 
 def main(filename):
