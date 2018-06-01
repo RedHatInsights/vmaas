@@ -47,11 +47,3 @@ def parse_datetime(date):
     if date is None:
         return None
     return dateutil_parser.parse(date)
-
-class ListDict(dict):
-    """Dictionary which can cummulate multiple values for the same key into a list."""
-    def __setitem__(self, key, value):
-        if key not in self:
-            dict.__setitem__(self, key, [])
-        if not value in self[key]:
-            self[key].append(value)
