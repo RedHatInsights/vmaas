@@ -57,7 +57,7 @@ class DataDump:
         """Select ordered updates lists for previously selected package names"""
         if self.packagename_ids:
             with self._named_cursor() as cursor:
-                cursor.execute("""select p.name_id, p.id, p.evr_id, p.arch_id
+                cursor.execute("""select p.name_id, p.id, p.evr_id
                                     from package p
                               inner join evr on p.evr_id = evr.id
                                    where p.name_id in %s
@@ -66,11 +66,11 @@ class DataDump:
                 index_cnt = {}
                 updates = {}
                 updates_index = {}
-                for name_id, pkg_id, evr_id, arch_id in cursor:
+                for name_id, pkg_id, evr_id in cursor:
                     idx = index_cnt.get(name_id, 0)
                     updates.setdefault("updates:%s" % name_id, []).append(pkg_id)
                     updates_index.setdefault("updates_index:%s" % name_id,
-                                             {}).setdefault((evr_id, arch_id), []).append(idx)
+                                             {}).setdefault(evr_id, []).append(idx)
                     idx += 1
                     index_cnt[name_id] = idx
                 dump.update(updates)
