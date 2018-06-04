@@ -159,12 +159,12 @@ class UpdatesAPI(object):
                     continue
 
                 errata_ids = self.cache.pkgid2errataids.get(update_pkg_id, set())
-                repo_ids = self._get_repositories(product_ids, update_pkg_id, errata_ids, available_repo_ids,
-                                                  valid_releasevers)
                 nevra = self._build_nevra(update_pkg_id)
-                for repo_id in repo_ids:
-                    repo_details = self.cache.repo_detail[repo_id]
-                    for errata_id in errata_ids:
+                for errata_id in errata_ids:
+                    repo_ids = self._get_repositories(product_ids, update_pkg_id, [errata_id], available_repo_ids,
+                                                  valid_releasevers)
+                    for repo_id in repo_ids:
+                        repo_details = self.cache.repo_detail[repo_id]
                         response['update_list'][pkg]['available_updates'].append({
                             'package': nevra,
                             'erratum': self.cache.errataid2name[errata_id],
