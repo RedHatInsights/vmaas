@@ -4,7 +4,7 @@ Module contains functions and CVE class for returning data from DB
 
 import re
 
-from utils import format_datetime, parse_datetime, none2empty
+from utils import format_datetime, parse_datetime, none2empty, paginate
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_DESCRIPTION
 
@@ -37,6 +37,8 @@ class CveAPI(object):
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
         modified_since_dt = parse_datetime(modified_since)
+        page = data.get("page", None)
+        page_size = data.get("page_size", None)
 
         answer = {}
         if not cves_to_process:
@@ -48,7 +50,8 @@ class CveAPI(object):
             cves_to_process = self.find_cves_by_regex(cves_to_process[0])
 
         cve_list = {}
-        for cve in cves_to_process:
+        cve_page_to_process, pagination_response = paginate(cves_to_process, page, page_size)
+        for cve in cve_page_to_process:
             cve_detail = self.cache.cve_detail.get(cve, None)
             if not cve_detail:
                 continue
@@ -68,6 +71,7 @@ class CveAPI(object):
                 "description": none2empty(cve_detail[CVE_DESCRIPTION]),
             }
         response = {"cve_list": cve_list}
+        response.update(pagination_response)
         if modified_since:
             response["modified_since"] = modified_since
         return response
