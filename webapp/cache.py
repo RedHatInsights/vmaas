@@ -30,6 +30,21 @@ CVE_IAVA = 6
 CVE_DESCRIPTION = 7
 CVE_CWE = 8
 
+# errata detail indexes
+ERRATA_SYNOPSIS = 0
+ERRATA_SUMMARY = 1
+ERRATA_TYPE = 2
+ERRATA_SEVERITY = 3
+ERRATA_DESCRIPTION = 4
+ERRATA_SOLUTION = 5
+ERRATA_ISSUED = 6
+ERRATA_UPDATED = 7
+ERRATA_CVE = 8
+ERRATA_PKGIDS = 9
+ERRATA_BUGZILLA = 10
+ERRATA_REFERENCE = 11
+ERRATA_URL = 12
+
 class Cache(object):
     """ Cache class. """
     # pylint: disable=too-many-instance-attributes
@@ -54,6 +69,7 @@ class Cache(object):
         self.errataid2repoids = {}
         self.cve_detail = {}
         self.dbchange = {}
+        self.errata_detail = {}
         self.reload()
 
     def clear(self):
@@ -77,6 +93,7 @@ class Cache(object):
         self.errataid2repoids = {}
         self.cve_detail = {}
         self.dbchange = {}
+        self.errata_detail = {}
 
     def reload(self):
         """Update data and reload dictionaries."""
@@ -138,5 +155,7 @@ class Cache(object):
                 self.cve_detail[key] = data[item]
             elif relation == "dbchange":
                 self.dbchange[key] = data[item]
+            elif relation == "errata_detail":
+                self.errata_detail[key] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
