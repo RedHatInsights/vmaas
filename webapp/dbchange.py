@@ -6,8 +6,8 @@ from utils import format_datetime
 
 class DBChange(object):
     """ Main /dbchange API class. """
-    def __init__(self, database):
-        self.cursor = database.dictcursor()
+    def __init__(self, cache):
+        self.cache = cache
 
     def process(self):
         """
@@ -16,13 +16,8 @@ class DBChange(object):
         :returns: dictionary of errata_changes/cve_changes/repository_changes/last_change timestamps
 
         """
-        query = 'SELECT * from dbchange'
-        self.cursor.execute(query)
-        updates = self.cursor.fetchall()
-
         answer = {}
-        for row in updates:
-            for key, value in row.items():
-                answer[key] = format_datetime(value)
+        for key, value in self.cache.dbchange.items():
+            answer[key] = format_datetime(value)
 
         return answer
