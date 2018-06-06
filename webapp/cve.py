@@ -18,12 +18,6 @@ class CveAPI(object):
         """Returns list of CVEs matching a provided regex."""
         return [label for label in self.cache.cve_detail if re.match(regex, label)]
 
-    @staticmethod
-    def filter_by_modified_since(cve_list, modified_since):
-        """Filter CVEs according to modified/published date."""
-        return [cve for cve in cve_list
-                if cve["modified_date"] >= modified_since or cve["published_date"] >= modified_since]
-
     def process_list(self, data):
         """
         This method returns details for given set of CVEs.
