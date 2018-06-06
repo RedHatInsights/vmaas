@@ -59,7 +59,7 @@ class BaseHandler(tornado.web.RequestHandler):
         elif endpoint == '/errata':
             result = ErrataAPI(db_instance).process_list(data)
         elif endpoint == '/dbchange':
-            result = DBChange(db_instance).process()
+            result = DBChange(self.db_cache).process()
         elif endpoint == '/apispec':
             result = SPEC.to_dict()
 

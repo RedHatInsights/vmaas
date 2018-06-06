@@ -53,6 +53,7 @@ class Cache(object):
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
         self.cve_detail = {}
+        self.dbchange = {}
         self.reload()
 
     def clear(self):
@@ -75,6 +76,7 @@ class Cache(object):
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
         self.cve_detail = {}
+        self.dbchange = {}
 
     def reload(self):
         """Update data and reload dictionaries."""
@@ -134,5 +136,7 @@ class Cache(object):
                 self.errataid2repoids[int(key)] = data[item]
             elif relation == "cve_detail":
                 self.cve_detail[key] = data[item]
+            elif relation == "dbchange":
+                self.dbchange[key] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)

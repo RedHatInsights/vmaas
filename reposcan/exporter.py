@@ -36,6 +36,7 @@ class DataDump:
             self.dump_repo(dump)
             self.dump_errata(dump)
             self.dump_cves(dump)
+            self.dump_dbchange(dump)
 
     def dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
@@ -226,6 +227,20 @@ class DataDump:
                 dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, impact,
                                                 published_date, modified_date, iava, description,
                                                 cveid2cwe.get(cve_id, []))
+
+    def dump_dbchange(self, dump):
+        """Select db change details"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select errata_changes,
+                                     cve_changes,
+                                     repository_changes,
+                                     last_change
+                                from dbchange""")
+            row = cursor.fetchone()
+            dump["dbchange:errata_changes"] = row[0]
+            dump["dbchange:cve_changes"] = row[1]
+            dump["dbchange:repository_changes"] = row[2]
+            dump["dbchange:last_change"] = row[3]
 
 
 def main(filename):
