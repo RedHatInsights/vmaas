@@ -826,6 +826,7 @@ class Application(tornado.web.Application):
     @staticmethod
     def _refresh_cache():
         BaseHandler.db_cache.reload()
+        BaseHandler.updates_api.clear_hot_cache()
         print("Cached data refreshed.")
         sys.stdout.flush()
 
