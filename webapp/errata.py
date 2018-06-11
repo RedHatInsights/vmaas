@@ -4,7 +4,7 @@ Module contains classes for returning errata data from DB
 
 import re
 
-from utils import format_datetime, parse_datetime, none2empty, join_packagename
+from utils import format_datetime, parse_datetime, none2empty, join_packagename, paginate
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
                   ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
@@ -46,6 +46,8 @@ class ErrataAPI(object):
         modified_since = data.get("modified_since", None)
         modified_since_dt = parse_datetime(modified_since)
         errata_to_process = data.get("errata_list", None)
+        page = data.get("page", None)
+        page_size = data.get("page_size", None)
 
         response = {"errata_list": {}}
         if modified_since:
@@ -59,7 +61,8 @@ class ErrataAPI(object):
             errata_to_process = self.find_errata_by_regex(errata_to_process[0])
 
         errata_list = {}
-        for errata in errata_to_process:
+        errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size)
+        for errata in errata_page_to_process:
             errata_detail = self.cache.errata_detail.get(errata, None)
             if not errata_detail:
                 continue
@@ -84,4 +87,5 @@ class ErrataAPI(object):
                 "url": none2empty(errata_detail[ERRATA_URL])
                 }
         response["errata_list"] = errata_list
+        response.update(pagination_response)
         return response
