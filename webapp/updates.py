@@ -254,7 +254,6 @@ class UpdatesAPI(object):
 
     def _process_updates(self, packages_to_process, available_repo_ids, response):
         for pkg, pkg_dict in packages_to_process.items():
-            self.hot_cache.insert(pkg, {})
 
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.cache.packagename2id[name]
@@ -366,11 +365,11 @@ class UpdatesAPI(object):
         # Return empty update list in case of empty input package list
         packages_to_process = self._process_input_packages(data, response)
 
-        if not packages_to_process:
-            return response
-
         # Get list of valid repository IDs based on input paramaters
         available_repo_ids = self._process_repositories(data, response)
+
+        if not packages_to_process:
+            return response
 
         # Process updated packages, errata and fill the response
         self._process_updates(packages_to_process, available_repo_ids, response)
