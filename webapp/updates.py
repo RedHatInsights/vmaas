@@ -184,7 +184,9 @@ class UpdatesAPI(object):
         if repo_list is not None:
             repo_ids = []
             for label in repo_list:
-                repo_ids.extend(self.db_cache.repolabel2ids[label])
+                repo_id = self.db_cache.repolabel2ids.get(label, None)
+                if repo_id:
+                    repo_ids.extend(repo_id)
             response['repository_list'] = repo_list
         else:
             repo_ids = self.db_cache.repo_detail.keys()
