@@ -2,6 +2,7 @@
 Module to handle /updates API calls.
 """
 
+import hashlib
 from jsonschema import validate
 
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID
@@ -252,9 +253,8 @@ class UpdatesAPI(object):
         arch = self.db_cache.id2arch[arch_id]
         return join_packagename(name, epoch, ver, rel, arch)
 
-    def _process_updates(self, packages_to_process, available_repo_ids, response):
+    def _process_updates(self, packages_to_process, available_repo_ids, repo_ids_key, response):
         for pkg, pkg_dict in packages_to_process.items():
-
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.db_cache.packagename2id[name]
             evr_id = self.db_cache.evr2id.get((epoch, ver, rel), None)
@@ -322,7 +322,7 @@ class UpdatesAPI(object):
                             'releasever': repo_details[REPO_RELEASEVER]
                         })
 
-            self.hot_cache.insert(pkg, response['update_list'][pkg])
+            self.hot_cache.insert(repo_ids_key + pkg, response['update_list'][pkg])
 
     def clear_hot_cache(self):
         """
@@ -347,12 +347,17 @@ class UpdatesAPI(object):
             'update_list': {},
         }
 
+        # Get list of valid repository IDs based on input paramaters
+        available_repo_ids = self._process_repositories(data, response)
+
+        repo_ids_key = hashlib.md5('_'.join([str(id) for id in sorted(available_repo_ids)]).encode('utf-8')).hexdigest()
+
         all_pkgs = data.get('package_list', None)
         pkgs_not_in_cache = []
 
         if all_pkgs is not None:
             for name in all_pkgs:
-                resp = self.hot_cache.find(name)
+                resp = self.hot_cache.find(repo_ids_key + name)
 
                 if resp is not None:
                     response['update_list'][name] = resp
@@ -365,13 +370,10 @@ class UpdatesAPI(object):
         # Return empty update list in case of empty input package list
         packages_to_process = self._process_input_packages(data, response)
 
-        # Get list of valid repository IDs based on input paramaters
-        available_repo_ids = self._process_repositories(data, response)
-
         if not packages_to_process:
             return response
 
         # Process updated packages, errata and fill the response
-        self._process_updates(packages_to_process, available_repo_ids, response)
+        self._process_updates(packages_to_process, available_repo_ids, repo_ids_key, response)
 
         return response
