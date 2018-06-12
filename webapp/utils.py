@@ -47,7 +47,10 @@ def parse_datetime(date):
     """Parse date from string in ISO format."""
     if date is None:
         return None
-    return dateutil_parser.parse(date)
+    ret = dateutil_parser.parse(date)
+    if not ret.tzinfo:
+        raise ValueError("Wrong date format (not ISO format with timezone): " + date)
+    return ret
 
 def none2empty(value):
     """Convert None to empty string."""
