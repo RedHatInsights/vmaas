@@ -16,6 +16,12 @@ class CveAPI(object):
 
     def find_cves_by_regex(self, regex):
         """Returns list of CVEs matching a provided regex."""
+        if not regex.startswith('^'):
+            regex = '^' + regex
+
+        if not regex.endswith('$'):
+            regex = regex + '$'
+
         return [label for label in self.cache.cve_detail if re.match(regex, label)]
 
     def process_list(self, data):
