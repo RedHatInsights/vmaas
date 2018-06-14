@@ -3,11 +3,14 @@
 Tool for exporting preprocessed data from database for webapp nodes.
 """
 
+import glob
+import os
 import shelve
 from common.logging import get_logger, init_logging
-from common.dateutil import format_datetime
+from common.dateutil import format_datetime, now
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
+KEEP_COPIES = 10
 DUMP = '/data/vmaas.dbm'
 LOGGER = get_logger(__name__)
 
@@ -26,7 +29,10 @@ class DataDump:
 
     def dump(self):
         """Dump necessary data tu disk file"""
-        with shelve.open(self.filename, 'c') as dump:
+        timestamp = format_datetime(now())
+        dump_filename = "%s-%s" % (self.filename, timestamp)
+        LOGGER.info("Exporting data to %s", dump_filename)
+        with shelve.open(dump_filename, 'c') as dump:
             self.dump_packagename(dump)
             self.dump_updates(dump)
             self.dump_evr(dump)
@@ -37,6 +43,15 @@ class DataDump:
             self.dump_errata(dump)
             self.dump_cves(dump)
             self.dump_dbchange(dump)
+            dump["dbchange:exported"] = timestamp
+        # relink to the latest file
+        os.unlink(self.filename)
+        os.symlink(dump_filename, self.filename)
+        # remove old data above limit
+        old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
+        for fname in old_data[KEEP_COPIES:]:
+            LOGGER.info("Removing old dump %s", fname)
+            os.unlink(fname)
 
     def dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
