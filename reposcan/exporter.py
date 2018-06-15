@@ -45,7 +45,10 @@ class DataDump:
             self.dump_dbchange(dump)
             dump["dbchange:exported"] = timestamp
         # relink to the latest file
-        os.unlink(self.filename)
+        try:
+            os.unlink(self.filename)
+        except FileNotFoundError:
+            pass
         os.symlink(dump_filename, self.filename)
         # remove old data above limit
         old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
