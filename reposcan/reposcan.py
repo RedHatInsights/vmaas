@@ -533,9 +533,10 @@ class SyncTask:
     def start(cls, func, callback, *args, **kwargs):
         """Start specified function with given parameters in separate worker."""
         cls._running = True
+        ioloop = IOLoop.instance()
 
         def _callback(result):
-            IOLoop.instance().add_callback(lambda: callback(result))
+            ioloop.add_callback(lambda: callback(result))
         cls.workers.apply_async(func, args, kwargs, _callback)
 
     @classmethod
