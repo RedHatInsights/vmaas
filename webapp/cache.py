@@ -104,7 +104,7 @@ class Cache(object):
     @staticmethod
     def download():
         """Download new version of data."""
-        return not os.system("rsync -a --quiet %s %s" % (REMOTE_DUMP, DUMP))
+        return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
 
     def load(self, filename):
         """Load data from shelve file into dictionaries."""
