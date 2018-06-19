@@ -75,6 +75,23 @@ class BaseHandler(tornado.web.RequestHandler):
         return data
 
 
+class HealthHandler(BaseHandler):
+    """Handler class providing health status."""
+
+    @gen.coroutine
+    def get(self):  # pylint: disable=arguments-differ
+        """Get API status.
+           ---
+           description: Return API status
+           responses:
+             200:
+               description: Application is alive
+           tags:
+             - monitoring
+        """
+        yield self.flush()
+
+
 class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
 
@@ -786,6 +803,7 @@ class Application(tornado.web.Application):
     """ main webserver application class """
     def __init__(self):
         handlers = [
+            (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
