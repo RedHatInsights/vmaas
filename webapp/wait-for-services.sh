@@ -6,11 +6,6 @@ set -e
 
 cmd="$@"
 
-until PGPASSWORD="$POSTGRESQL_PASSWORD" psql -h "$POSTGRESQL_HOST" -U "$POSTGRESQL_USER" -d "$POSTGRESQL_DATABASE" -c '\q' -q 2>/dev/null; do
-  >&2 echo "PostgreSQL is unavailable - sleeping"
-  sleep 1
-done
-
 until curl http://reposcan:8081/api/v1/apispec &>/dev/null; do
   >&2 echo "Reposcan API is unavailable - sleeping"
   sleep 1

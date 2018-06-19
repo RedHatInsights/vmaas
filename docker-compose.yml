@@ -36,12 +36,10 @@ services:
     image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
-      - ./conf/database-connection-reader.env
       - ./conf/webapp.env
     ports:
       - 8080:8080
     depends_on:
-      - database
       - reposcan
 
   apidoc:
