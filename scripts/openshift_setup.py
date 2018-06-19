@@ -18,6 +18,8 @@ def get_env_opts():
     options["storage_size"]["vmaas-db-data"] = os.getenv("storage_size_db", "5Gi")
     options["storage_size"]["vmaas-reposcan-tmp"] = os.getenv("storage_size_tmp", "15Gi")
     options["storage_size"]["vmaas-dump-data"] = os.getenv("storage_size_dump", "5Gi")
+    options["healthchecks"] = {}
+    options["healthchecks"]["webapp"] = {"vmaas-webapp": os.getenv("webapp_healthchecks_path" ,"./healthchecks/webapp.yml")}
     return options
 
 
@@ -32,6 +34,19 @@ def set_storage_attributes(options, name, item):
         item["spec"]["resources"]["requests"]["storage"] = options["storage_size"][name]
 
 
+def add_health_checks(options, name, item):
+    """Add health checks."""
+    if name in options["healthchecks"]:
+        for container in item["spec"]["template"]["spec"]["containers"]:
+            container_name = container["name"]
+            if container_name in options["healthchecks"][name]:
+                file_path = options["healthchecks"][name][container_name]
+                with open(file_path, "r") as healthcheck_file:
+                    healthcheck_yaml = yaml.load(healthcheck_file)
+                    for probe_type, probe in healthcheck_yaml.items():
+                        container[probe_type] = probe
+
+
 def main():
     """Main function."""
     options = get_env_opts()
@@ -44,6 +59,7 @@ def main():
         if (kind, name) not in processed_items:
             if kind == "DeploymentConfig":
                 set_app_label(options, item)
+                add_health_checks(options, name, item)
             elif kind == "PersistentVolumeClaim":
                 # set required storage size, kompose supports only to set this on service level - all volumes
                 # linked to service have same size
