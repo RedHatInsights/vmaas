@@ -40,7 +40,7 @@ class RepoAPI(object):
             repos = self.find_repos_by_regex(repos[0])
 
         for label in repos:
-            for repo_id in self.cache.repolabel2ids[label]:
+            for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 repolist.setdefault(label, []).append({
                     "label": label,
