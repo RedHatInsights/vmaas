@@ -15,7 +15,6 @@ import tornado.web
 
 
 from apispec import APISpec
-from database import Database
 from cache import Cache
 from cve import CveAPI
 from repos import RepoAPI
@@ -45,26 +44,9 @@ class BaseHandler(tornado.web.RequestHandler):
     db_cache = None
     updates_api = None
     repo_api = None
-
-    def api_process(self, endpoint='', data='{}'):  # pylint: disable=no-self-use
-        """Process in the background DB request."""
-
-        db_instance = Database()
-        result = None
-
-        if endpoint == '/cves':
-            result = CveAPI(self.db_cache).process_list(data)
-        elif endpoint == '/repos':
-            result = self.repo_api.process_list(data)
-        elif endpoint == '/errata':
-            result = ErrataAPI(self.db_cache).process_list(data)
-        elif endpoint == '/dbchange':
-            result = DBChange(self.db_cache).process()
-        elif endpoint == '/apispec':
-            result = SPEC.to_dict()
-
-        db_instance.connection.close()
-        return result
+    cve_api = None
+    errata_api = None
+    dbchange_api = None
 
     def data_received(self, chunk):
         pass
@@ -105,7 +87,7 @@ class ApiSpecHandler(BaseHandler):
              200:
                description: OpenAPI/Swagger 2.0 specification JSON returned
         """
-        result = self.api_process(endpoint='/apispec')
+        result = SPEC.to_dict()
         self.write(result)
         yield self.flush()
 
@@ -128,7 +110,7 @@ class DBChangeHandler(BaseHandler):
         tags:
           - dbchange
         """
-        result = self.api_process(endpoint='/dbchange')
+        result = self.dbchange_api.process()
         self.write(result)
         yield self.flush()
 
@@ -261,7 +243,7 @@ class CVEHandlerGet(BaseHandler):
         tags:
           - cves
         """
-        res = self.api_process(endpoint='/cves', data={'cve_list': [cve]})
+        res = self.cve_api.process_list({'cve_list': [cve]})
         self.write(res)
         yield self.flush()
 
@@ -308,7 +290,7 @@ class CVEHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = self.api_process(endpoint='/cves', data=data)
+                res = self.cve_api.process_list(data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -360,7 +342,7 @@ class ReposHandlerGet(BaseHandler):
         tags:
           - repos
         """
-        res = self.api_process(endpoint='/repos', data={'repository_list': [repo]})
+        res = self.repo_api.process_list({'repository_list': [repo]})
         self.write(res)
         yield self.flush()
 
@@ -403,7 +385,7 @@ class ReposHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = self.api_process(endpoint='/repos', data=data)
+                res = self.repo_api.process_list(data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -455,7 +437,7 @@ class ErrataHandlerGet(BaseHandler):
         tags:
           - errata
         """
-        res = self.api_process(endpoint='/errata', data={'errata_list': [erratum]})
+        res = self.errata_api.process_list({'errata_list': [erratum]})
         self.write(res)
         yield self.flush()
 
@@ -501,7 +483,7 @@ class ErrataHandlerPost(BaseHandler):
         data = self.get_post_data()
         if data:
             try:
-                res = self.api_process(endpoint='/errata', data=data)
+                res = self.errata_api.process_list(data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -879,6 +861,9 @@ def main():
     BaseHandler.db_cache = Cache()
     BaseHandler.updates_api = UpdatesAPI(BaseHandler.db_cache)
     BaseHandler.repo_api = RepoAPI(BaseHandler.db_cache)
+    BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
+    BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
+    BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
     vmaas_app.websocket_reconnect()
     vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
