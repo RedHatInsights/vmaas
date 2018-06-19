@@ -368,7 +368,7 @@ class ReposHandlerPost(BaseHandler):
                   type: array
                   items:
                     type: string
-                    example: rhel-6-server-rpms, rhel-7-sever-rpms
+                    example: rhel-6-server-rpms, rhel-7-server-rpms
               required:
                 - repository_list
         responses:
