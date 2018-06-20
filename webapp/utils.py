@@ -41,7 +41,7 @@ def format_datetime(datetime_obj):
     """Try to format object to ISO 8601 if object is datetime."""
     if isinstance(datetime_obj, datetime):
         return datetime_obj.isoformat()
-    return str(datetime_obj)
+    return None if datetime_obj is None else str(datetime_obj)
 
 def parse_datetime(date):
     """Parse date from string in ISO format."""
