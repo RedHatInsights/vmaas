@@ -1,4 +1,6 @@
 #!/bin/sh
 
+DIR=$(dirname $0)
+
 rsync --daemon --verbose
-exec /vmaas-reposcan/wait-for-postgres.sh /vmaas-reposcan/reposcan.py
+exec $DIR/wait-for-postgres.sh $DIR/reposcan.py

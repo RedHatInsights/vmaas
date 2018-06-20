@@ -1,3 +1,5 @@
 #!/bin/sh
 
-exec /app/wait-for-services.sh /app/app.py
+DIR=$(dirname $0)
+
+exec $DIR/wait-for-services.sh $DIR/app.py
