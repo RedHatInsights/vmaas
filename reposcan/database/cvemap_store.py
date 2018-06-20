@@ -42,21 +42,59 @@ class CvemapStore(CveStoreCommon):
 
         cve_data = cvemap.list_cves()
         cve_names = [(name,) for name in cve_data]
-        execute_values(cur, """select id, name, source_id from cve
+        execute_values(cur, """select id, name, source_id,
+                                 description, impact_id,
+                                 published_date, modified_date,
+                                 cvss3_score, iava, redhat_url,
+                                 secondary_url, source_id
+                                 from cve
                                  join (values %s) t(name)
                                 using (name)""", cve_names, page_size=len(cve_names))
-        for row in cur.fetchall():
-            cve_data[row[1]]["id"] = row[0]
+        #
+        # find and merge cves that have already been loaded
+        #
+        # fields we care about potentially merging include:
+        # [3]description,
+        # [5]published_date, [6]modified_date,
+        # [7]cvss3_score, [8]iava, [9]redhat_url,
+        # [10]secondary_url
+        cols = {
+            'description':3,
+            'published_date':5,
+            'modified_date':6,
+            'cvss3_score':7,
+            'iava':8,
+            'redhat_url':9,
+            'secondary_url':10}
+
+        for a_db_row in cur.fetchall():
+            # cve_data[row[1]] = incoming-cve-with-same-name-as-from-db
+            # skip id, name, source_id (they are *always* filled in
+            # for rest, use incoming unless null, then use from-db
+            db_name = a_db_row[1]
+            db_id = a_db_row[0]
+            cve_data[db_name]["id"] = db_id
+            for a_key in cols:
+                if not a_key in cve_data[db_name]:
+                    cve_data[db_name][a_key] = None
+                if not cve_data[db_name][a_key]:
+                    cve_data[db_name][a_key] = a_db_row[cols[a_key]]
 
         to_import = []
         to_update = []
+        # now, deal with all items
         for name, values in cve_data.items():
             values["impact_id"] = cve_impact_map[values["impact"].capitalize()] \
                         if values["impact"] is not None else cve_impact_map["NotSet"]
-            values["redhat_url"], values["secondary_url"] = self._process_url_list(name, [])
+            # make sure everyting has all the keys, even if val is empty
+            for a_key in cols:
+                if not a_key in values:
+                    values[a_key] = None
+
             item = (name, values["description"], values["impact_id"], values["published_date"],
                     values["modified_date"], values["cvss3_score"], None,
                     values["redhat_url"], values["secondary_url"], rh_source_id)
+            # if we have an 'id', it means we're already in the db
             if "id" in values:
                 to_update.append((values["id"],) + item)
             else:
