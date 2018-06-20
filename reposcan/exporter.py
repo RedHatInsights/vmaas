@@ -219,18 +219,23 @@ class DataDump:
             cursor.execute("""SELECT errata_cve.errata_id, cve.name
                                 FROM cve
                                 JOIN errata_cve ON cve_id = cve.id
-                           """)
+                               WHERE errata_id in %s
+                           """, [tuple(self.errata_ids)])
             for errata_id, cve_name in cursor:
                 errataid2cves.setdefault(errata_id, []).append(cve_name)
         errataid2pkgid = {}
         with self._named_cursor() as cursor:
-            cursor.execute("""SELECT errata_id, pkg_id FROM pkg_errata""")
+            cursor.execute("""SELECT errata_id, pkg_id FROM pkg_errata
+                               WHERE errata_id in %s
+                           """, [tuple(self.errata_ids)])
             for errata_id, pkg_id in cursor:
                 errataid2pkgid.setdefault(errata_id, []).append(pkg_id)
         errataid2bzs = {}
         errataid2refs = {}
         with self._named_cursor() as cursor:
-            cursor.execute("SELECT errata_id, type, name FROM errata_refs")
+            cursor.execute("""SELECT errata_id, type, name FROM errata_refs
+                               WHERE errata_id in %s
+                           """, [tuple(self.errata_ids)])
             for errata_id, ref_type, ref_name in cursor:
                 if ref_type == 'bugzilla':
                     errataid2bzs.setdefault(errata_id, []).append(ref_name)
@@ -244,7 +249,8 @@ class DataDump:
                                 FROM errata
                                 JOIN errata_type ON errata_type_id = errata_type.id
                                 JOIN errata_severity ON severity_id = errata_severity.id
-                           """)
+                               WHERE errata.id in %s
+                           """, [tuple(self.errata_ids)])
             for errata_id, e_name, synopsis, summary, e_type, e_severity, \
                 description, solution, issued, updated in cursor:
                 url = "https://access.redhat.com/errata/%s" % e_name
