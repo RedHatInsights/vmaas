@@ -20,6 +20,7 @@ def get_env_opts():
     options["storage_size"]["vmaas-dump-data"] = os.getenv("storage_size_dump", "5Gi")
     options["healthchecks"] = {}
     options["healthchecks"]["webapp"] = {"vmaas-webapp": os.getenv("webapp_healthchecks_path" ,"./healthchecks/webapp.yml")}
+    options["healthchecks"]["reposcan"] = {"vmaas-reposcan": os.getenv("reposcan_healthchecks_path" ,"./healthchecks/reposcan.yml")}
     return options
 
 
