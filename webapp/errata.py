@@ -17,6 +17,12 @@ class ErrataAPI(object):
 
     def find_errata_by_regex(self, regex):
         """Returns list of errata matching a provided regex."""
+        if not regex.startswith('^'):
+            regex = '^' + regex
+
+        if not regex.endswith('$'):
+            regex = regex + '$'
+
         return [label for label in self.cache.errata_detail
                 if re.match(regex, label)]
 
