@@ -22,6 +22,7 @@ def get_env_opts():
     options["healthchecks"]["webapp"] = {"vmaas-webapp": os.getenv("webapp_healthchecks_path" ,"./healthchecks/webapp.yml")}
     options["healthchecks"]["reposcan"] = {"vmaas-reposcan": os.getenv("reposcan_healthchecks_path" ,"./healthchecks/reposcan.yml")}
     options["healthchecks"]["database"] = {"vmaas-database": os.getenv("database_healthchecks_path" ,"./healthchecks/database.yml")}
+    options["healthchecks"]["apidoc"] = {"vmaas-apidoc": os.getenv("apidoc_healthchecks_path" ,"./healthchecks/apidoc.yml")}
     return options
 
 

@@ -1,0 +1,15 @@
+---
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  periodSeconds: 10
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 120
+  timeoutSeconds: 1
+  periodSeconds: 60
