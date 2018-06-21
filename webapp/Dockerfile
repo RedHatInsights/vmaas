@@ -2,7 +2,7 @@ FROM fedora:28
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
 ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
-ENV MAX_VMAAS_SERVERS=2
+ENV MAX_VMAAS_SERVERS=1
 
 RUN dnf -y update \
     && dnf install -y dnf-plugins-core \

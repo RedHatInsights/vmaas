@@ -24,7 +24,7 @@ from dbchange import DBChange
 import gen
 
 PUBLIC_API_PORT = 8080
-MAX_SERVERS = 2
+MAX_SERVERS = 1
 
 SPEC = APISpec(
     title='VMaaS Webapp',
