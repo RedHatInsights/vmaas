@@ -213,55 +213,55 @@ class DataDump:
                                                 set()).add(repo_id)
                 dump.update(errataid2repoids)
 
-        # Select errata detail for errata API
-        errataid2cves = {}
-        with self._named_cursor() as cursor:
-            cursor.execute("""SELECT errata_cve.errata_id, cve.name
-                                FROM cve
-                                JOIN errata_cve ON cve_id = cve.id
-                               WHERE errata_id in %s
-                           """, [tuple(self.errata_ids)])
-            for errata_id, cve_name in cursor:
-                errataid2cves.setdefault(errata_id, []).append(cve_name)
-        errataid2pkgid = {}
-        with self._named_cursor() as cursor:
-            cursor.execute("""SELECT errata_id, pkg_id FROM pkg_errata
-                               WHERE errata_id in %s
-                           """, [tuple(self.errata_ids)])
-            for errata_id, pkg_id in cursor:
-                errataid2pkgid.setdefault(errata_id, []).append(pkg_id)
-        errataid2bzs = {}
-        errataid2refs = {}
-        with self._named_cursor() as cursor:
-            cursor.execute("""SELECT errata_id, type, name FROM errata_refs
-                               WHERE errata_id in %s
-                           """, [tuple(self.errata_ids)])
-            for errata_id, ref_type, ref_name in cursor:
-                if ref_type == 'bugzilla':
-                    errataid2bzs.setdefault(errata_id, []).append(ref_name)
-                else:
-                    errataid2refs.setdefault(errata_id, []).append(ref_name)
-        # Now pull all the data together for the dump
-        with self._named_cursor() as cursor:
-            cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
-                                     errata_type.name, errata_severity.name,
-                                     description, solution, issued, updated
-                                FROM errata
-                                JOIN errata_type ON errata_type_id = errata_type.id
-                                JOIN errata_severity ON severity_id = errata_severity.id
-                               WHERE errata.id in %s
-                           """, [tuple(self.errata_ids)])
-            for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                description, solution, issued, updated in cursor:
-                url = "https://access.redhat.com/errata/%s" % e_name
-                dump["errata_detail:%s" % e_name] = (synopsis, summary, e_type,
-                                                     e_severity, description,
-                                                     solution, issued, updated,
-                                                     errataid2cves.get(errata_id, []),
-                                                     errataid2pkgid.get(errata_id, []),
-                                                     errataid2bzs.get(errata_id, []),
-                                                     errataid2refs.get(errata_id, []),
-                                                     url)
+            # Select errata detail for errata API
+            errataid2cves = {}
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT errata_cve.errata_id, cve.name
+                                    FROM cve
+                                    JOIN errata_cve ON cve_id = cve.id
+                                   WHERE errata_id in %s
+                               """, [tuple(self.errata_ids)])
+                for errata_id, cve_name in cursor:
+                    errataid2cves.setdefault(errata_id, []).append(cve_name)
+            errataid2pkgid = {}
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT errata_id, pkg_id FROM pkg_errata
+                                   WHERE errata_id in %s
+                               """, [tuple(self.errata_ids)])
+                for errata_id, pkg_id in cursor:
+                    errataid2pkgid.setdefault(errata_id, []).append(pkg_id)
+            errataid2bzs = {}
+            errataid2refs = {}
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT errata_id, type, name FROM errata_refs
+                                   WHERE errata_id in %s
+                               """, [tuple(self.errata_ids)])
+                for errata_id, ref_type, ref_name in cursor:
+                    if ref_type == 'bugzilla':
+                        errataid2bzs.setdefault(errata_id, []).append(ref_name)
+                    else:
+                        errataid2refs.setdefault(errata_id, []).append(ref_name)
+            # Now pull all the data together for the dump
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
+                                         errata_type.name, errata_severity.name,
+                                         description, solution, issued, updated
+                                    FROM errata
+                                    JOIN errata_type ON errata_type_id = errata_type.id
+                                    JOIN errata_severity ON severity_id = errata_severity.id
+                                   WHERE errata.id in %s
+                               """, [tuple(self.errata_ids)])
+                for errata_id, e_name, synopsis, summary, e_type, e_severity, \
+                    description, solution, issued, updated in cursor:
+                    url = "https://access.redhat.com/errata/%s" % e_name
+                    dump["errata_detail:%s" % e_name] = (synopsis, summary, e_type,
+                                                         e_severity, description,
+                                                         solution, issued, updated,
+                                                         errataid2cves.get(errata_id, []),
+                                                         errataid2pkgid.get(errata_id, []),
+                                                         errataid2bzs.get(errata_id, []),
+                                                         errataid2refs.get(errata_id, []),
+                                                         url)
 
     def dump_cves(self, dump):
         """Select cve details"""
