@@ -20,6 +20,12 @@ class RepoAPI(object):
 
         :returns: list of repository-labels matching the provided regex
         """
+        if not repo_regex.startswith('^'):
+            repo_regex = '^' + repo_regex
+
+        if not repo_regex.endswith('$'):
+            repo_regex = repo_regex + '$'
+
         return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
 
     def process_list(self, data):
