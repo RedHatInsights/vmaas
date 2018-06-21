@@ -104,6 +104,22 @@ class BaseHandler(RequestHandler):
         self.finish()
 
 
+class HealthHandler(BaseHandler):
+    """Handler class providing health status."""
+
+    def get(self):  # pylint: disable=arguments-differ
+        """Get API status.
+           ---
+           description: Return API status
+           responses:
+             200:
+               description: Application is alive
+           tags:
+             - monitoring
+        """
+        self.flush()
+
+
 class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
     def get(self): # pylint: disable=arguments-differ
@@ -555,6 +571,7 @@ class ReposcanApplication(Application):
     def __init__(self):
         handlers = [
             (r"/notifications/?", NotificationHandler),
+            (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/export/?", ExporterHandler),
