@@ -5,6 +5,7 @@ Module to handle /repos API calls.
 import re
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
+from utils import paginate
 
 
 class RepoAPI(object):
@@ -37,6 +38,8 @@ class RepoAPI(object):
         :returns: json response with repository details
         """
         repos = data.get('repository_list', None)
+        page = data.get("page", None)
+        page_size = data.get("page_size", None)
         repolist = {}
         if not repos:
             return repolist
@@ -45,7 +48,9 @@ class RepoAPI(object):
             # treat single-label like a regex, get all matching names
             repos = self.find_repos_by_regex(repos[0])
 
-        for label in repos:
+        repo_page_to_process, pagination_response = paginate(repos, page, page_size)
+
+        for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 repolist.setdefault(label, []).append({
@@ -61,5 +66,6 @@ class RepoAPI(object):
         response = {
             'repository_list': repolist,
         }
+        response.update(pagination_response)
 
         return response
