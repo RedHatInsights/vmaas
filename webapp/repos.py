@@ -3,8 +3,21 @@ Module to handle /repos API calls.
 """
 
 import re
+from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
+
+JSON_SCHEMA = {
+    'type' : 'object',
+    'required': ['repository_list'],
+    'properties' : {
+        'repository_list': {
+            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
+            },
+        'page_size' : {'type' : 'number'},
+        'page' : {'type' : 'number'}
+    }
+}
 
 
 class RepoAPI(object):
@@ -36,6 +49,8 @@ class RepoAPI(object):
 
         :returns: json response with repository details
         """
+        validate(data, JSON_SCHEMA)
+
         repos = data.get('repository_list', None)
         repolist = {}
         if not repos:

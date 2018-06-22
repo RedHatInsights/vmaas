@@ -3,10 +3,24 @@ Module contains functions and CVE class for returning data from DB
 """
 
 import re
+from jsonschema import validate
 
 from utils import format_datetime, parse_datetime, none2empty, paginate
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_DESCRIPTION
+
+JSON_SCHEMA = {
+    'type' : 'object',
+    'required': ['cve_list'],
+    'properties' : {
+        'cve_list': {
+            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
+            },
+        'modified_since' : {'type' : 'string'},
+        'page_size' : {'type' : 'number'},
+        'page' : {'type' : 'number'}
+    }
+}
 
 
 class CveAPI(object):
@@ -33,6 +47,7 @@ class CveAPI(object):
         :returns: list of dictionaries containing detailed information for given cve list}
 
         """
+        validate(data, JSON_SCHEMA)
 
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
