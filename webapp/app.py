@@ -144,6 +144,22 @@ class ApiSpecHandler(BaseHandler):
         yield self.flush()
 
 
+class VersionHandler(BaseHandler):
+    """Handler class providing app version."""
+
+    @gen.coroutine
+    def get(self): # pylint: disable=arguments-differ
+        """Get app version.
+           ---
+           description: Get version of application
+           responses:
+             200:
+               description: Version of application returned
+        """
+        self.write(VMAAS_VERSION)
+        yield self.flush()
+
+
 class DBChangeHandler(BaseHandler):
     """
     Class to return last-updated information from VMaaS DB
@@ -719,6 +735,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
+            (r"/api/v1/version/?", VersionHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
             (r"/api/v1/cves/?", CVEHandlerPost),
