@@ -1,6 +1,7 @@
 FROM fedora:28
 MAINTAINER Gennadii Altukhov <galt@redhat.com>
 
+ENV VMAAS_VERSION=latest
 ENV REPOSCAN_WEBSOCKET_URL=ws://reposcan:8081/notifications
 ENV MAX_VMAAS_SERVERS=1
 

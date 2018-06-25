@@ -22,11 +22,12 @@ from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
+VMAAS_VERSION = os.getenv("VMAAS_VERSION", "latest")
 LOGGER = get_logger(__name__)
 
 SPEC = APISpec(
     title='VMaaS Reposcan',
-    version='1',
+    version=VMAAS_VERSION,
     plugins=(
         'apispec.ext.tornado',
     ),
