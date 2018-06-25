@@ -1,6 +1,7 @@
 FROM fedora:28
 
 # defaults; will be overwritten by docker-compose.env
+ENV VMAAS_VERSION=latest
 ENV POSTGRESQL_HOST=database
 ENV POSTGRESQL_PORT=5432
 ENV POSTGRESQL_USER=vmaas_writer

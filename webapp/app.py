@@ -23,12 +23,13 @@ from errata import ErrataAPI
 from dbchange import DBChange
 import gen
 
+VMAAS_VERSION = os.getenv("VMAAS_VERSION", "latest")
 PUBLIC_API_PORT = 8080
 MAX_SERVERS = 1
 
 SPEC = APISpec(
     title='VMaaS Webapp',
-    version='1',
+    version=VMAAS_VERSION,
     plugins=(
         'apispec.ext.tornado',
     ),
