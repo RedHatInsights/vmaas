@@ -352,7 +352,9 @@ class UpdatesAPI(object):
         # Get list of valid repository IDs based on input paramaters
         available_repo_ids = self._process_repositories(data, response)
 
-        repo_ids_key = hashlib.md5('_'.join([str(id) for id in sorted(available_repo_ids)]).encode('utf-8')).hexdigest()
+        repo_ids_key = hashlib.md5('_'.join(
+            [str(r_id) for r_id in sorted(available_repo_ids)]
+        ).encode('utf-8')).hexdigest()
 
         all_pkgs = data.get('package_list', None)
         pkgs_not_in_cache = []
