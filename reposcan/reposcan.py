@@ -134,6 +134,20 @@ class ApiSpecHandler(BaseHandler):
         self.write(SPEC.to_dict())
 
 
+class VersionHandler(BaseHandler):
+    """Handler class providing app version."""
+    def get(self): # pylint: disable=arguments-differ
+        """Get app version.
+           ---
+           description: Get version of application
+           responses:
+             200:
+               description: Version of application returned
+        """
+        self.write(VMAAS_VERSION)
+        self.flush()
+
+
 class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
 
@@ -574,6 +588,7 @@ class ReposcanApplication(Application):
             (r"/notifications/?", NotificationHandler),
             (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
+            (r"/api/v1/version/?", VersionHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/export/?", ExporterHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
