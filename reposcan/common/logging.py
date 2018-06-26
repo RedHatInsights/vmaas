@@ -8,9 +8,10 @@ import logging
 def init_logging():
     """Setup root logger handler."""
     logger = logging.getLogger()
+    uuid = os.uname().nodename
     if not logger.handlers:
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(fmt="%(asctime)s %(name)s: [%(levelname)s] %(message)s"))
+        handler.setFormatter(logging.Formatter(fmt=uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"))
         logger.addHandler(handler)
 
 
