@@ -4,6 +4,7 @@ Main web API module
 """
 
 import os
+import sre_constants
 import sys
 import json
 
@@ -93,6 +94,10 @@ class BaseHandler(tornado.web.RequestHandler):
             except ValueError as valuerr:
                 res = str(valuerr)
                 print('ValueError: ' + res)
+                sys.stdout.flush()
+            except sre_constants.error as sre_err:
+                res = 'Regular expression error: ' + str(sre_err)
+                print('sre_constants.error: ' + res)
                 sys.stdout.flush()
             except: # pylint: disable=bare-except
                 res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
