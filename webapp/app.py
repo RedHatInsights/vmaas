@@ -24,7 +24,7 @@ from dbchange import DBChange
 from utils import init_logging, get_logger
 import gen
 
-VMAAS_VERSION = os.getenv("VMAAS_VERSION", "latest")
+VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
 MAX_SERVERS = 1
 
@@ -806,7 +806,7 @@ def main():
     num_servers = int(os.getenv("MAX_VMAAS_SERVERS", MAX_SERVERS))
     server.start(num_servers)  # start forking here
     init_logging(num_servers)
-    LOGGER.info("Starting")
+    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
 
     # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
