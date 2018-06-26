@@ -174,6 +174,42 @@ class SyncHandler(BaseHandler):
         SyncTask.finish()
 
 
+class ExporterHandler(SyncHandler):
+    """Handler for Export sync API."""
+
+    task_type = "Export"
+
+    def get(self): # pylint: disable=arguments-differ
+        """Export disk dump.
+           ---
+           description: Export disk dump
+           responses:
+             200:
+               description: Sync started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
+             429:
+               description: Another sync is already in progress
+           tags:
+             - sync
+        """
+        status_code, status_msg = self.start_task()
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start exporting disk dump."""
+        try:
+            export_data(DUMP)
+        except: # pylint: disable=bare-except
+            LOGGER.error(traceback.format_exc())
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
+
+
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
@@ -453,42 +489,6 @@ class CvemapSyncHandler(SyncHandler):
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK, %s" % ExporterHandler.run_task()
-
-
-class ExporterHandler(SyncHandler):
-    """Handler for Export sync API."""
-
-    task_type = "Export"
-
-    def get(self): # pylint: disable=arguments-differ
-        """Export disk dump.
-           ---
-           description: Export disk dump
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/StatusResponse"
-             429:
-               description: Another sync is already in progress
-           tags:
-             - sync
-        """
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
-
-    @staticmethod
-    def run_task(*args, **kwargs):
-        """Function to start exporting disk dump."""
-        try:
-            export_data(DUMP)
-        except: # pylint: disable=bare-except
-            LOGGER.error(traceback.format_exc())
-            DatabaseHandler.rollback()
-            return "ERROR"
-        return "OK"
 
 
 class AllSyncHandler(SyncHandler):
