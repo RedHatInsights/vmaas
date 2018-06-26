@@ -2,7 +2,9 @@
 Set of functions and precedures shared between different modules.
 """
 
+import logging
 import math
+import os
 import re
 from datetime import datetime
 from dateutil import parser as dateutil_parser
@@ -77,3 +79,24 @@ def paginate(input_list, page, page_size):
     end = page * page_size
     pages = int(math.ceil(float(len(input_list))/page_size))
     return (input_list[start:end], {"page": page, "page_size": page_size, "pages": pages})
+
+def init_logging(num_servers=1):
+    """Setup root logger handler."""
+    logger = logging.getLogger()
+    uuid = os.uname().nodename
+    if num_servers > 1:
+        uuid += ":%d" % os.getpid()
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(fmt=uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"))
+        logger.addHandler(handler)
+
+def get_logger(name):
+    """
+    Set logging level and return logger.
+    Don't set custom logging level in root handler to not display debug messages from underlying libraries.
+    """
+    logger = logging.getLogger(name)
+    level = os.getenv('LOGGING_LEVEL', "INFO")
+    logger.setLevel(getattr(logging, level, logging.INFO))
+    return logger

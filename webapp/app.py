@@ -5,7 +5,6 @@ Main web API module
 
 import os
 import sre_constants
-import sys
 import json
 
 
@@ -22,6 +21,7 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
+from utils import init_logging, get_logger
 import gen
 
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "latest")
@@ -39,6 +39,7 @@ SPEC = APISpec(
 )
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
+LOGGER = get_logger(__name__)
 
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
@@ -90,25 +91,20 @@ class BaseHandler(tornado.web.RequestHandler):
                     res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
                 else:
                     res = '%s' % validerr.message
-                print('ValidationError: ' + res)
-                sys.stdout.flush()
+                LOGGER.error('ValidationError: %s', res)
             except ValueError as valuerr:
                 res = str(valuerr)
-                print('ValueError: ' + res)
-                sys.stdout.flush()
+                LOGGER.error('ValueError: %s', res)
             except sre_constants.error as sre_err:
                 res = 'Regular expression error: ' + str(sre_err)
-                print('sre_constants.error: ' + res)
-                sys.stdout.flush()
+                LOGGER.error('sre_constants.error: %s', res)
             except: # pylint: disable=bare-except
                 res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
                 code = 500
-                print(res)
-                sys.stdout.flush()
+                LOGGER.error(res)
         else:
             res = 'Error: malformed input JSON.'
-            print(res)
-            sys.stdout.flush()
+            LOGGER.error(res)
 
         self.set_status(code)
         self.write(res)
@@ -123,8 +119,7 @@ class BaseHandler(tornado.web.RequestHandler):
             code = 200
         except sre_constants.error as sre_err:
             result = 'Regular expression error: ' + str(sre_err)
-            print('sre_constants.error: ' + result)
-            sys.stdout.flush()
+            LOGGER.warning('sre_constants.error: %s', result)
 
         self.set_status(code)
         self.write(result)
@@ -767,8 +762,7 @@ class Application(tornado.web.Application):
     def _refresh_cache():
         BaseHandler.db_cache.reload()
         BaseHandler.updates_api.clear_hot_cache()
-        print("Cached data refreshed.")
-        sys.stdout.flush()
+        LOGGER.info("Cached data refreshed.")
 
     def websocket_reconnect(self):
         """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
@@ -785,11 +779,9 @@ class Application(tornado.web.Application):
 
         if result is None:
             # TODO: print the traceback as debug message when we use logging module instead of prints here
-            print("Unable to connect to: %s" % self.reposcan_websocket_url)
-            sys.stdout.flush()
+            LOGGER.warning("Unable to connect to: %s", self.reposcan_websocket_url)
         else:
-            print("Connected to: %s" % self.reposcan_websocket_url)
-            sys.stdout.flush()
+            LOGGER.warning("Connected to: %s", self.reposcan_websocket_url)
 
         self.reposcan_websocket = result
 
@@ -799,10 +791,8 @@ class Application(tornado.web.Application):
             if message == "refresh-cache":
                 self._refresh_cache()
         else:
-            print("Connection to %s closed: %s (%s)" % (self.reposcan_websocket_url,
-                                                        self.reposcan_websocket.close_reason,
-                                                        self.reposcan_websocket.close_code))
-            sys.stdout.flush()
+            LOGGER.warning("Connection to %s closed: %s (%s)", self.reposcan_websocket_url,
+                           self.reposcan_websocket.close_reason, self.reposcan_websocket.close_code)
             self.reposcan_websocket = None
 
 
@@ -813,7 +803,10 @@ def main():
 
     server = tornado.httpserver.HTTPServer(vmaas_app)
     server.bind(PUBLIC_API_PORT)
-    server.start(int(os.getenv("MAX_VMAAS_SERVERS", MAX_SERVERS)))  # start forking here
+    num_servers = int(os.getenv("MAX_VMAAS_SERVERS", MAX_SERVERS))
+    server.start(num_servers)  # start forking here
+    init_logging(num_servers)
+    LOGGER.info("Starting")
 
     # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
