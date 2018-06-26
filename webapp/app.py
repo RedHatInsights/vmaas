@@ -98,10 +98,11 @@ class BaseHandler(tornado.web.RequestHandler):
             except sre_constants.error as sre_err:
                 res = 'Regular expression error: ' + str(sre_err)
                 LOGGER.error('sre_constants.error: %s', res)
-            except: # pylint: disable=bare-except
-                res = 'Unexpected error: %s - %s' % (sys.exc_info()[0], sys.exc_info()[1])
+            except Exception as err: # pylint: disable=broad-except
+                err_id = err.__hash__()
+                res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
                 code = 500
-                LOGGER.error(res)
+                LOGGER.exception(res)
         else:
             res = 'Error: malformed input JSON.'
             LOGGER.error(res)
