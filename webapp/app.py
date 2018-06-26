@@ -116,7 +116,16 @@ class BaseHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def handle_get(self, api_endpoint, param_name, param):
         """Takes care of validation of input and execution of GET methods."""
-        result = api_endpoint.process_list({param_name : [param]})
+        code = 400
+        try:
+            result = api_endpoint.process_list({param_name : [param]})
+            code = 200
+        except sre_constants.error as sre_err:
+            result = 'Regular expression error: ' + str(sre_err)
+            print('sre_constants.error: ' + result)
+            sys.stdout.flush()
+
+        self.set_status(code)
         self.write(result)
         yield self.flush()
 
