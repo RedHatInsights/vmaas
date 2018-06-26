@@ -22,7 +22,7 @@ from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
-VMAAS_VERSION = os.getenv("VMAAS_VERSION", "latest")
+VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 LOGGER = get_logger(__name__)
 
 SPEC = APISpec(
@@ -607,6 +607,7 @@ def periodic_sync():
 def main():
     """Main entrypoint."""
     init_logging()
+    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', 720)) * 60000
     if sync_interval > 0:
         PeriodicCallback(periodic_sync, sync_interval).start()
