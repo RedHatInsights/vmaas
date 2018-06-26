@@ -113,6 +113,13 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write(res)
         yield self.flush()
 
+    @gen.coroutine
+    def handle_get(self, api_endpoint, param_name, param):
+        """Takes care of validation of input and execution of GET methods."""
+        result = api_endpoint.process_list({param_name : [param]})
+        self.write(result)
+        yield self.flush()
+
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
@@ -174,7 +181,6 @@ class DBChangeHandler(BaseHandler):
 class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    @gen.coroutine
     def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
@@ -194,9 +200,7 @@ class UpdatesHandlerGet(BaseHandler):
         tags:
           - updates
         """
-        result = self.updates_api.process_list({'package_list': [nevra]})
-        self.write(result)
-        yield self.flush()
+        self.handle_get(self.updates_api, 'package_list', nevra)
 
 
 class UpdatesHandlerPost(BaseHandler):
@@ -248,7 +252,6 @@ class UpdatesHandlerPost(BaseHandler):
 class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
-    @gen.coroutine
     def get(self, cve=None):  # pylint: disable=arguments-differ
         """
         ---
@@ -268,9 +271,7 @@ class CVEHandlerGet(BaseHandler):
         tags:
           - cves
         """
-        res = self.cve_api.process_list({'cve_list': [cve]})
-        self.write(res)
-        yield self.flush()
+        self.handle_get(self.cve_api, 'cve_list', cve)
 
 
 class CVEHandlerPost(BaseHandler):
@@ -315,7 +316,6 @@ class CVEHandlerPost(BaseHandler):
 class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
 
-    @gen.coroutine
     def get(self, repo=None):  # pylint: disable=arguments-differ
         """
         ---
@@ -336,9 +336,7 @@ class ReposHandlerGet(BaseHandler):
         tags:
           - repos
         """
-        res = self.repo_api.process_list({'repository_list': [repo]})
-        self.write(res)
-        yield self.flush()
+        self.handle_get(self.repo_api, 'repository_list', repo)
 
 
 class ReposHandlerPost(BaseHandler):
@@ -380,7 +378,6 @@ class ReposHandlerPost(BaseHandler):
 class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
 
-    @gen.coroutine
     def get(self, erratum=None): # pylint: disable=arguments-differ
         """
         ---
@@ -401,9 +398,7 @@ class ErrataHandlerGet(BaseHandler):
         tags:
           - errata
         """
-        res = self.errata_api.process_list({'errata_list': [erratum]})
-        self.write(res)
-        yield self.flush()
+        self.handle_get(self.errata_api, 'errata_list', erratum)
 
 
 class ErrataHandlerPost(BaseHandler):
