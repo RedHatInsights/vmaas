@@ -6,7 +6,6 @@ into specified PostgreSQL database.
 
 import os
 from multiprocessing.pool import Pool
-import traceback
 import json
 
 from apispec import APISpec
@@ -218,8 +217,9 @@ class ExporterHandler(SyncHandler):
         """Function to start exporting disk dump."""
         try:
             export_data(DUMP)
-        except: # pylint: disable=bare-except
-            LOGGER.error(traceback.format_exc())
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK"
@@ -381,13 +381,14 @@ class RepoSyncHandler(SyncHandler):
         """
         try:
             products, repos = self._parse_input_list()
-        except: # pylint: disable=bare-except
+        except Exception as err: # pylint: disable=broad-except
             products = None
             repos = None
-            LOGGER.warning(traceback.format_exc())
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
             self.set_status(400)
 
-            self.write(ResponseJson("Incorrect JSON format.", success=False))
+            self.write(ResponseJson(msg, success=False))
             self.flush()
         if repos:
             status_code, status_msg = self.start_task(products=products, repos=repos)
@@ -420,8 +421,9 @@ class RepoSyncHandler(SyncHandler):
                 # Re-sync repos in DB
                 repository_controller.add_synced_repositories()
             repository_controller.store()
-        except: # pylint: disable=bare-except
-            LOGGER.error(traceback.format_exc())
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK, %s" % ExporterHandler.run_task()
@@ -460,8 +462,9 @@ class CveSyncHandler(SyncHandler):
             controller = CveRepoController()
             controller.add_repos()
             controller.store()
-        except: # pylint: disable=bare-except
-            LOGGER.error(traceback.format_exc())
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK, %s" % ExporterHandler.run_task()
@@ -499,8 +502,9 @@ class CvemapSyncHandler(SyncHandler):
             init_db()
             controller = CvemapController()
             controller.store()
-        except: # pylint: disable=bare-except
-            LOGGER.error(traceback.format_exc())
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK, %s" % ExporterHandler.run_task()
