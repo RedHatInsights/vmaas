@@ -73,10 +73,12 @@ class CveAPI(object):
 
             # if we have information about modified/published dates and receive "modified_since" in request,
             # compare the dates
-            if modified_since and \
-                    (cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_MODIFIED_DATE] < modified_since_dt or
-                     cve_detail[CVE_PUBLISHED_DATE] and cve_detail[CVE_PUBLISHED_DATE] < modified_since_dt):
-                continue
+            if modified_since:
+                if cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_MODIFIED_DATE] < modified_since_dt:
+                    continue
+                elif not cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_PUBLISHED_DATE] and \
+                                cve_detail[CVE_PUBLISHED_DATE] < modified_since_dt:
+                    continue
 
             cve_list[cve] = {
                 "redhat_url": none2empty(cve_detail[CVE_REDHAT_URL]),
