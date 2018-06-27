@@ -91,10 +91,12 @@ class ErrataAPI(object):
 
             # if we have information about modified/published dates and receive "modified_since" in request,
             # compare the dates
-            if modified_since and \
-                    (errata_detail[ERRATA_UPDATED] and errata_detail[ERRATA_UPDATED] < modified_since_dt or
-                     errata_detail[ERRATA_ISSUED] and errata_detail[ERRATA_ISSUED] < modified_since_dt):
-                continue
+            if modified_since:
+                if errata_detail[ERRATA_UPDATED] and errata_detail[ERRATA_UPDATED] < modified_since_dt:
+                    continue
+                elif not errata_detail[ERRATA_UPDATED] and errata_detail[ERRATA_ISSUED] and \
+                                errata_detail[ERRATA_ISSUED] < modified_since_dt:
+                    continue
 
             errata_list[errata] = {
                 "synopsis": none2empty(errata_detail[ERRATA_SYNOPSIS]),
