@@ -213,7 +213,7 @@ class UpdatesHandlerGet(BaseHandler):
             required: True
             type: string
             in: path
-            example: kernel-2.6.32-696.20.1.el6.x86_64
+            x-example: kernel-2.6.32-696.20.1.el6.x86_64
         responses:
           200:
             description: Return list of security updates for single package NEVRA
@@ -284,7 +284,7 @@ class CVEHandlerGet(BaseHandler):
             required: True
             type: string
             in: path
-            example: CVE-2017-5715, CVE-2017-571[1-5], CVE-2017-5.*
+            x-example: CVE-2017-5715, CVE-2017-571[1-5], CVE-2017-5.*
         responses:
           200:
             description: Return details about CVEs
@@ -349,7 +349,7 @@ class ReposHandlerGet(BaseHandler):
             required: True
             type: string
             in: path
-            example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
+            x-example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
         responses:
           200:
             description: Return details about repository or repositories that match the expression
@@ -411,7 +411,7 @@ class ErrataHandlerGet(BaseHandler):
             required: True
             type: string
             in: path
-            example: RHSA-2018:0512, RHSA-2018:051[1-5], RH.*
+            x-example: RHSA-2018:0512, RHSA-2018:051[1-5], RH.*
         responses:
           200:
             description: Return details about errata
