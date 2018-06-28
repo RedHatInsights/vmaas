@@ -782,7 +782,7 @@ class Application(tornado.web.Application):
             # TODO: print the traceback as debug message when we use logging module instead of prints here
             LOGGER.warning("Unable to connect to: %s", self.reposcan_websocket_url)
         else:
-            LOGGER.warning("Connected to: %s", self.reposcan_websocket_url)
+            LOGGER.info("Connected to: %s", self.reposcan_websocket_url)
 
         self.reposcan_websocket = result
 
