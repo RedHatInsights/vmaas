@@ -9,6 +9,7 @@ DOCKER_COMPOSE_FILE="docker-compose.yml"
 TRAVIS_FILE=".travis.yml"
 RELEASE_FILE="scripts/docker-push.sh"
 PATCH_DOCKERFILES="webapp/Dockerfile reposcan/Dockerfile"
+ENV_FILES="conf/webapp.env conf/reposcan.env"
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" != "$ORIGINAL_BRANCH" ]; then
     echo "Please checkout $ORIGINAL_BRANCH branch to create new release."
@@ -40,6 +41,10 @@ elif [[ "$1" =~ $VERSION_REGEXP ]]; then
     for dockerfile in $PATCH_DOCKERFILES; do
         sed -i "s/ENV VMAAS_VERSION=latest/ENV VMAAS_VERSION=$1/g" "$dockerfile"
         git add "$dockerfile"
+    done
+    for envfile in $ENV_FILES; do
+        sed -i "s/^LOGGING_TYPE=.*/LOGGING_TYPE=OPENSHIFT/g" "$envfile"
+        git add "$envfile"
     done
     git add "$DOCKER_COMPOSE_FILE" "$TRAVIS_FILE" "$RELEASE_FILE"
     git commit -m "Update version to $1"
