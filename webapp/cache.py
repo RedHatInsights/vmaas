@@ -6,6 +6,8 @@ import dbm
 import os
 import shelve
 
+from utils import get_logger
+
 DUMP = '/data/vmaas.dbm'
 REMOTE_DUMP = 'rsync://reposcan:8730/data/vmaas.dbm'
 
@@ -44,6 +46,8 @@ ERRATA_PKGIDS = 9
 ERRATA_BUGZILLA = 10
 ERRATA_REFERENCE = 11
 ERRATA_URL = 12
+
+LOGGER = get_logger(__name__)
 
 class Cache(object):
     """ Cache class. """
@@ -111,8 +115,9 @@ class Cache(object):
         # pylint: disable=too-many-branches
         try:
             data = shelve.open(filename, 'r')
-        except dbm.error:
+        except dbm.error as err:
             # file does not exist or has wrong type
+            LOGGER.warning("Failed to load data %s: %s", filename, err)
             return
         for item in data:
             relation, key = item.split(":", 1)
@@ -159,3 +164,4 @@ class Cache(object):
                 self.errata_detail[key] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
+        LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))
