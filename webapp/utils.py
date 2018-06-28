@@ -83,12 +83,17 @@ def paginate(input_list, page, page_size):
 def init_logging(num_servers=1):
     """Setup root logger handler."""
     logger = logging.getLogger()
-    uuid = os.uname().nodename
-    if num_servers > 1:
-        uuid += ":%d" % os.getpid()
+    log_type = os.getenv('LOGGING_TYPE', "OPENSHIFT")
+    if log_type == "OPENSHIFT":
+        log_fmt = "%(name)s: [%(levelname)s] %(message)s"
+    else:
+        uuid = os.uname().nodename
+        if num_servers > 1:
+            uuid += ":%d" % os.getpid()
+        log_fmt = uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"
     if not logger.handlers:
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(fmt=uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"))
+        handler.setFormatter(logging.Formatter(fmt=log_fmt))
         logger.addHandler(handler)
 
 def get_logger(name):
