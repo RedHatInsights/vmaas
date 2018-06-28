@@ -103,6 +103,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
                 code = 500
                 LOGGER.exception(res)
+                LOGGER.info("Input data for <%s>: %s", err_id, data)
         else:
             res = 'Error: malformed input JSON.'
             LOGGER.error(res)
