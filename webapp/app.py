@@ -35,7 +35,6 @@ SPEC = APISpec(
         'apispec.ext.tornado',
     ),
     basePath="/api/v1",
-    schemes=["http"],
 )
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
