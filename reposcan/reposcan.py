@@ -31,7 +31,6 @@ SPEC = APISpec(
         'apispec.ext.tornado',
     ),
     basePath="/api/v1",
-    schemes=["http"],
 )
 
 WEBSOCKET_PING_INTERVAL = 60
