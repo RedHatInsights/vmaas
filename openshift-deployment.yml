@@ -43,7 +43,7 @@
         - up
 
     - name: Create OpenShift routes
-      shell: oc expose service apidoc --port {{ apidoc_container_port }}; oc expose service reposcan --port {{ reposcan_container_port }}; oc expose service webapp --port {{ webapp_container_port }}
+      shell: oc create route edge --service apidoc --port {{ apidoc_container_port }}; oc create route edge --service reposcan --port {{ reposcan_container_port }}; oc create route edge --service webapp --port {{ webapp_container_port }}
       tags:
         - up
         - routes-up
