@@ -204,7 +204,7 @@ class ExporterHandler(SyncHandler):
              429:
                description: Another sync is already in progress
            tags:
-             - sync
+             - export
         """
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
@@ -592,10 +592,10 @@ class ReposcanApplication(Application):
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/version/?", VersionHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
-            (r"/api/v1/sync/export/?", ExporterHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
             (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
+            (r"/api/v1/export/?", ExporterHandler),
         ]
         setup_apispec(handlers)
         Application.__init__(self, handlers)
