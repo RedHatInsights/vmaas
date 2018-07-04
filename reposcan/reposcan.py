@@ -146,6 +146,180 @@ class VersionHandler(BaseHandler):
         self.flush()
 
 
+class RepoListHandler(BaseHandler):
+    """Handler for repository list/add API."""
+
+    @staticmethod
+    def _content_set_to_repos(content_set):
+        baseurl = content_set["baseurl"]
+        basearches = content_set["basearch"]
+        releasevers = content_set["releasever"]
+
+        # (repo_url, basearch, releasever)
+        repos = [(baseurl, None, None)]
+        # Replace basearch
+        repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
+                 for basearch in basearches for repo in repos]
+        # Replace releasever
+        repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
+                 for releasever in releasevers for repo in repos]
+
+        return repos
+
+    def _parse_input_list(self):
+        products = {}
+        repos = []
+        json_data = ""
+        # check if JSON is passed as a file or as a body of POST request
+        if self.request.files:
+            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
+        elif self.request.body:
+            json_data = self.request.body
+
+        data = json.loads(json_data)
+        for repo_group in data:
+            # Entitlement cert is optional
+            if "entitlement_cert" in repo_group:
+                cert_name = repo_group["entitlement_cert"]["name"]
+                ca_cert = repo_group["entitlement_cert"]["ca_cert"]
+                cert = repo_group["entitlement_cert"]["cert"]
+                key = repo_group["entitlement_cert"]["key"]
+            else:
+                cert_name, ca_cert, cert, key = None, None, None, None
+
+            # Repository list with product and content set information
+            for product_name, product in repo_group["products"].items():
+                products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
+                for content_set_label, content_set in product["content_sets"].items():
+                    products[product_name]["content_sets"][content_set_label] = content_set["name"]
+                    for repo_url, basearch, releasever in self._content_set_to_repos(content_set):
+                        repos.append((repo_url, content_set_label, basearch, releasever,
+                                      cert_name, ca_cert, cert, key))
+
+        return products, repos
+
+    def post(self): # pylint: disable=arguments-differ
+        """Add repositories listed in request to the DB.
+           ---
+           description: Add repositories listed in request to the DB
+           parameters:
+             - name: body
+               description: Input JSON
+               required: True
+               in: body
+               schema:
+                 type: array
+                 items:
+                   type: object
+                   properties:
+                     entitlement_cert:
+                       type: object
+                       properties:
+                         name:
+                           type: string
+                           example: RHSM-CDN
+                         ca_cert:
+                           type: string
+                         cert:
+                           type: string
+                         key:
+                           type: string
+                       required:
+                         - name
+                         - ca_cert
+                     products:
+                       type: object
+                       properties:
+                         Red Hat Enterprise Linux Server:
+                           type: object
+                           properties:
+                             redhat_eng_product_id:
+                               type: integer
+                               example: 69
+                             content_sets:
+                               type: object
+                               properties:
+                                 rhel-6-server-rpms:
+                                   type: object
+                                   properties:
+                                     name:
+                                       type: string
+                                       example: Red Hat Enterprise Linux 6 Server (RPMs)
+                                     baseurl:
+                                       type: string
+                                       example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+                                     basearch:
+                                       type: array
+                                       items:
+                                         type: string
+                                         example: x86_64
+                                     releasever:
+                                       type: array
+                                       items:
+                                         type: string
+                                         example: 6Server
+                                   required:
+                                     - name
+                                     - baseurl
+                                     - basearch
+                                     - releasever
+                           required:
+                             - content_sets
+                   required:
+                     - products
+           responses:
+             200:
+               description: Repos and products added to the DB
+               schema:
+                 $ref: "#/definitions/StatusResponse"
+             400:
+               description: Invalid input JSON format
+           tags:
+             - repos
+        """
+        try:
+            products, repos = self._parse_input_list()
+        except Exception as err: # pylint: disable=broad-except
+            products = None
+            repos = None
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            self.set_status(400)
+
+            self.write(ResponseJson(msg, success=False))
+            self.flush()
+        if repos:
+            self.import_repositories(products=products, repos=repos)
+            msg = "Products and repositories imported."
+            self.write(ResponseJson(msg))
+            self.flush()
+
+    @staticmethod
+    def import_repositories(products=None, repos=None):
+        """Function to import all repositories from input list to the DB."""
+        try:
+            init_logging()
+            init_db()
+            repository_controller = RepositoryController()
+            if products:
+                product_store = ProductStore()
+                product_store.store(products)
+                # Reference imported content set to associate with repositories
+                repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
+
+            if repos:
+                # Sync repos from input
+                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
+                    repository_controller.add_repository(repo_url, content_set, basearch, releasever,
+                                                         cert_name=cert_name, ca_cert=ca_cert,
+                                                         cert=cert, key=key)
+            repository_controller.import_repositories()
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+
+
 class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
 
@@ -229,55 +403,6 @@ class RepoSyncHandler(SyncHandler):
 
     task_type = "Repo + %s" % ExporterHandler.task_type
 
-    @staticmethod
-    def _content_set_to_repos(content_set):
-        baseurl = content_set["baseurl"]
-        basearches = content_set["basearch"]
-        releasevers = content_set["releasever"]
-
-        # (repo_url, basearch, releasever)
-        repos = [(baseurl, None, None)]
-        # Replace basearch
-        repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
-                 for basearch in basearches for repo in repos]
-        # Replace releasever
-        repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
-                 for releasever in releasevers for repo in repos]
-
-        return repos
-
-    def _parse_input_list(self):
-        products = {}
-        repos = []
-        json_data = ""
-        # check if JSON is passed as a file or as a body of POST request
-        if self.request.files:
-            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
-        elif self.request.body:
-            json_data = self.request.body
-
-        data = json.loads(json_data)
-        for repo_group in data:
-            # Entitlement cert is optional
-            if "entitlement_cert" in repo_group:
-                cert_name = repo_group["entitlement_cert"]["name"]
-                ca_cert = repo_group["entitlement_cert"]["ca_cert"]
-                cert = repo_group["entitlement_cert"]["cert"]
-                key = repo_group["entitlement_cert"]["key"]
-            else:
-                cert_name, ca_cert, cert, key = None, None, None, None
-
-            # Repository list with product and content set information
-            for product_name, product in repo_group["products"].items():
-                products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
-                for content_set_label, content_set in product["content_sets"].items():
-                    products[product_name]["content_sets"][content_set_label] = content_set["name"]
-                    for repo_url, basearch, releasever in self._content_set_to_repos(content_set):
-                        repos.append((repo_url, content_set_label, basearch, releasever,
-                                      cert_name, ca_cert, cert, key))
-
-        return products, repos
-
     def get(self): # pylint: disable=arguments-differ
         """Sync repositories stored in DB.
            ---
@@ -297,128 +422,14 @@ class RepoSyncHandler(SyncHandler):
         self.write(status_msg)
         self.flush()
 
-    def post(self): # pylint: disable=arguments-differ
-        """Sync repositories listed in request.
-           ---
-           description: Sync repositories listed in request
-           parameters:
-             - name: body
-               description: Input JSON
-               required: True
-               in: body
-               schema:
-                 type: array
-                 items:
-                   type: object
-                   properties:
-                     entitlement_cert:
-                       type: object
-                       properties:
-                         name:
-                           type: string
-                           example: RHSM-CDN
-                         ca_cert:
-                           type: string
-                         cert:
-                           type: string
-                         key:
-                           type: string
-                       required:
-                         - name
-                         - ca_cert
-                     products:
-                       type: object
-                       properties:
-                         Red Hat Enterprise Linux Server:
-                           type: object
-                           properties:
-                             redhat_eng_product_id:
-                               type: integer
-                               example: 69
-                             content_sets:
-                               type: object
-                               properties:
-                                 rhel-6-server-rpms:
-                                   type: object
-                                   properties:
-                                     name:
-                                       type: string
-                                       example: Red Hat Enterprise Linux 6 Server (RPMs)
-                                     baseurl:
-                                       type: string
-                                       example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
-                                     basearch:
-                                       type: array
-                                       items:
-                                         type: string
-                                         example: x86_64
-                                     releasever:
-                                       type: array
-                                       items:
-                                         type: string
-                                         example: 6Server
-                                   required:
-                                     - name
-                                     - baseurl
-                                     - basearch
-                                     - releasever
-                           required:
-                             - content_sets
-                   required:
-                     - products
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/StatusResponse"
-             400:
-               description: Invalid input JSON format
-             429:
-               description: Another sync is already in progress
-           tags:
-             - sync
-        """
-        try:
-            products, repos = self._parse_input_list()
-        except Exception as err: # pylint: disable=broad-except
-            products = None
-            repos = None
-            msg = "Internal server error <%s>" % err.__hash__()
-            LOGGER.exception(msg)
-            self.set_status(400)
-
-            self.write(ResponseJson(msg, success=False))
-            self.flush()
-        if repos:
-            status_code, status_msg = self.start_task(products=products, repos=repos)
-            self.set_status(status_code)
-            self.write(status_msg)
-            self.flush()
-
     @staticmethod
     def run_task(*args, **kwargs):
-        """Function to start syncing all repositories from input list or from database."""
-        products = kwargs.get('products', None)
-        repos = kwargs.get('repos', None)
+        """Function to start syncing all repositories available from database."""
         try:
             init_logging()
             init_db()
             repository_controller = RepositoryController()
-            if products:
-                product_store = ProductStore()
-                product_store.store(products)
-                # Reference imported content set to associate with repositories
-                repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
-
-            if repos:
-                # Sync repos from input
-                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
-                    repository_controller.add_repository(repo_url, content_set, basearch, releasever,
-                                                         cert_name=cert_name, ca_cert=ca_cert,
-                                                         cert=cert, key=key)
-            else:
-                # Re-sync repos in DB
-                repository_controller.add_synced_repositories()
+            repository_controller.add_db_repositories()
             repository_controller.store()
         except Exception as err: # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
