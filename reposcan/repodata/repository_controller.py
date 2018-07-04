@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 from urllib.parse import urljoin
+import re
 
 from common.batch_list import BatchList
 from common.logging import get_logger
@@ -186,6 +187,22 @@ class RepositoryController:
                         self.certs_files[cert_name][cert_type] = cert_path
                     else:
                         self.certs_files[cert_name][cert_type] = None
+
+    def _find_content_sets_by_regex(self, content_set_regex):
+        if not content_set_regex.startswith('^'):
+            content_set_regex = '^' + content_set_regex
+
+        if not content_set_regex.endswith('$'):
+            content_set_regex = content_set_regex + '$'
+
+        return [content_set_label for content_set_label in self.repo_store.content_set_to_db_id
+                if re.match(content_set_regex, content_set_label)]
+
+    def delete_content_set(self, content_set_regex):
+        """Deletes content sets described by given regex from DB."""
+        for content_set_label in self._find_content_sets_by_regex(content_set_regex):
+            self.logger.info("Deleting content set: %s", content_set_label)
+            self.repo_store.delete_content_set(content_set_label)
 
     def import_repositories(self):
         """Create or update repository records in the DB."""
