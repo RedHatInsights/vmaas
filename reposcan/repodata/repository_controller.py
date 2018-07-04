@@ -148,8 +148,8 @@ class RepositoryController:
             self.certs_tmp_directory = None
             self.certs_files = {}
 
-    def add_synced_repositories(self):
-        """Queue all previously synced repositories."""
+    def add_db_repositories(self):
+        """Queue all previously imported repositories."""
         repos = self.repo_store.list_repositories()
         for (content_set, basearch, releasever), repo_dict in repos.items():
             # Reference content_set_label -> content set id
@@ -186,6 +186,12 @@ class RepositoryController:
                         self.certs_files[cert_name][cert_type] = cert_path
                     else:
                         self.certs_files[cert_name][cert_type] = None
+
+    def import_repositories(self):
+        """Create or update repository records in the DB."""
+        self.logger.info("Importing %d repositories.", len(self.repositories))
+        for repository in self.repositories:
+            self.repo_store.import_repository(repository)
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""

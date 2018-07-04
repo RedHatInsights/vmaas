@@ -73,7 +73,10 @@ class RepositoryStore:
         self.conn.commit()
         return cert_id[0]
 
-    def _import_repository(self, repo):
+    def import_repository(self, repo):
+        """
+        Imports or updates repository record in DB. 
+        """
         if repo.ca_cert:
             cert_id = self._import_certificate(repo.cert_name, repo.ca_cert, repo.cert, repo.key)
         else:
@@ -89,13 +92,13 @@ class RepositoryStore:
                                              revision, eol, certificate_id)
                         values (%s, %s, %s, %s, %s, false, %s) returning id""",
                         (repo.repo_url, content_set_id, basearch_id, repo.releasever,
-                         repo.repomd.get_revision(), cert_id,))
+                         repo.get_revision(), cert_id,))
             repo_id = cur.fetchone()
         else:
             # Update repository timestamp
             cur.execute("""update repo set revision = %s, certificate_id = %s, content_set_id = %s,
                                            basearch_id = %s, releasever = %s
-                        where id = %s""", (repo.repomd.get_revision(), cert_id, content_set_id, basearch_id,
+                        where id = %s""", (repo.get_revision(), cert_id, content_set_id, basearch_id,
                                            repo.releasever, repo_id[0],))
         cur.close()
         self.conn.commit()
@@ -103,12 +106,12 @@ class RepositoryStore:
 
     def store(self, repository):
         """
-        Store single repository into DB.
+        Store single repository content into DB.
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
         self.logger.info("Syncing repository: %s", ", ".join((repository.content_set, repository.basearch,
                                                               repository.releasever)))
-        repo_id = self._import_repository(repository)
+        repo_id = self.import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())
