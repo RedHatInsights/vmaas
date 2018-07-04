@@ -12,20 +12,20 @@ class RepositoryStore:
     Class providing interface for listing repositories stored in DB and storing repositories one by one.
     """
     def __init__(self):
-        self.content_set_to_db_id = {}
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
+        self.content_set_to_db_id = self._prepare_content_set_map()
 
-    def set_content_set_db_mapping(self, content_set_to_db_id):
-        """Set content set to DB is mapping from product_store"""
-        self.content_set_to_db_id = content_set_to_db_id
-
-    def _get_content_set_id(self, repo):
-        if repo.content_set in self.content_set_to_db_id:
-            return self.content_set_to_db_id[repo.content_set]
-        return None
+    def _prepare_content_set_map(self):
+        cur = self.conn.cursor()
+        cur.execute("""select id, label from content_set""")
+        content_sets = {}
+        for cs_id, cs_label in cur.fetchall():
+            content_sets[cs_label] = cs_id
+        cur.close()
+        return content_sets
 
     def list_repositories(self):
         """List repositories stored in DB. Dictionary with repository label as key is returned."""
@@ -73,9 +73,25 @@ class RepositoryStore:
         self.conn.commit()
         return cert_id[0]
 
+    def delete_content_set(self, content_set_label):
+        """
+        Deletes repositories and their content from DB.
+        """
+        content_set_id = self.content_set_to_db_id[content_set_label]
+        cur = self.conn.cursor()
+        cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
+        repo_ids = [repo_id for repo_id in cur.fetchall()]
+        for repo_id in repo_ids:
+            cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
+            cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
+            cur.execute("delete from repo where id = %s", (repo_id,))
+        cur.execute("delete from content_set where id = %s", (content_set_id,))
+        cur.close()
+        self.conn.commit()
+
     def import_repository(self, repo):
         """
-        Imports or updates repository record in DB. 
+        Imports or updates repository record in DB.
         """
         if repo.ca_cert:
             cert_id = self._import_certificate(repo.cert_name, repo.ca_cert, repo.cert, repo.key)
@@ -86,7 +102,7 @@ class RepositoryStore:
             basearch_id = self._import_basearch(repo.basearch)
         else:
             basearch_id = None
-        content_set_id = self._get_content_set_id(repo)
+        content_set_id = self.content_set_to_db_id[repo.content_set]
         cur = self.conn.cursor()
         cur.execute("""select id from repo where content_set_id = %s
                        and ((%s is null and basearch_id is null) or basearch_id = %s)

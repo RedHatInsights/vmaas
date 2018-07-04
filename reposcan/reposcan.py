@@ -300,20 +300,19 @@ class RepoListHandler(BaseHandler):
         try:
             init_logging()
             init_db()
-            repository_controller = RepositoryController()
+
             if products:
                 product_store = ProductStore()
                 product_store.store(products)
-                # Reference imported content set to associate with repositories
-                repository_controller.repo_store.set_content_set_db_mapping(product_store.cs_to_dbid)
 
             if repos:
+                repository_controller = RepositoryController()
                 # Sync repos from input
                 for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
                     repository_controller.add_repository(repo_url, content_set, basearch, releasever,
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
-            repository_controller.import_repositories()
+                repository_controller.import_repositories()
         except Exception as err: # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
@@ -329,13 +328,13 @@ class SyncHandler(BaseHandler):
     def start_task(cls, *args, **kwargs):
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
-            msg = "%s sync task started." % cls.task_type
+            msg = "%s task started." % cls.task_type
             LOGGER.info(msg)
             SyncTask.start(cls.run_task_and_export, cls.finish_task, *args, **kwargs)
             status_code = 200
             status_msg = ResponseJson(msg)
         else:
-            msg = "%s sync request ignored. Another sync task already in progress." % cls.task_type
+            msg = "%s task request ignored. Another task already in progress." % cls.task_type
             LOGGER.info(msg)
             # Too Many Requests
             status_code = 429
@@ -365,12 +364,52 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         # Notify webapps to update it's cache
         SyncHandler._notify_webapps()
-        LOGGER.info("%s sync task finished: %s.", cls.task_type, task_result)
+        LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
 
+class RepoDeleteHandler(SyncHandler):
+    """Handler for repository item API."""
+
+    task_type = "Delete"
+
+    def delete(self, repo=None): # pylint: disable=arguments-differ
+        """Delete repository.
+           ---
+           description: Delete repository
+           responses:
+             200:
+               description: Repository deletion started
+               schema:
+                 $ref: "#/definitions/StatusResponse"
+             429:
+               description: Another task is already in progress
+           tags:
+             - repos
+        """
+        status_code, status_msg = self.start_task(repo=repo)
+        self.set_status(status_code)
+        self.write(status_msg)
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start deleting repos."""
+        try:
+            repo = kwargs.get("repo", None)
+            init_logging()
+            init_db()
+            repository_controller = RepositoryController()
+            repository_controller.delete_content_set(repo)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
+
+
 class ExporterHandler(SyncHandler):
-    """Handler for Export sync API."""
+    """Handler for Export API."""
 
     task_type = "Export"
 
@@ -384,7 +423,7 @@ class ExporterHandler(SyncHandler):
                schema:
                  $ref: "#/definitions/StatusResponse"
              429:
-               description: Another sync is already in progress
+               description: Another task is already in progress
            tags:
              - export
         """
@@ -421,7 +460,7 @@ class RepoSyncHandler(SyncHandler):
                schema:
                  $ref: "#/definitions/StatusResponse"
              429:
-               description: Another sync is already in progress
+               description: Another task is already in progress
            tags:
              - sync
         """
@@ -462,7 +501,7 @@ class CveSyncHandler(SyncHandler):
                schema:
                  $ref: "#/definitions/StatusResponse"
              429:
-               description: Another sync is already in progress
+               description: Another task is already in progress
            tags:
              - sync
         """
@@ -503,7 +542,7 @@ class CvemapSyncHandler(SyncHandler):
                schema:
                  $ref: "#/definitions/StatusResponse"
              429:
-               description: Another sync is already in progress
+               description: Another task is already in progress
            tags:
              - sync
         """
@@ -545,7 +584,7 @@ class AllSyncHandler(SyncHandler):
                schema:
                  $ref: "#/definitions/StatusResponse"
              429:
-               description: Another sync is already in progress
+               description: Another task is already in progress
            tags:
              - sync
         """
@@ -616,8 +655,10 @@ class ReposcanApplication(Application):
             (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
             (r"/api/v1/export/?", ExporterHandler),
         ]
-        setup_apispec(handlers)
+
         Application.__init__(self, handlers)
+
+        setup_apispec(handlers)
 
 
 def periodic_sync():
