@@ -591,6 +591,8 @@ class ReposcanApplication(Application):
             (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/version/?", VersionHandler),
+            (r"/api/v1/repos/?", RepoListHandler),
+            (r"/api/v1/repos/(?P<repo>[\\a-zA-Z0-9%*-.+?\[\]]+)", RepoDeleteHandler),
             (r"/api/v1/sync/?", AllSyncHandler),
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
