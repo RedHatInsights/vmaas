@@ -366,7 +366,7 @@ class ExporterHandler(SyncHandler):
 
     task_type = "Export"
 
-    def get(self): # pylint: disable=arguments-differ
+    def put(self): # pylint: disable=arguments-differ
         """Export disk dump.
            ---
            description: Export disk dump
@@ -403,7 +403,7 @@ class RepoSyncHandler(SyncHandler):
 
     task_type = "Repo + %s" % ExporterHandler.task_type
 
-    def get(self): # pylint: disable=arguments-differ
+    def put(self): # pylint: disable=arguments-differ
         """Sync repositories stored in DB.
            ---
            description: Sync repositories stored in DB
@@ -444,7 +444,7 @@ class CveSyncHandler(SyncHandler):
 
     task_type = "CVE + %s" % ExporterHandler.task_type
 
-    def get(self): # pylint: disable=arguments-differ
+    def put(self): # pylint: disable=arguments-differ
         """Sync CVEs.
            ---
            description: Sync CVE lists
@@ -485,7 +485,7 @@ class CvemapSyncHandler(SyncHandler):
 
     task_type = "CVEmap + %s" % ExporterHandler.task_type
 
-    def get(self): # pylint: disable=arguments-differ
+    def put(self): # pylint: disable=arguments-differ
         """Sync CVEmap.
            ---
            description: Sync CVE map
@@ -528,7 +528,7 @@ class AllSyncHandler(SyncHandler):
                                        CveSyncHandler.task_type,
                                        ExporterHandler.task_type)
 
-    def get(self): # pylint: disable=arguments-differ
+    def put(self): # pylint: disable=arguments-differ
         """Sync repos + CVEs + CVEmap.
            ---
            description: Sync repositories stored in DB and CVE lists
