@@ -113,8 +113,6 @@ class HealthHandler(BaseHandler):
            responses:
              200:
                description: Application is alive
-           tags:
-             - monitoring
         """
         self.flush()
 
