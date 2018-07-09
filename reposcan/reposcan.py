@@ -329,7 +329,7 @@ class SyncHandler(BaseHandler):
         if not SyncTask.is_running():
             msg = "%s sync task started." % cls.task_type
             LOGGER.info(msg)
-            SyncTask.start(cls.run_task, cls.finish_task, *args, **kwargs)
+            SyncTask.start(cls.run_task_and_export, cls.finish_task, *args, **kwargs)
             status_code = 200
             status_msg = ResponseJson(msg)
         else:
@@ -339,6 +339,14 @@ class SyncHandler(BaseHandler):
             status_code = 429
             status_msg = ResponseJson(msg, success=False)
         return status_code, status_msg
+
+    @classmethod
+    def run_task_and_export(cls, *args, **kwargs):
+        """Run sync task of current class and export."""
+        result = cls.run_task(*args, **kwargs)
+        if cls != ExporterHandler:
+            ExporterHandler.run_task()
+        return result
 
     @staticmethod
     def _notify_webapps():
@@ -399,7 +407,7 @@ class ExporterHandler(SyncHandler):
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
-    task_type = "Repo + %s" % ExporterHandler.task_type
+    task_type = "Repo"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync repositories stored in DB.
@@ -434,13 +442,13 @@ class RepoSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
-        return "OK, %s" % ExporterHandler.run_task()
+        return "OK"
 
 
 class CveSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
-    task_type = "CVE + %s" % ExporterHandler.task_type
+    task_type = "CVE"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync CVEs.
@@ -475,13 +483,13 @@ class CveSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
-        return "OK, %s" % ExporterHandler.run_task()
+        return "OK"
 
 
 class CvemapSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
-    task_type = "CVEmap + %s" % ExporterHandler.task_type
+    task_type = "CVEmap"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync CVEmap.
@@ -515,16 +523,15 @@ class CvemapSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
-        return "OK, %s" % ExporterHandler.run_task()
+        return "OK"
 
 
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s + %s" % (RepoSyncHandler.task_type,
-                                       CvemapSyncHandler.task_type,
-                                       CveSyncHandler.task_type,
-                                       ExporterHandler.task_type)
+    task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
+                                  CvemapSyncHandler.task_type,
+                                  CveSyncHandler.task_type)
 
     def put(self): # pylint: disable=arguments-differ
         """Sync repos + CVEs + CVEmap.
@@ -548,10 +555,9 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s, %s" % (RepoSyncHandler.run_task(),
-                                   CvemapSyncHandler.run_task(),
-                                   CveSyncHandler.run_task(),
-                                   ExporterHandler.run_task())
+        return "%s, %s, %s" % (RepoSyncHandler.run_task(),
+                               CvemapSyncHandler.run_task(),
+                               CveSyncHandler.run_task())
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
