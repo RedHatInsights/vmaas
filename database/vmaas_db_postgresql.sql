@@ -481,7 +481,7 @@ CREATE TABLE IF NOT EXISTS repo (
   basearch_id INT NOT NULL,
   releasever TEXT NOT NULL, CHECK (NOT empty(releasever)),
   eol BOOLEAN NOT NULL,
-  revision TIMESTAMP WITH TIME ZONE NOT NULL,
+  revision TIMESTAMP WITH TIME ZONE NULL,
   certificate_id INT NULL,
   PRIMARY KEY (id),
   UNIQUE (content_set_id, basearch_id, releasever),
