@@ -156,11 +156,13 @@ class RepoListHandler(BaseHandler):
         # (repo_url, basearch, releasever)
         repos = [(baseurl, None, None)]
         # Replace basearch
-        repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
-                 for basearch in basearches for repo in repos]
+        if basearches:
+            repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
+                     for basearch in basearches for repo in repos]
         # Replace releasever
-        repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
-                 for releasever in releasevers for repo in repos]
+        if releasevers:
+            repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
+                     for releasever in releasevers for repo in repos]
 
         return repos
 

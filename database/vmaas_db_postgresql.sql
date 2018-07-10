@@ -478,13 +478,12 @@ CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
   url TEXT NOT NULL, CHECK (NOT empty(url)),
   content_set_id INT NOT NULL,
-  basearch_id INT NOT NULL,
-  releasever TEXT NOT NULL, CHECK (NOT empty(releasever)),
+  basearch_id INT NULL,
+  releasever TEXT NULL, CHECK (NOT empty(releasever)),
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NULL,
   certificate_id INT NULL,
   PRIMARY KEY (id),
-  UNIQUE (content_set_id, basearch_id, releasever),
   CONSTRAINT content_set_id
     FOREIGN KEY (content_set_id)
     REFERENCES content_set (id),
@@ -495,6 +494,10 @@ CREATE TABLE IF NOT EXISTS repo (
     FOREIGN KEY (certificate_id)
     REFERENCES certificate (id)
 )TABLESPACE pg_default;
+CREATE UNIQUE INDEX repo_content_set_id_key ON repo (content_set_id) WHERE basearch_id IS NULL AND releasever IS NULL;
+CREATE UNIQUE INDEX repo_content_set_id_basearch_id_key ON repo (content_set_id, basearch_id) WHERE basearch_id IS NOT NULL AND releasever IS NULL;
+CREATE UNIQUE INDEX repo_content_set_id_releasever_key ON repo (content_set_id, releasever) WHERE basearch_id IS NULL AND releasever IS NOT NULL;
+CREATE UNIQUE INDEX repo_content_set_id_basearch_id_releasever_key ON repo (content_set_id, basearch_id, releasever) WHERE basearch_id IS NOT NULL AND releasever IS NOT NULL;
 CREATE TRIGGER repo_changed AFTER INSERT OR UPDATE OR DELETE ON repo
   FOR EACH STATEMENT
   EXECUTE PROCEDURE repos_changed();

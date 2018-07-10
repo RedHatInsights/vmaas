@@ -80,7 +80,7 @@ class RepositoryController:
                 repository.repomd = repomd
             else:
                 self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
-                                 ", ".join(repository_key), str(downloaded_revision), str(db_revision))
+                                 ", ".join(filter(None, repository_key)), str(downloaded_revision), str(db_revision))
 
     def _repo_download_failed(self, repo, failed_items):
         failed = False
