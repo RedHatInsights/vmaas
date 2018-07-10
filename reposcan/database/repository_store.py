@@ -81,11 +81,18 @@ class RepositoryStore:
             cert_id = self._import_certificate(repo.cert_name, repo.ca_cert, repo.cert, repo.key)
         else:
             cert_id = None
-        basearch_id = self._import_basearch(repo.basearch)
+
+        if repo.basearch:
+            basearch_id = self._import_basearch(repo.basearch)
+        else:
+            basearch_id = None
         content_set_id = self._get_content_set_id(repo)
         cur = self.conn.cursor()
-        cur.execute("select id from repo where content_set_id = %s and basearch_id = %s and releasever = %s",
-                    (content_set_id, basearch_id, repo.releasever))
+        cur.execute("""select id from repo where content_set_id = %s
+                       and ((%s is null and basearch_id is null) or basearch_id = %s)
+                       and ((%s is null and releasever is null) or releasever = %s)
+                    """,
+                    (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever))
         repo_id = cur.fetchone()
         if not repo_id:
             cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
@@ -110,8 +117,8 @@ class RepositoryStore:
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
-        self.logger.info("Syncing repository: %s", ", ".join((repository.content_set, repository.basearch,
-                                                              repository.releasever)))
+        self.logger.info("Syncing repository: %s", ", ".join(filter(None, (repository.content_set, repository.basearch,
+                                                                           repository.releasever))))
         repo_id = self.import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())
