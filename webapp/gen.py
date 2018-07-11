@@ -7,7 +7,7 @@ from tornado.gen import coroutine as tornado_coroutine
 
 def coroutine(func, replace_callback=True):
     """Fixed coroutine annotation."""
-    wrapper = tornado_coroutine(func, replace_callback=replace_callback)
+    wrapper = tornado_coroutine(func, replace_callback=replace_callback) # pylint: disable=unexpected-keyword-arg
     wrapper.__wrapped__ = func
     wrapper.__tornado_coroutine__ = True
     return wrapper
