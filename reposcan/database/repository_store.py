@@ -73,6 +73,38 @@ class RepositoryStore:
         self.conn.commit()
         return cert_id[0]
 
+    def cleanup_unused_data(self):
+        """
+        Deletes packages and errata not associated with any repo etc.
+        """
+        cur = self.conn.cursor()
+        cur.execute("""select p.id from package p where not exists (
+                         select 1 from pkg_repo pr where pr.pkg_id = p.id
+                       )
+                    """)
+        packages_to_delete = [pkg_id for pkg_id in cur.fetchall()]
+
+        cur.execute("""select e.id from errata e where not exists (
+                         select 1 from errata_repo er where er.errata_id = e.id
+                       )
+                    """)
+        updates_to_delete = [update_id for update_id in cur.fetchall()]
+
+        if packages_to_delete or updates_to_delete:
+            cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s or pe.errata_id in %s""",
+                        (tuple(packages_to_delete), tuple(updates_to_delete),))
+
+        if packages_to_delete:
+            cur.execute("""delete from package p where p.id in %s""", (tuple(packages_to_delete),))
+
+        if updates_to_delete:
+            cur.execute("""delete from errata_cve ec where ec.errata_id in %s""", (tuple(updates_to_delete),))
+            cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
+            cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
+
+        cur.close()
+        self.conn.commit()
+
     def delete_content_set(self, content_set_label):
         """
         Deletes repositories and their content from DB.
