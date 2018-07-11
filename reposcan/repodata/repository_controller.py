@@ -203,6 +203,7 @@ class RepositoryController:
         for content_set_label in self._find_content_sets_by_regex(content_set_regex):
             self.logger.info("Deleting content set: %s", content_set_label)
             self.repo_store.delete_content_set(content_set_label)
+        self.repo_store.cleanup_unused_data()
 
     def import_repositories(self):
         """Create or update repository records in the DB."""
@@ -251,4 +252,5 @@ class RepositoryController:
                 repository.unload_metadata()
             self.clean_repodata(batch)
 
+        self.repo_store.cleanup_unused_data()
         self._clean_certificate_cache()
