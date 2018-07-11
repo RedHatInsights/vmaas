@@ -79,15 +79,19 @@ class NotificationHandler(WebSocketHandler):
         self.last_pong = IOLoop.current().time()
 
 
-class ResponseJson(dict):
-    """Object used as API response to user, represented as JSON"""
+class TaskStatusResponse(dict):
+    """Object used as API response to user."""
+    def __init__(self, running=False):
+        super(TaskStatusResponse, self).__init__()
+        self['running'] = running
+
+
+class TaskStartResponse(dict):
+    """Object used as API response to user."""
     def __init__(self, msg, success=True):
-        super(ResponseJson, self).__init__()
+        super(TaskStartResponse, self).__init__()
         self['msg'] = msg
         self['success'] = success
-
-    def __repr__(self):
-        return json.dumps(self)
 
 
 class BaseHandler(RequestHandler):
@@ -141,6 +145,47 @@ class VersionHandler(BaseHandler):
                description: Version of application returned
         """
         self.write(VMAAS_VERSION)
+        self.flush()
+
+
+class TaskStatusHandler(BaseHandler):
+    """Handler class providing status of currently running background task."""
+
+    def get(self):  # pylint: disable=arguments-differ
+        """Get status of currently running background task.
+           ---
+           description: Get status of currently running background task
+           responses:
+             200:
+               description: Status of currently running background task
+               schema:
+                 $ref: "#/definitions/TaskStatusResponse"
+           tags:
+             - task
+        """
+        self.write(TaskStatusResponse(running=SyncTask.is_running()))
+        self.flush()
+
+
+class TaskCancelHandler(BaseHandler):
+    """Handler class to cancel currently running background task."""
+
+    def put(self):  # pylint: disable=arguments-differ
+        """Cancel currently running background task.
+           ---
+           description: Cancel currently running background task
+           responses:
+             200:
+               description: Task canceled
+               schema:
+                 $ref: "#/definitions/TaskStatusResponse"
+           tags:
+             - task
+        """
+        if SyncTask.is_running():
+            SyncTask.cancel()
+            LOGGER.warning("Background task terminated.")
+        self.write(TaskStatusResponse(running=SyncTask.is_running()))
         self.flush()
 
 
@@ -271,7 +316,7 @@ class RepoListHandler(BaseHandler):
              200:
                description: Repos and products added to the DB
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              400:
                description: Invalid input JSON format
            tags:
@@ -286,12 +331,12 @@ class RepoListHandler(BaseHandler):
             LOGGER.exception(msg)
             self.set_status(400)
 
-            self.write(ResponseJson(msg, success=False))
+            self.write(TaskStartResponse(msg, success=False))
             self.flush()
         if repos:
             self.import_repositories(products=products, repos=repos)
             msg = "Products and repositories imported."
-            self.write(ResponseJson(msg))
+            self.write(TaskStartResponse(msg))
             self.flush()
 
     @staticmethod
@@ -332,13 +377,13 @@ class SyncHandler(BaseHandler):
             LOGGER.info(msg)
             SyncTask.start(cls.run_task_and_export, cls.finish_task, *args, **kwargs)
             status_code = 200
-            status_msg = ResponseJson(msg)
+            status_msg = TaskStartResponse(msg)
         else:
             msg = "%s task request ignored. Another task already in progress." % cls.task_type
             LOGGER.info(msg)
             # Too Many Requests
             status_code = 429
-            status_msg = ResponseJson(msg, success=False)
+            status_msg = TaskStartResponse(msg, success=False)
         return status_code, status_msg
 
     @classmethod
@@ -381,7 +426,7 @@ class RepoDeleteHandler(SyncHandler):
              200:
                description: Repository deletion started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -421,7 +466,7 @@ class ExporterHandler(SyncHandler):
              200:
                description: Sync started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -458,7 +503,7 @@ class RepoSyncHandler(SyncHandler):
              200:
                description: Sync started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -499,7 +544,7 @@ class CveSyncHandler(SyncHandler):
              200:
                description: Sync started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -540,7 +585,7 @@ class CvemapSyncHandler(SyncHandler):
              200:
                description: Sync started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -582,7 +627,7 @@ class AllSyncHandler(SyncHandler):
              200:
                description: Sync started
                schema:
-                 $ref: "#/definitions/StatusResponse"
+                 $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
            tags:
@@ -602,8 +647,9 @@ class AllSyncHandler(SyncHandler):
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
-    SPEC.definition("StatusResponse", properties={"success": {"type": "boolean"},
-                                                  "msg": {"type": "string", "example": "Repo sync task started."}})
+    SPEC.definition("TaskStatusResponse", properties={"running": {"type": "boolean"}})
+    SPEC.definition("TaskStartResponse", properties={"success": {"type": "boolean"},
+                                                     "msg": {"type": "string", "example": "Repo sync task started."}})
     # Register public API handlers to apispec
     for handler in handlers:
         if handler[0].startswith(r"/api/v1/"):
@@ -638,6 +684,14 @@ class SyncTask:
         """Return True when some sync is running."""
         return cls._running
 
+    @classmethod
+    def cancel(cls):
+        """Terminate the process pool."""
+        cls.workers.terminate()
+        cls.workers.join()
+        cls.workers = Pool(1)
+        cls.finish()
+
 
 class ReposcanApplication(Application):
     """Class defining API handlers."""
@@ -654,6 +708,8 @@ class ReposcanApplication(Application):
             (r"/api/v1/sync/cve/?", CveSyncHandler),
             (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
             (r"/api/v1/export/?", ExporterHandler),
+            (r"/api/v1/task/status/?", TaskStatusHandler),
+            (r"/api/v1/task/cancel/?", TaskCancelHandler),
         ]
 
         Application.__init__(self, handlers)
