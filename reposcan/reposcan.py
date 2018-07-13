@@ -81,9 +81,10 @@ class NotificationHandler(WebSocketHandler):
 
 class TaskStatusResponse(dict):
     """Object used as API response to user."""
-    def __init__(self, running=False):
+    def __init__(self, running=False, task_type=None):
         super(TaskStatusResponse, self).__init__()
         self['running'] = running
+        self['task_type'] = task_type
 
 
 class TaskStartResponse(dict):
@@ -164,7 +165,7 @@ class TaskStatusHandler(BaseHandler):
            tags:
              - task
         """
-        self.write(TaskStatusResponse(running=SyncTask.is_running()))
+        self.write(TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type()))
         self.flush()
 
 
@@ -186,7 +187,7 @@ class TaskCancelHandler(BaseHandler):
         if SyncTask.is_running():
             SyncTask.cancel()
             LOGGER.warning("Background task terminated.")
-        self.write(TaskStatusResponse(running=SyncTask.is_running()))
+        self.write(TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type()))
         self.flush()
 
 
@@ -368,7 +369,7 @@ class RepoListHandler(BaseHandler):
 class SyncHandler(BaseHandler):
     """Base handler class providing common methods for different sync types."""
 
-    task_type = None
+    task_type = "Unknown"
 
     @classmethod
     def start_task(cls, *args, **kwargs):
@@ -376,7 +377,7 @@ class SyncHandler(BaseHandler):
         if not SyncTask.is_running():
             msg = "%s task started." % cls.task_type
             LOGGER.info(msg)
-            SyncTask.start(cls.run_task_and_export, cls.finish_task, *args, **kwargs)
+            SyncTask.start(cls.task_type, cls.run_task_and_export, cls.finish_task, *args, **kwargs)
             status_code = 200
             status_msg = TaskStartResponse(msg)
         else:
@@ -417,7 +418,7 @@ class SyncHandler(BaseHandler):
 class RepoDeleteHandler(SyncHandler):
     """Handler for repository item API."""
 
-    task_type = "Delete"
+    task_type = "Delete repositories"
 
     def delete(self, repo=None): # pylint: disable=arguments-differ
         """Delete repository.
@@ -457,7 +458,7 @@ class RepoDeleteHandler(SyncHandler):
 class ExporterHandler(SyncHandler):
     """Handler for Export API."""
 
-    task_type = "Export"
+    task_type = "Export dump"
 
     def put(self): # pylint: disable=arguments-differ
         """Export disk dump.
@@ -494,7 +495,7 @@ class ExporterHandler(SyncHandler):
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
-    task_type = "Repo"
+    task_type = "Sync repositories"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync repositories stored in DB.
@@ -535,7 +536,7 @@ class RepoSyncHandler(SyncHandler):
 class CveSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
-    task_type = "CVE"
+    task_type = "Sync CVEs"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync CVEs.
@@ -576,7 +577,7 @@ class CveSyncHandler(SyncHandler):
 class CvemapSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
-    task_type = "CVEmap"
+    task_type = "Sync CVE map"
 
     def put(self): # pylint: disable=arguments-differ
         """Sync CVEmap.
@@ -648,7 +649,8 @@ class AllSyncHandler(SyncHandler):
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
-    SPEC.definition("TaskStatusResponse", properties={"running": {"type": "boolean"}})
+    SPEC.definition("TaskStatusResponse", properties={"running": {"type": "boolean"},
+                                                      "task_type": {"type": "string", "example": "Sync CVEs"}})
     SPEC.definition("TaskStartResponse", properties={"success": {"type": "boolean"},
                                                      "msg": {"type": "string", "example": "Repo sync task started."}})
     # Register public API handlers to apispec
@@ -663,12 +665,14 @@ class SyncTask:
     Limit to single DB worker.
     """
     _running = False
+    _running_task_type = None
     workers = Pool(1)
 
     @classmethod
-    def start(cls, func, callback, *args, **kwargs):
+    def start(cls, task_type, func, callback, *args, **kwargs):
         """Start specified function with given parameters in separate worker."""
         cls._running = True
+        cls._running_task_type = task_type
         ioloop = IOLoop.instance()
 
         def _callback(result):
@@ -679,11 +683,17 @@ class SyncTask:
     def finish(cls):
         """Mark work as done."""
         cls._running = False
+        cls._running_task_type = None
 
     @classmethod
     def is_running(cls):
         """Return True when some sync is running."""
         return cls._running
+
+    @classmethod
+    def get_task_type(cls):
+        """Get currently running task type."""
+        return cls._running_task_type
 
     @classmethod
     def cancel(cls):
