@@ -23,7 +23,7 @@ JSON_SCHEMA = {
 }
 
 
-class CveAPI(object):
+class CveAPI:
     """ Main /cves API class. """
     def __init__(self, cache):
         self.cache = cache

@@ -25,7 +25,7 @@ JSON_SCHEMA = {
 }
 
 
-class ErrataAPI(object):
+class ErrataAPI:
     """ Main /errata API class. """
     def __init__(self, cache):
         self.cache = cache

@@ -16,7 +16,7 @@ from download.unpacker import FileUnpacker
 from nistcve.cvemeta import CveMeta
 from nistcve.cverepo import CveRepo
 
-DEFAULT_YEAR_SINCE = 2002
+DEFAULT_YEAR_SINCE = "2002"
 
 
 class CveRepoController:

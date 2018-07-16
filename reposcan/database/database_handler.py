@@ -52,4 +52,4 @@ def init_db():
     DatabaseHandler.db_user = os.getenv('POSTGRESQL_USER', "vmaas_writer")
     DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
     DatabaseHandler.db_host = os.getenv('POSTGRESQL_HOST', "database")
-    DatabaseHandler.db_port = os.getenv('POSTGRESQL_PORT', 5432)
+    DatabaseHandler.db_port = int(os.getenv('POSTGRESQL_PORT', "5432"))
