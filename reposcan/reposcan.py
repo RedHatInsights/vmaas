@@ -424,6 +424,13 @@ class RepoDeleteHandler(SyncHandler):
         """Delete repository.
            ---
            description: Delete repository
+           parameters:
+             - name: repo
+               description: Repository name or POSIX regular expression pattern
+               required: True
+               type: string
+               in: path
+               x-example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
            responses:
              200:
                description: Repository deletion started
