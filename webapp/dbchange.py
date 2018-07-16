@@ -4,7 +4,7 @@ Module contains functions for returning last-modified data from the DB
 
 from utils import format_datetime
 
-class DBChange(object):
+class DBChange:
     """ Main /dbchange API class. """
     def __init__(self, cache):
         self.cache = cache

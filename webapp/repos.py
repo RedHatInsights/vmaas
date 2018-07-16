@@ -21,7 +21,7 @@ JSON_SCHEMA = {
 }
 
 
-class RepoAPI(object):
+class RepoAPI:
     """ Main /repos API class."""
     def __init__(self, cache):
         self.cache = cache

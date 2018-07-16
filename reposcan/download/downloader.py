@@ -14,9 +14,9 @@ from requests.exceptions import ConnectionError  # pylint: disable=redefined-bui
 
 from common.logging import get_logger
 
-DEFAULT_CHUNK_SIZE = 1048576
-DEFAULT_THREADS = 8
-DEFAULT_RETRY_COUNT = 3
+DEFAULT_CHUNK_SIZE = "1048576"
+DEFAULT_THREADS = "8"
+DEFAULT_RETRY_COUNT = "3"
 VALID_HTTP_CODES = [200]
 
 

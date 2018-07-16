@@ -3,16 +3,13 @@ Module containing class for list of batches.
 """
 import os
 
-DEFAULT_BATCH_SIZE = 100
+DEFAULT_BATCH_SIZE = "100"
 
 class BatchList:
     """List of lists with defined maximum size of inner lists."""
 
-    def __init__(self, max_batch_size=-1):
-        # If batch-size not specified, use setting from env or default if unset
-        if max_batch_size == -1:
-            max_batch_size = os.getenv('BATCH_SIZE', DEFAULT_BATCH_SIZE)
-        self.max_batch_size = int(max_batch_size)
+    def __init__(self):
+        self.max_batch_size = int(os.getenv('BATCH_SIZE', DEFAULT_BATCH_SIZE))
         self.batches = []
 
     def __iter__(self):

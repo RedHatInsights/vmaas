@@ -748,7 +748,7 @@ def main():
     """Main entrypoint."""
     init_logging()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
-    sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', 720)) * 60000
+    sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "720")) * 60000
     if sync_interval > 0:
         PeriodicCallback(periodic_sync, sync_interval).start()
     else:

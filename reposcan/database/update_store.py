@@ -36,8 +36,7 @@ class UpdateStore:
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
-            nevras = set([(pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
-                          for pkg in update["pkglist"]])
+            nevras = {(pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"]) for pkg in update["pkglist"]}
             for nevra in nevras:
                 if nevra not in nevras_in_repo:
                     self.logger.debug("NEVRA associated with %s not found in repository: (%s)",
@@ -231,7 +230,7 @@ class UpdateStore:
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
-            for cve in set([cve["id"] for cve in update["references"] if cve["type"] == "cve"]):
+            for cve in {cve["id"] for cve in update["references"] if cve["type"] == "cve"}:
                 cve_id = cve_map[cve]
                 if update_id in update_to_cves and cve_id in update_to_cves[update_id]:
                     # Already associated, remove from set

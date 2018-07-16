@@ -25,7 +25,7 @@ JSON_SCHEMA = {
 }
 
 
-class CacheNode(object):
+class CacheNode:
     """Node of a binary tree"""
 
     def __init__(self, key, cached_response=None):
@@ -34,7 +34,7 @@ class CacheNode(object):
         self.left = self.right = None
 
 
-class HotCache(object):
+class HotCache:
     """Splay Tree implementaion, see https://en.wikipedia.org/wiki/Splay_tree for the details
 
         We use this tree to store cached data in nodes,
@@ -172,7 +172,7 @@ class HotCache(object):
             self._pruning(node.right, level=level + 1)
 
 
-class UpdatesAPI(object):
+class UpdatesAPI:
     """ Main /updates API class."""
     def __init__(self, db_cache):
         self.db_cache = db_cache      # DB dump in memory, stored like a dict

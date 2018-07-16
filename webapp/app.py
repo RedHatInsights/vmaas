@@ -26,7 +26,7 @@ import gen
 
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
-MAX_SERVERS = 1
+MAX_SERVERS = "1"
 
 SPEC = APISpec(
     title='VMaaS Webapp',

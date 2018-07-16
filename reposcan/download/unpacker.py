@@ -8,7 +8,7 @@ import bz2
 
 from common.logging import get_logger
 
-DEFAULT_CHUNK_SIZE = 1048576
+DEFAULT_CHUNK_SIZE = "1048576"
 
 
 
@@ -31,9 +31,9 @@ class FileUnpacker:
     def _get_unpack_func(file_path):
         if file_path.endswith(".gz"):
             return gzip.open
-        elif file_path.endswith(".xz"):
+        if file_path.endswith(".xz"):
             return lzma.open
-        elif file_path.endswith(".bz2"):
+        if file_path.endswith(".bz2"):
             return bz2.open
         return None
 
