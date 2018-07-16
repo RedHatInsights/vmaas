@@ -420,6 +420,9 @@ class RepoDeleteHandler(SyncHandler):
 
     task_type = "Delete repositories"
 
+    def options(self, repo=None): # pylint: disable=arguments-differ,unused-argument
+        self.finish()
+
     def delete(self, repo=None): # pylint: disable=arguments-differ
         """Delete repository.
            ---
