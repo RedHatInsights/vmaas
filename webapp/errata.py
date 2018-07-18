@@ -5,7 +5,8 @@ Module contains classes for returning errata data from DB
 import re
 from jsonschema import validate
 
-from utils import format_datetime, parse_datetime, none2empty, join_packagename, paginate
+from utils import format_datetime, parse_datetime, none2empty, join_packagename, paginate, \
+                  pkgidlist2packages
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
                   ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
@@ -40,19 +41,6 @@ class ErrataAPI:
 
         return [label for label in self.cache.errata_detail
                 if re.match(regex, label)]
-
-    def pkgidlist2packages(self, pkgid_list):
-        """
-        This method returns a list of packages for the given list of package ids.
-        """
-        pkg_list = []
-        cch = self.cache
-        for pkg_id in pkgid_list:
-            name = cch.id2packagename[cch.package_details[pkg_id][0]]
-            epoch, ver, rel = cch.id2evr[cch.package_details[pkg_id][1]]
-            arch = cch.id2arch[cch.package_details[pkg_id][2]]
-            pkg_list.append(join_packagename(name, epoch, ver, rel, arch))
-        return pkg_list
 
     def process_list(self, data):
         """
@@ -108,7 +96,7 @@ class ErrataAPI:
                 "issued": none2empty(format_datetime(errata_detail[ERRATA_ISSUED])),
                 "updated": none2empty(format_datetime(errata_detail[ERRATA_UPDATED])),
                 "cve_list": errata_detail[ERRATA_CVE],
-                "package_list": self.pkgidlist2packages(errata_detail[ERRATA_PKGIDS]),
+                "package_list": pkgidlist2packages(self.cache, errata_detail[ERRATA_PKGIDS]),
                 "bugzilla_list": errata_detail[ERRATA_BUGZILLA],
                 "reference_list": errata_detail[ERRATA_REFERENCE],
                 "url": none2empty(errata_detail[ERRATA_URL])
