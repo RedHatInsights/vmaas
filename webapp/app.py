@@ -570,6 +570,20 @@ def setup_apispec(handlers):
                                 "type": "string",
                                 "example": "CWE-200"
                             }
+                        },
+                        "errata_list": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "example": "RHSA-2015:1981"
+                            }
+                        },
+                        "package_list": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "example": "nss-devel-3.16.1-9.el6_5.x86_64"
+                            }
                         }
                     }
                 }
