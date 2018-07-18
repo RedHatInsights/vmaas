@@ -32,7 +32,7 @@ CVE_IAVA = 6
 CVE_DESCRIPTION = 7
 CVE_CWE = 8
 CVE_PID = 9
-CVE_EID =10
+CVE_EID = 10
 
 # errata detail indexes
 ERRATA_SYNOPSIS = 0

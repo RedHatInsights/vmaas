@@ -5,7 +5,7 @@ Module contains classes for returning errata data from DB
 import re
 from jsonschema import validate
 
-from utils import format_datetime, parse_datetime, none2empty, join_packagename, paginate, \
+from utils import format_datetime, parse_datetime, none2empty, paginate, \
                   pkgidlist2packages
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
