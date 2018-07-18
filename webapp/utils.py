@@ -16,6 +16,19 @@ def join_packagename(name, epoch, version, release, arch):
     epoch = ("%s:" % epoch) if int(epoch) else ''
     return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
+def pkgidlist2packages(cache, pkgid_list):
+    """
+    This method returns a list of package-nevras for the given list of package ids from
+    the specified cache
+    """
+    pkg_list = []
+    for pkg_id in pkgid_list:
+        name = cache.id2packagename[cache.package_details[pkg_id][0]]
+        epoch, ver, rel = cache.id2evr[cache.package_details[pkg_id][1]]
+        arch = cache.id2arch[cache.package_details[pkg_id][2]]
+        pkg_list.append(join_packagename(name, epoch, ver, rel, arch))
+    return pkg_list
+
 NEVRA_RE = re.compile(r'(.*)-(([0-9]+):)?([^-]+)-([^-]+)\.([a-z0-9_]+)')
 def split_packagename(filename):
     """

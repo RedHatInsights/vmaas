@@ -275,7 +275,31 @@ class DataDump:
             for cve_id, cwe in cursor:
                 cveid2cwe.setdefault(cve_id, []).append(cwe)
 
-        # Select errata ID to name mapping
+        # Select CVE to package-id mapping
+        cveid2pid = {}
+        with self._named_cursor() as cursor:
+            cursor.execute("""
+                            select distinct cve.id as cve_id, pe.pkg_id
+                              from cve cve
+                                   inner join errata_cve ec on cve.id = ec.cve_id
+                                   inner join pkg_errata pe on ec.errata_id = pe.errata_id
+                            order by cve.id, pe.pkg_id
+                           """)
+            for cve_id, pkg_id in cursor:
+                cveid2pid.setdefault(cve_id, []).append(pkg_id)
+
+        # Select CVE to errata-ID mapping
+        cveid2eid = {}
+        with self._named_cursor() as cursor:
+            cursor.execute("""
+                           select ec.cve_id as cve_id, ec.errata_id
+                             from errata_cve ec
+                           order by ec.cve_id, ec.errata_id
+                           """)
+            for cve_id, errata_id in cursor:
+                cveid2eid.setdefault(cve_id, []).append(errata_id)
+
+        # Pull everything together
         with self._named_cursor() as cursor:
             cursor.execute("""select cve.id,
                                      cve.name,
@@ -294,7 +318,9 @@ class DataDump:
                 published_date, modified_date, iava, description in cursor:
                 dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, impact,
                                                 published_date, modified_date, iava, description,
-                                                cveid2cwe.get(cve_id, []))
+                                                cveid2cwe.get(cve_id, []),
+                                                cveid2pid.get(cve_id, []),
+                                                cveid2eid.get(cve_id, []))
 
     def dump_dbchange(self, dump):
         """Select db change details"""
