@@ -9,11 +9,16 @@ import os
 import sys
 import yaml
 
+WEBSOCKET_URL_KEY_NAME = "REPOSCAN_WEBSOCKET_URL"
+POSTGRESQL_HOST_KEY_NAME = "POSTGRESQL_HOST"
+REPOSCAN_HOST_KEY_NAME = "REPOSCAN_HOST"
+
 
 def get_env_opts():
     """Override default settings from environment."""
     options = {}
     options["app_name"] = os.getenv("app_name", "vmaas")
+    options["app_id"] = os.getenv("app_id", "")
     options["storage_size"] = {}
     options["storage_size"]["vmaas-db-data"] = os.getenv("storage_size_db", "5Gi")
     options["storage_size"]["vmaas-reposcan-tmp"] = os.getenv("storage_size_tmp", "15Gi")
@@ -29,6 +34,53 @@ def get_env_opts():
 def set_app_label(options, item):
     """Set application label."""
     item["metadata"]["labels"]["app"] = options["app_name"]
+
+
+def _append_to_value(data_dict, key, suffix):
+    current_value = data_dict.get(key, None)
+    if current_value is not None:
+        data_dict[key] = "%s-%s" % (current_value, suffix)
+
+
+def set_app_id(options, item):
+    """Set application id to all components."""
+    if options["app_id"]:
+        # Append to name
+        _append_to_value(item["metadata"], "name", options["app_id"])
+        # Append to service label
+        _append_to_value(item["metadata"]["labels"], "io.kompose.service", options["app_id"])
+        # Append to service selector
+        if item["kind"] == "Service":
+            _append_to_value(item["spec"]["selector"], "io.kompose.service", options["app_id"])
+        # Update URLs in config
+        elif item["kind"] == "ConfigMap":
+            if WEBSOCKET_URL_KEY_NAME in item["data"]:
+                item["data"][WEBSOCKET_URL_KEY_NAME] = item["data"][WEBSOCKET_URL_KEY_NAME].replace(
+                    "reposcan", "reposcan-%s" % options["app_id"])
+            for key in (POSTGRESQL_HOST_KEY_NAME, REPOSCAN_HOST_KEY_NAME):
+                if key in item["data"]:
+                    item["data"][key] = "%s-%s" % (item["data"][key], options["app_id"])
+        # Append to deployment config attributes
+        elif item["kind"] == "DeploymentConfig":
+            _append_to_value(item["metadata"]["labels"], "app", options["app_id"])
+            _append_to_value(item["spec"]["selector"], "io.kompose.service", options["app_id"])
+            _append_to_value(item["spec"]["template"]["metadata"]["labels"], "io.kompose.service", options["app_id"])
+            for container in item["spec"]["template"]["spec"]["containers"]:
+                for env_var in container.get("env", []):
+                    if "valueFrom" in env_var and "configMapKeyRef" in env_var["valueFrom"]:
+                        _append_to_value(env_var["valueFrom"]["configMapKeyRef"], "name", options["app_id"])
+                for mount in container.get("volumeMounts", []):
+                    _append_to_value(mount, "name", options["app_id"])
+            for volume in item["spec"]["template"]["spec"].get("volumes", []):
+                _append_to_value(volume, "name", options["app_id"])
+                if "persistentVolumeClaim" in volume:
+                    _append_to_value(volume["persistentVolumeClaim"], "claimName", options["app_id"])
+            for image_change_trigger in [trigger for trigger in item["spec"]["triggers"]
+                                         if trigger["type"] == "ImageChange"]:
+                original_name = image_change_trigger["imageChangeParams"]["from"]["name"]
+                image_name_tag = original_name.split(":")
+                image_change_trigger["imageChangeParams"]["from"]["name"] = "%s-%s:%s" % (
+                    image_name_tag[0], options["app_id"], image_name_tag[1])
 
 
 def set_storage_attributes(options, name, item):
@@ -67,6 +119,8 @@ def main():
                 # set required storage size, kompose supports only to set this on service level - all volumes
                 # linked to service have same size
                 set_storage_attributes(options, name, item)
+            # append app_id as a suffix to all objects
+            set_app_id(options, item)
             processed_items[(kind, name)] = item
     data["items"] = list(processed_items.values())
     print(yaml.dump(data))

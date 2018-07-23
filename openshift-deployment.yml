@@ -17,6 +17,13 @@
       tags:
         - always
 
+    - name: Get last Git commit
+      command: git rev-parse --short HEAD
+      changed_when: False
+      register: git_commit_id
+      tags:
+        - always
+
     - name: Get current OpenShift project
       command: oc project -q
       changed_when: False
@@ -38,12 +45,12 @@
         - always
 
     - name: Create VMaaS
-      shell: kompose --provider openshift convert -o - | ./scripts/openshift_setup.py | oc create -f -
+      shell: kompose --provider openshift convert -o - | app_id={{ git_commit_id.stdout }} ./scripts/openshift_setup.py | oc create -f -
       tags:
         - up
 
     - name: Create OpenShift routes
-      shell: oc create route edge --service apidoc --port {{ apidoc_container_port }}; oc create route edge --service reposcan --port {{ reposcan_container_port }}; oc create route edge --service webapp --port {{ webapp_container_port }}
+      shell: oc create route edge apidoc --service apidoc-{{ git_commit_id.stdout }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service reposcan-{{ git_commit_id.stdout }} --port {{ reposcan_container_port }}; oc create route edge webapp --service webapp-{{ git_commit_id.stdout }} --port {{ webapp_container_port }}
       tags:
         - up
         - routes-up
@@ -63,7 +70,7 @@
         - configure-apidoc
 
     - name: Configure API documentation
-      shell: oc rollout status dc/apidoc && oc patch configmap {{ apidoc_config_map }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc
+      shell: oc rollout status dc/apidoc-{{ git_commit_id.stdout }} && oc patch configmap {{ apidoc_config_map }}-{{ git_commit_id.stdout }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc-{{ git_commit_id.stdout }}
       tags:
         - up
         - configure-apidoc
@@ -81,6 +88,6 @@
       ignore_errors: True
 
     - name: Delete VMaaS
-      shell: kompose --provider openshift convert -o - | ./scripts/openshift_setup.py | oc delete -f -
+      shell: kompose --provider openshift convert -o - | app_id={{ git_commit_id.stdout }} ./scripts/openshift_setup.py | oc delete -f -
       tags:
         - down
