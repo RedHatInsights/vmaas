@@ -56,26 +56,7 @@ class Cache:
     # pylint: disable=too-many-instance-attributes
     def __init__(self, filename=DUMP):
         self.filename = filename
-        self.packagename2id = {}
-        self.id2packagename = {}
-        self.updates = {}
-        self.updates_index = {}
-        self.evr2id = {}
-        self.id2evr = {}
-        self.arch2id = {}
-        self.id2arch = {}
-        self.arch_compat = {}
-        self.package_details = {}
-        self.repo_detail = {}
-        self.repolabel2ids = {}
-        self.productid2repoids = {}
-        self.pkgid2repoids = {}
-        self.errataid2name = {}
-        self.pkgid2errataids = {}
-        self.errataid2repoids = {}
-        self.cve_detail = {}
-        self.dbchange = {}
-        self.errata_detail = {}
+        self.clear()
         self.reload()
 
     def clear(self):
