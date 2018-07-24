@@ -67,6 +67,7 @@
       tags:
         - up
         - configure-apidoc
+        - upgrade-finish
 
     - name: Get exposed webapp URL
       shell: oc get route webapp | tail -n 1 | awk '{print $2}'
@@ -74,6 +75,7 @@
       tags:
         - up
         - configure-apidoc
+        - upgrade-finish
 
     - name: Get exposed reposcan temporary URL
       shell: oc get route reposcan-upgrade | tail -n 1 | awk '{print $2}'
@@ -87,17 +89,29 @@
       tags:
         - upgrade-start
 
+    - name: Update VMaaS images
+      shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
+      tags:
+        - update-images
+
+    - name: Point routes to the current deployment
+      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"apidoc-{{ git_commit_id.stdout }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"reposcan-{{ git_commit_id.stdout }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"webapp-{{ git_commit_id.stdout }}"}}}'
+      tags:
+        - upgrade-finish
+
+    - name: Delete temporary OpenShift routes
+      shell: oc delete route apidoc-upgrade reposcan-upgrade webapp-upgrade
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
     - name: Configure API documentation
       shell: oc rollout status dc/apidoc-{{ git_commit_id.stdout }} && oc patch configmap {{ apidoc_config_map }}-{{ git_commit_id.stdout }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc-{{ git_commit_id.stdout }}
       tags:
         - up
         - configure-apidoc
         - upgrade-start
-
-    - name: Update VMaaS images
-      shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
-      tags:
-        - update-images
+        - upgrade-finish
 
     - name: Delete OpenShift routes
       shell: oc delete route apidoc reposcan webapp
