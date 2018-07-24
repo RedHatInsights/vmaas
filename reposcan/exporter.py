@@ -131,6 +131,7 @@ class DataDump:
                                """, [tuple(self.packagename_ids)])
                 for pkg_id, name_id, evr_id, arch_id, summary, description in cursor:
                     dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, summary, description)
+                    dump["nevra2pkgid:%s:%s:%s" % (name_id, evr_id, arch_id)] = pkg_id
                     self.package_ids.append(pkg_id)
 
     def dump_repo(self, dump):

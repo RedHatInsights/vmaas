@@ -71,6 +71,7 @@ class Cache:
         self.id2arch = {}
         self.arch_compat = {}
         self.package_details = {}
+        self.nevra2pkgid = {}
         self.repo_detail = {}
         self.repolabel2ids = {}
         self.productid2repoids = {}
@@ -95,7 +96,7 @@ class Cache:
 
     def load(self, filename):
         """Load data from shelve file into dictionaries."""
-        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-branches,too-many-statements
         try:
             data = shelve.open(filename, 'r')
         except dbm.error as err:
@@ -125,6 +126,9 @@ class Cache:
                 self.arch_compat[int(key)] = data[item]
             elif relation == "package_details":
                 self.package_details[int(key)] = data[item]
+            elif relation == "nevra2pkgid":
+                name_id, evr_id, arch_id = key.split(":", 2)
+                self.nevra2pkgid[(int(name_id), int(evr_id), int(arch_id))] = data[item]
             elif relation == "repo_detail":
                 self.repo_detail[int(key)] = data[item]
             elif relation == "repolabel2ids":
