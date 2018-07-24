@@ -20,6 +20,7 @@ from cve import CveAPI
 from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
+from packages import PackagesAPI
 from dbchange import DBChange
 from utils import init_logging, get_logger
 import gen
@@ -48,6 +49,7 @@ class BaseHandler(tornado.web.RequestHandler):
     repo_api = None
     cve_api = None
     errata_api = None
+    packages_api = None
     dbchange_api = None
 
     def data_received(self, chunk):
@@ -460,6 +462,67 @@ class ErrataHandlerPost(BaseHandler):
         self.handle_post(self.errata_api)
 
 
+class PackagesHandlerGet(BaseHandler):
+    """Handler for processing /packages GET requests."""
+
+    def get(self, nevra=None): # pylint: disable=arguments-differ
+        """
+        ---
+        description: Get details about packages.
+        parameters:
+          - name: nevra
+            description: Package NEVRA
+            required: True
+            type: string
+            in: path
+            x-example: kernel-2.6.32-696.20.1.el6.x86_64
+        responses:
+          200:
+            description: Return details about single package NEVRA
+            schema:
+              $ref: "#/definitions/PackagesResponse"
+        tags:
+          - packages
+        """
+        self.handle_get(self.packages_api, 'package_list', nevra)
+
+
+class PackagesHandlerPost(BaseHandler):
+    """ /packages API handler """
+
+    def post(self): # pylint: disable=arguments-differ
+        """
+        ---
+        description: Get details about packages. "package_list" must be a list of
+         package NEVRAs.
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
+            schema:
+              type: object
+              properties:
+                package_list:
+                  type: array
+                  items:
+                    type: string
+                    example: kernel-2.6.32-696.20.1.el6.x86_64
+              required:
+                - package_list
+        responses:
+          200:
+            description: Return details about list of package NEVRAs
+            schema:
+              $ref: "#/definitions/PackagesResponse"
+          400:
+            description: Invalid input JSON format
+        tags:
+          - packages
+        """
+        self.handle_post(self.packages_api)
+
+
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
     SPEC.definition("UpdatesResponse", properties={
@@ -717,6 +780,50 @@ def setup_apispec(handlers):
             "example": "2018-04-05T01:23:45+02:00"
         },
     })
+    SPEC.definition("PackagesResponse", properties={
+        "package_list": {
+            "type": "object",
+            "properties": {
+                "kernel-2.6.32-696.20.1.el6.x86_64": {
+                    "type": "object",
+                    "properties": {
+                        "summary": {
+                            "type": "string",
+                            "example": "package summary"
+                        },
+                        "description": {
+                            "type": "string",
+                            "example": "package description"
+                        },
+                        "repositories": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "label": {
+                                        "type": "string",
+                                        "example": "rhel-6-server-rpms"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
+                                    },
+                                    "basearch": {
+                                        "type": "string",
+                                        "example": "x86_64"
+                                    },
+                                    "releasever": {
+                                        "type": "string",
+                                        "example": "6.9"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
     SPEC.definition("DBChangeResponse", properties={
         "dbchange": {
             "type": "object",
@@ -761,6 +868,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/repos/(?P<repo>[\\a-zA-Z0-9%*-.+?\[\]]+)", ReposHandlerGet),
             (r"/api/v1/errata/?", ErrataHandlerPost),
             (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
+            (r"/api/v1/packages/?", PackagesHandlerPost),
+            (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:]+)", PackagesHandlerGet),
             (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
         ]
 
@@ -827,6 +936,7 @@ def main():
     BaseHandler.repo_api = RepoAPI(BaseHandler.db_cache)
     BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
     BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
+    BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
     vmaas_app.websocket_reconnect()
