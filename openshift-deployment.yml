@@ -120,7 +120,110 @@
         - routes-down
       ignore_errors: True
 
-    - name: Delete VMaaS
-      shell: kompose --provider openshift convert -o - | app_id={{ git_commit_id.stdout }} ./scripts/openshift_setup.py | oc delete -f -
+    - name: Delete old Config Maps
+      shell: oc get cm | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete cm
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
+    - name: Delete old Services
+      shell: oc get svc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete svc
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
+    - name: Delete old Deployment Configs
+      shell: oc get dc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete dc
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
+    - name: Delete old Persistent Volume Claims
+      shell: oc get pvc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete pvc
+      with_items:
+        - vmaas-db-data
+        - vmaas-dump-data
+        - vmaas-reposcan-tmp
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
+    - name: Delete old Image Streams
+      shell: oc get is | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete is
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - upgrade-finish
+      ignore_errors: True
+
+    - name: Delete all Config Maps
+      shell: oc get cm | awk '{print $1}' | grep {{ item }} | xargs oc delete cm
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
       tags:
         - down
+      ignore_errors: True
+
+    - name: Delete all Services
+      shell: oc get svc | awk '{print $1}' | grep {{ item }} | xargs oc delete svc
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - down
+      ignore_errors: True
+
+    - name: Delete all Deployment Configs
+      shell: oc get dc | awk '{print $1}' | grep {{ item }} | xargs oc delete dc
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - down
+      ignore_errors: True
+
+    - name: Delete all Persistent Volume Claims
+      shell: oc get pvc | awk '{print $1}' | grep {{ item }} | xargs oc delete pvc
+      with_items:
+        - vmaas-db-data
+        - vmaas-dump-data
+        - vmaas-reposcan-tmp
+      tags:
+        - down
+      ignore_errors: True
+
+    - name: Delete all Image Streams
+      shell: oc get is | awk '{print $1}' | grep {{ item }} | xargs oc delete is
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
+        - database
+      tags:
+        - down
+      ignore_errors: True
