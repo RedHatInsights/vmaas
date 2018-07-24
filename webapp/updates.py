@@ -2,6 +2,7 @@
 Module to handle /updates API calls.
 """
 
+import os
 import hashlib
 from jsonschema import validate
 
@@ -48,12 +49,12 @@ class HotCache:
         2^max_cache_levels * 2 - 1 nodes.
     """
 
-    def __init__(self, insertions_per_pruning=1024, cache_levels=11):
+    def __init__(self):
         self.root = None
         self.header = CacheNode(None)  # workaround, need for the splay()
         self.inserts = 0
-        self.max_inserts_per_pruning = insertions_per_pruning
-        self.max_cache_levels = cache_levels
+        self.max_inserts_per_pruning = int(os.getenv("HOTCACHE_PRUNING", "1024"))
+        self.max_cache_levels = int(os.getenv("HOTCACHE_LEVELS", "11"))
 
     def insert(self, key, cached_response):
         """
