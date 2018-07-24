@@ -8,7 +8,7 @@
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images, configure-apidoc."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images, configure-apidoc, upgrade-start, upgrade-finish."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -48,12 +48,18 @@
       shell: kompose --provider openshift convert -o - | app_id={{ git_commit_id.stdout }} ./scripts/openshift_setup.py | oc create -f -
       tags:
         - up
+        - upgrade-start
 
     - name: Create OpenShift routes
       shell: oc create route edge apidoc --service apidoc-{{ git_commit_id.stdout }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service reposcan-{{ git_commit_id.stdout }} --port {{ reposcan_container_port }}; oc create route edge webapp --service webapp-{{ git_commit_id.stdout }} --port {{ webapp_container_port }}
       tags:
         - up
         - routes-up
+
+    - name: Create temporary OpenShift routes
+      shell: oc create route edge apidoc-upgrade --service apidoc-{{ git_commit_id.stdout }} --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service reposcan-{{ git_commit_id.stdout }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service webapp-{{ git_commit_id.stdout }} --port {{ webapp_container_port }}
+      tags:
+        - upgrade-start
 
     - name: Get exposed reposcan URL
       shell: oc get route reposcan | tail -n 1 | awk '{print $2}'
@@ -69,11 +75,24 @@
         - up
         - configure-apidoc
 
+    - name: Get exposed reposcan temporary URL
+      shell: oc get route reposcan-upgrade | tail -n 1 | awk '{print $2}'
+      register: reposcan_url
+      tags:
+        - upgrade-start
+
+    - name: Get exposed webapp temporary URL
+      shell: oc get route webapp-upgrade | tail -n 1 | awk '{print $2}'
+      register: webapp_url
+      tags:
+        - upgrade-start
+
     - name: Configure API documentation
       shell: oc rollout status dc/apidoc-{{ git_commit_id.stdout }} && oc patch configmap {{ apidoc_config_map }}-{{ git_commit_id.stdout }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc-{{ git_commit_id.stdout }}
       tags:
         - up
         - configure-apidoc
+        - upgrade-start
 
     - name: Update VMaaS images
       shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
