@@ -149,7 +149,7 @@ class DataDump:
                                       r.revision
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
-                                 join arch a on a.id = r.basearch_id
+                                 left join arch a on a.id = r.basearch_id
                                  join product p on p.id = cs.product_id
                                  """)
             repolabel2ids = {}
