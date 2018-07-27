@@ -23,7 +23,7 @@ class PackagesAPI:
     def __init__(self, cache):
         self.cache = cache
 
-    def process_list(self, data):
+    def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         Returns package details.
 

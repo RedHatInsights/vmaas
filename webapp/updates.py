@@ -256,7 +256,8 @@ class UpdatesAPI:
         arch = self.db_cache.id2arch[arch_id]
         return join_packagename(name, epoch, ver, rel, arch)
 
-    def _process_updates(self, packages_to_process, available_repo_ids, repo_ids_key, response):
+    def _process_updates(self, packages_to_process, api_version, available_repo_ids, repo_ids_key, response):
+        # pylint: disable=too-many-branches
         for pkg, pkg_dict in packages_to_process.items():
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.db_cache.packagename2id[name]
@@ -280,8 +281,9 @@ class UpdatesAPI:
                 continue
 
             pkg_id = next(iter(current_nevra_pkg_ids))
-            response['update_list'][pkg]['summary'] = self.db_cache.package_details[pkg_id][3]
-            response['update_list'][pkg]['description'] = self.db_cache.package_details[pkg_id][4]
+            if api_version == 1:
+                response['update_list'][pkg]['summary'] = self.db_cache.package_details[pkg_id][3]
+                response['update_list'][pkg]['description'] = self.db_cache.package_details[pkg_id][4]
             response['update_list'][pkg]['available_updates'] = []
 
             # No updates found for given NEVRA
@@ -334,7 +336,7 @@ class UpdatesAPI:
 
         self.hot_cache = HotCache()
 
-    def process_list(self, data):
+    def process_list(self, api_version, data):
         """
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
@@ -353,9 +355,10 @@ class UpdatesAPI:
         # Get list of valid repository IDs based on input paramaters
         available_repo_ids = self._process_repositories(data, response)
 
-        repo_ids_key = hashlib.md5('_'.join(
-            [str(r_id) for r_id in sorted(available_repo_ids)]
-        ).encode('utf-8')).hexdigest()
+        hashlib_elements = []
+        hashlib_elements.append(str(api_version))
+        hashlib_elements.extend([str(r_id) for r_id in sorted(available_repo_ids)])
+        repo_ids_key = hashlib.md5('_'.join(hashlib_elements).encode('utf-8')).hexdigest()
 
         all_pkgs = data.get('package_list', None)
         pkgs_not_in_cache = []
@@ -379,6 +382,6 @@ class UpdatesAPI:
             return response
 
         # Process updated packages, errata and fill the response
-        self._process_updates(packages_to_process, available_repo_ids, repo_ids_key, response)
+        self._process_updates(packages_to_process, api_version, available_repo_ids, repo_ids_key, response)
 
         return response

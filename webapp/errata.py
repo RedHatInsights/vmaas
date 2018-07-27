@@ -42,7 +42,7 @@ class ErrataAPI:
         return [label for label in self.cache.errata_detail
                 if re.match(regex, label)]
 
-    def process_list(self, data):
+    def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of Errata.
 

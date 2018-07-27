@@ -80,17 +80,17 @@ def main():
         if options.command == 'updates':
             data = read_data(options.pkgfile, options.pkgnames, "package_list")
 
-            answer = UpdatesAPI(cursor, repocache).process_list(data)
+            answer = UpdatesAPI(cursor, repocache).process_list(1, data)
 
         elif options.command == 'cves':
             data = read_data(options.cvefile, options.cvenames, "cve_list")
 
-            answer = CveAPI(cursor).process_list(data)
+            answer = CveAPI(cursor).process_list(1, data)
 
         elif options.command == 'repos':
             data = read_data(options.repofile, options.repolabels, "repository_list")
 
-            answer = RepoAPI(cursor, repocache).process_list(data)
+            answer = RepoAPI(cursor, repocache).process_list(1, data)
     except ValueError as e:
         print("JSON parsing error: " + e.message)
         sys.exit(1)

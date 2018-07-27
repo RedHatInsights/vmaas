@@ -42,7 +42,7 @@ class RepoAPI:
 
         return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
 
-    def process_list(self, data):
+    def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         Returns repository details.
 

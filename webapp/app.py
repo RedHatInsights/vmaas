@@ -25,6 +25,8 @@ from dbchange import DBChange
 from utils import init_logging, get_logger
 import gen
 
+# pylint: disable=too-many-lines
+
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
 MAX_SERVERS = "1"
@@ -35,7 +37,7 @@ SPEC = APISpec(
     plugins=(
         'apispec.ext.tornado',
     ),
-    basePath="/api/v1",
+    basePath="/api",
 )
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
@@ -79,13 +81,13 @@ class BaseHandler(tornado.web.RequestHandler):
         return data
 
     @gen.coroutine
-    def handle_post(self, api_endpoint):
+    def handle_post(self, api_endpoint, api_version):
         """Takes care of validation of input and execution of POST methods."""
         code = 400
         data = self.get_post_data()
         if data:
             try:
-                res = api_endpoint.process_list(data)
+                res = api_endpoint.process_list(api_version, data)
                 code = 200
             except ValidationError as validerr:
                 if validerr.absolute_path:
@@ -114,11 +116,11 @@ class BaseHandler(tornado.web.RequestHandler):
         yield self.flush()
 
     @gen.coroutine
-    def handle_get(self, api_endpoint, param_name, param):
+    def handle_get(self, api_endpoint, api_version, param_name, param):
         """Takes care of validation of input and execution of GET methods."""
         code = 400
         try:
-            result = api_endpoint.process_list({param_name : [param]})
+            result = api_endpoint.process_list(api_version, {param_name : [param]})
             code = 200
         except sre_constants.error as sre_err:
             result = 'Regular expression error: ' + str(sre_err)
@@ -222,7 +224,7 @@ class UpdatesHandlerGet(BaseHandler):
         tags:
           - updates
         """
-        self.handle_get(self.updates_api, 'package_list', nevra)
+        self.handle_get(self.updates_api, 1, 'package_list', nevra)
 
 
 class UpdatesHandlerPost(BaseHandler):
@@ -268,7 +270,78 @@ class UpdatesHandlerPost(BaseHandler):
         tags:
           - updates
         """
-        self.handle_post(self.updates_api)
+        self.handle_post(self.updates_api, 1)
+
+
+class UpdatesHandlerV2Get(BaseHandler):
+    """Handler for processing /updates GET requests."""
+
+    def get(self, nevra=None): # pylint: disable=arguments-differ
+        """
+        ---
+        description: List security updates for single package NEVRA
+        parameters:
+          - name: nevra
+            description: Package NEVRA
+            required: True
+            type: string
+            in: path
+            x-example: kernel-2.6.32-696.20.1.el6.x86_64
+        responses:
+          200:
+            description: Return list of security updates for single package NEVRA
+            schema:
+              $ref: "#/definitions/UpdatesV2Response"
+        tags:
+          - updates
+        """
+        self.handle_get(self.updates_api, 2, 'package_list', nevra)
+
+
+class UpdatesHandlerV2Post(BaseHandler):
+    """Handler for processing /updates POST requests."""
+
+    def post(self): # pylint: disable=arguments-differ
+        """
+        ---
+        description: List security updates for list of package NEVRAs
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
+            schema:
+              type: object
+              properties:
+                package_list:
+                  type: array
+                  items:
+                    type: string
+                    example: kernel-2.6.32-696.20.1.el6.x86_64
+                repository_list:
+                  type: array
+                  items:
+                    type: string
+                    example: rhel-6-server-rpms
+                releasever:
+                  type: string
+                  example: 6Server
+                basearch:
+                  type: string
+                  example: x86_64
+              required:
+                - package_list
+        responses:
+          200:
+            description: Return list of security updates for list of package NEVRAs
+            schema:
+              $ref: "#/definitions/UpdatesV2Response"
+          400:
+            description: Invalid input JSON format
+        tags:
+          - updates
+        """
+        self.handle_post(self.updates_api, 2)
 
 
 class CVEHandlerGet(BaseHandler):
@@ -293,7 +366,7 @@ class CVEHandlerGet(BaseHandler):
         tags:
           - cves
         """
-        self.handle_get(self.cve_api, 'cve_list', cve)
+        self.handle_get(self.cve_api, 1, 'cve_list', cve)
 
 
 class CVEHandlerPost(BaseHandler):
@@ -332,7 +405,7 @@ class CVEHandlerPost(BaseHandler):
         tags:
           - cves
         """
-        self.handle_post(self.cve_api)
+        self.handle_post(self.cve_api, 1)
 
 
 class ReposHandlerGet(BaseHandler):
@@ -358,7 +431,7 @@ class ReposHandlerGet(BaseHandler):
         tags:
           - repos
         """
-        self.handle_get(self.repo_api, 'repository_list', repo)
+        self.handle_get(self.repo_api, 1, 'repository_list', repo)
 
 
 class ReposHandlerPost(BaseHandler):
@@ -394,7 +467,7 @@ class ReposHandlerPost(BaseHandler):
         tags:
           - repos
         """
-        self.handle_post(self.repo_api)
+        self.handle_post(self.repo_api, 1)
 
 
 class ErrataHandlerGet(BaseHandler):
@@ -420,7 +493,7 @@ class ErrataHandlerGet(BaseHandler):
         tags:
           - errata
         """
-        self.handle_get(self.errata_api, 'errata_list', erratum)
+        self.handle_get(self.errata_api, 1, 'errata_list', erratum)
 
 
 class ErrataHandlerPost(BaseHandler):
@@ -459,7 +532,7 @@ class ErrataHandlerPost(BaseHandler):
         tags:
           - errata
         """
-        self.handle_post(self.errata_api)
+        self.handle_post(self.errata_api, 1)
 
 
 class PackagesHandlerGet(BaseHandler):
@@ -484,7 +557,7 @@ class PackagesHandlerGet(BaseHandler):
         tags:
           - packages
         """
-        self.handle_get(self.packages_api, 'package_list', nevra)
+        self.handle_get(self.packages_api, 1, 'package_list', nevra)
 
 
 class PackagesHandlerPost(BaseHandler):
@@ -520,7 +593,7 @@ class PackagesHandlerPost(BaseHandler):
         tags:
           - packages
         """
-        self.handle_post(self.packages_api)
+        self.handle_post(self.packages_api, 1)
 
 
 def setup_apispec(handlers):
@@ -567,6 +640,61 @@ def setup_apispec(handlers):
                         "summary": {
                             "type": "string",
                             "example": "package summary"
+                        }
+                    }
+                }
+            }
+        },
+        "repository_list": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "example": "rhel-6-server-rpms"
+            }
+        },
+        "releasever": {
+            "type": "string",
+            "example": "6Server"
+        },
+        "basearch": {
+            "type": "string",
+            "example": "x86_64"
+        },
+    })
+    SPEC.definition("UpdatesV2Response", properties={
+        "update_list": {
+            "type": "object",
+            "properties": {
+                "kernel-2.6.32-696.20.1.el6.x86_64": {
+                    "type": "object",
+                    "properties": {
+                        "available_updates": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "repository": {
+                                        "type": "string",
+                                        "example": "rhel-6-server-rpms"
+                                    },
+                                    "releasever": {
+                                        "type": "string",
+                                        "example": "6Server"
+                                    },
+                                    "basearch": {
+                                        "type": "string",
+                                        "example": "x86_64"
+                                    },
+                                    "erratum": {
+                                        "type": "string",
+                                        "example": "RHSA-2018:0512"
+                                    },
+                                    "package": {
+                                        "type": "string",
+                                        "example": "kernel-2.6.32-696.23.1.el6.x86_64"
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -849,7 +977,7 @@ def setup_apispec(handlers):
     })
     # Register public API handlers to apispec
     for handler in handlers:
-        if handler[0].startswith(r"/api/v1/"):
+        if handler[0].startswith(('/api/v1/', '/api/v2/')):
             SPEC.add_path(urlspec=handler)
 
 
@@ -862,6 +990,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/version/?", VersionHandler),
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
+            (r"/api/v2/updates/?", UpdatesHandlerV2Post),
+            (r"/api/v2/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerV2Get),
             (r"/api/v1/cves/?", CVEHandlerPost),
             (r"/api/v1/cves/(?P<cve>[\\a-zA-Z0-9%*-.+^$?\[\]]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
