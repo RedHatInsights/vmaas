@@ -22,7 +22,7 @@ from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
 from dbchange import DBChange
-from utils import init_logging, get_logger
+from logging_utils import init_logging, get_logger
 import gen
 
 # pylint: disable=too-many-lines
