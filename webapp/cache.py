@@ -6,7 +6,7 @@ import dbm
 import os
 import shelve
 
-from utils import get_logger
+from logging_utils import get_logger
 
 DUMP = '/data/vmaas.dbm'
 REMOTE_DUMP = 'rsync://reposcan:8730/data/vmaas.dbm'

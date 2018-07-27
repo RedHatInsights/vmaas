@@ -21,7 +21,7 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from dbchange import DBChange
-from utils import init_logging, get_logger
+from logging_utils import init_logging, get_logger
 import gen
 
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
