@@ -7,6 +7,7 @@ into specified PostgreSQL database.
 import os
 from multiprocessing.pool import Pool
 import json
+import requests
 
 from apispec import APISpec
 from tornado.ioloop import IOLoop, PeriodicCallback
@@ -108,6 +109,40 @@ class BaseHandler(RequestHandler):
     def options(self): # pylint: disable=arguments-differ
         self.finish()
 
+    def is_authorized(self):
+        """Authorization check routine
+
+            only requests from the localhost are allowed w/o authorization token,
+            otherwise, GitHub authorization token is required
+        """
+
+        host_request = self.request.host.split(':')[0]
+
+        if host_request in ('localhost', '127.0.0.1'):
+            return True
+
+        github_token = self.request.headers.get('Authorization', None)
+        if not github_token:
+            return False
+
+        user_info_response = requests.get('https://api.github.com/user',
+                                          headers={'Authorization': github_token})
+
+        if user_info_response.status_code != 200:
+            return False
+
+        orgs_response = requests.get('https://api.github.com/users/' + user_info_response.json()['login'] + '/orgs',
+                                     headers={'Authorization': github_token})
+
+        if orgs_response.status_code != 200:
+            return False
+
+        for org_info in orgs_response.json():
+            if org_info['login'] == 'RedHatInsights':
+                return True
+
+        return False
+
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
@@ -181,9 +216,14 @@ class TaskCancelHandler(BaseHandler):
                description: Task canceled
                schema:
                  $ref: "#/definitions/TaskStatusResponse"
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - task
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         if SyncTask.is_running():
             SyncTask.cancel()
             LOGGER.warning("Background task terminated.")
@@ -321,9 +361,14 @@ class RepoListHandler(BaseHandler):
                  $ref: "#/definitions/TaskStartResponse"
              400:
                description: Invalid input JSON format
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - repos
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         try:
             products, repos = self._parse_input_list()
         except Exception as err: # pylint: disable=broad-except
@@ -441,9 +486,14 @@ class RepoDeleteHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - repos
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task(repo=repo)
         self.set_status(status_code)
         self.write(status_msg)
@@ -481,9 +531,14 @@ class ExporterHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - export
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
@@ -518,9 +573,14 @@ class RepoSyncHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - sync
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
@@ -559,9 +619,14 @@ class CveSyncHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - sync
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
@@ -600,9 +665,14 @@ class CvemapSyncHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - sync
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
@@ -642,9 +712,14 @@ class AllSyncHandler(SyncHandler):
                  $ref: "#/definitions/TaskStartResponse"
              429:
                description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
            tags:
              - sync
         """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
         status_code, status_msg = self.start_task()
         self.set_status(status_code)
         self.write(status_msg)
