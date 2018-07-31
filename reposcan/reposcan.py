@@ -129,18 +129,21 @@ class BaseHandler(RequestHandler):
                                           headers={'Authorization': github_token})
 
         if user_info_response.status_code != 200:
+            LOGGER.warning("Cannot execute github API with provided %s", github_token)
             return False
-
-        orgs_response = requests.get('https://api.github.com/users/' + user_info_response.json()['login'] + '/orgs',
+        github_user_login = user_info_response.json()['login']
+        orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
                                      headers={'Authorization': github_token})
 
         if orgs_response.status_code != 200:
+            LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
             return False
 
         for org_info in orgs_response.json():
             if org_info['login'] == 'RedHatInsights':
                 return True
 
+        LOGGER.warning("User %s does not belong to RedHatInsights organization", github_user_login)
         return False
 
 
