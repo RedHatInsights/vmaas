@@ -12,6 +12,14 @@ services:
       - 5432:5432
     volumes:
       - vmaas-db-data:/var/lib/pgsql/data
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.20'
+          memory: 200M
+        limits:
+          cpus: '1.00'
+          memory: 1G
 
   reposcan:
     container_name: vmaas-reposcan
@@ -29,6 +37,14 @@ services:
       - vmaas-dump-data:/data:z
     depends_on:
       - database
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.20'
+          memory: 200M
+        limits:
+          cpus: '1.00'
+          memory: 1G
 
   webapp:
     container_name: vmaas-webapp
@@ -41,6 +57,14 @@ services:
       - 8080:8080
     depends_on:
       - reposcan
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.20'
+          memory: 2G
+        limits:
+          cpus: '1.00'
+          memory: 2G
 
   apidoc:
     container_name: vmaas-apidoc
@@ -54,6 +78,14 @@ services:
     depends_on:
       - reposcan
       - webapp
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.10'
+          memory: 100M
+        limits:
+          cpus: '0.10'
+          memory: 100M
 
 volumes:
   vmaas-db-data:
