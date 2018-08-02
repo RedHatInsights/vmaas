@@ -9,7 +9,7 @@ import shelve
 from logging_utils import get_logger
 
 DUMP = '/data/vmaas.dbm'
-REMOTE_DUMP = 'rsync://reposcan:8730/data/vmaas.dbm'
+REMOTE_DUMP = 'rsync://%s:8730/data/vmaas.dbm' % os.getenv("REPOSCAN_HOST", "reposcan")
 
 # repo_detail indexes
 REPO_LABEL = 0
