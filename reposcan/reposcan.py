@@ -141,6 +141,9 @@ class BaseHandler(RequestHandler):
 
         for org_info in orgs_response.json():
             if org_info['login'] == 'RedHatInsights':
+                request_str = str(self.request)
+                LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
+                               user_info_response.json()['id'], request_str)
                 return True
 
         LOGGER.warning("User %s does not belong to RedHatInsights organization", github_user_login)
