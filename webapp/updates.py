@@ -178,6 +178,7 @@ class UpdatesAPI:
     def __init__(self, db_cache):
         self.db_cache = db_cache      # DB dump in memory, stored like a dict
         self.hot_cache = HotCache()   # hot cache of the application, splay tree
+        self.use_hot_cache = "YES"
 
     def _process_repositories(self, data, response):
         # Read list of repositories
@@ -327,7 +328,8 @@ class UpdatesAPI:
                             'releasever': repo_details[REPO_RELEASEVER]
                         })
 
-            self.hot_cache.insert(repo_ids_key + pkg, response['update_list'][pkg])
+            if self.use_hot_cache.upper() == "YES":
+                self.hot_cache.insert(repo_ids_key + pkg, response['update_list'][pkg])
 
     def clear_hot_cache(self):
         """
@@ -362,13 +364,17 @@ class UpdatesAPI:
 
         all_pkgs = data.get('package_list', None)
         pkgs_not_in_cache = []
+        self.use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
 
         if all_pkgs is not None:
             for name in all_pkgs:
-                resp = self.hot_cache.find(repo_ids_key + name)
+                if self.use_hot_cache.upper() == "YES":
+                    resp = self.hot_cache.find(repo_ids_key + name)
 
-                if resp is not None:
-                    response['update_list'][name] = resp
+                    if resp is not None:
+                        response['update_list'][name] = resp
+                    else:
+                        pkgs_not_in_cache.append(name)
                 else:
                     pkgs_not_in_cache.append(name)
 
