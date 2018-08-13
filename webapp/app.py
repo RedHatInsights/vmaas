@@ -1013,7 +1013,9 @@ class Application(tornado.web.Application):
     @staticmethod
     def _refresh_cache():
         BaseHandler.db_cache.reload()
-        BaseHandler.updates_api.clear_hot_cache()
+        use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
+        if use_hot_cache.upper() == "YES":
+            BaseHandler.updates_api.clear_hot_cache()
         LOGGER.info("Cached data refreshed.")
 
     def websocket_reconnect(self):
