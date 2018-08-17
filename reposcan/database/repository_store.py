@@ -90,14 +90,12 @@ class RepositoryStore:
                     """)
         updates_to_delete = [update_id for update_id in cur.fetchall()]
 
-        if packages_to_delete or updates_to_delete:
-            cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s or pe.errata_id in %s""",
-                        (tuple(packages_to_delete), tuple(updates_to_delete),))
-
         if packages_to_delete:
+            cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s""", (tuple(packages_to_delete),))
             cur.execute("""delete from package p where p.id in %s""", (tuple(packages_to_delete),))
 
         if updates_to_delete:
+            cur.execute("""delete from pkg_errata pe where pe.errata_id in %s""", (tuple(updates_to_delete),))
             cur.execute("""delete from errata_cve ec where ec.errata_id in %s""", (tuple(updates_to_delete),))
             cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
             cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
