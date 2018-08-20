@@ -44,7 +44,7 @@ services:
           memory: 200M
         limits:
           cpus: '1.00'
-          memory: 1G
+          memory: 2G
 
   webapp:
     container_name: vmaas-webapp
