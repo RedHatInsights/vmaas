@@ -23,6 +23,14 @@
       register: git_commit_id
       tags:
         - always
+      when: app_id is not defined
+
+    - name: Use Git commit id as app ID
+      set_fact:
+        app_id: "{{ git_commit_id.stdout }}"
+      tags:
+        - always
+      when: app_id is not defined
 
     - name: Get current OpenShift project
       command: oc project -q
@@ -45,19 +53,19 @@
         - always
 
     - name: Create VMaaS
-      shell: kompose --provider openshift convert -o - | app_id={{ git_commit_id.stdout }} ./scripts/openshift_setup.py | oc create -f -
+      shell: kompose --provider openshift convert -o - | app_id={{ app_id }} ./scripts/openshift_setup.py | oc create -f -
       tags:
         - up
         - upgrade-start
 
     - name: Create OpenShift routes
-      shell: oc create route edge apidoc --service apidoc-{{ git_commit_id.stdout }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service reposcan-{{ git_commit_id.stdout }} --port {{ reposcan_container_port }}; oc create route edge webapp --service webapp-{{ git_commit_id.stdout }} --port {{ webapp_container_port }}
+      shell: oc create route edge apidoc --service apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service webapp-{{ app_id }} --port {{ webapp_container_port }}
       tags:
         - up
         - routes-up
 
     - name: Create temporary OpenShift routes
-      shell: oc create route edge apidoc-upgrade --service apidoc-{{ git_commit_id.stdout }} --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service reposcan-{{ git_commit_id.stdout }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service webapp-{{ git_commit_id.stdout }} --port {{ webapp_container_port }}
+      shell: oc create route edge apidoc-upgrade --service apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service webapp-{{ app_id }} --port {{ webapp_container_port }}
       tags:
         - upgrade-start
 
@@ -95,7 +103,7 @@
         - update-images
 
     - name: Point routes to the current deployment
-      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"apidoc-{{ git_commit_id.stdout }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"reposcan-{{ git_commit_id.stdout }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"webapp-{{ git_commit_id.stdout }}"}}}'
+      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"apidoc-{{ app_id }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"webapp-{{ app_id }}"}}}'
       tags:
         - upgrade-finish
 
@@ -106,7 +114,7 @@
       ignore_errors: True
 
     - name: Configure API documentation
-      shell: oc rollout status dc/apidoc-{{ git_commit_id.stdout }} && oc patch configmap {{ apidoc_config_map }}-{{ git_commit_id.stdout }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc-{{ git_commit_id.stdout }}
+      shell: oc rollout status dc/apidoc-{{ app_id }} && oc patch configmap {{ apidoc_config_map }}-{{ app_id }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/apidoc-{{ app_id }}
       tags:
         - up
         - configure-apidoc
@@ -121,7 +129,7 @@
       ignore_errors: True
 
     - name: Delete old Config Maps
-      shell: oc get cm | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete cm
+      shell: oc get cm | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete cm
       with_items:
         - apidoc
         - reposcan
@@ -132,7 +140,7 @@
       ignore_errors: True
 
     - name: Delete old Services
-      shell: oc get svc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete svc
+      shell: oc get svc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete svc
       with_items:
         - apidoc
         - reposcan
@@ -143,7 +151,7 @@
       ignore_errors: True
 
     - name: Delete old Deployment Configs
-      shell: oc get dc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete dc
+      shell: oc get dc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete dc
       with_items:
         - apidoc
         - reposcan
@@ -154,7 +162,7 @@
       ignore_errors: True
 
     - name: Delete old Persistent Volume Claims
-      shell: oc get pvc | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete pvc
+      shell: oc get pvc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete pvc
       with_items:
         - vmaas-db-data
         - vmaas-dump-data
@@ -164,7 +172,7 @@
       ignore_errors: True
 
     - name: Delete old Image Streams
-      shell: oc get is | awk '{print $1}' | grep {{ item }} | grep -v {{ git_commit_id.stdout }} | xargs oc delete is
+      shell: oc get is | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete is
       with_items:
         - apidoc
         - reposcan
