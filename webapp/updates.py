@@ -7,7 +7,7 @@ import hashlib
 from jsonschema import validate
 
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID
-from utils import join_packagename, split_packagename
+from utils import join_packagename, split_packagename, none2empty
 
 
 JSON_SCHEMA = {
@@ -324,8 +324,8 @@ class UpdatesAPI:
                             'package': nevra,
                             'erratum': self.db_cache.errataid2name[errata_id],
                             'repository': repo_details[REPO_LABEL],
-                            'basearch': repo_details[REPO_BASEARCH],
-                            'releasever': repo_details[REPO_RELEASEVER]
+                            'basearch': none2empty(repo_details[REPO_BASEARCH]),
+                            'releasever': none2empty(repo_details[REPO_RELEASEVER])
                         })
 
             if self.use_hot_cache.upper() == "YES":

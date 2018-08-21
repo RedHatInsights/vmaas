@@ -5,7 +5,7 @@ Module to handle /packages API calls.
 from jsonschema import validate
 
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER
-from utils import split_packagename
+from utils import split_packagename, none2empty
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -57,8 +57,8 @@ class PackagesAPI:
                         repodata = {
                             'label': repodetail[REPO_LABEL],
                             'name': repodetail[REPO_NAME],
-                            'basearch': repodetail[REPO_BASEARCH],
-                            'releasever': repodetail[REPO_RELEASEVER]
+                            'basearch': none2empty(repodetail[REPO_BASEARCH]),
+                            'releasever': none2empty(repodetail[REPO_RELEASEVER])
                         }
                         packagedata['repositories'].append(repodata)
         response = {
