@@ -6,7 +6,7 @@ import re
 from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
-from utils import paginate
+from utils import paginate, none2empty
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -72,8 +72,8 @@ class RepoAPI:
                     "label": label,
                     "name": repo_detail[REPO_NAME],
                     "url": repo_detail[REPO_URL],
-                    "basearch": repo_detail[REPO_BASEARCH],
-                    "releasever": repo_detail[REPO_RELEASEVER],
+                    "basearch": none2empty(repo_detail[REPO_BASEARCH]),
+                    "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
                     "product": repo_detail[REPO_PRODUCT],
                     "revision": repo_detail[REPO_REVISION]
                     })
