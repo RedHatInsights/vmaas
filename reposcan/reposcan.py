@@ -18,6 +18,7 @@ from common.logging import get_logger, init_logging
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from exporter import DUMP, main as export_data
+from pkgtree import PKGTREE_FILE, main as export_pkgtree
 from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
@@ -443,8 +444,9 @@ class SyncHandler(BaseHandler):
     def run_task_and_export(cls, *args, **kwargs):
         """Run sync task of current class and export."""
         result = cls.run_task(*args, **kwargs)
-        if cls != ExporterHandler:
+        if cls not in (ExporterHandler, PkgTreeHandler):
             ExporterHandler.run_task()
+            PkgTreeHandler.run_task()
         return result
 
     @staticmethod
@@ -562,6 +564,81 @@ class ExporterHandler(SyncHandler):
             return "ERROR"
         return "OK"
 
+
+class PkgTreeHandler(SyncHandler):
+    """Handler for Package Tree API."""
+
+    task_type = "Export package tree"
+
+    def put(self): # pylint: disable=arguments-differ
+        """Export package tree.
+           ---
+           description: Export package tree
+           responses:
+             200:
+               description: Sync started
+               schema:
+                 $ref: "#/definitions/TaskStartResponse"
+             429:
+               description: Another task is already in progress
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
+           tags:
+             - sync
+        """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
+        status_code, status_msg = self.start_task()
+        self.set_status(status_code)
+        self.write(status_msg)
+        self.flush()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start exporting disk dump."""
+        try:
+            export_pkgtree(PKGTREE_FILE)
+        except Exception as err: # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            return "ERROR"
+        return "OK"
+
+
+class PkgTreeDownloadHandler(BaseHandler):
+    """Handler class to download package tree to the caller."""
+
+    def get(self):  # pylint: disable=arguments-differ
+        """Download the package tree.
+           ---
+           description: Download the package tree.
+           responses:
+             200:
+               description: The package tree
+               schema:
+                 $ref: "#/definitions/PkgTreeDownloadResponse"
+             403:
+               description: GitHub personal access token (PAT) was not provided for authorization.
+             404:
+               description: Package Tree file not found.  Has it been generated yet?  Try /sync/pkgtree first.
+           tags:
+             - pkgtree
+        """
+        if not self.is_authorized():
+            self.set_status(403, 'Valid authorization token was not provided')
+            return
+
+        try:
+            with open(PKGTREE_FILE, 'r') as pkgtree_file_reader:
+                lines = pkgtree_file_reader.readlines()
+                for line in lines:
+                    self.write(line)
+                self.flush()
+        except FileNotFoundError:
+            self.set_status(404, 'Package Tree file not found.  Has it been generated?')
+            return
 
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
@@ -744,6 +821,78 @@ def setup_apispec(handlers):
                                                       "task_type": {"type": "string", "example": "Sync CVEs"}})
     SPEC.definition("TaskStartResponse", properties={"success": {"type": "boolean"},
                                                      "msg": {"type": "string", "example": "Repo sync task started."}})
+    SPEC.definition("PkgTreeDownloadResponse", properties={
+        "timestamp": {
+            "type": "string",
+            "example": "2018-08-27T18:24:51.840698+00:00"
+        },
+        "packages": {
+            "type": "object",
+            "properties": {
+                "kernel": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "nevra": {
+                                "type": "string",
+                                "example": "kernel-2.6.32-71.el6.x86_64"
+                            },
+                            "first_published": {
+                                "type": "string",
+                                "example": "2010-11-10T00:00:00+00:00"
+                            },
+                            "repositories": {
+                                "type": "object",
+                                "properties": {
+                                    "label": {
+                                        "type": "string",
+                                        "example": "rhel-6-workstation-rpms"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Red Hat Enterprise Linux 6 Workstation (RPMs)"
+                                    },
+                                    "arch": {
+                                        "type": "string",
+                                        "example": "x86_64"
+                                    },
+                                    "releasever": {
+                                        "type": "string",
+                                        "example": "6Workstation"
+                                    },
+                                    "revision": {
+                                        "type": "string",
+                                        "example": "2018-08-20T15:11:29+00:00"
+                                    }
+                                }
+                            },
+                            "errata": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "RHSA-2010:0842"
+                                    },
+                                    "issued": {
+                                        "type": "string",
+                                        "example": "2010-11-10T00:00:00+00:00"
+                                    },
+                                    "cve_list": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "CVE-2010-3437"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
     # Register public API handlers to apispec
     for handler in handlers:
         if handler[0].startswith(r"/api/v1/"):
@@ -809,7 +958,9 @@ class ReposcanApplication(Application):
             (r"/api/v1/sync/repo/?", RepoSyncHandler),
             (r"/api/v1/sync/cve/?", CveSyncHandler),
             (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
+            (r"/api/v1/sync/pkgtree/?", PkgTreeHandler),
             (r"/api/v1/export/?", ExporterHandler),
+            (r"/api/v1/pkgtree/?", PkgTreeDownloadHandler),
             (r"/api/v1/task/status/?", TaskStatusHandler),
             (r"/api/v1/task/cancel/?", TaskCancelHandler),
         ]
