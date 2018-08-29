@@ -6,7 +6,7 @@ import os
 import hashlib
 from jsonschema import validate
 
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
 from utils import join_packagename, split_packagename, none2empty
 
 
@@ -197,14 +197,18 @@ class UpdatesAPI:
         releasever = data.get('releasever', None)
         if releasever is not None:
             repo_ids = [oid for oid in repo_ids
-                        if self.db_cache.repo_detail[oid][REPO_RELEASEVER] == releasever]
+                        if self.db_cache.repo_detail[oid][REPO_RELEASEVER] == releasever
+                        or (self.db_cache.repo_detail[oid][REPO_RELEASEVER] is None
+                            and releasever in self.db_cache.repo_detail[oid][REPO_URL])]
             response['releasever'] = releasever
 
         # Filter out repositories of different basearch
         basearch = data.get('basearch', None)
         if basearch is not None:
             repo_ids = [oid for oid in repo_ids
-                        if self.db_cache.repo_detail[oid][REPO_BASEARCH] == basearch]
+                        if self.db_cache.repo_detail[oid][REPO_BASEARCH] == basearch
+                        or (self.db_cache.repo_detail[oid][REPO_BASEARCH] is None
+                            and basearch in self.db_cache.repo_detail[oid][REPO_URL])]
             response['basearch'] = basearch
 
         return set(repo_ids)
