@@ -238,8 +238,60 @@ class TaskCancelHandler(BaseHandler):
         self.flush()
 
 
-class RepoListHandler(BaseHandler):
+class SyncHandler(BaseHandler):
+    """Base handler class providing common methods for different sync types."""
+
+    task_type = "Unknown"
+
+    @classmethod
+    def start_task(cls, *args, **kwargs):
+        """Start given task if DB worker isn't currently executing different task."""
+        if not SyncTask.is_running():
+            msg = "%s task started." % cls.task_type
+            LOGGER.info(msg)
+            SyncTask.start(cls.task_type, cls.run_task_and_export, cls.finish_task, *args, **kwargs)
+            status_code = 200
+            status_msg = TaskStartResponse(msg)
+        else:
+            msg = "%s task request ignored. Another task already in progress." % cls.task_type
+            LOGGER.info(msg)
+            # Too Many Requests
+            status_code = 429
+            status_msg = TaskStartResponse(msg, success=False)
+        return status_code, status_msg
+
+    @classmethod
+    def run_task_and_export(cls, *args, **kwargs):
+        """Run sync task of current class and export."""
+        result = cls.run_task(*args, **kwargs)
+        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler):
+            ExporterHandler.run_task()
+            PkgTreeHandler.run_task()
+        return result
+
+    @staticmethod
+    def _notify_webapps():
+        for client in NotificationHandler.connections:
+            client.write_message("refresh-cache")
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Run synchronization task."""
+        raise NotImplementedError("abstract method")
+
+    @classmethod
+    def finish_task(cls, task_result):
+        """Mark current task as finished."""
+        # Notify webapps to update it's cache
+        SyncHandler._notify_webapps()
+        LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
+        SyncTask.finish()
+
+
+class RepoListHandler(SyncHandler):
     """Handler for repository list/add API."""
+
+    task_type = "Import repositories"
 
     @staticmethod
     def _content_set_to_repos(content_set):
@@ -363,9 +415,11 @@ class RepoListHandler(BaseHandler):
                      - products
            responses:
              200:
-               description: Repos and products added to the DB
+               description: Repos and products import started
                schema:
                  $ref: "#/definitions/TaskStartResponse"
+             429:
+               description: Another task is already in progress
              400:
                description: Invalid input JSON format
              403:
@@ -384,19 +438,20 @@ class RepoListHandler(BaseHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             self.set_status(400)
-
             self.write(TaskStartResponse(msg, success=False))
             self.flush()
         if repos:
-            self.import_repositories(products=products, repos=repos)
-            msg = "Products and repositories imported."
-            self.write(TaskStartResponse(msg))
+            status_code, status_msg = self.start_task(products=products, repos=repos)
+            self.set_status(status_code)
+            self.write(status_msg)
             self.flush()
 
     @staticmethod
-    def import_repositories(products=None, repos=None):
+    def run_task(*args, **kwargs):
         """Function to import all repositories from input list to the DB."""
         try:
+            products = kwargs.get("products", None)
+            repos = kwargs.get("repos", None)
             init_logging()
             init_db()
 
@@ -416,56 +471,8 @@ class RepoListHandler(BaseHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
-
-
-class SyncHandler(BaseHandler):
-    """Base handler class providing common methods for different sync types."""
-
-    task_type = "Unknown"
-
-    @classmethod
-    def start_task(cls, *args, **kwargs):
-        """Start given task if DB worker isn't currently executing different task."""
-        if not SyncTask.is_running():
-            msg = "%s task started." % cls.task_type
-            LOGGER.info(msg)
-            SyncTask.start(cls.task_type, cls.run_task_and_export, cls.finish_task, *args, **kwargs)
-            status_code = 200
-            status_msg = TaskStartResponse(msg)
-        else:
-            msg = "%s task request ignored. Another task already in progress." % cls.task_type
-            LOGGER.info(msg)
-            # Too Many Requests
-            status_code = 429
-            status_msg = TaskStartResponse(msg, success=False)
-        return status_code, status_msg
-
-    @classmethod
-    def run_task_and_export(cls, *args, **kwargs):
-        """Run sync task of current class and export."""
-        result = cls.run_task(*args, **kwargs)
-        if cls not in (ExporterHandler, PkgTreeHandler):
-            ExporterHandler.run_task()
-            PkgTreeHandler.run_task()
-        return result
-
-    @staticmethod
-    def _notify_webapps():
-        for client in NotificationHandler.connections:
-            client.write_message("refresh-cache")
-
-    @staticmethod
-    def run_task(*args, **kwargs):
-        """Run synchronization task."""
-        raise NotImplementedError("abstract method")
-
-    @classmethod
-    def finish_task(cls, task_result):
-        """Mark current task as finished."""
-        # Notify webapps to update it's cache
-        SyncHandler._notify_webapps()
-        LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
-        SyncTask.finish()
+            return "ERROR"
+        return "OK"
 
 
 class RepoDeleteHandler(SyncHandler):
