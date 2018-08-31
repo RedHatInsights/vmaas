@@ -282,8 +282,9 @@ class SyncHandler(BaseHandler):
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
-        # Notify webapps to update it's cache
-        SyncHandler._notify_webapps()
+        if cls not in (PkgTreeHandler, RepoListHandler):
+            # Notify webapps to update it's cache
+            SyncHandler._notify_webapps()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
