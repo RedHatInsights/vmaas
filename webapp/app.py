@@ -9,6 +9,7 @@ import json
 
 
 from jsonschema.exceptions import ValidationError
+from tornado import gen
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
 import tornado.web
@@ -23,7 +24,6 @@ from errata import ErrataAPI
 from packages import PackagesAPI
 from dbchange import DBChange
 from logging_utils import init_logging, get_logger
-import gen
 
 # pylint: disable=too-many-lines
 
