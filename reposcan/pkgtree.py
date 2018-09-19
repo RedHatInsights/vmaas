@@ -113,10 +113,13 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
                                 join content_set cs on cs.id = r.content_set_id
                            """)
             for repo_id, label, name, arch_id, releasever, revision in cursor:
+                archname = ''
+                if arch_id in self.archid2arch:
+                    archname = self.archid2arch[arch_id]
                 self.repodata[repo_id] = {'revision': revision,
                                           'data': {'label': label,
                                                    'name': name,
-                                                   'arch': self.archid2arch[arch_id],
+                                                   'arch': archname,
                                                    'releasever': releasever,
                                                    'revision':format_datetime(revision)}
                                          }
