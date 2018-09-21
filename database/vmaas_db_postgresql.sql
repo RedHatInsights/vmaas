@@ -767,6 +767,94 @@ INSERT INTO dbchange (errata_changes, cve_changes, repository_changes)
   VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- -----------------------------------------------------
+-- Table vmaas.module
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module (
+  id SERIAL,
+  name VARCHAR(32) NOT NULL,
+  repo_id INT NOT NULL,
+  arch_id INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT repo_id
+    FOREIGN KEY (repo_id)
+    REFERENCES repo (id),
+  CONSTRAINT arch_id
+    FOREIGN KEY (arch_id)
+    REFERENCES arch (id),
+  CONSTRAINT module_name_repo_arch_id_uq
+    UNIQUE (name, repo_id, arch_id)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.module_stream
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module_stream (
+  id SERIAL,
+  module_id INT NOT NULL,
+  stream_name VARCHAR(8) NOT NULL,
+  is_default BOOLEAN NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT module_id
+    FOREIGN KEY (module_id)
+    REFERENCES module (id),
+  CONSTRAINT module_stream_ids_uq
+    UNIQUE (module_id, stream_name)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.module_profile
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module_profile (
+  id SERIAL,
+  stream_id INT NOT NULL,
+  profile_name VARCHAR(16) NOT NULL,
+  is_default BOOLEAN NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT stream_id
+    FOREIGN KEY (stream_id)
+    REFERENCES module_stream (id),
+  CONSTRAINT module_profile_stream_uq
+    UNIQUE (stream_id, profile_name)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.module_rpm_artifact
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module_rpm_artifact (
+  pkg_id INT NOT NULL,
+  stream_id INT NOT NULL,
+  CONSTRAINT pkg_id
+    FOREIGN KEY (pkg_id)
+    REFERENCES package (id),
+  CONSTRAINT stream_id
+    FOREIGN KEY (stream_id)
+    REFERENCES module_stream (id),
+  CONSTRAINT module_rpm_artifact_ids_uq
+    UNIQUE (pkg_id, stream_id)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.module_profile_pkg
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module_profile_pkg (
+  package_name_id INT NOT NULL,
+  profile_id INT NOT NULL,
+  CONSTRAINT package_name_id
+    FOREIGN KEY (package_name_id)
+    REFERENCES package_name (id),
+  CONSTRAINT profile_id
+    FOREIGN KEY (profile_id)
+    REFERENCES module_profile (id),
+  CONSTRAINT module_profile_pkg_ids_uq
+    UNIQUE (package_name_id, profile_id)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
 -- vmaas users permission setup:
 -- vmaas_writer - has rights to INSERT/UPDATE/DELETE; used by reposcan
 -- vmaas_reader - has SELECT only; used by webapp
