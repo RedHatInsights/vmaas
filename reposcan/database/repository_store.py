@@ -3,6 +3,7 @@ Module containing classes for fetching/importing repositories from/into database
 """
 from common.logging import get_logger
 from database.database_handler import DatabaseHandler
+from database.modules_store import ModulesStore
 from database.package_store import PackageStore
 from database.update_store import UpdateStore
 
@@ -14,6 +15,7 @@ class RepositoryStore:
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
+        self.module_store = ModulesStore()
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
         self.content_set_to_db_id = self._prepare_content_set_map()
@@ -168,3 +170,4 @@ class RepositoryStore:
         repo_id = self.import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())
+        self.module_store.store(repo_id, repository.list_modules())
