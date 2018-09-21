@@ -106,6 +106,10 @@ class RepositoryController:
                 repository.md_files["updateinfo"] = repository.repomd.get_metadata("updateinfo")["location"]
             except RepoMDTypeNotFound:
                 pass
+            try:
+                repository.md_files["modules"] = repository.repomd.get_metadata("modules")["location"]
+            except RepoMDTypeNotFound:
+                pass
 
             # queue metadata files for download
             for md_location in repository.md_files.values():
