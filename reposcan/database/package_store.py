@@ -3,34 +3,23 @@ Module containing classes for fetching/importing packages from/into database.
 """
 from psycopg2.extras import execute_values
 
-from common.logging import get_logger
-from database.database_handler import DatabaseHandler
+from database.object_store import ObjectStore
 
 CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
 
 
-class PackageStore:
+class PackageStore(ObjectStore):
     """
     Class providing interface for storing packages and related info.
     All packages from repository are imported to the DB at once.
     """
     def __init__(self):
-        self.logger = get_logger(__name__)
-        self.conn = DatabaseHandler.get_connection()
+        super().__init__()
         self.arch_map = self._prepare_arch_map()
         self.checksum_type_map = self._prepare_checksum_type_map()
         self.evr_map = self._prepare_evr_map()
         self.package_name_map = self._prepare_package_name_map()
         self.package_map = self._prepare_package_map()
-
-    def _prepare_arch_map(self):
-        arch_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, name from arch")
-        for arch_id, name in cur.fetchall():
-            arch_map[name] = arch_id
-        self.conn.commit()
-        return arch_map
 
     def _prepare_checksum_type_map(self):
         checksum_type_map = {}
@@ -49,15 +38,6 @@ class PackageStore:
             evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
         self.conn.commit()
         return evr_map
-
-    def _prepare_package_name_map(self):
-        package_name_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, name from package_name")
-        for name_id, name in cur.fetchall():
-            package_name_map[name] = name_id
-        self.conn.commit()
-        return package_name_map
 
     def _prepare_package_map(self):
         package_map = {}
