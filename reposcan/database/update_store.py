@@ -3,33 +3,14 @@ Module containing classes for fetching/importing updates from/into database.
 """
 from psycopg2.extras import execute_values
 
-from common.logging import get_logger
-from database.database_handler import DatabaseHandler
+from database.object_store import ObjectStore
 
 
-class UpdateStore:
+class UpdateStore(ObjectStore):
     """
     Class providing interface for storing updates and related info.
     All updates from repository are imported to the DB at once.
     """
-    def __init__(self):
-        self.logger = get_logger(__name__)
-        self.conn = DatabaseHandler.get_connection()
-
-    def _get_nevras_in_repo(self, repo_id):
-        cur = self.conn.cursor()
-        # Select all packages synced from current repository and save them to dict accessible by NEVRA
-        nevras_in_repo = {}
-        cur.execute("""select p.id, pn.name, evr.epoch, evr.version, evr.release, a.name
-                               from package p inner join
-                                    package_name pn on p.name_id = pn.id inner join
-                                    evr on p.evr_id = evr.id inner join
-                                    arch a on p.arch_id = a.id inner join
-                                    pkg_repo pr on p.id = pr.pkg_id and pr.repo_id = %s""", (repo_id,))
-        for row in cur.fetchall():
-            nevras_in_repo[(row[1], row[2], row[3], row[4], row[5])] = row[0]
-        cur.close()
-        return nevras_in_repo
 
     def _get_associations_todo(self, repo_id, updates, update_map, update_to_packages):
         nevras_in_repo = self._get_nevras_in_repo(repo_id)
