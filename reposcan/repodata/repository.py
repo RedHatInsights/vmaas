@@ -1,6 +1,7 @@
 """
 Module containing class for aggregating repository metadata.
 """
+from repodata.modules import ModuleMD
 from repodata.primary import PrimaryMD
 from repodata.primary_db import PrimaryDatabaseMD
 from repodata.updateinfo import UpdateInfoMD
@@ -16,6 +17,7 @@ class Repository:
         self.repomd = None
         self.primary = None
         self.updateinfo = None
+        self.modules = None
         self.md_files = {}
         self.tmp_directory = None
         self.content_set = content_set
@@ -35,6 +37,12 @@ class Repository:
     def get_update_count(self, update_type=None):
         """Returns updates count in repository (from updateinfo XML if available)."""
         return len(self.list_updates(update_type=update_type))
+
+    def list_modules(self):
+        """List modules in repository (from modules.yaml if available)"""
+        if self.modules:
+            return self.modules.list_modules()
+        return []
 
     def list_packages(self):
         """List packages in repository (from primary XML or SQLite if available)"""
@@ -59,6 +67,8 @@ class Repository:
                 self.primary = PrimaryMD(self.md_files["primary"])
             elif md_type == "updateinfo":
                 self.updateinfo = UpdateInfoMD(self.md_files["updateinfo"])
+            elif md_type == "modules":
+                self.modules = ModuleMD(self.md_files["modules"])
 
     def unload_metadata(self):
         """Unset previously loaded metadata files from this object."""
