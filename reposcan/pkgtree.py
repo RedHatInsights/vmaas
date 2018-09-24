@@ -7,12 +7,13 @@ channels/streams for use by Product Security.
 import glob
 import os
 import json
+import gzip
 from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 KEEP_COPIES = 2
-PKGTREE_FILE = '/data/pkg_tree.json'
+PKGTREE_FILE = '/data/pkg_tree.json.gz'
 LOGGER = get_logger(__name__)
 
 # copied from webapp/utils.py
@@ -60,8 +61,8 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         self.associate_repos()
         self.associate_errata()
         LOGGER.info("Exporting data to %s", dump_filename)
-        with open(dump_filename, 'w') as dump_file:
-            json.dump(self.outputdata, dump_file, indent=2, ensure_ascii=False)
+        with gzip.open(dump_filename, 'wt') as dump_file:
+            json.dump(self.outputdata, dump_file, indent=0, ensure_ascii=False)
         # relink to the latest file
         try:
             os.unlink(self.filename)
