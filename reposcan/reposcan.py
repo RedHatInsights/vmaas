@@ -28,6 +28,8 @@ LOGGER = get_logger(__name__)
 WEBSOCKET_PING_INTERVAL = 60
 WEBSOCKET_TIMEOUT = 300
 
+DEFAULT_CHUNK_SIZE = "1048576"
+
 
 class NotificationHandler(WebSocketHandler):
     """Websocket handler to send messages to subscribed clients."""
@@ -607,6 +609,9 @@ class PkgTreeHandler(SyncHandler):
 
 class PkgTreeDownloadHandler(BaseHandler):
     """Handler class to download package tree to the caller."""
+    def __init__(self, application, request, **kwargs):
+        super(PkgTreeDownloadHandler, self).__init__(application, request, **kwargs)
+        self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
 
     def get(self):  # pylint: disable=arguments-differ
         """Download the package tree.
@@ -629,10 +634,14 @@ class PkgTreeDownloadHandler(BaseHandler):
             return
 
         try:
-            with open(PKGTREE_FILE, 'r') as pkgtree_file_reader:
-                lines = pkgtree_file_reader.readlines()
-                for line in lines:
-                    self.write(line)
+            with open(PKGTREE_FILE, 'rb') as pkgtree_file_reader:
+                self.set_header("Content-Type", "application/json")
+                self.set_header("Content-Encoding", "gzip")
+                while True:
+                    chunk = pkgtree_file_reader.read(self.chunk_size)
+                    if not chunk:
+                        break
+                    self.write(chunk)
                 self.flush()
         except FileNotFoundError:
             self.set_status(404, 'Package Tree file not found.  Has it been generated?')
