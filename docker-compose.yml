@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  database:
+  vmaas_database:
     container_name: vmaas-database
     build: ./database
     image: vmaas/database:latest
@@ -21,7 +21,7 @@ services:
           cpus: '1.00'
           memory: 1G
 
-  reposcan:
+  vmaas_reposcan:
     container_name: vmaas-reposcan
     build: ./reposcan
     image: vmaas/reposcan:latest
@@ -36,7 +36,7 @@ services:
       - vmaas-reposcan-tmp:/tmp
       - vmaas-dump-data:/data:z
     depends_on:
-      - database
+      - vmaas_database
     deploy:
       resources:
         reservations:
@@ -46,7 +46,7 @@ services:
           cpus: '1.00'
           memory: 2G
 
-  webapp:
+  vmaas_webapp:
     container_name: vmaas-webapp
     build: ./webapp
     image: vmaas/webapp:latest
@@ -56,7 +56,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - reposcan
+      - vmaas_reposcan
     deploy:
       resources:
         reservations:
@@ -66,7 +66,7 @@ services:
           cpus: '1.00'
           memory: 2G
 
-  apidoc:
+  vmaas_apidoc:
     container_name: vmaas-apidoc
     build: ./apidoc
     image: vmaas/apidoc:latest
@@ -76,8 +76,8 @@ services:
     ports:
       - 8000:8080
     depends_on:
-      - reposcan
-      - webapp
+      - vmaas_reposcan
+      - vmaas_webapp
     deploy:
       resources:
         reservations:
