@@ -86,7 +86,7 @@ This "Initial Setup" section was put together as I set up on my Fedora 27 system
 
 For OpenShift deployment install also following tools.
 
-```sudo dnf install origin-clients ansible kompose```
+```sudo dnf install origin-clients ansible```
 
 Start docker.
 

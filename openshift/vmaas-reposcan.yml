@@ -1,0 +1,264 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: vmaas-${RELEASE}
+
+parameters:
+- name: RELEASE
+  description: Release of this component
+  value: '1'
+- name: GIT_REF
+  description: Git reference in repository to build from
+  value: master
+
+objects:
+- apiVersion: v1
+  data:
+    BATCH_SIZE: '100'
+    CHUNK_SIZE: '1048576'
+    LOGGING_LEVEL: INFO
+    LOGGING_TYPE: OPENSHIFT
+    REPOSCAN_SYNC_INTERVAL_MINUTES: '720'
+    RETRY_COUNT: '3'
+    THREADS: '8'
+    YEAR_SINCE: '2002'
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+
+- apiVersion: v1
+  data:
+    POSTGRESQL_DATABASE: vmaas
+    POSTGRESQL_HOST: vmaas-database-${RELEASE}
+    POSTGRESQL_PASSWORD: vmaas_writer_pwd
+    POSTGRESQL_PORT: '5432'
+    POSTGRESQL_USER: vmaas_writer
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-tmp-${RELEASE}
+  spec:
+    accessModes: [ReadWriteOnce]
+    resources:
+      requests: {storage: 15Gi}
+  status: {}
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-dump-data-${RELEASE}
+  spec:
+    accessModes: [ReadWriteOnce]
+    resources:
+      requests: {storage: 5Gi}
+  status: {}
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-${RELEASE}
+  spec:
+    nodeSelector: null
+    output:
+      to: {kind: ImageStreamTag, name: 'vmaas-reposcan-${RELEASE}:latest'}
+    postCommit: {}
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    runPolicy: Serial
+    source:
+      contextDir: reposcan/
+      git:
+        ref: ${GIT_REF}
+        uri: 'https://github.com/RedHatInsights/vmaas.git'
+      type: Git
+    strategy:
+      dockerStrategy: {}
+      type: Docker
+    triggers:
+    - {type: ConfigChange}
+  status: {lastVersion: 0}
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-${RELEASE}
+  spec:
+    tags:
+    - name: latest
+  status: {dockerImageRepository: ''}
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+      component: vmaas-reposcan-${RELEASE}
+    name: vmaas-reposcan-${RELEASE}
+  spec:
+    replicas: 1
+    selector:
+      component: vmaas-reposcan-${RELEASE}
+    strategy:
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          component: vmaas-reposcan-${RELEASE}
+      spec:
+        containers:
+        - env:
+          - name: BATCH_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: BATCH_SIZE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: CHUNK_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: CHUNK_SIZE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: LOGGING_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: LOGGING_LEVEL
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: LOGGING_TYPE
+            valueFrom:
+              configMapKeyRef:
+                key: LOGGING_TYPE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRESQL_DATABASE
+                name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+          - name: POSTGRESQL_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRESQL_HOST
+                name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRESQL_PASSWORD
+                name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+          - name: POSTGRESQL_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRESQL_PORT
+                name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+          - name: POSTGRESQL_USER
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRESQL_USER
+                name: vmaas-reposcan-conf-database-connection-writer-env-${RELEASE}
+          - name: REPOSCAN_SYNC_INTERVAL_MINUTES
+            valueFrom:
+              configMapKeyRef:
+                key: REPOSCAN_SYNC_INTERVAL_MINUTES
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: RETRY_COUNT
+            valueFrom:
+              configMapKeyRef:
+                key: RETRY_COUNT
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: THREADS
+            valueFrom:
+              configMapKeyRef:
+                key: THREADS
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: YEAR_SINCE
+            valueFrom:
+              configMapKeyRef:
+                key: YEAR_SINCE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          image: ' '
+          name: vmaas-reposcan
+          ports:
+          - {containerPort: 8081}
+          - {containerPort: 8730}
+          resources:
+            limits: {cpu: '1', memory: 2Gi}
+            requests: {cpu: 200m, memory: 200Mi}
+          volumeMounts:
+          - mountPath: /tmp
+            name: vmaas-reposcan-tmp-${RELEASE}
+          - mountPath: /data
+            name: vmaas-dump-data-${RELEASE}
+          readinessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8081
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8081
+            initialDelaySeconds: 120
+            timeoutSeconds: 1
+            periodSeconds: 60
+        restartPolicy: Always
+        volumes:
+        - name: vmaas-reposcan-tmp-${RELEASE}
+          persistentVolumeClaim:
+            claimName: vmaas-reposcan-tmp-${RELEASE}
+        - name: vmaas-dump-data-${RELEASE}
+          persistentVolumeClaim:
+            claimName: vmaas-dump-data-${RELEASE}
+    test: false
+    triggers:
+    - {type: ConfigChange}
+    - imageChangeParams:
+        automatic: true
+        containerNames: [vmaas-reposcan]
+        from: {kind: ImageStreamTag, name: 'vmaas-reposcan-${RELEASE}:latest'}
+      type: ImageChange
+  status: {}
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-reposcan-${RELEASE}
+  spec:
+    ports:
+    - {name: '8081', port: 8081, targetPort: 8081}
+    - {name: '8730', port: 8730, targetPort: 8730}
+    selector:
+      component: vmaas-reposcan-${RELEASE}
+  status:
+    loadBalancer: {}
