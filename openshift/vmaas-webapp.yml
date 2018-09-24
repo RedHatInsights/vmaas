@@ -1,0 +1,184 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: vmaas-${RELEASE}
+
+parameters:
+- name: RELEASE
+  description: Release of this component
+  value: '1'
+- name: GIT_REF
+  description: Git reference in repository to build from
+  value: master
+
+objects:
+- apiVersion: v1
+  data:
+    HOTCACHE_ENABLED: 'YES'
+    HOTCACHE_LEVELS: '11'
+    HOTCACHE_PRUNING: '1024'
+    LOGGING_LEVEL: INFO
+    LOGGING_TYPE: OPENSHIFT
+    MAX_VMAAS_SERVERS: '1'
+    REPOSCAN_HOST: vmaas-reposcan-${RELEASE}
+    REPOSCAN_WEBSOCKET_URL: 'ws://vmaas-reposcan-${RELEASE}:8081/notifications'
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-webapp-conf-webapp-env-${RELEASE}
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-webapp-${RELEASE}
+  spec:
+    nodeSelector: null
+    output:
+      to: {kind: ImageStreamTag, name: 'vmaas-webapp-${RELEASE}:latest'}
+    postCommit: {}
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    runPolicy: Serial
+    source:
+      contextDir: webapp/
+      git:
+        ref: ${GIT_REF}
+        uri: 'https://github.com/RedHatInsights/vmaas.git'
+      type: Git
+    strategy:
+      dockerStrategy: {}
+      type: Docker
+    triggers:
+    - {type: ConfigChange}
+  status: {lastVersion: 0}
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-webapp-${RELEASE}
+  spec:
+    tags:
+    - name: latest
+  status: {dockerImageRepository: ''}
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+      component: vmaas-webapp-${RELEASE}
+    name: vmaas-webapp-${RELEASE}
+  spec:
+    replicas: 1
+    selector:
+      component: vmaas-webapp-${RELEASE}
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          component: vmaas-webapp-${RELEASE}
+      spec:
+        containers:
+        - env:
+          - name: HOTCACHE_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: HOTCACHE_ENABLED
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: HOTCACHE_LEVELS
+            valueFrom:
+              configMapKeyRef:
+                key: HOTCACHE_LEVELS
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: HOTCACHE_PRUNING
+            valueFrom:
+              configMapKeyRef:
+                key: HOTCACHE_PRUNING
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: LOGGING_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: LOGGING_LEVEL
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: LOGGING_TYPE
+            valueFrom:
+              configMapKeyRef:
+                key: LOGGING_TYPE
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: MAX_VMAAS_SERVERS
+            valueFrom:
+              configMapKeyRef:
+                key: MAX_VMAAS_SERVERS
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: REPOSCAN_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: REPOSCAN_HOST
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          - name: REPOSCAN_WEBSOCKET_URL
+            valueFrom:
+              configMapKeyRef:
+                key: REPOSCAN_WEBSOCKET_URL
+                name: vmaas-webapp-conf-webapp-env-${RELEASE}
+          image: ' '
+          name: vmaas-webapp
+          ports:
+          - {containerPort: 8080}
+          resources:
+            limits: {cpu: '1', memory: 2Gi}
+            requests: {cpu: 200m, memory: 2Gi}
+          readinessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 1
+            periodSeconds: 60
+        restartPolicy: Always
+    test: false
+    triggers:
+    - {type: ConfigChange}
+    - imageChangeParams:
+        automatic: true
+        containerNames: [vmaas-webapp]
+        from: {kind: ImageStreamTag, name: 'vmaas-webapp-${RELEASE}:latest'}
+      type: ImageChange
+  status: {}
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas-${RELEASE}
+    name: vmaas-webapp-${RELEASE}
+  spec:
+    ports:
+    - {name: '8080', port: 8080, targetPort: 8080}
+    selector:
+      component: vmaas-webapp-${RELEASE}
+  status:
+    loadBalancer: {}
