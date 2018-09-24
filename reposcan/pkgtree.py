@@ -14,6 +14,8 @@ from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 KEEP_COPIES = 2
 PKGTREE_FILE = '/data/pkg_tree.json.gz'
+DEFAULT_PKGTREE_INDENT = "0"
+
 LOGGER = get_logger(__name__)
 
 # copied from webapp/utils.py
@@ -38,6 +40,9 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         self.repodata = {}
         self.cvename = {}
         self.erratadata = {}
+        self.pkgtree_indent = int(os.getenv('PKGTREE_INDENT', DEFAULT_PKGTREE_INDENT))
+        if self.pkgtree_indent > 2:
+            self.pkgtree_indent = 2
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
@@ -62,7 +67,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         self.associate_errata()
         LOGGER.info("Exporting data to %s", dump_filename)
         with gzip.open(dump_filename, 'wt') as dump_file:
-            json.dump(self.outputdata, dump_file, indent=0, ensure_ascii=False)
+            json.dump(self.outputdata, dump_file, indent=self.pkgtree_indent, ensure_ascii=False)
         # relink to the latest file
         try:
             os.unlink(self.filename)
