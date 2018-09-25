@@ -17,17 +17,9 @@
       tags:
         - always
 
-    - name: Get last Git commit
-      command: git rev-parse --short HEAD
-      changed_when: False
-      register: git_commit_id
-      tags:
-        - always
-      when: app_id is not defined
-
-    - name: Use Git commit id as app ID
-      set_fact:
-        app_id: "{{ git_commit_id.stdout }}"
+    - name: Prevent run without release version
+      fail:
+        msg: "You must run this playbook with app_id parameter! E.g. '-e app_id=2'"
       tags:
         - always
       when: app_id is not defined
