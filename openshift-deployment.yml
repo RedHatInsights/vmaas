@@ -8,7 +8,7 @@
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, update-images, configure-apidoc, upgrade-start, upgrade-finish."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -97,13 +97,13 @@
         - up
         - upgrade-start
 
-    - name: Update VMaaS images
-      shell: for image in $(grep "image:" docker-compose.yml | awk '{print $2}'); do oc import-image $image; done
+    - name: Rebuild VMaaS images
+      shell: oc start-build vmaas-apidoc-{{ app_id }}; oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}
       tags:
-        - update-images
+        - rebuild-images
 
     - name: Point routes to the current deployment
-      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"apidoc-{{ app_id }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"webapp-{{ app_id }}"}}}'
+      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"vmaas-apidoc-{{ app_id }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"vmaas-reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"vmaas-webapp-{{ app_id }}"}}}'
       tags:
         - upgrade-finish
 
