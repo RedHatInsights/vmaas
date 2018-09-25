@@ -8,7 +8,7 @@
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -134,7 +134,7 @@
         - vmaas-webapp
         - vmaas-database
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete old Services
@@ -145,7 +145,7 @@
         - vmaas-webapp
         - vmaas-database
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete old Deployment Configs
@@ -156,7 +156,7 @@
         - vmaas-webapp
         - vmaas-database
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete old Persistent Volume Claims
@@ -166,7 +166,7 @@
         - vmaas-dump-data
         - vmaas-reposcan-tmp
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete old Image Streams
@@ -177,7 +177,7 @@
         - vmaas-webapp
         - vmaas-database
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete old Build Configs
@@ -188,7 +188,7 @@
         - vmaas-webapp
         - vmaas-database
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Delete all Config Maps
