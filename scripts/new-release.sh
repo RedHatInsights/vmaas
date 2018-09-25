@@ -7,7 +7,6 @@ VERSION_REGEXP="[0-9]+\.[0-9]+"
 RELEASE_BRANCH_PREFIX="vmaas-"
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 TRAVIS_FILE=".travis.yml"
-RELEASE_FILE="scripts/docker-push.sh"
 PATCH_DOCKERFILES="webapp/Dockerfile reposcan/Dockerfile"
 ENV_FILES="conf/webapp.env conf/reposcan.env"
 
@@ -37,16 +36,11 @@ elif [[ "$1" =~ $VERSION_REGEXP ]]; then
     echo "Updating $DOCKER_COMPOSE_FILE..."
     sed -i "s/:latest/:$1/g" "$DOCKER_COMPOSE_FILE"
     sed -i "s/- master/- $RELEASE_BRANCH_PREFIX$1/g" "$TRAVIS_FILE"
-    sed -i "s/RELEASE_BRANCH=\"master\"/RELEASE_BRANCH=\"$RELEASE_BRANCH_PREFIX$1\"/g" "$RELEASE_FILE"
     for dockerfile in $PATCH_DOCKERFILES; do
         sed -i "s/ENV VMAAS_VERSION=latest/ENV VMAAS_VERSION=$1/g" "$dockerfile"
         git add "$dockerfile"
     done
-    for envfile in $ENV_FILES; do
-        sed -i "s/^LOGGING_TYPE=.*/LOGGING_TYPE=OPENSHIFT/g" "$envfile"
-        git add "$envfile"
-    done
-    git add "$DOCKER_COMPOSE_FILE" "$TRAVIS_FILE" "$RELEASE_FILE"
+    git add "$DOCKER_COMPOSE_FILE" "$TRAVIS_FILE"
     git commit -m "Update version to $1"
     git checkout "$ORIGINAL_BRANCH"
     echo ""
