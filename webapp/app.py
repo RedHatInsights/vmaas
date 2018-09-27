@@ -1036,6 +1036,7 @@ class Application(tornado.web.Application):
             LOGGER.warning("Unable to connect to: %s", self.reposcan_websocket_url)
         else:
             LOGGER.info("Connected to: %s", self.reposcan_websocket_url)
+            result.write_message("subscribe-webapp")
 
         self.reposcan_websocket = result
 
@@ -1044,6 +1045,8 @@ class Application(tornado.web.Application):
         if message is not None:
             if message == "refresh-cache":
                 self._refresh_cache()
+                self.reposcan_websocket.write_message("refreshed %s" %
+                                                      BaseHandler.db_cache.dbchange["exported"])
         else:
             LOGGER.warning("Connection to %s closed: %s (%s)", self.reposcan_websocket_url,
                            self.reposcan_websocket.close_reason, self.reposcan_websocket.close_code)

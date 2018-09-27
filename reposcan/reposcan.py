@@ -33,7 +33,8 @@ DEFAULT_CHUNK_SIZE = "1048576"
 
 class NotificationHandler(WebSocketHandler):
     """Websocket handler to send messages to subscribed clients."""
-    connections = set()
+    connections = {}
+    webapp_export_timestamps = {}
 
     def __init__(self, application, request, **kwargs):
         super(NotificationHandler, self).__init__(application, request, **kwargs)
@@ -41,7 +42,7 @@ class NotificationHandler(WebSocketHandler):
         self.timeout_callback = None
 
     def open(self, *args, **kwargs):
-        self.connections.add(self)
+        self.connections[self] = None
         # Set last pong timestamp to current timestamp and ping client
         self.last_pong = IOLoop.current().time()
         self.ping(b"")
@@ -53,12 +54,21 @@ class NotificationHandler(WebSocketHandler):
         pass
 
     def on_message(self, message):
-        """We don't need to handle any incoming messages."""
-        pass
+        if message == "subscribe-webapp":
+            self.connections[self] = "webapp"
+        elif message == "subscribe-listener":
+            self.connections[self] = "listener"
+        elif message.startswith("refreshed"):
+            _, timestamp = message.split()
+            self.webapp_export_timestamps[self] = timestamp
+            # All webapp connections are refreshed with same dump version
+            if (len([c for c in self.connections.values() if c == "webapp"]) == len(self.webapp_export_timestamps)
+                    and len(set(self.webapp_export_timestamps.values())) == 1):
+                self.send_message("listener", "webapps-refreshed")
 
     def on_close(self):
         self.timeout_callback.stop()
-        self.connections.remove(self)
+        del self.connections[self]
 
     def timeout_check(self):
         """Check time since we received last pong. Send ping again."""
@@ -71,6 +81,14 @@ class NotificationHandler(WebSocketHandler):
     def on_pong(self, data):
         """Pong received from client."""
         self.last_pong = IOLoop.current().time()
+
+    @staticmethod
+    def send_message(target_client_type, message):
+        """Send message to selected group of connected clients."""
+        NotificationHandler.webapp_export_timestamps.clear()
+        for client, client_type in NotificationHandler.connections.items():
+            if client_type == target_client_type:
+                client.write_message(message)
 
 
 class TaskStatusResponse(dict):
@@ -262,11 +280,6 @@ class SyncHandler(BaseHandler):
         return result
 
     @staticmethod
-    def _notify_webapps():
-        for client in NotificationHandler.connections:
-            client.write_message("refresh-cache")
-
-    @staticmethod
     def run_task(*args, **kwargs):
         """Run synchronization task."""
         raise NotImplementedError("abstract method")
@@ -276,7 +289,7 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler):
             # Notify webapps to update it's cache
-            SyncHandler._notify_webapps()
+            NotificationHandler.send_message("webapp", "refresh-cache")
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
