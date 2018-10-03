@@ -751,6 +751,10 @@ def setup_apispec(handlers):
                             "type": "string",
                             "example": "5.600",
                         },
+                        "cvss3_metrics": {
+                            "type": "string",
+                            "example": "CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                        },
                         "secondary_url": {
                             "type": "string",
                             "example": "http://lists.opensuse.org/opensuse-security-announce/2018-01/msg00002.html",
