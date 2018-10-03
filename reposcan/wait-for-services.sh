@@ -11,5 +11,10 @@ until PGPASSWORD="$POSTGRESQL_PASSWORD" psql -h "$POSTGRESQL_HOST" -U "$POSTGRES
   sleep 1
 done
 
->&2 echo "PostgreSQL is up - executing command"
+until curl http://$WEBSOCKET_HOST:8082/api/v1/monitoring/health &>/dev/null; do
+  >&2 echo "Websocket server is unavailable - sleeping"
+  sleep 1
+done
+
+>&2 echo "Everything is up - executing command"
 exec $cmd
