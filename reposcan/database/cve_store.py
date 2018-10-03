@@ -45,6 +45,7 @@ class CveStore(CveStoreCommon):
                 "description": _desc(cve_desc_list, "lang", "en", "value"),
                 "impact_id": cve_impact_map[impact.capitalize()] if impact is not None else cve_impact_map['NotSet'],
                 "cvss3_score": _dget(cve, "impact", "baseMetricV3", "cvssV3", "baseScore"),
+                "cvss3_metrics": _dget(cve, "impact", "baseMetricV3", "cvssV3", "vectorString"),
                 "redhat_url": redhat_url,
                 "cwe_list": cwe_list,
                 "secondary_url": secondary_url,
@@ -69,12 +70,12 @@ class CveStore(CveStoreCommon):
                     continue
                 cve_data[row[1]]["id"] = row[0]
         to_import = [(name, values["description"], values["impact_id"], values["published_date"],
-                      values["modified_date"], values["cvss3_score"], values["iava"],
+                      values["modified_date"], values["cvss3_score"], values["cvss3_metrics"], values["iava"],
                       values["redhat_url"], values["secondary_url"], values["source_id"])
                      for name, values in cve_data.items() if "id" not in values]
         self.logger.debug("CVEs to import: %d", len(to_import))
         to_update = [(values["id"], name, values["description"], values["impact_id"], values["published_date"],
-                      values["modified_date"], values["cvss3_score"], values["iava"],
+                      values["modified_date"], values["cvss3_score"], values["cvss3_metrics"], values["iava"],
                       values["redhat_url"], values["secondary_url"], values["source_id"])
                      for name, values in cve_data.items() if "id" in values]
 
@@ -83,7 +84,8 @@ class CveStore(CveStoreCommon):
         if to_import:
             execute_values(cur,
                            """insert into cve (name, description, impact_id, published_date, modified_date,
-                              cvss3_score, iava, redhat_url, secondary_url, source_id) values %s returning id, name""",
+                              cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id)
+                              values %s returning id, name""",
                            list(to_import), page_size=len(to_import))
             for row in cur.fetchall():
                 cve_data[row[1]]["id"] = row[0]
@@ -98,14 +100,15 @@ class CveStore(CveStoreCommon):
                                              redhat_url = v.redhat_url,
                                              secondary_url = v.secondary_url,
                                              cvss3_score = v.cvss3_score,
+                                             cvss3_metrics = v.cvss3_metrics,
                                              iava = v.iava,
                                              source_id = v.source_id
                               from (values %s)
                               as v(id, name, description, impact_id, published_date, modified_date, cvss3_score,
-                              iava, redhat_url, secondary_url, source_id)
+                              cvss3_metrics, iava, redhat_url, secondary_url, source_id)
                               where cve.id = v.id """,
                            list(to_update), page_size=len(to_update),
-                           template=b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s::int)")
+                           template=b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int)")
         self._populate_cwes(cur, cve_data)
         cur.close()
         self.conn.commit()

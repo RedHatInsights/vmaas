@@ -654,6 +654,7 @@ CREATE TABLE IF NOT EXISTS cve (
   published_date TIMESTAMP WITH TIME ZONE NULL,
   modified_date TIMESTAMP WITH TIME ZONE NULL,
   cvss3_score NUMERIC(5,3),
+  cvss3_metrics TEXT, CHECK (NOT empty(cvss3_metrics)),
   iava TEXT, CHECK (NOT empty(iava)),
   redhat_url TEXT, CHECK (NOT empty(redhat_url)),
   secondary_url TEXT, CHECK (NOT empty(secondary_url)),
