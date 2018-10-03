@@ -90,7 +90,7 @@
         - upgrade-start
 
     - name: Rebuild VMaaS images
-      shell: oc start-build vmaas-apidoc-{{ app_id }}; oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}
+      shell: oc start-build vmaas-apidoc-{{ app_id }}; oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}; oc start-build vmaas-websocket-{{ app_id }}
       tags:
         - rebuild-images
 
@@ -135,6 +135,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - upgrade-cleanup
@@ -146,6 +147,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - upgrade-cleanup
@@ -167,6 +169,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - upgrade-cleanup
@@ -178,6 +181,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - upgrade-cleanup
@@ -200,6 +204,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - down
@@ -211,6 +216,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - down
@@ -232,6 +238,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - down
@@ -243,6 +250,7 @@
         - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
+        - vmaas-websocket
         - vmaas-database
       tags:
         - down
