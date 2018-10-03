@@ -13,6 +13,14 @@ services:
     volumes:
       - vmaas-db-data:/var/lib/pgsql/data
 
+  vmaas_websocket:
+    container_name: vmaas-websocket
+    build: ./websocket
+    image: vmaas/websocket:latest
+    restart: unless-stopped
+    ports:
+      - 8082:8082
+
   vmaas_reposcan:
     container_name: vmaas-reposcan
     build: ./reposcan
@@ -28,6 +36,7 @@ services:
       - vmaas-reposcan-tmp:/tmp
       - vmaas-dump-data:/data:z
     depends_on:
+      - vmaas_websocket
       - vmaas_database
 
   vmaas_webapp:
@@ -40,6 +49,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
+      - vmaas_websocket
       - vmaas_reposcan
 
   vmaas_apidoc:
