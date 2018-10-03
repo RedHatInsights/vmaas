@@ -8,6 +8,14 @@ services:
       - label=disable
     working_dir: /git
 
+  vmaas_websocket:
+    volumes:
+      - ./websocket:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+    command: ["sleep", "infinity"]
+
   vmaas_reposcan:
     volumes:
       - ./reposcan:/git
