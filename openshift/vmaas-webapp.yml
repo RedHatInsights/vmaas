@@ -21,7 +21,7 @@ objects:
     LOGGING_TYPE: OPENSHIFT
     MAX_VMAAS_SERVERS: '1'
     REPOSCAN_HOST: vmaas-reposcan-${RELEASE}
-    REPOSCAN_WEBSOCKET_URL: 'ws://vmaas-reposcan-${RELEASE}:8081/notifications'
+    WEBSOCKET_HOST: vmaas-websocket-${RELEASE}
   kind: ConfigMap
   metadata:
     creationTimestamp: null
@@ -130,10 +130,10 @@ objects:
               configMapKeyRef:
                 key: REPOSCAN_HOST
                 name: vmaas-webapp-conf-webapp-env-${RELEASE}
-          - name: REPOSCAN_WEBSOCKET_URL
+          - name: WEBSOCKET_HOST
             valueFrom:
               configMapKeyRef:
-                key: REPOSCAN_WEBSOCKET_URL
+                key: WEBSOCKET_HOST
                 name: vmaas-webapp-conf-webapp-env-${RELEASE}
           image: ' '
           name: vmaas-webapp
