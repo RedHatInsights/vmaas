@@ -22,6 +22,7 @@ objects:
     RETRY_COUNT: '3'
     THREADS: '8'
     YEAR_SINCE: '2002'
+    WEBSOCKET_HOST: vmaas-websocket-${RELEASE}
   kind: ConfigMap
   metadata:
     creationTimestamp: null
@@ -200,6 +201,11 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: YEAR_SINCE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: WEBSOCKET_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: WEBSOCKET_HOST
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           image: ' '
           name: vmaas-reposcan
