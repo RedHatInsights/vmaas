@@ -19,3 +19,4 @@ install:
 script:
   - /bin/bash run_tests.sh reposcan
   - /bin/bash run_tests.sh webapp
+  - /bin/bash run_tests.sh websocket
