@@ -56,9 +56,9 @@ All at once
 
 Single service
 
-```docker-compose start database```
+```docker-compose start vmaas_database```
 
-```docker-compose stop database```
+```docker-compose stop vmaas_database```
 
 ### OpenShift deployment (stable)
 
@@ -143,13 +143,13 @@ Congratulations!
 
 Build and start your container in "developer mode"
 
-```./scripts/devel-compose build --no-cache webapp```
+```./scripts/devel-compose build --no-cache vmaas_webapp```
 
-```./scripts/devel-compose up webapp```
+```./scripts/devel-compose up vmaas_webapp```
 
 switch inside of the container
 
-```./scripts/devel-compose exec webapp bash```
+```./scripts/devel-compose exec vmaas_webapp bash```
 
 now your local git directory is mounted under ```/git``` in the container so any change
 you make you can immediatelly test.
