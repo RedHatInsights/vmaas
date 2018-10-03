@@ -11,7 +11,7 @@ import requests
 
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
-from tornado.websocket import WebSocketHandler
+from tornado.websocket import websocket_connect
 
 from apidoc import SPEC, VMAAS_VERSION, setup_apispec
 from common.logging import get_logger, init_logging
@@ -25,70 +25,8 @@ from repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
 
-WEBSOCKET_PING_INTERVAL = 60
-WEBSOCKET_TIMEOUT = 300
-
 DEFAULT_CHUNK_SIZE = "1048576"
-
-
-class NotificationHandler(WebSocketHandler):
-    """Websocket handler to send messages to subscribed clients."""
-    connections = {}
-    webapp_export_timestamps = {}
-
-    def __init__(self, application, request, **kwargs):
-        super(NotificationHandler, self).__init__(application, request, **kwargs)
-        self.last_pong = None
-        self.timeout_callback = None
-
-    def open(self, *args, **kwargs):
-        self.connections[self] = None
-        # Set last pong timestamp to current timestamp and ping client
-        self.last_pong = IOLoop.current().time()
-        self.ping(b"")
-        # Start periodic callback checking time since last received pong
-        self.timeout_callback = PeriodicCallback(self.timeout_check, WEBSOCKET_PING_INTERVAL * 1000)
-        self.timeout_callback.start()
-
-    def data_received(self, chunk):
-        pass
-
-    def on_message(self, message):
-        if message == "subscribe-webapp":
-            self.connections[self] = "webapp"
-        elif message == "subscribe-listener":
-            self.connections[self] = "listener"
-        elif message.startswith("refreshed"):
-            _, timestamp = message.split()
-            self.webapp_export_timestamps[self] = timestamp
-            # All webapp connections are refreshed with same dump version
-            if (len([c for c in self.connections.values() if c == "webapp"]) == len(self.webapp_export_timestamps)
-                    and len(set(self.webapp_export_timestamps.values())) == 1):
-                self.send_message("listener", "webapps-refreshed")
-
-    def on_close(self):
-        self.timeout_callback.stop()
-        del self.connections[self]
-
-    def timeout_check(self):
-        """Check time since we received last pong. Send ping again."""
-        now = IOLoop.current().time()
-        if now - self.last_pong > WEBSOCKET_TIMEOUT:
-            self.close(1000, "Connection timed out.")
-            return
-        self.ping(b"")
-
-    def on_pong(self, data):
-        """Pong received from client."""
-        self.last_pong = IOLoop.current().time()
-
-    @staticmethod
-    def send_message(target_client_type, message):
-        """Send message to selected group of connected clients."""
-        NotificationHandler.webapp_export_timestamps.clear()
-        for client, client_type in NotificationHandler.connections.items():
-            if client_type == target_client_type:
-                client.write_message(message)
+WEBSOCKET_RECONNECT_INTERVAL = 60
 
 
 class TaskStatusResponse(dict):
@@ -289,7 +227,7 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler):
             # Notify webapps to update it's cache
-            NotificationHandler.send_message("webapp", "refresh-cache")
+            ReposcanApplication.websocket.write_message("invalidate-cache")
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
@@ -883,9 +821,13 @@ class SyncTask:
 
 class ReposcanApplication(Application):
     """Class defining API handlers."""
+
+    websocket = None
+    websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
+    reconnect_callback = None
+
     def __init__(self):
         handlers = [
-            (r"/notifications/?", NotificationHandler),
             (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/version/?", VersionHandler),
@@ -906,6 +848,38 @@ class ReposcanApplication(Application):
 
         setup_apispec(handlers)
 
+    @classmethod
+    def websocket_reconnect(cls):
+        """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
+        if cls.websocket is None:
+            websocket_connect(cls.websocket_url, on_message_callback=cls._read_websocket_message,
+                              callback=cls._websocket_connect_status)
+
+    @classmethod
+    def _websocket_connect_status(cls, future):
+        """Check if connection attempt succeeded."""
+        try:
+            result = future.result()
+        except: # pylint: disable=bare-except
+            result = None
+
+        if result is None:
+            # TODO: print the traceback as debug message when we use logging module instead of prints here
+            LOGGER.warning("Unable to connect to: %s", cls.websocket_url)
+        else:
+            LOGGER.info("Connected to: %s", cls.websocket_url)
+            result.write_message("subscribe-reposcan")
+
+        cls.websocket = result
+
+    @classmethod
+    def _read_websocket_message(cls, message):
+        """Read incoming websocket messages."""
+        if message is None:
+            LOGGER.warning("Connection to %s closed: %s (%s)", cls.websocket_url,
+                           cls.websocket.close_reason, cls.websocket.close_code)
+            cls.websocket = None
+
 
 def periodic_sync():
     """Function running both repo and CVE sync."""
@@ -924,6 +898,11 @@ def main():
         LOGGER.info("Periodic syncing disabled.")
     app = ReposcanApplication()
     app.listen(8081)
+
+    app.websocket_reconnect()
+    app.reconnect_callback = PeriodicCallback(app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
+    app.reconnect_callback.start()
+
     IOLoop.instance().start()
 
 if __name__ == '__main__':

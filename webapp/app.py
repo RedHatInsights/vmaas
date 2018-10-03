@@ -1010,8 +1010,8 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
 
         setup_apispec(handlers)
-        self.reposcan_websocket_url = os.getenv("REPOSCAN_WEBSOCKET_URL", "ws://reposcan:8081/notifications")
-        self.reposcan_websocket = None
+        self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
+        self.websocket = None
         self.reconnect_callback = None
 
     @staticmethod
@@ -1024,8 +1024,8 @@ class Application(tornado.web.Application):
 
     def websocket_reconnect(self):
         """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
-        if self.reposcan_websocket is None:
-            websocket_connect(self.reposcan_websocket_url, on_message_callback=self._read_websocket_message,
+        if self.websocket is None:
+            websocket_connect(self.websocket_url, on_message_callback=self._read_websocket_message,
                               callback=self._websocket_connect_status)
 
     def _websocket_connect_status(self, future):
@@ -1037,24 +1037,24 @@ class Application(tornado.web.Application):
 
         if result is None:
             # TODO: print the traceback as debug message when we use logging module instead of prints here
-            LOGGER.warning("Unable to connect to: %s", self.reposcan_websocket_url)
+            LOGGER.warning("Unable to connect to: %s", self.websocket_url)
         else:
-            LOGGER.info("Connected to: %s", self.reposcan_websocket_url)
+            LOGGER.info("Connected to: %s", self.websocket_url)
             result.write_message("subscribe-webapp")
 
-        self.reposcan_websocket = result
+        self.websocket = result
 
     def _read_websocket_message(self, message):
         """Read incoming websocket messages."""
         if message is not None:
             if message == "refresh-cache":
                 self._refresh_cache()
-                self.reposcan_websocket.write_message("refreshed %s" %
-                                                      BaseHandler.db_cache.dbchange["exported"])
+                self.websocket.write_message("refreshed %s" %
+                                             BaseHandler.db_cache.dbchange["exported"])
         else:
-            LOGGER.warning("Connection to %s closed: %s (%s)", self.reposcan_websocket_url,
-                           self.reposcan_websocket.close_reason, self.reposcan_websocket.close_code)
-            self.reposcan_websocket = None
+            LOGGER.warning("Connection to %s closed: %s (%s)", self.websocket_url,
+                           self.websocket.close_reason, self.websocket.close_code)
+            self.websocket = None
 
 
 def main():
