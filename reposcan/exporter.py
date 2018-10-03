@@ -307,6 +307,7 @@ class DataDump:
                                      cve.redhat_url,
                                      cve.secondary_url,
                                      cve.cvss3_score,
+                                     cve.cvss3_metrics,
                                      cve_impact.name as impact,
                                      cve.published_date,
                                      cve.modified_date,
@@ -315,10 +316,10 @@ class DataDump:
                                 from cve
                            left join cve_impact on cve.impact_id = cve_impact.id
                            """)
-            for cve_id, name, redhat_url, secondary_url, cvss3_score, impact, \
+            for cve_id, name, redhat_url, secondary_url, cvss3_score, cvss3_metrics, impact, \
                 published_date, modified_date, iava, description in cursor:
-                dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, impact,
-                                                published_date, modified_date, iava, description,
+                dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, cvss3_metrics,
+                                                impact, published_date, modified_date, iava, description,
                                                 cveid2cwe.get(cve_id, []),
                                                 cveid2pid.get(cve_id, []),
                                                 cveid2eid.get(cve_id, []))
