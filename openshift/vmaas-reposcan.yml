@@ -18,6 +18,7 @@ objects:
     CHUNK_SIZE: '1048576'
     LOGGING_LEVEL: INFO
     LOGGING_TYPE: OPENSHIFT
+    PKGTREE_INDENT: '0'
     REPOSCAN_SYNC_INTERVAL_MINUTES: '720'
     RETRY_COUNT: '3'
     THREADS: '8'
@@ -156,6 +157,11 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: LOGGING_TYPE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: PKGTREE_INDENT
+            valueFrom:
+              configMapKeyRef:
+                key: PKGTREE_INDENT
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           - name: POSTGRESQL_DATABASE
             valueFrom:
