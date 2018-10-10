@@ -12,7 +12,7 @@ from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
-DEFAULT_KEEP_COPIES = 2
+DEFAULT_KEEP_COPIES = "2"
 PKGTREE_FILE = '/data/pkg_tree.json.gz'
 DEFAULT_PKGTREE_INDENT = "0"
 
