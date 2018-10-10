@@ -10,7 +10,7 @@ from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
-KEEP_COPIES = 10
+DEFAULT_KEEP_COPIES = 2
 DUMP = '/data/vmaas.dbm'
 LOGGER = get_logger(__name__)
 
@@ -23,6 +23,7 @@ class DataDump:
         self.packagename_ids = []
         self.package_ids = []
         self.errata_ids = []
+        self.keep_copies = int(os.getenv('KEEP_COPIES', DEFAULT_KEEP_COPIES))
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
@@ -52,7 +53,7 @@ class DataDump:
         os.symlink(dump_filename, self.filename)
         # remove old data above limit
         old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
-        for fname in old_data[KEEP_COPIES:]:
+        for fname in old_data[self.keep_copies:]:
             LOGGER.info("Removing old dump %s", fname)
             os.unlink(fname)
 
