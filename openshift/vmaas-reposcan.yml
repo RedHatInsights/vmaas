@@ -19,11 +19,13 @@ objects:
     LOGGING_LEVEL: INFO
     LOGGING_TYPE: OPENSHIFT
     PKGTREE_INDENT: '0'
+    PKGTREE_KEEP_COPIES: '2'
     REPOSCAN_SYNC_INTERVAL_MINUTES: '720'
     RETRY_COUNT: '3'
     THREADS: '8'
     YEAR_SINCE: '2002'
     WEBSOCKET_HOST: vmaas-websocket-${RELEASE}
+    KEEP_COPIES: '3'
   kind: ConfigMap
   metadata:
     creationTimestamp: null
@@ -163,6 +165,11 @@ objects:
               configMapKeyRef:
                 key: PKGTREE_INDENT
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: PKGTREE_KEEP_COPIES
+            valueFrom:
+              configMapKeyRef:
+                key: PKGTREE_KEEP_COPIES
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           - name: POSTGRESQL_DATABASE
             valueFrom:
               configMapKeyRef:
@@ -212,6 +219,11 @@ objects:
             valueFrom:
               configMapKeyRef:
                 key: WEBSOCKET_HOST
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: KEEP_COPIES
+            valueFrom:
+              configMapKeyRef:
+                key: KEEP_COPIES
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           image: ' '
           name: vmaas-reposcan
