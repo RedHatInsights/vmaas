@@ -8,6 +8,7 @@ from test import tools
 from test.conftest import TestBase
 
 import pytest
+import pytz
 
 from cache import ERRATA_UPDATED, ERRATA_ISSUED
 from errata import ErrataAPI
@@ -33,8 +34,8 @@ class TestErrataAPI(TestBase):
         # WORKAROUND: tzinfo from date is lost after loading YAML
         errata_detail = self.cache.errata_detail["RHSA-2018:1055"]
         errata_detail_list = list(errata_detail)
-        errata_detail_list[ERRATA_UPDATED] = errata_detail[ERRATA_UPDATED].astimezone()
-        errata_detail_list[ERRATA_ISSUED] = errata_detail[ERRATA_ISSUED].astimezone()
+        errata_detail_list[ERRATA_UPDATED] = errata_detail[ERRATA_UPDATED].replace(tzinfo=pytz.utc)
+        errata_detail_list[ERRATA_ISSUED] = errata_detail[ERRATA_ISSUED].replace(tzinfo=pytz.utc)
         self.cache.errata_detail["RHSA-2018:1055"] = errata_detail_list
 
         # make errata_detail without ERRATA_UPDATED
@@ -88,7 +89,7 @@ class TestErrataAPI(TestBase):
     def test_modified_since(self):
         """Test errata API with 'modified_since' property."""
         errata = ERRATA_JSON.copy()
-        errata["modified_since"] = str(datetime.datetime.now().astimezone())
+        errata["modified_since"] = str(datetime.datetime.now().replace(tzinfo=pytz.UTC))
         response = self.errata_api.process_list(api_version="v1", data=errata)
         assert tools.match(EMPTY_RESPONSE, response) is True
 
