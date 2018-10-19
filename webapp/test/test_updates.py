@@ -8,6 +8,7 @@ from test import schemas
 from test.conftest import TestBase
 
 import pytest
+
 from updates import HotCache
 from updates import UpdatesAPI
 

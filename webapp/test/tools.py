@@ -23,9 +23,9 @@ def match(expected, given):
             not_match.update({key: given[key]})
 
     if not_match:
-        msg = f"""
+        msg = """
             Expected details does not match:
-            expected: {expected!r}
-            not matching: {not_match!r}
-        """
+            expected: {!r}
+            not matching: {!r}
+        """.format(expected, not_match)
     return msg

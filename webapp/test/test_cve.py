@@ -7,6 +7,7 @@ from test import schemas, tools
 from test.conftest import TestBase
 
 import pytest
+import pytz
 
 from cve import CveAPI
 from cache import CVE_MODIFIED_DATE, CVE_PUBLISHED_DATE
@@ -39,8 +40,8 @@ class TestCveAPI(TestBase):
         # WORKAROUND: tzinfo from date is lost after loading YAML
         cve_detail = self.cache.cve_detail["CVE-2016-0634"]
         cve_detail_list = list(cve_detail)
-        cve_detail_list[CVE_MODIFIED_DATE] = cve_detail[CVE_MODIFIED_DATE].astimezone()
-        cve_detail_list[CVE_PUBLISHED_DATE] = cve_detail[CVE_PUBLISHED_DATE].astimezone()
+        cve_detail_list[CVE_MODIFIED_DATE] = cve_detail[CVE_MODIFIED_DATE].replace(tzinfo=pytz.utc)
+        cve_detail_list[CVE_PUBLISHED_DATE] = cve_detail[CVE_PUBLISHED_DATE].replace(tzinfo=pytz.utc)
         self.cache.cve_detail["CVE-2016-0634"] = cve_detail_list
 
         # make cve_detail without CVE_MODIFIED_DATE
@@ -102,7 +103,7 @@ class TestCveAPI(TestBase):
     def test_modified_since(self):
         """Test CVE API with 'modified_since' property."""
         cve = CVE_JSON.copy()
-        cve["modified_since"] = str(datetime.datetime.now().astimezone())
+        cve["modified_since"] = str(datetime.datetime.now().replace(tzinfo=pytz.UTC))
         response = self.cve.process_list(api_version=1, data=cve)
         assert tools.match(EMPTY_RESPONSE, response) is True
 

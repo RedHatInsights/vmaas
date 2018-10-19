@@ -7,7 +7,7 @@ import pytest
 from repos import RepoAPI
 
 REPO_JSON_EMPTY = {}
-REPO_JSON_BAD = {"page_size": "9"}
+REPO_JSON_BAD = {"page_size": 9}
 REPO_JSON = {"repository_list": ["rhel-7-server-rpms"]}
 REPO_JSON_EMPTY_LIST = {"repository_list": [""]}
 REPO_JSON_NON_EXIST = {"repository_list": ["non-existent-repo"]}
