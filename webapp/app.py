@@ -975,6 +975,10 @@ def setup_apispec(handlers):
                 "last_change": {
                     "type": "string",
                     "example": "2018-04-16 20:07:58.500192+00"
+                    },
+                "exported": {
+                    "type": "string",
+                    "example": "2018-04-16 20:07:59.235962+00"
                     }
                 }
             }
