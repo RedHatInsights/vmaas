@@ -19,8 +19,4 @@ install:
 script:
   - /bin/bash run_tests.sh reposcan
   - /bin/bash run_tests.sh webapp
-jobs:
-  include:
-    - stage: Update docker images
-      python: "3.6"
-      script: /bin/bash scripts/docker-push.sh
+  - /bin/bash run_tests.sh websocket
