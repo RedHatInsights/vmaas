@@ -12,7 +12,7 @@ from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
-KEEP_COPIES = 2
+DEFAULT_KEEP_COPIES = "2"
 PKGTREE_FILE = '/data/pkg_tree.json.gz'
 DEFAULT_PKGTREE_INDENT = "0"
 
@@ -41,6 +41,8 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         self.cvename = {}
         self.erratadata = {}
         self.pkgtree_indent = int(os.getenv('PKGTREE_INDENT', DEFAULT_PKGTREE_INDENT))
+        self.pkgtree_keep_copies = int(os.getenv('PKGTREE_KEEP_COPIES', DEFAULT_KEEP_COPIES))
+
         if self.pkgtree_indent > 2:
             self.pkgtree_indent = 2
 
@@ -77,7 +79,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         LOGGER.info("Finished exporting data.  Elapsed time: %s", now() - starttime)
         # remove old data above limit
         old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
-        for fname in old_data[KEEP_COPIES:]:
+        for fname in old_data[self.pkgtree_keep_copies:]:
             LOGGER.info("Removing old dump %s", fname)
             os.unlink(fname)
 
