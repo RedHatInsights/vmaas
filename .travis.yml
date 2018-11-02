@@ -15,7 +15,7 @@ matrix:
 notifications:
   email: false
 install:
-  - pip install pylint psycopg2 requests tornado apispec python-dateutil jsonschema
+  - pip install pylint psycopg2 requests tornado apispec python-dateutil jsonschema schema pytest pytest-cov codecov iso8601 pytz
 script:
   - /bin/bash run_tests.sh reposcan
   - /bin/bash run_tests.sh webapp
