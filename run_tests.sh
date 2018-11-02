@@ -15,7 +15,7 @@ rc=0
 # Check for python test files with invalid names
 test_dirs=$(find . -type d -name 'test')
 for test_dir in $test_dirs; do
-    test_files=$(find $test_dir -name '*.py' | grep -vE "__init__|schemas|tools|webapp_test_case|yaml_cache|conftest")
+    test_files=$(find $test_dir -name '*.py' | grep -vE "__init__|schemas|tools|webapp_test_case|yaml_cache|conftest|db_idxs")
     for test_file in $test_files; do
         base_filename=$(basename $test_file)
         [[ ! "$base_filename" =~ ^test_.* ]] && echo "ERROR: Invalid test file name - $test_file" && rc=$(($rc+1))
