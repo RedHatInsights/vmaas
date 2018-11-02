@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cvemap updated="2018-10-31T07:45:52">
+
+<Vulnerability name="CVE-2018-1097">
+    <ThreatSeverity>Moderate</ThreatSeverity>
+    <PublicDate>2018-02-10T00:00:00</PublicDate>
+    <Bugzilla id="1561723" url="https://bugzilla.redhat.com/show_bug.cgi?id=1561723" xml:lang="en:us">
+CVE-2018-1097 foreman: Ovirt admin password exposed by foreman API
+    </Bugzilla>
+    <CVSS3 status="verified">
+        <CVSS3BaseScore>7.7</CVSS3BaseScore>
+        <CVSS3ScoringVector>CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N</CVSS3ScoringVector>
+    </CVSS3>
+    <CWE>CWE-200</CWE>
+    <Details xml:lang="en:us" source="Mitre">
+A flaw was found in foreman before 1.16.1. The issue allows users with limited permissions for powering oVirt/RHV hosts on and off to discover the username and password used to connect to the compute resource.
+    </Details>
+    <Statement xml:lang="en:us">
+This issue affects the versions of foreman as shipped with Red Hat Enterprise Satellite 6. Red Hat Product Security has rated this issue as having security impact of Moderate. A future update may address this issue. For additional information, refer to the Issue Severity Classification: https://access.redhat.com/security/updates/classification/.
+    </Statement>
+    <AffectedRelease cpe="cpe:/a:redhat:satellite:6.4::el7">
+        <ProductName>Red Hat Satellite 6.4 for RHEL 7</ProductName>
+        <ReleaseDate>2018-10-16T00:00:00</ReleaseDate>
+        <Advisory type="RHSA" url="https://access.redhat.com/errata/RHSA-2018:2927">RHSA-2018:2927</Advisory>
+        <Package name="foreman">foreman-1.18.0.37-1.el7sat</Package>
+    </AffectedRelease>
+    <AffectedRelease cpe="cpe:/a:redhat:satellite_capsule:6.4::el7">
+        <ProductName>Red Hat Satellite 6.4 for RHEL 7</ProductName>
+        <ReleaseDate>2018-10-16T00:00:00</ReleaseDate>
+        <Advisory type="RHSA" url="https://access.redhat.com/errata/RHSA-2018:2927">RHSA-2018:2927</Advisory>
+        <Package name="foreman">foreman-1.18.0.37-1.el7sat</Package>
+    </AffectedRelease>
+    <PackageState cpe="cpe:/a:redhat:ceph_storage:1.3">
+        <ProductName>Red Hat Ceph Storage 1.3</ProductName>
+        <FixState>Not affected</FixState>
+        <PackageName>foreman</PackageName>
+    </PackageState>
+    <PackageState cpe="cpe:/a:redhat:network_satellite:6">
+        <ProductName>Red Hat Satellite 6</ProductName>
+        <FixState>Affected</FixState>
+        <PackageName>foreman</PackageName>
+    </PackageState>
+</Vulnerability>
+
+</cvemap>
