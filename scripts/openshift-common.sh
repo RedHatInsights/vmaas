@@ -43,8 +43,10 @@ for dc in $dcs; do
     containers=$(oc get dc/$dc -o json | python -c "import sys,json;obj=json.load(sys.stdin);containers=obj['spec']['template']['spec']['containers'];print(' '.join([c['name'] for c in containers]))" | wc -w)
     containers=$((containers-1))
     for i in $(seq 0 $containers); do
-	if ["$action" == "remove-resources"]; then
+	if [ "$action" == "remove-resources" ]; then
             oc patch dc/$dc --type json -p "[{\"op\": \"remove\", \"path\": \"/spec/template/spec/containers/$i/resources\"}]"
+	elif [ "$action" == "devel-container" ]; then
+	    oc patch dc/$dc --type json -p "[{\"op\": \"add\", \"path\": \"/spec/template/spec/containers/$i/command\", \"value\": [\"sleep\", \"infinity\"]}]"
 	fi
     done
 done
