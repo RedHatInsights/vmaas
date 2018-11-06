@@ -47,6 +47,7 @@ for dc in $dcs; do
             oc patch dc/$dc --type json -p "[{\"op\": \"remove\", \"path\": \"/spec/template/spec/containers/$i/resources\"}]"
 	elif [ "$action" == "devel-container" ]; then
 	    oc patch dc/$dc --type json -p "[{\"op\": \"add\", \"path\": \"/spec/template/spec/containers/$i/command\", \"value\": [\"sleep\", \"infinity\"]}]"
+	    oc patch dc/$dc --type json -p "[{\"op\": \"add\", \"path\": \"/spec/template/spec/containers/$i/securityContext\", \"value\": {\"runAsUser\": '0'}}]"
 	fi
     done
 done
