@@ -98,3 +98,6 @@ ENV/
 
 # JetBrains IDE
 .idea
+
+# VS Code
+.vscode
