@@ -14,7 +14,7 @@ parameters:
 objects:
 - apiVersion: v1
   data:
-    BATCH_SIZE: '100'
+    BATCH_SIZE: '50'
     CHUNK_SIZE: '1048576'
     LOGGING_LEVEL: INFO
     LOGGING_TYPE: OPENSHIFT

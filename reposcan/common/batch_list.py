@@ -3,7 +3,7 @@ Module containing class for list of batches.
 """
 import os
 
-DEFAULT_BATCH_SIZE = "100"
+DEFAULT_BATCH_SIZE = "50"
 
 class BatchList:
     """List of lists with defined maximum size of inner lists."""
