@@ -73,7 +73,7 @@ class FileDownloadThread(Thread):
             else:
                 with self.session.get(**req_args) as response:
                     while True:
-                        chunk = response.raw.read(self.chunk_size, decode_content=False)
+                        chunk = response.raw.read(self.chunk_size, decode_content=True)
                         if chunk == b"":
                             break
                         file_handle.write(chunk)
