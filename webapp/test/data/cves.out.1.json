@@ -2,6 +2,9 @@
     "cve_list": {
         "CVE-2010-3080": {
             "cvss3_score": "",
+            "cvss3_metrics": "",
+            "cvss2_score": "4.700",
+            "cvss2_metrics": "AV:L/AC:M/Au:N/C:N/I:N/A:C",
             "cwe_list": [
                 "CWE-399"
             ],
@@ -15,6 +18,9 @@
         },
         "CVE-2016-0253": {
             "cvss3_score": "5.400",
+            "cvss3_metrics": "CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N",
+            "cvss2_score": "3.500",
+            "cvss2_metrics": "AV:N/AC:M/Au:S/C:N/I:P/A:N",
             "cwe_list": [
                 "CWE-79"
             ],
@@ -28,6 +34,9 @@
         },
         "CVE-2017-0001": {
             "cvss3_score": "7.800",
+            "cvss3_metrics": "CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+            "cvss2_score": "7.200",
+            "cvss2_metrics": "AV:L/AC:L/Au:N/C:C/I:C/A:C",
             "cwe_list": [
                 "CWE-264"
             ],
@@ -41,6 +50,9 @@
         },
         "CVE-2018-0001": {
             "cvss3_score": "9.800",
+            "cvss3_metrics": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+            "cvss2_score": "7.500",
+            "cvss2_metrics": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
             "cwe_list": [
                 "CWE-416"
             ],

@@ -12,11 +12,13 @@ _cves = {
             "modified_date": str,
             Optional("redhat_url"): str,
             "cvss3_score": str,
+            "cvss2_score": str,
             Optional("secondary_url"): str,
             "cwe_list": [str],
             "errata_list": [str],
             "package_list": [str],
             "cvss3_metrics": str,
+            "cvss2_metrics": str,
         }
     },
     Optional("modified_since"): str,
