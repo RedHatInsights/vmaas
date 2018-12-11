@@ -747,6 +747,14 @@ def setup_apispec(handlers):
                             "type": "string",
                             "example": "https://access.redhat.com/security/cve/cve-2017-5715",
                         },
+                        "cvss2_score": {
+                            "type": "string",
+                            "example": "5.600",
+                        },
+                        "cvss2_metrics": {
+                            "type": "string",
+                            "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                        },
                         "cvss3_score": {
                             "type": "string",
                             "example": "5.600",
