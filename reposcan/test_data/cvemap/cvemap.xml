@@ -42,4 +42,73 @@ This issue affects the versions of foreman as shipped with Red Hat Enterprise Sa
     </PackageState>
 </Vulnerability>
 
+<Vulnerability name="CVE-2015-8921">
+    <ThreatSeverity>Low</ThreatSeverity>
+    <PublicDate>2016-06-17T00:00:00</PublicDate>
+    <Bugzilla id="1348772" url="https://bugzilla.redhat.com/show_bug.cgi?id=1348772" xml:lang="en:us">
+CVE-2015-8921 libarchive: Global out of bounds read in mtree parser
+    </Bugzilla>
+    <CVSS status="verified">
+        <CVSSBaseScore>3.5</CVSSBaseScore>
+        <CVSSScoringVector>AV:N/AC:M/Au:S/C:P/I:N/A:N</CVSSScoringVector>
+    </CVSS>
+    <CVSS3 status="verified">
+        <CVSS3BaseScore>3.7</CVSS3BaseScore>
+        <CVSS3ScoringVector>CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N</CVSS3ScoringVector>
+    </CVSS3>
+    <CWE>CWE-228-&gt;CWE-125</CWE>
+    <Details xml:lang="en:us" source="Mitre">
+The ae_strtofflags function in archive_entry.c in libarchive before 3.2.0 allows remote attackers to cause a denial of service (out-of-bounds read) via a crafted mtree file.
+    </Details>
+    <Details xml:lang="en:us" source="Red Hat">
+A vulnerability was found in libarchive.  A specially crafted mtree file could cause libarchive to read beyond a statically declared structure, potentially disclosing application memory.
+    </Details>
+    <AffectedRelease cpe="cpe:/o:redhat:enterprise_linux:6">
+        <ProductName>Red Hat Enterprise Linux 6</ProductName>
+        <ReleaseDate>2016-09-12T00:00:00</ReleaseDate>
+        <Advisory type="RHSA" url="https://access.redhat.com/errata/RHSA-2016:1850">RHSA-2016:1850</Advisory>
+        <Package name="libarchive">libarchive-2.8.3-7.el6_8</Package>
+    </AffectedRelease>
+    <AffectedRelease cpe="cpe:/o:redhat:enterprise_linux:7">
+        <ProductName>Red Hat Enterprise Linux 7</ProductName>
+        <ReleaseDate>2016-09-12T00:00:00</ReleaseDate>
+        <Advisory type="RHSA" url="https://access.redhat.com/errata/RHSA-2016:1844">RHSA-2016:1844</Advisory>
+        <Package name="libarchive">libarchive-3.1.2-10.el7_2</Package>
+    </AffectedRelease>
+    <UpstreamFix>libarchive 3.2.0</UpstreamFix>
+</Vulnerability>
+
+<Vulnerability name="CVE-2016-2524">
+    <ThreatSeverity>Moderate</ThreatSeverity>
+    <PublicDate>2016-02-26T00:00:00</PublicDate>
+    <Bugzilla id="1312780" url="https://bugzilla.redhat.com/show_bug.cgi?id=1312780" xml:lang="en:us">
+CVE-2016-2524 wireshark: X.509AF crash (wnpa-sec-2016-04)
+    </Bugzilla>
+    <CVSS status="draft">
+        <CVSSBaseScore>4.3</CVSSBaseScore>
+        <CVSSScoringVector>AV:N/AC:M/Au:N/C:N/I:N/A:P</CVSSScoringVector>
+    </CVSS>
+    <Details xml:lang="en:us" source="Mitre">
+epan/dissectors/packet-x509af.c in the X.509AF dissector in Wireshark 2.0.x before 2.0.2 mishandles the algorithm ID, which allows remote attackers to cause a denial of service (application crash) via a crafted packet.
+    </Details>
+    <PackageState cpe="cpe:/o:redhat:enterprise_linux:5">
+        <ProductName>Red Hat Enterprise Linux 5</ProductName>
+        <FixState>Not affected</FixState>
+        <PackageName>wireshark</PackageName>
+    </PackageState>
+    <PackageState cpe="cpe:/o:redhat:enterprise_linux:6">
+        <ProductName>Red Hat Enterprise Linux 6</ProductName>
+        <FixState>Not affected</FixState>
+        <PackageName>wireshark</PackageName>
+    </PackageState>
+    <PackageState cpe="cpe:/o:redhat:enterprise_linux:7">
+        <ProductName>Red Hat Enterprise Linux 7</ProductName>
+        <FixState>Not affected</FixState>
+        <PackageName>wireshark</PackageName>
+    </PackageState>
+    <UpstreamFix>Wireshark 2.0.2</UpstreamFix>
+    <References xml:lang="en:us">
+https://www.wireshark.org/security/wnpa-sec-2016-04.html
+    </References>
+</Vulnerability>
 </cvemap>
