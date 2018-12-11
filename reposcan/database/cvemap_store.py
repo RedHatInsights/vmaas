@@ -47,7 +47,8 @@ class CvemapStore(CveStoreCommon):
                                  published_date, modified_date,
                                  cvss3_score, cvss3_metrics,
                                  iava, redhat_url,
-                                 secondary_url, source_id
+                                 secondary_url, source_id,
+                                 cvss2_score, cvss2_metrics
                                  from cve
                                  join (values %s) t(name)
                                 using (name)""", cve_names, page_size=len(cve_names))
@@ -58,7 +59,8 @@ class CvemapStore(CveStoreCommon):
         # [3]description,
         # [5]published_date, [6]modified_date,
         # [7]cvss3_score, [8]cvss3_metrics,
-        # [9]iava, [10]redhat_url, [11]secondary_url
+        # [9]iava, [10]redhat_url, [11]secondary_url,
+        # [13]cvss2_score, [14]cvss2_metrics,
         cols = {
             'description':3,
             'published_date':5,
@@ -67,7 +69,9 @@ class CvemapStore(CveStoreCommon):
             'cvss3_metrics': 8,
             'iava':9,
             'redhat_url':10,
-            'secondary_url':11}
+            'secondary_url':11,
+            'cvss2_score':13,
+            'cvss2_metrics': 14}
 
         for a_db_row in cur.fetchall():
             # cve_data[row[1]] = incoming-cve-with-same-name-as-from-db
@@ -95,7 +99,8 @@ class CvemapStore(CveStoreCommon):
 
             item = (name, values["description"], values["impact_id"], values["published_date"],
                     values["modified_date"], values["cvss3_score"], values["cvss3_metrics"], None,
-                    values["redhat_url"], values["secondary_url"], rh_source_id)
+                    values["redhat_url"], values["secondary_url"], rh_source_id,
+                    values["cvss2_score"], values["cvss2_metrics"])
             # if we have an 'id', it means we're already in the db
             if "id" in values:
                 to_update.append((values["id"],) + item)
@@ -109,13 +114,15 @@ class CvemapStore(CveStoreCommon):
             execute_values(cur, """insert into cve (name, description, impact_id,
                                                     published_date, modified_date,
                                                     cvss3_score, cvss3_metrics, iava,
-                                                    redhat_url, secondary_url, source_id)
+                                                    redhat_url, secondary_url, source_id,
+                                                    cvss2_score, cvss2_metrics)
                                           values %s returning id, name""",
                            list(to_import), page_size=len(to_import))
             for row in cur.fetchall():
                 cve_data[row[1]]["id"] = row[0]
 
         if to_update:
+            tmpl_str = b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int, %s::numeric, %s)"
             execute_values(cur,
                            """update cve set name = v.name,
                                              description = v.description,
@@ -124,16 +131,18 @@ class CvemapStore(CveStoreCommon):
                                              modified_date = v.modified_date,
                                              redhat_url = v.redhat_url,
                                              secondary_url = v.secondary_url,
+                                             cvss2_score = v.cvss2_score,
+                                             cvss2_metrics = v.cvss2_metrics,
                                              cvss3_score = v.cvss3_score,
                                              cvss3_metrics = v.cvss3_metrics,
                                              iava = v.iava,
                                              source_id = v.source_id
                               from (values %s)
-                              as v(id, name, description, impact_id, published_date, modified_date, cvss3_score,
-                              cvss3_metrics, iava, redhat_url, secondary_url, source_id)
+                              as v(id, name, description, impact_id, published_date, modified_date,
+                              cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id,
+                              cvss2_score, cvss2_metrics)
                               where cve.id = v.id """,
-                           list(to_update), page_size=len(to_update),
-                           template=b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int)")
+                           list(to_update), page_size=len(to_update), template=tmpl_str)
         self._populate_cwes(cur, cve_data)
         cur.close()
         self.conn.commit()
