@@ -47,6 +47,8 @@ class CvemapBody:
                     'impact': text_strip(elem.find('ThreatSeverity')),
                     'published_date': parse_datetime(text_strip(elem.find('PublicDate'))),
                     'modified_date': updated,
+                    'cvss2_score': text_strip(elem.find('CVSS/CVSSBaseScore')),
+                    'cvss2_metrics': text_strip(elem.find('CVSS/CVSSScoringVector')),
                     'cvss3_score': text_strip(elem.find('CVSS3/CVSS3BaseScore')),
                     'cvss3_metrics': text_strip(elem.find('CVSS3/CVSS3ScoringVector')),
                     'cwe_list': self._cwe_list(text_strip(elem.find('CWE'))),

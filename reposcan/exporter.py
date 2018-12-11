@@ -313,17 +313,22 @@ class DataDump:
                                      cve.published_date,
                                      cve.modified_date,
                                      cve.iava,
-                                     cve.description
+                                     cve.description,
+                                     cve.cvss2_score,
+                                     cve.cvss2_metrics
                                 from cve
                            left join cve_impact on cve.impact_id = cve_impact.id
                            """)
-            for cve_id, name, redhat_url, secondary_url, cvss3_score, cvss3_metrics, impact, \
-                published_date, modified_date, iava, description in cursor:
+            for cve_id, name, redhat_url, secondary_url, \
+                cvss3_score, cvss3_metrics, \
+                impact, published_date, modified_date, iava, description, \
+                cvss2_score, cvss2_metrics in cursor:
                 dump["cve_detail:%s" % name] = (redhat_url, secondary_url, cvss3_score, cvss3_metrics,
                                                 impact, published_date, modified_date, iava, description,
                                                 cveid2cwe.get(cve_id, []),
                                                 cveid2pid.get(cve_id, []),
-                                                cveid2eid.get(cve_id, []))
+                                                cveid2eid.get(cve_id, []),
+                                                cvss2_score, cvss2_metrics)
 
     def dump_dbchange(self, dump):
         """Select db change details"""
