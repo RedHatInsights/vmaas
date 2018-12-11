@@ -9,7 +9,7 @@ from utils import format_datetime, parse_datetime, none2empty, paginate, \
                   pkgidlist2packages
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
-                  CVE_DESCRIPTION, CVE_PID, CVE_EID
+                  CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -92,6 +92,8 @@ class CveAPI:
                 "cwe_list": none2empty(cve_detail[CVE_CWE]),
                 "cvss3_score": str(none2empty(cve_detail[CVE_CVSS3_SCORE])),
                 "cvss3_metrics": str(none2empty(cve_detail[CVE_CVSS3_METRICS])),
+                "cvss2_score": str(none2empty(cve_detail[CVE_CVSS2_SCORE])),
+                "cvss2_metrics": str(none2empty(cve_detail[CVE_CVSS2_METRICS])),
                 "description": none2empty(cve_detail[CVE_DESCRIPTION]),
                 "package_list": pkgidlist2packages(self.cache, cve_detail[CVE_PID]),
                 "errata_list": [self.cache.errataid2name[eid] for eid in cve_detail[CVE_EID]],
