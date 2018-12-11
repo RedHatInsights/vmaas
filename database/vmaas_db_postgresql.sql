@@ -653,6 +653,8 @@ CREATE TABLE IF NOT EXISTS cve (
   impact_id INT NOT NULL DEFAULT 0,
   published_date TIMESTAMP WITH TIME ZONE NULL,
   modified_date TIMESTAMP WITH TIME ZONE NULL,
+  cvss2_score NUMERIC(5,3),
+  cvss2_metrics TEXT, CHECK (NOT empty(cvss3_metrics)),
   cvss3_score NUMERIC(5,3),
   cvss3_metrics TEXT, CHECK (NOT empty(cvss3_metrics)),
   iava TEXT, CHECK (NOT empty(iava)),
