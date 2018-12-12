@@ -76,17 +76,19 @@ class TestBatchList:
         """Test empty batchlist."""
         assert not self.blist.batches
 
-    @pytest.mark.parametrize("batch_size", [100, 150])
-    def test_batch_creation(self, batchlist, batch_size):
+    # Assuming default is 50, 102 = 3 batches, 50/50/2 ; 150 = 50/50/50; 157 == 4, 50/50/50/7
+    # move thru the batches, making sure each other than the last is DEFAULT_BATCH_SIZE long
+    @pytest.mark.parametrize("list_size", [102, 150, 157])
+    def test_batch_creation(self, batchlist, list_size):
         """Test creation of batch list."""
-        for i in range(batch_size):
+        for i in range(list_size):
             self.blist.add_item(i)
-        batch_num = math.ceil(batch_size / int(DEFAULT_BATCH_SIZE))
-        assert len(self.blist.batches) == batch_num
-        if batch_num > 1:
-            num = int(DEFAULT_BATCH_SIZE)
-            for i in range(batch_num):
-                assert len(self.blist.batches[i]) == num
-                num -= batch_size - num
-        else:
-            assert len(self.blist.batches[0]) == batch_size
+        total_batches = math.ceil(list_size / int(DEFAULT_BATCH_SIZE))
+        last_batch_size = list_size % int(DEFAULT_BATCH_SIZE)
+        assert len(self.blist.batches) == total_batches
+        for curr_batch in range(total_batches):
+            if curr_batch == (total_batches - 1) and last_batch_size > 0:
+                expected_num_in_batch = last_batch_size
+            else:
+                expected_num_in_batch = int(DEFAULT_BATCH_SIZE)
+            assert len(self.blist.batches[curr_batch]) == expected_num_in_batch
