@@ -12,7 +12,6 @@ NS = {"repo": "http://linux.duke.edu/metadata/repo"}
 
 class RepoMDTypeNotFound(Exception):
     """Raised when certain data type was not parsed from repomd file."""
-    pass
 
 
 class RepoMD:
