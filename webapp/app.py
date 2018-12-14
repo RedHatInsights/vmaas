@@ -601,49 +601,47 @@ def setup_apispec(handlers):
     SPEC.definition("UpdatesResponse", properties={
         "update_list": {
             "type": "object",
-            "properties": {
-                "kernel-2.6.32-696.20.1.el6.x86_64": {
-                    "type": "object",
-                    "properties": {
-                        "available_updates": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "repository": {
-                                        "type": "string",
-                                        "example": "rhel-6-server-rpms"
-                                    },
-                                    "releasever": {
-                                        "type": "string",
-                                        "example": "6Server"
-                                    },
-                                    "basearch": {
-                                        "type": "string",
-                                        "example": "x86_64"
-                                    },
-                                    "erratum": {
-                                        "type": "string",
-                                        "example": "RHSA-2018:0512"
-                                    },
-                                    "package": {
-                                        "type": "string",
-                                        "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                                    }
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "available_updates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "repository": {
+                                    "type": "string",
+                                    "example": "rhel-6-server-rpms"
+                                },
+                                "releasever": {
+                                    "type": "string",
+                                    "example": "6Server"
+                                },
+                                "basearch": {
+                                    "type": "string",
+                                    "example": "x86_64"
+                                },
+                                "erratum": {
+                                    "type": "string",
+                                    "example": "RHSA-2018:0512"
+                                },
+                                "package": {
+                                    "type": "string",
+                                    "example": "kernel-2.6.32-696.23.1.el6.x86_64"
                                 }
                             }
-                        },
-                        "description": {
-                            "type": "string",
-                            "example": "package description"
-                        },
-                        "summary": {
-                            "type": "string",
-                            "example": "package summary"
                         }
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "package description"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "package summary"
                     }
                 }
-            }
+            },
         },
         "repository_list": {
             "type": "array",
@@ -664,41 +662,39 @@ def setup_apispec(handlers):
     SPEC.definition("UpdatesV2Response", properties={
         "update_list": {
             "type": "object",
-            "properties": {
-                "kernel-2.6.32-696.20.1.el6.x86_64": {
-                    "type": "object",
-                    "properties": {
-                        "available_updates": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "repository": {
-                                        "type": "string",
-                                        "example": "rhel-6-server-rpms"
-                                    },
-                                    "releasever": {
-                                        "type": "string",
-                                        "example": "6Server"
-                                    },
-                                    "basearch": {
-                                        "type": "string",
-                                        "example": "x86_64"
-                                    },
-                                    "erratum": {
-                                        "type": "string",
-                                        "example": "RHSA-2018:0512"
-                                    },
-                                    "package": {
-                                        "type": "string",
-                                        "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                                    }
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "available_updates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "repository": {
+                                    "type": "string",
+                                    "example": "rhel-6-server-rpms"
+                                },
+                                "releasever": {
+                                    "type": "string",
+                                    "example": "6Server"
+                                },
+                                "basearch": {
+                                    "type": "string",
+                                    "example": "x86_64"
+                                },
+                                "erratum": {
+                                    "type": "string",
+                                    "example": "RHSA-2018:0512"
+                                },
+                                "package": {
+                                    "type": "string",
+                                    "example": "kernel-2.6.32-696.23.1.el6.x86_64"
                                 }
                             }
                         }
                     }
                 }
-            }
+            },
         },
         "repository_list": {
             "type": "array",
@@ -719,78 +715,61 @@ def setup_apispec(handlers):
     SPEC.definition("CvesResponse", properties={
         "cve_list": {
             "type": "object",
-            "properties": {
-                "CVE-2017-5715": {
-                    "type": "object",
-                    "properties": {
-                        "impact": {
-                            "type": "string",
-                            "example": "Medium",
-                        },
-                        "public_date": {
-                            "type": "string",
-                            "example": "2018-01-04T13:29:00+00:00",
-                        },
-                        "synopsis": {
-                            "type": "string",
-                            "example": "CVE-2017-5715",
-                        },
-                        "description": {
-                            "type": "string",
-                            "example": "description text",
-                        },
-                        "modified_date": {
-                            "type": "string",
-                            "example": "2018-03-31T01:29:00+00:00",
-                        },
-                        "redhat_url": {
-                            "type": "string",
-                            "example": "https://access.redhat.com/security/cve/cve-2017-5715",
-                        },
-                        "cvss2_score": {
-                            "type": "string",
-                            "example": "5.600",
-                        },
-                        "cvss2_metrics": {
-                            "type": "string",
-                            "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
-                        },
-                        "cvss3_score": {
-                            "type": "string",
-                            "example": "5.600",
-                        },
-                        "cvss3_metrics": {
-                            "type": "string",
-                            "example": "CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
-                        },
-                        "secondary_url": {
-                            "type": "string",
-                            "example": "http://lists.opensuse.org/opensuse-security-announce/2018-01/msg00002.html",
-                        },
-                        "cwe_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "CWE-200"
-                            }
-                        },
-                        "errata_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "RHSA-2015:1981"
-                            }
-                        },
-                        "package_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "nss-devel-3.16.1-9.el6_5.x86_64"
-                            }
-                        }
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "impact": {
+                        "type": "string",
+                        "example": "Medium",
+                    },
+                    "public_date": {
+                        "type": "string",
+                        "example": "2018-01-04T13:29:00+00:00",
+                    },
+                    "synopsis": {
+                        "type": "string",
+                        "example": "CVE-2017-5715",
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "description text",
+                    },
+                    "modified_date": {
+                        "type": "string",
+                        "example": "2018-03-31T01:29:00+00:00",
+                    },
+                    "redhat_url": {
+                        "type": "string",
+                        "example": "https://access.redhat.com/security/cve/cve-2017-5715",
+                    },
+                    "cvss2_score": {
+                        "type": "string",
+                        "example": "5.600",
+                    },
+                    "cvss2_metrics": {
+                        "type": "string",
+                        "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                    },
+                    "cvss3_score": {
+                        "type": "string",
+                        "example": "CWE-200"
+                    }
+                },
+                "errata_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "RHSA-2015:1981"
+                    }
+                },
+                "package_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "nss-devel-3.16.1-9.el6_5.x86_64"
                     }
                 }
-            }
+            },
         },
         "modified_since": {
             "type": "string",
@@ -800,117 +779,113 @@ def setup_apispec(handlers):
     SPEC.definition("ReposResponse", properties={
         "repository_list": {
             "type": "object",
-            "properties": {
-                "rhel-6-server-rpms": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "product": {
-                                "type": "string",
-                                "example": "Red Hat Enterprise Linux Server"
-                            },
-                            "releasever": {
-                                "type": "string",
-                                "example": "6Server"
-                            },
-                            "name": {
-                                "type": "string",
-                                "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
-                            },
-                            "url": {
-                                "type": "string",
-                                "example": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/"
-                            },
-                            "basearch": {
-                                "type": "string",
-                                "example": "x86_64"
-                            },
-                            "revision": {
-                                "type": "string",
-                                "example": "2018-03-27T10:55:16+00:00"
-                            },
-                            "label": {
-                                "type": "string",
-                                "example": "rhel-6-server-rpms"
-                            }
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "product": {
+                            "type": "string",
+                            "example": "Red Hat Enterprise Linux Server"
+                        },
+                        "releasever": {
+                            "type": "string",
+                            "example": "6Server"
+                        },
+                        "name": {
+                            "type": "string",
+                            "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
+                        },
+                        "url": {
+                            "type": "string",
+                            "example": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/"
+                        },
+                        "basearch": {
+                            "type": "string",
+                            "example": "x86_64"
+                        },
+                        "revision": {
+                            "type": "string",
+                            "example": "2018-03-27T10:55:16+00:00"
+                        },
+                        "label": {
+                            "type": "string",
+                            "example": "rhel-6-server-rpms"
                         }
                     }
                 }
-            }
+            },
         }
     })
     SPEC.definition("ErrataResponse", properties={
         "errata_list": {
             "type": "object",
-            "properties": {
-                "RHSA-2018:0512": {
-                    "type": "object",
-                    "properties": {
-                        "updated": {
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "updated": {
+                        "type": "string",
+                        "example": "2018-03-13T17:31:41+00:00"
+                    },
+                    "severity": {
+                        "type": "string",
+                        "example": "Important"
+                    },
+                    "reference_list": {
+                        "type": "array",
+                        "items": {
                             "type": "string",
-                            "example": "2018-03-13T17:31:41+00:00"
-                        },
-                        "severity": {
-                            "type": "string",
-                            "example": "Important"
-                        },
-                        "reference_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "classification-RHSA-2018:0512"
-                            }
-                        },
-                        "issued": {
-                            "type": "string",
-                            "example": "2018-03-13T17:31:28+00:00"
-                        },
-                        "description": {
-                            "type": "string",
-                            "example": "description text"
-                        },
-                        "solution": {
-                            "type": "string",
-                            "example": "solution text"
-                        },
-                        "summary": {
-                            "type": "string",
-                            "example": "summary text"
-                        },
-                        "url": {
-                            "type": "string",
-                            "example": "https://access.redhat.com/errata/RHSA-2018:0512"
-                        },
-                        "synopsis": {
-                            "type": "string",
-                            "example": "Important: kernel security and bug fix update"
-                        },
-                        "cve_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "CVE-2017-5715"
-                            }
-                        },
-                        "bugzilla_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "1519778"
-                            }
-                        },
-                        "package_list": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                            }
-                        },
-                        "type": {
-                            "type": "string",
-                            "example": "security"
+                            "example": "classification-RHSA-2018:0512"
                         }
+                    },
+                    "issued": {
+                        "type": "string",
+                        "example": "2018-03-13T17:31:28+00:00"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "description text"
+                    },
+                    "solution": {
+                        "type": "string",
+                        "example": "solution text"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "summary text"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://access.redhat.com/errata/RHSA-2018:0512"
+                    },
+                    "synopsis": {
+                        "type": "string",
+                        "example": "Important: kernel security and bug fix update"
+                    },
+                    "cve_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "CVE-2017-5715"
+                        }
+                    },
+                    "bugzilla_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "1519778"
+                        }
+                    },
+                    "package_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "kernel-2.6.32-696.23.1.el6.x86_64"
+                        }
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "security"
                     }
                 }
             }
@@ -923,39 +898,37 @@ def setup_apispec(handlers):
     SPEC.definition("PackagesResponse", properties={
         "package_list": {
             "type": "object",
-            "properties": {
-                "kernel-2.6.32-696.20.1.el6.x86_64": {
-                    "type": "object",
-                    "properties": {
-                        "summary": {
-                            "type": "string",
-                            "example": "package summary"
-                        },
-                        "description": {
-                            "type": "string",
-                            "example": "package description"
-                        },
-                        "repositories": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "label": {
-                                        "type": "string",
-                                        "example": "rhel-6-server-rpms"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
-                                    },
-                                    "basearch": {
-                                        "type": "string",
-                                        "example": "x86_64"
-                                    },
-                                    "releasever": {
-                                        "type": "string",
-                                        "example": "6.9"
-                                    }
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "summary": {
+                        "type": "string",
+                        "example": "package summary"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "package description"
+                    },
+                    "repositories": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "label": {
+                                    "type": "string",
+                                    "example": "rhel-6-server-rpms"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
+                                },
+                                "basearch": {
+                                    "type": "string",
+                                    "example": "x86_64"
+                                },
+                                "releasever": {
+                                    "type": "string",
+                                    "example": "6.9"
                                 }
                             }
                         }
