@@ -393,6 +393,9 @@ class CVEHandlerPost(BaseHandler):
                 modified_since:
                   type: string
                   example: "2018-04-05T01:23:45+02:00"
+                rh_only:
+                  type: boolean
+                  example: true
               required:
                 - cve_list
         responses:

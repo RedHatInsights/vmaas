@@ -9,7 +9,7 @@ from utils import format_datetime, parse_datetime, none2empty, paginate, \
                   pkgidlist2packages
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
-                  CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS
+                  CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -20,7 +20,8 @@ JSON_SCHEMA = {
             },
         'modified_since' : {'type' : 'string'},
         'page_size' : {'type' : 'number'},
-        'page' : {'type' : 'number'}
+        'page' : {'type' : 'number'},
+        'rh_only' : {'type' : 'boolean'}
     }
 }
 
@@ -53,6 +54,7 @@ class CveAPI:
 
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
+        rh_only = data.get('rh_only', False)
         modified_since_dt = parse_datetime(modified_since)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
@@ -80,6 +82,10 @@ class CveAPI:
                     continue
                 elif not cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_PUBLISHED_DATE] and \
                                 cve_detail[CVE_PUBLISHED_DATE] < modified_since_dt:
+                    continue
+
+            if rh_only:
+                if cve_detail[CVE_SOURCE] != 'Red Hat':
                     continue
 
             cve_list[cve] = {
