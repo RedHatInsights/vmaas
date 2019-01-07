@@ -9,7 +9,8 @@ RUN dnf -y update \
     && dnf install -y dnf-plugins-core \
     && dnf copr enable -y @vmaas/libs \
     && dnf -y install python3-tornado python3-psycopg2 python3-apispec postgresql python3-dateutil \
-                python3-jsonschema rsync \
+                python3-jsonschema python3-pip rsync \
+    && pip3 install prometheus_client \
     && rm -rf /var/cache/dnf/*
 
 RUN install -m 1777 -d /data
