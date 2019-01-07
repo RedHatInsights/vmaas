@@ -9,6 +9,7 @@ import json
 
 
 from jsonschema.exceptions import ValidationError
+from prometheus_client import Histogram, Counter
 from tornado import gen
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
@@ -43,8 +44,19 @@ SPEC = APISpec(
 WEBSOCKET_RECONNECT_INTERVAL = 60
 LOGGER = get_logger(__name__)
 
+# Prometheus support
+# We'd like to use something like @REQUEST_TIME.label(endpoint, get).time() in BaseHandler
+# to get independent Histogram info for all endpoints - but prometheus doesn't let us do that because label()
+# doesn't return a Histogram, but rather a LabelWrapper.
+#
+# So, for now we'll just get Histogram info from /updates (because that's The Hard One...
+REQUEST_TIME = Histogram('updates_processing_seconds', 'Time spent processing /updates requests')
+# ...and then we'll build Counter for all-the-things into the BaseHandler
+REQUEST_COUNTS = Counter('Invocations', 'Number of calls per handler', ['method', 'endpoint'])
+
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
+
 
     db_cache = None
     updates_api = None
@@ -83,6 +95,7 @@ class BaseHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def handle_post(self, api_endpoint, api_version):
         """Takes care of validation of input and execution of POST methods."""
+        REQUEST_COUNTS.labels('post', type(api_endpoint).__name__).inc()
         code = 400
         data = self.get_post_data()
         if data:
@@ -118,6 +131,7 @@ class BaseHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def handle_get(self, api_endpoint, api_version, param_name, param):
         """Takes care of validation of input and execution of GET methods."""
+        REQUEST_COUNTS.labels('get', type(api_endpoint).__name__).inc()
         code = 400
         try:
             result = api_endpoint.process_list(api_version, {param_name : [param]})
@@ -205,6 +219,7 @@ class DBChangeHandler(BaseHandler):
 class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
+    @REQUEST_TIME.time()
     def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
@@ -230,6 +245,7 @@ class UpdatesHandlerGet(BaseHandler):
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
+    @REQUEST_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -1069,7 +1085,6 @@ def main():
     vmaas_app.websocket_reconnect()
     vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
     vmaas_app.reconnect_callback.start()
-
     IOLoop.instance().start()
 
 
