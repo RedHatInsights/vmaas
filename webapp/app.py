@@ -7,14 +7,12 @@ import os
 import sre_constants
 import json
 
-
 from jsonschema.exceptions import ValidationError
-from prometheus_client import Histogram, Counter
+from prometheus_client import Histogram, Counter, generate_latest
 from tornado import gen
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
 import tornado.web
-
 
 from apispec import APISpec
 from cache import Cache
@@ -53,6 +51,7 @@ LOGGER = get_logger(__name__)
 REQUEST_TIME = Histogram('updates_processing_seconds', 'Time spent processing /updates requests')
 # ...and then we'll build Counter for all-the-things into the BaseHandler
 REQUEST_COUNTS = Counter('Invocations', 'Number of calls per handler', ['method', 'endpoint'])
+
 
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
@@ -144,6 +143,12 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write(result)
         yield self.flush()
 
+class MetricsHandler(BaseHandler):
+    """Handle requests to the metrics"""
+
+    def get(self):
+        """Get prometheus metrics"""
+        self.write(generate_latest())
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
@@ -1008,7 +1013,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
             (r"/api/v1/packages/?", PackagesHandlerPost),
             (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:]+)", PackagesHandlerGet),
-            (r"/api/v1/dbchange/?", DBChangeHandler)  # GET request
+            (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
+            (r"/metrics", MetricsHandler)  # GET request
         ]
 
         tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
