@@ -41,6 +41,23 @@ class CveAPI:
 
         return [label for label in self.cache.cve_detail if re.match(regex, label)]
 
+    def _filter_redhat_only(self, cves_to_process):
+        return [cve for cve in cves_to_process if self.cache.cve_detail.get(cve)
+                and self.cache.cve_detail.get(cve)[CVE_SOURCE] == 'Red Hat']
+
+    def _filter_modified_since(self, cves_to_process, modified_since_dt):
+        filtered_cves_to_process = []
+        for cve in cves_to_process:
+            cve_detail = self.cache.cve_detail.get(cve)
+            if not cve_detail:
+                continue
+            if cve_detail[CVE_MODIFIED_DATE]:
+                if cve_detail[CVE_MODIFIED_DATE] >= modified_since_dt:
+                    filtered_cves_to_process.append(cve)
+            elif cve_detail[CVE_PUBLISHED_DATE] and cve_detail[CVE_PUBLISHED_DATE] >= modified_since_dt:
+                filtered_cves_to_process.append(cve)
+        return filtered_cves_to_process
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
@@ -68,25 +85,20 @@ class CveAPI:
             # treat single-label like a regex, get all matching names
             cves_to_process = self.find_cves_by_regex(cves_to_process[0])
 
+        filters = []
+        if rh_only:
+            filters.append((self._filter_redhat_only, []))
+        # if we have information about modified/published dates and receive "modified_since" in request,
+        # compare the dates
+        if modified_since:
+            filters.append((self._filter_modified_since, [modified_since_dt]))
+
         cve_list = {}
-        cve_page_to_process, pagination_response = paginate(cves_to_process, page, page_size)
+        cve_page_to_process, pagination_response = paginate(cves_to_process, page, page_size, filters=filters)
         for cve in cve_page_to_process:
             cve_detail = self.cache.cve_detail.get(cve, None)
             if not cve_detail:
                 continue
-
-            # if we have information about modified/published dates and receive "modified_since" in request,
-            # compare the dates
-            if modified_since:
-                if cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_MODIFIED_DATE] < modified_since_dt:
-                    continue
-                elif not cve_detail[CVE_MODIFIED_DATE] and cve_detail[CVE_PUBLISHED_DATE] and \
-                                cve_detail[CVE_PUBLISHED_DATE] < modified_since_dt:
-                    continue
-
-            if rh_only:
-                if cve_detail[CVE_SOURCE] != 'Red Hat':
-                    continue
 
             cve_list[cve] = {
                 "redhat_url": none2empty(cve_detail[CVE_REDHAT_URL]),

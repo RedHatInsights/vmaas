@@ -42,6 +42,19 @@ class ErrataAPI:
         return [label for label in self.cache.errata_detail
                 if re.match(regex, label)]
 
+    def _filter_modified_since(self, errata_to_process, modified_since_dt):
+        filtered_errata_to_process = []
+        for errata in errata_to_process:
+            errata_detail = self.cache.errata_detail.get(errata)
+            if not errata_detail:
+                continue
+            if errata_detail[ERRATA_UPDATED]:
+                if errata_detail[ERRATA_UPDATED] >= modified_since_dt:
+                    filtered_errata_to_process.append(errata)
+            elif errata_detail[ERRATA_ISSUED] and errata_detail[ERRATA_ISSUED] >= modified_since_dt:
+                filtered_errata_to_process.append(errata)
+        return filtered_errata_to_process
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of Errata.
@@ -70,21 +83,18 @@ class ErrataAPI:
             # treat single-label like a regex, get all matching names
             errata_to_process = self.find_errata_by_regex(errata_to_process[0])
 
+        filters = []
+        # if we have information about modified/published dates and receive "modified_since" in request,
+        # compare the dates
+        if modified_since:
+            filters.append((self._filter_modified_since, [modified_since_dt]))
+
         errata_list = {}
-        errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size)
+        errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size, filters=filters)
         for errata in errata_page_to_process:
             errata_detail = self.cache.errata_detail.get(errata, None)
             if not errata_detail:
                 continue
-
-            # if we have information about modified/published dates and receive "modified_since" in request,
-            # compare the dates
-            if modified_since:
-                if errata_detail[ERRATA_UPDATED] and errata_detail[ERRATA_UPDATED] < modified_since_dt:
-                    continue
-                elif not errata_detail[ERRATA_UPDATED] and errata_detail[ERRATA_ISSUED] and \
-                                errata_detail[ERRATA_ISSUED] < modified_since_dt:
-                    continue
 
             errata_list[errata] = {
                 "synopsis": none2empty(errata_detail[ERRATA_SYNOPSIS]),

@@ -71,7 +71,7 @@ def none2empty(value):
 
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 5000
-def paginate(input_list, page, page_size):
+def paginate(input_list, page, page_size, filters=None):
     """Split input list into pages and return only requested page."""
     def _validate_num(num, default):
         try:
@@ -86,7 +86,11 @@ def paginate(input_list, page, page_size):
     page_size = _validate_num(page_size, DEFAULT_PAGE_SIZE)
 
     input_list.sort()
+    if filters:
+        for filter_method, filter_args in filters:
+            input_list = filter_method(*[input_list, *filter_args])
     start = (page - 1) * page_size
     end = page * page_size
     pages = int(math.ceil(float(len(input_list))/page_size))
-    return (input_list[start:end], {"page": page, "page_size": page_size, "pages": pages})
+    result_list = input_list[start:end]
+    return (result_list, {"page": page, "page_size": len(result_list), "pages": pages})
