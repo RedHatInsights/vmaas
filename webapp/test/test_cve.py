@@ -18,7 +18,7 @@ CVE_JSON = {"cve_list": ["CVE-2016-0634"], "modified_since": "2018-04-06T01:23:4
 CVE_JSON_EMPTY_CVE = {"cve_list": [""]}
 CVE_JSON_NON_EXIST = {"cve_list": ["CVE-9999-9999"]}
 
-EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 5000, "pages": 0}
+EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 0, "pages": 0}
 CORRECT_RESPONSE = {
     "cvss3_score": "4.9",
     "impact": "Moderate",
