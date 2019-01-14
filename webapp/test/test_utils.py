@@ -49,16 +49,16 @@ class TestUtils(TestBase):
         """Test pagination - page=page_size=None."""
         __, page_info = utils.paginate([], None, None)
         assert page_info["page"] == utils.DEFAULT_PAGE
-        assert page_info["page_size"] == utils.DEFAULT_PAGE_SIZE
+        assert page_info["page_size"] == 0
 
     def test_negative_page_number(self):
         """Test pagination - page=-1 page_size=0."""
         __, page_info = utils.paginate([], -1, 0)
         assert page_info["page"] == utils.DEFAULT_PAGE
-        assert page_info["page_size"] == utils.DEFAULT_PAGE_SIZE
+        assert page_info["page_size"] == 0
 
     def test_page_number(self):
         """Test pagination."""
         __, page_info = utils.paginate([], 2, 5)
         assert page_info["page"] == 2
-        assert page_info["page_size"] == 5
+        assert page_info["page_size"] == 0

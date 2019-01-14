@@ -20,7 +20,7 @@ ERRATA_JSON = {"errata_list": ["RHSA-2018:1055"], "modified_since": "2018-04-06T
 ERRATA_JSON_EMPTY_LIST = {"errata_list": [""]}
 ERRATA_JSON_NON_EXIST = {"errata_list": ["RHSA-9999:9999"]}
 
-EMPTY_RESPONSE = {"errata_list": {}, "page": 1, "page_size": 5000, "pages": 0}
+EMPTY_RESPONSE = {"errata_list": {}, "page": 1, "page_size": 0, "pages": 0}
 
 
 class TestErrataAPI(TestBase):
