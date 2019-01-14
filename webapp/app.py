@@ -144,7 +144,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class MetricsHandler(BaseHandler):
     """Handle requests to the metrics"""
 
-    def get(self):
+    def get(self): # pylint: disable=arguments-differ
         """Get prometheus metrics"""
         self.write(generate_latest())
 
