@@ -46,11 +46,13 @@ LOGGER = get_logger(__name__)
 # We'd like to use something like @REQUEST_TIME.label(endpoint, get).time() in BaseHandler
 # to get independent Histogram info for all endpoints - but prometheus doesn't let us do that because label()
 # doesn't return a Histogram, but rather a LabelWrapper.
-#
-# So, for now we'll just get Histogram info from /updates (because that's The Hard One...
-REQUEST_TIME = Histogram('updates_processing_seconds', 'Time spent processing /updates requests')
+UPDATES_V1_TIME = Histogram('vmaas_updates_v1_processing_seconds', 'Time spent processing /v1/updates requests')
+UPDATES_V2_TIME = Histogram('vmaas_updates_v2_processing_seconds', 'Time spent processing /v2/updates requests')
+CVES_TIME = Histogram('vmaas_cve_processing_seconds', 'Time spent processing /cves requests')
+REPOS_TIME = Histogram('vmaas_repos_processing_seconds', 'Time spent processing /repos requests')
+ERRATA_TIME = Histogram('vmaas_errata_processing_seconds', 'Time spent processing /errata requests')
 # ...and then we'll build Counter for all-the-things into the BaseHandler
-REQUEST_COUNTS = Counter('Invocations', 'Number of calls per handler', ['method', 'endpoint'])
+REQUEST_COUNTS = Counter('vmaas_handler_invocations', 'Number of calls per handler', ['method', 'endpoint'])
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -218,7 +220,7 @@ class DBChangeHandler(BaseHandler):
 class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    @REQUEST_TIME.time()
+    @UPDATES_V1_TIME.time()
     def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
@@ -244,7 +246,7 @@ class UpdatesHandlerGet(BaseHandler):
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    @REQUEST_TIME.time()
+    @UPDATES_V1_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -291,6 +293,7 @@ class UpdatesHandlerPost(BaseHandler):
 class UpdatesHandlerV2Get(BaseHandler):
     """Handler for processing /updates GET requests."""
 
+    @UPDATES_V2_TIME.time()
     def get(self, nevra=None): # pylint: disable=arguments-differ
         """
         ---
@@ -316,6 +319,7 @@ class UpdatesHandlerV2Get(BaseHandler):
 class UpdatesHandlerV2Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
+    @UPDATES_V2_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -362,6 +366,7 @@ class UpdatesHandlerV2Post(BaseHandler):
 class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
+    @CVES_TIME.time()
     def get(self, cve=None):  # pylint: disable=arguments-differ
         """
         ---
@@ -387,6 +392,7 @@ class CVEHandlerGet(BaseHandler):
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
+    @CVES_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -429,6 +435,7 @@ class CVEHandlerPost(BaseHandler):
 class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
 
+    @REPOS_TIME.time()
     def get(self, repo=None):  # pylint: disable=arguments-differ
         """
         ---
@@ -455,6 +462,7 @@ class ReposHandlerGet(BaseHandler):
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
+    @REPOS_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
@@ -491,6 +499,7 @@ class ReposHandlerPost(BaseHandler):
 class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
 
+    @ERRATA_TIME.time()
     def get(self, erratum=None): # pylint: disable=arguments-differ
         """
         ---
@@ -517,6 +526,7 @@ class ErrataHandlerGet(BaseHandler):
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
+    @ERRATA_TIME.time()
     def post(self): # pylint: disable=arguments-differ
         """
         ---
