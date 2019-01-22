@@ -7,7 +7,8 @@ import json
 import requests
 
 CONFIG_FILE = os.environ['HOME'] + "/.list_rhsm_repos.json"
-CONFIG_OPTIONS = ["ENG_PRODUCT_API", "PULP_API", "PULP_USER", "PULP_PASSWORD"]
+CONFIG_OPTIONS = ["ENG_PRODUCT_API", "ENG_PRODUCT_API_CERT", "ENG_PRODUCT_API_KEY",
+                  "PULP_API", "PULP_USER", "PULP_PASSWORD"]
 RHSM_CA_CERT = "/etc/rhsm/ca/redhat-uep.pem"
 VMAAS_ENTITLEMENT_NAME = "RHSM-CDN"
 EXAMPLE_TEXT = """usage:
@@ -42,8 +43,10 @@ def get_eng_products_response(options):
     active_eng_products_payload = {"criteria": [{"field": "status", "stringValues": ["ACTIVE"]}],
                                    "retrieveInactives": False, "retrieveAttributes": False}
     active_eng_products_url = options["ENG_PRODUCT_API"]
+    eng_products_cert = options["ENG_PRODUCT_API_CERT"]
+    eng_products_key = options["ENG_PRODUCT_API_KEY"]
     return requests.post(active_eng_products_url, data=json.dumps(active_eng_products_payload),
-                         headers=active_eng_products_headers)
+                         headers=active_eng_products_headers, cert=(eng_products_cert, eng_products_key))
 
 
 def get_pulp_repos_response(options):
