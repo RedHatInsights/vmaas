@@ -99,8 +99,9 @@ class ModulesStore(ObjectStore):
         nevras_in_repo = self._get_nevras_in_repo(repo_id)
         to_associate = set()
         for module in modules:
-            for rpm in module['artifacts']:
-                to_associate.add((nevras_in_repo[self._split_packagename(rpm)], module['stream_id'],))
+            if 'artifacts' in module:
+                for rpm in module['artifacts']:
+                    to_associate.add((nevras_in_repo[self._split_packagename(rpm)], module['stream_id'],))
         if to_associate:
             execute_values(cur,
                            """select pkg_id, stream_id from module_rpm_artifact

@@ -28,7 +28,8 @@ class ModuleMD:
                 module_dict[name][stream]['profiles'] = data.get('profiles', [])
                 for profile_name in module_dict[name][stream]['profiles']:
                     module_dict[name][stream]['profiles'][profile_name]['default_profile'] = False
-                module_dict[name][stream]['artifacts'] = data.get('artifacts').get('rpms', [])
+                if 'artifacts' in module_dict[name][stream]:
+                    module_dict[name][stream]['artifacts'] = data.get('artifacts').get('rpms', [])
                 module_dict[name][stream]['default_stream'] = False
             elif parsed['document'] == 'modulemd-defaults':
                 default_list.append(parsed)
