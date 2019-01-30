@@ -8,6 +8,7 @@ class ModuleMD:
     def __init__(self, filename):
         self.modules = []
         module_dict = {}
+        default_list = []
 
         with open(filename, 'r') as fdesc:
             content = fdesc.read()
@@ -30,14 +31,17 @@ class ModuleMD:
                 module_dict[name][stream]['artifacts'] = data.get('artifacts').get('rpms', [])
                 module_dict[name][stream]['default_stream'] = False
             elif parsed['document'] == 'modulemd-defaults':
-                name = data.get('module')
-                default_stream = data.get('stream', None)
-                if default_stream:
-                    module_dict[name][default_stream]['default_stream'] = True
-                for stream in data['profiles']:
-                    default_profile = data['profiles'][stream]
-                    if default_profile:
-                        module_dict[name][stream]['profiles'][default_profile[0]]['default_profile'] = True
+                default_list.append(parsed)
+        for parsed in default_list:
+            data = parsed['data']
+            name = data.get('module')
+            default_stream = data.get('stream', None)
+            if default_stream:
+                module_dict[name][default_stream]['default_stream'] = True
+            for stream in data['profiles']:
+                default_profile = data['profiles'][stream]
+                if default_profile:
+                    module_dict[name][stream]['profiles'][default_profile[0]]['default_profile'] = True
         for name in module_dict:
             for stream in module_dict[name]:
                 self.modules.append(module_dict[name][stream])
