@@ -67,29 +67,30 @@ class ModulesStore(ObjectStore):
         streams = set()
         stream_map = {}
         for module in modules:
-            streams.add((module['module_id'], module['stream'],))
+            streams.add((module['module_id'], module['stream'], module['version'],))
         if streams:
             execute_values(cur,
-                           """select id, module_id, stream_name from module_stream
-                              inner join (values %s) t(module_id, stream_name)
-                              using (module_id, stream_name)
+                           """select id, module_id, stream_name, version from module_stream
+                              inner join (values %s) t(module_id, stream_name, version)
+                              using (module_id, stream_name, version)
                            """, list(streams), page_size=len(streams))
             for row in cur.fetchall():
-                stream_map[(row[1], row[2],)] = row[0]
-                streams.remove((row[1], row[2],))
+                stream_map[(row[1], row[2], row[3])] = row[0]
+                streams.remove((row[1], row[2], row[3]))
         if streams:
             import_data = set()
             for module in modules:
-                if (module['module_id'], module['stream'],) in streams:
-                    import_data.add((module['module_id'], module['stream'], module['default_stream']))
+                if (module['module_id'], module['stream'], module['version']) in streams:
+                    import_data.add((module['module_id'], module['stream'], module['version'],
+                                     module['default_stream']))
             execute_values(cur,
-                           """insert into module_stream (module_id, stream_name, is_default)
-                              values %s returning id, module_id, stream_name""",
+                           """insert into module_stream (module_id, stream_name, version, is_default)
+                              values %s returning id, module_id, stream_name, version""",
                            list(import_data), page_size=len(import_data))
             for row in cur.fetchall():
-                stream_map[(row[1], row[2],)] = row[0]
+                stream_map[(row[1], row[2], row[3])] = row[0]
         for module in modules:
-            module['stream_id'] = stream_map[(module['module_id'], module['stream'])]
+            module['stream_id'] = stream_map[(module['module_id'], module['stream'], module['version'])]
         cur.close()
         self.conn.commit()
         return modules
