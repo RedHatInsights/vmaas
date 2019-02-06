@@ -1026,6 +1026,7 @@ class Application(tornado.web.Application):
         setup_apispec(handlers)
         self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
         self.websocket = None
+        self.websocket_response_queue = set()
         self.reconnect_callback = None
 
     @staticmethod
@@ -1055,6 +1056,9 @@ class Application(tornado.web.Application):
         else:
             LOGGER.info("Connected to: %s", self.websocket_url)
             result.write_message("subscribe-webapp")
+            for item in self.websocket_response_queue:
+                self.websocket.write_message(item)
+            self.websocket_response_queue.clear()
 
         self.websocket = result
 
@@ -1063,8 +1067,11 @@ class Application(tornado.web.Application):
         if message is not None:
             if message == "refresh-cache":
                 self._refresh_cache()
-                self.websocket.write_message("refreshed %s" %
-                                             BaseHandler.db_cache.dbchange["exported"])
+                msg = "refreshed %s" % BaseHandler.db_cache.dbchange["exported"]
+                if self.websocket:
+                    self.websocket.write_message(msg)
+                else:
+                    self.websocket_response_queue.add(msg)
         else:
             LOGGER.warning("Connection to %s closed: %s (%s)", self.websocket_url,
                            self.websocket.close_reason, self.websocket.close_code)
