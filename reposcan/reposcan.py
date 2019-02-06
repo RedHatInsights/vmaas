@@ -227,7 +227,10 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler):
             # Notify webapps to update it's cache
-            ReposcanApplication.websocket.write_message("invalidate-cache")
+            if ReposcanApplication.websocket:
+                ReposcanApplication.websocket.write_message("invalidate-cache")
+            else:
+                ReposcanApplication.websocket_response_queue.add("invalidate-cache")
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
@@ -824,6 +827,7 @@ class ReposcanApplication(Application):
 
     websocket = None
     websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
+    websocket_response_queue = set()
     reconnect_callback = None
 
     def __init__(self):
@@ -869,6 +873,9 @@ class ReposcanApplication(Application):
         else:
             LOGGER.info("Connected to: %s", cls.websocket_url)
             result.write_message("subscribe-reposcan")
+            for item in cls.websocket_response_queue:
+                result.write_message(item)
+            cls.websocket_response_queue.clear()
 
         cls.websocket = result
 
