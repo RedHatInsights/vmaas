@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Main entrypoint of reposcan tool. It provides and API and allows to sync specified repositories
 into specified PostgreSQL database.
