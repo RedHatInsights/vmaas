@@ -1,0 +1,29 @@
+FROM registry.access.redhat.com/rhel7
+
+# all environment variables are defined in conf/reposcan.env
+# only VMAAS_VERSION is here because we want it to be hardcoded in the image
+ENV VMAAS_VERSION=latest
+
+RUN yum -y update \
+    && yum-config-manager --enable rhel-server-rhscl-7-rpms \
+    && yum -y install rh-python36 rsync \
+    && rm -rf /var/cache/yum/*
+
+ENV APPBASEDIR=/webapp
+
+RUN install -m 1777 -d /data
+ADD $APPBASEDIR/*.sh $APPBASEDIR/
+ADD $APPBASEDIR/*.py $APPBASEDIR/
+ADD scl-enable.sh $APPBASEDIR/
+
+RUN adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
+
+RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
+
+RUN $APPBASEDIR/scl-enable.sh pip install tornado apispec python-dateutil jsonschema prometheus_client
+
+USER vmaas
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "$APPBASEDIR/scl-enable.sh $APPBASEDIR/entrypoint.sh"]

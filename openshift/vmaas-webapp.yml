@@ -48,13 +48,13 @@ objects:
         memory: 512Mi
     runPolicy: Serial
     source:
-      contextDir: webapp/
       git:
         ref: ${GIT_REF}
         uri: 'https://github.com/RedHatInsights/vmaas.git'
       type: Git
     strategy:
-      dockerStrategy: {}
+      dockerStrategy:
+        dockerfilePath: Dockerfile-webapp
       type: Docker
     triggers:
     - {type: ConfigChange}
