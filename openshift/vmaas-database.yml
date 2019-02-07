@@ -60,13 +60,13 @@ objects:
         memory: 512Mi
     runPolicy: Serial
     source:
-      contextDir: database/
       git:
         ref: ${GIT_REF}
         uri: 'https://github.com/RedHatInsights/vmaas.git'
       type: Git
     strategy:
-      dockerStrategy: {}
+      dockerStrategy:
+        dockerfilePath: Dockerfile-database
       type: Docker
     triggers:
     - {type: ConfigChange}
