@@ -34,6 +34,13 @@ class ModuleMD:
                 module_dict[name][stream]['default_stream'] = False
             elif parsed['document'] == 'modulemd-defaults':
                 default_list.append(parsed)
+        self._parse_modulemd_defaults(module_dict, default_list)
+        for name in module_dict:
+            for stream in module_dict[name]:
+                self.modules.append(module_dict[name][stream])
+
+    @staticmethod
+    def _parse_modulemd_defaults(module_dict, default_list):
         for parsed in default_list:
             data = parsed['data']
             name = data.get('module')
@@ -41,12 +48,11 @@ class ModuleMD:
             if default_stream:
                 module_dict[name][default_stream]['default_stream'] = True
             for stream in data['profiles']:
+                if stream not in module_dict[name]:
+                    continue # this is here due to module defaults referencing non-existing modules
                 default_profile = data['profiles'][stream]
-                if default_profile:
+                if default_profile and default_profile[0] in module_dict[name][stream]['profiles']:
                     module_dict[name][stream]['profiles'][default_profile[0]]['default_profile'] = True
-        for name in module_dict:
-            for stream in module_dict[name]:
-                self.modules.append(module_dict[name][stream])
 
     def list_modules(self):
         """Returns list of parsed modules (list of dictionaries)."""
