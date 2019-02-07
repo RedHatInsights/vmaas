@@ -54,7 +54,9 @@ services:
 
   vmaas_apidoc:
     container_name: vmaas-apidoc
-    build: ./apidoc
+    build:
+        context: ./
+        dockerfile: ./Dockerfile-apidoc
     image: vmaas/apidoc:latest
     restart: unless-stopped
     env_file:

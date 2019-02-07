@@ -45,13 +45,13 @@ objects:
         memory: 512Mi
     runPolicy: Serial
     source:
-      contextDir: apidoc/
       git:
         ref: ${GIT_REF}
         uri: 'https://github.com/RedHatInsights/vmaas.git'
       type: Git
     strategy:
-      dockerStrategy: {}
+      dockerStrategy:
+        dockerfilePath: Dockerfile-apidoc
       type: Docker
     triggers:
     - {type: ConfigChange}
