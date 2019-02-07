@@ -3,7 +3,9 @@ version: '3'
 services:
   vmaas_database:
     container_name: vmaas-database
-    build: ./database
+    build:
+        context: ./
+        dockerfile: ./Dockerfile-database
     image: vmaas/database:latest
     restart: unless-stopped
     env_file:
