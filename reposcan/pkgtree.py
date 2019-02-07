@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Tool for exporting package tree containing CVEs, release date and
 channels/streams for use by Product Security.

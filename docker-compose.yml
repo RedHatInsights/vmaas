@@ -25,7 +25,9 @@ services:
 
   vmaas_reposcan:
     container_name: vmaas-reposcan
-    build: ./reposcan
+    build:
+        context: ./
+        dockerfile: ./Dockerfile-reposcan
     image: vmaas/reposcan:latest
     restart: unless-stopped
     env_file:

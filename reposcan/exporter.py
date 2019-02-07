@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Tool for exporting preprocessed data from database for webapp nodes.
 """
