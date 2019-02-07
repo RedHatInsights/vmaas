@@ -31,13 +31,13 @@ objects:
         memory: 512Mi
     runPolicy: Serial
     source:
-      contextDir: websocket/
       git:
         ref: ${GIT_REF}
         uri: 'https://github.com/RedHatInsights/vmaas.git'
       type: Git
     strategy:
-      dockerStrategy: {}
+      dockerStrategy:
+        dockerfilePath: Dockerfile-websocket
       type: Docker
     triggers:
     - {type: ConfigChange}

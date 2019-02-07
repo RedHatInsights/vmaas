@@ -17,7 +17,9 @@ services:
 
   vmaas_websocket:
     container_name: vmaas-websocket
-    build: ./websocket
+    build:
+        context: ./
+        dockerfile: ./Dockerfile-websocket
     image: vmaas/websocket:latest
     restart: unless-stopped
     ports:
