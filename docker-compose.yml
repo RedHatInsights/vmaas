@@ -45,7 +45,9 @@ services:
 
   vmaas_webapp:
     container_name: vmaas-webapp
-    build: ./webapp
+    build:
+        context: ./
+        dockerfile: ./Dockerfile-webapp
     image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
