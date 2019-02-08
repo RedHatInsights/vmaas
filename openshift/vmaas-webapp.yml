@@ -10,6 +10,12 @@ parameters:
 - name: GIT_REF
   description: Git reference in repository to build from
   value: master
+- name: DOCKERFILE
+  description: Dockerfile to build from
+  value: Dockerfile-webapp
+- name: DOCKERFILE_SUFFIX
+  description: Dockerfile additional suffix (RHEL)
+  value: ""
 
 objects:
 - apiVersion: v1
@@ -54,7 +60,7 @@ objects:
       type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: Dockerfile-webapp
+        dockerfilePath: ${DOCKERFILE}${DOCKERFILE_SUFFIX}
       type: Docker
     triggers:
     - {type: ConfigChange}
