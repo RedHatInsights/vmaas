@@ -185,7 +185,7 @@ def runStages() {
             }
 
             // run webapp's app.py again
-            sh 'oc exec "${webapp_pod}" -- bash -c "/app/app.py &>/proc/1/fd/1"'
+            sh "oc exec ${webapp_pod} -- bash -c '/app/app.py &>/proc/1/fd/1' &"
         }
 
         stage("Publish in Polarion") {
