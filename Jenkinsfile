@@ -66,15 +66,25 @@ def runStages() {
                     sh """
                         # Create an env.yaml to have the builder pull from a different branch
                         echo "vmaas/vmaas-apidoc:" > builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-reposcan:" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-webapp:" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "  DOCKERFILE_PATH: Dockerfile-qe" >> builder-env.yml
                         echo "vmaas/vmaas-websocket:" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-db:" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
 
                         # Deploy these customized builders into 'vmaas-qe' project
