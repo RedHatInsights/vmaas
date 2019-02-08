@@ -61,30 +61,31 @@ def runStages() {
                     sh "${pipelineVars.venvDir}/bin/pip install -r requirements.txt"
                     // wipe old deployment
                     sh "${pipelineVars.venvDir}/bin/ocdeployer wipe -f vmaas-qe -l app=vmaas"
+                    // git reference
+                    String GIT_REF = "${env.BRANCH_NAME}"
+                    if (env.BRANCH_NAME.startsWith("PR")) {
+                        String GIT_PR = "${env.BRANCH_NAME}" - "PR-"
+                        GIT_REF = "+refs/pull/${GIT_PR}/head"
+                    }
                     // set needed env.yml
                     // build vmaas-webapp from Dockerfile-qe - it won't start app.py
                     sh """
                         # Create an env.yaml to have the builder pull from a different branch
                         echo "vmaas/vmaas-apidoc:" > builder-env.yml
-                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-reposcan:" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-webapp:" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "  DOCKERFILE_PATH: Dockerfile-qe" >> builder-env.yml
                         echo "vmaas/vmaas-websocket:" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                         echo "vmaas/vmaas-db:" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_REF: ${env.BRANCH_NAME}" >> builder-env.yml
-                        echo "  SOURCE_REPOSITORY_COMMIT: ${scmVars.GIT_COMMIT}" >> builder-env.yml
+                        echo "  SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "  SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
 
                         # Deploy these customized builders into 'vmaas-qe' project
