@@ -5,10 +5,11 @@
     webapp_container_port: 8080
     reposcan_container_port: 8081
     apidoc_config_map: vmaas-apidoc-conf-apidoc-env
+    dockerfile_suffix: ""
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, rhel-containers."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -43,6 +44,12 @@
       when: not (oc_project_decision.user_input | bool)
       tags:
         - always
+
+    - name: Use RHEL containers
+      set_fact:
+        dockerfile_suffix: ".rhel7"
+      tags:
+        - rhel-containers
 
     - name: Create OpenShift routes
       shell: oc create route edge apidoc --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
@@ -84,7 +91,7 @@
         - upgrade-start
 
     - name: Create VMaaS
-      shell: find ./openshift/ -name '*.yml' -o -name '*.yaml' | sort | xargs -n1 oc process --ignore-unknown-parameters=true -p RELEASE={{ app_id }} -p GIT_REF={{ git_branch_name.stdout }} -p WEBAPP_URL={{ webapp_url.stdout }} -p REPOSCAN_URL={{ reposcan_url.stdout }} -f | oc create -f -
+      shell: find ./openshift/ -name '*.yml' -o -name '*.yaml' | sort | xargs -n1 oc process --ignore-unknown-parameters=true -p RELEASE={{ app_id }} -p GIT_REF={{ git_branch_name.stdout }} -p WEBAPP_URL={{ webapp_url.stdout }} -p REPOSCAN_URL={{ reposcan_url.stdout }} DOCKERFILE_SUFFIX={{ dockerfile_suffix }} -f | oc create -f -
       tags:
         - up
         - upgrade-start

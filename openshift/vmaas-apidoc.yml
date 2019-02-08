@@ -14,6 +14,9 @@ parameters:
 - name: GIT_REF
   description: Git reference in repository to build from
   value: master
+- name: DOCKERFILE
+  description: Dockerfile to build from
+  value: Dockerfile-apidoc
 
 objects:
 - apiVersion: v1
@@ -51,7 +54,7 @@ objects:
       type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: Dockerfile-apidoc
+        dockerfilePath: ${DOCKERFILE}
       type: Docker
     triggers:
     - {type: ConfigChange}
