@@ -28,7 +28,7 @@ RUN adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
 
 RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
 
-RUN $APPBASEDIR/scl-enable.sh pip install psycopg2-binary tornado requests apispec python-dateutil
+RUN $APPBASEDIR/scl-enable.sh pip install psycopg2-binary tornado requests "apispec==0.39.0" python-dateutil
 
 USER vmaas
 
