@@ -25,6 +25,7 @@ class ModuleMD:
                 module_dict[name][stream]['name'] = name
                 module_dict[name][stream]['arch'] = data.get('arch')
                 module_dict[name][stream]['version'] = int(data.get('version'))
+                module_dict[name][stream]['context'] = str(data.get('context'))
                 module_dict[name][stream]['stream'] = str(stream)
                 module_dict[name][stream]['profiles'] = data.get('profiles', [])
                 for profile_name in module_dict[name][stream]['profiles']:
