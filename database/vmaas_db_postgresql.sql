@@ -798,13 +798,14 @@ CREATE TABLE IF NOT EXISTS module_stream (
   module_id INT NOT NULL,
   stream_name VARCHAR(8) NOT NULL,
   version BIGINT NOT NULL,
+  context VARCHAR(8) NOT NULL,
   is_default BOOLEAN NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT module_id
     FOREIGN KEY (module_id)
     REFERENCES module (id),
   CONSTRAINT module_stream_ids_uq
-    UNIQUE (module_id, stream_name, version)
+    UNIQUE (module_id, stream_name, version, context)
 ) TABLESPACE pg_default;
 
 -- -----------------------------------------------------
