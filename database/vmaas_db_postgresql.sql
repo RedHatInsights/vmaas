@@ -597,27 +597,6 @@ CREATE INDEX ON errata_repo(repo_id);
 
 
 -- -----------------------------------------------------
--- Table vmaas.pkg_errata
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS pkg_errata (
-  pkg_id INT NOT NULL,
-  errata_id INT NOT NULL,
-  UNIQUE (pkg_id, errata_id),
-  CONSTRAINT pkg_id
-    FOREIGN KEY (pkg_id)
-    REFERENCES package (id),
-  CONSTRAINT errata_id
-    FOREIGN KEY (errata_id)
-    REFERENCES errata (id)
-)TABLESPACE pg_default;
-CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
-  FOR EACH STATEMENT
-  EXECUTE PROCEDURE errata_changed();
-
-CREATE INDEX ON pkg_errata(errata_id);
-
-
--- -----------------------------------------------------
 -- Table vmaas.cve_impact
 -- from https://nvd.nist.gov/vuln-metrics
 -- -----------------------------------------------------
@@ -858,6 +837,33 @@ CREATE TABLE IF NOT EXISTS module_profile_pkg (
   CONSTRAINT module_profile_pkg_ids_uq
     UNIQUE (package_name_id, profile_id)
 ) TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.pkg_errata
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS pkg_errata (
+  pkg_id INT NOT NULL,
+  errata_id INT NOT NULL,
+  module_stream_id INT,
+  UNIQUE (pkg_id, errata_id),
+  CONSTRAINT pkg_id
+    FOREIGN KEY (pkg_id)
+    REFERENCES package (id),
+  CONSTRAINT errata_id
+    FOREIGN KEY (errata_id)
+    REFERENCES errata (id),
+  CONSTRAINT module_stream_id
+    FOREIGN KEY (module_stream_id)
+    REFERENCES module_stream (id)
+)TABLESPACE pg_default;
+CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE errata_changed();
+
+CREATE INDEX ON pkg_errata(errata_id);
+CREATE INDEX ON pkg_errata(module_stream_id);
+
 
 -- -----------------------------------------------------
 -- vmaas users permission setup:

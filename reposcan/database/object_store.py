@@ -27,6 +27,20 @@ class ObjectStore:
         cur.close()
         return nevras_in_repo
 
+    def _get_modules_in_repo(self, repo_id):
+        cur = self.conn.cursor()
+        modules_in_repo = {}
+        cur.execute(""" select m.id, m.name, ms.stream_name, ms.version, ms.context, a.name
+                          from module m
+                          join module_stream ms on m.id = ms.module_id
+                          join arch a on m.arch_id = a.id
+                         where m.repo_id = %s
+                    """, (repo_id,))
+        for row in cur.fetchall():
+            modules_in_repo[(row[1], row[2], row[3], row[4], row[5])] = row[0]
+        cur.close()
+        return modules_in_repo
+
     def _prepare_arch_map(self):
         arch_map = {}
         cur = self.conn.cursor()

@@ -58,18 +58,31 @@ class UpdateInfoMD:
                 pkglist = elem.find("pkglist")
                 update["pkglist"] = []
                 if pkglist is not None:
-                    for pkg in pkglist.find("collection").findall("package"):
-                        update["pkglist"].append({
-                            "name": pkg.get("name"),
-                            "epoch": pkg.get("epoch", "0"),
-                            "ver": pkg.get("version"),
-                            "rel": pkg.get("release"),
-                            "arch": pkg.get("arch")
-                        })
+                    for collection in pkglist.findall("collection"):
+                        module = collection.find("module")
+                        for pkg in collection.findall("package"):
+                            update["pkglist"].append(self._process_package(pkg, module))
 
                 self.updates.append(update)
                 # Clear the XML tree continuously
                 root.clear()
+
+    @staticmethod
+    def _process_package(pkg, module):
+        rec = {
+            "name": pkg.get("name"),
+            "epoch": pkg.get("epoch", "0"),
+            "ver": pkg.get("version"),
+            "rel": pkg.get("release"),
+            "arch": pkg.get("arch")
+        }
+        if module is not None:
+            rec["module_name"] = module.get("name")
+            rec["module_stream"] = module.get("stream")
+            rec["module_version"] = int(module.get("version"))
+            rec["module_context"] = module.get("context")
+            rec["module_arch"] = module.get("arch")
+        return rec
 
     @staticmethod
     def _get_dt(str_value):
