@@ -14,28 +14,36 @@ class UpdateStore(ObjectStore):
 
     def _get_associations_todo(self, repo_id, updates, update_map, update_to_packages):
         nevras_in_repo = self._get_nevras_in_repo(repo_id)
+        modules_in_repo = self._get_modules_in_repo(repo_id)
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
-            nevras = {(pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"]) for pkg in update["pkglist"]}
-            for nevra in nevras:
+            for pkg in update["pkglist"]:
+                nevra = (pkg["name"], pkg["epoch"], pkg["ver"], pkg["rel"], pkg["arch"])
+                module = (pkg["module_name"], pkg["module_stream"], pkg["module_version"], pkg["module_context"],
+                          pkg["module_arch"]) if "module_name" in pkg else None
                 if nevra not in nevras_in_repo:
                     self.logger.debug("NEVRA associated with %s not found in repository: (%s)",
                                       update["id"], ",".join(nevra))
                     continue
+                if module and module not in modules_in_repo:
+                    self.logger.debug("Module associated with %s not found in repository: (%s)",
+                                      update["id"], ",".join(module))
+                    continue
                 package_id = nevras_in_repo[nevra]
-                if update_id in update_to_packages and package_id in update_to_packages[update_id]:
+                module_id = modules_in_repo[module] if module else None
+                if update_id in update_to_packages and (package_id, module_id) in update_to_packages[update_id]:
                     # Already associated, remove from set
-                    update_to_packages[update_id].remove(package_id)
+                    update_to_packages[update_id].remove((package_id, module_id))
                 else:
                     # Not associated -> associate
-                    to_associate.append((package_id, update_id))
+                    to_associate.append((package_id, update_id, module_id))
 
         # Disassociate rest of package IDs
         to_disassociate = []
         for update_id in update_to_packages:
             for package_id in update_to_packages[update_id]:
-                to_disassociate.append((package_id, update_id))
+                to_disassociate.append((package_id, update_id, module_id))
 
         return to_associate, to_disassociate
 
@@ -116,7 +124,7 @@ class UpdateStore(ObjectStore):
         # Save them to dict: errata_id -> set(package_id)
         update_to_packages = {}
         if update_map:
-            cur.execute("""select e.id, pe.pkg_id
+            cur.execute("""select e.id, pe.pkg_id, pe.module_stream_id
                            from errata e inner join
                                 pkg_errata pe on e.id = pe.errata_id inner join
                                 pkg_repo pr on pe.pkg_id = pr.pkg_id and pr.repo_id = %s
@@ -124,7 +132,7 @@ class UpdateStore(ObjectStore):
             for row in cur.fetchall():
                 if row[0] not in update_to_packages:
                     update_to_packages[row[0]] = set()
-                update_to_packages[row[0]].add(row[1])
+                update_to_packages[row[0]].add((row[1], row[2]))
 
         to_associate, to_disassociate = self._get_associations_todo(repo_id, updates, update_map, update_to_packages)
 
@@ -132,11 +140,12 @@ class UpdateStore(ObjectStore):
         self.logger.debug("Update-package disassociations: %d", len(to_disassociate))
 
         if to_associate:
-            execute_values(cur, "insert into pkg_errata (pkg_id, errata_id) values %s",
+            execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                            list(to_associate), page_size=len(to_associate))
 
         if to_disassociate:
-            cur.execute("delete from pkg_errata where (pkg_id, errata_id) in %s", (tuple(to_disassociate),))
+            cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
+                        (tuple(to_disassociate),))
 
         cur.close()
         self.conn.commit()
