@@ -20,7 +20,7 @@ RUN adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
 
 RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
 
-RUN $APPBASEDIR/scl-enable.sh pip install tornado "apispec==0.39.0" python-dateutil jsonschema prometheus_client
+RUN $APPBASEDIR/scl-enable.sh pip install tornado "apispec==0.39.0" psycopg2-binary python-dateutil jsonschema prometheus_client
 
 USER vmaas
 
