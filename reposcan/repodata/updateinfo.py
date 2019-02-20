@@ -1,6 +1,8 @@
 """
 Module containing class for UpdateInfo XML metadata.
 """
+# pylint: disable=too-many-nested-blocks
+# I really don't want to do that but, the way how updateinfo XML is done it's unfortuntately needed
 from datetime import datetime
 import re
 import xml.etree.ElementTree as eT
@@ -61,7 +63,9 @@ class UpdateInfoMD:
                     for collection in pkglist.findall("collection"):
                         module = collection.find("module")
                         for pkg in collection.findall("package"):
-                            update["pkglist"].append(self._process_package(pkg, module))
+                            rec = self._process_package(pkg, module)
+                            if rec not in update["pkglist"]:
+                                update["pkglist"].append(rec)
 
                 self.updates.append(update)
                 # Clear the XML tree continuously
