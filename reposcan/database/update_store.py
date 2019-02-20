@@ -42,7 +42,7 @@ class UpdateStore(ObjectStore):
         # Disassociate rest of package IDs
         to_disassociate = []
         for update_id in update_to_packages:
-            for package_id in update_to_packages[update_id]:
+            for package_id, module_id in update_to_packages[update_id]:
                 to_disassociate.append((package_id, update_id, module_id))
 
         return to_associate, to_disassociate
