@@ -7,7 +7,7 @@ VERSION_REGEXP="[0-9]+\.[0-9]+"
 RELEASE_BRANCH_PREFIX="vmaas-"
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 TRAVIS_FILE=".travis.yml"
-PATCH_DOCKERFILES="webapp/Dockerfile reposcan/Dockerfile"
+PATCH_DOCKERFILES="Dockerfile-webapp Dockerfile-reposcan"
 ENV_FILES="conf/webapp.env conf/reposcan.env"
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" != "$ORIGINAL_BRANCH" ]; then
