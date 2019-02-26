@@ -84,6 +84,8 @@ class Cache:
         self.pkgid2errataids = {}
         self.errataid2repoids = {}
         self.cve_detail = {}
+        self.pkg2module = {}
+        self.modulename2id = {}
         self.dbchange = {}
         self.errata_detail = {}
 
@@ -153,6 +155,11 @@ class Cache:
                 self.dbchange[key] = data[item]
             elif relation == "errata_detail":
                 self.errata_detail[key] = data[item]
+            elif relation == "pkg2module":
+                self.pkg2module[int(key)] = data[item]
+            elif relation == "modulename2id":
+                name, stream_name = key.split(":", 1)
+                self.modulename2id[(name, stream_name)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
         LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))
