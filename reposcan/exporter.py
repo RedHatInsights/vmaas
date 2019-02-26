@@ -43,6 +43,7 @@ class DataDump:
             self.dump_repo(dump)
             self.dump_errata(dump)
             self.dump_cves(dump)
+            self.dump_modules(dump)
             self.dump_dbchange(dump)
             dump["dbchange:exported"] = timestamp
         # relink to the latest file
@@ -331,6 +332,42 @@ class DataDump:
                                                 cveid2pid.get(cve_id, []),
                                                 cveid2eid.get(cve_id, []),
                                                 cvss2_score, cvss2_metrics, source)
+
+    def dump_modules(self, dump):
+        """Select module information"""
+        with self._named_cursor() as cursor:
+            if self.errata_ids:
+                cursor.execute("""select pkg_id,
+                                         module_stream_id as module_id
+                                    from pkg_errata
+                                   where module_stream_id is not null
+                                     and errata_id in %s
+                                   union
+                                  select pkg_id,
+                                         stream_id as module_id
+                                    from module_rpm_artifact
+                            """, [tuple(self.errata_ids)])
+            else:
+                cursor.execute("""select pkg_id,
+                                         stream_id as module_id
+                                    from module_rpm_artifact
+                               """)
+            pkg2module = {}
+            for pkg_id, module_id in cursor:
+                pkg2module.setdefault("pkg2module:%s" % pkg_id, set()).add(module_id)
+            dump.update(pkg2module)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select m.name,
+                                     s.stream_name,
+                                     s.id as stream_id
+                                from module_stream s
+                                join module m on s.module_id = m.id
+                           """)
+            modulename2id = {}
+            for name, stream_name, stream_id in cursor:
+                modulename2id.setdefault("modulename2id:%s:%s" % (name, stream_name), set()).add(stream_id)
+            dump.update(modulename2id)
 
     def dump_dbchange(self, dump):
         """Select db change details"""
