@@ -336,25 +336,16 @@ class DataDump:
     def dump_modules(self, dump):
         """Select module information"""
         with self._named_cursor() as cursor:
-            if self.errata_ids:
-                cursor.execute("""select pkg_id,
-                                         module_stream_id as module_id
-                                    from pkg_errata
-                                   where module_stream_id is not null
-                                     and errata_id in %s
-                                   union
-                                  select pkg_id,
-                                         stream_id as module_id
-                                    from module_rpm_artifact
-                            """, [tuple(self.errata_ids)])
-            else:
-                cursor.execute("""select pkg_id,
-                                         stream_id as module_id
-                                    from module_rpm_artifact
-                               """)
+            cursor.execute("""select pkg_id,
+                                     errata_id,
+                                     module_stream_id as module_id
+                                from pkg_errata
+                               where module_stream_id is not null
+                                 and errata_id in %s
+                        """, [tuple(self.errata_ids)])
             pkg2module = {}
-            for pkg_id, module_id in cursor:
-                pkg2module.setdefault("pkg2module:%s" % pkg_id, set()).add(module_id)
+            for pkg_id, errata_id, module_id in cursor:
+                pkg2module.setdefault("pkgerrata2module:%s:%s" % (pkg_id, errata_id), set()).add(module_id)
             dump.update(pkg2module)
 
         with self._named_cursor() as cursor:
