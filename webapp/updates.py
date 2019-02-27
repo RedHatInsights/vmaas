@@ -20,6 +20,16 @@ JSON_SCHEMA = {
         'repository_list': {
             'type': 'array', 'items': {'type' : 'string'}
             },
+        'modules_list': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'module_name': {'type': 'string'},
+                    'module_stream': {'type': 'string'}
+                }
+            }
+        },
         'releasever' : {'type' : 'string'},
         'basearch' : {'type' : 'string'}
     }
@@ -261,8 +271,10 @@ class UpdatesAPI:
         arch = self.db_cache.id2arch[arch_id]
         return join_packagename(name, epoch, ver, rel, arch)
 
-    def _process_updates(self, packages_to_process, api_version, available_repo_ids, repo_ids_key, response):
+    def _process_updates(self, packages_to_process, api_version, available_repo_ids,
+                         repo_ids_key, response, module_ids):
         # pylint: disable=too-many-branches
+        module_filter = module_ids is not None
         for pkg, pkg_dict in packages_to_process.items():
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.db_cache.packagename2id[name]
@@ -320,6 +332,9 @@ class UpdatesAPI:
                 errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
                 nevra = self._build_nevra(update_pkg_id)
                 for errata_id in errata_ids:
+                    if (module_filter and (update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
+                            self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
+                        continue
                     repo_ids = self._get_repositories(product_ids, update_pkg_id, [errata_id], available_repo_ids,
                                                       valid_releasevers)
                     for repo_id in repo_ids:
@@ -352,6 +367,7 @@ class UpdatesAPI:
         :returns: json with updates_list as a list of dictionaries
                   {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
+        # pylint: disable=too-many-branches
         validate(data, JSON_SCHEMA)
 
         response = {
@@ -360,10 +376,24 @@ class UpdatesAPI:
 
         # Get list of valid repository IDs based on input paramaters
         available_repo_ids = self._process_repositories(data, response)
+        modules_list = data.get('modules_list', None)
+        if modules_list is not None:
+            module_info = [(x['module_name'], x['module_stream']) for x in modules_list]
+            module_ids = set()
+            for module in module_info:
+                if module in self.db_cache.modulename2id:
+                    module_ids.update(self.db_cache.modulename2id[module])
+        else:
+            module_ids = None
 
         hashlib_elements = []
         hashlib_elements.append(str(api_version))
         hashlib_elements.extend([str(r_id) for r_id in sorted(available_repo_ids)])
+        if module_ids is not None:
+            if module_ids:
+                hashlib_elements.extend([str(m_id) for m_id in sorted(module_ids)])
+            else:
+                hashlib_elements.extend('no_enabled_modules')
         repo_ids_key = hashlib.md5('_'.join(hashlib_elements).encode('utf-8')).hexdigest()
 
         all_pkgs = data.get('package_list', None)
@@ -392,6 +422,7 @@ class UpdatesAPI:
             return response
 
         # Process updated packages, errata and fill the response
-        self._process_updates(packages_to_process, api_version, available_repo_ids, repo_ids_key, response)
+        self._process_updates(packages_to_process, api_version,
+                              available_repo_ids, repo_ids_key, response, module_ids)
 
         return response
