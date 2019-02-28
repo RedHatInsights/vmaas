@@ -30,7 +30,7 @@ class ObjectStore:
     def _get_modules_in_repo(self, repo_id):
         cur = self.conn.cursor()
         modules_in_repo = {}
-        cur.execute(""" select m.id, m.name, ms.stream_name, ms.version, ms.context, a.name
+        cur.execute(""" select ms.id, m.name, ms.stream_name, ms.version, ms.context, a.name
                           from module m
                           join module_stream ms on m.id = ms.module_id
                           join arch a on m.arch_id = a.id
