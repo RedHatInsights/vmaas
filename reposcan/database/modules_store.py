@@ -35,20 +35,20 @@ class ModulesStore(ObjectStore):
         module_map = {}
         arch_map = self._prepare_arch_map()
         for module in modules:
-            names.add((module['name'], arch_map[module['arch']],))
+            names.add((module['name'], arch_map[module['arch']], repo_id))
         if names:
             execute_values(cur,
-                           """select id, name, arch_id from module
-                              inner join (values %s) t(name, arch_id)
-                              using (name, arch_id)
+                           """select id, name, arch_id, repo_id from module
+                              inner join (values %s) t(name, arch_id, repo_id)
+                              using (name, arch_id, repo_id)
                            """, list(names), page_size=len(names))
             for row in cur.fetchall():
                 module_map[(row[1], row[2],)] = row[0]
-                names.remove((row[1], row[2],))
+                names.remove((row[1], row[2], row[3]))
         if names:
             import_data = set()
             for module in modules:
-                if (module['name'], arch_map[module['arch']],) in names:
+                if (module['name'], arch_map[module['arch']], repo_id) in names:
                     import_data.add((module['name'], repo_id, arch_map[module['arch']]))
             execute_values(cur,
                            """insert into module (name, repo_id, arch_id)
