@@ -197,6 +197,13 @@ class ModulesStore(ObjectStore):
         cur.close()
         self.conn.commit()
 
+    def create_module(self, repo_id, module):
+        """Creates a new module stream (used for new module N:S:V:C introduced in errata)"""
+        module['default_stream'] = False
+        modules = self._populate_modules(repo_id, [module])
+        modules = self._populate_streams(modules)
+        return modules[0]
+
     def store(self, repo_id, modules):
         """Import all modules from repository into all related DB tables."""
 
