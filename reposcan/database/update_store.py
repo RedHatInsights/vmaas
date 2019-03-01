@@ -4,6 +4,7 @@ Module containing classes for fetching/importing updates from/into database.
 from psycopg2.extras import execute_values
 
 from database.object_store import ObjectStore
+from .modules_store import ModulesStore
 
 
 class UpdateStore(ObjectStore):
@@ -27,9 +28,10 @@ class UpdateStore(ObjectStore):
                                       update["id"], ",".join(nevra))
                     continue
                 if module and module not in modules_in_repo:
-                    self.logger.debug("Module associated with %s not found in repository: (%s)",
-                                      update["id"], ",".join(module))
-                    continue
+                    # this errata introduced new module N:S:V:C, create a record for it in DB
+                    module_dict = {'name': module[0], 'stream': module[1], 'version': module[2],
+                                   'context': module[3], 'arch': module[4]}
+                    modules_in_repo[module] = ModulesStore().create_module(repo_id, module_dict)['stream_id']
                 package_id = nevras_in_repo[nevra]
                 module_id = modules_in_repo[module] if module else None
                 if update_id in update_to_packages and (package_id, module_id) in update_to_packages[update_id]:
