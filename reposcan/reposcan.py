@@ -55,7 +55,8 @@ class BaseHandler(RequestHandler):
         self.set_header("Access-Control-Allow-Headers", "Content-Type")
         self.set_header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
 
-    def options(self): # pylint: disable=arguments-differ
+    def options(self):
+        """Answer OPTIONS request."""
         self.finish()
 
     def is_authorized(self):
@@ -102,7 +103,7 @@ class BaseHandler(RequestHandler):
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
 
-    def get(self):  # pylint: disable=arguments-differ
+    def get(self):
         """Get API status.
            ---
            description: Return API status
@@ -115,7 +116,7 @@ class HealthHandler(BaseHandler):
 
 class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """Get API specification.
            ---
            description: Get API specification
@@ -128,7 +129,7 @@ class ApiSpecHandler(BaseHandler):
 
 class VersionHandler(BaseHandler):
     """Handler class providing app version."""
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """Get app version.
            ---
            description: Get version of application
@@ -143,7 +144,7 @@ class VersionHandler(BaseHandler):
 class TaskStatusHandler(BaseHandler):
     """Handler class providing status of currently running background task."""
 
-    def get(self):  # pylint: disable=arguments-differ
+    def get(self):
         """Get status of currently running background task.
            ---
            description: Get status of currently running background task
@@ -162,7 +163,7 @@ class TaskStatusHandler(BaseHandler):
 class TaskCancelHandler(BaseHandler):
     """Handler class to cancel currently running background task."""
 
-    def put(self):  # pylint: disable=arguments-differ
+    def put(self):
         """Cancel currently running background task.
            ---
            description: Cancel currently running background task
@@ -291,7 +292,7 @@ class RepoListHandler(SyncHandler):
 
         return products, repos
 
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """Add repositories listed in request to the DB.
            ---
            description: Add repositories listed in request to the DB
@@ -430,7 +431,7 @@ class RepoDeleteHandler(SyncHandler):
     def options(self, repo=None): # pylint: disable=arguments-differ,unused-argument
         self.finish()
 
-    def delete(self, repo=None): # pylint: disable=arguments-differ
+    def delete(self, repo=None):
         """Delete repository.
            ---
            description: Delete repository
@@ -482,7 +483,7 @@ class ExporterHandler(SyncHandler):
 
     task_type = "Export dump"
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Export disk dump.
            ---
            description: Export disk dump
@@ -524,7 +525,7 @@ class PkgTreeHandler(SyncHandler):
 
     task_type = "Export package tree"
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Export package tree.
            ---
            description: Export package tree
@@ -567,7 +568,7 @@ class PkgTreeDownloadHandler(BaseHandler):
         super(PkgTreeDownloadHandler, self).__init__(application, request, **kwargs)
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
 
-    def get(self):  # pylint: disable=arguments-differ
+    def get(self):
         """Download the package tree.
            ---
            description: Download the package tree.
@@ -606,7 +607,7 @@ class RepoSyncHandler(SyncHandler):
 
     task_type = "Sync repositories"
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Sync repositories stored in DB.
            ---
            description: Sync repositories stored in DB
@@ -652,7 +653,7 @@ class CveSyncHandler(SyncHandler):
 
     task_type = "Sync CVEs"
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Sync CVEs.
            ---
            description: Sync CVE lists
@@ -698,7 +699,7 @@ class CvemapSyncHandler(SyncHandler):
 
     task_type = "Sync CVE map"
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Sync CVEmap.
            ---
            description: Sync CVE map
@@ -745,7 +746,7 @@ class AllSyncHandler(SyncHandler):
                                   CvemapSyncHandler.task_type,
                                   CveSyncHandler.task_type)
 
-    def put(self): # pylint: disable=arguments-differ
+    def put(self):
         """Sync repos + CVEs + CVEmap.
            ---
            description: Sync repositories stored in DB and CVE lists

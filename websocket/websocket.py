@@ -80,7 +80,7 @@ class HealthHandler(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def get(self):  # pylint: disable=arguments-differ
+    def get(self):
         """Get API status.
            ---
            description: Return API status
