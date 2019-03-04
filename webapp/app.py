@@ -74,8 +74,9 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "Content-Type")
 
-    def options(self): # pylint: disable=arguments-differ
-        pass
+    def options(self):
+        """Answer OPTIONS request."""
+        self.finish()
 
     def get_post_data(self):
         """extract input JSON from POST request"""
@@ -146,7 +147,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class MetricsHandler(BaseHandler):
     """Handle requests to the metrics"""
 
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """Get prometheus metrics"""
         self.write(generate_latest())
 
@@ -154,7 +155,7 @@ class HealthHandler(BaseHandler):
     """Handler class providing health status."""
 
     @gen.coroutine
-    def get(self):  # pylint: disable=arguments-differ
+    def get(self):
         """Get API status.
            ---
            description: Return API status
@@ -168,7 +169,7 @@ class ApiSpecHandler(BaseHandler):
     """Handler class providing API specification."""
 
     @gen.coroutine
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """Get API specification.
            ---
            description: Get API specification
@@ -184,7 +185,7 @@ class VersionHandler(BaseHandler):
     """Handler class providing app version."""
 
     @gen.coroutine
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """Get app version.
            ---
            description: Get version of application
@@ -201,7 +202,7 @@ class DBChangeHandler(BaseHandler):
     """
 
     @gen.coroutine
-    def get(self): # pylint: disable=arguments-differ
+    def get(self):
         """
         ---
         description: Get last-updated-times for VMaaS DB
@@ -221,7 +222,7 @@ class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
     @UPDATES_V1_TIME.time()
-    def get(self, nevra=None): # pylint: disable=arguments-differ
+    def get(self, nevra=None):
         """
         ---
         description: List security updates for single package NEVRA
@@ -247,7 +248,7 @@ class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
     @UPDATES_V1_TIME.time()
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: List security updates for list of package NEVRAs
@@ -305,7 +306,7 @@ class UpdatesHandlerV2Get(BaseHandler):
     """Handler for processing /updates GET requests."""
 
     @UPDATES_V2_TIME.time()
-    def get(self, nevra=None): # pylint: disable=arguments-differ
+    def get(self, nevra=None):
         """
         ---
         description: List security updates for single package NEVRA
@@ -331,7 +332,7 @@ class UpdatesHandlerV2Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
     @UPDATES_V2_TIME.time()
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: List security updates for list of package NEVRAs
@@ -389,7 +390,7 @@ class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
     @CVES_TIME.time()
-    def get(self, cve=None):  # pylint: disable=arguments-differ
+    def get(self, cve=None):
         """
         ---
         description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
@@ -415,7 +416,7 @@ class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
     @CVES_TIME.time()
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE
@@ -458,7 +459,7 @@ class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
 
     @REPOS_TIME.time()
-    def get(self, repo=None):  # pylint: disable=arguments-differ
+    def get(self, repo=None):
         """
         ---
         description: Get details about a repository or repository-expression. It is allowed to use POSIX regular
@@ -485,7 +486,7 @@ class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
     @REPOS_TIME.time()
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: Get details about list of repositories. "repository_list" can be either a list of repository
@@ -522,7 +523,7 @@ class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
 
     @ERRATA_TIME.time()
-    def get(self, erratum=None): # pylint: disable=arguments-differ
+    def get(self, erratum=None):
         """
         ---
         description: Get details about errata. It is possible to use POSIX regular
@@ -549,7 +550,7 @@ class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
     @ERRATA_TIME.time()
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: Get details about errata with additional parameters. "errata_list"
@@ -588,7 +589,7 @@ class ErrataHandlerPost(BaseHandler):
 class PackagesHandlerGet(BaseHandler):
     """Handler for processing /packages GET requests."""
 
-    def get(self, nevra=None): # pylint: disable=arguments-differ
+    def get(self, nevra=None):
         """
         ---
         description: Get details about packages.
@@ -613,7 +614,7 @@ class PackagesHandlerGet(BaseHandler):
 class PackagesHandlerPost(BaseHandler):
     """ /packages API handler """
 
-    def post(self): # pylint: disable=arguments-differ
+    def post(self):
         """
         ---
         description: Get details about packages. "package_list" must be a list of
