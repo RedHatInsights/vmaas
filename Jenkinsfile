@@ -68,7 +68,7 @@ def runStages() {
                         GIT_REF = "+refs/pull/${GIT_PR}/head"
                     }
                     // set needed env.yml
-                    // build vmaas-webapp from Dockerfile-qe - it won't start app.py
+                    // build vmaas-webapp from Dockerfile-webapp-qe - it won't start app.py
                     sh """
                         # Create an env.yaml to have the builder pull from a different branch
                         echo "vmaas/vmaas-apidoc:" > builder-env.yml
@@ -83,7 +83,7 @@ def runStages() {
                         echo "  parameters:" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "    DOCKERFILE_PATH: Dockerfile-qe" >> builder-env.yml
+                        echo "    DOCKERFILE_PATH: Dockerfile-webapp-qe" >> builder-env.yml
                         echo "vmaas/vmaas-websocket:" >> builder-env.yml
                         echo "  parameters:" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
@@ -122,7 +122,7 @@ def runStages() {
                     // Start webapp as `coverage run ...` instead of `python ...` to collect coverage
                     sh '''
                         webapp_pod="$(oc get pods | grep 'Running' | grep 'webapp' | awk '{print $1}')"
-                        oc exec "${webapp_pod}" -- bash -c "coverage run /app/app.py --source app &>/proc/1/fd/1" &
+                        oc exec "${webapp_pod}" -- bash -c "webapp/scl-enable.sh coverage run webapp/app.py --source webapp &>/proc/1/fd/1" &
                     '''
                 }
                 stage("Setup DB") {
@@ -178,7 +178,7 @@ def runStages() {
             
             def status = 99
             status = sh(
-                script: "oc exec ${webapp_pod} -- coverage html --fail-under=${codecovThreshold} --omit /usr/\\* -d /tmp/htmlcov",
+                script: "oc exec ${webapp_pod} -- webapp/scl-enable.sh coverage html --fail-under=${codecovThreshold} --omit /usr/\\* -d /tmp/htmlcov",
                 returnStatus: true
             )
 
@@ -190,7 +190,7 @@ def runStages() {
             }
 
             // run webapp's app.py again
-            sh "oc exec ${webapp_pod} -- bash -c '/app/app.py &>/proc/1/fd/1' &"
+            sh "oc exec ${webapp_pod} -- bash -c 'webapp/scl-enable.sh webapp/app.py &>/proc/1/fd/1' &"
         }
 
         stage("Publish in Polarion") {
