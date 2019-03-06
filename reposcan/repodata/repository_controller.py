@@ -242,19 +242,22 @@ class RepositoryController:
         self.logger.info("Syncing %d repositories.", sum(len(l) for l in batches))
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
-        for batch in batches:
-            failed = self._download_metadata(batch)
-            if failed:
-                self.logger.warning("%d metadata files failed to download.", len(failed))
-                failed_repos = [repo for repo in batch if self._repo_download_failed(repo, failed)]
-                self.clean_repodata(failed_repos)
-                batch = [repo for repo in batch if repo not in failed_repos]
-            self._unpack_metadata(batch)
-            for repository in batch:
-                repository.load_metadata()
-                self.repo_store.store(repository)
-                repository.unload_metadata()
-            self.clean_repodata(batch)
-
-        self.repo_store.cleanup_unused_data()
-        self._clean_certificate_cache()
+        try:
+            for batch in batches:
+                try:
+                    failed = self._download_metadata(batch)
+                    if failed:
+                        self.logger.warning("%d metadata files failed to download.", len(failed))
+                        failed_repos = [repo for repo in batch if self._repo_download_failed(repo, failed)]
+                        self.clean_repodata(failed_repos)
+                        batch = [repo for repo in batch if repo not in failed_repos]
+                    self._unpack_metadata(batch)
+                    for repository in batch:
+                        repository.load_metadata()
+                        self.repo_store.store(repository)
+                        repository.unload_metadata()
+                finally:
+                    self.clean_repodata(batch)
+        finally:
+            self.repo_store.cleanup_unused_data()
+            self._clean_certificate_cache()

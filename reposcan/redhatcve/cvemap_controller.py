@@ -89,9 +89,11 @@ class CvemapController:
             self.logger.warning("Cve map failed to download.")
         self._read_head(failed)
 
-        if self.updated:
-            # Download and process cvemap
-            self._download_xml()
-            cvemap = self._load_xml(self.lastmodified)
-            self.cvemap_store.store(cvemap)
+        try:
+            if self.updated:
+                # Download and process cvemap
+                self._download_xml()
+                cvemap = self._load_xml(self.lastmodified)
+                self.cvemap_store.store(cvemap)
+        finally:
             self.clean()
