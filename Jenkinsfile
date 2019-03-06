@@ -46,7 +46,7 @@ def runStages() {
 
         stage("Deploy VMaaS") {
             // Deploy VMaaS to vmaas-qe project
-            withStatusContext.dry("continuous-integration/jenkins/deploy") {
+            withStatusContext.custom("deploy") {
                 stage("Login as deployer account") {
                     withCredentials([string(credentialsId: "openshift_token", variable: "TOKEN")]) {
                         sh "oc login https://${pipelineVars.devCluster} --token=${TOKEN}"
@@ -109,7 +109,7 @@ def runStages() {
 
         stage("Integration tests") {
             // Run integration tests
-            withStatusContext.dry("continuous-integration/jenkins/integration-tests") {
+            withStatusContext.custom("integration-tests") {
                 sh """
                     cd ~/.local/lib/python3.6/site-packages/iqe/conf
                     ln -rs ${WORKSPACE}/vmaas-yamls/conf/credentials.yaml
