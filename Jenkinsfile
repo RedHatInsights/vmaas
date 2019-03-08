@@ -61,6 +61,8 @@ def runStages() {
                     sh "${pipelineVars.venvDir}/bin/pip install -r requirements.txt"
                     // wipe old deployment
                     sh "${pipelineVars.venvDir}/bin/ocdeployer wipe -f vmaas-qe -l app=vmaas"
+                    // make sure that DB volume is deleted
+                    sh "oc delete pvc vmaas-db-data || true"
                     // git reference
                     String GIT_REF = "${env.BRANCH_NAME}"
                     if (env.BRANCH_NAME.startsWith("PR")) {
