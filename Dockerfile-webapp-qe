@@ -24,6 +24,8 @@ RUN $APPBASEDIR/scl-enable.sh pip install tornado "apispec==0.39.0" psycopg2-bin
 
 USER vmaas
 
+ENV COVERAGE_FILE='/tmp/.coverage'
+
 EXPOSE 8080
 
 CMD ["sh", "-c", "$APPBASEDIR/scl-enable.sh $APPBASEDIR/entrypoint-qe.sh"]
