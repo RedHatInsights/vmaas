@@ -13,7 +13,7 @@ from common.logging import get_logger
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
-from mnm import FAILED_REPOMD, FAILED_REPO
+from mnm import FAILED_REPOMD
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
 
