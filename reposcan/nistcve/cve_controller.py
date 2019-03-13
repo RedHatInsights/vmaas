@@ -13,11 +13,11 @@ from common.logging import get_logger
 from database.cverepo_store import CveRepoStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
+from mnm import FAILED_NIST
 from nistcve.cvemeta import CveMeta
 from nistcve.cverepo import CveRepo
 
 DEFAULT_YEAR_SINCE = "2002"
-
 
 class CveRepoController:
     """
@@ -66,6 +66,7 @@ class CveRepoController:
                     self.logger.info("Cve list '%s' has not been updated (since %s).",
                                      repo.label, str(db_lastmodified))
             else:
+                FAILED_NIST.inc()
                 self.logger.warning("Download failed: %s (HTTP CODE %d)", repo.meta_url(), failed[meta_path])
 
     def _download_json(self, batch):
@@ -110,6 +111,7 @@ class CveRepoController:
         # Download all repomd files first
         failed = self._download_meta()
         if failed:
+            FAILED_NIST.inc()
             self.logger.warning("%d meta files failed to download.", len(failed))
         self._read_meta(failed)
 

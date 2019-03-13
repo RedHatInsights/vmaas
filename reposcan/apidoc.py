@@ -96,4 +96,5 @@ def setup_apispec(handlers):
     })
     # Register public API handlers to apispec
     for handler in handlers:
-        SPEC.add_path(urlspec=handler)
+        if handler[0].startswith(('/api/')):
+            SPEC.add_path(urlspec=handler)

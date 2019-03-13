@@ -9,6 +9,7 @@ from multiprocessing.pool import Pool
 import json
 import requests
 
+from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
 from tornado.websocket import websocket_connect
@@ -19,6 +20,7 @@ from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from exporter import DUMP, main as export_data
 from pkgtree import PKGTREE_FILE, main as export_pkgtree
+from mnm import FAILED_AUTH, FAILED_WEBSOCK
 from nistcve.cve_controller import CveRepoController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
@@ -27,7 +29,6 @@ LOGGER = get_logger(__name__)
 
 DEFAULT_CHUNK_SIZE = "1048576"
 WEBSOCKET_RECONNECT_INTERVAL = 60
-
 
 class TaskStatusResponse(dict):
     """Object used as API response to user."""
@@ -73,12 +74,14 @@ class BaseHandler(RequestHandler):
 
         github_token = self.request.headers.get('Authorization', None)
         if not github_token:
+            FAILED_AUTH.inc()
             return False
 
         user_info_response = requests.get('https://api.github.com/user',
                                           headers={'Authorization': github_token})
 
         if user_info_response.status_code != 200:
+            FAILED_AUTH.inc()
             LOGGER.warning("Cannot execute github API with provided %s", github_token)
             return False
         github_user_login = user_info_response.json()['login']
@@ -86,6 +89,7 @@ class BaseHandler(RequestHandler):
                                      headers={'Authorization': github_token})
 
         if orgs_response.status_code != 200:
+            FAILED_AUTH.inc()
             LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
             return False
 
@@ -96,9 +100,17 @@ class BaseHandler(RequestHandler):
                                user_info_response.json()['id'], request_str)
                 return True
 
+        FAILED_AUTH.inc()
         LOGGER.warning("User %s does not belong to RedHatInsights organization", github_user_login)
         return False
 
+
+class MetricsHandler(BaseHandler):
+    """Handle requests to the metrics"""
+
+    def get(self): # pylint: disable=arguments-differ
+        """Get prometheus metrics"""
+        self.write(generate_latest())
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
@@ -178,6 +190,7 @@ class TaskCancelHandler(BaseHandler):
              - task
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         if SyncTask.is_running():
@@ -208,6 +221,7 @@ class SyncHandler(BaseHandler):
             status_code = 429
             status_msg = TaskStartResponse(msg, success=False)
         return status_code, status_msg
+
 
     @classmethod
     def run_task_and_export(cls, *args, **kwargs):
@@ -455,6 +469,7 @@ class RepoDeleteHandler(SyncHandler):
              - repos
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task(repo=repo)
@@ -500,6 +515,7 @@ class ExporterHandler(SyncHandler):
              - export
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task()
@@ -542,6 +558,7 @@ class PkgTreeHandler(SyncHandler):
              - sync
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task()
@@ -585,6 +602,7 @@ class PkgTreeDownloadHandler(BaseHandler):
              - pkgtree
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
 
@@ -624,6 +642,7 @@ class RepoSyncHandler(SyncHandler):
              - sync
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task()
@@ -716,6 +735,7 @@ class CvemapSyncHandler(SyncHandler):
              - sync
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task()
@@ -763,6 +783,7 @@ class AllSyncHandler(SyncHandler):
              - sync
         """
         if not self.is_authorized():
+            FAILED_AUTH.inc()
             self.set_status(403, 'Valid authorization token was not provided')
             return
         status_code, status_msg = self.start_task()
@@ -847,6 +868,7 @@ class ReposcanApplication(Application):
             (r"/api/v1/pkgtree/?", PkgTreeDownloadHandler),
             (r"/api/v1/task/status/?", TaskStatusHandler),
             (r"/api/v1/task/cancel/?", TaskCancelHandler),
+            (r"/metrics", MetricsHandler)
         ]
 
         Application.__init__(self, handlers)
@@ -870,6 +892,7 @@ class ReposcanApplication(Application):
 
         if result is None:
             # TODO: print the traceback as debug message when we use logging module instead of prints here
+            FAILED_WEBSOCK.inc()
             LOGGER.warning("Unable to connect to: %s", cls.websocket_url)
         else:
             LOGGER.info("Connected to: %s", cls.websocket_url)
@@ -884,6 +907,7 @@ class ReposcanApplication(Application):
     def _read_websocket_message(cls, message):
         """Read incoming websocket messages."""
         if message is None:
+            FAILED_WEBSOCK.inc()
             LOGGER.warning("Connection to %s closed: %s (%s)", cls.websocket_url,
                            cls.websocket.close_reason, cls.websocket.close_code)
             cls.websocket = None
@@ -893,7 +917,6 @@ def periodic_sync():
     """Function running both repo and CVE sync."""
     LOGGER.info("Periodic sync started.")
     AllSyncHandler.start_task()
-
 
 def main():
     """Main entrypoint."""

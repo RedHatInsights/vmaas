@@ -10,11 +10,11 @@ from common.dateutil import parse_datetime
 from common.logging import get_logger
 from database.cvemap_store import CvemapStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
+from mnm import FAILED_CVEMAP
 from redhatcve.cvemap import CvemapHead, CvemapBody
 
 URL = os.getenv('REDHAT_CVEMAP_URL',
                 'https://www.redhat.com/security/data/metrics/cvemap.xml')
-
 
 class CvemapController:
     """
@@ -63,6 +63,7 @@ class CvemapController:
                 self.logger.info("Cve map has not been updated (since %s).",
                                  str(db_lastmodified))
         else:
+            FAILED_CVEMAP.inc()
             self.logger.warning("Download failed: %s (HTTP CODE %d)", URL, failed[header_path])
 
     def _download_xml(self):
@@ -86,6 +87,7 @@ class CvemapController:
         # Download all repomd files first
         failed = self._download_head()
         if failed:
+            FAILED_CVEMAP.inc()
             self.logger.warning("Cve map failed to download.")
         self._read_head(failed)
 

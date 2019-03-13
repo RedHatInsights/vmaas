@@ -13,11 +13,11 @@ from common.logging import get_logger
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
+from mnm import FAILED_REPOMD, FAILED_REPO
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
-
 
 class RepositoryController:
     """
@@ -224,6 +224,7 @@ class RepositoryController:
         # Download all repomd files first
         failed = self._download_repomds()
         if failed:
+            FAILED_REPOMD.inc(len(failed))
             self.logger.warning("%d repomd.xml files failed to download.", len(failed))
             failed_repos = [repo for repo in self.repositories if self._repo_download_failed(repo, failed)]
             self.clean_repodata(failed_repos)

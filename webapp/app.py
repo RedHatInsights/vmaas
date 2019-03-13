@@ -46,13 +46,13 @@ LOGGER = get_logger(__name__)
 # We'd like to use something like @REQUEST_TIME.label(endpoint, get).time() in BaseHandler
 # to get independent Histogram info for all endpoints - but prometheus doesn't let us do that because label()
 # doesn't return a Histogram, but rather a LabelWrapper.
-UPDATES_V1_TIME = Histogram('vmaas_updates_v1_processing_seconds', 'Time spent processing /v1/updates requests')
-UPDATES_V2_TIME = Histogram('vmaas_updates_v2_processing_seconds', 'Time spent processing /v2/updates requests')
-CVES_TIME = Histogram('vmaas_cve_processing_seconds', 'Time spent processing /cves requests')
-REPOS_TIME = Histogram('vmaas_repos_processing_seconds', 'Time spent processing /repos requests')
-ERRATA_TIME = Histogram('vmaas_errata_processing_seconds', 'Time spent processing /errata requests')
+UPDATES_V1_TIME = Histogram('vmaas_webapp_updates_v1_processing_seconds', 'Time spent processing /v1/updates requests')
+UPDATES_V2_TIME = Histogram('vmaas_webapp_updates_v2_processing_seconds', 'Time spent processing /v2/updates requests')
+CVES_TIME = Histogram('vmaas_webapp_cve_processing_seconds', 'Time spent processing /cves requests')
+REPOS_TIME = Histogram('vmaas_webapp_repos_processing_seconds', 'Time spent processing /repos requests')
+ERRATA_TIME = Histogram('vmaas_webapp_errata_processing_seconds', 'Time spent processing /errata requests')
 # ...and then we'll build Counter for all-the-things into the BaseHandler
-REQUEST_COUNTS = Counter('vmaas_handler_invocations', 'Number of calls per handler', ['method', 'endpoint'])
+REQUEST_COUNTS = Counter('vmaas_webapp_handler_invocations', 'Number of calls per handler', ['method', 'endpoint'])
 
 
 class BaseHandler(tornado.web.RequestHandler):
