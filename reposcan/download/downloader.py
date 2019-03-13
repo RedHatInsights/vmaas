@@ -19,7 +19,6 @@ DEFAULT_THREADS = "8"
 DEFAULT_RETRY_COUNT = "3"
 VALID_HTTP_CODES = [200]
 
-
 class DownloadItem:
     """
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
