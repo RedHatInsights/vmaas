@@ -11,7 +11,7 @@ class CveJson:
     """
     def __init__(self, filename):
         self.data = []
-        with open(filename, 'r') as fde:
+        with open(filename, 'r', encoding='utf-8') as fde:
             self.data = json.load(fde)
 
     def get_count(self):
