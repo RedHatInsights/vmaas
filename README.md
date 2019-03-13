@@ -1,6 +1,7 @@
-# VMaaS
-
 [![Build Status](https://travis-ci.org/RedHatInsights/vmaas.svg?branch=master)](https://travis-ci.org/RedHatInsights/vmaas)
+[![codecov](https://codecov.io/gh/RedHatInsights/vmaas/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/vmaas)
+
+# VMaaS
 
 Vulnerability Metadata as a Service
 
