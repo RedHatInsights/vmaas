@@ -701,6 +701,22 @@ def setup_apispec(handlers):
                 "example": "rhel-6-server-rpms"
             }
         },
+        "modules_list": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "module_name": {
+                        "type": "string",
+                        "example": "rhn-tools"
+                    },
+                    "module_stream": {
+                        "type": "string",
+                        "example": "1"
+                    }
+                }
+            }
+        },
         "releasever": {
             "type": "string",
             "example": "6Server"
@@ -752,6 +768,22 @@ def setup_apispec(handlers):
             "items": {
                 "type": "string",
                 "example": "rhel-6-server-rpms"
+            }
+        },
+        "modules_list": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "module_name": {
+                        "type": "string",
+                        "example": "rhn-tools"
+                    },
+                    "module_stream": {
+                        "type": "string",
+                        "example": "1"
+                    }
+                }
             }
         },
         "releasever": {
