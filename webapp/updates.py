@@ -383,6 +383,7 @@ class UpdatesAPI:
             for module in module_info:
                 if module in self.db_cache.modulename2id:
                     module_ids.update(self.db_cache.modulename2id[module])
+            response['modules_list'] = modules_list
         else:
             module_ids = None
 
