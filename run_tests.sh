@@ -1,5 +1,28 @@
 #!/usr/bin/bash
 
+rc=0
+
+for dockerfile in Dockerfile-database Dockerfile-reposcan Dockerfile-webapp Dockerfile-websocket
+do
+    if [ ! -f "$dockerfile" ]; then
+        echo "Dockerfile '$dockerfile' doesn't exist" >&2
+        rc=$(($rc+1))
+    fi
+    sed \
+        -e "s/centos:7/registry.access.redhat.com\/rhel7/" \
+        -e "s/centos\/postgresql-96-centos7/registry.access.redhat.com\/rhscl\/postgresql-96-rhel7/" \
+        -e "s/yum -y install centos-release-scl/yum-config-manager --enable rhel-server-rhscl-7-rpms/" \
+        "$dockerfile" | diff "${dockerfile}.rhel7" -
+    diff_rc=$?
+    if [ $diff_rc -gt 0 ]; then
+        echo "$dockerfile and $dockerfile.rhel7 are too different!"
+    else
+  echo "$dockerfile and $dockerfile.rhel7 are OK"
+    fi
+    rc=$(($rc+$diff_rc))
+done
+echo ""
+
 TESTDIR=$1
 if [ ! -d "$TESTDIR" ] ; then
     echo "usage: $(basename $0) <testdir>" >&2
@@ -9,8 +32,6 @@ fi
 (
 # Go to script's directory
 cd "$TESTDIR"
-
-rc=0
 
 # Check for python test files with invalid names
 test_dirs=$(find . -type d -name 'test')
