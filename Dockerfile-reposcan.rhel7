@@ -11,6 +11,15 @@ RUN yum -y update \
 
 ENV APPBASEDIR=/reposcan
 
+ADD scl-enable.sh $APPBASEDIR/
+
+RUN install -d -m 775 -g root /data
+RUN adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
+
+RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
+
+RUN $APPBASEDIR/scl-enable.sh pip install prometheus-client psycopg2-binary tornado requests "apispec==0.39.0" python-dateutil
+
 # copy application to directory in a container
 ADD $APPBASEDIR/*.sh $APPBASEDIR/
 ADD $APPBASEDIR/*.py $APPBASEDIR/
@@ -21,14 +30,6 @@ ADD $APPBASEDIR/nistcve/*.py $APPBASEDIR/nistcve/
 ADD $APPBASEDIR/redhatcve/*.py $APPBASEDIR/redhatcve/
 ADD $APPBASEDIR/repodata/*.py $APPBASEDIR/repodata/
 ADD $APPBASEDIR/rsyncd.conf /etc/
-ADD scl-enable.sh $APPBASEDIR/
-
-RUN install -d -m 775 -g root /data
-RUN adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
-
-RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
-
-RUN $APPBASEDIR/scl-enable.sh pip install prometheus-client psycopg2-binary tornado requests "apispec==0.39.0" python-dateutil
 
 USER vmaas
 
