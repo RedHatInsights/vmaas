@@ -7,7 +7,6 @@ RUN yum -y update \
 
 ENV APPBASEDIR=/websocket
 
-ADD $APPBASEDIR/*.py $APPBASEDIR/
 ADD scl-enable.sh $APPBASEDIR/
 
 RUN adduser --gid 0 -d /app --no-create-home -c 'VMAAS user' vmaas
@@ -15,6 +14,8 @@ RUN adduser --gid 0 -d /app --no-create-home -c 'VMAAS user' vmaas
 RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip
 
 RUN $APPBASEDIR/scl-enable.sh pip install tornado
+
+ADD $APPBASEDIR/*.py $APPBASEDIR/
 
 USER vmaas
 
