@@ -24,6 +24,7 @@ JSON_SCHEMA = {
             'type': 'array',
             'items': {
                 'type': 'object',
+                'required': ['module_name', 'module_stream'],
                 'properties': {
                     'module_name': {'type': 'string'},
                     'module_stream': {'type': 'string'}
