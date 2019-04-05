@@ -1,6 +1,6 @@
-# Dockerfile uses postgresql 9.6 latest image
+# Dockerfile uses postgresql 10 latest image
 # with applied vmaas database schema
-FROM registry.access.redhat.com/rhscl/postgresql-96-rhel7
+FROM registry.access.redhat.com/rhscl/postgresql-10-rhel7
 
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'

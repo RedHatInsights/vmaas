@@ -1,6 +1,6 @@
-# Dockerfile uses postgresql 9.6 latest image
+# Dockerfile uses postgresql 10 latest image
 # with applied vmaas database schema
-FROM centos/postgresql-96-centos7
+FROM centos/postgresql-10-centos7
 
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
