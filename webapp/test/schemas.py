@@ -103,6 +103,10 @@ _updates_package_v2 = {
     ]
 }
 
+_vulnerabilities_response = {
+    'cve_list': [str]
+}
+
 errata_schema = Schema(_errata)
 repos_schema = Schema(_repos)
 cves_schema = Schema(_cves)
@@ -115,3 +119,4 @@ updates_top_releasever_schema = Schema(_updates_top_releasever)
 updates_top_all_schema = Schema(_updates_top_all)
 updates_package_schema = Schema(_updates_package)
 updates_package_schema_v2 = Schema(_updates_package_v2)
+vulnerabilities_schema = Schema(_vulnerabilities_response)

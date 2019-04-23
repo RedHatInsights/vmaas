@@ -21,6 +21,7 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
+from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from logging_utils import init_logging, get_logger
 
@@ -51,6 +52,8 @@ UPDATES_V2_TIME = Histogram('vmaas_webapp_updates_v2_processing_seconds', 'Time 
 CVES_TIME = Histogram('vmaas_webapp_cve_processing_seconds', 'Time spent processing /cves requests')
 REPOS_TIME = Histogram('vmaas_webapp_repos_processing_seconds', 'Time spent processing /repos requests')
 ERRATA_TIME = Histogram('vmaas_webapp_errata_processing_seconds', 'Time spent processing /errata requests')
+VULNERABILITIES_TIME = Histogram('vmaas_webapp_vulnerabilities_processing_seconds',
+                                 'Time spent processing /vulnerabilities requests')
 # ...and then we'll build Counter for all-the-things into the BaseHandler
 REQUEST_COUNTS = Counter('vmaas_webapp_handler_invocations', 'Number of calls per handler', ['method', 'endpoint'])
 
@@ -65,6 +68,7 @@ class BaseHandler(tornado.web.RequestHandler):
     cve_api = None
     errata_api = None
     packages_api = None
+    vulnerabilities_api = None
     dbchange_api = None
 
     def data_received(self, chunk):
@@ -647,6 +651,89 @@ class PackagesHandlerPost(BaseHandler):
         self.handle_post(self.packages_api, 1)
 
 
+class VulnerabilitiesHandlerGet(BaseHandler):
+    """Handler for processing /vulnerabilities GET requests."""
+
+    @VULNERABILITIES_TIME.time()
+    def get(self, nevra=None):
+        """
+        ---
+        description: List of applicable CVEs for a single package NEVRA
+        parameters:
+          - name: nevra
+            description: Package NEVRA
+            required: True
+            type: string
+            in: path
+            x-example: kernel-2.6.32-696.20.1.el6.x86_64
+        responses:
+          200:
+            description: Return list of applicable CVEs for a single NEVRA
+            schema:
+              $ref: "#/definitions/VulnerabilitiesResponse"
+        tags:
+          - vulnerabilities
+        """
+        self.handle_get(self.vulnerabilities_api, 1, 'package_list', nevra)
+
+
+class VulnerabilitiesHandlerPost(BaseHandler):
+    """Handler for processing /vulnerabilities POST requests."""
+
+    @VULNERABILITIES_TIME.time()
+    def post(self):
+        """
+        ---
+        description: List of applicable CVEs to a package list.
+        parameters:
+          - name: body
+            description: Input JSON
+            required: True
+            in: body
+            schema:
+              type: object
+              properties:
+                package_list:
+                  type: array
+                  items:
+                    type: string
+                    example: kernel-2.6.32-696.20.1.el6.x86_64
+                repository_list:
+                  type: array
+                  items:
+                    type: string
+                    example: rhel-6-server-rpms
+                modules_list:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      module_name:
+                        type: string
+                        example: rhn-tools
+                      module_stream:
+                        type: string
+                        example: 1.0
+                releasever:
+                  type: string
+                  example: 6Server
+                basearch:
+                  type: string
+                  example: x86_64
+              required:
+                - package_list
+        responses:
+          200:
+            description: List of applicable CVEs to a package list.
+            schema:
+              $ref: "#/definitions/VulnerabilitiesResponse"
+          400:
+            description: Invalid input JSON format
+        tags:
+          - vulnerabilities
+        """
+        self.handle_post(self.vulnerabilities_api, 1)
+
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
     SPEC.definition("UpdatesResponse", properties={
@@ -1047,6 +1134,15 @@ def setup_apispec(handlers):
                 }
             }
     })
+    SPEC.definition('VulnerabilitiesResponse', properties={
+        'cve_list': {
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'example': 'CVE-2016-0800'
+            }
+        }
+    })
     # Register public API handlers to apispec
     for handler in handlers:
         if handler[0].startswith(('/api/v1/', '/api/v2/')):
@@ -1073,6 +1169,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/packages/?", PackagesHandlerPost),
             (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:]+)", PackagesHandlerGet),
             (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
+            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:]+)", VulnerabilitiesHandlerGet),
+            (r"/api/v1/vulnerabilities/?", VulnerabilitiesHandlerPost),
             (r"/metrics", MetricsHandler)  # GET request
         ]
 
@@ -1152,6 +1250,7 @@ def main():
     BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
     BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
+    BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
     vmaas_app.websocket_reconnect()
