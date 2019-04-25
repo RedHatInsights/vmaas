@@ -8,7 +8,7 @@ import sre_constants
 import json
 
 from jsonschema.exceptions import ValidationError
-from prometheus_client import Histogram, Counter, generate_latest
+from prometheus_client import generate_latest
 from tornado import gen
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
@@ -24,6 +24,8 @@ from packages import PackagesAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from logging_utils import init_logging, get_logger
+from probes import REQUEST_COUNTS, UPDATES_V1_TIME, UPDATES_V2_TIME, CVES_TIME, REPOS_TIME, \
+     ERRATA_TIME, VULNERABILITIES_TIME
 
 # pylint: disable=too-many-lines
 
@@ -42,20 +44,6 @@ SPEC = APISpec(
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
 LOGGER = get_logger(__name__)
-
-# Prometheus support
-# We'd like to use something like @REQUEST_TIME.label(endpoint, get).time() in BaseHandler
-# to get independent Histogram info for all endpoints - but prometheus doesn't let us do that because label()
-# doesn't return a Histogram, but rather a LabelWrapper.
-UPDATES_V1_TIME = Histogram('vmaas_webapp_updates_v1_processing_seconds', 'Time spent processing /v1/updates requests')
-UPDATES_V2_TIME = Histogram('vmaas_webapp_updates_v2_processing_seconds', 'Time spent processing /v2/updates requests')
-CVES_TIME = Histogram('vmaas_webapp_cve_processing_seconds', 'Time spent processing /cves requests')
-REPOS_TIME = Histogram('vmaas_webapp_repos_processing_seconds', 'Time spent processing /repos requests')
-ERRATA_TIME = Histogram('vmaas_webapp_errata_processing_seconds', 'Time spent processing /errata requests')
-VULNERABILITIES_TIME = Histogram('vmaas_webapp_vulnerabilities_processing_seconds',
-                                 'Time spent processing /vulnerabilities requests')
-# ...and then we'll build Counter for all-the-things into the BaseHandler
-REQUEST_COUNTS = Counter('vmaas_webapp_handler_invocations', 'Number of calls per handler', ['method', 'endpoint'])
 
 
 class BaseHandler(tornado.web.RequestHandler):

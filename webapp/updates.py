@@ -6,6 +6,7 @@ import os
 import hashlib
 from jsonschema import validate
 
+from probes import UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
 from utils import join_packagename, split_packagename, none2empty
 
@@ -408,10 +409,13 @@ class UpdatesAPI:
                     resp = self.hot_cache.find(repo_ids_key + name)
 
                     if resp is not None:
+                        UPDATES_CACHE_HITS.inc()
                         response['update_list'][name] = resp
                     else:
+                        UPDATES_CACHE_MISSES.inc()
                         pkgs_not_in_cache.append(name)
                 else:
+                    # no need to put counter here as caching is disabled
                     pkgs_not_in_cache.append(name)
 
         # Start main processing of packages which are not in the hot cache
