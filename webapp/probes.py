@@ -19,4 +19,5 @@ REQUEST_COUNTS = Counter('vmaas_webapp_handler_invocations', 'Number of calls pe
 UPDATES_CACHE_HITS = Counter('vmaas_updates_cache_hits', 'Number of /updates hot cache hits')
 UPDATES_CACHE_MISSES = Counter('vmaas_updates_cache_misses', 'Number of /updates hot cache misses')
 
+HOT_CACHE_INSERTS = Counter('vmaas_hotcache_inserts', 'Number of inserts into cache')
 HOT_CACHE_REMOVAL = Counter('vmaas_hotcache_removal', 'Number of times something was removed from hot cache')

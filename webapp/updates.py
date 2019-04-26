@@ -6,7 +6,7 @@ import os
 import hashlib
 from jsonschema import validate
 
-from probes import HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
+from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
 from utils import join_packagename, split_packagename, none2empty
 
@@ -351,6 +351,7 @@ class UpdatesAPI:
                         })
 
             if self.use_hot_cache.upper() == "YES":
+                HOT_CACHE_INSERTS.inc()
                 self.hot_cache.insert(repo_ids_key + pkg, response['update_list'][pkg])
 
     def clear_hot_cache(self):
