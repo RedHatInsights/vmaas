@@ -6,7 +6,7 @@ import os
 import hashlib
 from jsonschema import validate
 
-from probes import UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
+from probes import HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
 from utils import join_packagename, split_packagename, none2empty
 
@@ -172,6 +172,7 @@ class HotCache:
         :return:
         """
         if level == self.max_cache_levels:
+            HOT_CACHE_REMOVAL.inc()
             node.left = None
             node.right = None
             return

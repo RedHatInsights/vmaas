@@ -1230,6 +1230,7 @@ def main():
     server.start(num_servers)  # start forking here
     init_logging(num_servers)
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+    LOGGER.info('Hotcache enabled: %s', os.getenv("HOTCACHE_ENABLED", "YES"))
 
     # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
