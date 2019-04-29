@@ -106,6 +106,7 @@ class PackageStore(ObjectStore):
         cur = self.conn.cursor()
         self.logger.debug("Unique package names in repository: %d", len(unique_names))
         to_import = []
+        self.package_name_map = self._prepare_package_name_map()
         for name in unique_names:
             if name not in self.package_name_map:
                 to_import.append((name,))
