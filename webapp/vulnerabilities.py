@@ -3,18 +3,18 @@ Module to handle /vulnerabilities API calls.
 """
 
 from cache import ERRATA_CVE
-from updates import UpdatesAPI
 
 
 class VulnerabilitiesAPI:
     """Main /vulnerabilities API class"""
 
-    def __init__(self, db_cache):
+    def __init__(self, db_cache, updates_api):
         self.db_cache = db_cache
+        self.updates_api = updates_api
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """Return list of potential security issues"""
-        updates = UpdatesAPI(self.db_cache).process_list(2, data)
+        updates = self.updates_api.process_list(2, data)
         errata_list = set()
         cve_list = set()
         for package in updates['update_list']:

@@ -7,6 +7,7 @@ from test.conftest import TestBase
 
 import pytest
 
+from updates import UpdatesAPI
 from vulnerabilities import VulnerabilitiesAPI
 
 PKG = "bash-0:4.2.46-20.el7_2.x86_64"
@@ -31,7 +32,7 @@ class TestVulnerabilitiesAPI(TestBase):
     @pytest.fixture(autouse=True)
     def setup_api(self, load_cache):
         """Setup UpdatesAPI object."""
-        self.vulnerabilities_api = VulnerabilitiesAPI(self.cache)
+        self.vulnerabilities_api = VulnerabilitiesAPI(self.cache, UpdatesAPI(self.cache))
 
     def test_schema(self):
         """Test schema of vulnerabilities api."""
