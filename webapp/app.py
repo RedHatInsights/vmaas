@@ -1239,7 +1239,7 @@ def main():
     BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
     BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
-    BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache)
+    BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
     vmaas_app.websocket_reconnect()
