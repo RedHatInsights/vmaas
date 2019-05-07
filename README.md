@@ -139,6 +139,8 @@ Build the images and start containers
 
 Congratulations!
 
+### Run tests
+```docker-compose -f docker-compose.test.yml up --build```
 
 ### Developing / Debugging
 

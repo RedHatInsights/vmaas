@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 rc=0
 
@@ -44,7 +44,7 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pytest --cov=. -v
+pytest --cov=. -v --color=yes
 rc=$(($rc+$?))
 
 if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
