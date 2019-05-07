@@ -1,0 +1,13 @@
+FROM python:3.6.8-stretch
+
+RUN apt-get update -y && \
+    apt-get install -y postgresql libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip && \
+    pip install pylint psycopg2-binary requests tornado "apispec==0.39.0" python-dateutil jsonschema schema "pytest>=3.6" pytest-cov codecov iso8601 pytz testing.postgresql prometheus_client pyyaml
+
+ADD . /vmaas
+RUN chown -R postgres:postgres /vmaas
+
+USER postgres

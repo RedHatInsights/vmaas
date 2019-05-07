@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  vmaas_reposcan:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: bash -c "cd /vmaas && ./run_tests.sh reposcan && ./run_tests.sh webapp && ./run_tests.sh websocket"
