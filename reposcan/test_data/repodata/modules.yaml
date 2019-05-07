@@ -1,0 +1,218 @@
+---
+document: modulemd
+version: 2
+data:
+  name: perl-YAML
+  stream: 1.24
+  version: 820181214175558
+  context: 8652dbeb
+  arch: x86_64
+  summary: Perl parser for YAML
+  description: >
+    The YAML.pm module implements a YAML Loader and Dumper based on the YAML 1.0 specification.
+    YAML is a generic data serialization language that is optimized for human readability.
+    It can be used to express the data structures of most modern programming languages,
+    including Perl. For information on the YAML syntax, please refer to the YAML specification.
+  license:
+    module:
+    - MIT
+    content:
+    - GPL+ or Artistic
+  xmd:
+    mbs:
+      mse: TRUE
+      scmurl: git://pkgs.devel.redhat.com/modules/perl-YAML?#aed63de3a5e4619b4d47a9cbf56d1a45fa307d39
+      commit: aed63de3a5e4619b4d47a9cbf56d1a45fa307d39
+      buildrequires:
+        platform:
+          stream_collision_modules: 
+          stream: el8
+          ref: virtual
+          filtered_rpms: []
+          ursine_rpms: 
+          koji_tag: module-rhel-8.0.0-build
+          version: 2
+          context: 00000000
+        perl-YAML-bootstrap:
+          koji_tag: module-perl-YAML-bootstrap-1.24-820181214144021-fbe42456
+          stream: 1.24
+          ref: 58f8b9d5b32c0b7ee746308190a3c5d3efc66dbb
+          context: fbe42456
+          filtered_rpms: []
+          version: 820181214144021
+        perl:
+          koji_tag: module-perl-5.26-20181002144634-9edba152
+          stream: 5.26
+          ref: bc915cd2442f22ed91e358f8a417be25bb52e2e1
+          context: 9edba152
+          filtered_rpms: []
+          version: 20181002144634
+      rpms:
+        perl-YAML:
+          ref: 2d4de98155dab5adce4ae29017f075f9a0fbafcb
+  dependencies:
+  - buildrequires:
+      perl: [5.26]
+      perl-YAML-bootstrap: [1.24]
+      platform: [el8]
+    requires:
+      perl: [5.26]
+      platform: [el8]
+  references:
+    community: https://metacpan.org/release/YAML
+  profiles:
+    common:
+      description: YAML distribution
+      rpms:
+      - perl-YAML
+  api:
+    rpms:
+    - perl-YAML
+  buildopts:
+    rpms:
+      macros: |
+        %_with_perl_YAML_enables_test 1
+  components:
+    rpms:
+      perl-YAML:
+        rationale: The API.
+        repository: git://pkgs.devel.redhat.com/rpms/perl-YAML
+        cache: http://pkgs.devel.redhat.com/repo/pkgs/perl-YAML
+        ref: stream-1.24
+        arches: [aarch64, i686, ppc64le, s390x, x86_64]
+  artifacts:
+    rpms:
+    - perl-YAML-0:1.24-2.module+el8+2543+db7a354e.noarch
+...
+---
+document: modulemd
+version: 2
+data:
+  name: subversion
+  stream: 1.10
+  version: 820181215112250
+  context: a51370e3
+  arch: x86_64
+  summary: Apache Subversion
+  description: >-
+    Apache Subversion, a Modern Version Control System
+  license:
+    module:
+    - MIT
+    content:
+    - ASL 2.0
+    - Unicode and MIT
+  xmd:
+    mbs:
+      mse: TRUE
+      scmurl: git://pkgs.devel.redhat.com/modules/subversion?#09be7f26cabb95617462a1904d02f434e6d7eb72
+      commit: 09be7f26cabb95617462a1904d02f434e6d7eb72
+      buildrequires:
+        swig:
+          koji_tag: module-swig-3.0-820181213143944-9edba152
+          stream: 3.0
+          ref: 614664ffe23df4b09828e6021bebd354b82977ee
+          context: 9edba152
+          filtered_rpms: []
+          version: 820181213143944
+        platform:
+          stream_collision_modules: 
+          stream: el8
+          ref: virtual
+          filtered_rpms: []
+          ursine_rpms: 
+          koji_tag: module-rhel-8.0.0-build
+          version: 2
+          context: 00000000
+        httpd:
+          koji_tag: module-httpd-2.4-820181213135705-9edba152
+          stream: 2.4
+          ref: b67e51ed813eec6681b3425ad6fdc1fa0121d54a
+          context: 9edba152
+          filtered_rpms: []
+          version: 820181213135705
+      rpms:
+        libserf:
+          ref: c118b600119eb59d30fe15897419aaf3bf66336c
+        subversion:
+          ref: 99518d73f93f5a3dda61241c4c7fefd7eeffb23d
+        utf8proc:
+          ref: 7f7b2a133a54e621119c03bd7b8df40210e50b2f
+  dependencies:
+  - buildrequires:
+      httpd: [2.4]
+      platform: [el8]
+      swig: [3.0]
+    requires:
+      platform: [el8]
+  references:
+    documentation: http://subversion.apache.org/docs/
+    tracker: https://issues.apache.org/jira/projects/SVN
+  profiles:
+    common:
+      rpms:
+      - subversion
+      - subversion-libs
+      - subversion-tools
+    server:
+      rpms:
+      - mod_dav_svn
+      - subversion
+      - subversion-libs
+      - subversion-tools
+  api:
+    rpms:
+    - mod_dav_svn
+    - subversion
+    - subversion-devel
+    - subversion-libs
+  filter:
+    rpms:
+    - libserf-devel
+    - python3-subversion
+    - subversion-ruby
+    - utf8proc-devel
+  buildopts:
+    rpms:
+      macros: |
+        %_without_kwallet 1
+        %_without_python2 1
+        %_with_python3 1
+        %_without_bdb 1
+        %_without_pyswig 1
+  components:
+    rpms:
+      libserf:
+        rationale: Build dependency.
+        repository: git://pkgs.devel.redhat.com/rpms/libserf
+        cache: http://pkgs.devel.redhat.com/repo/pkgs/libserf
+        ref: stream-v1
+        buildorder: 10
+        arches: [aarch64, i686, ppc64le, s390x, x86_64]
+      subversion:
+        rationale: Module API.
+        repository: git://pkgs.devel.redhat.com/rpms/subversion
+        cache: http://pkgs.devel.redhat.com/repo/pkgs/subversion
+        ref: stream-1.10
+        buildorder: 20
+        arches: [aarch64, i686, ppc64le, s390x, x86_64]
+      utf8proc:
+        rationale: Build dependency.
+        repository: git://pkgs.devel.redhat.com/rpms/utf8proc
+        cache: http://pkgs.devel.redhat.com/repo/pkgs/utf8proc
+        ref: stream-v2
+        buildorder: 10
+        arches: [aarch64, i686, ppc64le, s390x, x86_64]
+  artifacts:
+    rpms:
+    - libserf-0:1.3.9-8.module+el8+2562+4c88223a.x86_64
+    - mod_dav_svn-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-devel-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-gnome-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-javahl-0:1.10.2-1.module+el8+2562+4c88223a.noarch
+    - subversion-libs-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-perl-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - subversion-tools-0:1.10.2-1.module+el8+2562+4c88223a.x86_64
+    - utf8proc-0:2.1.1-4.module+el8+2562+4c88223a.x86_64
+...
