@@ -24,7 +24,7 @@ class YamlCache(Cache):
         """Load cache from YAML file."""
         with open(self.filename, "r") as stream:
             try:
-                data = yaml.load(stream)
+                data = yaml.full_load(stream)
             except yaml.YAMLError as err:
                 print(err)
 
