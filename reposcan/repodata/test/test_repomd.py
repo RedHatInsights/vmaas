@@ -10,8 +10,7 @@ from repodata.repomd import RepoMD, RepoMDTypeNotFound
 class TestRepoMD(unittest.TestCase):
     """Test RepoMD class."""
     def setUp(self):
-        """Setup two repomd files. First with all sections. Second with primary section only.
-        """
+        """Setup two repomd files. First with all sections. Second with primary section only."""
         self.repomd = RepoMD("test_data/repodata/repomd.xml")
         self.repomd_primary_only = RepoMD("test_data/repodata/repomd_primary_only.xml")
 
