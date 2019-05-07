@@ -4,10 +4,14 @@ RUN apt-get update -y && \
     apt-get install -y postgresql libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip && \
-    pip install pylint psycopg2-binary requests tornado "apispec==0.39.0" python-dateutil jsonschema schema "pytest>=3.6" pytest-cov codecov iso8601 pytz testing.postgresql prometheus_client pyyaml
-
 ADD . /vmaas
+
+RUN pip install --upgrade pip && \
+    pip install -r /vmaas/reposcan/requirements.txt && \
+    pip install -r /vmaas/webapp/requirements.txt && \
+    pip install -r /vmaas/websocket/requirements.txt && \
+    pip install -r /vmaas/requirements_tests.txt
+
 RUN chown -R postgres:postgres /vmaas
 
 USER postgres
