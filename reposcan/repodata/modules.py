@@ -3,6 +3,7 @@ Module containing class for modules metadata.
 """
 import yaml
 
+
 class ModuleMD:
     """Class parsing modules.yaml, takes filename in the constructor"""
     def __init__(self, filename):
@@ -14,7 +15,7 @@ class ModuleMD:
             content = fdesc.read()
         groups = content.replace('...', '').split('---')[1:]  # get rid of modulemd separators
         for chunk in groups:
-            parsed = yaml.load(chunk)
+            parsed = yaml.full_load(chunk)
             data = parsed['data']
             if parsed['document'] == 'modulemd':
                 name = data['name']
