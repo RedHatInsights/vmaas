@@ -846,7 +846,6 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
   pkg_id INT NOT NULL,
   errata_id INT NOT NULL,
   module_stream_id INT,
-  UNIQUE (pkg_id, errata_id),
   CONSTRAINT pkg_id
     FOREIGN KEY (pkg_id)
     REFERENCES package (id),
@@ -860,6 +859,11 @@ CREATE TABLE IF NOT EXISTS pkg_errata (
 CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
   FOR EACH STATEMENT
   EXECUTE PROCEDURE errata_changed();
+
+CREATE UNIQUE INDEX pkg_errata_pkgid_errataid ON pkg_errata (pkg_id, errata_id)
+WHERE module_stream_id IS NULL;
+CREATE UNIQUE INDEX pkg_errata_pkgid_streamid_errataid ON pkg_errata (pkg_id, module_stream_id, errata_id)
+WHERE module_stream_id IS NOT NULL;
 
 CREATE INDEX ON pkg_errata(errata_id);
 CREATE INDEX ON pkg_errata(module_stream_id);
