@@ -44,7 +44,7 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pytest --cov=. -v --color=yes
+pytest --cov=. -v --color=yes --durations=0
 rc=$(($rc+$?))
 
 if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
