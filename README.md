@@ -140,7 +140,9 @@ Build the images and start containers
 Congratulations!
 
 ### Run tests
-```docker-compose -f docker-compose.test.yml up --build```
+
+You can run all tests from scratch just after cloning repo using command:
+```docker-compose -f docker-compose.test.yml up --build --exit-code-from test```
 
 ### Developing / Debugging
 
