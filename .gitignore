@@ -101,3 +101,6 @@ ENV/
 
 # VS Code
 .vscode
+
+# cache files
+*~
