@@ -9,10 +9,5 @@ python:
   - "3.6"
 notifications:
   email: false
-install:
-  - pip install --upgrade pip
-  - pip install pylint psycopg2 requests tornado "apispec==0.39.0" python-dateutil jsonschema schema "pytest>=3.6" pytest-cov codecov iso8601 pytz testing.postgresql prometheus_client pyyaml
 script:
-  - /bin/bash run_tests.sh reposcan
-  - /bin/bash run_tests.sh webapp
-  - /bin/bash run_tests.sh websocket
+  - docker-compose -f docker-compose.test.yml up --build --exit-code-from test
