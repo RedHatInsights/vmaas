@@ -53,7 +53,7 @@ if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
 fi
 
 # Run pylint
-find . -iname '*.py' | xargs pylint --rcfile=../pylintrc
+find . -iname '*.py' | xargs pylint --rcfile=../pylintrc --output-format=colorized
 rc=$(($rc+$?))
 
 # Upload to Codecov.io
