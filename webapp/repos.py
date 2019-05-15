@@ -6,23 +6,25 @@ import re
 from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
-from utils import paginate, none2empty
+from utils import paginate, none2empty, parse_datetime
 
 JSON_SCHEMA = {
-    'type' : 'object',
+    'type': 'object',
     'required': ['repository_list'],
-    'properties' : {
+    'properties': {
         'repository_list': {
-            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
-            },
-        'page_size' : {'type' : 'number'},
-        'page' : {'type' : 'number'}
+            'type': 'array', 'items': {'type': 'string'}, 'minItems': 1
+        },
+        'modified_since': {'type': 'string'},
+        'page_size': {'type': 'number'},
+        'page': {'type': 'number'}
     }
 }
 
 
 class RepoAPI:
     """ Main /repos API class."""
+
     def __init__(self, cache):
         self.cache = cache
 
@@ -42,7 +44,7 @@ class RepoAPI:
 
         return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument
+    def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns repository details.
 
@@ -53,11 +55,14 @@ class RepoAPI:
         validate(data, JSON_SCHEMA)
 
         repos = data.get('repository_list', None)
+        modified_since = data.get('modified_since', None)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
         repolist = {}
         if not repos:
             return repolist
+        if modified_since:
+            modified_since = parse_datetime(modified_since)
 
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
@@ -68,14 +73,16 @@ class RepoAPI:
         for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-                repolist.setdefault(label, []).append({
-                    "label": label,
-                    "name": repo_detail[REPO_NAME],
-                    "url": repo_detail[REPO_URL],
-                    "basearch": none2empty(repo_detail[REPO_BASEARCH]),
-                    "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
-                    "product": repo_detail[REPO_PRODUCT],
-                    "revision": repo_detail[REPO_REVISION]
+                if not modified_since or (repo_detail[REPO_REVISION] != 'None' \
+                    and parse_datetime(repo_detail[REPO_REVISION]) > modified_since):
+                    repolist.setdefault(label, []).append({
+                        "label": label,
+                        "name": repo_detail[REPO_NAME],
+                        "url": repo_detail[REPO_URL],
+                        "basearch": none2empty(repo_detail[REPO_BASEARCH]),
+                        "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
+                        "product": repo_detail[REPO_PRODUCT],
+                        "revision": repo_detail[REPO_REVISION]
                     })
 
         response = {
