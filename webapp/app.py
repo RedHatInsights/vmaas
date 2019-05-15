@@ -496,6 +496,10 @@ class ReposHandlerPost(BaseHandler):
                   items:
                     type: string
                     example: rhel-6-server-rpms, rhel-7-server-rpms
+                modified_since:
+                  type: string
+                  example: "2018-04-05T01:23:45+02:00"
+                  description: Return only repositories changed after the given date
               required:
                 - repository_list
         responses:
