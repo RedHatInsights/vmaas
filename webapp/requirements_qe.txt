@@ -1,0 +1,10 @@
+prometheus-client==0.6.0
+psycopg2-binary==2.8.2
+tornado==6.0.2
+apispec==0.39.0
+python-dateutil==2.8.0
+jsonschema==3.0.1
+schema==0.7.0
+pytz==2019.1
+iso8601==0.1.12
+coverage==4.5.3

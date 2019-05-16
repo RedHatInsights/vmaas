@@ -21,7 +21,7 @@ ADD $APPBASEDIR/*.py $APPBASEDIR/
 ADD $APPBASEDIR/*.txt $APPBASEDIR/
 
 RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip && \
-    $APPBASEDIR/scl-enable.sh pip install -r $APPBASEDIR/requirements.txt
+    $APPBASEDIR/scl-enable.sh pip install -r $APPBASEDIR/requirements_qe.txt
 
 USER vmaas
 
