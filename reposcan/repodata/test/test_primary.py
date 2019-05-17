@@ -19,7 +19,6 @@ class TestPrimaryMD(unittest.TestCase):
             self.assertTrue(field in actual_fields)
         for field in actual_fields:
             self.assertTrue(field in intended_fields)
-            self.assertIsNotNone(pkg[field])
             self.assertEqual(str, type(pkg[field]))
 
     def test_invalid_file(self):
