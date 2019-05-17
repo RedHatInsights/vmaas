@@ -19,6 +19,8 @@ class TestPrimaryMD(unittest.TestCase):
             self.assertTrue(field in actual_fields)
         for field in actual_fields:
             self.assertTrue(field in intended_fields)
+            self.assertIsNotNone(pkg[field])
+            self.assertEqual(str, type(pkg[field]))
 
     def test_invalid_file(self):
         """Test case when file doesn't exist or is invalid."""
@@ -33,6 +35,7 @@ class TestPrimaryMD(unittest.TestCase):
         packages = self.primary.list_packages()
         # Package count read from field and number of actually parsed packages should be same
         self.assertEqual(pkg_count, len(packages))
+        self.assertEqual(12, pkg_count)
         # Test fields of packages in list
         for pkg in packages:
             self._test_package(pkg)
