@@ -169,5 +169,5 @@ class RepositoryStore:
                                                                            repository.releasever))))
         repo_id = self.import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
-        self.module_store.store(repo_id, repository.list_modules())
+        #  self.module_store.store(repo_id, repository.list_modules())
         self.update_store.store(repo_id, repository.list_updates())
