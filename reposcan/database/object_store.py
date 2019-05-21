@@ -5,6 +5,7 @@ Module containing shared code between various *Store classes
 from common.logging import get_logger
 from database.database_handler import DatabaseHandler
 
+
 class ObjectStore:
     """Shared code between various *Store classes"""
 
@@ -41,20 +42,19 @@ class ObjectStore:
         cur.close()
         return modules_in_repo
 
-    def _prepare_arch_map(self):
-        arch_map = {}
+    def _prepare_table_map(self, cols, table):
+        """Create map from table map[columns] -> id."""
+        table_map = {}
         cur = self.conn.cursor()
-        cur.execute("select id, name from arch")
-        for arch_id, name in cur.fetchall():
-            arch_map[name] = arch_id
+        if len(cols) == 1:
+            sql = "select id, %s from %s" % (cols[0], table)
+            cur.execute(sql)
+            for row in cur.fetchall():
+                table_map[row[1]] = row[0]  # column value is a key
+        else:
+            sql = "select id, %s from %s" % (",".join(cols), table)
+            cur.execute(sql)
+            for row in cur.fetchall():
+                table_map[tuple(row[1:])] = row[0]  # tuple of columns values is a key
         self.conn.commit()
-        return arch_map
-
-    def _prepare_package_name_map(self):
-        package_name_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, name from package_name")
-        for name_id, name in cur.fetchall():
-            package_name_map[name] = name_id
-        self.conn.commit()
-        return package_name_map
+        return table_map

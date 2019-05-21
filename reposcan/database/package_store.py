@@ -15,38 +15,11 @@ class PackageStore(ObjectStore):
     """
     def __init__(self):
         super().__init__()
-        self.arch_map = self._prepare_arch_map()
-        self.checksum_type_map = self._prepare_checksum_type_map()
-        self.evr_map = self._prepare_evr_map()
-        self.package_name_map = self._prepare_package_name_map()
-        self.package_map = self._prepare_package_map()
-
-    def _prepare_checksum_type_map(self):
-        checksum_type_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, name from checksum_type")
-        for ct_id, name in cur.fetchall():
-            checksum_type_map[name] = ct_id
-        self.conn.commit()
-        return checksum_type_map
-
-    def _prepare_evr_map(self):
-        evr_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, epoch, version, release from evr")
-        for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
-            evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
-        self.conn.commit()
-        return evr_map
-
-    def _prepare_package_map(self):
-        package_map = {}
-        cur = self.conn.cursor()
-        cur.execute("SELECT id, checksum_type_id, checksum from package")
-        for pkg_id, checksum_type_id, checksum in cur.fetchall():
-            package_map[(checksum_type_id, checksum)] = pkg_id
-        self.conn.commit()
-        return package_map
+        self.arch_map = self._prepare_table_map(cols=["name"], table="arch")
+        self.checksum_type_map = self._prepare_table_map(cols=["name"], table="checksum_type")
+        self.evr_map = self._prepare_table_map(cols=["epoch", "version", "release"], table="evr")
+        self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
+        self.package_map = self._prepare_table_map(cols=["checksum_type_id", "checksum"], table="package")
 
     def _populate_archs(self, unique_archs):
         cur = self.conn.cursor()
@@ -106,7 +79,7 @@ class PackageStore(ObjectStore):
         cur = self.conn.cursor()
         self.logger.debug("Unique package names in repository: %d", len(unique_names))
         to_import = []
-        self.package_name_map = self._prepare_package_name_map()
+        self.package_name_map = self._prepare_table_map(["name"], "package_name")
         for name in unique_names:
             if name not in self.package_name_map:
                 to_import.append((name,))
