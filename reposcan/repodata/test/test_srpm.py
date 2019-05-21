@@ -9,13 +9,29 @@ from repodata import srpm
 class TestSrpm(unittest.TestCase):
     """Test srpm module functions"""
 
-    def test_parse_1(self):
+    def test_parse_1_srpm(self):
         """Test parsing valid srpm name."""
-        name, _, ver, _ = srpm.parse_srpm_name('389-ds-base-1.3.7.8-1.fc27.src.rpm')
+        name, epoch, ver, rel, arch = srpm.parse_srpm_name('389-ds-base-1.3.7.8-1.fc27.src.rpm')
+        self.assertEqual("0", epoch)
         self.assertEqual("389-ds-base", name)
         self.assertEqual("1.3.7.8", ver)
+        self.assertEqual("1.fc27", rel)
+        self.assertEqual("src", arch)
 
-    def test_parse_2(self):
-        """Test parsing invalid srpm name."""
-        with self.assertRaises(srpm.SRPMParseException):
-            srpm.parse_srpm_name('fake.src.rpm')
+    def test_parse_2_rpm(self):
+        """Test parsing valid rpm name."""
+        name, epoch, ver, rel, arch = srpm.parse_srpm_name('Agda-2.5.2-9.fc27.x86_64.rpm')
+        self.assertEqual("0", epoch)
+        self.assertEqual("Agda", name)
+        self.assertEqual("2.5.2", ver)
+        self.assertEqual("9.fc27", rel)
+        self.assertEqual("x86_64", arch)
+
+    def test_parse_3_epoch(self):
+        """Test parsing valid rpm name."""
+        name, epoch, ver, rel, arch = srpm.parse_srpm_name('3:Agda-2.5.2-9.fc27.x86_64.rpm')
+        self.assertEqual("3", epoch)
+        self.assertEqual("Agda", name)
+        self.assertEqual("2.5.2", ver)
+        self.assertEqual("9.fc27", rel)
+        self.assertEqual("x86_64", arch)
