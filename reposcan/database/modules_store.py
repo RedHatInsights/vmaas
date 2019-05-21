@@ -14,7 +14,7 @@ class ModulesStore(ObjectStore):
         cur = self.conn.cursor()
         names = set()
         module_map = {}
-        arch_map = self._prepare_arch_map()
+        arch_map = self._prepare_table_map(["name"], "arch")
         for module in modules:
             names.add((module['name'], arch_map[module['arch']], repo_id))
         if names:
