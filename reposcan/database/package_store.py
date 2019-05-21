@@ -21,37 +21,21 @@ class PackageStore(ObjectStore):
         self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
         self.package_map = self._prepare_table_map(cols=["checksum_type_id", "checksum"], table="package")
 
-    def _populate_archs(self, unique_archs):
+    def _populate_dep_table(self, table, unique_items, table_map):
+        """Populate dependency table with column 'name'."""
         cur = self.conn.cursor()
-        self.logger.debug("Unique architectures in repository: %d", len(unique_archs))
+        self.logger.debug("Unique %s's in repository: %d", table, len(unique_items))
         to_import = []
-        for name in unique_archs:
-            if name not in self.arch_map:
-                to_import.append((name,))
+        for row in unique_items:
+            if row not in table_map:
+                to_import.append((row, ))
 
-        self.logger.debug("Architectures to import: %d", len(to_import))
+        self.logger.debug("%s's to import: %d", table, len(to_import))
         if to_import:
-            execute_values(cur, "insert into arch (name) values %s returning id, name",
-                           to_import, page_size=len(to_import))
-            for arch_id, name in cur.fetchall():
-                self.arch_map[name] = arch_id
-        cur.close()
-        self.conn.commit()
-
-    def _populate_checksum_types(self, unique_checksum_types):
-        cur = self.conn.cursor()
-        self.logger.debug("Unique checksum types in repository: %d", len(unique_checksum_types))
-        to_import = []
-        for name in unique_checksum_types:
-            if name not in self.checksum_type_map:
-                to_import.append((name,))
-
-        self.logger.debug("Checksum types to import: %d", len(to_import))
-        if to_import:
-            execute_values(cur, "insert into checksum_type (name) values %s returning id, name",
-                           to_import, page_size=len(to_import))
-            for ct_id, name in cur.fetchall():
-                self.checksum_type_map[name] = ct_id
+            sql = "insert into %s (name) values %%s returning id, name" % table
+            execute_values(cur, sql, to_import, page_size=len(to_import))
+            for row in cur.fetchall():
+                table_map[row[1]] = row[0]
         cur.close()
         self.conn.commit()
 
@@ -75,24 +59,6 @@ class PackageStore(ObjectStore):
         cur.close()
         self.conn.commit()
 
-    def _populate_package_names(self, unique_names):
-        cur = self.conn.cursor()
-        self.logger.debug("Unique package names in repository: %d", len(unique_names))
-        to_import = []
-        for name in unique_names:
-            if name not in self.package_name_map:
-                to_import.append((name,))
-
-        self.logger.debug("Package names to import: %d", len(to_import))
-        if to_import:
-            execute_values(cur,
-                           """insert into package_name (name) values %s returning id, name""",
-                           to_import, page_size=len(to_import))
-            for name_id, name in cur.fetchall():
-                self.package_name_map[name] = name_id
-        cur.close()
-        self.conn.commit()
-
     def _populate_dependent_tables(self, packages):
         unique_archs = set()
         unique_checksum_types = set()
@@ -105,10 +71,11 @@ class PackageStore(ObjectStore):
             unique_checksum_types.add(pkg["checksum_type"])
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
             unique_names.add(pkg["name"])
-        self._populate_archs(unique_archs)
-        self._populate_checksum_types(unique_checksum_types)
+
+        self._populate_dep_table("arch", unique_archs, self.arch_map)
+        self._populate_dep_table("checksum_type", unique_checksum_types, self.checksum_type_map)
+        self._populate_dep_table("package_name", unique_names, self.package_name_map)
         self._populate_evrs(unique_evrs)
-        self._populate_package_names(unique_names)
 
     def _populate_packages(self, packages):
         self._populate_dependent_tables(packages)
