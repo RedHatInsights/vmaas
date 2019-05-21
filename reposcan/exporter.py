@@ -127,12 +127,12 @@ class DataDump:
         """Select details about packages (for previously selected package names)"""
         if self.packagename_ids:
             with self._named_cursor() as cursor:
-                cursor.execute("""select id, name_id, evr_id, arch_id, summary, description
+                cursor.execute("""select id, name_id, evr_id, arch_id, srpm_id, summary, description
                                     from package
                                    where name_id in %s
                                """, [tuple(self.packagename_ids)])
-                for pkg_id, name_id, evr_id, arch_id, summary, description in cursor:
-                    dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, summary, description)
+                for pkg_id, name_id, evr_id, arch_id, srpm_id, summary, description in cursor:
+                    dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, srpm_id, summary, description)
                     dump["nevra2pkgid:%s:%s:%s" % (name_id, evr_id, arch_id)] = pkg_id
                     self.package_ids.append(pkg_id)
 
