@@ -12,17 +12,14 @@ INSERT INTO evr (id, epoch, version, release, evr) VALUES
   (205, '3', '3', '3', ('3', rpmver_array('3'), rpmver_array('3'))),
   (206, '4', '4', '4', ('4', rpmver_array('4'), rpmver_array('4')));
 
-INSERT INTO checksum_type (id, name) VALUES
-  (1, 'sha1');
-
-INSERT INTO package (id, name_id, evr_id, arch_id, checksum, checksum_type_id, summary, description) VALUES
-  (301, 101, 201, 1, 'checksum1', 1, 'summary1', 'description1'),
-  (302, 101, 202, 1, 'checksum2', 1, 'summary1', 'description1'),
-  (303, 101, 203, 1, 'checksum3', 1, 'summary1', 'description1'),
-  (304, 102, 204, 1, 'checksum4', 1, 'summary2', 'description2'),
-  (305, 103, 205, 1, 'checksum5', 1, 'summary3', 'description3'),
-  (306, 103, 206, 1, 'checksum6', 1, 'summary3', 'description3'),
-  (307, 104, 204, 1, 'checksum7', 1, 'summary4', 'description4');
+INSERT INTO package (id, name_id, evr_id, arch_id, summary, description) VALUES
+  (301, 101, 201, 1, 'summary1', 'description1'),
+  (302, 101, 202, 1, 'summary1', 'description1'),
+  (303, 101, 203, 1, 'summary1', 'description1'),
+  (304, 102, 204, 1, 'summary2', 'description2'),
+  (305, 103, 205, 1, 'summary3', 'description3'),
+  (306, 103, 206, 1, 'summary3', 'description3'),
+  (307, 104, 204, 1, 'summary4', 'description4');
 
 INSERT INTO errata_type (id, name) VALUES
   (1, 'security'),
