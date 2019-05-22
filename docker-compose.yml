@@ -75,13 +75,6 @@ services:
       - vmaas_reposcan
       - vmaas_webapp
 
-  vmaas_adminer:
-    image: adminer:4.6.3
-    ports:
-      - 8888:8080
-    depends_on:
-      - vmaas_database
-
 volumes:
   vmaas-db-data:
   vmaas-dump-data:
