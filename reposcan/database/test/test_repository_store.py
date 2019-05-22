@@ -122,7 +122,7 @@ class TestRepositoryStore:
     def test_srpm(self, db_conn, repository):
         """Test that packages from repo are present in DB."""
         cur = db_conn.cursor()
-        cur.execute("select count(*) from srpm")
+        cur.execute("select count(*) from source_package")
         srpm_num = cur.fetchone()[0]
 
         assert srpm_num == 6  # 6 srpms expected from primary.xml/primary.db
