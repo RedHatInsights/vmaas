@@ -171,16 +171,6 @@ CREATE TABLE IF NOT EXISTS evr (
 
 
 -- -----------------------------------------------------
--- Table vmaas.checksum_type
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS checksum_type (
-  id SERIAL,
-  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
-  PRIMARY KEY (id)
-)TABLESPACE pg_default;
-
-
--- -----------------------------------------------------
 -- Table vmaas.arch
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS arch (
@@ -407,11 +397,9 @@ CREATE TABLE IF NOT EXISTS package (
   name_id INT NOT NULL,
   evr_id INT NOT NULL,
   arch_id INT NOT NULL,
-  checksum TEXT NOT NULL, CHECK (NOT empty(checksum)),
-  checksum_type_id INT NOT NULL,
   summary TEXT NULL, CHECK (NOT empty(summary)),
   description TEXT NULL, CHECK (NOT empty(description)),
-  UNIQUE (checksum_type_id, checksum),
+  UNIQUE (name_id, evr_id, arch_id),
   PRIMARY KEY (id),
   CONSTRAINT name_id
     FOREIGN KEY (name_id)
@@ -421,10 +409,7 @@ CREATE TABLE IF NOT EXISTS package (
     REFERENCES evr (id),
   CONSTRAINT arch_id
     FOREIGN KEY (arch_id)
-    REFERENCES arch (id),
-  CONSTRAINT checksum_type_id
-    FOREIGN KEY (checksum_type_id)
-    REFERENCES checksum_type (id)
+    REFERENCES arch (id)
 )TABLESPACE pg_default;
 
 CREATE INDEX ON package(name_id);
