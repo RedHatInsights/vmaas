@@ -13,7 +13,7 @@ class PrimaryDatabaseMD:
         cur = conn.cursor()
         sql = """
             select name, epoch, version, release, arch,
-                   summary, description, checksum_type, pkgid
+                   summary, description
               from packages"""
         for row in cur.execute(sql):
             self.packages.append({
@@ -23,9 +23,7 @@ class PrimaryDatabaseMD:
                 "rel": row["release"],
                 "arch": row["arch"],
                 "summary": row["summary"],
-                "description": row["description"],
-                "checksum_type": row["checksum_type"],
-                "checksum": row["pkgid"]
+                "description": row["description"]
             })
         conn.close()
 
