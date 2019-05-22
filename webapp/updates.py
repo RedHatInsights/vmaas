@@ -289,32 +289,33 @@ class UpdatesAPI:
             if not current_evr_indexes:
                 continue
 
-            current_nevra_pkg_ids = set()
+            current_nevra_pkg_id = None
             for current_evr_index in current_evr_indexes:
                 pkg_id = self.db_cache.updates[name_id][current_evr_index]
                 current_nevra_arch_id = self.db_cache.package_details[pkg_id][2]
                 if current_nevra_arch_id == arch_id:
-                    current_nevra_pkg_ids.add(pkg_id)
+                    current_nevra_pkg_id = pkg_id
+                    break
 
             # Package with given NEVRA not found in cache/DB
-            if not current_nevra_pkg_ids:
+            if not current_nevra_pkg_id:
                 continue
 
-            pkg_id = next(iter(current_nevra_pkg_ids))
             if api_version == 1:
-                response['update_list'][pkg]['summary'] = self.db_cache.package_details[pkg_id][3]
-                response['update_list'][pkg]['description'] = self.db_cache.package_details[pkg_id][4]
+                response['update_list'][pkg]['summary'] = \
+                    self.db_cache.package_details[current_nevra_pkg_id][3]
+                response['update_list'][pkg]['description'] = \
+                    self.db_cache.package_details[current_nevra_pkg_id][4]
             response['update_list'][pkg]['available_updates'] = []
 
             # No updates found for given NEVRA
             last_version_pkg_id = self.db_cache.updates[name_id][-1]
-            if last_version_pkg_id in current_nevra_pkg_ids:
+            if last_version_pkg_id == current_nevra_pkg_id:
                 continue
 
             # Get associated product IDs
             original_package_repo_ids = set()
-            for current_nevra_pkg_id in current_nevra_pkg_ids:
-                original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(current_nevra_pkg_id, []))
+            original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(current_nevra_pkg_id, []))
             product_ids = self._get_related_products(original_package_repo_ids)
             valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
 
