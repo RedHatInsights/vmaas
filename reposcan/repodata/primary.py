@@ -30,9 +30,6 @@ class PrimaryMD:
                     package["arch"] = text_strip(elem.find("primary:arch", NS))
                     package["summary"] = text_strip(elem.find("primary:summary", NS))
                     package["description"] = text_strip(elem.find("primary:description", NS))
-                    checksum = elem.find("primary:checksum", NS)
-                    package["checksum_type"] = checksum.get("type")
-                    package["checksum"] = text_strip(checksum)
                     self.packages.append(package)
                     # Clear the XML tree continuously
                     root.clear()
