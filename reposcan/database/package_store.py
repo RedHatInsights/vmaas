@@ -5,8 +5,6 @@ from psycopg2.extras import execute_values
 
 from database.object_store import ObjectStore
 
-CHECKSUM_TYPE_ALIASES = {"sha": "sha1"}
-
 
 class PackageStore(ObjectStore):
     """
@@ -16,10 +14,9 @@ class PackageStore(ObjectStore):
     def __init__(self):
         super().__init__()
         self.arch_map = self._prepare_table_map(cols=["name"], table="arch")
-        self.checksum_type_map = self._prepare_table_map(cols=["name"], table="checksum_type")
         self.evr_map = self._prepare_table_map(cols=["epoch", "version", "release"], table="evr")
         self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
-        self.package_map = self._prepare_table_map(cols=["checksum_type_id", "checksum"], table="package")
+        self.package_map = self._prepare_table_map(cols=["name_id", "evr_id", "arch_id"], table="package")
 
     def _populate_dep_table(self, table, unique_items, table_map):
         """Populate dependency table with column 'name'."""
@@ -36,6 +33,7 @@ class PackageStore(ObjectStore):
             execute_values(cur, sql, to_import, page_size=len(to_import))
             for row in cur.fetchall():
                 table_map[row[1]] = row[0]
+
         cur.close()
         self.conn.commit()
 
@@ -61,19 +59,14 @@ class PackageStore(ObjectStore):
 
     def _populate_dependent_tables(self, packages):
         unique_archs = set()
-        unique_checksum_types = set()
         unique_evrs = set()
         unique_names = set()
         for pkg in packages:
             unique_archs.add(pkg["arch"])
-            if pkg["checksum_type"] in CHECKSUM_TYPE_ALIASES:
-                pkg["checksum_type"] = CHECKSUM_TYPE_ALIASES[pkg["checksum_type"]]
-            unique_checksum_types.add(pkg["checksum_type"])
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
             unique_names.add(pkg["name"])
 
         self._populate_dep_table("arch", unique_archs, self.arch_map)
-        self._populate_dep_table("checksum_type", unique_checksum_types, self.checksum_type_map)
         self._populate_dep_table("package_name", unique_names, self.package_name_map)
         self._populate_evrs(unique_evrs)
 
@@ -82,28 +75,29 @@ class PackageStore(ObjectStore):
         cur = self.conn.cursor()
         unique_packages = {}
         for pkg in packages:
-            unique_packages[(self.checksum_type_map[pkg["checksum_type"]], pkg["checksum"])] = \
-                (self.package_name_map[pkg["name"]], self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])],
-                 self.arch_map[pkg["arch"]], self.checksum_type_map[pkg["checksum_type"]],
-                 pkg["checksum"], pkg["summary"], pkg["description"])
+            name_id = self.package_name_map[pkg["name"]]
+            evr_id = self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])]
+            arch_id = self.arch_map[pkg["arch"]]
+            unique_packages[(name_id, evr_id, arch_id)] = \
+                (name_id, evr_id, arch_id, pkg["summary"], pkg["description"])
         package_ids = []
         to_import = []
-        for checksum_type_id, checksum in unique_packages:
-            if (checksum_type_id, checksum) not in self.package_map:
-                to_import.append(unique_packages[(checksum_type_id, checksum)])
+        for name_id, evr_id, arch_id in unique_packages:
+            if (name_id, evr_id, arch_id) not in self.package_map:
+                to_import.append(unique_packages[(name_id, evr_id, arch_id)])
             else:
-                package_ids.append(self.package_map[(checksum_type_id, checksum)])
+                package_ids.append(self.package_map[(name_id, evr_id, arch_id)])
 
         self.logger.debug("Packages to import: %d", len(to_import))
         if to_import:
             execute_values(cur,
                            """insert into package
-                              (name_id, evr_id, arch_id, checksum_type_id, checksum, summary, description)
+                              (name_id, evr_id, arch_id, summary, description)
                               values %s
-                              returning id, checksum_type_id, checksum""",
+                              returning id, name_id, evr_id, arch_id""",
                            to_import, page_size=len(to_import))
-            for pkg_id, checksum_type_id, checksum in cur.fetchall():
-                self.package_map[(checksum_type_id, checksum)] = pkg_id
+            for pkg_id, name_id, evr_id, arch_id in cur.fetchall():
+                self.package_map[(name_id, evr_id, arch_id)] = pkg_id
                 package_ids.append(pkg_id)
         cur.close()
         self.conn.commit()
