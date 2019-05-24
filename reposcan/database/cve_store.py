@@ -126,9 +126,9 @@ class CveStore(CveStoreCommon):
         """
         Store / update cve information in database.
         """
-        self.logger.info("Syncing %d CVEs.", repo.get_count())
+        self.logger.debug("Syncing %d CVEs.", repo.get_count())
         self._populate_cves(repo)
-        self.logger.info("Syncing CVEs finished.")
+        self.logger.debug("Syncing CVEs finished.")
 
 
 def _dget(struct, *keys):

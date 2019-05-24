@@ -51,5 +51,4 @@ class CveRepoStore:
         """
         self.logger.info("Syncing CVE list: %s", repo.label)
         self._import_repo(repo.label, repo.meta.get_lastmodified())
-        self.logger.info("Syncing CVEs: %s", repo.get_count())
         self.cve_store.store(repo)

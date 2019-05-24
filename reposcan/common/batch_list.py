@@ -29,3 +29,7 @@ class BatchList:
             last_batch = []
             self.batches.append(last_batch)
         last_batch.append(item)
+
+    def get_total_items(self):
+        """Return total item count in all batches."""
+        return sum(len(l) for l in self.batches)

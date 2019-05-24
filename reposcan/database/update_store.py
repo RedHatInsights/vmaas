@@ -289,11 +289,11 @@ class UpdateStore(ObjectStore):
         """
         Import all updates from repository into all related DB tables.
         """
-        self.logger.info("Syncing %d updates.", len(updates))
+        self.logger.debug("Syncing %d updates.", len(updates))
         update_map = self._populate_updates(updates)
         self._associate_packages(updates, update_map, repo_id)
         self._associate_updates(update_map, repo_id)
         cve_map = self._populate_cves(updates)
         self._associate_cves(updates, update_map, cve_map)
         self._associate_refs(updates, update_map)
-        self.logger.info("Syncing updates finished.")
+        self.logger.debug("Syncing updates finished.")
