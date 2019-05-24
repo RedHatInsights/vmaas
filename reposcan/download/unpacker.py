@@ -6,7 +6,7 @@ import gzip
 import lzma
 import bz2
 
-from common.logging import get_logger
+from common.logging import ProgressLogger, get_logger
 
 DEFAULT_CHUNK_SIZE = "1048576"
 
@@ -22,6 +22,7 @@ class FileUnpacker:
         self.queue = []
         self.logger = get_logger(__name__)
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
+        self.progress_logger = ProgressLogger(self.logger, 0)
 
     def add(self, file_path):
         """Add compressed file path to queue."""
@@ -49,12 +50,13 @@ class FileUnpacker:
                             break
                         unpacked.write(chunk)
             os.unlink(file_path)
-            self.logger.info("%s -> %s", file_path, unpacked_file_path)
+            self.progress_logger.update(source=file_path, target=unpacked_file_path)
         else:
-            self.logger.info("%s skipped.", file_path)
+            self.progress_logger.update(source=file_path, target="(unknown archive format)")
 
     def run(self):
         """Unpack all queued file paths."""
+        self.progress_logger.reset(len(self.queue))
         self.logger.info("Unpacking started.")
         for file_path in self.queue:
             self._unpack(file_path)

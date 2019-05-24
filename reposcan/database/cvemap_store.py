@@ -151,7 +151,8 @@ class CvemapStore(CveStoreCommon):
         """
         Store list of CVEs in the database.
         """
-        self.logger.info("Syncing CVE map")
+        self.logger.info("Syncing CVE map.")
         self._save_lastmodified(cvemap.get_lastmodified())
-        self.logger.info("Syncing CVEs: %s", cvemap.get_cve_count())
+        self.logger.debug("Syncing CVEs: %s", cvemap.get_cve_count())
         self._populate_cves(cvemap)
+        self.logger.debug("Syncing CVEs finished.")

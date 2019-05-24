@@ -80,8 +80,8 @@ class RepositoryController:
             if db_revision is None or downloaded_revision > db_revision:
                 repository.repomd = repomd
             else:
-                self.logger.info("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
-                                 ", ".join(filter(None, repository_key)), str(downloaded_revision), str(db_revision))
+                self.logger.debug("Downloaded repo %s (%s) is not newer than repo in DB (%s).",
+                                  ", ".join(filter(None, repository_key)), str(downloaded_revision), str(db_revision))
 
     def _repo_download_failed(self, repo, failed_items):
         failed = False
@@ -225,8 +225,8 @@ class RepositoryController:
         failed = self._download_repomds()
         if failed:
             FAILED_REPOMD.inc(len(failed))
-            self.logger.warning("%d repomd.xml files failed to download.", len(failed))
             failed_repos = [repo for repo in self.repositories if self._repo_download_failed(repo, failed)]
+            self.logger.warning("%d repomd.xml files failed to download.", len(failed))
             self.clean_repodata(failed_repos)
 
         self._read_repomds()
@@ -239,8 +239,10 @@ class RepositoryController:
             else:
                 to_skip.append(repository)
         self.clean_repodata(to_skip)
-        self.logger.info("%d repositories skipped.", len(to_skip))
-        self.logger.info("Syncing %d repositories.", sum(len(l) for l in batches))
+        self.logger.info("%d repositories are up to date.", (len(to_skip) - len(failed)))
+        total_repositories = batches.get_total_items()
+        completed_repositories = 0
+        self.logger.info("%d repositories need to be synced.", total_repositories)
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         try:
@@ -255,6 +257,10 @@ class RepositoryController:
                     self._unpack_metadata(batch)
                     for repository in batch:
                         repository.load_metadata()
+                        completed_repositories += 1
+                        self.logger.info("Syncing repository: %s [%s/%s]", ", ".join(
+                            filter(None, (repository.content_set, repository.basearch, repository.releasever))),
+                                         completed_repositories, total_repositories)
                         self.repo_store.store(repository)
                         repository.unload_metadata()
                 finally:

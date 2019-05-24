@@ -132,7 +132,7 @@ class PackageStore(ObjectStore):
         """
         Import all packages from repository into all related DB tables.
         """
-        self.logger.info("Syncing %d packages.", len(packages))
+        self.logger.debug("Syncing %d packages.", len(packages))
         package_ids = self._populate_packages(packages)
         self._associate_packages(package_ids, repo_id)
-        self.logger.info("Syncing packages finished.")
+        self.logger.debug("Syncing packages finished.")

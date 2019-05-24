@@ -163,8 +163,6 @@ class RepositoryStore:
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
-        self.logger.info("Syncing repository: %s", ", ".join(filter(None, (repository.content_set, repository.basearch,
-                                                                           repository.releasever))))
         repo_id = self.import_repository(repository)
         self.package_store.store(repo_id, repository.list_packages())
         self.update_store.store(repo_id, repository.list_updates())

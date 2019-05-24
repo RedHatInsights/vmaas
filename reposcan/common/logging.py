@@ -6,6 +6,9 @@ TODO: packaging changes that let this live in one place please
 
 import logging
 import os
+from threading import Lock
+import time
+
 
 class OneLineExceptionFormatter(logging.Formatter):
     """
@@ -29,6 +32,46 @@ class OneLineExceptionFormatter(logging.Formatter):
         if record.exc_text:
             fmt_str = fmt_str.replace('\n', '') + '|'
         return fmt_str
+
+
+class ProgressLogger:
+    """
+    Class to log progress every N seconds.
+    """
+    def __init__(self, logger, total, log_interval=60):
+        self.logger = logger
+        self.log_interval = log_interval
+        self.total = total
+        self.lock = Lock()
+        self.last_log_time = 0
+        self.completed = 0
+
+    def reset(self, total):
+        """Initialize all counters."""
+        with self.lock:
+            self.total = total
+            self.last_log_time = 0
+            self.completed = 0
+
+    def get_completed_percent(self):
+        """Get percentage of completed items."""
+        return round(((self.completed / self.total) * 100), 2)
+
+    def update(self, source=None, target=None):
+        """
+        One item was completed. Log it if N seconds since last log passed.
+        And log every update on debug level.
+        """
+        with self.lock:
+            self.completed += 1
+            now = time.time()
+            if (now - self.last_log_time) > self.log_interval or self.completed == self.total:
+                self.logger.info("%6.2f %% completed [%s/%s]", self.get_completed_percent(),
+                                 self.completed, self.total)
+                self.last_log_time = now
+            if source and target:
+                self.logger.debug("[%s/%s] %s -> %s", self.completed, self.total, source, target)
+
 
 def init_logging(num_servers=1):
     """Setup root logger handler."""

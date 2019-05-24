@@ -12,7 +12,7 @@ import requests
 
 from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
 
-from common.logging import get_logger
+from common.logging import ProgressLogger, get_logger
 
 DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_THREADS = "8"
@@ -38,11 +38,12 @@ class FileDownloadThread(Thread):
     Single thread for downloading files. After it's created, it processes DownloadItem objects from queue shared
     between all threads. Thread will end when shared queue is empty.
     """
-    def __init__(self, queue, logger, headers_only=False):
+    def __init__(self, queue, logger, progress_logger, headers_only=False):
         Thread.__init__(self)
         self.queue = queue
         self.session = requests.Session()
         self.logger = logger
+        self.progress_logger = progress_logger
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
         self.retry_count = int(os.getenv('RETRY_COUNT', DEFAULT_RETRY_COUNT))
         self.headers_only = headers_only
@@ -82,11 +83,10 @@ class FileDownloadThread(Thread):
         for _ in range(self.retry_count):
             try:
                 self._download(download_item)
-                self.logger.info("%s -> %s", download_item.source_url, download_item.target_path)
                 break
             except (ProtocolError, ConnectionError):
                 self.logger.warning("Download failed: %s", download_item.source_url)
-                self.logger.debug(traceback.format_exc())
+                self.logger.warning(traceback.format_exc())
                 download_item.status_code = -1
 
     def run(self):
@@ -97,6 +97,7 @@ class FileDownloadThread(Thread):
             except Empty:
                 break
             self._retry_download(download_item)
+            self.progress_logger.update(source=download_item.source_url, target=download_item.target_path)
             self.queue.task_done()
 
         self.session.close()
@@ -119,11 +120,12 @@ class FileDownloader:
 
     def run(self, headers_only=False):
         """Start processing download queue using multiple threads."""
+        progress_logger = ProgressLogger(self.logger, self.queue.qsize())
         self.logger.info("Downloading started.")
         threads = []
         for i in range(min(self.num_threads, self.queue.qsize())):
             self.logger.debug("Starting thread %d.", i)
-            thread = FileDownloadThread(self.queue, self.logger, headers_only)
+            thread = FileDownloadThread(self.queue, self.logger, progress_logger, headers_only)
             thread.setDaemon(True)
             thread.start()
             threads.append(thread)
