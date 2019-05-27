@@ -183,7 +183,7 @@ INSERT INTO arch (name) VALUES
   ('noarch'), ('i386'), ('i486'), ('i586'), ('i686'), ('alpha'), ('alphaev6'), ('ia64'), ('sparc'),
   ('sparcv9'), ('sparc64'), ('s390'), ('athlon'), ('s390x'), ('ppc'), ('ppc64'), ('ppc64le'),
   ('pSeries'), ('iSeries'), ('x86_64'), ('ppc64iseries'), ('ppc64pseries'), ('ia32e'), ('amd64'), ('aarch64'),
-  ('armv7hnl'), ('armv7hl'), ('armv7l'), ('armv6hl'), ('armv6l'), ('armv5tel');
+  ('armv7hnl'), ('armv7hl'), ('armv7l'), ('armv6hl'), ('armv6l'), ('armv5tel'), ('src');
 
 
 -- -----------------------------------------------------
@@ -399,6 +399,7 @@ CREATE TABLE IF NOT EXISTS package (
   arch_id INT NOT NULL,
   summary TEXT NULL, CHECK (NOT empty(summary)),
   description TEXT NULL, CHECK (NOT empty(description)),
+  source_package_id INT NULL,
   UNIQUE (name_id, evr_id, arch_id),
   PRIMARY KEY (id),
   CONSTRAINT name_id
@@ -409,7 +410,10 @@ CREATE TABLE IF NOT EXISTS package (
     REFERENCES evr (id),
   CONSTRAINT arch_id
     FOREIGN KEY (arch_id)
-    REFERENCES arch (id)
+    REFERENCES arch (id),
+  CONSTRAINT source_package_id
+    FOREIGN KEY (source_package_id)
+    REFERENCES package (id)
 )TABLESPACE pg_default;
 
 CREATE INDEX ON package(name_id);

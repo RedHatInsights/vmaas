@@ -10,6 +10,7 @@ from exporter import DataDump
 
 TEST_DUMP_FILE = "/tmp/dump.output"
 
+
 class TestExporter:
     """Test Exporter class."""
 
@@ -93,7 +94,7 @@ class TestExporter:
     def check_package_details(self, dbdump):
         """Check package details in dump."""
         assert "package_details:301" in dbdump
-        assert dbdump["package_details:301"] == (101, 201, 1, 1, "summary1", "description1")
+        assert dbdump["package_details:301"] == (101, 201, 1, "summary1", "description1", None)
 
     def check_repo(self, dbdump):
         """Check repo data in dump."""
