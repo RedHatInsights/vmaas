@@ -2,11 +2,11 @@
 Module containing class for Primary XML metadata.
 """
 
-import xml.etree.ElementTree as eT
 
+import xml.etree.ElementTree as eT
 from common.string import text_strip
 
-NS = {"primary": "http://linux.duke.edu/metadata/common"}
+NS = {"primary": "http://linux.duke.edu/metadata/common", "rpm": "http://linux.duke.edu/metadata/rpm"}
 
 
 class PrimaryMD:
@@ -30,6 +30,7 @@ class PrimaryMD:
                     package["arch"] = text_strip(elem.find("primary:arch", NS))
                     package["summary"] = text_strip(elem.find("primary:summary", NS))
                     package["description"] = text_strip(elem.find("primary:description", NS))
+                    package["srpm"] = elem.find("primary:format", NS).find("rpm:sourcerpm", NS).text
                     self.packages.append(package)
                     # Clear the XML tree continuously
                     root.clear()
