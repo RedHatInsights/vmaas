@@ -119,10 +119,28 @@ class TestRepositoryStore:
             assert errata_num == 0
 
     @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
-    def test_srpm(self, db_conn, repository):
-        """Test that packages from repo are present in DB."""
+    def test_pkgs_count(self, db_conn, repository):
+        """Test all packages count in package table."""
         cur = db_conn.cursor()
-        cur.execute("select count(*) from source_package")
-        srpm_num = cur.fetchone()[0]
+        cur.execute("select count(*) from package")
+        pkg_num = cur.fetchone()[0]
 
-        assert srpm_num == 6  # 6 srpms expected from primary.xml/primary.db
+        assert pkg_num == 18  # 18 packages expected from primary.xml/primary.db
+
+    @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
+    def test_rpm_pkgs_count(self, db_conn, repository):
+        """Test rpm packages count in package table."""
+        cur = db_conn.cursor()
+        cur.execute("select count(*) from package where source_package_id is not null")
+        pkg_num = cur.fetchone()[0]
+
+        assert pkg_num == 12
+
+    @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
+    def test_srpm_pkgs_count(self, db_conn, repository):
+        """Test srpm packages count in package table."""
+        cur = db_conn.cursor()
+        cur.execute("select count(*) from package where source_package_id is null")
+        pkg_num = cur.fetchone()[0]
+
+        assert pkg_num == 6

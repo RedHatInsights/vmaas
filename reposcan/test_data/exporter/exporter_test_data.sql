@@ -12,14 +12,14 @@ INSERT INTO evr (id, epoch, version, release, evr) VALUES
   (205, '3', '3', '3', ('3', rpmver_array('3'), rpmver_array('3'))),
   (206, '4', '4', '4', ('4', rpmver_array('4'), rpmver_array('4')));
 
-INSERT INTO package (id, name_id, evr_id, arch_id, summary, description) VALUES
-  (301, 101, 201, 1, 'summary1', 'description1'),
-  (302, 101, 202, 1, 'summary1', 'description1'),
-  (303, 101, 203, 1, 'summary1', 'description1'),
-  (304, 102, 204, 1, 'summary2', 'description2'),
-  (305, 103, 205, 1, 'summary3', 'description3'),
-  (306, 103, 206, 1, 'summary3', 'description3'),
-  (307, 104, 204, 1, 'summary4', 'description4');
+INSERT INTO package (id, name_id, evr_id, arch_id, summary, description, source_package_id) VALUES
+  (301, 101, 201, 1, 'summary1', 'description1', null),
+  (302, 101, 202, 1, 'summary1', 'description1', null),
+  (303, 101, 203, 1, 'summary1', 'description1', null),
+  (304, 102, 204, 1, 'summary2', 'description2', null),
+  (305, 103, 205, 1, 'summary3', 'description3', null),
+  (306, 103, 206, 1, 'summary3', 'description3', null),
+  (307, 104, 204, 1, 'summary4', 'description4', null);
 
 INSERT INTO errata_type (id, name) VALUES
   (1, 'security'),
