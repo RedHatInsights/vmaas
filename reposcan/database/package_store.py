@@ -4,6 +4,7 @@ Module containing classes for fetching/importing packages from/into database.
 from psycopg2.extras import execute_values
 
 from database.object_store import ObjectStore
+from repodata import srpm
 
 
 class PackageStore(ObjectStore):
@@ -70,16 +71,27 @@ class PackageStore(ObjectStore):
         self._populate_dep_table("package_name", unique_names, self.package_name_map)
         self._populate_evrs(unique_evrs)
 
+    def _get_srpm_id(self, pkg):
+        if pkg["srpm"] is None:
+            srpm_id = None
+        else:
+            name, epoch, ver, rel, arch = srpm.parse_rpm_name(pkg["srpm"])
+            name_id = self.package_name_map[name]
+            evr_id = self.evr_map[(epoch, ver, rel)]
+            arch_id = self.arch_map[arch]
+            srpm_id = self.package_map[(name_id, evr_id, arch_id)]
+        return srpm_id
+
     def _populate_packages(self, packages):
-        self._populate_dependent_tables(packages)
         cur = self.conn.cursor()
         unique_packages = {}
         for pkg in packages:
             name_id = self.package_name_map[pkg["name"]]
             evr_id = self.evr_map[(pkg["epoch"], pkg["ver"], pkg["rel"])]
             arch_id = self.arch_map[pkg["arch"]]
+            srpm_id = self._get_srpm_id(pkg)
             unique_packages[(name_id, evr_id, arch_id)] = \
-                (name_id, evr_id, arch_id, pkg["summary"], pkg["description"])
+                (name_id, evr_id, arch_id, pkg["summary"], pkg["description"], srpm_id)
         package_ids = []
         to_import = []
         for name_id, evr_id, arch_id in unique_packages:
@@ -92,7 +104,7 @@ class PackageStore(ObjectStore):
         if to_import:
             execute_values(cur,
                            """insert into package
-                              (name_id, evr_id, arch_id, summary, description)
+                              (name_id, evr_id, arch_id, summary, description, srpm_id)
                               values %s
                               returning id, name_id, evr_id, arch_id""",
                            to_import, page_size=len(to_import))
@@ -128,11 +140,25 @@ class PackageStore(ObjectStore):
         cur.close()
         self.conn.commit()
 
+    @staticmethod
+    def _get_source_packages(packages):
+        unique_source_packages = set()
+        for pkg in packages:
+            unique_source_packages.add(srpm.parse_rpm_name(pkg["srpm"]))
+        source_packages = []
+        for name, epoch, ver, rel, arch in unique_source_packages:
+            source_packages.append(dict(name=name, epoch=epoch, ver=ver, rel=rel, arch=arch,
+                                        srpm=None, summary=None, description=None))
+        return source_packages
+
     def store(self, repo_id, packages):
         """
         Import all packages from repository into all related DB tables.
         """
-        self.logger.debug("Syncing %d packages.", len(packages))
+        source_packages = self._get_source_packages(packages)
+        self.logger.debug("Syncing %d packages.", len(packages) + len(source_packages))
+        self._populate_dependent_tables(packages)
+        source_package_ids = self._populate_packages(source_packages)
         package_ids = self._populate_packages(packages)
-        self._associate_packages(package_ids, repo_id)
+        self._associate_packages(source_package_ids + package_ids, repo_id)
         self.logger.debug("Syncing packages finished.")

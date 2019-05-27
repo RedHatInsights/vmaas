@@ -101,7 +101,7 @@ class TestRepositoryStore:
         cur.execute("select count(*) from pkg_repo where repo_id = {}".format(repo_id))
         pkg_num = cur.fetchone()[0]
 
-        assert pkg_num == 12  # 12 packages expected from primary.xml/primary.db
+        assert pkg_num == 18  # 18 packages expected from primary.xml/primary.db
 
     @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
     def test_repo_errata(self, db_conn, repository):
@@ -117,12 +117,3 @@ class TestRepositoryStore:
             assert errata_num == 9  # 9 erata expected from primary.xml/primary.db
         else:
             assert errata_num == 0
-
-    @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
-    def test_srpm(self, db_conn, repository):
-        """Test that packages from repo are present in DB."""
-        cur = db_conn.cursor()
-        cur.execute("select count(*) from source_package")
-        srpm_num = cur.fetchone()[0]
-
-        assert srpm_num == 6  # 6 srpms expected from primary.xml/primary.db
