@@ -80,7 +80,7 @@ class RepositoryStore:
         cur = self.conn.cursor()
         cur.execute("""select p.id from package p where not exists (
                          select 1 from pkg_repo pr where pr.pkg_id = p.id
-                       )
+                       ) and p.source_package_id is not null
                     """)
         packages_to_delete = [pkg_id for pkg_id in cur.fetchall()]
 
