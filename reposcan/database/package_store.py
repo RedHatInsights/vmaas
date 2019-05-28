@@ -156,8 +156,8 @@ class PackageStore(ObjectStore):
         Import all packages from repository into all related DB tables.
         """
         source_packages = self._get_source_packages(packages)
-        self.logger.debug("Syncing %d packages.", len(packages) + len(source_packages))
-        self._populate_dependent_tables(packages)
+        self.logger.debug("Syncing %d packages.", len(packages))
+        self._populate_dependent_tables(source_packages + packages)
         self._populate_packages(source_packages)
         package_ids = self._populate_packages(packages)
         self._associate_packages(package_ids, repo_id)
