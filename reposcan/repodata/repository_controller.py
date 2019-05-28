@@ -230,16 +230,16 @@ class RepositoryController:
             self.clean_repodata(failed_repos)
 
         self._read_repomds()
-        # Filter all repositories without repomd attribute set (failed download, downloaded repomd is not newer)
+        # Filter all repositories without repomd attribute set (downloaded repomd is not newer)
         batches = BatchList()
-        to_skip = []
+        up_to_date = []
         for repository in self.repositories:
             if repository.repomd:
                 batches.add_item(repository)
             else:
-                to_skip.append(repository)
-        self.clean_repodata(to_skip)
-        self.logger.info("%d repositories are up to date.", (len(to_skip) - len(failed)))
+                up_to_date.append(repository)
+        self.clean_repodata(up_to_date)
+        self.logger.info("%d repositories are up to date.", len(up_to_date))
         total_repositories = batches.get_total_items()
         completed_repositories = 0
         self.logger.info("%d repositories need to be synced.", total_repositories)
