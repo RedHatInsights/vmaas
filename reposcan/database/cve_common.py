@@ -28,6 +28,7 @@ class CveStoreCommon:
     def _populate_cwes(self, cursor, cve_data):
         # pylint: disable=R0914
         # Populate CWE table
+        # DB errors caught by caller
         cursor.execute("SELECT name, id FROM cwe")
         cwe_name_id = cursor.fetchall()
         cwe_name = [cwe[0] for cwe in cwe_name_id]
@@ -50,8 +51,9 @@ class CveStoreCommon:
         # Populate cve_cwe mappings
         mapping_set = []
         for entry in cve_data.values():
-            cwe_names = [x["cwe_name"] for x in entry["cwe_list"]]
-            mapping_set.extend([(entry['id'], cwe_name) for cwe_name in cwe_names])
+            if "id" in entry:
+                cwe_names = [x["cwe_name"] for x in entry["cwe_list"]]
+                mapping_set.extend([(entry['id'], cwe_name) for cwe_name in cwe_names])
 
         # Some entries are not commited to DB yet, get them from last insert
         all_cwes = dict(tuple(new_cwes) + tuple(cwe_name_id))

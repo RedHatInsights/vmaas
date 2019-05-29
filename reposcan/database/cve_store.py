@@ -82,44 +82,67 @@ class CveStore(CveStoreCommon):
                       values["redhat_url"], values["secondary_url"], values["source_id"],
                       values["cvss2_score"], values["cvss2_metrics"])
                      for name, values in cve_data.items() if "id" in values]
-
+        cur.close()
         self.logger.debug("CVEs to update: %d", len(to_update))
 
         if to_import:
-            execute_values(cur,
-                           """insert into cve (name, description, impact_id, published_date, modified_date,
-                              cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id,
-                              cvss2_score, cvss2_metrics)
-                              values %s returning id, name""",
-                           list(to_import), page_size=len(to_import))
-            for row in cur.fetchall():
-                cve_data[row[1]]["id"] = row[0]
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur,
+                               """insert into cve (name, description, impact_id, published_date, modified_date,
+                                  cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id,
+                                  cvss2_score, cvss2_metrics)
+                                  values %s returning id, name""",
+                               list(to_import), page_size=len(to_import))
+                for row in cur.fetchall():
+                    cve_data[row[1]]["id"] = row[0]
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while importing CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
 
         if to_update:
-            tmpl_str = b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int, %s::numeric, %s)"
-            execute_values(cur,
-                           """update cve set name = v.name,
-                                             description = v.description,
-                                             impact_id = v.impact_id,
-                                             published_date = v.published_date,
-                                             modified_date = v.modified_date,
-                                             redhat_url = v.redhat_url,
-                                             secondary_url = v.secondary_url,
-                                             cvss3_score = v.cvss3_score,
-                                             cvss3_metrics = v.cvss3_metrics,
-                                             iava = v.iava,
-                                             source_id = v.source_id,
-                                             cvss2_score = v.cvss2_score,
-                                             cvss2_metrics = v.cvss2_metrics
-                              from (values %s)
-                              as v(id, name, description, impact_id, published_date,
-                              modified_date, cvss3_score, cvss3_metrics, iava, redhat_url,
-                              secondary_url, source_id, cvss2_score, cvss2_metrics)
-                              where cve.id = v.id """,
-                           list(to_update), page_size=len(to_update), template=tmpl_str)
-        self._populate_cwes(cur, cve_data)
-        cur.close()
-        self.conn.commit()
+            cur = self.conn.cursor()
+            try:
+                tmpl_str = b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int, %s::numeric, %s)"
+                execute_values(cur,
+                               """update cve set name = v.name,
+                                                 description = v.description,
+                                                 impact_id = v.impact_id,
+                                                 published_date = v.published_date,
+                                                 modified_date = v.modified_date,
+                                                 redhat_url = v.redhat_url,
+                                                 secondary_url = v.secondary_url,
+                                                 cvss3_score = v.cvss3_score,
+                                                 cvss3_metrics = v.cvss3_metrics,
+                                                 iava = v.iava,
+                                                 source_id = v.source_id,
+                                                 cvss2_score = v.cvss2_score,
+                                                 cvss2_metrics = v.cvss2_metrics
+                                  from (values %s)
+                                  as v(id, name, description, impact_id, published_date,
+                                  modified_date, cvss3_score, cvss3_metrics, iava, redhat_url,
+                                  secondary_url, source_id, cvss2_score, cvss2_metrics)
+                                  where cve.id = v.id """,
+                               list(to_update), page_size=len(to_update), template=tmpl_str)
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while updating CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
+
+        cur = self.conn.cursor()
+        try:
+            self._populate_cwes(cur, cve_data)
+            self.conn.commit()
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failure when populating CWEs")
+            self.conn.rollback()
+        finally:
+            cur.close()
         return cve_data
 
     def store(self, repo):

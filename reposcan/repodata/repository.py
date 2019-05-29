@@ -71,6 +71,7 @@ class Repository:
         """Unset previously loaded metadata files from this object."""
         self.primary = None
         self.updateinfo = None
+        self.modules = None
 
     def get_revision(self):
         """Returns revision field of parsed repomd file if available."""
