@@ -5,4 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
+    environment:
+      - CODECOV_TOKEN="7f66179a-6b19-4826-b993-a560e707b35a"
+      #- CODECOV_TOKEN="${CODECOV_TOKEN}"
     command: bash -c "cd /vmaas && ./run_tests.sh reposcan && ./run_tests.sh webapp && ./run_tests.sh websocket"
