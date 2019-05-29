@@ -59,7 +59,7 @@ class TestUpdatesAPI(TestBase):
         """Test repos processing."""
         response = {}
         repo_ids = self.updates_api._process_repositories(UPDATES_JSON, response)
-        assert repo_ids == {1}
+        assert len(repo_ids) == 1
 
     def test_process_repos_repo(self):
         """Test repos processing - filter out repository_list."""
