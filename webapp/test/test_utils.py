@@ -26,7 +26,7 @@ class TestUtils(TestBase):
     # load_cache is pytest fixture
     def test_pkgidlist2packages(self, load_cache):
         """Test making NEVRA from package id."""
-        pkgid_list = [1, 2]
+        pkgid_list = [pkg_id for pkg_id in self.cache.package_details][:10]
         nevras = utils.pkgidlist2packages(self.cache, pkgid_list)
         for nevra in nevras:
             assert self._is_nevra(nevra)
