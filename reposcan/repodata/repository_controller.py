@@ -212,8 +212,14 @@ class RepositoryController:
     def import_repositories(self):
         """Create or update repository records in the DB."""
         self.logger.info("Importing %d repositories.", len(self.repositories))
+        failures = 0
         for repository in self.repositories:
-            self.repo_store.import_repository(repository)
+            try:
+                self.repo_store.import_repository(repository)
+            except Exception: # pylint: disable=broad-except
+                failures += 1
+        if failures > 0:
+            self.logger.warning("Failed to import %d repositories.", failures)
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""

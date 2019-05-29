@@ -47,30 +47,42 @@ class RepositoryStore:
 
     def _import_basearch(self, basearch):
         cur = self.conn.cursor()
-        cur.execute("select id from arch where name = %s", (basearch,))
-        arch_id = cur.fetchone()
-        if not arch_id:
-            cur.execute("insert into arch (name) values(%s) returning id", (basearch,))
+        try:
+            cur.execute("select id from arch where name = %s", (basearch,))
             arch_id = cur.fetchone()
-        cur.close()
-        self.conn.commit()
+            if not arch_id:
+                cur.execute("insert into arch (name) values(%s) returning id", (basearch,))
+                arch_id = cur.fetchone()
+            self.conn.commit()
+        except Exception:
+            self.logger.exception("Failed to import basearch.")
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
         return arch_id[0]
 
     def _import_certificate(self, cert_name, ca_cert, cert, key):
         if not key:
             key = None
         cur = self.conn.cursor()
-        cur.execute("select id from certificate where name = %s", (cert_name,))
-        cert_id = cur.fetchone()
-        if not cert_id:
-            cur.execute("""insert into certificate (name, ca_cert, cert, key)
-                        values (%s, %s, %s, %s) returning id""", (cert_name, ca_cert, cert, key,))
+        try:
+            cur.execute("select id from certificate where name = %s", (cert_name,))
             cert_id = cur.fetchone()
-        else:
-            cur.execute("update certificate set ca_cert = %s, cert = %s, key = %s where name = %s",
-                        (ca_cert, cert, key, cert_name,))
-        cur.close()
-        self.conn.commit()
+            if not cert_id:
+                cur.execute("""insert into certificate (name, ca_cert, cert, key)
+                            values (%s, %s, %s, %s) returning id""", (cert_name, ca_cert, cert, key,))
+                cert_id = cur.fetchone()
+            else:
+                cur.execute("update certificate set ca_cert = %s, cert = %s, key = %s where name = %s",
+                            (ca_cert, cert, key, cert_name,))
+            self.conn.commit()
+        except Exception:
+            self.logger.exception("Failed to import certificate.")
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
         return cert_id[0]
 
     def cleanup_unused_data(self):
@@ -78,30 +90,34 @@ class RepositoryStore:
         Deletes packages and errata not associated with any repo etc.
         """
         cur = self.conn.cursor()
-        cur.execute("""select p.id from package p where not exists (
-                         select 1 from pkg_repo pr where pr.pkg_id = p.id
-                       ) and p.source_package_id is not null
-                    """)
-        packages_to_delete = [pkg_id for pkg_id in cur.fetchall()]
+        try:
+            cur.execute("""select p.id from package p where not exists (
+                             select 1 from pkg_repo pr where pr.pkg_id = p.id
+                           ) and p.source_package_id is not null
+                        """)
+            packages_to_delete = [pkg_id for pkg_id in cur.fetchall()]
 
-        cur.execute("""select e.id from errata e where not exists (
-                         select 1 from errata_repo er where er.errata_id = e.id
-                       )
-                    """)
-        updates_to_delete = [update_id for update_id in cur.fetchall()]
+            cur.execute("""select e.id from errata e where not exists (
+                             select 1 from errata_repo er where er.errata_id = e.id
+                           )
+                        """)
+            updates_to_delete = [update_id for update_id in cur.fetchall()]
 
-        if packages_to_delete:
-            cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s""", (tuple(packages_to_delete),))
-            cur.execute("""delete from package p where p.id in %s""", (tuple(packages_to_delete),))
+            if packages_to_delete:
+                cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s""", (tuple(packages_to_delete),))
+                cur.execute("""delete from package p where p.id in %s""", (tuple(packages_to_delete),))
 
-        if updates_to_delete:
-            cur.execute("""delete from pkg_errata pe where pe.errata_id in %s""", (tuple(updates_to_delete),))
-            cur.execute("""delete from errata_cve ec where ec.errata_id in %s""", (tuple(updates_to_delete),))
-            cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
-            cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
-
-        cur.close()
-        self.conn.commit()
+            if updates_to_delete:
+                cur.execute("""delete from pkg_errata pe where pe.errata_id in %s""", (tuple(updates_to_delete),))
+                cur.execute("""delete from errata_cve ec where ec.errata_id in %s""", (tuple(updates_to_delete),))
+                cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
+                cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
+            self.conn.commit()
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failed to clean up unused data.")
+            self.conn.rollback()
+        finally:
+            cur.close()
 
     def delete_content_set(self, content_set_label):
         """
@@ -109,53 +125,67 @@ class RepositoryStore:
         """
         content_set_id = self.content_set_to_db_id[content_set_label]
         cur = self.conn.cursor()
-        cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
-        repo_ids = [repo_id for repo_id in cur.fetchall()]
-        for repo_id in repo_ids:
-            cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
-            cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
-            cur.execute("delete from repo where id = %s", (repo_id,))
-        cur.execute("delete from content_set where id = %s", (content_set_id,))
-        cur.close()
-        self.conn.commit()
+        try:
+            cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
+            repo_ids = [repo_id for repo_id in cur.fetchall()]
+            for repo_id in repo_ids:
+                cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
+                cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
+                cur.execute("delete from repo where id = %s", (repo_id,))
+            cur.execute("delete from content_set where id = %s", (content_set_id,))
+            self.conn.commit()
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failed to delete content set.")
+            self.conn.rollback()
+        finally:
+            cur.close()
 
     def import_repository(self, repo):
         """
         Imports or updates repository record in DB.
         """
         if repo.ca_cert:
+            # will raise exception if db error occurs
             cert_id = self._import_certificate(repo.cert_name, repo.ca_cert, repo.cert, repo.key)
         else:
             cert_id = None
 
         if repo.basearch:
+            # will raise exception if db error occurs
             basearch_id = self._import_basearch(repo.basearch)
         else:
             basearch_id = None
-        content_set_id = self.content_set_to_db_id[repo.content_set]
+
         cur = self.conn.cursor()
-        cur.execute("""select id from repo where content_set_id = %s
-                       and ((%s is null and basearch_id is null) or basearch_id = %s)
-                       and ((%s is null and releasever is null) or releasever = %s)
-                    """,
-                    (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever))
-        repo_id = cur.fetchone()
-        if not repo_id:
-            cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
-                                             revision, eol, certificate_id)
-                        values (%s, %s, %s, %s, %s, false, %s) returning id""",
-                        (repo.repo_url, content_set_id, basearch_id, repo.releasever,
-                         repo.get_revision(), cert_id,))
+        try:
+            content_set_id = self.content_set_to_db_id[repo.content_set]
+            cur.execute("""select id from repo where content_set_id = %s
+                           and ((%s is null and basearch_id is null) or basearch_id = %s)
+                           and ((%s is null and releasever is null) or releasever = %s)
+                        """,
+                        (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever))
             repo_id = cur.fetchone()
-        else:
-            # Update repository timestamp
-            cur.execute("""update repo set revision = %s, certificate_id = %s, content_set_id = %s,
-                                           basearch_id = %s, releasever = %s
-                        where id = %s""", (repo.get_revision(), cert_id, content_set_id, basearch_id,
-                                           repo.releasever, repo_id[0],))
-        cur.close()
-        self.conn.commit()
-        return repo_id[0]
+            if not repo_id:
+                cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
+                                                 revision, eol, certificate_id)
+                            values (%s, %s, %s, %s, %s, false, %s) returning id""",
+                            (repo.repo_url, content_set_id, basearch_id, repo.releasever,
+                             repo.get_revision(), cert_id,))
+                repo_id = cur.fetchone()
+            else:
+                # Update repository timestamp
+                cur.execute("""update repo set revision = %s, certificate_id = %s, content_set_id = %s,
+                                               basearch_id = %s, releasever = %s
+                            where id = %s""", (repo.get_revision(), cert_id, content_set_id, basearch_id,
+                                               repo.releasever, repo_id[0],))
+            self.conn.commit()
+            return repo_id[0]
+        except Exception:
+            self.logger.exception("Failed to import repository.")
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
 
     def store(self, repository):
         """
@@ -163,6 +193,10 @@ class RepositoryStore:
         First, basic repository info is processed, then all packages, then all updates.
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
-        repo_id = self.import_repository(repository)
-        self.package_store.store(repo_id, repository.list_packages())
-        self.update_store.store(repo_id, repository.list_updates())
+        try:
+            repo_id = self.import_repository(repository)
+            self.package_store.store(repo_id, repository.list_packages())
+            self.update_store.store(repo_id, repository.list_updates())
+        except Exception: # pylint: disable=broad-except
+            # exception already logged.
+            pass

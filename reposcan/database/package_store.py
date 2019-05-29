@@ -21,7 +21,6 @@ class PackageStore(ObjectStore):
 
     def _populate_dep_table(self, table, unique_items, table_map):
         """Populate dependency table with column 'name'."""
-        cur = self.conn.cursor()
         self.logger.debug("Unique %s's in repository: %d", table, len(unique_items))
         to_import = []
         for row in unique_items:
@@ -30,16 +29,20 @@ class PackageStore(ObjectStore):
 
         self.logger.debug("%s's to import: %d", table, len(to_import))
         if to_import:
-            sql = "insert into %s (name) values %%s returning id, name" % table
-            execute_values(cur, sql, to_import, page_size=len(to_import))
-            for row in cur.fetchall():
-                table_map[row[1]] = row[0]
-
-        cur.close()
-        self.conn.commit()
+            cur = self.conn.cursor()
+            try:
+                sql = "insert into %s (name) values %%s returning id, name" % table
+                execute_values(cur, sql, to_import, page_size=len(to_import))
+                for row in cur.fetchall():
+                    table_map[row[1]] = row[0]
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while inserting into %s", table)
+                self.conn.rollback()
+            finally:
+                cur.close()
 
     def _populate_evrs(self, unique_evrs):
-        cur = self.conn.cursor()
         self.logger.debug("Unique EVRs in repository: %d", len(unique_evrs))
         to_import = []
         for epoch, version, release in unique_evrs:
@@ -49,15 +52,21 @@ class PackageStore(ObjectStore):
 
         self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
-            execute_values(cur,
-                           """insert into evr (epoch, version, release, evr) values %s
-                           returning id, epoch, version, release""",
-                           to_import, template=b"(%s, %s, %s, (%s, %s, %s))",
-                           page_size=len(to_import))
-            for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
-                self.evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
-        cur.close()
-        self.conn.commit()
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur,
+                               """insert into evr (epoch, version, release, evr) values %s
+                               returning id, epoch, version, release""",
+                               to_import, template=b"(%s, %s, %s, (%s, %s, %s))",
+                               page_size=len(to_import))
+                for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
+                    self.evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while inserting into evr table")
+                self.conn.rollback()
+            finally:
+                cur.close()
 
     def _populate_dependent_tables(self, packages):
         unique_archs = set()
@@ -94,7 +103,6 @@ class PackageStore(ObjectStore):
         return source_package_id
 
     def _populate_packages(self, packages):
-        cur = self.conn.cursor()
         unique_packages = {}
         for pkg in packages:
             name_id = self.package_name_map[pkg["name"]]
@@ -113,43 +121,54 @@ class PackageStore(ObjectStore):
 
         self.logger.debug("Packages to import: %d", len(to_import))
         if to_import:
-            execute_values(cur,
-                           """insert into package
-                              (name_id, evr_id, arch_id, summary, description, source_package_id)
-                              values %s
-                              returning id, name_id, evr_id, arch_id""",
-                           to_import, page_size=len(to_import))
-            for pkg_id, name_id, evr_id, arch_id in cur.fetchall():
-                self.package_map[(name_id, evr_id, arch_id)] = pkg_id
-                package_ids.append(pkg_id)
-        cur.close()
-        self.conn.commit()
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur,
+                               """insert into package
+                                  (name_id, evr_id, arch_id, summary, description, source_package_id)
+                                  values %s
+                                  returning id, name_id, evr_id, arch_id""",
+                               to_import, page_size=len(to_import))
+                for pkg_id, name_id, evr_id, arch_id in cur.fetchall():
+                    self.package_map[(name_id, evr_id, arch_id)] = pkg_id
+                    package_ids.append(pkg_id)
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while inserting into package table")
+                self.conn.rollback()
+            finally:
+                cur.close()
         return package_ids
 
     def _associate_packages(self, package_ids, repo_id):
         cur = self.conn.cursor()
-        associated_with_repo = set()
-        cur.execute("select pkg_id from pkg_repo where repo_id = %s", (repo_id,))
-        for row in cur.fetchall():
-            associated_with_repo.add(row[0])
-        self.logger.debug("Packages associated with repository: %d", len(associated_with_repo))
-        to_associate = []
-        for pkg_id in package_ids:
-            if pkg_id in associated_with_repo:
-                associated_with_repo.remove(pkg_id)
-            else:
-                to_associate.append(pkg_id)
-        self.logger.debug("New packages to associate with repository: %d", len(to_associate))
-        self.logger.debug("Packages to disassociate with repository: %d", len(associated_with_repo))
-        if to_associate:
-            execute_values(cur, "insert into pkg_repo (repo_id, pkg_id) values %s",
-                           [(repo_id, pkg_id) for pkg_id in to_associate], page_size=len(to_associate))
-        # Are there packages to disassociate?
-        if associated_with_repo:
-            cur.execute("delete from pkg_repo where repo_id = %s and pkg_id in %s",
-                        (repo_id, tuple(associated_with_repo),))
-        cur.close()
-        self.conn.commit()
+        try:
+            associated_with_repo = set()
+            cur.execute("select pkg_id from pkg_repo where repo_id = %s", (repo_id,))
+            for row in cur.fetchall():
+                associated_with_repo.add(row[0])
+            self.logger.debug("Packages associated with repository: %d", len(associated_with_repo))
+            to_associate = []
+            for pkg_id in package_ids:
+                if pkg_id in associated_with_repo:
+                    associated_with_repo.remove(pkg_id)
+                else:
+                    to_associate.append(pkg_id)
+            self.logger.debug("New packages to associate with repository: %d", len(to_associate))
+            self.logger.debug("Packages to disassociate with repository: %d", len(associated_with_repo))
+            if to_associate:
+                execute_values(cur, "insert into pkg_repo (repo_id, pkg_id) values %s",
+                               [(repo_id, pkg_id) for pkg_id in to_associate], page_size=len(to_associate))
+            # Are there packages to disassociate?
+            if associated_with_repo:
+                cur.execute("delete from pkg_repo where repo_id = %s and pkg_id in %s",
+                            (repo_id, tuple(associated_with_repo),))
+            self.conn.commit()
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failure while associating packages with repo_id %s", repo_id)
+            self.conn.rollback()
+        finally:
+            cur.close()
 
     @staticmethod
     def _get_source_packages(packages):
