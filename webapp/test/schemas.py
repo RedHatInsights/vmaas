@@ -49,6 +49,7 @@ _repos = {
             }
         ]
     },
+    Optional("modified_since"): Or(str, None),
     "page": int,
     "page_size": int,
     "pages": int,
