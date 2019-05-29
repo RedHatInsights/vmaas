@@ -268,7 +268,7 @@ class UpdatesAPI:
         return repo_ids
 
     def _build_nevra(self, update_pkg_id):
-        name_id, evr_id, arch_id, _, _ = self.db_cache.package_details[update_pkg_id]
+        name_id, evr_id, arch_id, _, _, _ = self.db_cache.package_details[update_pkg_id]
         name = self.db_cache.id2packagename[name_id]
         epoch, ver, rel = self.db_cache.id2evr[evr_id]
         arch = self.db_cache.id2arch[arch_id]
