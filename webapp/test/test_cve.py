@@ -14,18 +14,17 @@ from cache import CVE_MODIFIED_DATE, CVE_PUBLISHED_DATE
 
 CVE_JSON_EMPTY = {}
 CVE_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
-CVE_JSON = {"cve_list": ["CVE-2016-0634"], "modified_since": "2018-04-06T01:23:45+02:00"}
+CVE_JSON = {"cve_list": ["CVE-2014-1545"], "modified_since": "2018-04-06T01:23:45+02:00"}
 CVE_JSON_EMPTY_CVE = {"cve_list": [""]}
 CVE_JSON_NON_EXIST = {"cve_list": ["CVE-9999-9999"]}
 
 EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 0, "pages": 0}
 CORRECT_RESPONSE = {
-    "cvss3_score": "4.9",
+    "cvss2_score": "5.100",
     "impact": "Moderate",
-    # "redhat_url": "https://access.redhat.com/security/cve/cve-2016-0634",
-    "synopsis": "CVE-2016-0634",
-    "package_list": ["bash-4.2.46-28.el7.x86_64"],
-    "errata_list": ["RHSA-2017:1931"],
+    "synopsis": "CVE-2014-1545",
+    "package_list": ["my-pkg-1.1.0-1.el8.i686"],
+    "errata_list": ["RHBA-2015:0364"],
 }
 
 
@@ -38,14 +37,14 @@ class TestCveAPI(TestBase):
     def setup_api(self, load_cache):
         """Set CveAPI object"""
         # WORKAROUND: tzinfo from date is lost after loading YAML
-        cve_detail = self.cache.cve_detail["CVE-2016-0634"]
+        cve_detail = self.cache.cve_detail["CVE-2014-1545"]
         cve_detail_list = list(cve_detail)
         cve_detail_list[CVE_MODIFIED_DATE] = cve_detail[CVE_MODIFIED_DATE].replace(tzinfo=pytz.utc)
         cve_detail_list[CVE_PUBLISHED_DATE] = cve_detail[CVE_PUBLISHED_DATE].replace(tzinfo=pytz.utc)
-        self.cache.cve_detail["CVE-2016-0634"] = cve_detail_list
+        self.cache.cve_detail["CVE-2014-1545"] = cve_detail_list
 
         # make cve_detail without CVE_MODIFIED_DATE
-        cve_detail2 = self.cache.cve_detail["CVE-2016-0634"]
+        cve_detail2 = self.cache.cve_detail["CVE-2014-1545"]
         cve_detail_list2 = list(cve_detail2)
         cve_detail_list2[CVE_MODIFIED_DATE] = None
         self.cache.cve_detail["CVE-W/O-MODIFIED"] = cve_detail_list2
@@ -55,9 +54,8 @@ class TestCveAPI(TestBase):
 
     def test_regex(self):
         """Test finding CVEs by correct regex."""
-        assert self.cve.find_cves_by_regex("CVE-2018-5750") == ["CVE-2018-5750"]
-        assert "CVE-2018-5750" in self.cve.find_cves_by_regex("CVE-2018-5.*")
-        assert len(self.cve.find_cves_by_regex("CVE-2018-5.*")) > 1
+        assert self.cve.find_cves_by_regex("CVE-2014-1545") == ["CVE-2014-1545"]
+        assert self.cve.find_cves_by_regex("CVE-2014-.*") == ["CVE-2014-1545"]
 
     def test_wrong_regex(self):
         """Test CVE API with wrong regex."""

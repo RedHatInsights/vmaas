@@ -16,7 +16,7 @@ from errata import ErrataAPI
 
 ERRATA_JSON_EMPTY = {}
 ERRATA_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
-ERRATA_JSON = {"errata_list": ["RHSA-2018:1055"], "modified_since": "2018-04-06T01:23:45+02:00"}
+ERRATA_JSON = {"errata_list": ["RHBA-2015:0364"], "modified_since": "2014-04-06T01:23:45+02:00"}
 ERRATA_JSON_EMPTY_LIST = {"errata_list": [""]}
 ERRATA_JSON_NON_EXIST = {"errata_list": ["RHSA-9999:9999"]}
 
@@ -32,14 +32,14 @@ class TestErrataAPI(TestBase):
     def setup_api(self, load_cache):
         """Setup ErrataAPI object from self.cache"""
         # WORKAROUND: tzinfo from date is lost after loading YAML
-        errata_detail = self.cache.errata_detail["RHSA-2018:1055"]
+        errata_detail = self.cache.errata_detail["RHBA-2015:0364"]
         errata_detail_list = list(errata_detail)
         errata_detail_list[ERRATA_UPDATED] = errata_detail[ERRATA_UPDATED].replace(tzinfo=pytz.utc)
         errata_detail_list[ERRATA_ISSUED] = errata_detail[ERRATA_ISSUED].replace(tzinfo=pytz.utc)
-        self.cache.errata_detail["RHSA-2018:1055"] = errata_detail_list
+        self.cache.errata_detail["RHBA-2015:0364"] = errata_detail_list
 
         # make errata_detail without ERRATA_UPDATED
-        errata_detail2 = self.cache.errata_detail["RHSA-2018:1055"]
+        errata_detail2 = self.cache.errata_detail["RHBA-2015:0364"]
         errata_detail_list2 = list(errata_detail2)
         errata_detail_list2[ERRATA_UPDATED] = None
         self.cache.errata_detail["RHSA-W/O:MODIFIED"] = errata_detail_list2
@@ -54,9 +54,8 @@ class TestErrataAPI(TestBase):
 
     def test_regex(self):
         """Test correct errata regex."""
-        assert self.errata_api.find_errata_by_regex("RHSA-2018:1055") == ["RHSA-2018:1055"]
-        assert "RHSA-2018:1055" in self.errata_api.find_errata_by_regex("RHSA-2018:1.*")
-        assert len(self.errata_api.find_errata_by_regex("RHSA-2018:1.*")) > 1
+        assert self.errata_api.find_errata_by_regex("RHBA-2015:0364") == ["RHBA-2015:0364"]
+        assert self.errata_api.find_errata_by_regex("RHBA-2015:0.*") == ["RHBA-2015:0364"]
 
     def test_missing_required(self):
         """Test missing required property 'errata_list'."""
