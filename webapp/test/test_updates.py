@@ -12,7 +12,7 @@ import pytest
 from updates import HotCache
 from updates import UpdatesAPI
 
-PKG = "bash-0:4.2.46-20.el7_2.x86_64"
+PKG = "my-pkg-1.1.0-1.el8.i686"
 UPDATES_JSON = {
     "package_list": [PKG],
     "repository_list": ["rhel-7-server-rpms"],

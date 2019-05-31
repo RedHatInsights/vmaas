@@ -9,7 +9,7 @@ import pytest
 
 from packages import PackagesAPI
 
-PKG = "bash-0:4.2.46-20.el7_2.x86_64"
+PKG = "my-pkg-1.1.0-1.el8.i686"
 PKG_JSON_EMPTY = {}
 PKG_JSON = {"package_list": [PKG]}
 PKG_JSON_EMPTY_LIST = {"package_list": [""]}
