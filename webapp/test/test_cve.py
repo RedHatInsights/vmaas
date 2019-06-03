@@ -12,9 +12,10 @@ import pytz
 from cve import CveAPI
 from cache import CVE_MODIFIED_DATE, CVE_PUBLISHED_DATE
 
+CVE_NAME = "CVE-2014-1545"
 CVE_JSON_EMPTY = {}
 CVE_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
-CVE_JSON = {"cve_list": ["CVE-2014-1545"], "modified_since": "2018-04-06T01:23:45+02:00"}
+CVE_JSON = {"cve_list": [CVE_NAME], "modified_since": "2018-04-06T01:23:45+02:00"}
 CVE_JSON_EMPTY_CVE = {"cve_list": [""]}
 CVE_JSON_NON_EXIST = {"cve_list": ["CVE-9999-9999"]}
 
@@ -22,8 +23,9 @@ EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 0, "pages": 0}
 CORRECT_RESPONSE = {
     "cvss2_score": "5.100",
     "impact": "Moderate",
-    "synopsis": "CVE-2014-1545",
+    "synopsis": CVE_NAME,
     "package_list": ["my-pkg-1.1.0-1.el8.i686"],
+    "source_package_list": ["my-pkg-1.1.0-1.el8.src"],
     "errata_list": ["RHBA-2015:0364"],
 }
 
@@ -37,14 +39,14 @@ class TestCveAPI(TestBase):
     def setup_api(self, load_cache):
         """Set CveAPI object"""
         # WORKAROUND: tzinfo from date is lost after loading YAML
-        cve_detail = self.cache.cve_detail["CVE-2014-1545"]
+        cve_detail = self.cache.cve_detail[CVE_NAME]
         cve_detail_list = list(cve_detail)
         cve_detail_list[CVE_MODIFIED_DATE] = cve_detail[CVE_MODIFIED_DATE].replace(tzinfo=pytz.utc)
         cve_detail_list[CVE_PUBLISHED_DATE] = cve_detail[CVE_PUBLISHED_DATE].replace(tzinfo=pytz.utc)
-        self.cache.cve_detail["CVE-2014-1545"] = cve_detail_list
+        self.cache.cve_detail[CVE_NAME] = cve_detail_list
 
         # make cve_detail without CVE_MODIFIED_DATE
-        cve_detail2 = self.cache.cve_detail["CVE-2014-1545"]
+        cve_detail2 = self.cache.cve_detail[CVE_NAME]
         cve_detail_list2 = list(cve_detail2)
         cve_detail_list2[CVE_MODIFIED_DATE] = None
         self.cache.cve_detail["CVE-W/O-MODIFIED"] = cve_detail_list2
@@ -54,8 +56,8 @@ class TestCveAPI(TestBase):
 
     def test_regex(self):
         """Test finding CVEs by correct regex."""
-        assert self.cve.find_cves_by_regex("CVE-2014-1545") == ["CVE-2014-1545"]
-        assert self.cve.find_cves_by_regex("CVE-2014-.*") == ["CVE-2014-1545"]
+        assert self.cve.find_cves_by_regex(CVE_NAME) == [CVE_NAME]
+        assert self.cve.find_cves_by_regex("CVE-2014-.*") == [CVE_NAME]
 
     def test_wrong_regex(self):
         """Test CVE API with wrong regex."""
@@ -85,17 +87,12 @@ class TestCveAPI(TestBase):
         response = self.cve.process_list(api_version=1, data=CVE_JSON_NON_EXIST)
         assert response == EMPTY_RESPONSE
 
-    def test_schema(self):
-        """Test CVE API response schema."""
-        response = self.cve.process_list(api_version=1, data=CVE_JSON)
-        assert schemas.cves_schema.validate(response)
-
     def test_cve_response(self):
         """Test if CVE API response is correct for correct JSON."""
         response = self.cve.process_list(api_version=1, data=CVE_JSON)
-        cve, = response["cve_list"].items()
-        assert cve[0] == CVE_JSON["cve_list"][0]
-        assert tools.match(CORRECT_RESPONSE, cve[1]) is True
+        assert schemas.cves_schema.validate(response)
+        assert CVE_NAME in response["cve_list"]
+        assert tools.match(CORRECT_RESPONSE, response["cve_list"][CVE_NAME]) is True
 
     @pytest.mark.skip("Blocked by https://github.com/RedHatInsights/vmaas/issues/419")
     def test_modified_since(self):
