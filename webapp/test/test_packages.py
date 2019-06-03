@@ -10,8 +10,10 @@ import pytest
 from packages import PackagesAPI
 
 PKG = "my-pkg-1.1.0-1.el8.i686"
+PKG_SRC = "my-pkg-1.1.0-1.el8.src"
 PKG_JSON_EMPTY = {}
 PKG_JSON = {"package_list": [PKG]}
+PKG_SRC_JSON = {"package_list": [PKG_SRC]}
 PKG_JSON_EMPTY_LIST = {"package_list": [""]}
 PKG_JSON_NON_EXIST = {"package_list": ["non-exist"]}
 
@@ -34,6 +36,14 @@ class TestPackagesAPI(TestBase):
         response = self.pkg_api.process_list(1, PKG_JSON)
         schemas.pkgs_top_schema.validate(response)
         schemas.pkgs_list_schema.validate(response["package_list"][PKG])
+        assert len(response["package_list"][PKG]["repositories"]) == 1  # package is expected to be in one repo
+
+    def test_schema_src(self):
+        """Test pkg api response schema of valid input."""
+        response = self.pkg_api.process_list(1, PKG_SRC_JSON)
+        schemas.pkgs_top_schema.validate(response)
+        schemas.pkgs_list_schema.validate(response["package_list"][PKG_SRC])
+        assert not response["package_list"][PKG_SRC]["repositories"]  # source package is assigned to no repo
 
     def test_empty_json(self):
         """Test pkg api with empty json."""
