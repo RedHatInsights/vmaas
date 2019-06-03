@@ -96,6 +96,7 @@ class ErrataAPI:
             if not errata_detail:
                 continue
 
+            bin_pkg_list, src_pkg_list = pkgidlist2packages(self.cache, errata_detail[ERRATA_PKGIDS])
             errata_list[errata] = {
                 "synopsis": none2empty(errata_detail[ERRATA_SYNOPSIS]),
                 "summary": none2empty(errata_detail[ERRATA_SUMMARY]),
@@ -106,7 +107,8 @@ class ErrataAPI:
                 "issued": none2empty(format_datetime(errata_detail[ERRATA_ISSUED])),
                 "updated": none2empty(format_datetime(errata_detail[ERRATA_UPDATED])),
                 "cve_list": errata_detail[ERRATA_CVE],
-                "package_list": pkgidlist2packages(self.cache, errata_detail[ERRATA_PKGIDS]),
+                "package_list": bin_pkg_list,
+                "source_package_list": src_pkg_list,
                 "bugzilla_list": errata_detail[ERRATA_BUGZILLA],
                 "reference_list": errata_detail[ERRATA_REFERENCE],
                 "url": none2empty(errata_detail[ERRATA_URL])

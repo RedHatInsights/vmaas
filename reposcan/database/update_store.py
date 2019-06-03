@@ -120,6 +120,17 @@ class UpdateStore(ObjectStore):
         self.conn.commit()
         return update_map
 
+    @staticmethod
+    def _associate_source_packages(cur):
+        cur.execute("""select distinct source_package_id, errata_id, e.module_stream_id
+                       from pkg_errata e inner join package p on p.id = e.pkg_id
+                       where source_package_id is not null
+                       except (select pkg_id, errata_id, module_stream_id from pkg_errata)""")
+        source_pkg_erratas = [item for item in cur.fetchall()]
+        if source_pkg_erratas:
+            execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
+                           source_pkg_erratas, page_size=len(source_pkg_erratas))
+
     def _associate_packages(self, updates, update_map, repo_id):
         cur = self.conn.cursor()
         # Select packages already associated with updates, from current repository only
@@ -149,6 +160,7 @@ class UpdateStore(ObjectStore):
             cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
                         (tuple(to_disassociate),))
 
+        self._associate_source_packages(cur)
         cur.close()
         self.conn.commit()
 

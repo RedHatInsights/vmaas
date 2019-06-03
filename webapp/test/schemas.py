@@ -17,6 +17,7 @@ _cves = {
             "cwe_list": [str],
             "errata_list": [str],
             "package_list": [str],
+            "source_package_list": [str],
             "cvss3_metrics": str,
             "cvss2_metrics": str,
         }
@@ -32,6 +33,7 @@ _pkgs_top = {"package_list": {str: dict}}
 _pkgs_list = {
     "summary": str,
     "description": str,
+    "source_package": Or(str, None),
     "repositories": [{"label": str, "name": str, "basearch": str, "releasever": str}],
 }
 
@@ -70,6 +72,7 @@ _errata = {
             "cve_list": [str],
             "bugzilla_list": [str],
             "package_list": [str],
+            "source_package_list": [str],
             "type": str,
         }
     },

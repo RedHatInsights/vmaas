@@ -100,6 +100,7 @@ class CveAPI:
             if not cve_detail:
                 continue
 
+            bin_pkg_list, src_pkg_list = pkgidlist2packages(self.cache, cve_detail[CVE_PID])
             cve_list[cve] = {
                 "redhat_url": none2empty(cve_detail[CVE_REDHAT_URL]),
                 "secondary_url": none2empty(cve_detail[CVE_SECONDARY_URL]),
@@ -113,7 +114,8 @@ class CveAPI:
                 "cvss2_score": str(none2empty(cve_detail[CVE_CVSS2_SCORE])),
                 "cvss2_metrics": str(none2empty(cve_detail[CVE_CVSS2_METRICS])),
                 "description": none2empty(cve_detail[CVE_DESCRIPTION]),
-                "package_list": pkgidlist2packages(self.cache, cve_detail[CVE_PID]),
+                "package_list": bin_pkg_list,
+                "source_package_list": src_pkg_list,
                 "errata_list": [self.cache.errataid2name[eid] for eid in cve_detail[CVE_EID]],
 
             }

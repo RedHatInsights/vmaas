@@ -7,6 +7,9 @@ import re
 from datetime import datetime
 from dateutil import parser as dateutil_parser
 
+from cache import PKG_NAME_ID, PKG_EVR_ID, PKG_ARCH_ID
+
+
 def join_packagename(name, epoch, version, release, arch):
     """
     Build a package name from the separate NEVRA parts
@@ -14,18 +17,32 @@ def join_packagename(name, epoch, version, release, arch):
     epoch = ("%s:" % epoch) if int(epoch) else ''
     return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
+
+def pkg_detail2nevra(cache, pkg_detail):
+    """Create package object from pkg_detail using cache object."""
+    name = cache.id2packagename[pkg_detail[PKG_NAME_ID]]
+    epoch, ver, rel = cache.id2evr[pkg_detail[PKG_EVR_ID]]
+    arch = cache.id2arch[pkg_detail[PKG_ARCH_ID]]
+    return join_packagename(name, epoch, ver, rel, arch)
+
+
 def pkgidlist2packages(cache, pkgid_list):
     """
-    This method returns a list of package-nevras for the given list of package ids from
-    the specified cache
+    This method returns a two lists of package-nevras for the given list of package ids from
+    the specified cache. 1 - binary packages list, 2 - source packages list
     """
     pkg_list = []
+    source_pkg_list = []
+    src_arch_id = cache.arch2id["src"]
     for pkg_id in pkgid_list:
-        name = cache.id2packagename[cache.package_details[pkg_id][0]]
-        epoch, ver, rel = cache.id2evr[cache.package_details[pkg_id][1]]
-        arch = cache.id2arch[cache.package_details[pkg_id][2]]
-        pkg_list.append(join_packagename(name, epoch, ver, rel, arch))
-    return pkg_list
+        pkg_detail = cache.package_details[pkg_id]
+        pkg_str = pkg_detail2nevra(cache, pkg_detail)
+        if pkg_detail[PKG_ARCH_ID] == src_arch_id:
+            source_pkg_list.append(pkg_str)
+        else:
+            pkg_list.append(pkg_str)
+    return pkg_list, source_pkg_list
+
 
 NEVRA_RE = re.compile(r'(.*)-(([0-9]+):)?([^-]+)-([^-]+)\.([a-z0-9_]+)')
 def split_packagename(filename):

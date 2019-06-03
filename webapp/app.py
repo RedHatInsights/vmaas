@@ -930,6 +930,13 @@ def setup_apispec(handlers):
                         "type": "string",
                         "example": "nss-devel-3.16.1-9.el6_5.x86_64"
                     }
+                },
+                "source_package_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "nss-devel-3.16.1-9.el6_5.src"
+                    }
                 }
             },
         },
@@ -1045,6 +1052,13 @@ def setup_apispec(handlers):
                             "example": "kernel-2.6.32-696.23.1.el6.x86_64"
                         }
                     },
+                    "source_package_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "kernel-2.6.32-696.23.1.el6.src"
+                        }
+                    },
                     "type": {
                         "type": "string",
                         "example": "security"
@@ -1070,6 +1084,10 @@ def setup_apispec(handlers):
                     "description": {
                         "type": "string",
                         "example": "package description"
+                    },
+                    "source_package": {
+                        "type": "string",
+                        "example": "kernel-2.6.32-696.23.1.el6.src"
                     },
                     "repositories": {
                         "type": "array",
