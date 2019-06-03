@@ -1,8 +1,11 @@
 arch2id:
   i686: 5
+  src: 6
 arch_compat:
   5: !!set
     5: null
+  6: !!set
+    6: null
 cve_detail:
   CVE-2014-1545: !!python/tuple
   - null
@@ -16,6 +19,7 @@ cve_detail:
   - CVE description...
   - - CWE-787
   - - 8110
+    - 81100
   - - 444
   - !!python/object/apply:decimal.Decimal
     - '5.100'
@@ -39,6 +43,7 @@ errata_detail:
   - 2015-03-05 00:00:00
   - - CVE-2014-1545
   - - 8110
+    - 81100
   - - '1004102'
     - '1004107'
     - '1087507'
@@ -72,6 +77,7 @@ evr2id:
   : 210
 id2arch:
   5: i686
+  6: src
 id2evr:
   110: *id001
   120: *id002
@@ -98,6 +104,11 @@ nevra2pkgid:
   : 8110
   ? !!python/tuple
   - 2222
+  - 110
+  - 6
+  : 81100
+  ? !!python/tuple
+  - 2222
   - 120
   - 5
   : 8120
@@ -118,6 +129,13 @@ package_details:
   - 5
   - Testing package summary...
   - Testing package (1.1.0) description...
+  - 81100
+  81100: !!python/tuple
+  - 2222
+  - 110
+  - 6
+  - Testing source package summary...
+  - Testing source package (1.1.0) description...
   - null
   8120: !!python/tuple
   - 2222
@@ -149,6 +167,11 @@ pkgerrata2module:
   : !!set
     11: null
   ? !!python/tuple
+  - 81100
+  - 444
+  : !!set
+    11: null
+  ? !!python/tuple
   - 8120
   - 444
   : !!set
@@ -165,6 +188,8 @@ pkgerrata2module:
     22: null
 pkgid2errataids:
   8110: !!set
+    444: null
+  81100: !!set
     444: null
   8120: !!set
     444: null
