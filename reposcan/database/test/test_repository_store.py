@@ -144,3 +144,11 @@ class TestRepositoryStore:
         pkg_num = cur.fetchone()[0]
 
         assert pkg_num == 6
+
+    def test_pkg_errata_count(self, db_conn):
+        """Test that package - errata association are stored."""
+        cur = db_conn.cursor()
+        cur.execute("select count(*) from pkg_errata")
+        cnt = cur.fetchone()[0]
+
+        assert cnt == 9

@@ -4,8 +4,8 @@ Module to handle /packages API calls.
 
 from jsonschema import validate
 
-from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER
-from utils import split_packagename, none2empty
+from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY, PKG_DESC, PKG_SOURCE_PKG_ID
+import utils
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -22,6 +22,14 @@ class PackagesAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
         self.cache = cache
+
+    def _get_source_package(self, pkg_detail):
+        src_pkg_id = pkg_detail[PKG_SOURCE_PKG_ID]
+        if src_pkg_id is not None:
+            src_pkg_detail = self.cache.package_details[src_pkg_id]
+            src_pkg_nevra = utils.pkg_detail2nevra(self.cache, src_pkg_detail)
+            return src_pkg_nevra
+        return None
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
@@ -40,7 +48,7 @@ class PackagesAPI:
 
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
-            name, epoch, ver, rel, arch = split_packagename(pkg)
+            name, epoch, ver, rel, arch = utils.split_packagename(pkg)
             if name in self.cache.packagename2id \
                and (epoch, ver, rel) in self.cache.evr2id \
                and arch in self.cache.arch2id:
@@ -49,18 +57,21 @@ class PackagesAPI:
                 arch_id = self.cache.arch2id[arch]
                 if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
                     pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
-                    packagedata['summary'] = self.cache.package_details[pkg_id][3]
-                    packagedata['description'] = self.cache.package_details[pkg_id][4]
+                    pkg_detail = self.cache.package_details[pkg_id]
+                    packagedata['summary'] = pkg_detail[PKG_SUMMARY]
+                    packagedata['description'] = pkg_detail[PKG_DESC]
+                    packagedata['source_package'] = self._get_source_package(pkg_detail)
                     packagedata['repositories'] = []
-                    for repo_id in self.cache.pkgid2repoids[pkg_id]:
-                        repodetail = self.cache.repo_detail[repo_id]
-                        repodata = {
-                            'label': repodetail[REPO_LABEL],
-                            'name': repodetail[REPO_NAME],
-                            'basearch': none2empty(repodetail[REPO_BASEARCH]),
-                            'releasever': none2empty(repodetail[REPO_RELEASEVER])
-                        }
-                        packagedata['repositories'].append(repodata)
+                    if pkg_id in self.cache.pkgid2repoids:
+                        for repo_id in self.cache.pkgid2repoids[pkg_id]:
+                            repodetail = self.cache.repo_detail[repo_id]
+                            repodata = {
+                                'label': repodetail[REPO_LABEL],
+                                'name': repodetail[REPO_NAME],
+                                'basearch': utils.none2empty(repodetail[REPO_BASEARCH]),
+                                'releasever': utils.none2empty(repodetail[REPO_RELEASEVER])
+                            }
+                            packagedata['repositories'].append(repodata)
         response = {
             'package_list': packagelist
         }

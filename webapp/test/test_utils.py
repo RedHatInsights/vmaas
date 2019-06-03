@@ -26,9 +26,11 @@ class TestUtils(TestBase):
     # load_cache is pytest fixture
     def test_pkgidlist2packages(self, load_cache):
         """Test making NEVRA from package id."""
-        pkgid_list = [pkg_id for pkg_id in self.cache.package_details][:10]
-        nevras = utils.pkgidlist2packages(self.cache, pkgid_list)
-        for nevra in nevras:
+        pkgid_list = [pkg_id for pkg_id in self.cache.package_details]
+        bin_nevras, src_nevras = utils.pkgidlist2packages(self.cache, pkgid_list)
+        assert len(bin_nevras) == 4
+        assert len(src_nevras) == 1
+        for nevra in bin_nevras + src_nevras:
             assert self._is_nevra(nevra)
 
     def test_split_packagename(self):
