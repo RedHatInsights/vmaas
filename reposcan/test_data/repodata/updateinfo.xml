@@ -39,6 +39,16 @@
         <package name="golang-github-xeipuuv-gojsonschema" version="0" release="0.5.20171003git6b67b3f.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/g/golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27.src.rpm">
           <filename>golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27.src.rpm</filename>
         </package>
+        <!--  3 items added for testing purposes, to have items included in primary.xml-->
+        <package name="389-ds-base" version="1.3.7.8" release="1.fc27" epoch="0" arch="x86_64" src="-">
+          <filename>389-ds-base-1.3.7.8-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="389-ds-base-devel" version="1.3.7.8" release="1.fc27" epoch="0" arch="i686" src="-">
+          <filename>389-ds-base-devel-1.3.7.8-1.fc27.i686.rpm</filename>
+        </package>
+        <package name="Agda" version="2.5.2" release="9.fc27" epoch="0" arch="x86_64" src="-">
+          <filename>Agda-2.5.2-9.fc27.x86_64.rpm</filename>
+        </package>
       </collection>
     </pkglist>
   </update>
@@ -59,6 +69,13 @@
         </package>
         <package name="perl-Math-Base85" version="0.4" release="1.fc27" epoch="0" arch="src" src="https://download.fedoraproject.org/pub/fedora/linux/updates/27/SRPMS/p/perl-Math-Base85-0.4-1.fc27.src.rpm">
           <filename>perl-Math-Base85-0.4-1.fc27.src.rpm</filename>
+        </package>
+        <!--  2 items added for testing purposes, to have items included in primary.xml-->
+        <package name="389-ds-base" version="1.3.7.8" release="1.fc27" epoch="0" arch="x86_64" src="-">
+          <filename>389-ds-base-1.3.7.8-1.fc27.x86_64.rpm</filename>
+        </package>
+        <package name="BackupPC" version="4.1.5" release="1.fc27" epoch="0" arch="x86_64" src="-">
+          <filename>BackupPC-4.1.5-1.fc27.x86_64.rpm</filename>
         </package>
       </collection>
     </pkglist>
