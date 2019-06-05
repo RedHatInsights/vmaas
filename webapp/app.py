@@ -495,7 +495,7 @@ class ReposHandlerPost(BaseHandler):
                   type: array
                   items:
                     type: string
-                    example: rhel-6-server-rpms, rhel-7-server-rpms
+                    example: rhel-6-server-rpms
                 modified_since:
                   type: string
                   example: "2018-04-05T01:23:45+02:00"
