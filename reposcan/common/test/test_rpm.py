@@ -44,3 +44,10 @@ class TestSrpm(unittest.TestCase):
             rpm.parse_rpm_name('foo.rpm')
         with self.assertRaises(rpm.RPMParseException):
             rpm.parse_rpm_name('foo-1.3.x86.rpm')
+
+
+def test_rpmver2array_1():
+    """Test rpmver array building."""
+    assert rpm.rpmver2array("1.a") == [(1, ''), (0, 'a'), (-2, '')]
+    assert rpm.rpmver2array("1.a~rc1") == [(1, ''), (0, 'a'), (-2, 'rc'), (1, ''), (-2, '')]
+    assert rpm.rpmver2array("1.a^") == [(1, ''), (0, 'a'), (-1, ''), (-2, '')]

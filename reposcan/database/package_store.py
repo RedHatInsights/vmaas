@@ -44,14 +44,15 @@ class PackageStore(ObjectStore):
         to_import = []
         for epoch, version, release in unique_evrs:
             if (epoch, version, release) not in self.evr_map:
-                to_import.append((epoch, version, release, epoch, version, release))
+                to_import.append((epoch, version, release, epoch,
+                                  rpm.rpmver2sqlarray(version), rpm.rpmver2sqlarray(release)))
 
         self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
             execute_values(cur,
                            """insert into evr (epoch, version, release, evr) values %s
                            returning id, epoch, version, release""",
-                           to_import, template=b"(%s, %s, %s, (%s, rpmver_array(%s), rpmver_array(%s)))",
+                           to_import, template=b"(%s, %s, %s, (%s, %s, %s))",
                            page_size=len(to_import))
             for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
                 self.evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
