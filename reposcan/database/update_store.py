@@ -247,7 +247,7 @@ class UpdateStore(ObjectStore):
             cur.close()
         return cve_map
 
-    def _associate_cves(self, updates, update_map, cve_map):
+    def _associate_cves(self, updates, update_map, cve_map): # pylint: disable=too-many-branches
         cur = self.conn.cursor()
         try:
             update_to_cves = {}
@@ -293,9 +293,9 @@ class UpdateStore(ObjectStore):
         finally:
             cur.close()
 
-    def _associate_refs(self, updates, update_map):
+    def _associate_refs(self, updates, update_map): # pylint: disable=too-many-branches
         cur = self.conn.cursor()
-        try:
+        try: # pylint: disable=too-many-nested-blocks
             refs_to_add = set()
             refs_to_remove = []
             existing_refs_count = 0
