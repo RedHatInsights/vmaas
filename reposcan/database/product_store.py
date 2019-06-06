@@ -46,7 +46,7 @@ class ProductStore:
 
     def _import_content_sets(self, products):
         product_to_dbid = self._import_products(products)
-        if product_to_dbid:
+        if product_to_dbid: # pylint: disable=too-many-nested-blocks
             all_content_set_labels = [cs for product in products.values() for cs in product["content_sets"]]
             self.logger.debug("Syncing %d content sets.", len(all_content_set_labels))
             cs_to_dbid = {}
