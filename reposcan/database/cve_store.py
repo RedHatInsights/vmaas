@@ -23,6 +23,57 @@ class CveStore(CveStoreCommon):
         cur.close()
         return lastmodified
 
+    def _import_cves(self, to_import, cve_data):
+        if to_import:
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur,
+                               """insert into cve (name, description, impact_id, published_date, modified_date,
+                                  cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id,
+                                  cvss2_score, cvss2_metrics)
+                                  values %s returning id, name""",
+                               list(to_import), page_size=len(to_import))
+                for row in cur.fetchall():
+                    cve_data[row[1]]["id"] = row[0]
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while importing CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
+
+    def _update_cves(self, to_update):
+        if to_update:
+            cur = self.conn.cursor()
+            try:
+                tmpl_str = b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int, %s::numeric, %s)"
+                execute_values(cur,
+                               """update cve set name = v.name,
+                                                 description = v.description,
+                                                 impact_id = v.impact_id,
+                                                 published_date = v.published_date,
+                                                 modified_date = v.modified_date,
+                                                 redhat_url = v.redhat_url,
+                                                 secondary_url = v.secondary_url,
+                                                 cvss3_score = v.cvss3_score,
+                                                 cvss3_metrics = v.cvss3_metrics,
+                                                 iava = v.iava,
+                                                 source_id = v.source_id,
+                                                 cvss2_score = v.cvss2_score,
+                                                 cvss2_metrics = v.cvss2_metrics
+                                  from (values %s)
+                                  as v(id, name, description, impact_id, published_date,
+                                  modified_date, cvss3_score, cvss3_metrics, iava, redhat_url,
+                                  secondary_url, source_id, cvss2_score, cvss2_metrics)
+                                  where cve.id = v.id """,
+                               list(to_update), page_size=len(to_update), template=tmpl_str)
+                self.conn.commit()
+            except Exception: # pylint: disable=broad-except
+                self.logger.exception("Failure while updating CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
+
     def _populate_cves(self, repo):
         cve_impact_map = self._populate_cve_impacts()
         nist_source_id = self._get_source_id('NIST')
@@ -85,54 +136,9 @@ class CveStore(CveStoreCommon):
         cur.close()
         self.logger.debug("CVEs to update: %d", len(to_update))
 
-        if to_import:
-            cur = self.conn.cursor()
-            try:
-                execute_values(cur,
-                               """insert into cve (name, description, impact_id, published_date, modified_date,
-                                  cvss3_score, cvss3_metrics, iava, redhat_url, secondary_url, source_id,
-                                  cvss2_score, cvss2_metrics)
-                                  values %s returning id, name""",
-                               list(to_import), page_size=len(to_import))
-                for row in cur.fetchall():
-                    cve_data[row[1]]["id"] = row[0]
-                self.conn.commit()
-            except Exception: # pylint: disable=broad-except
-                self.logger.exception("Failure while importing CVEs")
-                self.conn.rollback()
-            finally:
-                cur.close()
+        self._import_cves(to_import, cve_data)
 
-        if to_update:
-            cur = self.conn.cursor()
-            try:
-                tmpl_str = b"(%s, %s, %s, %s::int, %s, %s, %s::numeric, %s, %s, %s, %s, %s::int, %s::numeric, %s)"
-                execute_values(cur,
-                               """update cve set name = v.name,
-                                                 description = v.description,
-                                                 impact_id = v.impact_id,
-                                                 published_date = v.published_date,
-                                                 modified_date = v.modified_date,
-                                                 redhat_url = v.redhat_url,
-                                                 secondary_url = v.secondary_url,
-                                                 cvss3_score = v.cvss3_score,
-                                                 cvss3_metrics = v.cvss3_metrics,
-                                                 iava = v.iava,
-                                                 source_id = v.source_id,
-                                                 cvss2_score = v.cvss2_score,
-                                                 cvss2_metrics = v.cvss2_metrics
-                                  from (values %s)
-                                  as v(id, name, description, impact_id, published_date,
-                                  modified_date, cvss3_score, cvss3_metrics, iava, redhat_url,
-                                  secondary_url, source_id, cvss2_score, cvss2_metrics)
-                                  where cve.id = v.id """,
-                               list(to_update), page_size=len(to_update), template=tmpl_str)
-                self.conn.commit()
-            except Exception: # pylint: disable=broad-except
-                self.logger.exception("Failure while updating CVEs")
-                self.conn.rollback()
-            finally:
-                cur.close()
+        self._update_cves(to_update)
 
         cur = self.conn.cursor()
         try:
