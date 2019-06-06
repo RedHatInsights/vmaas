@@ -5,12 +5,12 @@ INSERT INTO package_name (id, name) VALUES
   (104, 'pkg-sec-errata4');
 
 INSERT INTO evr (id, epoch, version, release, evr) VALUES
-  (201, '1', '1', '1', ('1', rpmver_array('1'), rpmver_array('1'))),
-  (202, '1', '1', '2', ('1', rpmver_array('1'), rpmver_array('2'))),
-  (203, '1', '1', '3', ('1', rpmver_array('1'), rpmver_array('3'))),
-  (204, '2', '2', '2', ('2', rpmver_array('2'), rpmver_array('2'))),
-  (205, '3', '3', '3', ('3', rpmver_array('3'), rpmver_array('3'))),
-  (206, '4', '4', '4', ('4', rpmver_array('4'), rpmver_array('4')));
+  (201, '1', '1', '1', ('1', ARRAY[(1,null)::evr_array_item], ARRAY[(1,null)::evr_array_item])),
+  (202, '1', '1', '2', ('1', ARRAY[(1,null)::evr_array_item], ARRAY[(2,null)::evr_array_item])),
+  (203, '1', '1', '3', ('1', ARRAY[(1,null)::evr_array_item], ARRAY[(3,null)::evr_array_item])),
+  (204, '2', '2', '2', ('2', ARRAY[(2,null)::evr_array_item], ARRAY[(2,null)::evr_array_item])),
+  (205, '3', '3', '3', ('3', ARRAY[(3,null)::evr_array_item], ARRAY[(3,null)::evr_array_item])),
+  (206, '4', '4', '4', ('4', ARRAY[(4,null)::evr_array_item], ARRAY[(4,null)::evr_array_item]));
 
 INSERT INTO package (id, name_id, evr_id, arch_id, summary, description, source_package_id) VALUES
   (301, 101, 201, 1, 'summary1', 'description1', null),
