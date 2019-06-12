@@ -5,11 +5,11 @@
     webapp_container_port: 8080
     reposcan_container_port: 8081
     apidoc_config_map: vmaas-apidoc-conf-apidoc-env
-    dockerfile_suffix: ""
+    dockerfile_suffix: ".rhel7"
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, rhel-containers."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, centos-containers."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -45,11 +45,11 @@
       tags:
         - always
 
-    - name: Use RHEL containers
+    - name: Use CentOS containers
       set_fact:
-        dockerfile_suffix: ".rhel7"
+        dockerfile_suffix: ""
       tags:
-        - rhel-containers
+        - centos-containers
 
     - name: Create OpenShift routes
       shell: oc create route edge apidoc --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
