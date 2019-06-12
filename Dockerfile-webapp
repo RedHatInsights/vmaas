@@ -2,7 +2,7 @@ FROM centos:7
 
 # all environment variables are defined in conf/reposcan.env
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
-ENV VMAAS_VERSION=latest
+ENV VMAAS_VERSION=0.13
 
 RUN yum -y update \
     && yum -y install centos-release-scl \

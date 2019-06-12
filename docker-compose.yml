@@ -6,7 +6,7 @@ services:
     build:
         context: ./
         dockerfile: ./Dockerfile-database
-    image: vmaas/database:latest
+    image: vmaas/database:0.13
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-admin.env
@@ -20,7 +20,7 @@ services:
     build:
         context: ./
         dockerfile: ./Dockerfile-websocket
-    image: vmaas/websocket:latest
+    image: vmaas/websocket:0.13
     restart: unless-stopped
     ports:
       - 8082:8082
@@ -30,7 +30,7 @@ services:
     build:
         context: ./
         dockerfile: ./Dockerfile-reposcan
-    image: vmaas/reposcan:latest
+    image: vmaas/reposcan:0.13
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-writer.env
@@ -50,7 +50,7 @@ services:
     build:
         context: ./
         dockerfile: ./Dockerfile-webapp
-    image: vmaas/webapp:latest
+    image: vmaas/webapp:0.13
     restart: unless-stopped
     env_file:
       - ./conf/webapp.env
@@ -65,7 +65,7 @@ services:
     build:
         context: ./
         dockerfile: ./Dockerfile-apidoc
-    image: vmaas/apidoc:latest
+    image: vmaas/apidoc:0.13
     restart: unless-stopped
     env_file:
       - ./conf/apidoc.env
