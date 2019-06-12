@@ -1089,6 +1089,13 @@ def setup_apispec(handlers):
                         "type": "string",
                         "example": "kernel-2.6.32-696.23.1.el6.src"
                     },
+                    "package_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "kernel-2.6.32-696.23.1.el6.x86_64"
+                        }
+                    },
                     "repositories": {
                         "type": "array",
                         "items": {

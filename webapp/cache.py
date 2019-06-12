@@ -96,6 +96,7 @@ class Cache:
         self.modulename2id = {}
         self.dbchange = {}
         self.errata_detail = {}
+        self.src_pkg_id2pkg_ids = {}
 
     def reload(self):
         """Update data and reload dictionaries."""
@@ -169,6 +170,8 @@ class Cache:
             elif relation == "modulename2id":
                 name, stream_name = key.split(":", 1)
                 self.modulename2id[(name, stream_name)] = data[item]
+            elif relation == "src_pkg_id2pkg_ids":
+                self.src_pkg_id2pkg_ids[int(key)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
         LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))

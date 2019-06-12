@@ -238,3 +238,6 @@ updates_index:
     - 2
     210:
     - 3
+src_pkg_id2pkg_ids:
+  81100:
+    - 8110
