@@ -29,6 +29,7 @@ class TestExporter:
             self.check_repo(dbdump)
             self.check_errata(dbdump)
             self.check_modules(dbdump)
+            self.check_src_pkg_id(dbdump)
 
     def check_predefined_content(self, dbdump):
         """Check the predefined database content"""
@@ -160,3 +161,11 @@ class TestExporter:
         assert 1103 in dbdump["modulename2id:module1:stream1"]
         assert "modulename2id:module2:stream2" in dbdump
         assert 1102 in dbdump["modulename2id:module2:stream2"]
+
+    def check_src_pkg_id(self, dbdump):
+        """Check source package to binary packages
+        mapping in dump."""
+        assert len(dbdump["src_pkg_id2pkg_ids:301"]) == 2
+        assert set(dbdump["src_pkg_id2pkg_ids:301"]) == {303, 305}
+        assert len(dbdump["src_pkg_id2pkg_ids:302"]) == 2
+        assert set(dbdump["src_pkg_id2pkg_ids:302"]) == {306, 307}

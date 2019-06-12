@@ -15,11 +15,11 @@ INSERT INTO evr (id, epoch, version, release, evr) VALUES
 INSERT INTO package (id, name_id, evr_id, arch_id, summary, description, source_package_id) VALUES
   (301, 101, 201, 1, 'summary1', 'description1', null),
   (302, 101, 202, 1, 'summary1', 'description1', null),
-  (303, 101, 203, 1, 'summary1', 'description1', null),
-  (304, 102, 204, 1, 'summary2', 'description2', null),
-  (305, 103, 205, 1, 'summary3', 'description3', null),
-  (306, 103, 206, 1, 'summary3', 'description3', null),
-  (307, 104, 204, 1, 'summary4', 'description4', null);
+  (303, 101, 203, 1, 'summary1', 'description1', 301),
+  (304, 102, 204, 1, 'summary2', 'description2', 301),
+  (305, 103, 205, 1, 'summary3', 'description3', 301),
+  (306, 103, 206, 1, 'summary3', 'description3', 302),
+  (307, 104, 204, 1, 'summary4', 'description4', 302);
 
 INSERT INTO errata_type (id, name) VALUES
   (1, 'security'),

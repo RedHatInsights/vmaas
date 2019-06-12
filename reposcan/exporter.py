@@ -131,11 +131,15 @@ class DataDump:
                                     from package
                                    where name_id in %s
                                """, [tuple(self.packagename_ids)])
+                src_pkg_id2pkg_ids = dict()
                 for pkg_id, name_id, evr_id, arch_id, summary, description, source_package_id in cursor:
                     dump["package_details:%s" % pkg_id] = (name_id, evr_id, arch_id, summary, description,
                                                            source_package_id)
                     dump["nevra2pkgid:%s:%s:%s" % (name_id, evr_id, arch_id)] = pkg_id
                     self.package_ids.append(pkg_id)
+                    if source_package_id is not None:
+                        src_pkg_id2pkg_ids.setdefault("src_pkg_id2pkg_ids:%s" % source_package_id, []).append(pkg_id)
+                dump.update(src_pkg_id2pkg_ids)
 
     def dump_repo(self, dump):
         """Select repo mappings"""
@@ -382,9 +386,9 @@ def main(filename):
     init_logging()
     init_db()
     db_instance = DatabaseHandler.get_connection()
-    #data = DataDump(db.cursor(), filename)
     data = DataDump(db_instance, filename)
     data.dump()
+
 
 if __name__ == '__main__':
     main(DUMP)
