@@ -21,8 +21,6 @@ def parse_rpm_name(name):
         raise RPMParseException("Failed to parse srpm name!")
     grps = parts.groups()
     _, epoch, name, ver, rel, arch = grps
-    if epoch is None:
-        epoch = "0"
     return name, epoch, ver, rel, arch
 
 
