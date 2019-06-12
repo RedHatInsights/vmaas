@@ -43,6 +43,7 @@ class TestPackagesAPI(TestBase):
         response = self.pkg_api.process_list(1, PKG_SRC_JSON)
         schemas.pkgs_top_schema.validate(response)
         schemas.pkgs_list_schema.validate(response["package_list"][PKG_SRC])
+        assert response["package_list"][PKG_SRC]["package_list"] == [PKG]
         assert not response["package_list"][PKG_SRC]["repositories"]  # source package is assigned to no repo
 
     def test_empty_json(self):

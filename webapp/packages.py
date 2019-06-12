@@ -31,6 +31,13 @@ class PackagesAPI:
             return src_pkg_nevra
         return None
 
+    def _get_built_binary_packages(self, pkg_id: int) -> list:
+        if pkg_id in self.cache.src_pkg_id2pkg_ids:
+            ids = self.cache.src_pkg_id2pkg_ids[pkg_id]
+            pkgs_list, source_pkgs_list = utils.pkgidlist2packages(self.cache, ids)
+            return pkgs_list + source_pkgs_list
+        return []
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         Returns package details.
@@ -62,6 +69,7 @@ class PackagesAPI:
                     packagedata['description'] = pkg_detail[PKG_DESC]
                     packagedata['source_package'] = self._get_source_package(pkg_detail)
                     packagedata['repositories'] = []
+                    packagedata['package_list'] = self._get_built_binary_packages(pkg_id)
                     if pkg_id in self.cache.pkgid2repoids:
                         for repo_id in self.cache.pkgid2repoids[pkg_id]:
                             repodetail = self.cache.repo_detail[repo_id]

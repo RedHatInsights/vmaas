@@ -34,6 +34,7 @@ _pkgs_list = {
     "summary": str,
     "description": str,
     "source_package": Or(str, None),
+    "package_list": list,
     "repositories": [{"label": str, "name": str, "basearch": str, "releasever": str}],
 }
 
