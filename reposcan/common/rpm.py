@@ -18,7 +18,7 @@ def parse_rpm_name(name):
 
     parts = re.search(r'((.*):)?(.*)-(.*)-(.*)\.(.*)\.rpm', name)
     if parts is None:
-        raise RPMParseException("Failed to parse srpm name!")
+        raise RPMParseException("Failed to parse rpm name '%s'!" % name)
     grps = parts.groups()
     _, epoch, name, ver, rel, arch = grps
     return name, epoch, ver, rel, arch
