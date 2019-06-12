@@ -12,7 +12,7 @@ class TestSrpm(unittest.TestCase):
     def test_parse_1_srpm(self):
         """Test parsing valid srpm name."""
         name, epoch, ver, rel, arch = rpm.parse_rpm_name('389-ds-base-1.3.7.8-1.fc27.src.rpm')
-        self.assertEqual("0", epoch)
+        self.assertEqual(None, epoch)
         self.assertEqual("389-ds-base", name)
         self.assertEqual("1.3.7.8", ver)
         self.assertEqual("1.fc27", rel)
@@ -21,7 +21,7 @@ class TestSrpm(unittest.TestCase):
     def test_parse_2_rpm(self):
         """Test parsing valid rpm name."""
         name, epoch, ver, rel, arch = rpm.parse_rpm_name('Agda-2.5.2-9.fc27.x86_64.rpm')
-        self.assertEqual("0", epoch)
+        self.assertEqual(None, epoch)
         self.assertEqual("Agda", name)
         self.assertEqual("2.5.2", ver)
         self.assertEqual("9.fc27", rel)
