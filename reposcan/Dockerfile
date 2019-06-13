@@ -11,23 +11,22 @@ RUN yum -y update && \
     ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
     ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
 
-RUN install -d -m 775 -g root /data && \
-    adduser --gid 0 -d /reposcan --no-create-home vmaas
-
-# copy application to directory in a container
-ADD /reposcan/*.sh  /reposcan/
-ADD /reposcan/*.py  /reposcan/
-ADD /reposcan/*.txt /reposcan/
-ADD /reposcan/common/*.py /reposcan/common/
-ADD /reposcan/database/*.py /reposcan/database/
-ADD /reposcan/download/*.py /reposcan/download/
-ADD /reposcan/nistcve/*.py /reposcan/nistcve/
+ADD /reposcan/*.sh           /reposcan/
+ADD /reposcan/*.py           /reposcan/
+ADD /reposcan/*.txt          /reposcan/
+ADD /reposcan/common/*.py    /reposcan/common/
+ADD /reposcan/database/*.py  /reposcan/database/
+ADD /reposcan/download/*.py  /reposcan/download/
+ADD /reposcan/nistcve/*.py   /reposcan/nistcve/
 ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
-ADD /reposcan/repodata/*.py /reposcan/repodata/
-ADD /reposcan/rsyncd.conf /etc/
+ADD /reposcan/repodata/*.py  /reposcan/repodata/
+ADD /reposcan/rsyncd.conf    /etc/
 
 RUN pip3 install --upgrade pip && \
     pip3 install -r /reposcan/requirements.txt
+
+RUN install -d -m 775 -g root /data && \
+    adduser --gid 0 -d /reposcan --no-create-home vmaas
 
 USER vmaas
 
