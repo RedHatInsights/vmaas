@@ -4,35 +4,33 @@ FROM centos:7
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
 ENV VMAAS_VERSION=latest
 
-RUN yum -y update \
-    && yum -y install centos-release-scl \
-    && yum -y install rh-python36 postgresql postgresql-libs rsync \
-    && rm -rf /var/cache/yum/*
-
-ENV APPBASEDIR=/reposcan
-
-ADD scl-enable.sh $APPBASEDIR/
+RUN yum -y update && \
+    yum -y install centos-release-scl && \
+    yum -y install rh-python36 postgresql postgresql-libs rsync && \
+    rm -rf /var/cache/yum/* && \
+    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
+    ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
 
 RUN install -d -m 775 -g root /data && \
-    adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
+    adduser --gid 0 -d /reposcan --no-create-home vmaas
 
 # copy application to directory in a container
-ADD $APPBASEDIR/*.sh $APPBASEDIR/
-ADD $APPBASEDIR/*.py $APPBASEDIR/
-ADD $APPBASEDIR/*.txt $APPBASEDIR/
-ADD $APPBASEDIR/common/*.py $APPBASEDIR/common/
-ADD $APPBASEDIR/database/*.py $APPBASEDIR/database/
-ADD $APPBASEDIR/download/*.py $APPBASEDIR/download/
-ADD $APPBASEDIR/nistcve/*.py $APPBASEDIR/nistcve/
-ADD $APPBASEDIR/redhatcve/*.py $APPBASEDIR/redhatcve/
-ADD $APPBASEDIR/repodata/*.py $APPBASEDIR/repodata/
-ADD $APPBASEDIR/rsyncd.conf /etc/
+ADD /reposcan/*.sh  /reposcan/
+ADD /reposcan/*.py  /reposcan/
+ADD /reposcan/*.txt /reposcan/
+ADD /reposcan/common/*.py /reposcan/common/
+ADD /reposcan/database/*.py /reposcan/database/
+ADD /reposcan/download/*.py /reposcan/download/
+ADD /reposcan/nistcve/*.py /reposcan/nistcve/
+ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
+ADD /reposcan/repodata/*.py /reposcan/repodata/
+ADD /reposcan/rsyncd.conf /etc/
 
-RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip && \
-    $APPBASEDIR/scl-enable.sh pip install -r $APPBASEDIR/requirements.txt
+RUN pip3 install --upgrade pip && \
+    pip3 install -r /reposcan/requirements.txt
 
 USER vmaas
 
 EXPOSE 8081 8730
 
-CMD ["sh", "-c", "$APPBASEDIR/scl-enable.sh $APPBASEDIR/entrypoint.sh"]
+CMD /reposcan/entrypoint.sh
