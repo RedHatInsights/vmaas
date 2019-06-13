@@ -44,6 +44,18 @@ class RepoAPI:
 
         return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
 
+    def _filter_modified_since(self, repos_to_process, modified_since_dt):
+        filtered_repos_to_process = []
+        for label in repos_to_process:
+            for repo_id in self.cache.repolabel2ids.get(label, []):
+                repo_detail = self.cache.repo_detail[repo_id]
+                if not repo_detail:
+                    continue
+                if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
+                        repo_detail[REPO_REVISION]) > modified_since_dt):
+                    filtered_repos_to_process.append(label)
+        return filtered_repos_to_process
+
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns repository details.
@@ -59,31 +71,33 @@ class RepoAPI:
         page = data.get("page", None)
         page_size = data.get("page_size", None)
         repolist = {}
+        filters = []
         if not repos:
             return repolist
         if modified_since:
             modified_since = parse_datetime(modified_since)
+            filters.append((self._filter_modified_since, [modified_since]))
 
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
             repos = self.find_repos_by_regex(repos[0])
 
-        repo_page_to_process, pagination_response = paginate(repos, page, page_size)
-
+        repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
         for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-                if not modified_since or (repo_detail[REPO_REVISION] != 'None' \
-                    and parse_datetime(repo_detail[REPO_REVISION]) > modified_since):
-                    repolist.setdefault(label, []).append({
-                        "label": label,
-                        "name": repo_detail[REPO_NAME],
-                        "url": repo_detail[REPO_URL],
-                        "basearch": none2empty(repo_detail[REPO_BASEARCH]),
-                        "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
-                        "product": repo_detail[REPO_PRODUCT],
-                        "revision": repo_detail[REPO_REVISION]
-                    })
+                if not repo_detail:
+                    continue
+
+                repolist.setdefault(label, []).append({
+                    "label": label,
+                    "name": repo_detail[REPO_NAME],
+                    "url": repo_detail[REPO_URL],
+                    "basearch": none2empty(repo_detail[REPO_BASEARCH]),
+                    "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
+                    "product": repo_detail[REPO_PRODUCT],
+                    "revision": repo_detail[REPO_REVISION]
+                })
 
         response = {
             'repository_list': repolist,
