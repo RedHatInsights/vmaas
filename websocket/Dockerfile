@@ -7,13 +7,13 @@ RUN yum -y update && \
     ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
     ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
 
-RUN adduser --gid 0 -d /app --no-create-home vmaas
-
-ADD /websocket/*.py /websocket/
+ADD /websocket/*.py  /websocket/
 ADD /websocket/*.txt /websocket/
 
 RUN pip3 install --upgrade pip && \
     pip3 install -r /websocket/requirements.txt
+
+RUN adduser --gid 0 -d /app --no-create-home vmaas
 
 USER vmaas
 

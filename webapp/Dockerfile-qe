@@ -11,15 +11,15 @@ RUN yum -y update && \
     ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
     ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
 
-RUN install -m 1777 -d /data && \
-    adduser --gid 0 -d /webapp --no-create-home vmaas
-
 ADD /webapp/*.sh  /webapp/
 ADD /webapp/*.py  /webapp/
 ADD /webapp/*.txt /webapp/
 
 RUN pip3 install --upgrade pip && \
     pip3 install -r /webapp/requirements_qe.txt
+
+RUN install -m 1777 -d /data && \
+    adduser --gid 0 -d /webapp --no-create-home vmaas
 
 USER vmaas
 
