@@ -4,9 +4,9 @@ services:
   vmaas_database:
     container_name: vmaas-database
     build:
-        context: ./
-        dockerfile: ./Dockerfile-database
-    image: vmaas/database:0.13
+        context: .
+        dockerfile: ./database/Dockerfile
+    image: vmaas/database:latest
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-admin.env
@@ -18,9 +18,9 @@ services:
   vmaas_websocket:
     container_name: vmaas-websocket
     build:
-        context: ./
-        dockerfile: ./Dockerfile-websocket
-    image: vmaas/websocket:0.13
+        context: .
+        dockerfile: ./websocket/Dockerfile
+    image: vmaas/websocket:latest
     restart: unless-stopped
     ports:
       - 8082:8082
@@ -28,9 +28,9 @@ services:
   vmaas_reposcan:
     container_name: vmaas-reposcan
     build:
-        context: ./
-        dockerfile: ./Dockerfile-reposcan
-    image: vmaas/reposcan:0.13
+        context: .
+        dockerfile: ./reposcan/Dockerfile
+    image: vmaas/reposcan:latest
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-writer.env
@@ -48,9 +48,9 @@ services:
   vmaas_webapp:
     container_name: vmaas-webapp
     build:
-        context: ./
-        dockerfile: ./Dockerfile-webapp
-    image: vmaas/webapp:0.13
+        context: .
+        dockerfile: ./webapp/Dockerfile
+    image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
       - ./conf/webapp.env
@@ -63,7 +63,7 @@ services:
   vmaas_apidoc:
     container_name: vmaas-apidoc
     build:
-        context: ./
+        context: .
         dockerfile: ./Dockerfile-apidoc
     image: vmaas/apidoc:0.13
     restart: unless-stopped

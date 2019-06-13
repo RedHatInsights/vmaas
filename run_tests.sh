@@ -2,7 +2,7 @@
 
 rc=0
 
-for dockerfile in Dockerfile-database Dockerfile-reposcan Dockerfile-webapp Dockerfile-websocket
+for dockerfile in */Dockerfile
 do
     if [ ! -f "$dockerfile" ]; then
         echo "Dockerfile '$dockerfile' doesn't exist" >&2
