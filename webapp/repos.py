@@ -56,6 +56,15 @@ class RepoAPI:
                     filtered_repos_to_process.append(label)
         return filtered_repos_to_process
 
+    def _filter_repo_if_exists(self, repos_to_process):
+        filtered_repos_to_process = []
+        for label in repos_to_process:
+            for repo_id in self.cache.repolabel2ids.get(label, []):
+                repo_detail = self.cache.repo_detail[repo_id]
+                if repo_detail:
+                    filtered_repos_to_process.append(label)
+        return filtered_repos_to_process
+
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns repository details.
@@ -71,9 +80,10 @@ class RepoAPI:
         page = data.get("page", None)
         page_size = data.get("page_size", None)
         repolist = {}
-        filters = []
         if not repos:
             return repolist
+
+        filters = [(self._filter_repo_if_exists, [])]
         if modified_since:
             modified_since = parse_datetime(modified_since)
             filters.append((self._filter_modified_since, [modified_since]))
