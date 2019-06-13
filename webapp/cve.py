@@ -58,6 +58,14 @@ class CveAPI:
                 filtered_cves_to_process.append(cve)
         return filtered_cves_to_process
 
+    def _filter_cve_if_exists(self, cves_to_process):
+        filtered_cves_to_process = []
+        for cve in cves_to_process:
+            cve_detail = self.cache.cve_detail.get(cve)
+            if cve_detail:
+                filtered_cves_to_process.append(cve)
+        return filtered_cves_to_process
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
@@ -85,7 +93,7 @@ class CveAPI:
             # treat single-label like a regex, get all matching names
             cves_to_process = self.find_cves_by_regex(cves_to_process[0])
 
-        filters = []
+        filters = [(self._filter_cve_if_exists, [])]
         if rh_only:
             filters.append((self._filter_redhat_only, []))
         # if we have information about modified/published dates and receive "modified_since" in request,
