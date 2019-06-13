@@ -55,6 +55,14 @@ class ErrataAPI:
                 filtered_errata_to_process.append(errata)
         return filtered_errata_to_process
 
+    def _filter_errata_if_exists(self, errata_to_process):
+        filtered_errata_to_process = []
+        for errata in errata_to_process:
+            errata_detail = self.cache.errata_detail.get(errata)
+            if errata_detail:
+                filtered_errata_to_process.append(errata)
+        return filtered_errata_to_process
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of Errata.
@@ -83,7 +91,7 @@ class ErrataAPI:
             # treat single-label like a regex, get all matching names
             errata_to_process = self.find_errata_by_regex(errata_to_process[0])
 
-        filters = []
+        filters = [(self._filter_errata_if_exists, [])]
         # if we have information about modified/published dates and receive "modified_since" in request,
         # compare the dates
         if modified_since:
