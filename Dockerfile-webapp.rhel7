@@ -4,27 +4,25 @@ FROM registry.access.redhat.com/rhel7
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
 ENV VMAAS_VERSION=latest
 
-RUN yum -y update \
-    && yum-config-manager --enable rhel-server-rhscl-7-rpms \
-    && yum -y install rh-python36 rsync \
-    && rm -rf /var/cache/yum/*
+RUN yum -y update && \
+    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    yum -y install rh-python36 rsync && \
+    rm -rf /var/cache/yum/* && \
+    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
+    ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
 
-ENV APPBASEDIR=/webapp
+ADD /webapp/*.sh  /webapp/
+ADD /webapp/*.py  /webapp/
+ADD /webapp/*.txt /webapp/
 
-ADD scl-enable.sh $APPBASEDIR/
+RUN pip3 install --upgrade pip && \
+    pip3 install -r /webapp/requirements.txt
 
 RUN install -m 1777 -d /data && \
-    adduser --gid 0 -d $APPBASEDIR --no-create-home -c 'VMAAS user' vmaas
-
-ADD $APPBASEDIR/*.sh $APPBASEDIR/
-ADD $APPBASEDIR/*.py $APPBASEDIR/
-ADD $APPBASEDIR/*.txt $APPBASEDIR/
-
-RUN $APPBASEDIR/scl-enable.sh pip install --upgrade pip && \
-    $APPBASEDIR/scl-enable.sh pip install -r $APPBASEDIR/requirements.txt
+    adduser --gid 0 -d /webapp --no-create-home vmaas
 
 USER vmaas
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "$APPBASEDIR/scl-enable.sh $APPBASEDIR/entrypoint.sh"]
+CMD /webapp/entrypoint.sh

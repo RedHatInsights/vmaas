@@ -124,7 +124,7 @@ def runStages() {
                     // Start webapp as `coverage run ...` instead of `python ...` to collect coverage
                     sh '''
                         webapp_pod="$(oc get pods | grep 'Running' | grep 'webapp' | awk '{print $1}')"
-                        oc exec "${webapp_pod}" -- bash -c "webapp/scl-enable.sh coverage run webapp/app.py --source webapp &>/proc/1/fd/1" &
+                        oc exec "${webapp_pod}" -- bash -c "coverage run webapp/app.py --source webapp &>/proc/1/fd/1" &
                     '''
                 }
                 stage("Setup DB") {
@@ -180,7 +180,7 @@ def runStages() {
             
             def status = 99
             status = sh(
-                script: "oc exec ${webapp_pod} -- webapp/scl-enable.sh coverage html --fail-under=${codecovThreshold} --omit '/opt/\\*' -d /tmp/htmlcov",
+                script: "oc exec ${webapp_pod} -- coverage html --fail-under=${codecovThreshold} --omit '/opt/\\*' -d /tmp/htmlcov",
                 returnStatus: true
             )
 
@@ -192,7 +192,7 @@ def runStages() {
             }
 
             // run webapp's app.py again
-            sh "oc exec ${webapp_pod} -- bash -c 'webapp/scl-enable.sh webapp/app.py &>/proc/1/fd/1' &"
+            sh "oc exec ${webapp_pod} -- bash -c 'webapp/app.py &>/proc/1/fd/1' &"
         }
 
         stage("Publish in Polarion") {
