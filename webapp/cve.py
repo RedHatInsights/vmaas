@@ -6,7 +6,7 @@ import re
 from jsonschema import validate
 
 from utils import format_datetime, parse_datetime, none2empty, paginate, \
-                  pkgidlist2packages
+                  pkgidlist2packages, filter_item_if_exists
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
                   CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
@@ -58,14 +58,6 @@ class CveAPI:
                 filtered_cves_to_process.append(cve)
         return filtered_cves_to_process
 
-    def _filter_cve_if_exists(self, cves_to_process):
-        filtered_cves_to_process = []
-        for cve in cves_to_process:
-            cve_detail = self.cache.cve_detail.get(cve)
-            if cve_detail:
-                filtered_cves_to_process.append(cve)
-        return filtered_cves_to_process
-
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
@@ -93,7 +85,7 @@ class CveAPI:
             # treat single-label like a regex, get all matching names
             cves_to_process = self.find_cves_by_regex(cves_to_process[0])
 
-        filters = [(self._filter_cve_if_exists, [])]
+        filters = [(filter_item_if_exists, [self.cache, 'cve'])]
         if rh_only:
             filters.append((self._filter_redhat_only, []))
         # if we have information about modified/published dates and receive "modified_since" in request,
