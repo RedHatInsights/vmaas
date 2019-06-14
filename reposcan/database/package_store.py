@@ -83,9 +83,8 @@ class PackageStore(ObjectStore):
         return name, epoch, ver, rel, arch
 
     def _get_source_package_id(self, pkg):
-        if pkg["srpm"] is None:
-            source_package_id = None
-        else:
+        source_package_id = None
+        if pkg["srpm"]:
             name, epoch, ver, rel, arch = PackageStore._get_source_package_nevra(pkg)
             name_id = self.package_name_map[name]
             evr_id = self.evr_map[(epoch, ver, rel)]
@@ -155,7 +154,8 @@ class PackageStore(ObjectStore):
     def _get_source_packages(packages):
         unique_source_packages = set()
         for pkg in packages:
-            unique_source_packages.add(PackageStore._get_source_package_nevra(pkg))
+            if pkg["srpm"]:
+                unique_source_packages.add(PackageStore._get_source_package_nevra(pkg))
         source_packages = []
         for name, epoch, ver, rel, arch in unique_source_packages:
             source_packages.append(dict(name=name, epoch=epoch, ver=ver, rel=rel, arch=arch,
