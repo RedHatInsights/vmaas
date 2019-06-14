@@ -6,7 +6,7 @@ import re
 from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
-from utils import paginate, none2empty, parse_datetime
+from utils import paginate, none2empty, parse_datetime, filter_item_if_exists
 
 JSON_SCHEMA = {
     'type': 'object',
@@ -49,19 +49,8 @@ class RepoAPI:
         for label in repos_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-                if not repo_detail:
-                    continue
                 if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
                         repo_detail[REPO_REVISION]) > modified_since_dt):
-                    filtered_repos_to_process.append(label)
-        return filtered_repos_to_process
-
-    def _filter_repo_if_exists(self, repos_to_process):
-        filtered_repos_to_process = []
-        for label in repos_to_process:
-            for repo_id in self.cache.repolabel2ids.get(label, []):
-                repo_detail = self.cache.repo_detail[repo_id]
-                if repo_detail:
                     filtered_repos_to_process.append(label)
         return filtered_repos_to_process
 
@@ -77,16 +66,16 @@ class RepoAPI:
 
         repos = data.get('repository_list', None)
         modified_since = data.get('modified_since', None)
+        modified_since_dt = parse_datetime(modified_since)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
         repolist = {}
         if not repos:
             return repolist
 
-        filters = [(self._filter_repo_if_exists, [])]
+        filters = [(filter_item_if_exists, [self.cache, 'repo'])]
         if modified_since:
-            modified_since = parse_datetime(modified_since)
-            filters.append((self._filter_modified_since, [modified_since]))
+            filters.append((self._filter_modified_since, [modified_since_dt]))
 
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
@@ -96,8 +85,6 @@ class RepoAPI:
         for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-                if not repo_detail:
-                    continue
 
                 repolist.setdefault(label, []).append({
                     "label": label,
