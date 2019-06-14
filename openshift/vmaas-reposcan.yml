@@ -12,7 +12,7 @@ parameters:
   value: master
 - name: DOCKERFILE
   description: Dockerfile to build from
-  value: Dockerfile-reposcan
+  value: reposcan/Dockerfile
 - name: DOCKERFILE_SUFFIX
   description: Dockerfile additional suffix (RHEL)
   value: ""
