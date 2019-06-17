@@ -1,6 +1,7 @@
 """
 Module containing class for aggregating repository metadata.
 """
+from repodata.modules import ModuleMD
 from repodata.primary import PrimaryMD
 from repodata.primary_db import PrimaryDatabaseMD
 from repodata.updateinfo import UpdateInfoMD
@@ -66,6 +67,8 @@ class Repository:
                 self.primary = PrimaryMD(self.md_files["primary"])
             elif md_type == "updateinfo":
                 self.updateinfo = UpdateInfoMD(self.md_files["updateinfo"])
+            elif md_type == "modules":
+                self.modules = ModuleMD(self.md_files["modules"])
 
     def unload_metadata(self):
         """Unset previously loaded metadata files from this object."""
