@@ -172,7 +172,7 @@ class ModulesStore(ObjectStore):
 
     def _populate_profile_names(self, modules):
         cur = self.conn.cursor()
-        package_name_map = self._prepare_package_name_map()
+        package_name_map = self._prepare_table_map(["name"], "package_name")
         to_associate = set()
         for module in modules:
             for profile in module['profiles']:
