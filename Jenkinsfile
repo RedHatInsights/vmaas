@@ -85,7 +85,7 @@ def runStages() {
                         echo "  parameters:" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "    DOCKERFILE_PATH: Dockerfile-webapp-qe" >> builder-env.yml
+                        echo "    DOCKERFILE_PATH: webapp/Dockerfile-qe" >> builder-env.yml
                         echo "vmaas/vmaas-websocket:" >> builder-env.yml
                         echo "  parameters:" >> builder-env.yml
                         echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
