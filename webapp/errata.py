@@ -83,7 +83,7 @@ class ErrataAPI:
             # treat single-label like a regex, get all matching names
             errata_to_process = self.find_errata_by_regex(errata_to_process[0])
 
-        filters = [(filter_item_if_exists, [self.cache, 'errata'])]
+        filters = [(filter_item_if_exists, [self.cache.errata_detail])]
         # if we have information about modified/published dates and receive "modified_since" in request,
         # compare the dates
         if modified_since:
