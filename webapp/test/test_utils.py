@@ -64,3 +64,16 @@ class TestUtils(TestBase):
         __, page_info = utils.paginate([], 2, 5)
         assert page_info["page"] == 2
         assert page_info["page_size"] == 0
+
+    def test_filter_none_exist_items(self):
+        """Test filter_item_if_exists"""
+        repos = [
+            "nonexistent-1",
+            "nonexistent-2"
+        ]
+        details = {
+            "nonexistent-1": [],
+            "nonexistent-2": []
+        }
+        filtered_items = utils.filter_item_if_exists(repos, details)
+        assert filtered_items == []
