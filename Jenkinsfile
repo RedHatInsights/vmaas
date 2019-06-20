@@ -180,7 +180,7 @@ def runStages() {
             
             def status = 99
             status = sh(
-                script: "oc exec ${webapp_pod} -- coverage html --fail-under=${codecovThreshold} --omit '/opt/\\*' -d /tmp/htmlcov",
+                script: "oc exec ${webapp_pod} -- coverage html --fail-under=${codecovThreshold} --omit /opt/\\* -d /tmp/htmlcov",
                 returnStatus: true
             )
 
