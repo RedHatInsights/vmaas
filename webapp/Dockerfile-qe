@@ -17,6 +17,8 @@ ADD /webapp/*.txt /webapp/
 
 RUN pip3 install --upgrade pip && \
     pip3 install -r /webapp/requirements_qe.txt
+    
+RUN ln -s /opt/rh/rh-python36/root/bin/coverage /usr/bin/coverage
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp --no-create-home vmaas
