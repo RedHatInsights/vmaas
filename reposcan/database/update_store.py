@@ -32,7 +32,7 @@ class UpdateStore(ObjectStore):
                     module_dict = {'name': module[0], 'stream': module[1], 'version': module[2],
                                    'context': module[3], 'arch': module[4]}
                     new_module = ModulesStore().create_module(repo_id, module_dict)
-                    if 'stream_id' in new_module:
+                    if new_module and 'stream_id' in new_module:
                         modules_in_repo[module] = new_module['stream_id']
                 package_id = nevras_in_repo[nevra]
                 module_id = modules_in_repo[module] if module else None
