@@ -73,13 +73,19 @@ class RepoAPI:
         if not repos:
             return repolist
 
-        filters = [(filter_item_if_exists, [self.cache, 'repo'])]
+        filters = []
         if modified_since:
             filters.append((self._filter_modified_since, [modified_since_dt]))
 
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
             repos = self.find_repos_by_regex(repos[0])
+
+        repo_details = {}
+        for label in repos:
+            for repo_id in self.cache.repolabel2ids.get(label, []):
+                repo_details[label] = self.cache.repo_detail[repo_id]
+        filters.append((filter_item_if_exists, [repo_details]))
 
         repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
         for label in repo_page_to_process:
