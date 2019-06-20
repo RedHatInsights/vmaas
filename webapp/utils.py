@@ -113,23 +113,17 @@ def paginate(input_list, page, page_size, filters=None):
     return (result_list, {"page": page, "page_size": len(result_list), "pages": pages})
 
 
-def filter_item_if_exists(list_to_process, cache, api_type):
+def filter_item_if_exists(list_to_process, item_details):
     """
     Filter to check if item exists
+    :param item_details: item details from cache
     :param list_to_process: list of items to filter
-    :param cache: api cache object
-    :param api_type: 'repo', 'cve', 'errata'
     :return: filtered list of items
     """
-    def _get_item_detail(item_to_filter):
-        if getattr(cache, api_type + '_detail').get(item_to_filter, None):
-            return item_to_filter
 
     filtered_list_to_process = []
     for item in list_to_process:
-        if api_type == 'repo':
-            for repo_id in cache.repolabel2ids.get(item, []):
-                filtered_list_to_process.append(_get_item_detail(repo_id))
-        else:
-            filtered_list_to_process.append(_get_item_detail(item))
+        item_detail = item_details.get(item)
+        if item_detail:
+            filtered_list_to_process.append(item)
     return filtered_list_to_process
