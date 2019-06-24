@@ -111,7 +111,7 @@ class ModulesStore(ObjectStore):
 
     def _populate_rpm_artifacts(self, modules, repo_id):
         cur = self.conn.cursor()
-        try:
+        try: # pylint: disable=too-many-nested-blocks
             nevras_in_repo = self._get_nevras_in_repo(repo_id)
             to_associate = set()
             for module in modules:
@@ -144,9 +144,9 @@ class ModulesStore(ObjectStore):
         finally:
             cur.close()
 
-    def _populate_profiles(self, modules):
+    def _populate_profiles(self, modules): # pylint: disable=too-many-branches
         cur = self.conn.cursor()
-        try:
+        try: # pylint: disable=too-many-nested-blocks
             profiles = set()
             profile_map = {}
             for module in modules:
@@ -188,7 +188,7 @@ class ModulesStore(ObjectStore):
 
     def _populate_profile_names(self, modules):
         cur = self.conn.cursor()
-        try:
+        try: # pylint: disable=too-many-nested-blocks
             package_name_map = self._prepare_table_map(["name"], "package_name")
             to_associate = set()
             for module in modules:
