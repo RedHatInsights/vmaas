@@ -46,7 +46,7 @@ class ModuleMD:
         for parsed in default_list:
             data = parsed['data']
             name = data.get('module')
-            default_stream = data.get('stream', None)
+            default_stream = data.get('stream')
             if default_stream:
                 module_dict[name][default_stream]['default_stream'] = True
             for stream in data['profiles']:
