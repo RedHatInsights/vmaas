@@ -7,6 +7,7 @@ import re
 from psycopg2.extras import execute_values
 
 from database.object_store import ObjectStore
+#from common import rpm
 
 class ModulesStore(ObjectStore):
     """Class providing interface for storing modules and related info."""
@@ -43,9 +44,9 @@ class ModulesStore(ObjectStore):
                                   inner join (values %s) t(name, arch_id, repo_id)
                                   using (name, arch_id, repo_id)
                                """, list(names), page_size=len(names))
-                for row in cur.fetchall():
-                    module_map[(row[1], row[2],)] = row[0]
-                    names.remove((row[1], row[2], row[3]))
+                for r_id, r_name, r_arch_id, r_repo_id in cur.fetchall():
+                    module_map[(r_name, r_arch_id,)] = r_id
+                    names.remove((r_name, r_arch_id, r_repo_id))
             if names:
                 import_data = set()
                 for module in modules:
@@ -55,8 +56,8 @@ class ModulesStore(ObjectStore):
                                """insert into module (name, repo_id, arch_id)
                                   values %s returning id, name, arch_id""",
                                list(import_data), page_size=len(import_data))
-                for row in cur.fetchall():
-                    module_map[(row[1], row[2],)] = row[0]
+                for r_id, r_name, r_arch_id in cur.fetchall():
+                    module_map[(r_name, r_arch_id,)] = r_id
             for module in modules:
                 module['module_id'] = module_map[(module['name'], arch_map[module['arch']],)]
             self.conn.commit()
@@ -81,9 +82,9 @@ class ModulesStore(ObjectStore):
                                   inner join (values %s) t(module_id, stream_name, version, context)
                                   using (module_id, stream_name, version, context)
                                """, list(streams), page_size=len(streams))
-                for row in cur.fetchall():
-                    stream_map[(row[1], row[2], row[3], row[4])] = row[0]
-                    streams.remove((row[1], row[2], row[3], row[4]))
+                for r_id, r_module_id, r_stream_name, r_version, r_context in cur.fetchall():
+                    stream_map[(r_module_id, r_stream_name, r_version, r_context)] = r_id
+                    streams.remove((r_module_id, r_stream_name, r_version, r_context))
             if streams:
                 import_data = set()
                 for module in modules:
@@ -94,8 +95,8 @@ class ModulesStore(ObjectStore):
                                """insert into module_stream (module_id, stream_name, version, context, is_default)
                                   values %s returning id, module_id, stream_name, version, context""",
                                list(import_data), page_size=len(import_data))
-                for row in cur.fetchall():
-                    stream_map[(row[1], row[2], row[3], row[4])] = row[0]
+                for r_id, r_module_id, r_stream_name, r_version, r_context in cur.fetchall():
+                    stream_map[(r_module_id, r_stream_name, r_version, r_context)] = r_id
             for module in modules:
                 module['stream_id'] = stream_map[(module['module_id'], module['stream'],
                                                   module['version'], module['context'])]
@@ -115,20 +116,22 @@ class ModulesStore(ObjectStore):
             to_associate = set()
             for module in modules:
                 if 'artifacts' in module:
-                    for rpm in module['artifacts']:
-                        split_pkg_name = self._split_packagename(rpm)
+                    for artifact in module['artifacts']:
+                        split_pkg_name = self._split_packagename(artifact)
+                        # rpm.parse_rpm_name fails to parse
+                        # perl-DBD-Pg-0:3.7.4-2.module+el8+2517+b1471f1c.x86_64
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))
                         else:
-                            self.logger.info('Nevra %s missing in repo %s', rpm, repo_id)
+                            self.logger.info('Nevra %s missing in repo %s', artifact, repo_id)
             if to_associate:
                 execute_values(cur,
                                """select pkg_id, stream_id from module_rpm_artifact
                                    inner join (values %s) t(pkg_id, stream_id)
                                    using (pkg_id, stream_id)
                                """, list(to_associate), page_size=len(to_associate))
-                for row in cur.fetchall():
-                    to_associate.remove((row[0], row[1],))
+                for r_pkg_id, r_stream_id in cur.fetchall():
+                    to_associate.remove((r_pkg_id, r_stream_id,))
             if to_associate:
                 execute_values(cur,
                                """insert into module_rpm_artifact (pkg_id, stream_id)
@@ -155,9 +158,9 @@ class ModulesStore(ObjectStore):
                                   inner join (values %s) t(stream_id, profile_name)
                                   using (stream_id, profile_name)
                                """, list(profiles), page_size=len(profiles))
-                for row in cur.fetchall():
-                    profile_map[(row[1], row[2],)] = row[0]
-                    profiles.remove((row[1], row[2],))
+                for mp_id, mp_stream_id, mp_profile_name in cur.fetchall():
+                    profile_map[(mp_stream_id, mp_profile_name,)] = mp_id
+                    profiles.remove((mp_stream_id, mp_profile_name,))
             if profiles:
                 import_data = set()
                 for module in modules:
@@ -169,8 +172,8 @@ class ModulesStore(ObjectStore):
                                """insert into module_profile (stream_id, profile_name, is_default)
                                   values %s returning id, stream_id, profile_name""",
                                list(import_data), page_size=len(import_data))
-                for row in cur.fetchall():
-                    profile_map[(row[1], row[2],)] = row[0]
+                for mp_id, mp_stream_id, mp_profile_name in cur.fetchall():
+                    profile_map[(mp_stream_id, mp_profile_name,)] = mp_id
             for module in modules:
                 for profile in module['profiles']:
                     module['profiles'][profile]['profile_id'] = profile_map[(module['stream_id'], profile,)]
@@ -211,8 +214,8 @@ class ModulesStore(ObjectStore):
                                   inner join (values %s) t(package_name_id, profile_id)
                                   using (package_name_id, profile_id)
                                """, list(to_associate), page_size=len(to_associate))
-                for row in cur.fetchall():
-                    to_associate.remove((row[0], row[1],))
+                for r_package_name_id, r_profile_id in cur.fetchall():
+                    to_associate.remove((r_package_name_id, r_profile_id,))
             if to_associate:
                 execute_values(cur,
                                """insert into module_profile_pkg (package_name_id, profile_id)
