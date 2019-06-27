@@ -12,7 +12,7 @@ REPO_JSON = {"repository_list": ["rhel-7-server-rpms"]}
 REPO_JSON_EMPTY_LIST = {"repository_list": [""]}
 REPO_JSON_NON_EXIST = {"repository_list": ["non-existent-repo"]}
 
-EMPTY_RESPONSE = {"repository_list": {}, "modified_since": None, "page": 1, "page_size": 0, "pages": 0}
+EMPTY_RESPONSE = {"repository_list": {}, "page": 1, "page_size": 0, "pages": 0}
 
 
 class TestRepoAPI(TestBase):
