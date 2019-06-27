@@ -104,8 +104,9 @@ class RepoAPI:
 
         response = {
             'repository_list': repolist,
-            'modified_since': str(modified_since) if modified_since else None,
         }
         response.update(pagination_response)
+        if modified_since:
+            response["modified_since"] = modified_since
 
         return response
