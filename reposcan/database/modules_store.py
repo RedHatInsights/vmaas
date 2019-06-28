@@ -144,96 +144,11 @@ class ModulesStore(ObjectStore):
         finally:
             cur.close()
 
-    def _populate_profiles(self, modules): # pylint: disable=too-many-branches
-        cur = self.conn.cursor()
-        try: # pylint: disable=too-many-nested-blocks
-            profiles = set()
-            profile_map = {}
-            for module in modules:
-                for profile in module['profiles']:
-                    profiles.add((module['stream_id'], profile,))
-            if profiles:
-                execute_values(cur,
-                               """select id, stream_id, profile_name from module_profile
-                                  inner join (values %s) t(stream_id, profile_name)
-                                  using (stream_id, profile_name)
-                               """, list(profiles), page_size=len(profiles))
-                for mp_id, mp_stream_id, mp_profile_name in cur.fetchall():
-                    profile_map[(mp_stream_id, mp_profile_name,)] = mp_id
-                    profiles.remove((mp_stream_id, mp_profile_name,))
-            if profiles:
-                import_data = set()
-                for module in modules:
-                    for profile in module['profiles']:
-                        if (module['stream_id'], profile,) in profiles:
-                            import_data.add(
-                                (module['stream_id'], profile, module['profiles'][profile]['default_profile'],))
-                execute_values(cur,
-                               """insert into module_profile (stream_id, profile_name, is_default)
-                                  values %s returning id, stream_id, profile_name""",
-                               list(import_data), page_size=len(import_data))
-                for mp_id, mp_stream_id, mp_profile_name in cur.fetchall():
-                    profile_map[(mp_stream_id, mp_profile_name,)] = mp_id
-            for module in modules:
-                for profile in module['profiles']:
-                    module['profiles'][profile]['profile_id'] = profile_map[(module['stream_id'], profile,)]
-            self.conn.commit()
-            return modules
-        except Exception:
-            self.logger.exception("Failed to populate profiles.")
-            self.conn.rollback()
-            raise
-        finally:
-            cur.close()
-
-    def _populate_profile_names(self, modules):
-        cur = self.conn.cursor()
-        try: # pylint: disable=too-many-nested-blocks
-            package_name_map = self._prepare_table_map(["name"], "package_name")
-            to_associate = set()
-            for module in modules:
-                for profile in module['profiles']:
-                    profile_id = module['profiles'][profile]['profile_id']
-                    for rpm_name in module['profiles'][profile]['rpms']:
-                        try:
-                            to_associate.add((package_name_map[rpm_name], profile_id,))
-                        except KeyError:
-                            # TODO: this whole try/except block is there due to poor modularity design
-                            # TODO: to actually fix this we would need to implement parsing and storing
-                            # TODO: of package provides
-                            execute_values(cur,
-                                           """insert into package_name (name)
-                                              values %s returning id""",
-                                           [(rpm_name,)], page_size=1)
-                            name_id = cur.fetchall()[0][0]
-                            to_associate.add((name_id, profile_id),)
-                            package_name_map[rpm_name] = name_id
-            if to_associate:
-                execute_values(cur,
-                               """select package_name_id, profile_id from module_profile_pkg
-                                  inner join (values %s) t(package_name_id, profile_id)
-                                  using (package_name_id, profile_id)
-                               """, list(to_associate), page_size=len(to_associate))
-                for r_package_name_id, r_profile_id in cur.fetchall():
-                    to_associate.remove((r_package_name_id, r_profile_id,))
-            if to_associate:
-                execute_values(cur,
-                               """insert into module_profile_pkg (package_name_id, profile_id)
-                                  values %s""",
-                               list(to_associate), page_size=len(to_associate))
-            self.conn.commit()
-        except Exception:
-            self.logger.exception("Failed to populate profile names.")
-            self.conn.rollback()
-            raise
-        finally:
-            cur.close()
-
     def create_module(self, repo_id, module):
         """Creates a new module stream (used for new module N:S:V:C introduced in errata)"""
         # if some steps below fail, invalid data may carry on to the next
-        # step.  Specifically _populate_modules, _populate_streams, and
-        # _populate_profiles could return modules with invalid/incomplete data.
+        # step.  Specifically _populate_modules and _populate_streams
+        # could return modules with invalid/incomplete data.
         try:
             module['default_stream'] = False
             modules = self._populate_modules(repo_id, [module])
@@ -246,14 +161,12 @@ class ModulesStore(ObjectStore):
     def store(self, repo_id, modules):
         """Import all modules from repository into all related DB tables."""
         # if some steps below fail, invalid data may carry on to the next
-        # step.  Specifically _populate_modules, _populate_streams, and
-        # _populate_profiles could return modules with invalid/incomplete data.
+        # step.  Specifically _populate_modules and _populate_streams
+        # could return modules with invalid/incomplete data.
         try:
             modules = self._populate_modules(repo_id, modules)
             modules = self._populate_streams(modules)
             self._populate_rpm_artifacts(modules, repo_id)
-            modules = self._populate_profiles(modules)
-            self._populate_profile_names(modules)
         except Exception: # pylint: disable=broad-except
             # exception already logged.
             pass
