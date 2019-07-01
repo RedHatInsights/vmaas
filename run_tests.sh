@@ -44,7 +44,8 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pytest --cov=. -v --color=yes --durations=0
+pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1
+
 rc=$(($rc+$?))
 
 if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
@@ -55,9 +56,6 @@ fi
 # Run pylint
 find . -iname '*.py' | xargs pylint --rcfile=../pylintrc --output-format=colorized
 rc=$(($rc+$?))
-
-# Upload to Codecov.io
-codecov
 
 exit $rc
 )
