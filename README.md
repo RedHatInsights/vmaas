@@ -22,6 +22,9 @@ system profiles or containers, or manage inventory workflow in any way. An
 inventory-management system could use VMaaS as one source of 'health' information for the
 entities being managed.
 
+## Architecture
+![](doc/schema.png)
+
 ## Quick Command Guide
 
 ### Local deployment (development)
