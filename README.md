@@ -144,7 +144,7 @@ switch inside of the container
 now your local git directory is mounted under `/git` in the container so any change
 you make you can immediatelly test.
 
-```[root@4cb6b50d0cb6 git]# python ./app.py```
+```[root@4cb6b50d0cb6 git]# python3 ./app.py```
 
 Note that by default container does NOT run the application (so you can run your own modificationtion)
 so if you want to run "original" (unmodified) application use
