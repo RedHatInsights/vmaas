@@ -1,0 +1,85 @@
+// dot schema.dot -Tpng -o schema.png -Gdpi=100
+digraph G {
+    rankdir="LR";
+    overlap=scalexy;
+    node [shape=box
+          style="rounded,filled"]
+
+    webapp[label=<
+           <table border="0">
+            <tr>
+             <td><img src="icon_tornado.png"/></td>
+            </tr>
+            <tr>
+             <td>webapp</td>
+            </tr>
+           </table>>
+           fillcolor=lightblue]
+
+    websocket[label=<
+           <table border="0">
+            <tr>
+             <td><img src="icon_tornado.png"/></td>
+            </tr>
+            <tr>
+             <td>websocket</td>
+            </tr>
+           </table>>
+           fillcolor=lightblue]
+
+    reposcan[label=<
+           <table border="0">
+            <tr>
+             <td><img src="icon_tornado.png"/></td>
+            </tr>
+            <tr>
+             <td>reposcan</td>
+            </tr>
+           </table>>
+           fillcolor=lightblue]
+
+    db[label=<
+           <table border="0">
+            <tr>
+             <td><img src="icon_postgresql.png"/></td>
+            </tr>
+            <tr>
+             <td>database</td>
+            </tr>
+           </table>>
+           fillcolor=orange
+           shape=cylinder]
+
+    apidoc[label=<
+           <table border="0">
+            <tr>
+             <td><img src="icon_swagger.png"/></td>
+            </tr>
+            <tr>
+             <td>apidoc</td>
+            </tr>
+           </table>>
+           fillcolor=darkolivegreen1]
+
+    client [fillcolor="pink"]
+
+    clientp [label="client\n(privileged)"
+             fillcolor="pink"]
+
+    client -> webapp [label="http:8080"]
+    client -> apidoc [label="http:8000"]
+    clientp -> reposcan [label="http:8081"]
+
+    subgraph cluster_os {
+        margin=25
+        label="OpenShift/docker-compose"
+        style="dashed,filled"
+        fillcolor=peachpuff
+        {rank=same webapp websocket reposcan}
+        webapp -> websocket [xlabel="http:8082"]
+        reposcan -> websocket [xlabel="http:8082"]
+        webapp -> reposcan  [xlabel="rsync:8730\nvmaas.dbm"]
+        reposcan -> db [label="postgresql:5432 (rw)"]
+        apidoc
+    }
+}
