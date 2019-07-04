@@ -90,6 +90,7 @@ def init_logging(num_servers=1):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+
 def get_logger(name):
     """
     Set logging level and return logger.
