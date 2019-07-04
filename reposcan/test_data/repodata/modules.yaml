@@ -1,4 +1,13 @@
 ---
+document: modulemd-defaults
+version: 1
+data:
+  module: perl-YAML
+  stream: 1.24
+  profiles:
+    common: [default]
+...
+---
 document: modulemd
 version: 2
 data:
