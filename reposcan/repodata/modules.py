@@ -51,7 +51,7 @@ class ModuleMD:
                 module_dict[name][default_stream]['default_stream'] = True
             for stream in data['profiles']:
                 if stream not in module_dict[name]:
-                    continue # this is here due to module defaults referencing non-existing modules
+                    continue  # this is here due to module defaults referencing non-existing modules
                 default_profile = data['profiles'][stream]
                 if default_profile and default_profile[0] in module_dict[name][stream]['profiles']:
                     module_dict[name][stream]['profiles'][default_profile[0]]['default_profile'] = True
