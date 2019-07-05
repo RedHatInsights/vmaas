@@ -19,6 +19,7 @@ from repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
 
+
 class RepositoryController:
     """
     Class for importing/syncing set of repositories into the DB.
