@@ -81,20 +81,10 @@ class PackageStore(ObjectStore):
         self._populate_dep_table("package_name", unique_names, self.package_name_map)
         self._populate_evrs(unique_evrs)
 
-    @staticmethod
-    def _get_source_package_nevra(pkg: dict) -> tuple:
-        """Get NEVRA for source package pkg["srpm"].
-        Get epoch from binary package if there is no epoch in "srpm" field.
-        Workaround to get correct epoch for source rpm if its not provided in primary.xml"""
-        name, epoch, ver, rel, arch = rpm.parse_rpm_name(pkg["srpm"])
-        if epoch is None:
-            epoch = pkg["epoch"]
-        return name, epoch, ver, rel, arch
-
     def _get_source_package_id(self, pkg):
         source_package_id = None
         if pkg["srpm"]:
-            name, epoch, ver, rel, arch = PackageStore._get_source_package_nevra(pkg)
+            name, epoch, ver, rel, arch = rpm.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"])
             name_id = self.package_name_map[name]
             evr_id = self.evr_map[(epoch, ver, rel)]
             arch_id = self.arch_map[arch]
@@ -174,7 +164,7 @@ class PackageStore(ObjectStore):
         unique_source_packages = set()
         for pkg in packages:
             if pkg["srpm"]:
-                unique_source_packages.add(PackageStore._get_source_package_nevra(pkg))
+                unique_source_packages.add(rpm.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"]))
         source_packages = []
         for name, epoch, ver, rel, arch in unique_source_packages:
             source_packages.append(dict(name=name, epoch=epoch, ver=ver, rel=rel, arch=arch,
