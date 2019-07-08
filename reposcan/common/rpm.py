@@ -10,19 +10,37 @@ class RPMParseException(Exception):
     SRPM name parsing exception.
     """
 
+# This will parse package names in the following formats:
+# 389-ds-base-1.3.7.8-1.fc27.src
+# perl-DBD-Pg-2:3.7.4-2.module+el8+2517+b1471f1c.x86_64
+# 3:Agda-2.5.2-9.fc27.x86_64
+# Note the epoch can be in either of two locations, or not
+# present at all.
+NEVRA_RE = re.compile(
+    r'((?P<e1>[0-9]+):)?(?P<pn>[^:]+)(?(e1)-|-((?P<e2>[0-9]+):)?)(?P<ver>[^-:]+)-(?P<rel>[^-:]+)\.(?P<arch>[a-z0-9_]+)')
 
-def parse_rpm_name(name):
+def parse_rpm_name(rpm_name, default_epoch=None):
     """
     Extract components from rpm name.
     """
+    filename = rpm_name
+    if rpm_name[-4:] == '.rpm':
+        filename = rpm_name[:-4]
 
-    parts = re.search(r'((.*):)?(.*)-(.*)-(.*)\.(.*)\.rpm', name)
-    if parts is None:
-        raise RPMParseException("Failed to parse rpm name '%s'!" % name)
-    grps = parts.groups()
-    _, epoch, name, ver, rel, arch = grps
-    return name, epoch, ver, rel, arch
+    match = NEVRA_RE.match(filename)
+    if not match:
+        raise RPMParseException("Failed to parse rpm name '%s'!" % rpm_name)
 
+    name = match.group('pn')
+    epoch = match.group('e1')
+    if not epoch:
+        epoch = match.group('e2')
+    if not epoch:
+        epoch = default_epoch
+    version = match.group('ver')
+    release = match.group('rel')
+    arch = match.group('arch')
+    return name, epoch, version, release, arch
 
 def rpmver2array(rpm_version: str) -> list:
     """
