@@ -2,33 +2,13 @@
 Module containing classes for fetching/importing modules from/into database.
 """
 
-import re
-
 from psycopg2.extras import execute_values
 
 from database.object_store import ObjectStore
-#from common import rpm
+from common import rpm
 
 class ModulesStore(ObjectStore):
     """Class providing interface for storing modules and related info."""
-
-    def __init__(self):
-        super().__init__()
-        self.nevra_re = re.compile(r'(.*)-(([0-9]+):)?([^-]+)-([^-]+)\.([a-z0-9_]+)')
-
-    def _split_packagename(self, filename):
-        """Split rpm name (incl. epoch) to NEVRA components."""
-        if filename[-4:] == '.rpm':
-            filename = filename[:-4]
-
-        match = self.nevra_re.match(filename)
-        if not match:
-            return '', '', '', '', ''
-
-        name, _, epoch, version, release, arch = match.groups()
-        if epoch is None:
-            epoch = '0'
-        return name, epoch, version, release, arch
 
     def _populate_modules(self, repo_id, modules):
         cur = self.conn.cursor()
@@ -117,9 +97,7 @@ class ModulesStore(ObjectStore):
             for module in modules:
                 if 'artifacts' in module:
                     for artifact in module['artifacts']:
-                        split_pkg_name = self._split_packagename(artifact)
-                        # rpm.parse_rpm_name fails to parse
-                        # perl-DBD-Pg-0:3.7.4-2.module+el8+2517+b1471f1c.x86_64
+                        split_pkg_name = rpm.parse_rpm_name(artifact, default_epoch='0')
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))
                         else:
