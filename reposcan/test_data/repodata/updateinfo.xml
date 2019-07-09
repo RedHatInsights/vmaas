@@ -8,8 +8,9 @@
     <release>Fedora 27</release>
     <summary>golang-github-xeipuuv-gojsonschema-0-0.5.20171003git6b67b3f.fc27 enhancement update</summary>
     <description>Bump to upstream 6b67b3fab74d992bd07f72550006ab2c6907c416</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
-      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1493960" id="1493960" type="bugzilla" title="Please update the package to a more recent version"/>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1493960" id="1493960" type="cve" title="Please update the package to a more recent version"/>
       <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1498057" id="1498057" type="bugzilla" title="Tracker for golang-github-xeipuuv-gojsonschema"/>
     </references>
     <pkglist>
@@ -60,6 +61,7 @@
     <release>Fedora 27</release>
     <summary>perl-Math-Base85-0.4-1.fc27 bugfix update</summary>
     <description>Updated to the latest version</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references/>
     <pkglist>
       <collection short="F27">
@@ -88,8 +90,9 @@
     <release>Fedora 27</release>
     <summary>rubygem-jgrep-1.5.0-1.fc27 enhancement update</summary>
     <description>[CHANGELOG](https://github.com/ploubser/JSON-Grep/blob/master/CHANGELOG.markdown)</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
-      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1480030" id="1480030" type="bugzilla" title="rubygem-jgrep-1.5.0 is available"/>
+      <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1480030" id="1480030" type="cve" title="rubygem-jgrep-1.5.0 is available"/>
     </references>
     <pkglist>
       <collection short="F27">
@@ -114,6 +117,7 @@
     <release>Fedora 27</release>
     <summary>jinput-2.0.7-11.20170607git.294629a.fc27 bugfix update</summary>
     <description>Fix a broken symbolic link.</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
       <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1513092" id="1513092" type="bugzilla" title="broken symlink in %_libdir/%name"/>
     </references>
@@ -200,6 +204,7 @@
     <release>Fedora 27</release>
     <summary>adobe-source-han-sans-jp-fonts-1.004-1.fc27 newpackage update</summary>
     <description>Initial packaging</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references/>
     <pkglist>
       <collection short="F27">
@@ -221,6 +226,7 @@
     <release>Fedora 27</release>
     <summary>synergy-1.8.8-2.fc27 enhancement update</summary>
     <description>Upstream update to 1.8.8</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
       <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1372714" id="1372714" type="bugzilla" title="Update to 1.8.8"/>
     </references>
@@ -306,6 +312,7 @@
     <description>- Update to 0.4.3
 - New Epoch
 - Rebuild against new libnuml</description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
       <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1496792" id="1496792" type="bugzilla" title="libsedml-v0.4.3 is available"/>
     </references>
@@ -714,6 +721,7 @@ Breaking API changes
 
 * No breaking API changes in this version.
 </description>
+    <updated date="2019-07-09 08:55:15"/>
     <references/>
     <pkglist>
       <collection short="F27">
@@ -862,6 +870,7 @@ Breaking API changes
     <summary>rpcbind-0.2.4-8.rc3.fc27 enhancement update</summary>
     <description>Updated to latest upstream RC release: rpcbind-0_2_5-rc3 (bz 1431574)
 </description>
+    <updated date="2019-07-09 08:55:15"/>
     <references>
       <reference href="https://bugzilla.redhat.com/show_bug.cgi?id=1431574" id="1431574" type="bugzilla" title="service file not starting rpcbind.target"/>
     </references>
