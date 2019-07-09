@@ -1,11 +1,8 @@
 """Test storing repository in DB."""
 # pylint: disable=unused-argument, attribute-defined-outside-init, no-self-use
 
-from datetime import datetime
-
 import pytest
 
-from common import utc
 from database.product_store import ProductStore
 from database.repository_store import RepositoryStore
 from database.test.db_idxs import (
@@ -61,12 +58,6 @@ class TestRepositoryStore:
     @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
     def test_repo_store(self, db_conn, repo_setup, repository):
         """Test storing repository data in DB."""
-
-        # update with updated = None result in IntegrityError
-        if repository[1].updateinfo:
-            for update in repository[1].updateinfo.updates:
-                if update["updated"] is None:
-                    update["updated"] = datetime.now(utc.UTC)
 
         # store repository
         self.repo_store.store(repository[1])
