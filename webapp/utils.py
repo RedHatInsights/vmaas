@@ -73,6 +73,7 @@ def format_datetime(datetime_obj):
         return datetime_obj.isoformat()
     return None if datetime_obj is None else str(datetime_obj)
 
+
 def parse_datetime(date):
     """Parse date from string in ISO format."""
     if date is None:
@@ -82,9 +83,11 @@ def parse_datetime(date):
         raise ValueError("Wrong date format (not ISO format with timezone): " + date)
     return ret
 
+
 def none2empty(value):
     """Convert None to empty string."""
     return value if value is not None else ""
+
 
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 5000
@@ -110,7 +113,7 @@ def paginate(input_list, page, page_size, filters=None):
     end = page * page_size
     pages = int(math.ceil(float(len(input_list))/page_size))
     result_list = input_list[start:end]
-    return (result_list, {"page": page, "page_size": len(result_list), "pages": pages})
+    return result_list, {"page": page, "page_size": len(result_list), "pages": pages}
 
 
 def filter_item_if_exists(list_to_process, item_details):

@@ -41,6 +41,12 @@ class YamlCache(Cache):
             yaml.dump(attrs, file)
 
 
+def load_test_cache():
+    """Load cache with testing data."""
+    cache = YamlCache("test/data/cache.yml")
+    return cache.load_yaml()
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage:\n./yaml_cache.py <vmaas.dbm path> <yaml output>")
