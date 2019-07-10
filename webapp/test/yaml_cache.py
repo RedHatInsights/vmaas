@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Export DB cache as YAML for unit tests."""
 
+import shelve
 import sys
 import yaml
 
@@ -39,6 +40,18 @@ class YamlCache(Cache):
 
         with open(output, "w") as file:
             yaml.dump(attrs, file)
+
+    def dump_shelve(self, output):
+        """Dump data to Shelve file"""
+        attrs = vars(self)
+        del attrs["filename"]
+
+        with shelve.open(output, 'c') as dump:
+            for key, val in attrs.items():
+                for name, data in val.items():
+                    if isinstance(name, tuple):
+                        name = ':'.join([f"{item}" for item in name])
+                    dump[f"{key}:{name}"] = data
 
 
 def load_test_cache():
