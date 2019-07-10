@@ -61,3 +61,14 @@ class TestPackagesAPI(TestBase):
         """Test pkg api with non existing package."""
         response = self.pkg_api.process_list(1, PKG_JSON_NON_EXIST)
         assert tools.match(NON_EXIST_RESPONSE, response) is True
+
+    def test_wrong_regex(self):
+        """Test wrong package regex."""
+        with pytest.raises(Exception) as context:
+            self.pkg_api.find_packages_by_regex("*")
+        assert "nothing to repeat" in str(context)
+
+    def test_regex(self):
+        """Test correct package regex."""
+        assert self.pkg_api.find_packages_by_regex(PKG) == [PKG]
+        assert self.pkg_api.find_packages_by_regex("my-pkg-1.1.0-1.el8.*") == [PKG]

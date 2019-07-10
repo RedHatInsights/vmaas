@@ -2,6 +2,7 @@
 Module to handle /packages API calls.
 """
 
+import re
 from jsonschema import validate
 
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY, PKG_DESC, PKG_SOURCE_PKG_ID
@@ -22,6 +23,29 @@ class PackagesAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
         self.cache = cache
+
+    def find_packages_by_regex(self, regex):
+        """Returns list of packages matching a provided regex."""
+        name, epoch, ver, rel, arch = utils.split_packagename(regex)
+
+        if name and epoch and ver and rel and arch and not regex[-2:] == '.*':
+            # If there is no regular expression return all packages what we get in api request
+            return [regex]
+
+        if not regex.startswith('^'):
+            regex = '^' + regex
+
+        if not regex.endswith('$'):
+            regex = regex + '$'
+
+        filtered_pkgs = []
+        for (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
+            pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
+            package_list = self._get_built_binary_packages(pkg_id)
+            for pkg in package_list:
+                if re.match(regex, pkg):
+                    filtered_pkgs.append(pkg)
+        return filtered_pkgs
 
     def _get_source_package(self, pkg_detail):
         src_pkg_id = pkg_detail[PKG_SOURCE_PKG_ID]
@@ -52,6 +76,10 @@ class PackagesAPI:
         packagelist = {}
         if not packages:
             return packagelist
+
+        if len(packages) == 1:
+            # treat single-label like a regex, get all matching names
+            packages = self.find_packages_by_regex(packages[0])
 
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
