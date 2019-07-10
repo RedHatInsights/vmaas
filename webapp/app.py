@@ -1259,8 +1259,8 @@ def load_cache_to_apis():
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
 
-def main():
-    """ The main function. It creates VmaaS application, servers, run everything."""
+def create_app():
+    """Create VmaaS application and servers"""
 
     vmaas_app = Application()
 
@@ -1279,6 +1279,11 @@ def main():
     vmaas_app.websocket_reconnect()
     vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
     vmaas_app.reconnect_callback.start()
+
+
+def main():
+    """Run webapp."""
+    create_app()
     IOLoop.instance().start()
 
 
