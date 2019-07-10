@@ -1,6 +1,7 @@
 """Module for testing cvemap_store."""
 # pylint: disable=unused-argument, attribute-defined-outside-init, protected-access
 
+import time
 from datetime import datetime
 from decimal import Decimal
 
@@ -44,4 +45,5 @@ class TestCvemapStore:
         assert cve[CVE_PUBLISHED].year == 2018
         assert cve[CVE_CVSS3_SCORE] == Decimal("7.7")
         assert cve[CVE_CVSS3_METRIC] == "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N"
+        assert self.cvemap_store.lastmodified()[:10] == time.strftime('%Y-%m-%d')
         # assert cve[0][REDHAT_URL] == "https://access.redhat.com/security/cve/cve-2018-1097"
