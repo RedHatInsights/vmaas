@@ -1173,6 +1173,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/monitoring/health/?", HealthHandler),
             (r"/api/v1/apispec/?", ApiSpecHandler),
             (r"/api/v1/version/?", VersionHandler),
+            (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
+            (r"/metrics", MetricsHandler),  # GET request
             (r"/api/v1/updates/?", UpdatesHandlerPost),
             (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
             (r"/api/v2/updates/?", UpdatesHandlerV2Post),
@@ -1185,10 +1187,8 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
             (r"/api/v1/packages/?", PackagesHandlerPost),
             (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:]+)", PackagesHandlerGet),
-            (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
-            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:]+)", VulnerabilitiesHandlerGet),
             (r"/api/v1/vulnerabilities/?", VulnerabilitiesHandlerPost),
-            (r"/metrics", MetricsHandler)  # GET request
+            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:]+)", VulnerabilitiesHandlerGet),
         ]
 
         tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
@@ -1248,6 +1248,17 @@ class Application(tornado.web.Application):
             self.websocket = None
 
 
+def load_cache_to_apis():
+    """Reload cache in APIs."""
+    BaseHandler.updates_api = UpdatesAPI(BaseHandler.db_cache)
+    BaseHandler.repo_api = RepoAPI(BaseHandler.db_cache)
+    BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
+    BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
+    BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
+    BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
+    BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
+
+
 def main():
     """ The main function. It creates VmaaS application, servers, run everything."""
 
@@ -1263,19 +1274,12 @@ def main():
 
     # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
-    BaseHandler.updates_api = UpdatesAPI(BaseHandler.db_cache)
-    BaseHandler.repo_api = RepoAPI(BaseHandler.db_cache)
-    BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
-    BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
-    BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
-    BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
-    BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
+    load_cache_to_apis()
 
     vmaas_app.websocket_reconnect()
     vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
     vmaas_app.reconnect_callback.start()
     IOLoop.instance().start()
-
 
 
 if __name__ == '__main__':
