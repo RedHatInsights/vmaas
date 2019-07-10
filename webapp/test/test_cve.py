@@ -16,6 +16,7 @@ CVE_NAME = "CVE-2014-1545"
 CVE_JSON_EMPTY = {}
 CVE_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
 CVE_JSON = {"cve_list": [CVE_NAME], "modified_since": "2018-04-06T01:23:45+02:00"}
+CVE_JSON_PUBLISHED = {"cve_list": [CVE_NAME], "published_since": "2018-04-06T01:23:45+02:00"}
 CVE_JSON_EMPTY_CVE = {"cve_list": [""]}
 CVE_JSON_NON_EXIST = {"cve_list": ["CVE-9999-9999"]}
 
@@ -94,7 +95,6 @@ class TestCveAPI(TestBase):
         assert CVE_NAME in response["cve_list"]
         assert tools.match(CORRECT_RESPONSE, response["cve_list"][CVE_NAME]) is True
 
-    @pytest.mark.skip("Blocked by https://github.com/RedHatInsights/vmaas/issues/419")
     def test_modified_since(self):
         """Test CVE API with 'modified_since' property."""
         cve = CVE_JSON.copy()
@@ -106,3 +106,21 @@ class TestCveAPI(TestBase):
         cve["cve_list"] = ["CVE-W/O-MODIFIED"]
         response = self.cve.process_list(api_version=1, data=cve)
         assert tools.match(EMPTY_RESPONSE, response) is True
+
+    def test_published_since(self):
+        """Test CVE API with 'published_since' property. """
+        cve = CVE_JSON_PUBLISHED.copy()
+        cve["published_since"] = str(datetime.datetime.now().replace(tzinfo=pytz.UTC))
+        response = self.cve.process_list(api_version=1, data=cve)
+        assert tools.match(EMPTY_RESPONSE, response) is True
+
+        # correct date since publish of dummy cve
+        cve["published_since"] = "2013-01-01T00:00:00+02:00"
+        response = self.cve.process_list(api_version=1, data=cve)
+        assert response["cve_list"][CVE_NAME]["synopsis"] == CVE_NAME
+
+        # without published date
+        cve["cve_list"] = ["CVE-W/O-PUBLISHED"]
+        response = self.cve.process_list(api_version=1, data=cve)
+        assert tools.match(EMPTY_RESPONSE, response) is True
+        

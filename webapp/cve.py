@@ -19,6 +19,7 @@ JSON_SCHEMA = {
             'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
             },
         'modified_since' : {'type' : 'string'},
+        'published_since' : {'type' : 'string'},
         'page_size' : {'type' : 'number'},
         'page' : {'type' : 'number'},
         'rh_only' : {'type' : 'boolean'}
@@ -58,6 +59,19 @@ class CveAPI:
                 filtered_cves_to_process.append(cve)
         return filtered_cves_to_process
 
+    def _filter_published_since(self, cves_to_process, published_since_dt):
+        filtered_cves_to_process = []
+
+        for cve in cves_to_process:
+            cve_detail = self.cache.cve_detail.get(cve)
+            if not cve_detail:
+                continue
+            elif cve_detail[CVE_PUBLISHED_DATE]:
+                if cve_detail[CVE_PUBLISHED_DATE] >= published_since_dt:
+                    filtered_cves_to_process.append(cve)
+
+        return filtered_cves_to_process
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
@@ -71,8 +85,10 @@ class CveAPI:
 
         cves_to_process = data.get("cve_list", None)
         modified_since = data.get("modified_since", None)
+        published_since = data.get("published_since", None)
         rh_only = data.get('rh_only', False)
         modified_since_dt = parse_datetime(modified_since)
+        published_since_dt = parse_datetime(published_since)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
 
@@ -88,10 +104,14 @@ class CveAPI:
         filters = [(filter_item_if_exists, [self.cache.cve_detail])]
         if rh_only:
             filters.append((self._filter_redhat_only, []))
-        # if we have information about modified/published dates and receive "modified_since" in request,
+        # if we have information about modified/published dates and receive "modified_since"
+        # or "published_since" in request,
         # compare the dates
         if modified_since:
             filters.append((self._filter_modified_since, [modified_since_dt]))
+
+        if published_since:
+            filters.append((self._filter_published_since, [published_since_dt]))
 
         cve_list = {}
         cve_page_to_process, pagination_response = paginate(cves_to_process, page, page_size, filters=filters)
@@ -123,4 +143,6 @@ class CveAPI:
         response.update(pagination_response)
         if modified_since:
             response["modified_since"] = modified_since
+        if published_since:
+            response["published_since"] = published_since
         return response
