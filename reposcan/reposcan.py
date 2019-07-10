@@ -918,8 +918,9 @@ def periodic_sync():
     LOGGER.info("Periodic sync started.")
     AllSyncHandler.start_task()
 
-def main():
-    """Main entrypoint."""
+
+def create_app():
+    """Create reposcan app."""
     init_logging()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "720")) * 60000
@@ -934,7 +935,12 @@ def main():
     app.reconnect_callback = PeriodicCallback(app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
     app.reconnect_callback.start()
 
+
+def main():
+    """Main entrypoint."""
+    create_app()
     IOLoop.instance().start()
+
 
 if __name__ == '__main__':
     main()
