@@ -13,8 +13,9 @@ codecovThreshold = 89
 node {
     // Cancel any prior builds that are running for this job
     cancelPriorBuilds()
-
-    runStages()
+    lock("vmaas-qe-deploy") {
+        runStages()
+    }
 }
 
 
