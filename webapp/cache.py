@@ -63,6 +63,7 @@ ERRATA_URL = 12
 
 LOGGER = get_logger(__name__)
 
+
 class Cache:
     """ Cache class. """
     # pylint: disable=too-many-instance-attributes
