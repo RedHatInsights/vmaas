@@ -89,7 +89,6 @@ class TestErrataAPI(TestBase):
         assert ERRATA_NAME in response["errata_list"]
         assert tools.match(CORRECT_RESPONSE, response["errata_list"][ERRATA_NAME]) is True
 
-    @pytest.mark.skip("Blocked by https://github.com/RedHatInsights/vmaas/issues/419")
     def test_modified_since(self):
         """Test errata API with 'modified_since' property."""
         errata = ERRATA_JSON.copy()
