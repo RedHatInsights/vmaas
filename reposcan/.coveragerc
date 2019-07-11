@@ -1,3 +1,6 @@
 [run]
 source = .
-omit = */test/*
+omit =
+    */test/*
+    test/*
+    test_integration/*
