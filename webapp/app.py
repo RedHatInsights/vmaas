@@ -911,6 +911,10 @@ def setup_apispec(handlers):
                         "type": "string",
                         "example": "https://access.redhat.com/security/cve/cve-2017-5715",
                     },
+                    "secondary_url": {
+                        "type": "string",
+                        "example": "https://seconday.url.com",
+                    },
                     "cvss2_score": {
                         "type": "string",
                         "example": "5.600",
@@ -921,31 +925,42 @@ def setup_apispec(handlers):
                     },
                     "cvss3_score": {
                         "type": "string",
-                        "example": "CWE-200"
-                    }
-                },
-                "errata_list": {
-                    "type": "array",
-                    "items": {
+                        "example": "5.1"
+                    },
+                    "cvss3_metrics": {
                         "type": "string",
-                        "example": "RHSA-2015:1981"
-                    }
-                },
-                "package_list": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "example": "nss-devel-3.16.1-9.el6_5.x86_64"
-                    }
-                },
-                "source_package_list": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "example": "nss-devel-3.16.1-9.el6_5.src"
+                        "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                    },
+                    "cwe_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "CWE-20"
+                        }
+                    },
+                    "errata_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "RHSA-2015:1981"
+                        }
+                    },
+                    "package_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "nss-devel-3.16.1-9.el6_5.x86_64"
+                        }
+                    },
+                    "source_package_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "nss-devel-3.16.1-9.el6_5.src"
+                        }
                     }
                 }
-            },
+            }
         },
         "modified_since": {
             "type": "string",
