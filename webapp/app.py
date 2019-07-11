@@ -129,10 +129,17 @@ class BaseHandler(tornado.web.RequestHandler):
         try:
             result = api_endpoint.process_list(api_version, {param_name : [param]})
             code = 200
+        except ValueError as valuerr:
+            result = str(valuerr)
+            LOGGER.error('ValueError: %s', result)
         except sre_constants.error as sre_err:
             result = 'Regular expression error: ' + str(sre_err)
             LOGGER.warning('sre_constants.error: %s', result)
-
+        except Exception as err: # pylint: disable=broad-except
+            err_id = err.__hash__()
+            result = 'Internal server error <%s>: please include this error id in bug report.' % err_id
+            code = 500
+            LOGGER.exception(result)
         self.set_status(code)
         self.write(result)
 
