@@ -102,10 +102,15 @@ class WebsocketApplication(Application):
         Application.__init__(self, handlers)
 
 
-def main():
-    """Main entrypoint."""
+def create_app():
+    """Create websocket tornado app."""
     app = WebsocketApplication()
     app.listen(8082)
+
+
+def main():
+    """Main entrypoint."""
+    create_app()
     IOLoop.instance().start()
 
 
