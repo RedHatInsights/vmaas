@@ -244,8 +244,6 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
                 module_id = self.streamid2stream[stream_id]['module_id']
                 module = self.moduleid2module[module_id]['name']
                 repo_id = self.moduleid2module[module_id]['repo_id']
-                if (pkg_id, repo_id) in self.pkgrepomodules:
-                    LOGGER.warning('found multiple modules for pkg_id, repo_id = %s, %s', pkg_id, repo_id)
                 self.pkgrepomodules[(pkg_id, repo_id)] = {'name': module,
                                                           'stream': stream}
 
