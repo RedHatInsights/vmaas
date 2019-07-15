@@ -26,22 +26,19 @@ def runStages() {
         scmVars = checkout scm
 
         // checkout vmaas_tests git repository
-        checkOutRepo(targetDir: "vmaas_tests", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
-        checkOutRepo(targetDir: "vmaas-yamls", repoUrl: "https://github.com/psegedy/vmaas-yamls", credentialsId: "github")
+        checkOutRepo(targetDir: "vulnerability", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
 
         stage("Pip install") {
             // withStatusContext runs the body code and notifies GitHub on whether it passed or failed
             withStatusContext.pipInstall {
-                sh "pip install --user --no-warn-script-location -U pip devpi-client setuptools setuptools_scm wheel"
-                // set devpi address, $DEV_PI is configured env variable in jenkins-slave-vmaas
-                sh "devpi use ${DEV_PI} --set-cfg"
-                // install iqe-tests
-                sh "pip install --user --no-warn-script-location iqe-integration-tests iqe-clientv3-plugin iqe-current-ui-plugin"
-                // install vulnerability plugin
-                // sh "pip install --user --no-warn-script-location iqe-vulnerability-plugin"
-                sh "pip install --user --no-warn-script-location -e vmaas_tests"
-                sh "pip install --user --no-warn-script-location pytest-html"
-                sh "pip install --user --no-warn-script-location pytest-report-parameters"
+                sh "pip install -U iqe-integration-tests pytest-html"
+                sh "iqe plugin install vulnerability"
+            }
+        }
+
+        stage('Inject local settings') {
+            withCredentials([file(credentialsId: "vmaas-settings-local-yaml", variable: "settings")]) {
+                sh "cp ${settings} ${IQE_VENV}/lib/python3.6/site-packages/iqe_vulnerability/conf"
             }
         }
 
@@ -56,12 +53,10 @@ def runStages() {
                 }
 
                 checkOutRepo(targetDir: pipelineVars.e2eDeployDir, repoUrl: pipelineVars.e2eDeployRepoSsh, credentialsId: pipelineVars.gitSshCreds)
-                sh "python3.6 -m venv ${pipelineVars.venvDir}"
-                sh "${pipelineVars.venvDir}/bin/pip install --upgrade pip"
                 dir(pipelineVars.e2eDeployDir) {
-                    sh "${pipelineVars.venvDir}/bin/pip install -r requirements.txt"
+                    sh "${IQE_VENV}/bin/pip install -r requirements.txt"
                     // wipe old deployment
-                    sh "${pipelineVars.venvDir}/bin/ocdeployer wipe -f vmaas-qe -l app=vmaas"
+                    sh "${IQE_VENV}/bin/ocdeployer wipe -f vmaas-qe -l app=vmaas"
                     // make sure that DB volume is deleted
                     sh "oc delete pvc vmaas-db-data || true"
                     // git reference
@@ -97,13 +92,13 @@ def runStages() {
                         echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
 
                         # Deploy these customized builders into 'vmaas-qe' project
-                        ${pipelineVars.venvDir}/bin/ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
+                        ${IQE_VENV}/bin/ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
                             -e builder-env.yml vmaas-qe --secrets-local-dir secrets/sanitized
                     """
                     // deploy vmaas service set
-                    sh "${pipelineVars.venvDir}/bin/ocdeployer deploy -f --sets vmaas \
-                        --template-dir ../vmaas_tests/openshift/templates \
-                        -e ../vmaas_tests/openshift/env/env.yml \
+                    sh "${IQE_VENV}/bin/ocdeployer deploy -f --sets vmaas \
+                        --template-dir ../vulnerability/openshift/templates \
+                        -e ../vulnerability/openshift/env/env.yml \
                         vmaas-qe --secrets-local-dir secrets/sanitized"
                 }
             }
@@ -113,14 +108,6 @@ def runStages() {
         stage("Integration tests") {
             // Run integration tests
             withStatusContext.custom("integration-tests") {
-                sh """
-                    cd ~/.local/lib/python3.6/site-packages/iqe/conf
-                    ln -rs ${WORKSPACE}/vmaas-yamls/conf/credentials.yaml
-                """
-                sh """
-                    cd vmaas_tests/iqe_vulnerability/conf
-                    ln -rs ${WORKSPACE}/vmaas-yamls/conf/settings.jenkins.yaml
-                """
                 stage("Run vmaas-webapp with coverage") {
                     // Start webapp as `coverage run ...` instead of `python ...` to collect coverage
                     sh '''
@@ -129,10 +116,11 @@ def runStages() {
                     '''
                 }
                 stage("Setup DB") {
-                    withCredentials([string(credentialsId: "vmaas-bot-token", variable: "TOKEN")]) {
+                    withCredentials([string(credentialsId: "vmaas-bot-token", variable: "TOKEN"),
+                                    file(credentialsId: "repolist-json", variable: "REPOLIST")]) {
                     sh """
-                        cd vmaas_tests
-                        vmaas/scripts/setup_db.sh ${WORKSPACE}/vmaas-yamls/data/repolist.json \
+                        cd vulnerability
+                        vmaas/scripts/setup_db.sh ${REPOLIST} \
                             http://vmaas-reposcan.vmaas-qe.svc:8081 \
                             http://vmaas-webapp.vmaas-qe.svc:8080 \
                             ${TOKEN}
@@ -150,14 +138,8 @@ def runStages() {
                     // 4: pytest command line usage error
                     // 5: No tests were collected
                     sh '''
-                        cd vmaas_tests
                         pytest_status=0
-                        # run only vmaas tests for now
-                        if [ -d iqe_vulnerability/tests/vmaas ]; then
-                            ~/.local/bin/iqe tests custom -v --junit-xml="iqe-junit-report.xml" --html="report.html" --self-contained-html iqe_vulnerability/tests/vmaas || pytest_status="$?"
-                        else
-                            ~/.local/bin/iqe tests plugin vulnerability -v --junit-xml="iqe-junit-report.xml" --html="report.html" --self-contained-html || pytest_status="$?"
-                        fi
+                        iqe tests plugin vulnerability -vvv -r s -k tests/vmaas --html="report.html" --self-contained-html --generate-report || pytest_status="$?"
                         if [ "$pytest_status" -gt 1 ]; then
                             exit "$pytest_status"
                         fi
@@ -166,7 +148,7 @@ def runStages() {
                     '''
                 }
             }
-            junit "vmaas_tests/iqe-junit-report.xml"
+            junit "iqe-junit-report.xml"
         }
 
         stage("Code coverage") {
@@ -198,21 +180,13 @@ def runStages() {
 
         stage("Publish in Polarion") {
             // Publish results for tagged commits in Polarion
-            withCredentials([string(credentialsId: 'polarion_passwd', variable: 'PASSWORD'), 
-                             string(credentialsId: 'polarion_user', variable: 'USER')]) {
-                sh '''
-                    last_commit="$(git rev-parse --short HEAD)"
-                    versioned="$(git describe --tags --exact-match "$last_commit" 2>/dev/null)" || true
-                    if [ -n "$versioned" ]; then
-                        cd vmaas_tests
-                        testrun_name="test-run-vmaas-$versioned"
-                        ~/.local/bin/pip install dump2polarion
-                        polarion_dumper.py -i iqe-junit-report.xml -t "$testrun_name" \
-                            --user "$USER" --password "$PASSWORD" \
-                            --log-level=debug --verify-timeout=1200 || true
-                    fi
-                '''
-            }
+            sh '''
+                last_commit="$(git rev-parse --short HEAD)"
+                versioned="$(git describe --tags --exact-match "$last_commit" 2>/dev/null)" || true
+                if [ -n "$versioned" ]; then
+                    iqe results plugin vulnerability -t test-run-vmaas-$versioned
+                fi
+            '''
         }
 
         stage("Publish HTML") {
@@ -228,7 +202,7 @@ def runStages() {
                   allowMissing: true,
                   alwaysLinkToLastBuild: true,
                   keepAll: true,
-                  reportDir: 'vmaas_tests/html_report',
+                  reportDir: 'html_report',
                   reportFiles: 'report.html',
                   reportName: "Test Report"
             ])
