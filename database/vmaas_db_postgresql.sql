@@ -630,12 +630,13 @@ CREATE TABLE IF NOT EXISTS  dbchange (
   errata_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   cve_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   repository_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  last_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+  last_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  pkgtree_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 )TABLESPACE pg_default;
-CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cve_changes, repository_changes ON dbchange
+CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cve_changes, repository_changes, pkgtree_change ON dbchange
   FOR EACH STATEMENT EXECUTE PROCEDURE last_change();
-INSERT INTO dbchange (errata_changes, cve_changes, repository_changes)
-  VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO dbchange (errata_changes, cve_changes, repository_changes, pkgtree_change)
+  VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- -----------------------------------------------------
 -- Table vmaas.module

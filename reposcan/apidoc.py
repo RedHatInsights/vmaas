@@ -94,6 +94,12 @@ def setup_apispec(handlers):
             }
         }
     })
+    SPEC.definition("DbChangeResponse", properties={
+        "pkgtree_change": {
+            "type": "string",
+            "example": "2010-11-10T00:00:00+00:00"
+        }
+    })
     # Register public API handlers to apispec
     for handler in handlers:
         if handler[0].startswith(('/api/')):
