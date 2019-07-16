@@ -289,9 +289,19 @@ class RepoListHandler(SyncHandler):
             # Entitlement cert is optional
             if "entitlement_cert" in repo_group:
                 cert_name = repo_group["entitlement_cert"]["name"]
-                ca_cert = repo_group["entitlement_cert"]["ca_cert"]
-                cert = repo_group["entitlement_cert"]["cert"]
-                key = repo_group["entitlement_cert"]["key"]
+
+                ca_cert_var = repo_group["entitlement_cert"]["ca_cert"]
+                ca_cert = os.getenv(ca_cert_var[1:], ca_cert_var) \
+                    if ca_cert_var.startswith('$') else ca_cert_var
+
+                cert_var = repo_group["entitlement_cert"]["cert"]
+                cert = os.getenv(cert_var[1:], cert_var) \
+                    if cert_var.startswith('$') else cert_var
+
+                key_var = repo_group["entitlement_cert"]["key"]
+                key = os.getenv(key_var[1:], key_var) \
+                    if key_var.startswith('$') else key_var
+
             else:
                 cert_name, ca_cert, cert, key = None, None, None, None
 
