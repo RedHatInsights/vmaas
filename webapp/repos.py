@@ -87,6 +87,7 @@ class RepoAPI:
                 repo_details[label] = self.cache.repo_detail[repo_id]
         filters.append((filter_item_if_exists, [repo_details]))
 
+        actual_page_size = 0
         repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
         for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
@@ -101,10 +102,13 @@ class RepoAPI:
                     "product": repo_detail[REPO_PRODUCT],
                     "revision": repo_detail[REPO_REVISION]
                 })
+            actual_page_size += len(repolist[label])
 
         response = {
             'repository_list': repolist,
         }
+
+        pagination_response['page_size'] = actual_page_size
         response.update(pagination_response)
         if modified_since:
             response["modified_since"] = modified_since
