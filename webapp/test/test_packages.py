@@ -15,10 +15,10 @@ PKG_JSON_EMPTY = {}
 PKG_JSON = {"package_list": [PKG]}
 PKG_SRC_JSON = {"package_list": [PKG_SRC]}
 PKG_JSON_EMPTY_LIST = {"package_list": [""]}
-PKG_JSON_NON_EXIST = {"package_list": ["non-exist"]}
+PKG_JSON_NON_EXIST = {"package_list": [""]}
 
-EMPTY_RESPONSE = {"package_list": {"": {}}}
-NON_EXIST_RESPONSE = {"package_list": {"non-exist": {}}}
+EMPTY_RESPONSE = {"package_list": {}}
+NON_EXIST_RESPONSE = {"package_list": {}}
 
 
 class TestPackagesAPI(TestBase):
