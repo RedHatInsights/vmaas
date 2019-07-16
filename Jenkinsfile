@@ -33,6 +33,13 @@ def runStages() {
             withStatusContext.pipInstall {
                 sh "pip install -U iqe-integration-tests pytest-html"
                 sh "iqe plugin install vulnerability"
+                try {
+                    sh "pip check"
+                } catch (err) {
+                    echo err.toString()
+                    // workaround for old pinned version in iqe-tests
+                    sh "pip install -U simple-rest-client"
+                }
             }
         }
 
