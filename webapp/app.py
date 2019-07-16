@@ -176,7 +176,7 @@ class DBChangeHandler(BaseHandler):
         description: Get last-updated-times for VMaaS DB
         responses:
           200:
-            description: Return last-update timestamps for errata, repos, cves, and the db as a whole
+            description: Return last-update timestamps for errata, repos, cves and the db as a whole
             schema:
               $ref: "#/definitions/DBChangeResponse"
         tags:

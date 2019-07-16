@@ -57,6 +57,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         """Dump necessary data tu disk file"""
         starttime = now()
         timestamp = format_datetime(starttime)
+        self._update_pkgtree_timestamp(timestamp)
         dump_filename = '%s-%s' % (self.filename, timestamp)
         self.outputdata['timestamp'] = timestamp
         self.outputdata['packages'] = {}
@@ -92,6 +93,15 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
             for fname in old_data[self.pkgtree_keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
                 remove_file_if_exists(fname)
+
+
+    def _update_pkgtree_timestamp(self, timestamp):
+        """ Updates the pkgtree_change column in db. """
+        with self.db_instance.cursor() as cursor:
+            cursor.execute("""update dbchange set pkgtree_change = to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.US')
+                              at time zone 'UTC'
+                           """ % timestamp)
+        self.db_instance.commit()
 
     def _load_packagenames(self):
         """Load the datadict and start filling in outputdata"""

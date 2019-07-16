@@ -18,6 +18,7 @@ from apidoc import SPEC, VMAAS_VERSION, setup_apispec
 from common.logging import get_logger, init_logging
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
+from dbchange import DbChangeAPI
 from exporter import DUMP, main as export_data
 from pkgtree import PKGTREE_FILE, main as export_pkgtree
 from mnm import FAILED_AUTH, FAILED_WEBSOCK
@@ -630,6 +631,26 @@ class PkgTreeDownloadHandler(BaseHandler):
             self.set_status(404, 'Package Tree file not found.  Has it been generated?')
             return
 
+class DbChangeHandler(BaseHandler):
+    """Handler for dbchange metadata information API. """
+
+    def get(self):
+        """
+        Get the metadata information about database.
+        ---
+        description: Recieve metadata informations about database sync.
+        responses:
+          200:
+            description: Returns timestamp of last pkgtree export.
+            schema:
+              $ref: "#/definitions/DbChangeResponse"
+        tags:
+          - dbchange
+        """
+        dbchange_api = DbChangeAPI()
+        result = dbchange_api.process()
+        self.write(result)
+
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
@@ -878,7 +899,8 @@ class ReposcanApplication(Application):
             (r"/api/v1/pkgtree/?", PkgTreeDownloadHandler),
             (r"/api/v1/task/status/?", TaskStatusHandler),
             (r"/api/v1/task/cancel/?", TaskCancelHandler),
-            (r"/metrics", MetricsHandler)
+            (r"/metrics", MetricsHandler),
+            (r"/api/v1/dbchange/?", DbChangeHandler)
         ]
 
         Application.__init__(self, handlers)
