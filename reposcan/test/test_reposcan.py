@@ -1,5 +1,7 @@
 """Reposcan overall test."""
 
+import os
+
 from http import HTTPStatus
 
 from tornado.testing import AsyncHTTPTestCase
@@ -50,11 +52,44 @@ class TestReposcanApp(AsyncHTTPTestCase):
         resp = self.fetch('/api/v1/repos', method='POST', body=body)
         self.assertEqual(HTTPStatus.OK, resp.code)
         self.assertEqual(b'{"msg": "Import repositories task started.", "success": true}', resp.body)
+        resp = self.fetch('/api/v1/task/cancel', method='PUT', body=body)
+
+    def test_add_repo_1_with_certs(self):
+        """Test_add_repo - with certs and keys"""
+
+        os.environ["RHSM-CDN-CA"] = "testRHSM-CDN-CA"
+        os.environ["RHSM-CDN-CERT"] = "testRHSM-CDN-CERT"
+        os.environ["RHSM-CDN-KEY"] = "testRHSM-CDN-KEY"
+
+        body = """[{
+           "products": {
+             "Testing Repo": {
+               "content_sets": {
+                 "testing-repo-name": {
+                   "name": "Testing repo desc",
+                   "baseurl": "http://localhost:8888/$releasever/$basearch/",
+                   "releasever": ["Server"],
+                   "basearch": ["Arch"]
+                 }
+               }
+             }
+           },
+           "entitlement_cert": {
+              "name": "RHSM-CDN",
+              "ca_cert": "$RHSM-CDN-CA",  
+              "cert": "$RHSM-CDN-CERT",  
+              "key": "$RHSM-CDN-KEY"
+            }
+        }]"""
+
+        resp = self.fetch('/api/v1/repos', method='POST', body=body)
+        self.assertEqual(HTTPStatus.OK, resp.code)
+        self.assertEqual(b'{"msg": "Import repositories task started.", "success": true}', resp.body)
+        resp = self.fetch('/api/v1/task/cancel', method='PUT', body=body)
 
     def test_add_repo_2(self):
         """Test add repo - bad request."""
-        body = """[{"wrong_key": {}}]"""
-
+        body = """[{"wrong_key: {}"}]"""
         resp = self.fetch('/api/v1/repos', method='POST', body=body)
         self.assertEqual(HTTPStatus.BAD_REQUEST, resp.code)
 
