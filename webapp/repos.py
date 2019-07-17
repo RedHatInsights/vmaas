@@ -44,13 +44,20 @@ class RepoAPI:
 
         return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
 
+    @staticmethod
+    def _modified_since(repo_detail, modified_since_dt):
+        if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
+                repo_detail[REPO_REVISION]) > modified_since_dt):
+            return True
+        return False
+
     def _filter_modified_since(self, repos_to_process, modified_since_dt):
+        """Filter repositories by modified since"""
         filtered_repos_to_process = []
         for label in repos_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-                if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
-                        repo_detail[REPO_REVISION]) > modified_since_dt):
+                if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
                     filtered_repos_to_process.append(label)
         return filtered_repos_to_process
 
@@ -92,16 +99,16 @@ class RepoAPI:
         for label in repo_page_to_process:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
-
-                repolist.setdefault(label, []).append({
-                    "label": label,
-                    "name": repo_detail[REPO_NAME],
-                    "url": repo_detail[REPO_URL],
-                    "basearch": none2empty(repo_detail[REPO_BASEARCH]),
-                    "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
-                    "product": repo_detail[REPO_PRODUCT],
-                    "revision": repo_detail[REPO_REVISION]
-                })
+                if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
+                    repolist.setdefault(label, []).append({
+                        "label": label,
+                        "name": repo_detail[REPO_NAME],
+                        "url": repo_detail[REPO_URL],
+                        "basearch": none2empty(repo_detail[REPO_BASEARCH]),
+                        "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
+                        "product": repo_detail[REPO_PRODUCT],
+                        "revision": repo_detail[REPO_REVISION]
+                    })
             actual_page_size += len(repolist[label])
 
         response = {
