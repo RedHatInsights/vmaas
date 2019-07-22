@@ -90,7 +90,8 @@ class RepositoryController:
             local_path = os.path.join(repo.tmp_directory, os.path.basename(md_path))
             if local_path in failed_items:
                 failed = True
-                self.logger.warning("Download failed: %s (HTTP CODE %d)", urljoin(repo.repo_url, md_path),
+                self.logger.warning("Download failed: LABEL: %s URL: %s (HTTP CODE %d)",
+                                    repo.content_set, urljoin(repo.repo_url, md_path),
                                     failed_items[local_path])
         return failed
 
