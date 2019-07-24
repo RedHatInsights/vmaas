@@ -1,0 +1,8 @@
+global:
+  scrape_interval:     5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'vmaas'
+    static_configs:
+      - targets: ['vmaas_reposcan:8081', 'vmaas_webapp:8080']
