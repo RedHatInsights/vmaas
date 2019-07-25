@@ -134,3 +134,4 @@ docker-compose -f docker-compose.test.yml up --build --exit-code-from test
 
 ### Developing / Debugging
 You can build and start your container in ["developer mode"](doc/developer_mode.md).
+You can tune metrics using Prometheus and Grafana dev containers, see [doc/metrics.md](doc/metrics.md).
