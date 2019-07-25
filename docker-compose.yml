@@ -109,8 +109,24 @@ services:
       - vmaas_webapp
     restart: always
 
+  vmaas_grafana:
+    container_name: vmaas-grafana
+    image: grafana/grafana:6.2.5
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - vmaas_prometheus
+    ports:
+      - 3000:3000
+    env_file:
+      - ./monitoring/grafana/grafana.conf
+    user: "104"
+    restart: always
+
 volumes:
   vmaas-db-data:
   vmaas-dump-data:
   vmaas-reposcan-tmp:
   prometheus-data:
+  grafana-data:
