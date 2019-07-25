@@ -9,7 +9,7 @@
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, centos-containers."
+        msg: "You must run this playbook with tags! Available tags: up, down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, centos-containers."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -52,13 +52,12 @@
         - centos-containers
 
     - name: Create OpenShift routes
-      shell: oc create route edge apidoc --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
+      shell: oc create route edge apidoc --service vmaas-apidoc --port {{ apidoc_container_port }}; oc create route edge reposcan --service vmaas-reposcan --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp --port {{ webapp_container_port }};
       tags:
         - up
-        - routes-up
 
-    - name: Create temporary OpenShift routes
-      shell: oc create route edge apidoc-upgrade --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
+    - name: Create OpenShift upgrade routes
+      shell: oc create route edge apidoc-upgrade --service vmaas-apidoc-upgrade --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service vmaas-reposcan-upgrade --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service vmaas-webapp-upgrade --port {{ webapp_container_port }}
       tags:
         - upgrade-start
 
@@ -91,25 +90,26 @@
         - upgrade-start
 
     - name: Create VMaaS
-      shell: find ./openshift/ -name '*.yml' -o -name '*.yaml' | sort | xargs -n1 oc process --ignore-unknown-parameters=true -p RELEASE={{ app_id }} -p GIT_REF={{ git_branch_name.stdout }} -p WEBAPP_URL={{ webapp_url.stdout }} -p REPOSCAN_URL={{ reposcan_url.stdout }} DOCKERFILE_SUFFIX={{ dockerfile_suffix }} -f | oc create -f -
+      shell: find ./openshift/ -name '*.yml' | grep -v /openshift/svc/ | sort | xargs -n1 oc process --ignore-unknown-parameters=true -p RELEASE={{ app_id }} -p GIT_REF={{ git_branch_name.stdout }} -p WEBAPP_URL={{ webapp_url.stdout }} -p REPOSCAN_URL={{ reposcan_url.stdout }} DOCKERFILE_SUFFIX={{ dockerfile_suffix }} -f | oc apply -f -
       tags:
         - up
         - upgrade-start
+
+    - name: Upgrade VMaaS services
+      shell: find ./openshift/svc/ -name '*.yml' | sort | xargs -n1 oc process -p RELEASE={{ app_id }} -f | oc apply -f -
+      tags:
+        - up
+        - upgrade-finish
 
     - name: Rebuild VMaaS images
       shell: oc start-build vmaas-apidoc-{{ app_id }}; oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}; oc start-build vmaas-websocket-{{ app_id }}
       tags:
         - rebuild-images
 
-    - name: Point routes to the current deployment
-      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"vmaas-apidoc-{{ app_id }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"vmaas-reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"vmaas-webapp-{{ app_id }}"}}}'
-      tags:
-        - upgrade-finish
-
-    - name: Delete temporary OpenShift routes
+    - name: Delete upgrade routes
       shell: oc delete route apidoc-upgrade reposcan-upgrade webapp-upgrade
       tags:
-        - upgrade-finish
+        - upgrade-cleanup
       ignore_errors: True
 
     - name: Configure API documentation
@@ -119,10 +119,13 @@
         - upgrade-finish
 
     - name: Delete OpenShift routes
-      shell: oc delete route apidoc reposcan webapp
+      shell: oc get route | awk '{print $1}' | grep {{ item }} | xargs oc delete route
+      with_items:
+        - apidoc
+        - reposcan
+        - webapp
       tags:
         - down
-        - routes-down
       ignore_errors: True
 
     - name: Delete old Config Maps
@@ -137,14 +140,15 @@
       ignore_errors: True
 
     - name: Delete old Services
-      shell: oc get svc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete svc
+      shell: oc delete service/{{ item }}
       with_items:
-        - vmaas-apidoc
-        - vmaas-reposcan
-        - vmaas-webapp
-        - vmaas-websocket
-        - vmaas-database
+        - vmaas-apidoc-upgrade
+        - vmaas-reposcan-upgrade
+        - vmaas-webapp-upgrade
+        - vmaas-websocket-upgrade
+        - vmaas-database-upgrade
       tags:
+        - up
         - upgrade-cleanup
       ignore_errors: True
 
