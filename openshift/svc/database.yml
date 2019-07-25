@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: vmaas-${RELEASE}
+
+parameters:
+- name: RELEASE
+  description: Release of this component
+  value: '1'
+
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas
+    name: vmaas-database
+  spec:
+    ports:
+    - {name: '5432', port: 5432, targetPort: 5432}
+    selector:
+      component: vmaas-database-${RELEASE}
+  status:
+    loadBalancer: {}

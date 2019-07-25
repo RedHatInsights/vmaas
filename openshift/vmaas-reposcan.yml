@@ -285,8 +285,8 @@ objects:
       prometheus.io/scrape: "true"
     creationTimestamp: null
     labels:
-      app: vmaas-${RELEASE}
-    name: vmaas-reposcan-${RELEASE}
+      app: vmaas-upgrade
+    name: vmaas-reposcan-upgrade
   spec:
     ports:
     - {name: '8081', port: 8081, targetPort: 8081}

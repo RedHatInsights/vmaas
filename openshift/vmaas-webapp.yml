@@ -182,8 +182,8 @@ objects:
       prometheus.io/scrape: "true"
     creationTimestamp: null
     labels:
-      app: vmaas-${RELEASE}
-    name: vmaas-webapp-${RELEASE}
+      app: vmaas-upgrade
+    name: vmaas-webapp-upgrade
   spec:
     ports:
     - {name: '8080', port: 8080, targetPort: 8080}

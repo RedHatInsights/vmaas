@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: vmaas-${RELEASE}
+
+parameters:
+- name: RELEASE
+  description: Release of this component
+  value: '1'
+
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: vmaas
+    name: vmaas-websocket
+  spec:
+    ports:
+    - {name: '8082', port: 8082, targetPort: 8082}
+    selector:
+      component: vmaas-websocket-${RELEASE}
+  status:
+    loadBalancer: {}

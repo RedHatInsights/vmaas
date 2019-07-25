@@ -193,8 +193,8 @@ objects:
     annotations: {}
     creationTimestamp: null
     labels:
-      app: vmaas-${RELEASE}
-    name: vmaas-database-${RELEASE}
+      app: vmaas-upgrade
+    name: vmaas-database-upgrade
   spec:
     ports:
     - {name: '5432', port: 5432, targetPort: 5432}

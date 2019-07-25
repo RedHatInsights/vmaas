@@ -138,8 +138,8 @@ objects:
     annotations: {}
     creationTimestamp: null
     labels:
-      app: vmaas-${RELEASE}
-    name: vmaas-apidoc-${RELEASE}
+      app: vmaas-upgrade
+    name: vmaas-apidoc-upgrade
   spec:
     ports:
     - {name: '8000', port: 8000, targetPort: 8080}

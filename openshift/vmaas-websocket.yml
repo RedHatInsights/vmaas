@@ -122,8 +122,8 @@ objects:
     annotations: {}
     creationTimestamp: null
     labels:
-      app: vmaas-${RELEASE}
-    name: vmaas-websocket-${RELEASE}
+      app: vmaas-upgrade
+    name: vmaas-websocket-upgrade
   spec:
     ports:
     - {name: '8082', port: 8082, targetPort: 8082}
