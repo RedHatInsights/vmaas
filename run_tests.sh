@@ -2,6 +2,7 @@
 
 rc=0
 
+# Check consistency of testing and production dockerfiles.
 for dockerfile in */Dockerfile
 do
     if [ ! -f "$dockerfile" ]; then
@@ -23,6 +24,7 @@ do
 done
 echo ""
 
+# Run tests.
 TESTDIR=$1
 if [ ! -d "$TESTDIR" ] ; then
     echo "usage: $(basename $0) <testdir>" >&2
