@@ -9,7 +9,8 @@ services:
       CI: "true"
       TRAVIS: "true"
     command: >
-      bash -c "cd /vmaas && ./run_tests.sh reposcan \
+      bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
+                         && ./run_tests.sh reposcan \
                          && ./run_tests.sh webapp \
                          && ./run_tests.sh websocket \
                          && bash <(curl -s https://codecov.io/bash)"
