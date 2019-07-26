@@ -28,7 +28,7 @@ class PackagesAPI:
         """Returns list of packages matching a provided regex."""
         name, epoch, ver, rel, arch = utils.split_packagename(regex)
 
-        if not regex[-2:] == '.*':
+        if not (regex.find('.+') != -1 or regex.find('.*') != -1):
             if name and epoch and ver and rel and arch:
                 # If there is no regular expression return all packages what we get in api request
                 return [regex]
