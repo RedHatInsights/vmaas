@@ -1,8 +1,6 @@
 """Unit tests for errata module."""
 # pylint: disable=unused-argument
 
-import datetime
-
 from test import schemas
 from test import tools
 from test.conftest import TestBase
@@ -10,13 +8,17 @@ from test.conftest import TestBase
 import pytest
 import pytz
 
+from utils import parse_datetime
 from cache import ERRATA_UPDATED, ERRATA_ISSUED
 from errata import ErrataAPI
 
 ERRATA_NAME = "RHBA-2015:0364"
+MODIFIED_IN_FUTURE = "2099-01-01T00:00:00+00:00"
+DATE_SINCE = "2014-04-06T01:23:45+02:00"
 ERRATA_JSON_EMPTY = {}
 ERRATA_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
-ERRATA_JSON = {"errata_list": [ERRATA_NAME], "modified_since": "2014-04-06T01:23:45+02:00"}
+ERRATA_JSON = {"errata_list": [ERRATA_NAME]}
+ERRATA_JSON_MODIFIED = {"errata_list": [ERRATA_NAME], "modified_since": DATE_SINCE}
 ERRATA_JSON_EMPTY_LIST = {"errata_list": [""]}
 ERRATA_JSON_NON_EXIST = {"errata_list": ["RHSA-9999:9999"]}
 
@@ -45,6 +47,7 @@ class TestErrataAPI(TestBase):
         errata_detail2 = self.cache.errata_detail[ERRATA_NAME]
         errata_detail_list2 = list(errata_detail2)
         errata_detail_list2[ERRATA_UPDATED] = None
+        errata_detail_list2[ERRATA_ISSUED] = None
         self.cache.errata_detail["RHSA-W/O:MODIFIED"] = errata_detail_list2
 
         self.errata_api = ErrataAPI(self.cache)
@@ -89,14 +92,30 @@ class TestErrataAPI(TestBase):
         assert ERRATA_NAME in response["errata_list"]
         assert tools.match(CORRECT_RESPONSE, response["errata_list"][ERRATA_NAME]) is True
 
+    def test_page_size(self):
+        """Test errata API page size"""
+        response = self.errata_api.process_list(api_version="v1", data=ERRATA_JSON)
+        page_size = len(response['errata_list'])
+        assert response['page_size'] == page_size
+
     def test_modified_since(self):
         """Test errata API with 'modified_since' property."""
-        errata = ERRATA_JSON.copy()
-        errata["modified_since"] = str(datetime.datetime.now().replace(tzinfo=pytz.UTC))
+        response = self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_MODIFIED)
+        modified_from_resp = parse_datetime(response['errata_list'][ERRATA_NAME]['updated'])
+        modified_since = parse_datetime(DATE_SINCE)
+        assert modified_from_resp >= modified_since
+        assert DATE_SINCE == response['modified_since']
+
+    def test_modified_in_future(self):
+        """Test CVE API with 'modified_since' property in future."""
+        errata = ERRATA_JSON_MODIFIED.copy()
+        errata["modified_since"] = MODIFIED_IN_FUTURE
         response = self.errata_api.process_list(api_version="v1", data=errata)
         assert tools.match(EMPTY_RESPONSE, response) is True
 
-        # without modified date
+    def test_without_modified(self):
+        """Test errata without modified date. In response  {updated: None}."""
+        errata = ERRATA_JSON_MODIFIED.copy()
         errata["errata_list"] = ["RHSA-W/O:MODIFIED"]
         response = self.errata_api.process_list(api_version="v1", data=errata)
         assert tools.match(EMPTY_RESPONSE, response) is True
