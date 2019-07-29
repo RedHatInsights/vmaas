@@ -74,6 +74,20 @@ services:
     depends_on:
       - vmaas_reposcan
       - vmaas_webapp
+      - vmaas_webapp_utils
+    
+  vmaas_webapp_utils:
+    container_name: vmaas-webapp-utils
+    build:
+        context: .
+        dockerfile: ./webapp-utils/Dockerfile
+    image: vmaas/webapp-utils:latest
+    restart: unless-stopped
+    ports:
+      - 8083:8083
+    depends_on:
+      - vmaas_webapp
+
 
 volumes:
   vmaas-db-data:
