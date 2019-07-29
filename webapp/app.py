@@ -6,6 +6,7 @@ Main web API module
 import os
 import sre_constants
 import json
+from http import HTTPStatus
 
 from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
@@ -79,68 +80,32 @@ class BaseHandler(tornado.web.RequestHandler):
         elif self.request.body:
             json_data = self.request.body
 
-        try:
-            data = json.loads(json_data)
-        except ValueError:
-            data = None
+        data = json.loads(json_data)
         return data
 
     @gen.coroutine
-    def handle_post(self, api_endpoint, api_version):
-        """Takes care of validation of input and execution of POST methods."""
+    def handle_request(self, api_endpoint, api_version, param_name=None, param=None):
+        """Takes care of validation of input and execution of request."""
         REQUEST_COUNTS.labels('post', type(api_endpoint).__name__).inc()
-        code = 400
-        data = self.get_post_data()
-        if data:
-            try:
-                res = api_endpoint.process_list(api_version, data)
-                code = 200
-            except ValidationError as validerr:
-                if validerr.absolute_path:
-                    res = '%s : %s' % (validerr.absolute_path.pop(), validerr.message)
-                else:
-                    res = '%s' % validerr.message
-                LOGGER.error('ValidationError: %s', res)
-            except ValueError as valuerr:
-                res = str(valuerr)
-                LOGGER.error('ValueError: %s', res)
-            except sre_constants.error as sre_err:
-                res = 'Regular expression error: ' + str(sre_err)
-                LOGGER.error('sre_constants.error: %s', res)
-            except Exception as err: # pylint: disable=broad-except
-                err_id = err.__hash__()
-                res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
-                code = 500
-                LOGGER.exception(res)
-                LOGGER.info("Input data for <%s>: %s", err_id, data)
-        else:
-            res = 'Error: malformed input JSON.'
-            LOGGER.error(res)
-
+        data = None
+        try:
+            if self.request.method == 'POST':
+                data = self.get_post_data()
+            else:
+                data = {param_name: [param]}
+            res = api_endpoint.process_list(api_version, data)
+            code = HTTPStatus.OK
+        except (ValidationError, ValueError, sre_constants.error) as ex:
+            res = repr(ex)
+            code = HTTPStatus.BAD_REQUEST
+        except Exception as err:  # pylint: disable=broad-except
+            err_id = err.__hash__()
+            res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
+            code = HTTPStatus.INTERNAL_SERVER_ERROR
+            LOGGER.exception(res)
+            LOGGER.error("Input data for <%s>: %s", err_id, data)
         self.set_status(code)
         self.write(res)
-
-    @gen.coroutine
-    def handle_get(self, api_endpoint, api_version, param_name, param):
-        """Takes care of validation of input and execution of GET methods."""
-        REQUEST_COUNTS.labels('get', type(api_endpoint).__name__).inc()
-        code = 400
-        try:
-            result = api_endpoint.process_list(api_version, {param_name : [param]})
-            code = 200
-        except ValueError as valuerr:
-            result = str(valuerr)
-            LOGGER.error('ValueError: %s', result)
-        except sre_constants.error as sre_err:
-            result = 'Regular expression error: ' + str(sre_err)
-            LOGGER.warning('sre_constants.error: %s', result)
-        except Exception as err: # pylint: disable=broad-except
-            err_id = err.__hash__()
-            result = 'Internal server error <%s>: please include this error id in bug report.' % err_id
-            code = 500
-            LOGGER.exception(result)
-        self.set_status(code)
-        self.write(result)
 
     def on_finish(self):
         LOGGER.info("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
@@ -245,7 +210,7 @@ class UpdatesHandlerGet(BaseHandler):
         tags:
           - updates
         """
-        self.handle_get(self.updates_api, 1, 'package_list', nevra)
+        self.handle_request(self.updates_api, 1, 'package_list', nevra)
 
 
 class UpdatesHandlerPost(BaseHandler):
@@ -303,7 +268,7 @@ class UpdatesHandlerPost(BaseHandler):
         tags:
           - updates
         """
-        self.handle_post(self.updates_api, 1)
+        self.handle_request(self.updates_api, 1)
 
 
 class UpdatesHandlerV2Get(BaseHandler):
@@ -329,7 +294,7 @@ class UpdatesHandlerV2Get(BaseHandler):
         tags:
           - updates
         """
-        self.handle_get(self.updates_api, 2, 'package_list', nevra)
+        self.handle_request(self.updates_api, 2, 'package_list', nevra)
 
 
 class UpdatesHandlerV2Post(BaseHandler):
@@ -387,7 +352,7 @@ class UpdatesHandlerV2Post(BaseHandler):
         tags:
           - updates
         """
-        self.handle_post(self.updates_api, 2)
+        self.handle_request(self.updates_api, 2)
 
 
 class CVEHandlerGet(BaseHandler):
@@ -413,7 +378,7 @@ class CVEHandlerGet(BaseHandler):
         tags:
           - cves
         """
-        self.handle_get(self.cve_api, 1, 'cve_list', cve)
+        self.handle_request(self.cve_api, 1, 'cve_list', cve)
 
 
 class CVEHandlerPost(BaseHandler):
@@ -456,7 +421,7 @@ class CVEHandlerPost(BaseHandler):
         tags:
           - cves
         """
-        self.handle_post(self.cve_api, 1)
+        self.handle_request(self.cve_api, 1)
 
 
 class ReposHandlerGet(BaseHandler):
@@ -483,7 +448,7 @@ class ReposHandlerGet(BaseHandler):
         tags:
           - repos
         """
-        self.handle_get(self.repo_api, 1, 'repository_list', repo)
+        self.handle_request(self.repo_api, 1, 'repository_list', repo)
 
 
 class ReposHandlerPost(BaseHandler):
@@ -524,7 +489,7 @@ class ReposHandlerPost(BaseHandler):
         tags:
           - repos
         """
-        self.handle_post(self.repo_api, 1)
+        self.handle_request(self.repo_api, 1)
 
 
 class ErrataHandlerGet(BaseHandler):
@@ -551,7 +516,7 @@ class ErrataHandlerGet(BaseHandler):
         tags:
           - errata
         """
-        self.handle_get(self.errata_api, 1, 'errata_list', erratum)
+        self.handle_request(self.errata_api, 1, 'errata_list', erratum)
 
 
 class ErrataHandlerPost(BaseHandler):
@@ -591,7 +556,7 @@ class ErrataHandlerPost(BaseHandler):
         tags:
           - errata
         """
-        self.handle_post(self.errata_api, 1)
+        self.handle_request(self.errata_api, 1)
 
 
 class PackagesHandlerGet(BaseHandler):
@@ -616,7 +581,7 @@ class PackagesHandlerGet(BaseHandler):
         tags:
           - packages
         """
-        self.handle_get(self.packages_api, 1, 'package_list', nevra)
+        self.handle_request(self.packages_api, 1, 'package_list', nevra)
 
 
 class PackagesHandlerPost(BaseHandler):
@@ -652,7 +617,7 @@ class PackagesHandlerPost(BaseHandler):
         tags:
           - packages
         """
-        self.handle_post(self.packages_api, 1)
+        self.handle_request(self.packages_api, 1)
 
 
 class VulnerabilitiesHandlerGet(BaseHandler):
@@ -678,7 +643,7 @@ class VulnerabilitiesHandlerGet(BaseHandler):
         tags:
           - vulnerabilities
         """
-        self.handle_get(self.vulnerabilities_api, 1, 'package_list', nevra)
+        self.handle_request(self.vulnerabilities_api, 1, 'package_list', nevra)
 
 
 class VulnerabilitiesHandlerPost(BaseHandler):
@@ -736,7 +701,8 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         tags:
           - vulnerabilities
         """
-        self.handle_post(self.vulnerabilities_api, 1)
+        self.handle_request(self.vulnerabilities_api, 1)
+
 
 def setup_apispec(handlers):
     """Setup definitions and handlers for apispec."""
