@@ -6,7 +6,6 @@ Main web API module
 import os
 import sre_constants
 import json
-from http import HTTPStatus
 
 from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
@@ -25,8 +24,7 @@ from packages import PackagesAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from logging_utils import init_logging, get_logger
-from probes import REQUEST_COUNTS, UPDATES_V1_TIME, UPDATES_V2_TIME, CVES_TIME, REPOS_TIME, \
-     ERRATA_TIME, VULNERABILITIES_TIME
+from probes import REQUEST_COUNTS, REQUEST_TIME
 
 # pylint: disable=too-many-lines
 
@@ -86,7 +84,6 @@ class BaseHandler(tornado.web.RequestHandler):
     @gen.coroutine
     def handle_request(self, api_endpoint, api_version, param_name=None, param=None):
         """Takes care of validation of input and execution of request."""
-        REQUEST_COUNTS.labels('post', type(api_endpoint).__name__).inc()
         data = None
         try:
             if self.request.method == 'POST':
@@ -94,20 +91,22 @@ class BaseHandler(tornado.web.RequestHandler):
             else:
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
-            code = HTTPStatus.OK
+            code = 200
         except (ValidationError, ValueError, sre_constants.error) as ex:
             res = repr(ex)
-            code = HTTPStatus.BAD_REQUEST
+            code = 400
         except Exception as err:  # pylint: disable=broad-except
             err_id = err.__hash__()
             res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
-            code = HTTPStatus.INTERNAL_SERVER_ERROR
+            code = 500
             LOGGER.exception(res)
             LOGGER.error("Input data for <%s>: %s", err_id, data)
         self.set_status(code)
         self.write(res)
 
     def on_finish(self):
+        REQUEST_TIME.labels(self.request.method, self.request.path).observe(self.request.request_time())
+        REQUEST_COUNTS.labels(self.request.method, self.request.path, self.get_status()).inc()
         LOGGER.info("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
                     self.get_status(), self.request.path, self.request.request_time())
 
@@ -190,7 +189,6 @@ class DBChangeHandler(BaseHandler):
 class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    @UPDATES_V1_TIME.time()
     def get(self, nevra=None):
         """
         ---
@@ -216,7 +214,6 @@ class UpdatesHandlerGet(BaseHandler):
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    @UPDATES_V1_TIME.time()
     def post(self):
         """
         ---
@@ -274,7 +271,6 @@ class UpdatesHandlerPost(BaseHandler):
 class UpdatesHandlerV2Get(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    @UPDATES_V2_TIME.time()
     def get(self, nevra=None):
         """
         ---
@@ -300,7 +296,6 @@ class UpdatesHandlerV2Get(BaseHandler):
 class UpdatesHandlerV2Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    @UPDATES_V2_TIME.time()
     def post(self):
         """
         ---
@@ -358,7 +353,6 @@ class UpdatesHandlerV2Post(BaseHandler):
 class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
-    @CVES_TIME.time()
     def get(self, cve=None):
         """
         ---
@@ -384,7 +378,6 @@ class CVEHandlerGet(BaseHandler):
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
-    @CVES_TIME.time()
     def post(self):
         """
         ---
@@ -427,7 +420,6 @@ class CVEHandlerPost(BaseHandler):
 class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
 
-    @REPOS_TIME.time()
     def get(self, repo=None):
         """
         ---
@@ -454,7 +446,6 @@ class ReposHandlerGet(BaseHandler):
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
-    @REPOS_TIME.time()
     def post(self):
         """
         ---
@@ -495,7 +486,6 @@ class ReposHandlerPost(BaseHandler):
 class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
 
-    @ERRATA_TIME.time()
     def get(self, erratum=None):
         """
         ---
@@ -522,7 +512,6 @@ class ErrataHandlerGet(BaseHandler):
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
-    @ERRATA_TIME.time()
     def post(self):
         """
         ---
@@ -623,7 +612,6 @@ class PackagesHandlerPost(BaseHandler):
 class VulnerabilitiesHandlerGet(BaseHandler):
     """Handler for processing /vulnerabilities GET requests."""
 
-    @VULNERABILITIES_TIME.time()
     def get(self, nevra=None):
         """
         ---
@@ -649,7 +637,6 @@ class VulnerabilitiesHandlerGet(BaseHandler):
 class VulnerabilitiesHandlerPost(BaseHandler):
     """Handler for processing /vulnerabilities POST requests."""
 
-    @VULNERABILITIES_TIME.time()
     def post(self):
         """
         ---
