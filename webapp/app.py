@@ -49,7 +49,6 @@ LOGGER = get_logger(__name__)
 class BaseHandler(tornado.web.RequestHandler):
     """Base handler setting CORS headers."""
 
-
     db_cache = None
     updates_api = None
     repo_api = None
@@ -143,12 +142,18 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_status(code)
         self.write(result)
 
+    def on_finish(self):
+        LOGGER.info("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
+                    self.get_status(), self.request.path, self.request.request_time())
+
+
 class MetricsHandler(BaseHandler):
     """Handle requests to the metrics"""
 
     def get(self):
         """Get prometheus metrics"""
         self.write(generate_latest())
+
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
