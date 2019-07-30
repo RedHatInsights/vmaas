@@ -15,6 +15,8 @@ class NamedCursor:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cursor.close()
+        # NOTE: An exception is raised and passes to the caller
+        # if a db exception occurs
 
 class DatabaseHandler:
     """Static class maintaining single PostgreSQL connection."""
