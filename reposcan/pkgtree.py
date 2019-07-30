@@ -59,35 +59,41 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         dump_filename = '%s-%s' % (self.filename, timestamp)
         self.outputdata['timestamp'] = timestamp
         self.outputdata['packages'] = {}
-        LOGGER.info("Loading data")
-        self._load_packagenames()
-        self._load_evr()
-        self._load_arch()
-        self._load_repodata()
-        self._load_cves()
-        self._load_errata()
-        self._associate_cves_to_errata()
-        self._load_packages()
-        self._load_module_streams()
-        self._load_modules()
-        self._associate_modules()
-        self._associate_repos()
-        self._associate_errata()
-        LOGGER.info("Exporting data to %s", dump_filename)
-        with gzip.open(dump_filename, 'wt') as dump_file:
-            json.dump(self.outputdata, dump_file, indent=self.pkgtree_indent, ensure_ascii=False)
-        # relink to the latest file
+        LOGGER.info("Loading pkgtree data")
         try:
-            os.unlink(self.filename)
-        except FileNotFoundError:
-            pass
-        os.symlink(dump_filename, self.filename)
-        LOGGER.info("Finished exporting data.  Elapsed time: %s", now() - starttime)
-        # remove old data above limit
-        old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
-        for fname in old_data[self.pkgtree_keep_copies:]:
-            LOGGER.info("Removing old dump %s", fname)
-            os.unlink(fname)
+            self._load_packagenames()
+            self._load_evr()
+            self._load_arch()
+            self._load_repodata()
+            self._load_cves()
+            self._load_errata()
+            self._associate_cves_to_errata()
+            self._load_packages()
+            self._load_module_streams()
+            self._load_modules()
+            self._associate_modules()
+            self._associate_repos()
+            self._associate_errata()
+        except Exception: # pylint: disable=broad-except
+            # database exceptions caught here
+            LOGGER.exception("Failed to export pkgtree")
+        else:
+            # only write pkgtree if all db queries succeeded
+            LOGGER.info("Exporting data to %s", dump_filename)
+            with gzip.open(dump_filename, 'wt') as dump_file:
+                json.dump(self.outputdata, dump_file, indent=self.pkgtree_indent, ensure_ascii=False)
+            # relink to the latest file
+            try:
+                os.unlink(self.filename)
+            except FileNotFoundError:
+                pass
+            os.symlink(dump_filename, self.filename)
+            LOGGER.info("Finished exporting data.  Elapsed time: %s", now() - starttime)
+            # remove old data above limit
+            old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
+            for fname in old_data[self.pkgtree_keep_copies:]:
+                LOGGER.info("Removing old dump %s", fname)
+                os.unlink(fname)
 
     def _load_packagenames(self):
         """Load the datadict and start filling in outputdata"""
