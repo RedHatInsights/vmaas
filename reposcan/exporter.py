@@ -33,32 +33,42 @@ class DataDump:
         timestamp = format_datetime(now())
         dump_filename = "%s-%s" % (self.filename, timestamp)
         LOGGER.info("Exporting data to %s", dump_filename)
-        with shelve.open(dump_filename, 'c') as dump:
-            self.dump_packagename(dump)
-            self.dump_updates(dump)
-            self.dump_evr(dump)
-            self.dump_arch(dump)
-            self.dump_arch_compat(dump)
-            self.dump_package_details(dump)
-            self.dump_repo(dump)
-            self.dump_errata(dump)
-            self.dump_cves(dump)
-            self.dump_modules(dump)
-            self.dump_dbchange(dump)
-            dump["dbchange:exported"] = timestamp
-        # relink to the latest file
         try:
-            os.unlink(self.filename)
-        except FileNotFoundError:
-            pass
-        os.symlink(dump_filename, self.filename)
-        # remove old data above limit
-        old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
-        for fname in old_data[self.keep_copies:]:
-            LOGGER.info("Removing old dump %s", fname)
-            os.unlink(fname)
+            with shelve.open(dump_filename, 'c') as dump:
+                self._dump_packagename(dump)
+                self._dump_updates(dump)
+                self._dump_evr(dump)
+                self._dump_arch(dump)
+                self._dump_arch_compat(dump)
+                self._dump_package_details(dump)
+                self._dump_repo(dump)
+                self._dump_errata(dump)
+                self._dump_cves(dump)
+                self._dump_modules(dump)
+                self._dump_dbchange(dump)
+                dump["dbchange:exported"] = timestamp
+        except Exception: # pylint: disable=broad-except
+            # database exceptions caught here
+            LOGGER.exception("Failed to create dbdump")
+            try:
+                # get rid of incomplete dump file
+                os.unlink(dump_filename)
+            except FileNotFoundError:
+                pass
+        else:
+            # relink to the latest file only if no db exceptions
+            try:
+                os.unlink(self.filename)
+            except FileNotFoundError:
+                pass
+            os.symlink(dump_filename, self.filename)
+            # remove old data above limit
+            old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
+            for fname in old_data[self.keep_copies:]:
+                LOGGER.info("Removing old dump %s", fname)
+                os.unlink(fname)
 
-    def dump_packagename(self, dump):
+    def _dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
         with self._named_cursor() as cursor:
             cursor.execute("""select distinct pn.id, pn.name
@@ -75,7 +85,7 @@ class DataDump:
                 dump["id2packagename:%s" % name_id] = pkg_name
                 self.packagename_ids.append(name_id)
 
-    def dump_updates(self, dump):
+    def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
         if self.packagename_ids:
             with self._named_cursor() as cursor:
@@ -98,7 +108,7 @@ class DataDump:
                 dump.update(updates)
                 dump.update(updates_index)
 
-    def dump_evr(self, dump):
+    def _dump_evr(self, dump):
         """Select all evrs and put them into dictionary"""
         with self._named_cursor() as cursor:
             cursor.execute("select id, epoch, version, release from evr")
@@ -106,7 +116,7 @@ class DataDump:
                 dump["evr2id:%s:%s:%s" % (epoch, ver, rel)] = evr_id
                 dump["id2evr:%s" % evr_id] = (epoch, ver, rel)
 
-    def dump_arch(self, dump):
+    def _dump_arch(self, dump):
         """Select all archs and put them into dictionary"""
         with self._named_cursor() as cursor:
             cursor.execute("select id, name from arch")
@@ -114,7 +124,7 @@ class DataDump:
                 dump["arch2id:%s" % name] = arch_id
                 dump["id2arch:%s" % arch_id] = name
 
-    def dump_arch_compat(self, dump):
+    def _dump_arch_compat(self, dump):
         """Select information about archs compatibility"""
         with self._named_cursor() as cursor:
             cursor.execute("select from_arch_id, to_arch_id from arch_compatibility")
@@ -123,7 +133,7 @@ class DataDump:
                 arch_compat.setdefault("arch_compat:%s" % from_arch_id, set()).add(to_arch_id)
             dump.update(arch_compat)
 
-    def dump_package_details(self, dump):
+    def _dump_package_details(self, dump):
         """Select details about packages (for previously selected package names)"""
         if self.packagename_ids:
             with self._named_cursor() as cursor:
@@ -141,7 +151,7 @@ class DataDump:
                         src_pkg_id2pkg_ids.setdefault("src_pkg_id2pkg_ids:%s" % source_package_id, []).append(pkg_id)
                 dump.update(src_pkg_id2pkg_ids)
 
-    def dump_repo(self, dump):
+    def _dump_repo(self, dump):
         """Select repo mappings"""
 
         # Select repo detail mapping
@@ -183,7 +193,7 @@ class DataDump:
                     pkgid2repoids.setdefault("pkgid2repoids:%s" % pkg_id, []).append(repo_id)
                 dump.update(pkgid2repoids)
 
-    def dump_errata(self, dump):
+    def _dump_errata(self, dump):
         """Select errata mappings"""
         # Select errata ID to name mapping
         with self._named_cursor() as cursor:
@@ -271,7 +281,7 @@ class DataDump:
                                                          errataid2refs.get(errata_id, []),
                                                          url)
 
-    def dump_cves(self, dump):
+    def _dump_cves(self, dump):
         """Select cve details"""
         # Select CWE to CVE mapping
         cveid2cwe = {}
@@ -338,7 +348,7 @@ class DataDump:
                                                 cveid2eid.get(cve_id, []),
                                                 cvss2_score, cvss2_metrics, source)
 
-    def dump_modules(self, dump):
+    def _dump_modules(self, dump):
         """Select module information"""
         if self.errata_ids:
             with self._named_cursor() as cursor:
@@ -366,7 +376,7 @@ class DataDump:
                 modulename2id.setdefault("modulename2id:%s:%s" % (name, stream_name), set()).add(stream_id)
             dump.update(modulename2id)
 
-    def dump_dbchange(self, dump):
+    def _dump_dbchange(self, dump):
         """Select db change details"""
         with self._named_cursor() as cursor:
             cursor.execute("""select errata_changes,
