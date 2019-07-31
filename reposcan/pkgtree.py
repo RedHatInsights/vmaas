@@ -10,6 +10,7 @@ import json
 import gzip
 from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
+from common.fileutil import remove_file_if_exists
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"
@@ -83,17 +84,14 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
             with gzip.open(dump_filename, 'wt') as dump_file:
                 json.dump(self.outputdata, dump_file, indent=self.pkgtree_indent, ensure_ascii=False)
             # relink to the latest file
-            try:
-                os.unlink(self.filename)
-            except FileNotFoundError:
-                pass
+            remove_file_if_exists(self.filename)
             os.symlink(dump_filename, self.filename)
             LOGGER.info("Finished exporting data.  Elapsed time: %s", now() - starttime)
             # remove old data above limit
             old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
             for fname in old_data[self.pkgtree_keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
-                os.unlink(fname)
+                remove_file_if_exists(fname)
 
     def _load_packagenames(self):
         """Load the datadict and start filling in outputdata"""
