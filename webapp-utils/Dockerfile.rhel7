@@ -12,6 +12,7 @@ RUN yum -y update && \
 ADD /webapp-utils/*.sh  /webapp-utils/
 ADD /webapp-utils/*.py  /webapp-utils/
 ADD /webapp-utils/*.txt /webapp-utils/
+ADD /webapp-utils/*.yml /webapp-utils/
 
 RUN pip3 install --upgrade pip && \
     pip3 install -r /webapp-utils/requirements.txt
