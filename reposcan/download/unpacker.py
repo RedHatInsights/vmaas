@@ -7,6 +7,8 @@ import lzma
 import bz2
 
 from common.logging import ProgressLogger, get_logger
+from common.fileutil import remove_file_if_exists
+
 
 DEFAULT_CHUNK_SIZE = "1048576"
 
@@ -49,7 +51,7 @@ class FileUnpacker:
                         if chunk == b"":
                             break
                         unpacked.write(chunk)
-            os.unlink(file_path)
+            remove_file_if_exists(file_path)
             self.progress_logger.update(source=file_path, target=unpacked_file_path)
         else:
             self.progress_logger.update(source=file_path, target="(unknown archive format)")
