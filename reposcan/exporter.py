@@ -8,6 +8,7 @@ import os
 import shelve
 from common.logging import get_logger, init_logging
 from common.dateutil import format_datetime, now
+from common.fileutil import remove_file_if_exists
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"
@@ -50,23 +51,16 @@ class DataDump:
         except Exception: # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump")
-            try:
-                # get rid of incomplete dump file
-                os.unlink(dump_filename)
-            except FileNotFoundError:
-                pass
+            remove_file_if_exists(dump_filename)
         else:
             # relink to the latest file only if no db exceptions
-            try:
-                os.unlink(self.filename)
-            except FileNotFoundError:
-                pass
+            remove_file_if_exists(self.filename)
             os.symlink(dump_filename, self.filename)
             # remove old data above limit
             old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
             for fname in old_data[self.keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
-                os.unlink(fname)
+                remove_file_if_exists(fname)
 
     def _dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
