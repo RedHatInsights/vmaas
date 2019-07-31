@@ -55,6 +55,8 @@ class RepoAPI:
         """Filter repositories by modified since"""
         filtered_repos_to_process = []
         for label in repos_to_process:
+            if label in filtered_repos_to_process:
+                continue
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
