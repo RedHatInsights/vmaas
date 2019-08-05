@@ -10,7 +10,7 @@ from utils import format_datetime, parse_datetime, none2empty, paginate, \
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
                   ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
-                  ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_URL
+                  ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL
 
 JSON_SCHEMA = {
     'type' : 'object',
@@ -97,6 +97,15 @@ class ErrataAPI:
                 continue
 
             bin_pkg_list, src_pkg_list = pkgidlist2packages(self.cache, errata_detail[ERRATA_PKGIDS])
+
+            if errata_detail[ERRATA_MODULE]:
+                for index, module_update in enumerate(errata_detail[ERRATA_MODULE]):
+                    if all(str(elem).isdigit() for elem in errata_detail[ERRATA_MODULE][index]["package_list"]):
+                        module_pkg_list, module_src_pkg_list = pkgidlist2packages(
+                            self.cache, module_update["package_list"])
+                        errata_detail[ERRATA_MODULE][index]["package_list"] = module_pkg_list
+                        errata_detail[ERRATA_MODULE][index]["source_package_list"] = module_src_pkg_list
+
             errata_list[errata] = {
                 "synopsis": none2empty(errata_detail[ERRATA_SYNOPSIS]),
                 "summary": none2empty(errata_detail[ERRATA_SUMMARY]),
@@ -111,6 +120,7 @@ class ErrataAPI:
                 "source_package_list": src_pkg_list,
                 "bugzilla_list": errata_detail[ERRATA_BUGZILLA],
                 "reference_list": errata_detail[ERRATA_REFERENCE],
+                "modules_list": errata_detail[ERRATA_MODULE],
                 "url": none2empty(errata_detail[ERRATA_URL])
                 }
         response["errata_list"] = errata_list
