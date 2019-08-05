@@ -187,7 +187,7 @@ class DataDump:
                     pkgid2repoids.setdefault("pkgid2repoids:%s" % pkg_id, []).append(repo_id)
                 dump.update(pkgid2repoids)
 
-    def _dump_errata(self, dump):
+    def _dump_errata(self, dump):  # pylint: disable=too-many-branches
         """Select errata mappings"""
         # Select errata ID to name mapping
         with self._named_cursor() as cursor:
@@ -253,6 +253,38 @@ class DataDump:
                         errataid2bzs.setdefault(errata_id, []).append(ref_name)
                     else:
                         errataid2refs.setdefault(errata_id, []).append(ref_name)
+
+            # Select errata ID to module mapping
+            errataid2modules = {}
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT distinct p.errata_id, module.name,
+                                  m.stream_name, m.version, m.context
+                                  FROM module_stream m
+                                  LEFT JOIN module on m.module_id = module.id
+                                  LEFT JOIN pkg_errata p ON module_stream_id = m.id
+                                  LEFT JOIN package_name on p.pkg_id = package_name.id
+                                  WHERE p.module_stream_id IS NOT NULL
+                                  AND p.errata_id in %s""", [tuple(self.errata_ids)])
+                for errata_id, module_name, module_stream_name, module_version, module_context in cursor:
+                    errataid2modules.setdefault(errata_id, []).append({"module_name": module_name,
+                                                                       "module_stream": module_stream_name,
+                                                                       "module_version": module_version,
+                                                                       "module_context": module_context,
+                                                                       "package_list": [],
+                                                                       "source_package_list": []})
+            # Select module to package ID mapping
+            modules2pkgid = {}
+            with self._named_cursor() as cursor:
+                cursor.execute("""SELECT distinct errata_id, pkg_id
+                                  FROM pkg_errata
+                                  WHERE module_stream_id is not null
+                                  AND errata_id in %s""", [tuple(self.errata_ids)])
+                for errata_id, pkg_id in cursor:
+                    modules2pkgid.setdefault(errata_id, []).append(pkg_id)
+            for errata_id in modules2pkgid:
+                for module in modules2pkgid[errata_id]:
+                    errataid2modules[errata_id][0]["package_list"].append(module)
+
             # Now pull all the data together for the dump
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
@@ -273,6 +305,7 @@ class DataDump:
                                                          errataid2pkgid.get(errata_id, []),
                                                          errataid2bzs.get(errata_id, []),
                                                          errataid2refs.get(errata_id, []),
+                                                         errataid2modules.get(errata_id, []),
                                                          url)
 
     def _dump_cves(self, dump):

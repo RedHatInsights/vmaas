@@ -988,6 +988,44 @@ def setup_apispec(handlers):
                             "example": "classification-RHSA-2018:0512"
                         }
                     },
+                    "modules_list": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "module_name": {
+                                    "type": "string",
+                                    "example": "postgresql"
+                                },
+                                "module_stream": {
+                                    "type": "string",
+                                    "example": "10"
+                                },
+                                "module_version": {
+                                    "type": "string",
+                                    "example": "820190104140132"
+                                },
+                                "module_context": {
+                                    "type": "string",
+                                    "example": "9edba152"
+                                },
+                                "package_list": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "example": "kernel-2.6.32-696.23.1.el6.x86_64"
+                                    }
+                                },
+                                "source_package_list":{
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "example": "kernel-2.6.32-696.23.1.el6.src"
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "issued": {
                         "type": "string",
                         "example": "2018-03-13T17:31:28+00:00"

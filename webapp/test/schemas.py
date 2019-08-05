@@ -75,6 +75,7 @@ _errata = {
             "package_list": [str],
             "source_package_list": [str],
             "type": str,
+            "modules_list": [dict]
         }
     },
     Optional("modified_since"): str,

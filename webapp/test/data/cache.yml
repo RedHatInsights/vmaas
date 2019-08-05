@@ -48,6 +48,14 @@ errata_detail:
     - '1004107'
     - '1087507'
   - []
+  - - module_name: postgresql
+      module_stream: 10
+      module_version: 820190104140132
+      module_context: 9edba152
+      package_list:
+        - kernel-2.6.32-696.23.1.el6.x86_64
+      source_package_list:
+        - kernel-2.6.32-696.23.1.el6.src
   - https://access.redhat.com/errata/RHBA-2015:0364
 errataid2name:
   444: RHBA-2015:0364
