@@ -25,6 +25,13 @@ ADD /reposcan/rsyncd.conf    /etc/
 RUN pip3 install --upgrade pip && \
     pip3 install -r /reposcan/requirements.txt
 
+ENV MANIFEST_PATH=/reposcan/manifest.txt
+ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-reposcan\/"
+ENV MANIFEST_PYTHON=python3
+ADD /scripts/generate_manifest.sh /generate_manifest.sh
+RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX $MANIFEST_PYTHON && \
+    echo 'MANIFEST:' && cat $MANIFEST_PATH
+
 RUN install -d -m 775 -g root /data && \
     adduser --gid 0 -d /reposcan --no-create-home vmaas
 
