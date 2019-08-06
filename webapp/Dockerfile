@@ -18,6 +18,13 @@ ADD /webapp/*.txt /webapp/
 RUN pip3 install --upgrade pip && \
     pip3 install -r /webapp/requirements.txt
 
+ENV MANIFEST_PATH=/webapp/manifest.txt
+ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-webapp\/"
+ENV MANIFEST_PYTHON=python3
+ADD /scripts/generate_manifest.sh /generate_manifest.sh
+RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX $MANIFEST_PYTHON && \
+    echo 'MANIFEST:' && cat /webapp/manifest.txt
+
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp --no-create-home vmaas
 
