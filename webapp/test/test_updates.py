@@ -1,9 +1,6 @@
 """Unit tests for updates module."""
 # pylint: disable=protected-access
 # pylint: disable=unused-argument
-
-import os
-
 from test import schemas
 from test.conftest import TestBase
 
@@ -28,21 +25,6 @@ UPDATES_JSON_EMPTY_LIST = {"package_list": [""]}
 
 EMPTY_RESPONSE = {"update_list": {"": {}}}
 NON_EXIST_RESPONSE = {"update_list": {"non-exist": {}}}
-
-
-class TestHotCache(TestBase):
-    """Test HotCache class."""
-
-    hot_cache = None
-
-    @pytest.fixture(autouse=True)
-    def setup_api(self, load_cache):
-        """Setup HotCache object."""
-        os.environ["HOTCACHE_PRUNING"] = "5"
-        os.environ["HOTCACHE_LEVELS"] = "3"
-        self.hot_cache = HotCache()
-
-    # TODO: write unit tests for Hot Cache
 
 
 class TestUpdatesAPI(TestBase):
@@ -169,3 +151,67 @@ class TestUpdatesAPI(TestBase):
             # NOTE: use copy of dict with json input, because process_list changes this dict
             self.updates_api.process_list(1, UPDATES_JSON_EMPTY.copy())
         assert "'package_list' is a required property" in str(context)
+
+
+class TestSplayTree(TestBase):
+    """ Set of tests for Splay tree implementation. """
+    hot_cache = HotCache()
+    TEST_NEVRA = [{"key": 1, "content": {"response": "nevra1"}},
+                  {"key": 2, "content": {"response": "nevra2"}},
+                  {"key": 3, "content": {"response": "nevra3"}},
+                  {"key": 4, "content": {"response": "nevra4"}},
+                  {"key": 5, "content": {"response": "nevra5"}},
+                  {"key": 6, "content": {"response": "nevra6"}}]
+
+    @pytest.fixture
+    def setup_small_tree(self):
+        """ Fixture creates small tree for testing. """
+        self.hot_cache.insert(self.TEST_NEVRA[2]["key"], self.TEST_NEVRA[2]["content"])
+        self.hot_cache.insert(self.TEST_NEVRA[0]["key"], self.TEST_NEVRA[0]["content"])
+        self.hot_cache.insert(self.TEST_NEVRA[1]["key"], self.TEST_NEVRA[1]["content"])
+
+    def _setup_huge_tree(self):
+        """ Fixture creates huge tree for pruning tests, etc. """
+        for order in range(0, 1025):
+            self.TEST_NEVRA[0]["key"] = order
+            self.hot_cache.insert(self.TEST_NEVRA[0]["key"], self.TEST_NEVRA[0]["content"])
+
+    def test_insertion_only_one(self):
+        """ Test only one insertion and if its in the tree. """
+        self.hot_cache.insert(self.TEST_NEVRA[0]["key"], self.TEST_NEVRA[0]["content"])
+
+        test_node = self.hot_cache.find(self.TEST_NEVRA[0]["key"])
+        assert test_node == self.TEST_NEVRA[0]["content"]
+
+    def test_find_nonexistent(self):
+        """ Test for finding nonexistent key. """
+        assert self.hot_cache.find(10) is None
+
+    def test_insertion_more(self, setup_small_tree):
+        """ Test for insertion more keys. """
+        test_node = self.hot_cache.find(self.TEST_NEVRA[0]["key"])
+        assert test_node == self.TEST_NEVRA[0]["content"]
+
+        test_node = self.hot_cache.find(self.TEST_NEVRA[2]["key"])
+        assert test_node == self.TEST_NEVRA[2]["content"]
+
+        test_node = self.hot_cache.find(self.TEST_NEVRA[1]["key"])
+        assert test_node == self.TEST_NEVRA[1]["content"]
+
+    def test_insertion_count(self, setup_small_tree):
+        """ Test for counting inserts. """
+        assert self.hot_cache.inserts == 3
+
+    def test_update_key(self, setup_small_tree):
+        """ Test for updating node content in tree. """
+        updated_content = {"reponse": "updatednevra2"}
+
+        self.hot_cache.insert(self.TEST_NEVRA[2]["key"], updated_content)
+
+        test_node = self.hot_cache.find(self.TEST_NEVRA[2]["key"])
+        assert test_node == updated_content
+
+    def test_pruning(self):
+        """ Test if the tree gets pruned after 1024 inserts. """
+        self._setup_huge_tree()
+        assert self.hot_cache.inserts == 0
