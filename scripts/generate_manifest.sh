@@ -1,36 +1,26 @@
 #!/bin/sh
 
-# ./scripts/generate_manifest.sh <DOCKERFILE> <MANIFEST_PATH>
+# ./scripts/generate_manifest.sh <MANIFEST_PATH> <PREFIX>
 # Example:
-# ./scripts/generate_manifest.sh webapp/Dockerfile manifest_webapp.txt
+# ./scripts/generate_manifest.sh manifest_webapp.txt my-service:
 # cat manifest_webapp.txt
 
-DOCKERFILE=$1
-MANIFEST_PATH=$2
-DOCKER_CONTEXT=$3
+MANIFEST_PATH=$1
+PREFIX=$2
+PYTHON=$3
 
-echo "Dockerfile:    ${DOCKERFILE}"
-echo "Manifest path: ${MANIFEST_PATH}"
+## Write rpm packages.
+rpm -qa --qf='%{sourcerpm}\n' | sort -u | sed 's/\.src\.rpm$//' > ${MANIFEST_PATH}
 
-# Write base image name.
-echo "[base_image]" > ${MANIFEST_PATH}
-cat ${DOCKERFILE} | grep "FROM" | sed -e "s/FROM //" >> ${MANIFEST_PATH}
+## Write Python packages if python set.
+if [[ ! -z $PYTHON ]]
+then
+    $PYTHON -m pip freeze | sort > /tmp/pipdeps
+    sed -i -e 's/^/'$PYTHON'-/' /tmp/pipdeps  # add 'python' prefix
+    sed -i -e 's/==/-/' /tmp/pipdeps       # replace '==' with '-'
+    sed -i -e 's/$/.pipfile/' /tmp/pipdeps # add '.pipfile' suffix
+    cat /tmp/pipdeps >> ${MANIFEST_PATH}   # append python deps to manifest
+fi
 
-
-# Build image and write out included packages (rpm, pip).
-echo "Building image to inspect..."
-docker build -t mf_image -f ${DOCKERFILE} .
-
-## Write content of /etc/system-release-cpe
-echo "[system-release-cpe]" >> ${MANIFEST_PATH}
-docker run -it --rm mf_image bash -c "cat /etc/system-release-cpe" >> ${MANIFEST_PATH}
-
-## Write RPM package.
-echo "[rpm]" >> ${MANIFEST_PATH}
-docker run -it --rm mf_image bash -c "rpm -qa" >> ${MANIFEST_PATH}
-
-## Write Python version and packages.
-echo "[python]" >> ${MANIFEST_PATH}
-echo -n "python_version=" >> ${MANIFEST_PATH}
-docker run -it --rm mf_image bash -c "python3 --version" >> ${MANIFEST_PATH}
-docker run -it --rm mf_image bash -c "python3 -m pip freeze" >> ${MANIFEST_PATH}
+## Add prefix to all lines.
+sed -i -e 's/^/'${PREFIX}'/' ${MANIFEST_PATH}
