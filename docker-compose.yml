@@ -80,9 +80,11 @@ services:
     container_name: vmaas-webapp-utils
     build:
         context: .
-        dockerfile: ./webapp-utils/Dockerfile
-    image: vmaas/webapp-utils:latest
+        dockerfile: ./webapp_utils/Dockerfile
+    image: vmaas/webapp_utils:latest
     restart: unless-stopped
+    env_file:
+      - ./conf/webapp_utils.env
     ports:
       - 8083:8083
     depends_on:

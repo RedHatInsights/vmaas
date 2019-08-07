@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
 """
 Webapp-utils - API utilities for webapp.
 """
 import yaml
 import connexion
+from connexion import RestyResolver
 
-with open("/webapp-utils/webapp-utils.yml", "rb") as specfile:
+with open("webapp-utils.yml", "rb") as specfile:
     SPEC = yaml.safe_load(specfile)
 
 def create_app():
@@ -12,7 +14,7 @@ def create_app():
     utils_app = connexion.App("webapp-utils", options={'swagger_ui': False,
                                                        'openapi_spec_path': 'openapi.json'})
     utils_app.add_api(SPEC,
-                      resolver=connexion.RestyResolver('api'),
+                      resolver=RestyResolver('api'),
                       validate_responses=True,
                       strict_validation=True)
 
@@ -30,4 +32,4 @@ def create_app():
 application = create_app() # pylint: disable=invalid-name
 
 if __name__ == "__main__":
-    application.run(port=8083)
+    application.run(host='0.0.0.0', port=8083)
