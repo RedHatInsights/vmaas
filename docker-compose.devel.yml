@@ -31,3 +31,11 @@ services:
       - label=disable
     working_dir: /git
     command: ["sleep", "infinity"]
+
+  vmaas_webapp_utils:
+    volumes:
+      - ./webapp_utils:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+    command: ["sleep", "infinity"]
