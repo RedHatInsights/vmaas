@@ -23,7 +23,15 @@ Now you have bash inside vmaas_webapp container, run:
 
 ```./entrypoint.sh```
 
-3. Switch into **websocket** container:
+3. Switch to **webapp_utils** container:
+~~~bash
+docker-compose exec vmaas_webapp_utils bash
+~~~
+Now run:
+
+```./entrypoint.sh```
+
+4. Switch into **websocket** container:
 ~~~bash
 docker-compose exec vmaas_websocket bash
 ~~~
@@ -31,7 +39,7 @@ Now run:
 
 ```python3 websocket.py```
 
-4. Switch into **reposcan** container:
+5. Switch into **reposcan** container:
 ~~~bash
 docker-compose exec vmaas_reposcan bash
 ~~~
@@ -39,7 +47,7 @@ Now run:
 
 ```./entrypoint.sh```
 
-5. Switch to **database** container to gain access to db:
+6. Switch to **database** container to gain access to db:
 ~~~bash
 docker-compose exec vmaas_database bash
 ~~~
