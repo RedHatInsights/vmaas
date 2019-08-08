@@ -1198,9 +1198,9 @@ class Application(tornado.web.Application):
             (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
             (r"/metrics", MetricsHandler),  # GET request
             (r"/api/v1/updates/?", UpdatesHandlerPost),
-            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerGet),
+            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", UpdatesHandlerGet),
             (r"/api/v2/updates/?", UpdatesHandlerV2Post),
-            (r"/api/v2/updates/(?P<nevra>[a-zA-Z0-9%-._:]+)", UpdatesHandlerV2Get),
+            (r"/api/v2/updates/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", UpdatesHandlerV2Get),
             (r"/api/v1/cves/?", CVEHandlerPost),
             (r"/api/v1/cves/(?P<cve>[\\a-zA-Z0-9%*-.+^$?\[\]]+)", CVEHandlerGet),
             (r"/api/v1/repos/?", ReposHandlerPost),
@@ -1208,9 +1208,9 @@ class Application(tornado.web.Application):
             (r"/api/v1/errata/?", ErrataHandlerPost),
             (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
             (r"/api/v1/packages/?", PackagesHandlerPost),
-            (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:]+)", PackagesHandlerGet),
+            (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", PackagesHandlerGet),
             (r"/api/v1/vulnerabilities/?", VulnerabilitiesHandlerPost),
-            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:]+)", VulnerabilitiesHandlerGet),
+            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", VulnerabilitiesHandlerGet),
         ]
 
         tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
