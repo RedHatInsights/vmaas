@@ -6,19 +6,18 @@ ENV VMAAS_VERSION=latest
 
 RUN yum -y update && \
     yum -y install centos-release-scl && \
-    yum -y install rh-python36 rsync procps-ng && \
-    rm -rf /var/cache/yum/* && \
-    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
-    ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
+    yum -y install rh-python36 which rsync procps-ng && \
+    rm -rf /var/cache/yum/*
 
-ADD /webapp/*.sh  /webapp/
-ADD /webapp/*.py  /webapp/
-ADD /webapp/*.txt /webapp/
+ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
-RUN pip3 install --upgrade pip && \
-    pip3 install -r /webapp/requirements_qe.txt
-    
-RUN ln -s /opt/rh/rh-python36/root/bin/coverage /usr/bin/coverage
+ADD /webapp/*.sh     /webapp/
+ADD /webapp/*.py     /webapp/
+ADD /webapp/Pipfile* /webapp/
+
+ENV LC_ALL=en_US.utf8
+RUN pip install --upgrade pip pipenv && \
+    cd /webapp && pipenv install --system --dev && pipenv check
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp --no-create-home vmaas
