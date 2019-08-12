@@ -1,23 +1,30 @@
 FROM registry.access.redhat.com/rhel7
 
-ENV VMAAS_VERSION=latest
-
 RUN yum -y update && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum -y install rh-python36 rsync && \
-    rm -rf /var/cache/yum/* && \
-    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
-    ln -s /opt/rh/rh-python36/root/bin/pip /usr/bin/pip3
+    yum -y install rh-python36 which rsync && \
+    rm -rf /var/cache/yum/*
 
-ADD /webapp_utils/*.sh  /webapp_utils/
-ADD /webapp_utils/*.py  /webapp_utils/
-ADD /webapp_utils/*.txt /webapp_utils/
-ADD /webapp_utils/*.yml /webapp_utils/
+ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
+
+ADD /webapp_utils/Pipfile*      /webapp_utils/
+ADD /webapp_utils/*.sh          /webapp_utils/
+ADD /webapp_utils/*.py          /webapp_utils/
+ADD /webapp_utils/*.yml         /webapp_utils/
 ADD /webapp_utils/handlers/*.py /webapp_utils/handlers/
 
-RUN pip3 install --upgrade pip && \
-    pip3 install -r /webapp_utils/requirements.txt && \
-    ln -s /opt/rh/rh-python36/root/bin/gunicorn /usr/bin/gunicorn
+WORKDIR /webapp_utils
+
+ENV LC_ALL=en_US.utf8
+RUN pip install --upgrade pip pipenv && \
+    pipenv install --system && pipenv check
+
+ENV VMAAS_VERSION=latest
+ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-webapp-utils\/"
+ENV MANIFEST_PYTHON=python
+ADD /scripts/generate_manifest.sh /generate_manifest.sh
+RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX $MANIFEST_PYTHON && \
+    echo 'MANIFEST:' && cat manifest.txt
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp_utils --no-create-home vmaas_utils

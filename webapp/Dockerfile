@@ -1,29 +1,28 @@
 FROM centos:7
 
-# all environment variables are defined in conf/reposcan.env
-# only VMAAS_VERSION is here because we want it to be hardcoded in the image
-ENV VMAAS_VERSION=latest
-
 RUN yum -y update && \
     yum -y install centos-release-scl && \
-    yum -y install rh-python36 rsync && \
-    rm -rf /var/cache/yum/* && \
-    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
-    ln -s /opt/rh/rh-python36/root/bin/pip    /usr/bin/pip3
+    yum -y install rh-python36 which rsync && \
+    rm -rf /var/cache/yum/*
 
-ADD /webapp/*.sh  /webapp/
-ADD /webapp/*.py  /webapp/
-ADD /webapp/*.txt /webapp/
+ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
-RUN pip3 install --upgrade pip && \
-    pip3 install -r /webapp/requirements.txt
+ADD /webapp/*.sh     /webapp/
+ADD /webapp/*.py     /webapp/
+ADD /webapp/Pipfile* /webapp/
 
-ENV MANIFEST_PATH=/webapp/manifest.txt
+WORKDIR /webapp
+
+ENV LC_ALL=en_US.utf8
+RUN pip install --upgrade pip pipenv && \
+    pipenv install --system && pipenv check
+
+ENV VMAAS_VERSION=latest
 ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-webapp\/"
-ENV MANIFEST_PYTHON=python3
+ENV MANIFEST_PYTHON=python
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
-RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX $MANIFEST_PYTHON && \
-    echo 'MANIFEST:' && cat /webapp/manifest.txt
+RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX $MANIFEST_PYTHON && \
+    echo 'MANIFEST:' && cat manifest.txt
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp --no-create-home vmaas
