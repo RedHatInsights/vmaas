@@ -69,19 +69,19 @@ class TestCveAPI(TestBase):
         """Test CVE API with wrong regex."""
         with pytest.raises(Exception) as context:
             self.cve.find_cves_by_regex("*")
-        assert "nothing to repeat" in str(context)
+        assert "nothing to repeat" in str(context.value)
 
     def test_missing_required(self):
         """Test CVE API without required property 'cve_list'."""
         with pytest.raises(Exception) as context:
             self.cve.process_list(api_version=1, data=CVE_JSON_BAD)
-        assert "'cve_list' is a required property" in str(context)
+        assert "'cve_list' is a required property" in str(context.value)
 
     def test_empty_json(self):
         """Test CVE API with empty JSON."""
         with pytest.raises(Exception) as context:
             self.cve.process_list(api_version=1, data=CVE_JSON_EMPTY)
-        assert "'cve_list' is a required property" in str(context)
+        assert "'cve_list' is a required property" in str(context.value)
 
     def test_empty_cve_list(self):
         """Test CVE API with with empty 'cve_list' property."""

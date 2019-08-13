@@ -150,7 +150,7 @@ class TestUpdatesAPI(TestBase):
         with pytest.raises(Exception) as context:
             # NOTE: use copy of dict with json input, because process_list changes this dict
             self.updates_api.process_list(1, UPDATES_JSON_EMPTY.copy())
-        assert "'package_list' is a required property" in str(context)
+        assert "'package_list' is a required property" in str(context.value)
 
 
 class TestSplayTree(TestBase):
