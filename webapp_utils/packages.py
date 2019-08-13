@@ -49,8 +49,8 @@ class GetPackage(Request): # pylint: disable=abstract-method
 
 class PackagesAPI:
     """ Class for handling packages API requests. """
-    def __init__(self, dsn=None):
-        self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
+    def __init__(self):
+        self.db_pool = DB.DatabasePoolHandler(POOL_SIZE)
 
     def _build_repositories(self, query): # pylint: disable=no-self-use
         """ Rebuilds the repositories list object in POST/GET response. """
