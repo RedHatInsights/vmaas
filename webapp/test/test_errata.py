@@ -56,7 +56,7 @@ class TestErrataAPI(TestBase):
         """Test wrong errata regex."""
         with pytest.raises(Exception) as context:
             self.errata_api.find_errata_by_regex("*")
-        assert "nothing to repeat" in str(context)
+        assert "nothing to repeat" in str(context.value)
 
     def test_regex(self):
         """Test correct errata regex."""
@@ -67,13 +67,13 @@ class TestErrataAPI(TestBase):
         """Test missing required property 'errata_list'."""
         with pytest.raises(Exception) as context:
             self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_BAD)
-        assert "'errata_list' is a required property" in str(context)
+        assert "'errata_list' is a required property" in str(context.value)
 
     def test_empty_json(self):
         """Test errata API with empty JSON."""
         with pytest.raises(Exception) as context:
             self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_EMPTY)
-        assert "'errata_list' is a required property" in str(context)
+        assert "'errata_list' is a required property" in str(context.value)
 
     def test_empty_errata_list(self):
         """Test errata API with empty 'errata_list'."""

@@ -50,7 +50,7 @@ class TestPackagesAPI(TestBase):
         """Test pkg api with empty json."""
         with pytest.raises(Exception) as context:
             self.pkg_api.process_list(1, PKG_JSON_EMPTY)
-        assert "'package_list' is a required property" in str(context)
+        assert "'package_list' is a required property" in str(context.value)
 
     def test_empty_pkg_list(self):
         """Test pkg api with empty package_list."""
