@@ -23,3 +23,13 @@ class Request:
     def handle_get(cls, **kwargs):  # pragma: no cover
         """Implement in child classes"""
         raise NotImplementedError
+
+    @classmethod
+    def post(cls, **kwargs):
+        """ Answer POST request. """
+        return cls.handle_post(**kwargs)
+
+    @classmethod
+    def handle_post(cls, **kwargs):
+        """ Implement in child classes """
+        raise NotImplementedError
