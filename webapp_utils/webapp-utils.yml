@@ -11,7 +11,7 @@ paths:
   /v1/health:
     get:
       summary: Returns avaiability of the api.
-      operationId: handlers.default_handler.GetHealth.get
+      operationId: default_handler.GetHealth.get
       responses:
         200:
           description: API is OK.
@@ -23,3 +23,98 @@ paths:
                   health:
                     type: string
                     description: Health of the API.
+    
+  /v1/packages:
+    post:
+      summary: Get details about packages which does not have security errata, "package_list" must be a list of package NEVRAs.
+      operationId: packages.PostPackages.post
+      responses:
+        200:
+          description: Return details about list of package NEVRAs
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PackagesReponse'
+      requestBody:
+        description: Input JSON with list of NEVRA.
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NevraList'
+      tags:
+        - packages
+
+  /v1/packages/{Nevra}:
+    get:
+      summary: Get details about package which does not have security errata.
+      operationId: packages.GetPackage.get
+      responses:
+        200:
+          description: Return details about package NEVRA.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PackagesReponse'
+      parameters:
+        - $ref: '#/components/parameters/Nevra'
+      tags:
+        - packages
+
+components:
+  parameters:
+    Nevra:
+      name: Nevra
+      in: path
+      description: Input NEVRA
+      required: true
+      schema:
+        type: string
+      example: kernel-2.6.32-696.20.1.el6.x86_64
+
+  schemas:    
+    PackagesReponse:
+      type: object
+      properties:
+        summary:
+          type: string
+          description: Summary of the package
+        description:
+          type: string
+          description: Description of the package
+        source_package:
+          type: string
+          example: kernel
+        binary_package_list:
+          type: array
+          items:
+            type: string
+            example: kernel
+        repositories:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                example: rhel-6-server-rpms
+              name:
+                type: string
+                example: Red Hat Enterprise Linux 6
+              basearch:
+                type: string
+                example: x86_64
+              releasever:
+                type: string
+                example: 6.9
+
+    NevraList:
+      type: object
+      required:
+        - package_list
+      properties:
+        package_list:
+          type: array
+          items:
+            type: string
+            example: kernel-2.6.32-696.20.1.el6.x86_64
