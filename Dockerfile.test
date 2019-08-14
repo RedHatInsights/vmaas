@@ -1,4 +1,4 @@
-FROM fedora:27
+FROM fedora:28
 
 RUN dnf install -y python3 python3-pip postgresql-server findutils git
 
