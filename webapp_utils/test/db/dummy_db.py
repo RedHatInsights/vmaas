@@ -7,7 +7,11 @@ import psycopg2
 
 DB_SCHEMA = open("../database/vmaas_db_postgresql.sql", "r").read()
 DB_USERS = open("../database/vmaas_user_create_postgresql.sql", "r").read()
+<<<<<<< HEAD
 DUMMY_DATA = open("test/db/dummy_data.sql", "r").read()
+=======
+DUMMY_DATA = open("test/db/dummy_data.sql").read()
+>>>>>>> Add webapp_utils packages API tests.
 
 class DummyDatabase():
     """ Class for the dummy database which creates vmaas database dummy copy,
