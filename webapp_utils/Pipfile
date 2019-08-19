@@ -10,6 +10,7 @@ pur = ">=5.2.2"
 connexion = ">=2.3.0"
 gunicorn= "==19.9.0"
 prometheus-client= "==0.6.0"
+psycopg2-binary = ">=2.8.3"
 
 [requires]
 python_version = "3.6"
