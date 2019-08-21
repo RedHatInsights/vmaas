@@ -107,8 +107,8 @@ class BaseHandler(tornado.web.RequestHandler):
     def on_finish(self):
         REQUEST_TIME.labels(self.request.method, self.request.path).observe(self.request.request_time())
         REQUEST_COUNTS.labels(self.request.method, self.request.path, self.get_status()).inc()
-        LOGGER.info("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
-                    self.get_status(), self.request.path, self.request.request_time())
+        LOGGER.debug("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
+                     self.get_status(), self.request.path, self.request.request_time())
 
 
 class MetricsHandler(BaseHandler):
