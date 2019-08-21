@@ -55,12 +55,11 @@ class RepoAPI:
         """Filter repositories by modified since"""
         filtered_repos_to_process = []
         for label in repos_to_process:
-            if label in filtered_repos_to_process:
-                continue
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
                     filtered_repos_to_process.append(label)
+                    break
         return filtered_repos_to_process
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
@@ -89,6 +88,8 @@ class RepoAPI:
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
             repos = self.find_repos_by_regex(repos[0])
+
+        repos = list(set(repos))
 
         repo_details = {}
         for label in repos:
