@@ -1,6 +1,7 @@
 """Pytest configuration for database tests."""
 
 import os
+import sys
 
 import psycopg2
 import pytest
@@ -11,6 +12,7 @@ from database.database_handler import init_db, DatabaseHandler
 os.environ["POSTGRESQL_DATABASE"] = "test"
 os.environ["POSTGRESQL_HOST"] = "127.0.0.1"
 
+sys.path.append("..")
 
 @pytest.fixture(scope="module")
 def exporter_db_conn():

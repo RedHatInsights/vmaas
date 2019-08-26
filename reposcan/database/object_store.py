@@ -2,7 +2,7 @@
 Module containing shared code between various *Store classes
 """
 
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.database_handler import DatabaseHandler
 
 

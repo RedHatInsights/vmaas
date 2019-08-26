@@ -6,7 +6,7 @@ Tool for exporting preprocessed data from database for webapp nodes.
 import glob
 import os
 import shelve
-from common.logging import get_logger, init_logging
+from common.logging_utils import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from common.fileutil import remove_file_if_exists
 from database.database_handler import DatabaseHandler, NamedCursor, init_db

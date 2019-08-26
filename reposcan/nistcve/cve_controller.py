@@ -9,7 +9,7 @@ import time
 
 from common.batch_list import BatchList
 from common.dateutil import parse_datetime
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.cverepo_store import CveRepoStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker

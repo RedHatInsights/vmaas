@@ -7,7 +7,7 @@ import shutil
 import tempfile
 
 from common.dateutil import parse_datetime
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.cvemap_store import CvemapStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from mnm import FAILED_CVEMAP
