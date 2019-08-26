@@ -1,7 +1,7 @@
 """"
 Module containing classes for fetching/importing cve list metadata from/into database.
 """
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.database_handler import DatabaseHandler
 from database.cve_store import CveStore
 

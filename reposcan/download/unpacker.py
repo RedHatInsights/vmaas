@@ -6,7 +6,7 @@ import gzip
 import lzma
 import bz2
 
-from common.logging import ProgressLogger, get_logger
+from common.logging_utils import ProgressLogger, get_logger
 from common.fileutil import remove_file_if_exists
 
 

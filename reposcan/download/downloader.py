@@ -12,7 +12,7 @@ import requests
 
 from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
 
-from common.logging import ProgressLogger, get_logger
+from common.logging_utils import ProgressLogger, get_logger
 
 DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_THREADS = "8"

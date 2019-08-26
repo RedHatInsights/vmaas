@@ -3,7 +3,7 @@ Module contains classes for fetching/importing CVE from/into database.
 """
 from psycopg2.extras import execute_values
 
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.database_handler import DatabaseHandler
 
 

@@ -37,12 +37,12 @@ EXPOSE 8081 8730
 
 ADD /reposcan/*.sh           /reposcan/
 ADD /reposcan/*.py           /reposcan/
-ADD /reposcan/common/*.py    /reposcan/common/
 ADD /reposcan/database/*.py  /reposcan/database/
 ADD /reposcan/download/*.py  /reposcan/download/
 ADD /reposcan/nistcve/*.py   /reposcan/nistcve/
 ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
 ADD /reposcan/repodata/*.py  /reposcan/repodata/
 ADD /reposcan/rsyncd.conf    /etc/
+ADD /common/*.py             /reposcan/common/
 
 CMD /reposcan/entrypoint.sh
