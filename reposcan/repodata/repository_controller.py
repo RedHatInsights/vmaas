@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 import re
 
 from common.batch_list import BatchList
-from common.logging import get_logger
+from common.logging_utils import get_logger
 
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES

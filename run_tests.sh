@@ -56,7 +56,8 @@ if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
 fi
 
 # Run pylint
-find . -iname '*.py' | xargs pipenv run pylint --rcfile=../pylintrc --output-format=colorized
+cd ..
+find "$TESTDIR" -iname '*.py' | xargs pipenv run pylint --rcfile=pylintrc --output-format=colorized
 rc=$(($rc+$?))
 
 exit $rc

@@ -1,12 +1,12 @@
 """Unit tests of logging module."""
 
-from common import logging
+from common import logging_utils
 
 
 def test_progress_logger(caplog):
     """Test ProgressLogger."""
-    logger = logging.get_logger(__name__)
-    progress_logger = logging.ProgressLogger(logger, 3, log_interval=0)
+    logger = logging_utils.get_logger(__name__)
+    progress_logger = logging_utils.ProgressLogger(logger, 3, log_interval=0)
 
     progress_logger.update()
     progress_logger.update()
