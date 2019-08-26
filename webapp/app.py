@@ -24,7 +24,7 @@ from errata import ErrataAPI
 from packages import PackagesAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
-from logging_utils import init_logging, get_logger
+from common.logging_utils import init_logging, get_logger
 from probes import REQUEST_COUNTS, REQUEST_TIME
 
 # pylint: disable=too-many-lines

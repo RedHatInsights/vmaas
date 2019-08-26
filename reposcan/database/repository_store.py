@@ -1,7 +1,7 @@
 """
 Module containing classes for fetching/importing repositories from/into database.
 """
-from common.logging import get_logger
+from common.logging_utils import get_logger
 from database.database_handler import DatabaseHandler
 from database.modules_store import ModulesStore
 from database.package_store import PackageStore

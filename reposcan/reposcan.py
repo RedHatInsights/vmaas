@@ -16,7 +16,7 @@ from tornado.web import RequestHandler, Application
 from tornado.websocket import websocket_connect
 
 from apidoc import SPEC, VMAAS_VERSION, setup_apispec
-from common.logging import get_logger, init_logging
+from common.logging_utils import get_logger, init_logging
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from dbchange import DbChangeAPI

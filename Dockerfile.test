@@ -16,13 +16,15 @@ ADD /webapp/Pipfile*       /vmaas/webapp/
 ADD /reposcan/Pipfile*     /vmaas/reposcan/
 ADD /websocket/Pipfile*    /vmaas/websocket/
 ADD /webapp_utils/Pipfile* /vmaas/webapp_utils/
+ADD Pipfile*               /vmaas/
 
 ENV LC_ALL=en_US.utf8
 ENV LANG=en_US.utf8
 RUN cd /vmaas/webapp && pipenv install --dev && pipenv check && \
     cd /vmaas/reposcan && pipenv install --dev && pipenv check && \
     cd /vmaas/websocket && pipenv install --dev && pipenv check && \
-    cd /vmaas/webapp_utils && pipenv install --dev && pipenv check
+    cd /vmaas/webapp_utils && pipenv install --dev && pipenv check && \
+    cd /vmaas/ && pipenv install --dev && pipenv check
 
 ADD . /vmaas/
 
