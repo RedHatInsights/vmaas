@@ -7,18 +7,9 @@ RUN yum -y update && \
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
-ADD /reposcan/*.sh           /reposcan/
-ADD /reposcan/*.py           /reposcan/
-ADD /reposcan/Pipfile*       /reposcan/
-ADD /reposcan/common/*.py    /reposcan/common/
-ADD /reposcan/database/*.py  /reposcan/database/
-ADD /reposcan/download/*.py  /reposcan/download/
-ADD /reposcan/nistcve/*.py   /reposcan/nistcve/
-ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
-ADD /reposcan/repodata/*.py  /reposcan/repodata/
-ADD /reposcan/rsyncd.conf    /etc/
-
 WORKDIR /reposcan
+
+ADD /reposcan/Pipfile*       /reposcan/
 
 ENV LC_ALL=en_US.utf8
 RUN pip install --upgrade pip pipenv && \
@@ -37,5 +28,15 @@ RUN install -d -m 775 -g root /data && \
 USER vmaas
 
 EXPOSE 8081 8730
+
+ADD /reposcan/*.sh           /reposcan/
+ADD /reposcan/*.py           /reposcan/
+ADD /reposcan/common/*.py    /reposcan/common/
+ADD /reposcan/database/*.py  /reposcan/database/
+ADD /reposcan/download/*.py  /reposcan/download/
+ADD /reposcan/nistcve/*.py   /reposcan/nistcve/
+ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
+ADD /reposcan/repodata/*.py  /reposcan/repodata/
+ADD /reposcan/rsyncd.conf    /etc/
 
 CMD /reposcan/entrypoint.sh

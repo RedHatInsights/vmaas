@@ -7,10 +7,9 @@ RUN yum -y update && \
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
-ADD /websocket/*.py     /websocket/
-ADD /websocket/Pipfile* /websocket/
-
 WORKDIR /websocket
+
+ADD /websocket/Pipfile* /websocket/
 
 ENV LC_ALL=en_US.utf8
 RUN pip install --upgrade pip pipenv && \
@@ -28,5 +27,7 @@ RUN adduser --gid 0 -d /app --no-create-home vmaas
 USER vmaas
 
 EXPOSE 8082
+
+ADD /websocket/*.py     /websocket/
 
 CMD /websocket/websocket.py

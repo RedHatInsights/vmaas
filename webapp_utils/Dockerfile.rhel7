@@ -7,13 +7,9 @@ RUN yum -y update && \
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
-ADD /webapp_utils/Pipfile*      /webapp_utils/
-ADD /webapp_utils/*.sh          /webapp_utils/
-ADD /webapp_utils/*.py          /webapp_utils/
-ADD /webapp_utils/*.yml         /webapp_utils/
-ADD /webapp_utils/handlers/*.py /webapp_utils/handlers/
-
 WORKDIR /webapp_utils
+
+ADD /webapp_utils/Pipfile*      /webapp_utils/
 
 ENV LC_ALL=en_US.utf8
 RUN pip install --upgrade pip pipenv && \
@@ -32,5 +28,10 @@ RUN install -m 1777 -d /data && \
 USER vmaas_utils
 
 EXPOSE 8083
+
+ADD /webapp_utils/*.sh          /webapp_utils/
+ADD /webapp_utils/*.py          /webapp_utils/
+ADD /webapp_utils/*.yml         /webapp_utils/
+ADD /webapp_utils/handlers/*.py /webapp_utils/handlers/
 
 CMD /webapp_utils/entrypoint.sh
