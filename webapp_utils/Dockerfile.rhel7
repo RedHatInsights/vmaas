@@ -26,7 +26,7 @@ ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-webapp-utils\/"
 ENV MANIFEST_PYTHON=python
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
-RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
+RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
     echo 'MANIFEST:' && cat manifest.txt
 
 RUN install -m 1777 -d /data && \
