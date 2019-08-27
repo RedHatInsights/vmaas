@@ -14,6 +14,7 @@ ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 ADD /webapp/Pipfile* /webapp/
 
 ENV LC_ALL=en_US.utf8
+ENV LANG=en_US.utf8
 RUN pip install --upgrade pip pipenv && \
     cd /webapp && pipenv install --system --dev && pipenv check
 
