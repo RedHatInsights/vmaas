@@ -2,6 +2,10 @@
 # with applied vmaas database schema
 FROM centos/postgresql-10-centos7
 
+ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
+# make sure (redhat|centos|fedora)-release is always included in the manifest
+RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
+
 # all environment variables are defined in conf/*.env
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
 ENV VMAAS_VERSION=latest
@@ -16,8 +20,9 @@ ADD /database/vmaas_db_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
 ADD /database/vmaas_user_create_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
 ADD /database/init_schema.sh ${CONTAINER_SCRIPTS_PATH}/start/
 
+RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV MANIFEST_PATH=/opt/app-root/manifest.txt
 ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-database\/"
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
-RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX && \
+RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
     echo 'MANIFEST:' && cat $MANIFEST_PATH
