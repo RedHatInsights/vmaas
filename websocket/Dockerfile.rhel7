@@ -12,6 +12,7 @@ WORKDIR /websocket
 ADD /websocket/Pipfile* /websocket/
 
 ENV LC_ALL=en_US.utf8
+ENV LANG=en_US.utf8
 RUN pip install --upgrade pip pipenv && \
     pipenv install --system && pipenv check
 
