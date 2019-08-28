@@ -76,6 +76,23 @@ objects:
       component: vmaas-websocket-${RELEASE}
     strategy:
       resources: {}
+      recreateParams:
+        pre:
+          failurePolicy: Abort
+          execNewPod:
+            containerName: vmaas-websocket
+            command:
+            - /push_manifest.sh
+            - RedHatInsights/manifests
+            - stable
+            - /websocket/manifest.txt
+            - vmaas/vmaas-websocket.txt
+            env:
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GIT_TOKEN
+                  name: github-vulnerability-bot
       type: Recreate
     template:
       metadata:
