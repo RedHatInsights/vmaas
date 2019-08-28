@@ -5,6 +5,7 @@ into specified PostgreSQL database.
 """
 
 import os
+import signal
 from multiprocessing.pool import Pool
 import json
 import requests
@@ -885,6 +886,14 @@ class ReposcanApplication(Application):
 
         setup_apispec(handlers)
 
+    @staticmethod
+    def stop():
+        """Stop the application"""
+        if SyncTask.is_running():
+            SyncTask.cancel()
+        IOLoop.instance().stop()
+
+
     @classmethod
     def websocket_reconnect(cls):
         """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
@@ -939,6 +948,16 @@ def create_app():
     else:
         LOGGER.info("Periodic syncing disabled.")
     app = ReposcanApplication()
+
+    def terminate(*_):
+        """Trigger shutdown."""
+        LOGGER.info("Signal received, stopping application.")
+        IOLoop.instance().add_callback_from_signal(app.stop)
+
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for sig in signals:
+        signal.signal(sig, terminate)
+
     app.listen(8081)
 
     app.websocket_reconnect()
