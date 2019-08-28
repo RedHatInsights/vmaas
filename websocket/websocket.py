@@ -2,6 +2,8 @@
 """
 Main entrypoint of websocket server.
 """
+import signal
+
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import Application, RequestHandler
 from tornado.websocket import WebSocketHandler
@@ -101,10 +103,24 @@ class WebsocketApplication(Application):
 
         Application.__init__(self, handlers)
 
+    @staticmethod
+    def stop():
+        """Stop the websocket"""
+        IOLoop.instance().stop()
+
 
 def create_app():
     """Create websocket tornado app."""
     app = WebsocketApplication()
+
+    def terminate(*_):
+        """Trigger shutdown."""
+        IOLoop.instance().add_callback_from_signal(app.stop)
+
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for sig in signals:
+        signal.signal(sig, terminate)
+
     app.listen(8082)
 
 
