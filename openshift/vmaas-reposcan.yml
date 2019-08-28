@@ -91,7 +91,10 @@ objects:
     nodeSelector: null
     output:
       to: {kind: ImageStreamTag, name: 'vmaas-reposcan-${RELEASE}:latest'}
-    postCommit: {}
+    postCommit:
+      script: >-
+        /push_manifest.sh RedHatInsights/manifests stable /reposcan/manifest.txt
+        vmaas/vmaas-reposcan.txt
     resources:
       limits:
         cpu: 500m
@@ -105,6 +108,12 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: ${DOCKERFILE}${DOCKERFILE_SUFFIX}
+        env:
+        - name: GIT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: GIT_TOKEN
+              name: github-vulnerability-bot
       type: Docker
     triggers:
     - {type: ConfigChange}

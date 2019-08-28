@@ -59,7 +59,10 @@ objects:
     nodeSelector: null
     output:
       to: {kind: ImageStreamTag, name: 'vmaas-database-${RELEASE}:latest'}
-    postCommit: {}
+    postCommit:
+      script: >-
+        /push_manifest.sh RedHatInsights/manifests stable
+        /opt/app-root/manifest.txt vmaas/vmaas-database.txt
     resources:
       limits:
         cpu: 500m
@@ -73,6 +76,12 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: ${DOCKERFILE}${DOCKERFILE_SUFFIX}
+        env:
+        - name: GIT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: GIT_TOKEN
+              name: github-vulnerability-bot
       type: Docker
     triggers:
     - {type: ConfigChange}
