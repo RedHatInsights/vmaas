@@ -35,7 +35,7 @@ class DatabasePoolConnection:
 class DatabasePoolHandler:
     """ Handler class for pool connection into db and querying. """
 
-    def __init__(self, size, dsn):
+    def __init__(self, size, dsn=None):
         if dsn:
             self.db_pool = pool.ThreadedConnectionPool(1, size,
                                                        dbname=dsn["database"], user=dsn["user"],
