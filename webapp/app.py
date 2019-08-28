@@ -4,6 +4,7 @@ Main web API module
 """
 
 import os
+import signal
 import sre_constants
 import json
 
@@ -1179,6 +1180,13 @@ class Application(tornado.web.Application):
         self.websocket_response_queue = set()
         self.reconnect_callback = None
 
+    def stop(self):
+        """Stop vmaas application"""
+        if self.websocket is not None:
+            self.websocket.close()
+            self.websocket = None
+        IOLoop.instance().stop()
+
     @staticmethod
     def _refresh_cache():
         BaseHandler.db_cache.reload()
@@ -1243,6 +1251,15 @@ def create_app():
     """Create VmaaS application and servers"""
 
     vmaas_app = Application()
+
+    def terminate(*_):
+        """Trigger shutdown."""
+        LOGGER.info("Signal received, stopping application.")
+        IOLoop.instance().add_callback_from_signal(vmaas_app.stop)
+
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for sig in signals:
+        signal.signal(sig, terminate)
 
     server = tornado.httpserver.HTTPServer(vmaas_app)
     server.bind(PUBLIC_API_PORT)
