@@ -137,6 +137,23 @@ objects:
       component: vmaas-reposcan-${RELEASE}
     strategy:
       resources: {}
+      recreateParams:
+        pre:
+          failurePolicy: Abort
+          execNewPod:
+            containerName: vmaas-reposcan
+            command:
+            - /push_manifest.sh
+            - RedHatInsights/manifests
+            - stable
+            - /reposcan/manifest.txt
+            - vmaas/vmaas-reposcan.txt
+            env:
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GIT_TOKEN
+                  name: github-vulnerability-bot
       type: Recreate
     template:
       metadata:
