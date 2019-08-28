@@ -105,6 +105,23 @@ objects:
       component: vmaas-database-${RELEASE}
     strategy:
       resources: {}
+      recreateParams:
+        pre:
+          failurePolicy: Abort
+          execNewPod:
+            containerName: vmaas-database
+            command:
+            - /push_manifest.sh
+            - RedHatInsights/manifests
+            - stable
+            - /opt/app-root/manifest.txt
+            - vmaas/vmaas-database.txt
+            env:
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GIT_TOKEN
+                  name: github-vulnerability-bot
       type: Recreate
     template:
       metadata:
