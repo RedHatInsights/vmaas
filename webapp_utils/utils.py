@@ -1,7 +1,10 @@
 """
 Set of functions and procedures shared between different modules.
 """
+
+import math
 import re
+from dateutil import parser as dateutil_parser
 
 def join_packagename(name, epoch, version, release, arch):
     """
@@ -40,3 +43,33 @@ def split_packagename(filename):
     if epoch is None:
         epoch = '0'
     return name, epoch, version, release, arch
+
+def parse_datetime(date):
+    """Parse date from string in ISO format."""
+    if date is "":
+        return ""
+    ret = dateutil_parser.parse(date)
+    if not ret.tzinfo:
+        raise ValueError("Wrong date format (not ISO format with timezone): " + date)
+    return ret
+
+DEFAULT_PAGE = 1
+DEFAULT_PAGE_SIZE = 2
+def paginate(input_list, page, page_size):
+    """Split input list into pages and return only requested page."""
+    def _validate_num(num, default):
+        try:
+            num = int(num)
+            if num <= 0:
+                num = default
+        except (TypeError, ValueError):
+            num = default
+        return num
+    page = _validate_num(page, DEFAULT_PAGE)
+    page_size = _validate_num(page_size, DEFAULT_PAGE_SIZE)
+    input_list.sort()
+    start = (page-1)*page_size
+    end = page*page_size
+    pages = int(math.ceil(float(len(input_list))/page_size))
+    result_list = input_list[start:end]
+    return result_list, {"page": page, "page_size": len(result_list), "pages": pages}

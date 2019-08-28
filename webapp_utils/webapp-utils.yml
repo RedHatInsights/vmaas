@@ -23,6 +23,8 @@ paths:
                   health:
                     type: string
                     description: Health of the API.
+      tags:
+        - default
     
   /v1/packages:
     post:
@@ -92,8 +94,16 @@ components:
       schema:
         type: string
       example: kernel-2.6.32-696.20.1.el6.x86_64
+    erratum:
+      name: erratum
+      in: path
+      description: Errata advisory name or POSIX regular expression patter.
+      required: true
+      schema:
+        type: string
+      example: RHSA-2018:0512
 
-  schemas:    
+  schemas:
     PackagesReponse:
       type: object
       properties:
