@@ -6,7 +6,7 @@ RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/
 
 RUN yum -y update && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum -y install rh-python36 which rsync git && \
+    yum -y install rh-python36 which rsync && \
     rm -rf /var/cache/yum/*
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
