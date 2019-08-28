@@ -6,12 +6,6 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-USER 0
-RUN yum -y install git && \
-    rm -rf /var/cache/yum/*
-# SCL postgresql is using UID 26
-USER 26
-
 # all environment variables are defined in conf/*.env
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
 ENV VMAAS_VERSION=latest
