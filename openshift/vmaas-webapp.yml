@@ -93,6 +93,23 @@ objects:
       component: vmaas-webapp-${RELEASE}
     strategy:
       resources: {}
+      rollingParams:
+        pre:
+          failurePolicy: Abort
+          execNewPod:
+            containerName: vmaas-webapp
+            command:
+            - /push_manifest.sh
+            - RedHatInsights/manifests
+            - stable
+            - /webapp/manifest.txt
+            - vmaas/vmaas-webapp.txt
+            env:
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GIT_TOKEN
+                  name: github-vulnerability-bot
     template:
       metadata:
         creationTimestamp: null
