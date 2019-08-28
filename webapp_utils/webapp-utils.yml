@@ -23,6 +23,8 @@ paths:
                   health:
                     type: string
                     description: Health of the API.
+      tags:
+        - default
     
   /v1/packages:
     post:
@@ -81,6 +83,44 @@ paths:
               $ref: '#/components/schemas/NevraList'
       tags:
         - packages
+  /v1/errata:
+    post:
+      summary: Errata details.
+      description: Get details about errata which are not of security type. "errata_list" parameter can be either a list of errata names OR a single POSIX regular expression.
+      operationId: errata.PostErrata.post
+      responses:
+        200:
+          description: Return details about list of errata.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrataResponse'
+      requestBody:
+        description: Input JSON.
+        required: true
+        content:
+          application/vnd.api+json:
+            schema: 
+              $ref: '#/components/schemas/ErrataList'
+      tags:
+        - errata
+
+  /v1/errata/{erratum}:
+    get:
+      summary: Errata details.
+      description: Get details about errata. It is possible to use POSIX regular expression as a pettern for errata names.
+      operationId: errata.GetErrata.get
+      responses:
+        200:
+          description: Return details about errata.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ErrataResponse'
+      parameters:
+        - $ref: '#/components/parameters/erratum'
+      tags:
+        - errata
 
 components:
   parameters:
@@ -92,8 +132,16 @@ components:
       schema:
         type: string
       example: kernel-2.6.32-696.20.1.el6.x86_64
+    erratum:
+      name: erratum
+      in: path
+      description: Errata advisory name or POSIX regular expression patter.
+      required: true
+      schema:
+        type: string
+      example: RHSA-2018:0512
 
-  schemas:    
+  schemas:
     PackagesReponse:
       type: object
       properties:
@@ -157,3 +205,75 @@ components:
                 label:
                   type: string
                   example: rhel-6-desktop-rpms
+    ErrataResponse:
+      type: object
+      properties:
+        errata_list:
+          type: object
+          properties:
+            updated:
+              type: string
+              example: 2018-03-13T17:31:41+00:00
+            severity:
+              type: string
+              example: Important
+            reference_list:
+              type: array
+              items:
+                type: string
+                example: classification-RHSA2018:0512
+            issued:
+              type: string
+              example: 2018-03-13T17:31:28+00:00
+            description:
+              type: string
+              example: description text
+            solution:
+              type: string
+              example: solution text
+            url:
+              type: string
+              example: https://access.redhat.com/errata/RHSA-2018:0512
+            synopsis:
+              type: string
+              example: Important:kernel security and bug fix update
+            cve_list:
+              type: array
+              items:
+                type: string
+                example: CVE-2017-5715
+            bugzilla_list:
+              type: array
+              items:
+                type: string
+                example: 1519778
+            package_list:
+              type: array
+              items: 
+                type: string
+                example: kernel-2.6.32-696.23.1.el6.x86_64
+            source_package_list:
+              type: array
+              items:
+                type: string
+                example: kernel-2.6.32-696.23.1.el6.src
+            type:
+              type: string
+              example: security
+        modified_since:
+          type: string
+          example: 2018-04-05T01:23:45+02:00
+
+    ErrataList:
+      type: object
+      required:
+        - errata_list
+      properties:
+        errata_list:
+          type: array
+          items: 
+            type: string
+            example: RHSA-2018:0512
+        modified_since:
+          type: string
+          example: 2018-04-05T01:23:45+02:00
