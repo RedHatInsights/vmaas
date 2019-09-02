@@ -93,7 +93,13 @@ class BaseHandler(tornado.web.RequestHandler):
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
             code = 200
-        except (ValidationError, ValueError, sre_constants.error) as ex:
+        except ValidationError as valid_err:
+            if valid_err.absolute_path:
+                res = '%s : %s' % (valid_err.absolute_path.pop(), valid_err.message)
+            else:
+                res = '%s' % valid_err.message
+            code = 400
+        except (ValueError, sre_constants.error) as ex:
             res = repr(ex)
             code = 400
         except Exception as err:  # pylint: disable=broad-except
