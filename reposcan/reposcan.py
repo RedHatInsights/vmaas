@@ -30,6 +30,7 @@ from repodata.repository_controller import RepositoryController
 LOGGER = get_logger(__name__)
 
 DEFAULT_CHUNK_SIZE = "1048576"
+DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
 class TaskStatusResponse(dict):
@@ -95,15 +96,17 @@ class BaseHandler(RequestHandler):
             LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
             return False
 
+        authorized_org = os.getenv('AUTHORIZED_API_ORG', DEFAULT_AUTHORIZED_API_ORG)
+
         for org_info in orgs_response.json():
-            if org_info['login'] == 'RedHatInsights':
+            if org_info['login'] == authorized_org:
                 request_str = str(self.request)
                 LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
                                user_info_response.json()['id'], request_str)
                 return True
 
         FAILED_AUTH.inc()
-        LOGGER.warning("User %s does not belong to RedHatInsights organization", github_user_login)
+        LOGGER.warning("User %s does not belong to %s organization", authorized_org, github_user_login)
         return False
 
 
