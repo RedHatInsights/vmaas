@@ -73,6 +73,7 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: ${DOCKERFILE}${DOCKERFILE_SUFFIX}
+        forcePull: true
       type: Docker
     triggers:
     - {type: ConfigChange}
