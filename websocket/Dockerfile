@@ -4,8 +4,7 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-RUN yum -y update && \
-    yum -y install centos-release-scl && \
+RUN yum -y install centos-release-scl && \
     yum -y install rh-python36 which rsync && \
     rm -rf /var/cache/yum/*
 

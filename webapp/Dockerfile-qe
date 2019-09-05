@@ -4,8 +4,7 @@ FROM centos:7
 # only VMAAS_VERSION is here because we want it to be hardcoded in the image
 ENV VMAAS_VERSION=latest
 
-RUN yum -y update && \
-    yum -y install centos-release-scl && \
+RUN yum -y install centos-release-scl && \
     yum -y install rh-python36 which rsync procps-ng && \
     rm -rf /var/cache/yum/*
 
