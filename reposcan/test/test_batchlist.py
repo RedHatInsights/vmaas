@@ -2,7 +2,7 @@
 Tests for batch list module.
 """
 import pytest
-from common.batch_list import BatchList
+from common.batch_list import BatchList, BATCH_MAX_SIZE
 
 
 class TestBatchList:
@@ -28,12 +28,14 @@ class TestBatchList:
 
     def test_insert_full_batch(self):
         """ Test for insertion of multiple items, until new batch needs to be created. """
-        for count in range(0, 51):
+        max_size = int(BATCH_MAX_SIZE)
+
+        for count in range(0, max_size + 1):
             self.batch_list.add_item({"item": count})
 
-        assert self.batch_list.get_total_items() == 51
+        assert self.batch_list.get_total_items() == max_size + 1
         assert len(self.batch_list.batches) == 2
-        assert len(self.batch_list.batches[0]) == 50
+        assert len(self.batch_list.batches[0]) == max_size
         assert len(self.batch_list.batches[1]) == 1
 
     def test_clear(self):
