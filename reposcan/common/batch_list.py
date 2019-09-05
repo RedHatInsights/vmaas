@@ -3,14 +3,16 @@ Module containing class for list of batches.
 """
 import os
 
-DEFAULT_BATCH_SIZE = "50"
+BATCH_MAX_SIZE = int(os.getenv('BATCH_MAX_SIZE', "500"))
+BATCH_MAX_FILESIZE = int(os.getenv('BATCH_MAX_FILESIZE', "14_000_000_000"))
+
 
 class BatchList:
-    """List of lists with defined maximum size of inner lists."""
+    """List of lists with defined maximum size of inner lists or by arbitrary file_size of each item"""
 
     def __init__(self):
-        self.max_batch_size = int(os.getenv('BATCH_SIZE', DEFAULT_BATCH_SIZE))
         self.batches = []
+        self.last_batch_filesize = 0
 
     def __iter__(self):
         return iter(self.batches)
@@ -19,16 +21,25 @@ class BatchList:
         """Clear all previously added items."""
         self.batches = []
 
-    def add_item(self, item):
+    def add_item(self, item, file_size=0):
         """Add item into the last batch. Create new batch if there is no batch or last batch is full."""
         if self.batches:
             last_batch = self.batches[-1]
         else:
             last_batch = None
-        if last_batch is None or len(last_batch) >= self.max_batch_size:
+
+        assert BATCH_MAX_FILESIZE > file_size, \
+            'Single repo uses %d Bytes, which is more than allowed BATCH_MAX_FILESIZE(%d)' \
+            % (file_size, BATCH_MAX_FILESIZE)
+
+        if last_batch is None or len(last_batch) >= BATCH_MAX_SIZE \
+                or self.last_batch_filesize + file_size > BATCH_MAX_FILESIZE:
             last_batch = []
             self.batches.append(last_batch)
+            self.last_batch_filesize = 0
+
         last_batch.append(item)
+        self.last_batch_filesize += file_size
 
     def get_total_items(self):
         """Return total item count in all batches."""
