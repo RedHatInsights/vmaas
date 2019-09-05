@@ -20,7 +20,8 @@ parameters:
 objects:
 - apiVersion: v1
   data:
-    BATCH_SIZE: '50'
+    BATCH_MAX_SIZE: '500'
+    BATCH_MAX_FILESIZE: '14_000_000_000'
     CHUNK_SIZE: '1048576'
     LOGGING_LEVEL: INFO
     LOGGING_TYPE: OPENSHIFT
@@ -164,10 +165,15 @@ objects:
       spec:
         containers:
         - env:
-          - name: BATCH_SIZE
+          - name: BATCH_MAX_SIZE
             valueFrom:
               configMapKeyRef:
-                key: BATCH_SIZE
+                key: BATCH_MAX_SIZE
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: BATCH_MAX_FILESIZE
+            valueFrom:
+              configMapKeyRef:
+                key: BATCH_MAX_FILESIZE
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           - name: CHUNK_SIZE
             valueFrom:

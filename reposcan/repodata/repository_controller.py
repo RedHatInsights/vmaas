@@ -241,11 +241,30 @@ class RepositoryController:
         # Filter all repositories without repomd attribute set (downloaded repomd is not newer)
         batches = BatchList()
         up_to_date = []
+
+        def md_size(repomd, data_type):
+            try:
+                mdata = repomd.get_metadata(data_type)
+                # open-size is not present for uncompressed files
+                return int(mdata['size']) + int(mdata.get('open-size', '0'))
+            except RepoMDTypeNotFound:
+                return 0
+
         for repository in self.repositories:
             if repository.repomd:
-                batches.add_item(repository)
+
+                repo_size = md_size(repository.repomd, 'primary_db')
+                # If we use primary_db, we don't even download primary data xml
+                if repo_size == 0:
+                    repo_size += md_size(repository.repomd, 'primary')
+
+                repo_size += md_size(repository.repomd, 'updateinfo')
+                repo_size += md_size(repository.repomd, 'modules')
+
+                batches.add_item(repository, repo_size)
             else:
                 up_to_date.append(repository)
+
         self.clean_repodata(up_to_date)
         self.logger.info("%d repositories are up to date.", len(up_to_date))
         total_repositories = batches.get_total_items()
@@ -255,6 +274,7 @@ class RepositoryController:
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
         try:
             for batch in batches:
+                self.logger.info("Syncing a batch of %d repositories", len(batch))
                 try:
                     failed = self._download_metadata(batch)
                     if failed:

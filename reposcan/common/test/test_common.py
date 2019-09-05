@@ -9,7 +9,7 @@ import pytest
 
 from common import string
 from common import dateutil
-from common.batch_list import BatchList, DEFAULT_BATCH_SIZE
+from common.batch_list import BatchList, BATCH_MAX_SIZE, BATCH_MAX_FILESIZE
 
 DATETIME_OBJ = datetime.now()
 DATETIME_ISO = datetime.now().isoformat()
@@ -17,6 +17,8 @@ DATETIME_ISO = datetime.now().isoformat()
 RE_ISO = re.compile(r"[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}")
 
 DATES = [("datetime_object", DATETIME_OBJ), ("datetime_iso", DATETIME_ISO)]
+
+ITEM_FILESIZES = [1, int(BATCH_MAX_FILESIZE) // 3, int(BATCH_MAX_FILESIZE) - 1]
 
 
 class TestString:
@@ -77,18 +79,33 @@ class TestBatchList:
         assert not self.blist.batches
 
     # Assuming default is 50, 102 = 3 batches, 50/50/2 ; 150 = 50/50/50; 157 == 4, 50/50/50/7
-    # move thru the batches, making sure each other than the last is DEFAULT_BATCH_SIZE long
+    # move thru the batches, making sure each other than the last is at most BATCH_MAX_SIZE long
+    # and each batch has cumulative file_size less than BATCH_MAX_FILESIZE
     @pytest.mark.parametrize("list_size", [102, 150, 157])
-    def test_batch_creation(self, batchlist, list_size):
+    @pytest.mark.parametrize("item_filesize", ITEM_FILESIZES)
+    def test_batch_creation(self, batchlist, list_size, item_filesize):
         """Test creation of batch list."""
+
         for i in range(list_size):
-            self.blist.add_item(i)
-        total_batches = math.ceil(list_size / int(DEFAULT_BATCH_SIZE))
-        last_batch_size = list_size % int(DEFAULT_BATCH_SIZE)
+            self.blist.add_item(i, item_filesize)
+
+        # batch size is variable, if items are too large, the batch might contain less than BATCH_MAX_SIZE items
+        batch_size = min(int(BATCH_MAX_SIZE), int(BATCH_MAX_FILESIZE) // item_filesize)
+
+        total_batches = math.ceil(list_size / batch_size)
+        last_batch_size = list_size % batch_size
         assert len(self.blist.batches) == total_batches
         for curr_batch in range(total_batches):
             if curr_batch == (total_batches - 1) and last_batch_size > 0:
                 expected_num_in_batch = last_batch_size
             else:
-                expected_num_in_batch = int(DEFAULT_BATCH_SIZE)
+                expected_num_in_batch = batch_size
             assert len(self.blist.batches[curr_batch]) == expected_num_in_batch
+
+    def test_invalid_batch_size(self, batchlist):
+        """
+        Test creation of an invalid batch list.
+        Should fail because single item is larger than max batch size
+        """
+        with pytest.raises(AssertionError):
+            self.test_batch_creation(batchlist, 102, int(BATCH_MAX_FILESIZE) + 1)
