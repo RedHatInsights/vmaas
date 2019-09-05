@@ -23,7 +23,7 @@ RUN pip install --upgrade pip pipenv && \
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV VMAAS_VERSION=latest
 ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-websocket\/"
-ENV MANIFEST_PYTHON=python3
+ENV MANIFEST_PYTHON=python
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
 RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt $MANIFEST_PYTHON && \
