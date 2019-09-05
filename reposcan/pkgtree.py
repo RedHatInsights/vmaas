@@ -54,7 +54,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         return NamedCursor(self.db_instance)
 
     def dump(self):
-        """Dump necessary data tu disk file"""
+        """Dump necessary data to disk file"""
         starttime = now()
         timestamp = format_datetime(starttime)
         self._update_pkgtree_timestamp(timestamp)

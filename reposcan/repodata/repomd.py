@@ -31,7 +31,18 @@ class RepoMD:
             location = child.find("repo:location", NS).get("href")
             checksum_type = child.find("repo:checksum", NS).get("type")
             checksum = text_strip(child.find("repo:checksum", NS))
-            self.data[data_type] = {"location": location, "checksum_type": checksum_type, "checksum": checksum}
+            size = child.find("repo:size", NS)
+            open_size = child.find("repo:open-size", NS)
+
+            self.data[data_type] = {
+                "location": location,
+                "checksum_type": checksum_type,
+                "checksum": checksum,
+                "size": int(size.text)
+            }
+
+            if open_size:
+                self.data[data_type]["open-size"] = int(open_size.text)
 
     def get_revision(self):
         """Returns revision field of parsed repomd file. This is in format of Unix timestamp."""
