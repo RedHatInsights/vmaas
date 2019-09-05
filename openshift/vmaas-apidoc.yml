@@ -55,6 +55,7 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: ${DOCKERFILE}
+        forcePull: true
       type: Docker
     triggers:
     - {type: ConfigChange}
