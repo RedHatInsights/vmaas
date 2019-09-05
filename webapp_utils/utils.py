@@ -54,7 +54,7 @@ def parse_datetime(date):
     return ret
 
 DEFAULT_PAGE = 1
-DEFAULT_PAGE_SIZE = 2
+DEFAULT_PAGE_SIZE = 5000
 def paginate(input_list, page, page_size):
     """Split input list into pages and return only requested page."""
     def _validate_num(num, default):

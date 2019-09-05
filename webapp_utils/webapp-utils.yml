@@ -101,7 +101,9 @@ paths:
         content:
           application/vnd.api+json:
             schema: 
-              $ref: '#/components/schemas/ErrataList'
+              oneOf:
+                - $ref: '#/components/schemas/ErrataList'
+                - $ref: '#/components/schemas/ErrataSearch'
       tags:
         - errata
 
@@ -271,9 +273,22 @@ components:
       properties:
         errata_list:
           type: array
-          items: 
+          items:
             type: string
             example: RHSA-2018:0512
         modified_since:
           type: string
           example: 2018-04-05T01:23:45+02:00
+      
+    ErrataSearch:
+      type: object
+      required:
+        - errata_search
+      properties:
+        errata_search:
+          type: string
+          example: RHSA-2018:05
+        modified_since:
+          type: string
+          example: 2018-04-05T01:23:45+02:00
+
