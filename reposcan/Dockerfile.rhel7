@@ -35,6 +35,7 @@ USER vmaas
 
 EXPOSE 8081 8730
 
+ADD /reposcan/*.spec.yaml    /reposcan/
 ADD /reposcan/*.sh           /reposcan/
 ADD /reposcan/*.py           /reposcan/
 ADD /reposcan/database/*.py  /reposcan/database/
