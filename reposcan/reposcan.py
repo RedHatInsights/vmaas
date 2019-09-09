@@ -8,12 +8,19 @@ import os
 import signal
 from multiprocessing.pool import Pool
 import json
+import yaml
 import requests
+
+from base import GetRequest, PostRequest, PutRequest, DeleteRequest, Request
 
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import RequestHandler, Application
+from tornado.wsgi import WSGIContainer
 from tornado.websocket import websocket_connect
+from tornado.httpserver import HTTPServer
+import connexion
+from flask import Response, request, send_file, make_response
 
 from apidoc import SPEC, VMAAS_VERSION, setup_apispec
 from common.logging_utils import get_logger, init_logging
@@ -33,8 +40,10 @@ DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
+
 class TaskStatusResponse(dict):
     """Object used as API response to user."""
+
     def __init__(self, running=False, task_type=None):
         super(TaskStatusResponse, self).__init__()
         self['running'] = running
@@ -43,84 +52,27 @@ class TaskStatusResponse(dict):
 
 class TaskStartResponse(dict):
     """Object used as API response to user."""
+
     def __init__(self, msg, success=True):
         super(TaskStartResponse, self).__init__()
         self['msg'] = msg
         self['success'] = success
 
 
-class BaseHandler(RequestHandler):
-    """Base handler setting CORS headers."""
-    def data_received(self, chunk):
-        pass
-
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type")
-        self.set_header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
-
-    def options(self):
-        """Answer OPTIONS request."""
-        self.finish()
-
-    def is_authorized(self):
-        """Authorization check routine
-
-            only requests from the localhost are allowed w/o authorization token,
-            otherwise, GitHub authorization token is required
-        """
-
-        host_request = self.request.host.split(':')[0]
-
-        if host_request in ('localhost', '127.0.0.1'):
-            return True
-
-        github_token = self.request.headers.get('Authorization', None)
-        if not github_token:
-            FAILED_AUTH.inc()
-            return False
-
-        user_info_response = requests.get('https://api.github.com/user',
-                                          headers={'Authorization': github_token})
-
-        if user_info_response.status_code != 200:
-            FAILED_AUTH.inc()
-            LOGGER.warning("Cannot execute github API with provided %s", github_token)
-            return False
-        github_user_login = user_info_response.json()['login']
-        orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
-                                     headers={'Authorization': github_token})
-
-        if orgs_response.status_code != 200:
-            FAILED_AUTH.inc()
-            LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
-            return False
-
-        authorized_org = os.getenv('AUTHORIZED_API_ORG', DEFAULT_AUTHORIZED_API_ORG)
-
-        for org_info in orgs_response.json():
-            if org_info['login'] == authorized_org:
-                request_str = str(self.request)
-                LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
-                               user_info_response.json()['id'], request_str)
-                return True
-
-        FAILED_AUTH.inc()
-        LOGGER.warning("User %s does not belong to %s organization", authorized_org, github_user_login)
-        return False
-
-
-class MetricsHandler(BaseHandler):
+class MetricsHandler(GetRequest):
     """Handle requests to the metrics"""
 
-    def get(self): # pylint: disable=arguments-differ
+    @classmethod
+    def handle_get(cls, **kwargs):  # pylint: disable=arguments-differ
         """Get prometheus metrics"""
-        self.write(generate_latest())
+        return generate_latest()
 
-class HealthHandler(BaseHandler):
+
+class HealthHandler(GetRequest):
     """Handler class providing health status."""
 
-    def get(self):
+    @classmethod
+    def handle_get(cls, **kwargs):
         """Get API status.
            ---
            description: Return API status
@@ -128,25 +80,14 @@ class HealthHandler(BaseHandler):
              200:
                description: Application is alive
         """
-        self.flush()
+        return True, 200
 
 
-class ApiSpecHandler(BaseHandler):
-    """Handler class providing API specification."""
-    def get(self):
-        """Get API specification.
-           ---
-           description: Get API specification
-           responses:
-             200:
-               description: OpenAPI/Swagger 2.0 specification JSON returned
-        """
-        self.write(SPEC.to_dict())
-
-
-class VersionHandler(BaseHandler):
+class VersionHandler(GetRequest):
     """Handler class providing app version."""
-    def get(self):
+
+    @classmethod
+    def handle_get(cls, **kwargs):
         """Get app version.
            ---
            description: Get version of application
@@ -154,14 +95,14 @@ class VersionHandler(BaseHandler):
              200:
                description: Version of application returned
         """
-        self.write(VMAAS_VERSION)
-        self.flush()
+        return VMAAS_VERSION
 
 
-class TaskStatusHandler(BaseHandler):
+class TaskStatusHandler(GetRequest):
     """Handler class providing status of currently running background task."""
 
-    def get(self):
+    @classmethod
+    def handle_get(cls, **kwargs):
         """Get status of currently running background task.
            ---
            description: Get status of currently running background task
@@ -173,14 +114,14 @@ class TaskStatusHandler(BaseHandler):
            tags:
              - task
         """
-        self.write(TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type()))
-        self.flush()
+        return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
 
-class TaskCancelHandler(BaseHandler):
+class TaskCancelHandler(PutRequest):
     """Handler class to cancel currently running background task."""
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Cancel currently running background task.
            ---
            description: Cancel currently running background task
@@ -194,18 +135,16 @@ class TaskCancelHandler(BaseHandler):
            tags:
              - task
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
+            return 'Valid authorization token was not provided', 403
         if SyncTask.is_running():
             SyncTask.cancel()
             LOGGER.warning("Background task terminated.")
-        self.write(TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type()))
-        self.flush()
+        return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
 
-class SyncHandler(BaseHandler):
+class SyncHandler:
     """Base handler class providing common methods for different sync types."""
 
     task_type = "Unknown"
@@ -227,7 +166,6 @@ class SyncHandler(BaseHandler):
             status_msg = TaskStartResponse(msg, success=False)
         return status_code, status_msg
 
-
     @classmethod
     def run_task_and_export(cls, *args, **kwargs):
         """Run sync task of current class and export."""
@@ -247,21 +185,21 @@ class SyncHandler(BaseHandler):
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler):
             # Notify webapps to update it's cache
-            if ReposcanApplication.websocket:
-                ReposcanApplication.websocket.write_message("invalidate-cache")
+            if ReposcanWebsocket.websocket:
+                ReposcanWebsocket.websocket.write_message("invalidate-cache")
             else:
-                ReposcanApplication.websocket_response_queue.add("invalidate-cache")
+                ReposcanWebsocket.websocket_response_queue.add("invalidate-cache")
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
 
-class RepoListHandler(SyncHandler):
+class RepoListHandler(PostRequest, SyncHandler):
     """Handler for repository list/add API."""
 
     task_type = "Import repositories"
 
-    @staticmethod
-    def _content_set_to_repos(content_set):
+    @classmethod
+    def _content_set_to_repos(cls, content_set):
         baseurl = content_set["baseurl"]
         basearches = content_set["basearch"]
         releasevers = content_set["releasever"]
@@ -279,17 +217,19 @@ class RepoListHandler(SyncHandler):
 
         return repos
 
-    def _parse_input_list(self):
+    @classmethod
+    def _parse_input_list(cls):
         products = {}
         repos = []
         json_data = ""
         # check if JSON is passed as a file or as a body of POST request
-        if self.request.files:
-            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
-        elif self.request.body:
-            json_data = self.request.body
+        data = None
+        if request.files:
+            json_data = request.files['file'][0]['body']  # pick up only first file (index 0)
+            data = json.loads(json_data)
+        elif request.data:
+            data = request.json
 
-        data = json.loads(json_data)
         for repo_group in data:
             # Entitlement cert is optional
             if "entitlement_cert" in repo_group:
@@ -315,13 +255,14 @@ class RepoListHandler(SyncHandler):
                 products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
                 for content_set_label, content_set in product["content_sets"].items():
                     products[product_name]["content_sets"][content_set_label] = content_set["name"]
-                    for repo_url, basearch, releasever in self._content_set_to_repos(content_set):
+                    for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
                         repos.append((repo_url, content_set_label, basearch, releasever,
                                       cert_name, ca_cert, cert, key))
 
         return products, repos
 
-    def post(self):
+    @classmethod
+    def handle_post(cls, **kwargs):
         """Add repositories listed in request to the DB.
            ---
            description: Add repositories listed in request to the DB
@@ -404,24 +345,19 @@ class RepoListHandler(SyncHandler):
            tags:
              - repos
         """
-        if not self.is_authorized():
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
+        if not cls.is_authorized():
+            return 'Valid authorization token was not provided', 403
         try:
-            products, repos = self._parse_input_list()
-        except Exception as err: # pylint: disable=broad-except
+            products, repos = cls._parse_input_list()
+        except Exception as err:  # pylint: disable=broad-except
             products = None
             repos = None
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
-            self.set_status(400)
-            self.write(TaskStartResponse(msg, success=False))
-            self.flush()
+            return TaskStartResponse(msg, success=False), 400
         if repos:
-            status_code, status_msg = self.start_task(products=products, repos=repos)
-            self.set_status(status_code)
-            self.write(status_msg)
-            self.flush()
+            status_code, status_msg = cls.start_task(products=products, repos=repos)
+            return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -444,7 +380,7 @@ class RepoListHandler(SyncHandler):
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
                 repository_controller.import_repositories()
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -452,14 +388,12 @@ class RepoListHandler(SyncHandler):
         return "OK"
 
 
-class RepoDeleteHandler(SyncHandler):
+class RepoDeleteHandler(DeleteRequest, SyncHandler):
     """Handler for repository item API."""
 
     task_type = "Delete repositories"
 
-    def options(self, repo=None): # pylint: disable=arguments-differ,unused-argument
-        self.finish()
-
+    @classmethod
     def delete(self, repo=None):
         """Delete repository.
            ---
@@ -485,11 +419,9 @@ class RepoDeleteHandler(SyncHandler):
         """
         if not self.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
+            return 'Valid authorization token was not provided', 403
         status_code, status_msg = self.start_task(repo=repo)
-        self.set_status(status_code)
-        self.write(status_msg)
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -508,12 +440,13 @@ class RepoDeleteHandler(SyncHandler):
         return "OK"
 
 
-class ExporterHandler(SyncHandler):
+class ExporterHandler(PutRequest, SyncHandler):
     """Handler for Export API."""
 
     task_type = "Export dump"
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Export disk dump.
            ---
            description: Export disk dump
@@ -529,21 +462,18 @@ class ExporterHandler(SyncHandler):
            tags:
              - export
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start exporting disk dump."""
         try:
             export_data(DUMP)
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -551,12 +481,13 @@ class ExporterHandler(SyncHandler):
         return "OK"
 
 
-class PkgTreeHandler(SyncHandler):
+class PkgTreeHandler(PutRequest, SyncHandler):
     """Handler for Package Tree API."""
 
     task_type = "Export package tree"
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Export package tree.
            ---
            description: Export package tree
@@ -572,21 +503,18 @@ class PkgTreeHandler(SyncHandler):
            tags:
              - sync
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start exporting disk dump."""
         try:
             export_pkgtree(PKGTREE_FILE)
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -594,13 +522,11 @@ class PkgTreeHandler(SyncHandler):
         return "OK"
 
 
-class PkgTreeDownloadHandler(BaseHandler):
+class PkgTreeDownloadHandler(GetRequest):
     """Handler class to download package tree to the caller."""
-    def __init__(self, application, request, **kwargs):
-        super(PkgTreeDownloadHandler, self).__init__(application, request, **kwargs)
-        self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
 
-    def get(self):
+    @classmethod
+    def handle_get(cls, **kwargs):
         """Download the package tree.
            ---
            description: Download the package tree.
@@ -616,29 +542,38 @@ class PkgTreeDownloadHandler(BaseHandler):
            tags:
              - pkgtree
         """
-        if not self.is_authorized():
+        chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
+            return 'Valid authorization token was not provided', 403
 
         try:
-            with open(PKGTREE_FILE, 'rb') as pkgtree_file_reader:
-                self.set_header("Content-Type", "application/json")
-                self.set_header("Content-Encoding", "gzip")
-                while True:
-                    chunk = pkgtree_file_reader.read(self.chunk_size)
-                    if not chunk:
-                        break
-                    self.write(chunk)
-                self.flush()
-        except FileNotFoundError:
-            self.set_status(404, 'Package Tree file not found.  Has it been generated?')
-            return
+            headers = {
+                "Content-Type": "application/json",
+                "Content-Encoding": "gzip"
+            }
 
-class DbChangeHandler(BaseHandler):
+            def gen():
+                with open(PKGTREE_FILE, 'rb') as pkgtree_file_reader:
+                    while True:
+                        chunk = pkgtree_file_reader.read(chunk_size)
+                        if not chunk:
+                            break
+                        yield chunk
+
+            response = make_response(send_file(PKGTREE_FILE))
+            response.headers["Content-Type"] = "application/json"
+            response.headers["Content-Encoding"] = "gzip"
+            return response
+        except FileNotFoundError:
+            return 'Package Tree file not found.  Has it been generated?', 404
+
+
+class DbChangeHandler(GetRequest):
     """Handler for dbchange metadata information API. """
 
-    def get(self):
+    @classmethod
+    def handle_get(cls, **kwargs):
         """
         Get the metadata information about database.
         ---
@@ -653,14 +588,16 @@ class DbChangeHandler(BaseHandler):
         """
         dbchange_api = DbChangeAPI()
         result = dbchange_api.process()
-        self.write(result)
+        return result
 
-class RepoSyncHandler(SyncHandler):
+
+class RepoSyncHandler(PutRequest, SyncHandler):
     """Handler for repository sync API."""
 
     task_type = "Sync repositories"
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Sync repositories stored in DB.
            ---
            description: Sync repositories stored in DB
@@ -676,14 +613,11 @@ class RepoSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -694,7 +628,7 @@ class RepoSyncHandler(SyncHandler):
             repository_controller = RepositoryController()
             repository_controller.add_db_repositories()
             repository_controller.store()
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -702,12 +636,13 @@ class RepoSyncHandler(SyncHandler):
         return "OK"
 
 
-class CveSyncHandler(SyncHandler):
+class CveSyncHandler(PutRequest, SyncHandler):
     """Handler for CVE sync API."""
 
     task_type = "Sync CVEs"
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Sync CVEs.
            ---
            description: Sync CVE lists
@@ -723,13 +658,11 @@ class CveSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        if not self.is_authorized():
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+        if not cls.is_authorized():
+            FAILED_AUTH.inc()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -740,7 +673,7 @@ class CveSyncHandler(SyncHandler):
             controller = CveRepoController()
             controller.add_repos()
             controller.store()
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -748,12 +681,13 @@ class CveSyncHandler(SyncHandler):
         return "OK"
 
 
-class CvemapSyncHandler(SyncHandler):
+class CvemapSyncHandler(PutRequest, SyncHandler):
     """Handler for CVE sync API."""
 
     task_type = "Sync CVE map"
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Sync CVEmap.
            ---
            description: Sync CVE map
@@ -769,14 +703,11 @@ class CvemapSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -786,7 +717,7 @@ class CvemapSyncHandler(SyncHandler):
             init_db()
             controller = CvemapController()
             controller.store()
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
@@ -794,14 +725,15 @@ class CvemapSyncHandler(SyncHandler):
         return "OK"
 
 
-class AllSyncHandler(SyncHandler):
+class AllSyncHandler(PutRequest, SyncHandler):
     """Handler for repo + CVE sync API."""
 
     task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
                                   CvemapSyncHandler.task_type,
                                   CveSyncHandler.task_type)
 
-    def put(self):
+    @classmethod
+    def handle_put(cls, **kwargs):
         """Sync repos + CVEs + CVEmap.
            ---
            description: Sync repositories stored in DB and CVE lists
@@ -817,14 +749,11 @@ class AllSyncHandler(SyncHandler):
            tags:
              - sync
         """
-        if not self.is_authorized():
+        if not cls.is_authorized():
             FAILED_AUTH.inc()
-            self.set_status(403, 'Valid authorization token was not provided')
-            return
-        status_code, status_msg = self.start_task()
-        self.set_status(status_code)
-        self.write(status_msg)
-        self.flush()
+            return 'Valid authorization token was not provided', 403
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -852,6 +781,7 @@ class SyncTask:
 
         def _callback(result):
             ioloop.add_callback(lambda: callback(result))
+
         cls.workers.apply_async(func, args, kwargs, _callback)
 
     @classmethod
@@ -879,7 +809,7 @@ class SyncTask:
         cls.finish()
 
 
-class ReposcanApplication(Application):
+class ReposcanWebsocket():
     """Class defining API handlers."""
 
     websocket = None
@@ -887,37 +817,12 @@ class ReposcanApplication(Application):
     websocket_response_queue = set()
     reconnect_callback = None
 
-    def __init__(self):
-        handlers = [
-            (r"/api/v1/monitoring/health/?", HealthHandler),
-            (r"/api/v1/apispec/?", ApiSpecHandler),
-            (r"/api/v1/version/?", VersionHandler),
-            (r"/api/v1/repos/?", RepoListHandler),
-            (r"/api/v1/repos/(?P<repo>[\\a-zA-Z0-9%*-.+?\[\]]+)", RepoDeleteHandler),
-            (r"/api/v1/sync/?", AllSyncHandler),
-            (r"/api/v1/sync/repo/?", RepoSyncHandler),
-            (r"/api/v1/sync/cve/?", CveSyncHandler),
-            (r"/api/v1/sync/cvemap/?", CvemapSyncHandler),
-            (r"/api/v1/sync/pkgtree/?", PkgTreeHandler),
-            (r"/api/v1/export/?", ExporterHandler),
-            (r"/api/v1/pkgtree/?", PkgTreeDownloadHandler),
-            (r"/api/v1/task/status/?", TaskStatusHandler),
-            (r"/api/v1/task/cancel/?", TaskCancelHandler),
-            (r"/metrics", MetricsHandler),
-            (r"/api/v1/dbchange/?", DbChangeHandler)
-        ]
-
-        Application.__init__(self, handlers)
-
-        setup_apispec(handlers)
-
     @staticmethod
     def stop():
         """Stop the application"""
         if SyncTask.is_running():
             SyncTask.cancel()
         IOLoop.instance().stop()
-
 
     @classmethod
     def websocket_reconnect(cls):
@@ -931,7 +836,7 @@ class ReposcanApplication(Application):
         """Check if connection attempt succeeded."""
         try:
             result = future.result()
-        except: # pylint: disable=bare-except
+        except:  # pylint: disable=bare-except
             result = None
 
         if result is None:
@@ -972,29 +877,46 @@ def create_app():
         PeriodicCallback(periodic_sync, sync_interval).start()
     else:
         LOGGER.info("Periodic syncing disabled.")
-    app = ReposcanApplication()
+
+    ws_handler = ReposcanWebsocket()
 
     def terminate(*_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
-        IOLoop.instance().add_callback_from_signal(app.stop)
+        IOLoop.instance().add_callback_from_signal(ws_handler.stop)
 
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
     for sig in signals:
         signal.signal(sig, terminate)
 
-    app.listen(8081)
+    ws_handler.websocket_reconnect()
+    ws_handler.reconnect_callback = PeriodicCallback(ws_handler.websocket_reconnect,
+                                                     WEBSOCKET_RECONNECT_INTERVAL * 1000)
+    ws_handler.reconnect_callback.start()
 
-    app.websocket_reconnect()
-    app.reconnect_callback = PeriodicCallback(app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
-    app.reconnect_callback.start()
+    app = connexion.App('VMaas Reposcan', options={
+        'swagger_ui': True,
+        'openapi_spec_path': '/v1/openapi.json'
+    })
+
+    with open('reposcan.spec.yaml', 'rb') as specfile:
+        SPEC = yaml.safe_load(specfile)
+
+    app.app.url_map.strict_slashes = False
+    app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
+                validate_responses=True,
+                strict_validation=True)
+
+    @app.app.route('/metrics', methods=['GET'])
+    def metrics():  # pylint: disable=unused-variable
+        return generate_latest()
+
+    return app
 
 
-def main():
-    """Main entrypoint."""
-    create_app()
-    IOLoop.instance().start()
-
+application = create_app()
 
 if __name__ == '__main__':
-    main()
+    server = HTTPServer(WSGIContainer(application))
+    server.listen(8081)
+    IOLoop.instance().start()

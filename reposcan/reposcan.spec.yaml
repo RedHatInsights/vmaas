@@ -1,0 +1,374 @@
+openapi: '3.0.0'
+
+info:
+  title: VMaaS Reposcan
+  version: latest
+
+x-format-resps: &format_resps
+  400:
+    description: Invalid input json format
+
+x-std-resps: &auth_resps
+  403:
+    description: GitHub personal access token (PAT) was not provided for authorization.
+
+x-running-resp: &running_resp
+  429:
+    description: Another task is already in progress
+
+x-secured: &secured
+  x-security:
+    - GhAuth: []
+
+paths:
+  /api/v1/monitoring/health:
+    get:
+      summary: Application availability
+      description: Check whether this application is live
+      operationId: reposcan.HealthHandler.get
+      x-methodName: getHealth
+      responses:
+        200:
+          description: Application available
+          content:
+            text/plain:
+              schema:
+                type: boolean
+                example: true
+      tags:
+        - Metadata
+
+  /api/v1/version:
+    get:
+      summary: Application version
+      operationId: reposcan.VersionHandler.get
+      x-methodName: getVersion
+      responses:
+        200:
+          description: Application version
+          content:
+            text/plain:
+              schema: { type: string, example: '0.0.0'}
+      tags:
+        - Metadata
+
+  /api/v1/repos:
+    post:
+      summary:  Add repositories to the DB
+      operationId: reposcan.RepoListHandler.post
+      <<: *secured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AddRepoItem'
+
+      responses: &repo_responses
+        200:
+          description: Import started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStartResponse'
+        <<: *running_resp
+        <<: *auth_resps
+        <<: *format_resps
+      tags:
+        - Repos
+
+  /api/v1/repos/{repo}:
+    delete:
+      summary: Delete repo from the DB
+      operationId: reposcan.RepoDeleteHandler.delete
+      <<: *secured
+      parameters:
+        - name: repo
+          description: Repository name or POSIX regular expression pattern
+          required: true
+          in: path
+          x-example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\d-server-rpms
+          schema:
+            type: string
+      responses:
+        <<: *repo_responses
+      tags:
+        - Repos
+
+  /api/v1/sync:
+    put:
+      summary: Sync repositories stored in DB and CVE lists
+      operationId: reposcan.AllSyncHandler.put
+      <<: *secured
+      responses: &sync_responses
+        200:
+          description: Sync started
+        <<: *running_resp
+        <<: *auth_resps
+      tags:
+        - Sync
+
+  /api/v1/sync/repo:
+    put:
+      summary: Sync the package tree
+      operationId: reposcan.RepoSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
+  /api/v1/sync/cve:
+    put:
+      summary: Sync the package tree
+      operationId: reposcan.CveSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
+  /api/v1/sync/cvemap:
+    put:
+      summary: Sync the package tree
+      operationId: reposcan.CvemapSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
+  /api/v1/sync/pkgtree:
+    put:
+      summary: Sync the package tree
+      operationId: reposcan.PkgTreeHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
+  /api/v1/export:
+    put:
+      summary: Export disk dump
+      operationId: reposcan.ExporterHandler.put
+      <<: *secured
+      responses:
+        200:
+          description: Sync started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStartResponse"
+
+        <<: *auth_resps
+        <<: *running_resp
+      tags:
+        - Sync
+
+  /api/v1/pkgtree:
+    get:
+      summary: Download the package tree.
+      operationId: reposcan.PkgTreeDownloadHandler.get
+      <<: *secured
+      responses:
+        200:
+          description: The package tree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PkgTreeDownloadResponse"
+        404:
+          description: Package tree not found
+          content:
+            text/plain:
+              schema: { type: string, example: "Pkgtree file not found - has it been generated ?" }
+
+        <<: *auth_resps
+      tags:
+        - PkgTree
+
+  /api/v1/task/status:
+    get:
+      summary: Get status of currently running background task
+      operationId: reposcan.TaskStatusHandler.get
+      responses:
+        200:
+          description:  Status of currently running background task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStatusResponse"
+      tags:
+        - Task
+
+  /api/v1/task/cancel:
+    put:
+      summary: Cancel currently running background task
+      operationId: reposcan.TaskCancelHandler.put
+      <<: *secured
+      responses:
+        200:
+          description: Task canceled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStatusResponse"
+        <<: *auth_resps
+      tags:
+        - Task
+
+  /api/v1/dbchange:
+    get:
+      summary: Information about database sync
+      operationId: reposcan.DbChangeHandler.get
+      responses:
+        200:
+          description: Returns timestamp of last pkgtree export
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/DbChangeResponse"
+      tags:
+        - DbChange
+
+
+components:
+  securitySchemes:
+    GhAuth:
+      type: http
+      scheme: bearer
+      x-bearerInfoFunc: base.Request.validate
+
+  schemas:
+    CertItem:
+      type: object
+      properties:
+        name:
+          type: string
+          example: RHSM-CDN
+        ca_cert:
+          type: string
+        cert:
+          type: string
+        key:
+          type: string
+      required:
+        - name
+        - ca_cert
+
+    ProductItem:
+      type: object
+      properties:
+        redhat_eng_product_id:
+          type: integer
+          example: 69
+        content_sets:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Red Hat Enterprise Linux 6 Server (RPMs)
+              baseurl:
+                type: string
+                example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+              basearch:
+                type: array
+                items:
+                  type: string
+                  example: x86_64
+              releasever:
+                type: array
+                items:
+                  type: string
+                  example: 6Server
+            required:
+            - name
+            - baseurl
+            - basearch
+            - releasever
+      required:
+      - content_sets
+    AddRepoItem:
+      type: object
+      properties:
+        entitlement_cert:
+          $ref: '#/components/schemas/CertItem'
+        products:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProductItem'
+      required:
+      - products
+    TaskStatusResponse:
+      type: object
+      properties:
+        running:
+          type: boolean
+        task_type:
+          type: string
+          example: Sync CVEs
+          x-nullable: true
+      required:
+        - running
+
+    TaskStartResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        msg: { type: string, example: 'Repo sync has started' }
+    ErrataObj:
+      type: object
+      properties:
+        name: { type: string, example: RHSA-2010:0842 }
+        issued: { type: string, example: '2010-11-10T00:00:00+00:00' }
+        cve_list:
+          type: array
+          items: { type: string, example: CVE-2010-3437}
+
+    PkgObj:
+      type: object
+      properties:
+        nevra:
+          type: string
+          example: kernel-2.6.32-71.el6.x86_64
+        first_published:
+          type: string
+          example: '2010-11-10T00:00:00+00:00'
+        repositories:
+          type: object
+          properties:
+            label:
+              type: string
+              example: rhel-6-workstation-rpms
+            name:
+              type: string
+              example: Red Hat Enterprise Linux 6 Workstation (RPMs)
+            arch:
+              type: string
+              example: x86_64
+            releasever:
+              type: string
+              example: 6Workstation
+            revision:
+              type: string
+              example: '2018-08-20T15:11:29+00:00'
+        errata:
+          $ref: '#/components/schemas/ErrataObj'
+
+    PkgTreeDownloadResponse:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/PkgObj'
+
+    DbChangeResponse:
+      type: object
+      properties:
+        pktree_change: { type: string, format: date-time,  example: '2010-11-10T00:00:00+00:00' }
+
