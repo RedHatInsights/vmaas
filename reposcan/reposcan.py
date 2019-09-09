@@ -37,7 +37,6 @@ from repodata.repository_controller import RepositoryController
 LOGGER = get_logger(__name__)
 
 DEFAULT_CHUNK_SIZE = "1048576"
-DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
 
@@ -73,13 +72,7 @@ class HealthHandler(GetRequest):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        """Get API status.
-           ---
-           description: Return API status
-           responses:
-             200:
-               description: Application is alive
-        """
+        """Get API status."""
         return True, 200
 
 
@@ -88,13 +81,7 @@ class VersionHandler(GetRequest):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        """Get app version.
-           ---
-           description: Get version of application
-           responses:
-             200:
-               description: Version of application returned
-        """
+        """Get app version."""
         return VMAAS_VERSION
 
 
@@ -103,17 +90,7 @@ class TaskStatusHandler(GetRequest):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        """Get status of currently running background task.
-           ---
-           description: Get status of currently running background task
-           responses:
-             200:
-               description: Status of currently running background task
-               schema:
-                 $ref: "#/definitions/TaskStatusResponse"
-           tags:
-             - task
-        """
+        """Get status of currently running background task."""
         return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
 
@@ -122,19 +99,7 @@ class TaskCancelHandler(PutRequest):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Cancel currently running background task.
-           ---
-           description: Cancel currently running background task
-           responses:
-             200:
-               description: Task canceled
-               schema:
-                 $ref: "#/definitions/TaskStatusResponse"
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - task
-        """
+        """Cancel currently running background task."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -263,88 +228,7 @@ class RepoListHandler(PostRequest, SyncHandler):
 
     @classmethod
     def handle_post(cls, **kwargs):
-        """Add repositories listed in request to the DB.
-           ---
-           description: Add repositories listed in request to the DB
-           parameters:
-             - name: body
-               description: Input JSON
-               required: True
-               in: body
-               schema:
-                 type: array
-                 items:
-                   type: object
-                   properties:
-                     entitlement_cert:
-                       type: object
-                       properties:
-                         name:
-                           type: string
-                           example: RHSM-CDN
-                         ca_cert:
-                           type: string
-                         cert:
-                           type: string
-                         key:
-                           type: string
-                       required:
-                         - name
-                         - ca_cert
-                     products:
-                       type: object
-                       properties:
-                         Red Hat Enterprise Linux Server:
-                           type: object
-                           properties:
-                             redhat_eng_product_id:
-                               type: integer
-                               example: 69
-                             content_sets:
-                               type: object
-                               properties:
-                                 rhel-6-server-rpms:
-                                   type: object
-                                   properties:
-                                     name:
-                                       type: string
-                                       example: Red Hat Enterprise Linux 6 Server (RPMs)
-                                     baseurl:
-                                       type: string
-                                       example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
-                                     basearch:
-                                       type: array
-                                       items:
-                                         type: string
-                                         example: x86_64
-                                     releasever:
-                                       type: array
-                                       items:
-                                         type: string
-                                         example: 6Server
-                                   required:
-                                     - name
-                                     - baseurl
-                                     - basearch
-                                     - releasever
-                           required:
-                             - content_sets
-                   required:
-                     - products
-           responses:
-             200:
-               description: Repos and products import started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             400:
-               description: Invalid input JSON format
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - repos
-        """
+        """Add repositories listed in request to the DB"""
         if not cls.is_authorized():
             return 'Valid authorization token was not provided', 403
         try:
@@ -395,28 +279,7 @@ class RepoDeleteHandler(DeleteRequest, SyncHandler):
 
     @classmethod
     def delete(self, repo=None):
-        """Delete repository.
-           ---
-           description: Delete repository
-           parameters:
-             - name: repo
-               description: Repository name or POSIX regular expression pattern
-               required: True
-               type: string
-               in: path
-               x-example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
-           responses:
-             200:
-               description: Repository deletion started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - repos
-        """
+        """Delete repository."""
         if not self.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -447,21 +310,7 @@ class ExporterHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Export disk dump.
-           ---
-           description: Export disk dump
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - export
-        """
+        """Export disk dump."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -488,21 +337,7 @@ class PkgTreeHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Export package tree.
-           ---
-           description: Export package tree
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - sync
-        """
+        """Export package tree."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -527,40 +362,12 @@ class PkgTreeDownloadHandler(GetRequest):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        """Download the package tree.
-           ---
-           description: Download the package tree.
-           responses:
-             200:
-               description: The package tree
-               schema:
-                 $ref: "#/definitions/PkgTreeDownloadResponse"
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-             404:
-               description: Package Tree file not found.  Has it been generated yet?  Try /sync/pkgtree first.
-           tags:
-             - pkgtree
-        """
-        chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
+        """Download the package tree."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
 
         try:
-            headers = {
-                "Content-Type": "application/json",
-                "Content-Encoding": "gzip"
-            }
-
-            def gen():
-                with open(PKGTREE_FILE, 'rb') as pkgtree_file_reader:
-                    while True:
-                        chunk = pkgtree_file_reader.read(chunk_size)
-                        if not chunk:
-                            break
-                        yield chunk
-
             response = make_response(send_file(PKGTREE_FILE))
             response.headers["Content-Type"] = "application/json"
             response.headers["Content-Encoding"] = "gzip"
@@ -574,18 +381,7 @@ class DbChangeHandler(GetRequest):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        """
-        Get the metadata information about database.
-        ---
-        description: Recieve metadata informations about database sync.
-        responses:
-          200:
-            description: Returns timestamp of last pkgtree export.
-            schema:
-              $ref: "#/definitions/DbChangeResponse"
-        tags:
-          - dbchange
-        """
+        """Get the metadata information about database."""
         dbchange_api = DbChangeAPI()
         result = dbchange_api.process()
         return result
@@ -598,21 +394,7 @@ class RepoSyncHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Sync repositories stored in DB.
-           ---
-           description: Sync repositories stored in DB
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - sync
-        """
+        """Sync repositories stored in DB."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -643,21 +425,7 @@ class CveSyncHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Sync CVEs.
-           ---
-           description: Sync CVE lists
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - sync
-        """
+        """Sync CVEs."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -688,21 +456,7 @@ class CvemapSyncHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Sync CVEmap.
-           ---
-           description: Sync CVE map
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - sync
-        """
+        """Sync CVEmap."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
@@ -734,21 +488,7 @@ class AllSyncHandler(PutRequest, SyncHandler):
 
     @classmethod
     def handle_put(cls, **kwargs):
-        """Sync repos + CVEs + CVEmap.
-           ---
-           description: Sync repositories stored in DB and CVE lists
-           responses:
-             200:
-               description: Sync started
-               schema:
-                 $ref: "#/definitions/TaskStartResponse"
-             429:
-               description: Another task is already in progress
-             403:
-               description: GitHub personal access token (PAT) was not provided for authorization.
-           tags:
-             - sync
-        """
+        """Sync repos + CVEs + CVEmap."""
         if not cls.is_authorized():
             FAILED_AUTH.inc()
             return 'Valid authorization token was not provided', 403
