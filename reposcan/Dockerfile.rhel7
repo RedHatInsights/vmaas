@@ -16,7 +16,7 @@ ADD /reposcan/Pipfile*       /reposcan/
 
 ENV LC_ALL=en_US.utf8
 ENV LANG=en_US.utf8
-RUN pip install --upgrade pip pipenv && \
+RUN pip install --upgrade pip && pip install --upgrade pipenv && \
     pipenv install --system && pipenv check
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
