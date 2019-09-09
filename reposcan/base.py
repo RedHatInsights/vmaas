@@ -7,30 +7,25 @@ import json
 from math import floor
 import os
 from distutils.util import strtobool  # pylint: disable=import-error, no-name-in-module
+import requests
 
-
-from flask import Response
+from flask import Response, request, Request
 from prometheus_client import Counter
 
-from common.identity import get_identity, is_entitled_smart_management
 from common.logging import get_logger
+from mnm import FAILED_AUTH, FAILED_WEBSOCK
 
 LOGGER = get_logger(__name__)
 
-VMAAS_HOST = os.environ.get('VMAAS_HOST', 'http://vmaas-webapp-1.vmaas-ci.svc:8080')  # pylint: disable=invalid-name
 DEFAULT_ROUTE = "%s/%s" % (os.environ.get('PATH_PREFIX', "/api"),
-                           os.environ.get('APP_NAME', "vulnerability"))
+                           os.environ.get('APP_NAME', "vmaas"))
 IDENTITY_HEADER = "x-rh-identity"
 DEFAULT_PAGE_SIZE = 25
 READ_ONLY_MODE = strtobool(os.environ.get('READ_ONLY_MODE', 'FALSE'))
 DEFAULT_BUSINESS_RISK = 'Not Defined'
+DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 
 LOGGER.info("Access URL: %s", DEFAULT_ROUTE)
-
-# Prometheus support
-# Counter for all-the-get-calls, dealt with in BaseHandler
-REQUEST_COUNTS = Counter('ve_manager_invocations', 'Number of calls per handler', ['method', 'endpoint'])
-ACCOUNT_REQUESTS = Counter('ve_manager_account_invocations', 'Number of calls per account', ['account'])
 
 
 class InvalidArgumentException(Exception):
@@ -70,44 +65,6 @@ def basic_auth(username, password, required_scopes=None):  # pylint: disable=unu
     """
     raise MissingEntitlementException
 
-
-def auth_common(identity):  # pylint: disable=unused-argument
-    """
-    Check account number and entitlements
-    """
-    if 'identity' not in identity:
-        return None
-    id_details = identity['identity']
-
-    if 'account_number' not in id_details:
-        return None
-    rh_account_number = id_details['account_number']
-
-    if not is_entitled_smart_management(identity):
-        raise MissingEntitlementException
-
-    ACCOUNT_REQUESTS.labels(rh_account_number).inc()
-    return {'uid': rh_account_number}
-
-
-def auth(x_rh_identity, required_scopes=None):  # pylint: disable=unused-argument
-    """
-    Parses account number from the x-rh-identity header
-    """
-    identity = get_identity(x_rh_identity)
-    return auth_common(identity) if identity is not None else None
-
-
-def auth_internal(x_rh_identity, required_scopes=None):  # pylint: disable=unused-argument
-    """
-    Parses account number from the x-rh-identity header and ensures account is internal
-    """
-    identity = get_identity(x_rh_identity)
-    if identity is not None:
-        if 'identity' not in identity or 'user' not in identity['identity'] or \
-                not identity['identity']['user'].get('is_internal', False):
-            raise InternalOnlyException
-    return auth_common(identity) if identity is not None else None
 
 
 def forbidden_missing_entitlement(exception):  # pylint: disable=unused-argument
@@ -197,6 +154,60 @@ class Request:
         }
 
     @staticmethod
+    def validate(github_token):
+        """Validate github token, method called by connexion based on x-bearerInfoFunc"""
+        if Request.is_authorized():
+            return {'scopes': github_token}
+        return None
+
+    @staticmethod
+    def is_authorized():
+        """Authorization check routine
+
+            only requests from the localhost are allowed w/o authorization token,
+            otherwise, GitHub authorization token is required
+        """
+
+        host_request = request.host.split(':')[0]
+
+        if host_request in ('localhost', '127.0.0.1'):
+            return True
+
+        github_token = request.headers.get('Authorization', None)
+        if not github_token:
+            FAILED_AUTH.inc()
+            return False
+
+        user_info_response = requests.get('https://api.github.com/user',
+                                          headers={'Authorization': github_token})
+
+        if user_info_response.status_code != 200:
+            FAILED_AUTH.inc()
+            LOGGER.warning("Cannot execute github API with provided %s", github_token)
+            return False
+        github_user_login = user_info_response.json()['login']
+        orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
+                                     headers={'Authorization': github_token})
+
+        if orgs_response.status_code != 200:
+            FAILED_AUTH.inc()
+            LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
+            return False
+
+        authorized_org = os.getenv('AUTHORIZED_API_ORG', DEFAULT_AUTHORIZED_API_ORG)
+
+        for org_info in orgs_response.json():
+            if org_info['login'] == authorized_org:
+                request_str = str(request)
+                LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
+                               user_info_response.json()['id'], request_str)
+                return True
+
+        FAILED_AUTH.inc()
+        LOGGER.warning("User %s does not belong to %s organization", authorized_org, github_user_login)
+        return False
+
+    @staticmethod
     def format_exception(text, status_code):
         """Formats error message to desired format"""
         return {"errors": [{"status": str(status_code), "detail": text}]}, status_code
@@ -231,7 +242,7 @@ class GetRequest(Request):
     @classmethod
     def get(cls, **kwargs):
         """Answer GET request"""
-        REQUEST_COUNTS.labels('get', cls._endpoint_name).inc()
+        #REQUEST_COUNTS.labels('get', cls._endpoint_name).inc()
         try:
             return cls.handle_get(**kwargs)
         except ApplicationException as exc:
@@ -254,7 +265,7 @@ class PatchRequest(Request):
     @classmethod
     def patch(cls, **kwargs):
         """Answer PATCH request"""
-        REQUEST_COUNTS.labels('patch', cls._endpoint_name).inc()
+        #REQUEST_COUNTS.labels('patch', cls._endpoint_name).inc()
         try:
             cls._check_read_only_mode()
             return cls.handle_patch(**kwargs)
@@ -280,7 +291,7 @@ class PostRequest(Request):
     @classmethod
     def post(cls, **kwargs):
         """Answer POST request"""
-        REQUEST_COUNTS.labels('post', cls._endpoint_name).inc()
+        #REQUEST_COUNTS.labels('post', cls._endpoint_name).inc()
         try:
             cls._check_read_only_mode()
             return cls.handle_post(**kwargs)
@@ -306,7 +317,7 @@ class PutRequest(Request):
     @classmethod
     def put(cls, **kwargs):
         """Answer PUT request"""
-        REQUEST_COUNTS.labels('put', cls._endpoint_name).inc()
+        #REQUEST_COUNTS.labels('put', cls._endpoint_name).inc()
         try:
             cls._check_read_only_mode()
             return cls.handle_put(**kwargs)
@@ -332,7 +343,7 @@ class DeleteRequest(Request):
     @classmethod
     def delete(cls, **kwargs):
         """Answer DELETE request"""
-        REQUEST_COUNTS.labels('delete', cls._endpoint_name).inc()
+        #REQUEST_COUNTS.labels('delete', cls._endpoint_name).inc()
         try:
             cls._check_read_only_mode()
             return cls.handle_delete(**kwargs)
