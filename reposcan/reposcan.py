@@ -8,21 +8,16 @@ import os
 import signal
 from multiprocessing.pool import Pool
 import json
-import yaml
-import requests
 
-from base import GetRequest, PostRequest, PutRequest, DeleteRequest, Request
+import yaml
 
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.web import RequestHandler, Application
-from tornado.wsgi import WSGIContainer
 from tornado.websocket import websocket_connect
-from tornado.httpserver import HTTPServer
+import requests
 import connexion
-from flask import Response, request, send_file, make_response
+from flask import request, send_file, make_response
 
-from apidoc import SPEC, VMAAS_VERSION, setup_apispec
 from common.logging_utils import get_logger, init_logging
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
@@ -36,7 +31,9 @@ from repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
 
+VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 DEFAULT_CHUNK_SIZE = "1048576"
+DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
 
@@ -58,51 +55,85 @@ class TaskStartResponse(dict):
         self['success'] = success
 
 
-class MetricsHandler(GetRequest):
-    """Handle requests to the metrics"""
+# pylint: disable=unused-argument
+def github_auth(github_token, required_scopes=None):
+    """Performs authorization using github"""
 
-    @classmethod
-    def handle_get(cls, **kwargs):  # pylint: disable=arguments-differ
-        """Get prometheus metrics"""
-        return generate_latest()
+    host_request = request.host.split(':')[0]
+
+    if host_request in ('localhost', '127.0.0.1'):
+        return {'scopes': ['local']}
+
+    if not github_token:
+        FAILED_AUTH.inc()
+        return None
+
+    user_info_response = requests.get('https://api.github.com/user',
+                                      headers={'Authorization': github_token})
+
+    if user_info_response.status_code != 200:
+        FAILED_AUTH.inc()
+        LOGGER.warning("Cannot execute github API with provided %s", github_token)
+        return None
+    github_user_login = user_info_response.json()['login']
+    orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
+                                 headers={'Authorization': github_token})
+
+    if orgs_response.status_code != 200:
+        FAILED_AUTH.inc()
+        LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
+        return None
+
+    authorized_org = os.getenv('AUTHORIZED_API_ORG', DEFAULT_AUTHORIZED_API_ORG)
+
+    for org_info in orgs_response.json():
+        if org_info['login'] == authorized_org:
+            request_str = str(request)
+            LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
+                           user_info_response.json()['id'], request_str)
+            return {'scopes': ['local', 'authorized']}
+
+    FAILED_AUTH.inc()
+    LOGGER.warning("User %s does not belong to %s organization", authorized_org, github_user_login)
+    return None
 
 
-class HealthHandler(GetRequest):
+# pylint: disable=unused-argument
+
+class HealthHandler():
     """Handler class providing health status."""
 
     @classmethod
-    def handle_get(cls, **kwargs):
+    def get(cls, **kwargs):
         """Get API status."""
         return True, 200
 
 
-class VersionHandler(GetRequest):
+class VersionHandler():
     """Handler class providing app version."""
 
     @classmethod
-    def handle_get(cls, **kwargs):
+    def get(cls, **kwargs):
         """Get app version."""
         return VMAAS_VERSION
 
 
-class TaskStatusHandler(GetRequest):
+class TaskStatusHandler():
     """Handler class providing status of currently running background task."""
 
     @classmethod
-    def handle_get(cls, **kwargs):
+    def get(cls, **kwargs):
         """Get status of currently running background task."""
         return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
 
-class TaskCancelHandler(PutRequest):
+class TaskCancelHandler():
     """Handler class to cancel currently running background task."""
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Cancel currently running background task."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         if SyncTask.is_running():
             SyncTask.cancel()
             LOGGER.warning("Background task terminated.")
@@ -158,7 +189,7 @@ class SyncHandler:
         SyncTask.finish()
 
 
-class RepoListHandler(PostRequest, SyncHandler):
+class RepoListHandler(SyncHandler):
     """Handler for repository list/add API."""
 
     task_type = "Import repositories"
@@ -227,21 +258,16 @@ class RepoListHandler(PostRequest, SyncHandler):
         return products, repos
 
     @classmethod
-    def handle_post(cls, **kwargs):
+    def post(cls, **kwargs):
         """Add repositories listed in request to the DB"""
-        if not cls.is_authorized():
-            return 'Valid authorization token was not provided', 403
         try:
             products, repos = cls._parse_input_list()
+            status_code, status_msg = cls.start_task(products=products, repos=repos)
+            return status_msg, status_code
         except Exception as err:  # pylint: disable=broad-except
-            products = None
-            repos = None
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             return TaskStartResponse(msg, success=False), 400
-        if repos:
-            status_code, status_msg = cls.start_task(products=products, repos=repos)
-            return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -272,18 +298,15 @@ class RepoListHandler(PostRequest, SyncHandler):
         return "OK"
 
 
-class RepoDeleteHandler(DeleteRequest, SyncHandler):
+class RepoDeleteHandler(SyncHandler):
     """Handler for repository item API."""
 
     task_type = "Delete repositories"
 
     @classmethod
-    def delete(self, repo=None):
+    def delete(cls, repo, **kwargs): # pylint: disable=arguments-differ
         """Delete repository."""
-        if not self.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
-        status_code, status_msg = self.start_task(repo=repo)
+        status_code, status_msg = cls.start_task(repo=repo)
         return status_msg, status_code
 
     @staticmethod
@@ -303,17 +326,15 @@ class RepoDeleteHandler(DeleteRequest, SyncHandler):
         return "OK"
 
 
-class ExporterHandler(PutRequest, SyncHandler):
+class ExporterHandler(SyncHandler):
     """Handler for Export API."""
 
     task_type = "Export dump"
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Export disk dump."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -330,17 +351,15 @@ class ExporterHandler(PutRequest, SyncHandler):
         return "OK"
 
 
-class PkgTreeHandler(PutRequest, SyncHandler):
+class PkgTreeHandler(SyncHandler):
     """Handler for Package Tree API."""
 
     task_type = "Export package tree"
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Export package tree."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -357,47 +376,44 @@ class PkgTreeHandler(PutRequest, SyncHandler):
         return "OK"
 
 
-class PkgTreeDownloadHandler(GetRequest):
+class PkgTreeDownloadHandler():
     """Handler class to download package tree to the caller."""
 
     @classmethod
-    def handle_get(cls, **kwargs):
+    def get(cls, **kwargs):
         """Download the package tree."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
 
         try:
             response = make_response(send_file(PKGTREE_FILE))
             response.headers["Content-Type"] = "application/json"
             response.headers["Content-Encoding"] = "gzip"
+            response.direct_passthrough = True
             return response
+
         except FileNotFoundError:
             return 'Package Tree file not found.  Has it been generated?', 404
 
 
-class DbChangeHandler(GetRequest):
+class DbChangeHandler():
     """Handler for dbchange metadata information API. """
 
     @classmethod
-    def handle_get(cls, **kwargs):
+    def get(cls, **kwargs):
         """Get the metadata information about database."""
         dbchange_api = DbChangeAPI()
         result = dbchange_api.process()
         return result
 
 
-class RepoSyncHandler(PutRequest, SyncHandler):
+class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
     task_type = "Sync repositories"
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Sync repositories stored in DB."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -418,17 +434,15 @@ class RepoSyncHandler(PutRequest, SyncHandler):
         return "OK"
 
 
-class CveSyncHandler(PutRequest, SyncHandler):
+class CveSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
     task_type = "Sync CVEs"
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Sync CVEs."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -449,17 +463,15 @@ class CveSyncHandler(PutRequest, SyncHandler):
         return "OK"
 
 
-class CvemapSyncHandler(PutRequest, SyncHandler):
+class CvemapSyncHandler(SyncHandler):
     """Handler for CVE sync API."""
 
     task_type = "Sync CVE map"
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Sync CVEmap."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -479,7 +491,7 @@ class CvemapSyncHandler(PutRequest, SyncHandler):
         return "OK"
 
 
-class AllSyncHandler(PutRequest, SyncHandler):
+class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
     task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
@@ -487,11 +499,9 @@ class AllSyncHandler(PutRequest, SyncHandler):
                                   CveSyncHandler.task_type)
 
     @classmethod
-    def handle_put(cls, **kwargs):
+    def put(cls, **kwargs):
         """Sync repos + CVEs + CVEmap."""
-        if not cls.is_authorized():
-            FAILED_AUTH.inc()
-            return 'Valid authorization token was not provided', 403
+
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -604,12 +614,14 @@ class ReposcanWebsocket():
 
 def periodic_sync():
     """Function running both repo and CVE sync."""
+
     LOGGER.info("Periodic sync started.")
     AllSyncHandler.start_task()
 
 
 def create_app():
     """Create reposcan app."""
+
     init_logging()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360")) * 60000
@@ -634,29 +646,32 @@ def create_app():
                                                      WEBSOCKET_RECONNECT_INTERVAL * 1000)
     ws_handler.reconnect_callback.start()
 
-    app = connexion.App('VMaas Reposcan', options={
+    with open('reposcan.spec.yaml', 'rb') as specfile:
+        SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+
+    app = connexion.App(__name__, options={
         'swagger_ui': True,
-        'openapi_spec_path': '/v1/openapi.json'
+        'openapi_spec_path': '/v1/apispec'
     })
 
-    with open('reposcan.spec.yaml', 'rb') as specfile:
-        SPEC = yaml.safe_load(specfile)
-
-    app.app.url_map.strict_slashes = False
+    # Response validation is disabled due to returing streamed response in GET /pkgtree
+    # https://github.com/zalando/connexion/pull/467 should fix it
     app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
-                validate_responses=True,
-                strict_validation=True)
+                validate_responses=False,
+                strict_validation=True,
+                base_path='/api'
+                )
 
     @app.app.route('/metrics', methods=['GET'])
     def metrics():  # pylint: disable=unused-variable
+        # /metrics API shouldn't be visible in the API documentation,
+        # hence it's added here in the create_app step
         return generate_latest()
 
+    @app.app.after_request
+    def set_headers(response): # pylint: disable=unused-variable
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
+
     return app
-
-
-application = create_app()
-
-if __name__ == '__main__':
-    server = HTTPServer(WSGIContainer(application))
-    server.listen(8081)
-    IOLoop.instance().start()
