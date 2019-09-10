@@ -60,6 +60,27 @@ paths:
         - $ref: '#/components/parameters/Nevra'
       tags:
         - packages
+  
+  /v1/packages/repositories:
+    post:
+      summary: Get list of repositories where the packages belong to.
+      operationId: package_repositories.PostPackageRepositories.post
+      responses:
+        200:
+          description: Return repositories list based on given NEVRAs.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PackageRepositories'
+      requestBody:
+        description: Input JSON with list of NEVRA.
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/NevraList'
+      tags:
+        - packages
 
 components:
   parameters:
@@ -115,6 +136,18 @@ components:
       properties:
         package_list:
           type: array
+          minItems: 1
           items:
             type: string
             example: kernel-2.6.32-696.20.1.el6.x86_64
+    
+    PackageRepositories:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              example: Red Hat Enterprise Linux 6 Server (RPMs)
