@@ -52,7 +52,7 @@ class PackagesAPI:
     def __init__(self, dsn=None):
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
 
-    def _build_repositories(self, query):
+    def _build_repositories(self, query): # pylint: disable=no-self-use
         """ Rebuilds the repositories list object in POST/GET response. """
         repositories = []
         for query_repository in query:
@@ -71,7 +71,7 @@ class PackagesAPI:
             repositories.append(repository)
         return repositories
 
-    def _build_binary_packages(self, query):
+    def _build_binary_packages(self, query): # pylint: disable=no-self-use
         """ Rebuilds list of binary packages object in POST/GET reponse. """
         binary_packages = []
         for query_repository in query:
