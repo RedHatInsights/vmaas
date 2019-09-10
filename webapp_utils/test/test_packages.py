@@ -1,8 +1,6 @@
 """
 Tests for the packages API in webapp_utils.
 """
-import pytest
-from jsonschema import ValidationError
 from packages import PackagesAPI
 from .db.dummy_db import DummyDatabase
 
@@ -24,8 +22,10 @@ PKG_LEGIT_EXPECTED = \
         "summary": "Kernel for basic OS functions.",
         "description": "Kernel description",
         "source_package": None,
-        "repositories": [
-        ],
+        "repositories": [{"label": "rhel-6-desktop-rpms", "name":"Red Hat Enterprise Linux 6 Desktop (RPMs)",
+                          "releasever": "696.20.1.el6", "arch": "x86_64"},
+                         {"label": "rhel-6-server-rpms", "name":"Red Hat Enterprise Linux 6 Server (RPMs)",
+                          "releasever": "696.20.1.el6", "arch": "x86_64"}],
         "binary_package_list": []
         }
     }
@@ -55,12 +55,6 @@ class TestPackagesAPI():
         """ Test with non existing packages inside the input JSON. """
         response = self.packages_api.process_list(PKG_NON_EXISTING_JSON2)
         assert response == PKG_NON_EXISTING_EXPECTED2
-
-    def test_malformed_json(self):
-        """ Test with malformed input JSON. """
-        # pylint: disable=unused-variable
-        with pytest.raises(ValidationError):
-            response = self.packages_api.process_list(PKG_MALFORMED_JSON)
 
     def test_correct_pkg_empty(self):
         """ Test with legit input, legit package. """
