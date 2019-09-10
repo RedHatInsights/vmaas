@@ -1,21 +1,11 @@
 """
 Module for API /packages.
 """
-from jsonschema import validate, ValidationError
 from base import Request
 import database.db_handler as DB
 from utils import split_packagename, join_packagename
 
 POOL_SIZE = 10
-PACKAGES_SCHEMA = {
-    "type": "object",
-    "required": ["package_list"],
-    "properties": {
-        "package_list": {
-            "type": "array", "items": {"type": "string"}, "minItems": 1
-        },
-    }
-}
 
 """ Indexes to make the request more readable. """
 PACKAGE_SUMMARY = 0
@@ -40,8 +30,8 @@ class PostPackages(Request): # pylint: disable=abstract-method
         try:
             packages = packages_api.process_list(kwargs.get("body"))
             response = 200
-        except ValidationError:
-            packages = "Error: malformed request JSON"
+        except Exception as ex: # pylint: disable=broad-except
+            packages = "Unknown exception, %s, include in bug report." % (ex)
         return packages, response
 
 class GetPackage(Request): # pylint: disable=abstract-method
@@ -53,8 +43,8 @@ class GetPackage(Request): # pylint: disable=abstract-method
         try:
             package = packages_api.process_nevra(kwargs.get("Nevra"))
             response = 200
-        except ValidationError:
-            package = "Error: malformed request JSON"
+        except Exception as ex: # pylint: disable=broad-except
+            package = "Unknown exception, %s include in bug report." % (ex)
         return package, response
 
 class PackagesAPI:
@@ -92,8 +82,6 @@ class PackagesAPI:
     def process_list(self, data):
         """ Processes whole package_list and returns info. """
         # pylint: disable=no-member
-        validate(data, PACKAGES_SCHEMA)
-
         packages = data.get("package_list")
         response = {"package_list": {}}
 

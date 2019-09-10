@@ -1,4 +1,3 @@
-
 FROM centos:7
 
 ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
