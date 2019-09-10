@@ -4,22 +4,14 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-RUN yum -y update && \
-    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum -y install rh-python36 rsync && \
-    rm -rf /var/cache/yum/* && \
-    ln -s /opt/rh/rh-python36/root/bin/python /usr/bin/python3 && \
-    ln -s /opt/rh/rh-python36/root/bin/pip /usr/bin/pip3
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    yum -y install rh-python36 which rsync && \
+    rm -rf /var/cache/yum/*
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
 WORKDIR /webapp_utils
 
-ADD /webapp_utils/*.sh  /webapp_utils/
-ADD /webapp_utils/*.py  /webapp_utils/
-ADD /webapp_utils/*.txt /webapp_utils/
-ADD /webapp_utils/*.yml /webapp_utils/
-ADD /webapp_utils/database/*.py /webapp_utils/database/
 ADD /webapp_utils/Pipfile*      /webapp_utils/
 
 ENV LC_ALL=en_US.utf8
@@ -42,5 +34,10 @@ RUN install -m 1777 -d /data && \
 USER vmaas_utils
 
 EXPOSE 8083
+
+ADD /webapp_utils/*.sh  /webapp_utils/
+ADD /webapp_utils/*.py  /webapp_utils/
+ADD /webapp_utils/*.yml /webapp_utils/
+ADD /webapp_utils/database/*.py /webapp_utils/database/
 
 CMD /webapp_utils/entrypoint.sh
