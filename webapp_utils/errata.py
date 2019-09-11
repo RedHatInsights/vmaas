@@ -4,7 +4,6 @@ Module for /errata API endpoint
 from jsonschema import validate, ValidationError
 from base import Request
 import database.db_handler as DB
-import time
 from utils import join_packagename, parse_datetime, paginate
 from logging_utils import get_logger, init_logging
 
@@ -19,6 +18,12 @@ ERRATA_SUMMARY = 5
 ERRATA_URL = 6
 ERRATA_SYNOPSIS = 7
 ERRATA_TYPE = 8
+
+ERRATA_PKG_NAME = 0
+ERRATA_PKG_EPOCH = 1
+ERRATA_PKG_VERSION = 2
+ERRATA_PKG_RELEASE = 3
+ERRATA_PKG_ARCH = 4
 
 MIN_ERRATA_SEARCH_SIZE = 1
 
@@ -119,11 +124,11 @@ class ErrataAPI:
         self.db_pool.return_connection(db_connection)
         for item in query:
             package = join_packagename(
-                item[0],
-                item[1],
-                item[2],
-                item[3],
-                item[4]
+                item[ERRATA_PKG_NAME],
+                item[ERRATA_PKG_EPOCH],
+                item[ERRATA_PKG_VERSION],
+                item[ERRATA_PKG_RELEASE],
+                item[ERRATA_PKG_ARCH]
             )
             if package and not source and not package in package_list and not package[-4:] == ".src":
                 package_list.append(package)
@@ -170,24 +175,16 @@ class ErrataAPI:
         response = {"errata_list": {}}
         if modified_since:
             response["modified_since"] = modified_since
-        start_time = time.time()
         if not errata_to_process and not errata_to_search:
             return response
         elif not errata_to_process and errata_to_search:
             errata_to_process = self._fill_errata(errata_to_search)
-        errata_fill_time = time.time() - start_time
-        LOGGER.info("ERRATA_FILL_TIME: %s", errata_fill_time)
         result = {}
         errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size)
-        pagination_time = time.time() - start_time - errata_fill_time
-        errata_start_time = time.time()
-        LOGGER.info("ERRATA_PAGINATION_TIME: %s", pagination_time)
         db_connection = self.db_pool.get_connection()
-        index = 0
         with db_connection.get_cursor() as cursor:
             for errata in errata_page_to_process:
                 result[errata] = {}
-                index += 1
                 if not self._errata_exists(errata):
                     continue
                 cursor.execute("""select distinct e.updated, es.name as severity,
@@ -200,9 +197,22 @@ class ErrataAPI:
                                   where e.name = '%s'
                                """ % errata)
                 query = cursor.fetchone()
-                query_time = time.time() - errata_start_time
-                LOGGER.info("SINGLE ERRATA queru cumulative time: %s at %s", query_time, str(index))
-                
+                result[errata] = {
+                    "updated": query[ERRATA_UPDATED],
+                    "severity": query[ERRATA_SEVERITY],
+                    "reference_list": self._build_references(errata),
+                    "issued": query[ERRATA_ISSUED],
+                    "description": query[ERRATA_DESCRIPTION],
+                    "solution": query[ERRATA_SOLUTION],
+                    "summary": query[ERRATA_SUMMARY],
+                    "url": "https://access.redhat.com/errata/%s" % str(query[ERRATA_URL]),
+                    "synopsis": query[ERRATA_SYNOPSIS],
+                    "cve_list": self._build_cve_list(errata),
+                    "bugzilla_list": self._build_references(errata, bugzilla=True),
+                    "package_list": self._build_package_list(errata),
+                    "source_package_list": self._build_package_list(errata, source=True),
+                    "type": query[ERRATA_TYPE]
+                }
             response["errata_list"].update(result)
         response.update(pagination_response)
         self.db_pool.return_connection(db_connection)
@@ -210,7 +220,6 @@ class ErrataAPI:
 
     def process_erratum(self, errata):
         """Processes errata from GET request."""
-        # TODO: errata_list vs errata_search input
         response = [str(errata)]
         response_schema = {"errata_list": response}
         return self.process_list(response_schema)
