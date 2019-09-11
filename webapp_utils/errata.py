@@ -12,23 +12,15 @@ POOL_SIZE = 10
 
 ERRATA_UPDATED = 0
 ERRATA_SEVERITY = 1
-ERRATA_REF_TYPE = 2
-ERRATA_REF_NAME = 3
-ERRATA_ISSUED = 4
-ERRATA_DESCRIPTION = 5
-ERRATA_SOLUTION = 6
-ERRATA_SUMMARY = 7
-ERRATA_URL = 8
-ERRATA_SYNOPSIS = 9
-ERRATA_CVE = 10
-ERRATA_PKGID_NAME = 11
-ERRATA_PKGID_EPOCH = 12
-ERRATA_PKGID_VERSION = 13
-ERRATA_PKGID_RELEASE = 14
-ERRATA_PKGID_ARCH = 15
-ERRATA_TYPE = 16
+ERRATA_ISSUED = 2
+ERRATA_DESCRIPTION = 3
+ERRATA_SOLUTION = 4
+ERRATA_SUMMARY = 5
+ERRATA_URL = 6
+ERRATA_SYNOPSIS = 7
+ERRATA_TYPE = 8
 
-MIN_ERRATA_SEARCH_SIZE = 4
+MIN_ERRATA_SEARCH_SIZE = 1
 
 LOGGER = get_logger(__name__)
 
@@ -68,37 +60,70 @@ class ErrataAPI:
         init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE)
 
-    def _build_references(self, query, bugzilla=False):
+    def _build_references(self, errata, bugzilla=False):
         """Builds references/bugzilla list object in POST/GET response."""
         references = []
         bugzillas = []
+        db_connection = self.db_pool.get_connection()
+        with db_connection.get_cursor() as cursor:
+            cursor.execute("""select er.type, er.name
+                              from errata e
+                              left join errata_refs er on e.id = er.errata_id
+                              where e.name = '%s'
+                           """ % errata)
+            query = cursor.fetchall()
+        self.db_pool.return_connection(db_connection)
         for item in query:
-            if bugzilla and item[ERRATA_REF_TYPE] == "bugzilla" and item[ERRATA_REF_NAME] not in bugzillas:
-                bugzillas.append(item[ERRATA_REF_NAME])
-            elif item[ERRATA_REF_TYPE] == "other" and item[ERRATA_REF_NAME] not in references:
-                references.append(item[ERRATA_REF_NAME])
+            if bugzilla and item[0] == "bugzilla" and item[1] not in bugzillas:
+                bugzillas.append(item[1])
+            elif item[0] == "other" and item[1] not in references:
+                references.append(item[1])
         if bugzilla:
             return bugzillas
         return references
 
-    def _build_cve_list(self, query):
+    def _build_cve_list(self, errata):
         """Builds cve list object on POST/GET response."""
         cve_list = []
+        db_connection = self.db_pool.get_connection()
+        with db_connection.get_cursor() as cursor:
+            cursor.execute("""select cve.name
+                              from errata e
+                              left join errata_cve ec on e.id = ec.errata_id
+                              left join cve on ec.cve_id = cve.id
+                              where e.name = '%s'
+                           """ % errata)
+            query = cursor.fetchall()
+        self.db_pool.return_connection(db_connection)
         for item in query:
-            if item[ERRATA_CVE] and not item[ERRATA_CVE] in cve_list:
-                cve_list.append(item[ERRATA_CVE])
+            if item[0] and not item[0] in cve_list:
+                cve_list.append(item[0])
         return cve_list
 
-    def _build_package_list(self, query, source=False):
+    def _build_package_list(self, errata, source=False):
         package_list = []
         source_package_list = []
+        db_connection = self.db_pool.get_connection()
+        with db_connection.get_cursor() as cursor:
+            cursor.execute("""select pn.name, evr.epoch, evr.version,
+                              evr.release, a.name as arch
+                              from errata e
+                              left join pkg_errata pkge on e.id = pkge.errata_id
+                              left join package p on pkge.pkg_id = p.id
+                              left join package_name pn on p.name_id = pn.id
+                              left join evr on p.evr_id = evr.id
+                              left join arch a on p.arch_id = a.id
+                              where e.name = '%s'
+                           """ % errata)
+            query = cursor.fetchall()
+        self.db_pool.return_connection(db_connection)
         for item in query:
             package = join_packagename(
-                item[ERRATA_PKGID_NAME],
-                item[ERRATA_PKGID_EPOCH],
-                item[ERRATA_PKGID_VERSION],
-                item[ERRATA_PKGID_RELEASE],
-                item[ERRATA_PKGID_ARCH]
+                item[0],
+                item[1],
+                item[2],
+                item[3],
+                item[4]
             )
             if package and not source and not package in package_list and not package[-4:] == ".src":
                 package_list.append(package)
@@ -158,48 +183,26 @@ class ErrataAPI:
         errata_start_time = time.time()
         LOGGER.info("ERRATA_PAGINATION_TIME: %s", pagination_time)
         db_connection = self.db_pool.get_connection()
+        index = 0
         with db_connection.get_cursor() as cursor:
             for errata in errata_page_to_process:
                 result[errata] = {}
+                index += 1
                 if not self._errata_exists(errata):
                     continue
                 cursor.execute("""select distinct e.updated, es.name as severity,
-                                  er.type, er.name, e.issued, e.description,
+                                  e.issued, e.description,
                                   e.solution, e.summary, e.name as url, e.synopsis,
-                                  cve.name as cve, pn.name, evr.epoch, evr.version,
-                                  evr.release, a.name as arch, et.name as type
+                                  et.name as type
                                   from errata e
                                   left join errata_severity es on e.severity_id = es.id
-                                  left join errata_refs er on e.id = er.errata_id
-                                  left join errata_cve ec on e.id = ec.errata_id
-                                  left join cve on ec.cve_id = cve.id
-                                  left join pkg_errata pkge on e.id = pkge.errata_id
-                                  left join package p on pkge.pkg_id = p.id
-                                  left join package_name pn on p.name_id = pn.id
-                                  left join evr on p.evr_id = evr.id
-                                  left join arch a on p.arch_id = a.id
                                   left join errata_type et on e.errata_type_id = et.id
                                   where e.name = '%s'
                                """ % errata)
-                query = cursor.fetchall()
+                query = cursor.fetchone()
                 query_time = time.time() - errata_start_time
-                LOGGER.info("SINGLE ERRATA queru cumulative time: %s", query_time)
-                result[errata] = {
-                    "updated": query[0][ERRATA_UPDATED],
-                    "severity": query[0][ERRATA_SEVERITY],
-                    "reference_list": self._build_references(query),
-                    "issued": query[0][ERRATA_ISSUED],
-                    "description": query[0][ERRATA_DESCRIPTION],
-                    "solution": query[0][ERRATA_SOLUTION],
-                    "summary": query[0][ERRATA_SUMMARY],
-                    "url": "https://access.redhat.com/errata/%s" % str(query[0][ERRATA_URL]),
-                    "synopsis": query[0][ERRATA_SYNOPSIS],
-                    "cve_list": self._build_cve_list(query),
-                    "bugzilla_list": self._build_references(query, bugzilla=True),
-                    "package_list": self._build_package_list(query),
-                    "source_package_list": self._build_package_list(query, source=True),
-                    "type": query[0][ERRATA_TYPE]
-                }
+                LOGGER.info("SINGLE ERRATA queru cumulative time: %s at %s", query_time, str(index))
+                
             response["errata_list"].update(result)
         response.update(pagination_response)
         self.db_pool.return_connection(db_connection)
