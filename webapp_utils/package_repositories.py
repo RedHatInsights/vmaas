@@ -9,6 +9,7 @@ POOL_SIZE = 10
 
 """ Indexes to make the request more readable. """
 REPOSITORY_NAME = 0
+REPOSITORY_LABEL = 1
 
 class PostPackageRepositories(Request): # pylint: disable=abstract-method
     """ POST to /v1/packages/repositories """
@@ -38,7 +39,7 @@ class PackagesRepositoriesAPI:
         with db_connection.get_cursor() as cursor:
             for package in packages:
                 name, epoch, version, release, arch = split_packagename(package)
-                cursor.execute("""select cs.name
+                cursor.execute("""select distinct cs.name, cs.label
                                   from package p
                                   left join package_name pn on p.name_id = pn.id
                                   left join evr e on p.evr_id = e.id
@@ -55,7 +56,12 @@ class PackagesRepositoriesAPI:
 
                 response["data"][package] = []
                 for repository_query in cursor: # pylint: disable=not-an-iterable
+                    repository_data = {}
                     if repository_query[REPOSITORY_NAME] is not None:
-                        response["data"][package].append(repository_query[REPOSITORY_NAME])
+                        repository_data["repo_name"] = repository_query[REPOSITORY_NAME]
+                    if repository_query[REPOSITORY_LABEL] is not None:
+                        repository_data["label"] = repository_query[REPOSITORY_LABEL]
+                    if repository_data:
+                        response["data"][package].append(repository_data)
 
         return response
