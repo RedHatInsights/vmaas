@@ -149,5 +149,11 @@ components:
           additionalProperties:
             type: array
             items:
-              type: string
-              example: Red Hat Enterprise Linux 6 Server (RPMs)
+              type: object
+              properties:
+                repo_name:
+                  type: string
+                  example: Red Hat Enterprise Linux 6 Desktop (RPMs)
+                label:
+                  type: string
+                  example: rhel-6-desktop-rpms
