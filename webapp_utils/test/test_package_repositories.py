@@ -8,8 +8,9 @@ EMPTY_JSON = {"package_list":[]}
 EMPTY_JSON_RESPONSE = {"data":{}}
 
 CORRECT_JSON = {"package_list":["kernel-2.6.32-696.20.1.el6.x86_64"]}
-CORRECT_JSON_RESPONSE = {"data":{"kernel-2.6.32-696.20.1.el6.x86_64":["Red Hat Enterprise Linux 6 Server (RPMs)",
-                                                                      "Red Hat Enterprise Linux 6 Desktop (RPMs)"]}}
+CORRECT_JSON_RESPONSE = {"data":{"kernel-2.6.32-696.20.1.el6.x86_64":[
+    {"repo_name": "Red Hat Enterprise Linux 6 Server (RPMs)", "label": "rhel-6-server-rpms"},
+    {"repo_name": "Red Hat Enterprise Linux 6 Desktop (RPMs)", "label": "rhel-6-desktop-rpms"}]}}
 
 NONEXISTING_PACKAGE_JSON = {"package_list":["non-existing-package"]}
 NONEXISTING_PACKAGE_JSON_RESPONSE = {"data":{"non-existing-package":[]}}
@@ -19,8 +20,8 @@ NONEXISTING_PACKAGES_JSON_RESPONSE = {"data":{"non-existing-package":[], "non-ex
 
 EXISTING_NONEXISTING_PACKAGES_JSON = {"package_list":["kernel-2.6.32-696.20.1.el6.x86_64", "non-existing-package"]}
 EXISTING_NONEXISTING_PACKAGES_JSON_RESPONSE = {"data":{"kernel-2.6.32-696.20.1.el6.x86_64":[
-    "Red Hat Enterprise Linux 6 Server (RPMs)",
-    "Red Hat Enterprise Linux 6 Desktop (RPMs)"],
+    {"repo_name": "Red Hat Enterprise Linux 6 Server (RPMs)", "label": "rhel-6-server-rpms"},
+    {"repo_name": "Red Hat Enterprise Linux 6 Desktop (RPMs)", "label": "rhel-6-desktop-rpms"}],
                                                        "non-existing-package":[]}}
 
 class TestPackageRepositories:
