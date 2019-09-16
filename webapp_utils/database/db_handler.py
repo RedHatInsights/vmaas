@@ -11,18 +11,6 @@ VMAAS_DB_NAME = os.getenv("POSTGRESQL_DATABASE", None)
 VMAAS_DB_HOST = os.getenv("POSTGRESQL_HOST", None)
 VMAAS_DB_PORT = os.getenv("POSTGRESQL_PORT", None)
 
-class CursorWrap:
-    """ Wrapper for psycopg2 cursor created by one DatbasePoolConnection. """
-
-    def __init__(self, cursor):
-        self.cursor = cursor
-
-    def __enter__(self):
-        return self.cursor
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cursor.close()
-
 class DatabasePoolConnection:
     """ Wrapper for psycopg2 one connection pool from DatabasePoolHandler. """
     def __init__(self, conn):
@@ -30,7 +18,7 @@ class DatabasePoolConnection:
 
     def get_cursor(self):
         """ Gets one cursor based on connection from pool. """
-        return CursorWrap(self.conn.cursor())
+        return self.conn.cursor()
 
 class DatabasePoolHandler:
     """ Handler class for pool connection into db and querying. """

@@ -7,7 +7,7 @@ from test.conftest import TestBase
 import pytest
 import pytz
 
-from utils import parse_datetime
+from common.webapp_utils import parse_datetime
 from cache import CVE_MODIFIED_DATE, CVE_PUBLISHED_DATE
 from cve import CveAPI
 
