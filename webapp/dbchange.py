@@ -2,7 +2,7 @@
 Module contains functions for returning last-modified data from the DB
 """
 
-from utils import format_datetime
+from common.webapp_utils import format_datetime
 
 class DBChange:
     """ Main /dbchange API class. """

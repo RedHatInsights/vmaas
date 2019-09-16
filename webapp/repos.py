@@ -6,7 +6,7 @@ import re
 from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
-from utils import paginate, none2empty, parse_datetime, filter_item_if_exists
+from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists
 
 JSON_SCHEMA = {
     'type': 'object',

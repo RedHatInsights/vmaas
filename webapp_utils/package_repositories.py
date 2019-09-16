@@ -1,9 +1,10 @@
 """
-Module for API /packages.
+Module for API /packages/repositories.
 """
 from base import Request
 import database.db_handler as DB
-from utils import split_packagename
+from common.webapp_utils import split_packagename
+from common.logging_utils import init_logging, get_logger
 
 POOL_SIZE = 10
 
@@ -11,7 +12,10 @@ POOL_SIZE = 10
 REPOSITORY_NAME = 0
 REPOSITORY_LABEL = 1
 
-class PostPackageRepositories(Request): # pylint: disable=abstract-method
+LOGGER = get_logger(__name__)
+
+# pylint: disable=broad-except
+class PostPackageRepositories(Request):
     """ POST to /v1/packages/repositories """
     @classmethod
     def handle_post(cls, **kwargs):
@@ -20,18 +24,22 @@ class PostPackageRepositories(Request): # pylint: disable=abstract-method
         try:
             repositories = repositories_api.process_nevras(kwargs.get("body"))
             response = 200
-        except Exception as ex: # pylint: disable=broad-except
+        except Exception as ex:
             repositories = "Unknown exception, %s, include in bug report." % (ex)
         return repositories, response
+
+    @classmethod
+    def handle_get(cls, **kwargs):
+        raise NotImplementedError
 
 class PackagesRepositoriesAPI:
     """ Class for handling packages to repositories requests. """
     def __init__(self, dsn=None):
+        init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
 
     def process_nevras(self, data):
         """ Method returns the list of repositories where package belongs. """
-        # pylint: disable=no-member
         packages = data.get("package_list")
         response = {"data": {}}
 
@@ -55,12 +63,12 @@ class PackagesRepositoriesAPI:
                                """ % (name, arch, epoch, version, release))
 
                 response["data"][package] = []
-                for repository_query in cursor: # pylint: disable=not-an-iterable
+                for repository_query in cursor:
                     repository_data = {}
                     if repository_query[REPOSITORY_NAME] is not None:
                         repository_data["repo_name"] = repository_query[REPOSITORY_NAME]
                     if repository_query[REPOSITORY_LABEL] is not None:
-                        repository_data["label"] = repository_query[REPOSITORY_LABEL]
+                        repository_data["repo_label"] = repository_query[REPOSITORY_LABEL]
                     if repository_data:
                         response["data"][package].append(repository_data)
 

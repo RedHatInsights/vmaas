@@ -7,8 +7,9 @@ import re
 from datetime import datetime
 from dateutil import parser as dateutil_parser
 
-from cache import PKG_NAME_ID, PKG_EVR_ID, PKG_ARCH_ID
-
+PKG_NAME_ID = 0
+PKG_EVR_ID = 1
+PKG_ARCH_ID = 2
 
 def join_packagename(name, epoch, version, release, arch):
     """

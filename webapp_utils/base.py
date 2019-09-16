@@ -1,5 +1,5 @@
 """
-Common classes for Webapp Utils
+Common classes for Webapp-utils.
 """
 
 
