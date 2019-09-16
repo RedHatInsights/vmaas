@@ -39,5 +39,6 @@ ADD /webapp_utils/*.sh  /webapp_utils/
 ADD /webapp_utils/*.py  /webapp_utils/
 ADD /webapp_utils/*.yml /webapp_utils/
 ADD /webapp_utils/database/*.py /webapp_utils/database/
+ADD /common/*.py /webapp_utils/common/
 
 CMD /webapp_utils/entrypoint.sh

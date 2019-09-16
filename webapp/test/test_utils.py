@@ -5,7 +5,7 @@ import re
 
 from test.conftest import TestBase
 
-import utils
+import common.webapp_utils as utils
 
 
 class TestUtils(TestBase):

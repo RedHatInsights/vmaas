@@ -8,7 +8,7 @@ from jsonschema import validate
 
 from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
-from utils import join_packagename, split_packagename, none2empty
+from common.webapp_utils import join_packagename, split_packagename, none2empty
 
 
 JSON_SCHEMA = {
