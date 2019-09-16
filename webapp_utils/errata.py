@@ -1,11 +1,11 @@
 """
 Module for /errata API endpoint
 """
-from jsonschema import validate, ValidationError
 from base import Request
 import database.db_handler as DB
-from utils import join_packagename, parse_datetime, paginate
-from logging_utils import get_logger, init_logging
+from common.webapp_utils import join_packagename
+from common.logging_utils import get_logger, init_logging
+from pagination import paginate
 
 POOL_SIZE = 10
 
@@ -29,8 +29,8 @@ MIN_ERRATA_SEARCH_SIZE = 1
 
 LOGGER = get_logger(__name__)
 
-
-class PostErrata(Request):  # pylint: disable=abstract-method
+# pylint: disable=broad-except
+class PostErrata(Request):
     """POST to /v1/errata"""
     @classmethod
     def handle_post(cls, **kwargs):
@@ -39,12 +39,16 @@ class PostErrata(Request):  # pylint: disable=abstract-method
         try:
             errata = errata_api.process_list(kwargs.get("body"))
             response = 200
-        except ValidationError:
-            errata = "Error: malformed request JSON"
+        except Exception as ex:
+            errata = "Unknown exception, %s, include in bug report." % (ex)
         return errata, response
 
+    @classmethod
+    def handle_get(cls, **kwargs):
+        raise NotImplementedError
 
-class GetErrata(Request):  # pylint: disable=abstract-method
+
+class GetErrata(Request):
     """GET to /v1/errata"""
     @classmethod
     def handle_get(cls, **kwargs):
@@ -53,14 +57,16 @@ class GetErrata(Request):  # pylint: disable=abstract-method
         try:
             errata = errata_api.process_erratum(kwargs.get("erratum"))
             response = 200
-        except ValidationError:
-            errata = "Error: malformed request JSON"
+        except Exception as ex:
+            errata = "Unknown exception, %s, include in bug report." % (ex)
         return errata, response
 
+    @classmethod
+    def handle_post(cls, **kwargs):
+        raise NotImplementedError
 
 class ErrataAPI:
     """Class handling errata API requests."""
-
     def __init__(self):
         init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE)
@@ -175,10 +181,10 @@ class ErrataAPI:
         response = {"errata_list": {}}
         if modified_since:
             response["modified_since"] = modified_since
-        if not errata_to_process and not errata_to_search:
-            return response
-        elif not errata_to_process and errata_to_search:
+        if not errata_to_process and errata_to_search:
             errata_to_process = self._fill_errata(errata_to_search)
+        elif not errata_to_process and not errata_to_search:
+            return response
         result = {}
         errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size)
         db_connection = self.db_pool.get_connection()

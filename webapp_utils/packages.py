@@ -3,7 +3,8 @@ Module for API /packages.
 """
 from base import Request
 import database.db_handler as DB
-from utils import split_packagename, join_packagename
+from common.webapp_utils import split_packagename, join_packagename
+from common.logging_utils import init_logging, get_logger
 
 POOL_SIZE = 10
 
@@ -21,7 +22,10 @@ REPOSITORY_ARCH = 9
 REPOSITORY_RELEASEVER = 10
 BINARY_PACKAGES = 11
 
-class PostPackages(Request): # pylint: disable=abstract-method
+LOGGER = get_logger(__name__)
+
+# pylint: disable=broad-except
+class PostPackages(Request):
     """ POST to /v1/packages """
     @classmethod
     def handle_post(cls, **kwargs):
@@ -30,11 +34,15 @@ class PostPackages(Request): # pylint: disable=abstract-method
         try:
             packages = packages_api.process_list(kwargs.get("body"))
             response = 200
-        except Exception as ex: # pylint: disable=broad-except
+        except Exception as ex:
             packages = "Unknown exception, %s, include in bug report." % (ex)
         return packages, response
 
-class GetPackage(Request): # pylint: disable=abstract-method
+    @classmethod
+    def handle_get(cls, **kwargs):
+        raise NotImplementedError
+
+class GetPackage(Request):
     """ GET to /v1/packages/{Nevra} """
     @classmethod
     def handle_get(cls, **kwargs):
@@ -43,16 +51,22 @@ class GetPackage(Request): # pylint: disable=abstract-method
         try:
             package = packages_api.process_nevra(kwargs.get("Nevra"))
             response = 200
-        except Exception as ex: # pylint: disable=broad-except
+        except Exception as ex:
             package = "Unknown exception, %s include in bug report." % (ex)
         return package, response
 
+    @classmethod
+    def handle_post(cls, **kwargs):
+        raise NotImplementedError
+
 class PackagesAPI:
     """ Class for handling packages API requests. """
+    # pylint: disable=no-self-use
     def __init__(self, dsn=None):
+        init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
 
-    def _build_repositories(self, query): # pylint: disable=no-self-use
+    def _build_repositories(self, query):
         """ Rebuilds the repositories list object in POST/GET response. """
         repositories = []
         for query_repository in query:
@@ -71,7 +85,7 @@ class PackagesAPI:
             repositories.append(repository)
         return repositories
 
-    def _build_binary_packages(self, query): # pylint: disable=no-self-use
+    def _build_binary_packages(self, query):
         """ Rebuilds list of binary packages object in POST/GET reponse. """
         binary_packages = []
         for query_repository in query:
@@ -81,7 +95,6 @@ class PackagesAPI:
 
     def process_list(self, data):
         """ Processes whole package_list and returns info. """
-        # pylint: disable=no-member
         packages = data.get("package_list")
         response = {"package_list": {}}
 

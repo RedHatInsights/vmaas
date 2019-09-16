@@ -5,7 +5,7 @@ Module to handle /packages API calls.
 from jsonschema import validate
 
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY, PKG_DESC, PKG_SOURCE_PKG_ID
-import utils
+import common.webapp_utils as utils
 
 JSON_SCHEMA = {
     'type' : 'object',

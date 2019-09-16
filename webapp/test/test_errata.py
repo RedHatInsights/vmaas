@@ -8,7 +8,7 @@ from test.conftest import TestBase
 import pytest
 import pytz
 
-from utils import parse_datetime
+from common.webapp_utils import parse_datetime
 from cache import ERRATA_UPDATED, ERRATA_ISSUED
 from errata import ErrataAPI
 

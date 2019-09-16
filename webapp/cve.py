@@ -5,7 +5,7 @@ Module contains functions and CVE class for returning data from DB
 import re
 from jsonschema import validate
 
-from utils import format_datetime, parse_datetime, none2empty, paginate, \
+from common.webapp_utils import format_datetime, parse_datetime, none2empty, paginate, \
                   pkgidlist2packages, filter_item_if_exists
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \

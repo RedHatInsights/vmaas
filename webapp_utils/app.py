@@ -9,6 +9,7 @@ from connexion import RestyResolver
 with open("webapp-utils.yml", "rb") as specfile:
     SPEC = yaml.safe_load(specfile)
 
+
 def create_app():
     """ Creates the application for webapp utils. """
     utils_app = connexion.App("webapp-utils", options={'swagger_ui': False,
