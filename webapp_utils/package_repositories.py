@@ -24,8 +24,9 @@ class PostPackageRepositories(Request):
         try:
             repositories = repositories_api.process_nevras(kwargs.get("body"))
             response = 200
-        except Exception as ex:
-            repositories = "Unknown exception, %s, include in bug report." % (ex)
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return repositories, response
 
     @classmethod
