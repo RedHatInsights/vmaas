@@ -34,8 +34,9 @@ class PostPackages(Request):
         try:
             packages = packages_api.process_list(kwargs.get("body"))
             response = 200
-        except Exception as ex:
-            packages = "Unknown exception, %s, include in bug report." % (ex)
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return packages, response
 
     @classmethod
@@ -51,8 +52,9 @@ class GetPackage(Request):
         try:
             package = packages_api.process_nevra(kwargs.get("Nevra"))
             response = 200
-        except Exception as ex:
-            package = "Unknown exception, %s include in bug report." % (ex)
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return package, response
 
     @classmethod
