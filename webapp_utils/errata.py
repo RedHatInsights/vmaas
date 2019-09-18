@@ -39,8 +39,9 @@ class PostErrata(Request):
         try:
             errata = errata_api.process_list(kwargs.get("body"))
             response = 200
-        except Exception as ex:
-            errata = "Unknown exception, %s, include in bug report." % (ex)
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return errata, response
 
     @classmethod
@@ -57,8 +58,9 @@ class GetErrata(Request):
         try:
             errata = errata_api.process_erratum(kwargs.get("erratum"))
             response = 200
-        except Exception as ex:
-            errata = "Unknown exception, %s, include in bug report." % (ex)
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return errata, response
 
     @classmethod
