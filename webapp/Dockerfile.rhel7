@@ -35,8 +35,9 @@ USER vmaas
 
 EXPOSE 8080
 
-ADD /webapp/*.sh     /webapp/
-ADD /webapp/*.py     /webapp/
-ADD /common/*.py     /webapp/common/
+ADD /webapp/*.spec.yaml /webapp/
+ADD /webapp/*.sh        /webapp/
+ADD /webapp/*.py        /webapp/
+ADD /common/*.py        /webapp/common/
 
 CMD /webapp/entrypoint.sh
