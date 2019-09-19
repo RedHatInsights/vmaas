@@ -2,4 +2,4 @@
 
 DIR=$(dirname $0)
 
-exec $DIR/wait-for-services.sh $DIR/app.py
+exec $DIR/wait-for-services.sh python3 -m main

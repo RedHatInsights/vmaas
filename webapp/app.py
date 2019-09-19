@@ -7,15 +7,14 @@ import os
 import signal
 import sre_constants
 import json
+import yaml
+import asyncio
 
 from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
-from tornado import gen
-from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.websocket import websocket_connect
-import tornado.web
+from aiohttp import web, ClientSession, WSMessage, WSMsgType, hdrs
+import connexion
 
-from apispec import APISpec
 from cache import Cache
 from cve import CveAPI
 from repos import RepoAPI
@@ -33,21 +32,12 @@ VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
 MAX_SERVERS = "1"
 
-SPEC = APISpec(
-    title='VMaaS Webapp',
-    version=VMAAS_VERSION,
-    plugins=(
-        'apispec.ext.tornado',
-    ),
-    basePath="/api",
-)
-
 WEBSOCKET_RECONNECT_INTERVAL = 60
 LOGGER = get_logger(__name__)
 
 
-class BaseHandler(tornado.web.RequestHandler):
-    """Base handler setting CORS headers."""
+class BaseHandler:
+    """Base class containing individual repositories"""
 
     db_cache = None
     updates_api = None
@@ -61,34 +51,27 @@ class BaseHandler(tornado.web.RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type")
-
     def options(self):
         """Answer OPTIONS request."""
-        self.finish()
 
-    def get_post_data(self):
+    @classmethod
+    async def get_post_data(cls, request):
         """extract input JSON from POST request"""
-        json_data = ''
+        data = None
 
-        # check if JSON is passed as a file or as a body of POST request
-        if self.request.files:
-            json_data = self.request.files['file'][0]['body']  # pick up only first file (index 0)
-        elif self.request.body:
-            json_data = self.request.body
+        if request.headers[hdrs.CONTENT_TYPE] == 'application/json':
+            return await request.json()
+        else:
+            raise ValueError("Only application/json supported for now")
 
-        data = json.loads(json_data)
-        return data
-
-    @gen.coroutine
-    def handle_request(self, api_endpoint, api_version, param_name=None, param=None):
+    @classmethod
+    async def handle_request(cls, api_endpoint, api_version,  param_name=None, param=None, request = None,**kwargs):
         """Takes care of validation of input and execution of request."""
+
         data = None
         try:
-            if self.request.method == 'POST':
-                data = self.get_post_data()
+            if request.method == 'POST':
+                data = await cls.get_post_data(request)
             else:
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
@@ -108,29 +91,21 @@ class BaseHandler(tornado.web.RequestHandler):
             code = 500
             LOGGER.exception(res)
             LOGGER.error("Input data for <%s>: %s", err_id, data)
-        self.set_status(code)
-        self.write(res)
+        return web.json_response(res, status=code)
 
-    def on_finish(self):
-        REQUEST_TIME.labels(self.request.method, self.request.path).observe(self.request.request_time())
-        REQUEST_COUNTS.labels(self.request.method, self.request.path, self.get_status()).inc()
-        LOGGER.debug("request called - method: %s, status: %d, path: %s, request_time: %f", self.request.method,
-                     self.get_status(), self.request.path, self.request.request_time())
-
-
-class MetricsHandler(BaseHandler):
-    """Handle requests to the metrics"""
-
-    def get(self):
-        """Get prometheus metrics"""
-        self.write(generate_latest())
+    @classmethod
+    def on_finish(cls, request):
+        REQUEST_TIME.labels(request.method, request.path).observe(request.request_time())
+        REQUEST_COUNTS.labels(request.method, request.path, request.stats_code ).inc()
+        LOGGER.debug("request called - method: %s, status: %d, path: %s, request_time: %f", request.method,
+                     request.stats_code, request.path, request.request_time())
 
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
 
-    @gen.coroutine
-    def get(self):
+    @classmethod
+    async def get(cls, **kwargs):
         """Get API status.
            ---
            description: Return API status
@@ -140,27 +115,11 @@ class HealthHandler(BaseHandler):
         """
 
 
-class ApiSpecHandler(BaseHandler):
-    """Handler class providing API specification."""
-
-    @gen.coroutine
-    def get(self):
-        """Get API specification.
-           ---
-           description: Get API specification
-           responses:
-             200:
-               description: OpenAPI/Swagger 2.0 specification JSON returned
-        """
-        result = SPEC.to_dict()
-        self.write(result)
-
-
 class VersionHandler(BaseHandler):
     """Handler class providing app version."""
 
-    @gen.coroutine
-    def get(self):
+    @classmethod
+    async def get(cls, **kwargs):
         """Get app version.
            ---
            description: Get version of application
@@ -168,7 +127,7 @@ class VersionHandler(BaseHandler):
              200:
                description: Version of application returned
         """
-        self.write(VMAAS_VERSION)
+        return VMAAS_VERSION, 200
 
 
 class DBChangeHandler(BaseHandler):
@@ -176,1060 +135,171 @@ class DBChangeHandler(BaseHandler):
     Class to return last-updated information from VMaaS DB
     """
 
-    @gen.coroutine
-    def get(self):
-        """
-        ---
-        description: Get last-updated-times for VMaaS DB
-        responses:
-          200:
-            description: Return last-update timestamps for errata, repos, cves and the db as a whole
-            schema:
-              $ref: "#/definitions/DBChangeResponse"
-        tags:
-          - dbchange
-        """
-        result = self.dbchange_api.process()
-        self.write(result)
+    @classmethod
+    async def get(cls, **kwargs):
+        """Get last-updated-times for VMaaS DB """
+        return web.json_response(cls.dbchange_api.process())
 
 
 class UpdatesHandlerGet(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    def get(self, nevra=None):
-        """
-        ---
-        description: List security updates for single package NEVRA
-        parameters:
-          - name: nevra
-            description: Package NEVRA
-            required: True
-            type: string
-            in: path
-            x-example: kernel-2.6.32-696.20.1.el6.x86_64
-        responses:
-          200:
-            description: Return list of security updates for single package NEVRA
-            schema:
-              $ref: "#/definitions/UpdatesResponse"
-        tags:
-          - updates
-        """
-        self.handle_request(self.updates_api, 1, 'package_list', nevra)
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """List security updates for single package NEVRA """
+        return await cls.handle_request(cls.updates_api, 1, 'package_list', nevra, **kwargs)
 
 
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    def post(self):
-        """
-        ---
-        description: List security updates for list of package NEVRAs
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                package_list:
-                  type: array
-                  items:
-                    type: string
-                    example: kernel-2.6.32-696.20.1.el6.x86_64
-                repository_list:
-                  type: array
-                  items:
-                    type: string
-                    example: rhel-6-server-rpms
-                modules_list:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      module_name:
-                        type: string
-                        example: rhn-tools
-                      module_stream:
-                        type: string
-                        example: 1.0
-                releasever:
-                  type: string
-                  example: 6Server
-                basearch:
-                  type: string
-                  example: x86_64
-              required:
-                - package_list
-        responses:
-          200:
-            description: Return list of security updates for list of package NEVRAs
-            schema:
-              $ref: "#/definitions/UpdatesResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - updates
-        """
-        self.handle_request(self.updates_api, 1)
+    @classmethod
+    async def post(cls, **kwargs):
+        """List security updates for list of package NEVRAs"""
+        return await cls.handle_request(cls.updates_api, 1, **kwargs)
 
 
 class UpdatesHandlerV2Get(BaseHandler):
     """Handler for processing /updates GET requests."""
 
-    def get(self, nevra=None):
-        """
-        ---
-        description: List security updates for single package NEVRA
-        parameters:
-          - name: nevra
-            description: Package NEVRA
-            required: True
-            type: string
-            in: path
-            x-example: kernel-2.6.32-696.20.1.el6.x86_64
-        responses:
-          200:
-            description: Return list of security updates for single package NEVRA
-            schema:
-              $ref: "#/definitions/UpdatesV2Response"
-        tags:
-          - updates
-        """
-        self.handle_request(self.updates_api, 2, 'package_list', nevra)
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """List security updates for single package NEVRA """
+        return await cls.handle_request(cls.updates_api, 2, 'package_list', nevra, **kwargs)
 
 
 class UpdatesHandlerV2Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
-    def post(self):
-        """
-        ---
-        description: List security updates for list of package NEVRAs
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                package_list:
-                  type: array
-                  items:
-                    type: string
-                    example: kernel-2.6.32-696.20.1.el6.x86_64
-                repository_list:
-                  type: array
-                  items:
-                    type: string
-                    example: rhel-6-server-rpms
-                modules_list:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      module_name:
-                        type: string
-                        example: rhn-tools
-                      module_stream:
-                        type: string
-                        example: 1.0
-                releasever:
-                  type: string
-                  example: 6Server
-                basearch:
-                  type: string
-                  example: x86_64
-              required:
-                - package_list
-        responses:
-          200:
-            description: Return list of security updates for list of package NEVRAs
-            schema:
-              $ref: "#/definitions/UpdatesV2Response"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - updates
-        """
-        self.handle_request(self.updates_api, 2)
+    @classmethod
+    async def post(cls, **kwargs):
+        """List security updates for list of package NEVRAs"""
+        return await cls.handle_request(cls.updates_api, 2, **kwargs)
 
 
 class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
-    def get(self, cve=None):
+    @classmethod
+    async def get(cls, cve=None, **kwargs):
         """
-        ---
-        description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
-        parameters:
-          - name: cve
-            description: CVE name or POSIX regular expression pattern
-            required: True
-            type: string
-            in: path
-            x-example: CVE-2017-5715, CVE-2017-571[1-5], CVE-2017-5.*
-        responses:
-          200:
-            description: Return details about CVEs
-            schema:
-              $ref: "#/definitions/CvesResponse"
-        tags:
-          - cves
+        Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
         """
-        self.handle_request(self.cve_api, 1, 'cve_list', cve)
+        return await cls.handle_request(cls.cve_api, 1, 'cve_list', cve, **kwargs)
 
 
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
-    def post(self):
+    @classmethod
+    async def post(cls, **kwargs):
         """
-        ---
-        description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE
-         names can be provided OR one POSIX regular expression.
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                cve_list:
-                  type: array
-                  items:
-                    type: string
-                    example: CVE-2017-57.*
-                modified_since:
-                  type: string
-                  example: "2018-04-05T01:23:45+02:00"
-                rh_only:
-                  type: boolean
-                  example: true
-              required:
-                - cve_list
-        responses:
-          200:
-            description: Return details about list of CVEs
-            schema:
-              $ref: "#/definitions/CvesResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - cves
+        Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE
+        names can be provided OR one POSIX regular expression.
         """
-        self.handle_request(self.cve_api, 1)
+        return await cls.handle_request(cls.cve_api, 1, **kwargs)
 
 
 class ReposHandlerGet(BaseHandler):
     """Handler for processing /repos GET requests."""
 
-    def get(self, repo=None):
+    @classmethod
+    async def get(cls, repo=None, **kwargs):
         """
-        ---
-        description: Get details about a repository or repository-expression. It is allowed to use POSIX regular
-         expression as a pattern for repository names.
-        parameters:
-          - name: repo
-            description: Repository name or POSIX regular expression pattern
-            required: True
-            type: string
-            in: path
-            x-example: rhel-6-server-rpms OR rhel-[4567]-.*-rpms OR rhel-\\d-server-rpms
-        responses:
-          200:
-            description: Return details about repository or repositories that match the expression
-            schema:
-              $ref: "#/definitions/ReposResponse"
-        tags:
-          - repos
+        Get details about a repository or repository-expression. It is allowed to use POSIX regular
+        expression as a pattern for repository names.
         """
-        self.handle_request(self.repo_api, 1, 'repository_list', repo)
+        return await cls.handle_request(cls.repo_api, 1, 'repository_list', repo, **kwargs)
 
 
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
-    def post(self):
+    @classmethod
+    async def post(cls, **kwargs):
         """
-        ---
-        description: Get details about list of repositories. "repository_list" can be either a list of repository
-         names, OR a single POSIX regular expression.
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                repository_list:
-                  type: array
-                  items:
-                    type: string
-                    example: rhel-6-server-rpms
-                modified_since:
-                  type: string
-                  example: "2018-04-05T01:23:45+02:00"
-                  description: Return only repositories changed after the given date
-              required:
-                - repository_list
-        responses:
-          200:
-            description: Return details about list of repositories
-            schema:
-              $ref: "#/definitions/ReposResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - repos
+        Get details about list of repositories. "repository_list" can be either a list of repository
+        names, OR a single POSIX regular expression.
         """
-        self.handle_request(self.repo_api, 1)
+        return await cls.handle_request(cls.repo_api, 1, **kwargs)
 
 
 class ErrataHandlerGet(BaseHandler):
     """Handler for processing /errata GET requests."""
 
-    def get(self, erratum=None):
+    @classmethod
+    async def get(cls, erratum=None, **kwargs):
         """
-        ---
-        description: Get details about errata. It is possible to use POSIX regular
-         expression as a pattern for errata names.
-        parameters:
-          - name: erratum
-            description: Errata advisory name or POSIX regular expression pattern
-            required: True
-            type: string
-            in: path
-            x-example: RHSA-2018:0512, RHSA-2018:051[1-5], RH.*
-        responses:
-          200:
-            description: Return details about errata
-            schema:
-              $ref: "#/definitions/ErrataResponse"
-        tags:
-          - errata
+        Get details about errata. It is possible to use POSIX regular
+        expression as a pattern for errata names.
         """
-        self.handle_request(self.errata_api, 1, 'errata_list', erratum)
+        return await cls.handle_request(cls.errata_api, 1, 'errata_list', erratum, **kwargs)
 
 
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
-    def post(self):
+    @classmethod
+    async def post(cls, **kwargs):
         """
-        ---
-        description: Get details about errata with additional parameters. "errata_list"
-         parameter can be either a list of errata names OR a single POSIX regular expression.
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                errata_list:
-                  type: array
-                  items:
-                    type: string
-                    example: RHSA-2018:05.*
-                modified_since:
-                  type: string
-                  example: "2018-04-05T01:23:45+02:00"
-              required:
-                - errata_list
-        responses:
-          200:
-            description: Return details about list of errata
-            schema:
-              $ref: "#/definitions/ErrataResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - errata
+        Get details about errata with additional parameters. "errata_list"
+        parameter can be either a list of errata names OR a single POSIX regular expression.
         """
-        self.handle_request(self.errata_api, 1)
+        return await cls.handle_request(cls.errata_api, 1, **kwargs)
 
 
 class PackagesHandlerGet(BaseHandler):
     """Handler for processing /packages GET requests."""
 
-    def get(self, nevra=None):
-        """
-        ---
-        description: Get details about packages.
-        parameters:
-          - name: nevra
-            description: Package NEVRA
-            required: True
-            type: string
-            in: path
-            x-example: kernel-2.6.32-696.20.1.el6.x86_64
-        responses:
-          200:
-            description: Return details about single package NEVRA
-            schema:
-              $ref: "#/definitions/PackagesResponse"
-        tags:
-          - packages
-        """
-        self.handle_request(self.packages_api, 1, 'package_list', nevra)
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """Get details about packages."""
+        return await cls.handle_request(cls.packages_api, 1, 'package_list', nevra, **kwargs)
 
 
 class PackagesHandlerPost(BaseHandler):
     """ /packages API handler """
 
-    def post(self):
-        """
-        ---
-        description: Get details about packages. "package_list" must be a list of
-         package NEVRAs.
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                package_list:
-                  type: array
-                  items:
-                    type: string
-                    example: kernel-2.6.32-696.20.1.el6.x86_64
-              required:
-                - package_list
-        responses:
-          200:
-            description: Return details about list of package NEVRAs
-            schema:
-              $ref: "#/definitions/PackagesResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - packages
-        """
-        self.handle_request(self.packages_api, 1)
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get details about packages. "package_list" must be a list of"""
+        return await cls.handle_request(cls.packages_api, 1, **kwargs)
 
 
 class VulnerabilitiesHandlerGet(BaseHandler):
     """Handler for processing /vulnerabilities GET requests."""
 
-    def get(self, nevra=None):
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """ List of applicable CVEs for a single package NEVRA
         """
-        ---
-        description: List of applicable CVEs for a single package NEVRA
-        parameters:
-          - name: nevra
-            description: Package NEVRA
-            required: True
-            type: string
-            in: path
-            x-example: kernel-2.6.32-696.20.1.el6.x86_64
-        responses:
-          200:
-            description: Return list of applicable CVEs for a single NEVRA
-            schema:
-              $ref: "#/definitions/VulnerabilitiesResponse"
-        tags:
-          - vulnerabilities
-        """
-        self.handle_request(self.vulnerabilities_api, 1, 'package_list', nevra)
+        return await cls.handle_request(cls.vulnerabilities_api, 1, 'package_list', nevra, **kwargs)
 
 
 class VulnerabilitiesHandlerPost(BaseHandler):
     """Handler for processing /vulnerabilities POST requests."""
 
-    def post(self):
-        """
-        ---
-        description: List of applicable CVEs to a package list.
-        parameters:
-          - name: body
-            description: Input JSON
-            required: True
-            in: body
-            schema:
-              type: object
-              properties:
-                package_list:
-                  type: array
-                  items:
-                    type: string
-                    example: kernel-2.6.32-696.20.1.el6.x86_64
-                repository_list:
-                  type: array
-                  items:
-                    type: string
-                    example: rhel-6-server-rpms
-                modules_list:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      module_name:
-                        type: string
-                        example: rhn-tools
-                      module_stream:
-                        type: string
-                        example: 1.0
-                releasever:
-                  type: string
-                  example: 6Server
-                basearch:
-                  type: string
-                  example: x86_64
-              required:
-                - package_list
-        responses:
-          200:
-            description: List of applicable CVEs to a package list.
-            schema:
-              $ref: "#/definitions/VulnerabilitiesResponse"
-          400:
-            description: Invalid input JSON format
-        tags:
-          - vulnerabilities
-        """
-        self.handle_request(self.vulnerabilities_api, 1)
+    @classmethod
+    async def post(cls, **kwargs):
+        """List of applicable CVEs to a package list. """
+        return await cls.handle_request(cls.vulnerabilities_api, 1,**kwargs)
 
 
-def setup_apispec(handlers):
-    """Setup definitions and handlers for apispec."""
-    SPEC.definition("UpdatesResponse", properties={
-        "update_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "available_updates": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string",
-                                    "example": "rhel-6-server-rpms"
-                                },
-                                "releasever": {
-                                    "type": "string",
-                                    "example": "6Server"
-                                },
-                                "basearch": {
-                                    "type": "string",
-                                    "example": "x86_64"
-                                },
-                                "erratum": {
-                                    "type": "string",
-                                    "example": "RHSA-2018:0512"
-                                },
-                                "package": {
-                                    "type": "string",
-                                    "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                                }
-                            }
-                        }
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "package description"
-                    },
-                    "summary": {
-                        "type": "string",
-                        "example": "package summary"
-                    }
-                }
-            },
-        },
-        "repository_list": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "example": "rhel-6-server-rpms"
-            }
-        },
-        "modules_list": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "module_name": {
-                        "type": "string",
-                        "example": "rhn-tools"
-                    },
-                    "module_stream": {
-                        "type": "string",
-                        "example": "1"
-                    }
-                }
-            }
-        },
-        "releasever": {
-            "type": "string",
-            "example": "6Server"
-        },
-        "basearch": {
-            "type": "string",
-            "example": "x86_64"
-        },
-    })
-    SPEC.definition("UpdatesV2Response", properties={
-        "update_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "available_updates": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string",
-                                    "example": "rhel-6-server-rpms"
-                                },
-                                "releasever": {
-                                    "type": "string",
-                                    "example": "6Server"
-                                },
-                                "basearch": {
-                                    "type": "string",
-                                    "example": "x86_64"
-                                },
-                                "erratum": {
-                                    "type": "string",
-                                    "example": "RHSA-2018:0512"
-                                },
-                                "package": {
-                                    "type": "string",
-                                    "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-        },
-        "repository_list": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "example": "rhel-6-server-rpms"
-            }
-        },
-        "modules_list": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "module_name": {
-                        "type": "string",
-                        "example": "rhn-tools"
-                    },
-                    "module_stream": {
-                        "type": "string",
-                        "example": "1"
-                    }
-                }
-            }
-        },
-        "releasever": {
-            "type": "string",
-            "example": "6Server"
-        },
-        "basearch": {
-            "type": "string",
-            "example": "x86_64"
-        },
-    })
-    SPEC.definition("CvesResponse", properties={
-        "cve_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "impact": {
-                        "type": "string",
-                        "example": "Medium",
-                    },
-                    "public_date": {
-                        "type": "string",
-                        "example": "2018-01-04T13:29:00+00:00",
-                    },
-                    "synopsis": {
-                        "type": "string",
-                        "example": "CVE-2017-5715",
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "description text",
-                    },
-                    "modified_date": {
-                        "type": "string",
-                        "example": "2018-03-31T01:29:00+00:00",
-                    },
-                    "redhat_url": {
-                        "type": "string",
-                        "example": "https://access.redhat.com/security/cve/cve-2017-5715",
-                    },
-                    "secondary_url": {
-                        "type": "string",
-                        "example": "https://seconday.url.com",
-                    },
-                    "cvss2_score": {
-                        "type": "string",
-                        "example": "5.600",
-                    },
-                    "cvss2_metrics": {
-                        "type": "string",
-                        "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
-                    },
-                    "cvss3_score": {
-                        "type": "string",
-                        "example": "5.1"
-                    },
-                    "cvss3_metrics": {
-                        "type": "string",
-                        "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
-                    },
-                    "cwe_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "CWE-20"
-                        }
-                    },
-                    "errata_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "RHSA-2015:1981"
-                        }
-                    },
-                    "package_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "nss-devel-3.16.1-9.el6_5.x86_64"
-                        }
-                    },
-                    "source_package_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "nss-devel-3.16.1-9.el6_5.src"
-                        }
-                    }
-                }
-            }
-        },
-        "modified_since": {
-            "type": "string",
-            "example": "2018-04-05T01:23:45+02:00"
-        },
-    })
-    SPEC.definition("ReposResponse", properties={
-        "repository_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "product": {
-                            "type": "string",
-                            "example": "Red Hat Enterprise Linux Server"
-                        },
-                        "releasever": {
-                            "type": "string",
-                            "example": "6Server"
-                        },
-                        "name": {
-                            "type": "string",
-                            "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
-                        },
-                        "url": {
-                            "type": "string",
-                            "example": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/"
-                        },
-                        "basearch": {
-                            "type": "string",
-                            "example": "x86_64"
-                        },
-                        "revision": {
-                            "type": "string",
-                            "example": "2018-03-27T10:55:16+00:00"
-                        },
-                        "label": {
-                            "type": "string",
-                            "example": "rhel-6-server-rpms"
-                        }
-                    }
-                }
-            },
-        }
-    })
-    SPEC.definition("ErrataResponse", properties={
-        "errata_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "updated": {
-                        "type": "string",
-                        "example": "2018-03-13T17:31:41+00:00"
-                    },
-                    "severity": {
-                        "type": "string",
-                        "example": "Important"
-                    },
-                    "reference_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "classification-RHSA-2018:0512"
-                        }
-                    },
-                    "modules_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "module_name": {
-                                    "type": "string",
-                                    "example": "postgresql"
-                                },
-                                "module_stream": {
-                                    "type": "string",
-                                    "example": "10"
-                                },
-                                "module_version": {
-                                    "type": "string",
-                                    "example": "820190104140132"
-                                },
-                                "module_context": {
-                                    "type": "string",
-                                    "example": "9edba152"
-                                },
-                                "package_list": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string",
-                                        "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                                    }
-                                },
-                                "source_package_list":{
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string",
-                                        "example": "kernel-2.6.32-696.23.1.el6.src"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "issued": {
-                        "type": "string",
-                        "example": "2018-03-13T17:31:28+00:00"
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "description text"
-                    },
-                    "solution": {
-                        "type": "string",
-                        "example": "solution text"
-                    },
-                    "summary": {
-                        "type": "string",
-                        "example": "summary text"
-                    },
-                    "url": {
-                        "type": "string",
-                        "example": "https://access.redhat.com/errata/RHSA-2018:0512"
-                    },
-                    "synopsis": {
-                        "type": "string",
-                        "example": "Important: kernel security and bug fix update"
-                    },
-                    "cve_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "CVE-2017-5715"
-                        }
-                    },
-                    "bugzilla_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "1519778"
-                        }
-                    },
-                    "package_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                        }
-                    },
-                    "source_package_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "kernel-2.6.32-696.23.1.el6.src"
-                        }
-                    },
-                    "type": {
-                        "type": "string",
-                        "example": "security"
-                    }
-                }
-            }
-        },
-        "modified_since": {
-            "type": "string",
-            "example": "2018-04-05T01:23:45+02:00"
-        },
-    })
-    SPEC.definition("PackagesResponse", properties={
-        "package_list": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "summary": {
-                        "type": "string",
-                        "example": "package summary"
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "package description"
-                    },
-                    "source_package": {
-                        "type": "string",
-                        "example": "kernel-2.6.32-696.23.1.el6.src"
-                    },
-                    "package_list": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "kernel-2.6.32-696.23.1.el6.x86_64"
-                        }
-                    },
-                    "repositories": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "label": {
-                                    "type": "string",
-                                    "example": "rhel-6-server-rpms"
-                                },
-                                "name": {
-                                    "type": "string",
-                                    "example": "Red Hat Enterprise Linux 6 Server (RPMs)"
-                                },
-                                "basearch": {
-                                    "type": "string",
-                                    "example": "x86_64"
-                                },
-                                "releasever": {
-                                    "type": "string",
-                                    "example": "6.9"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    })
-    SPEC.definition("DBChangeResponse", properties={
-        "dbchange": {
-            "type": "object",
-            "properties": {
-                "errata_changes": {
-                    "type": "string",
-                    "example": "2018-04-16 20:07:58.500192+00"
-                    },
-                "cve_changes": {
-                    "type": "string",
-                    "example": "2018-04-16 20:06:47.214266+00"
-                    },
-                "repository_changes": {
-                    "type": "string",
-                    "example": "2018-04-16 20:07:55.01395+00"
-                    },
-                "last_change": {
-                    "type": "string",
-                    "example": "2018-04-16 20:07:58.500192+00"
-                    },
-                "exported": {
-                    "type": "string",
-                    "example": "2018-04-16 20:07:59.235962+00"
-                    }
-                }
-            }
-    })
-    SPEC.definition('VulnerabilitiesResponse', properties={
-        'cve_list': {
-            'type': 'array',
-            'items': {
-                'type': 'string',
-                'example': 'CVE-2016-0800'
-            }
-        }
-    })
-    # Register public API handlers to apispec
-    for handler in handlers:
-        if handler[0].startswith(('/api/v1/', '/api/v2/')):
-            SPEC.add_path(urlspec=handler)
-
-
-class Application(tornado.web.Application):
+class Application:
     """ main webserver application class """
     def __init__(self):
-        handlers = [
-            (r"/api/v1/monitoring/health/?", HealthHandler),
-            (r"/api/v1/apispec/?", ApiSpecHandler),
-            (r"/api/v1/version/?", VersionHandler),
-            (r"/api/v1/dbchange/?", DBChangeHandler),  # GET request
-            (r"/metrics", MetricsHandler),  # GET request
-            (r"/api/v1/updates/?", UpdatesHandlerPost),
-            (r"/api/v1/updates/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", UpdatesHandlerGet),
-            (r"/api/v2/updates/?", UpdatesHandlerV2Post),
-            (r"/api/v2/updates/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", UpdatesHandlerV2Get),
-            (r"/api/v1/cves/?", CVEHandlerPost),
-            (r"/api/v1/cves/(?P<cve>[\\a-zA-Z0-9%*-.+^$?\[\]]+)", CVEHandlerGet),
-            (r"/api/v1/repos/?", ReposHandlerPost),
-            (r"/api/v1/repos/(?P<repo>[\\a-zA-Z0-9%*-.+?\[\]]+)", ReposHandlerGet),
-            (r"/api/v1/errata/?", ErrataHandlerPost),
-            (r"/api/v1/errata/(?P<erratum>[\\a-zA-Z0-9%*-:.+?\[\]]+)", ErrataHandlerGet),
-            (r"/api/v1/packages/?", PackagesHandlerPost),
-            (r"/api/v1/packages/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", PackagesHandlerGet),
-            (r"/api/v1/vulnerabilities/?", VulnerabilitiesHandlerPost),
-            (r"/api/v1/vulnerabilities/(?P<nevra>[a-zA-Z0-9%-._:^~]+)", VulnerabilitiesHandlerGet),
-        ]
-
-        tornado.web.Application.__init__(self, handlers, autoreload=False, debug=False, serve_traceback=False)
-
-        setup_apispec(handlers)
         self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
         self.websocket = None
         self.websocket_response_queue = set()
-        self.reconnect_callback = None
 
     def stop(self):
         """Stop vmaas application"""
         if self.websocket is not None:
             self.websocket.close()
             self.websocket = None
-        IOLoop.instance().stop()
+        # TODO: Which one here
+        asyncio.current_task().cancel()
+        #asyncio.get_event_loop().stop()
 
     @staticmethod
     def _refresh_cache():
@@ -1239,45 +309,42 @@ class Application(tornado.web.Application):
             BaseHandler.updates_api.clear_hot_cache()
         LOGGER.info("Cached data refreshed.")
 
-    def websocket_reconnect(self):
-        """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
-        if self.websocket is None:
-            websocket_connect(self.websocket_url, on_message_callback=self._read_websocket_message,
-                              callback=self._websocket_connect_status)
+    async def websocket_loop(self):
+        async with ClientSession() as session:
+            while True:
+                async with session.ws_connect(url=self.websocket_url) as ws:
+                    LOGGER.info("Connected to: %s", self.websocket_url)
+                    self.websocket = ws
 
-    def _websocket_connect_status(self, future):
-        """Check if connection attempt succeeded."""
-        try:
-            result = future.result()
-        except: # pylint: disable=bare-except
-            result = None
+                    await self.websocket.send_str("subscribe-webapp")
 
-        if result is None:
-            # TODO: print the traceback as debug message when we use logging module instead of prints here
-            LOGGER.warning("Unable to connect to: %s", self.websocket_url)
-        else:
-            LOGGER.info("Connected to: %s", self.websocket_url)
-            result.write_message("subscribe-webapp")
-            for item in self.websocket_response_queue:
-                self.websocket.write_message(item)
-            self.websocket_response_queue.clear()
+                    for item in self.websocket_response_queue:
+                        await self.websocket.send_str(item)
 
-        self.websocket = result
+                    self.websocket_response_queue.clear()
 
-    def _read_websocket_message(self, message):
-        """Read incoming websocket messages."""
-        if message is not None:
-            if message == "refresh-cache":
+                    # handle websocket messages
+                    await self.websocket_msg_handler()
+                    self.websocket = None
+                    # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
+                    await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL * 1000)
+
+
+    async def websocket_msg_handler(self):
+        async for msg in self.websocket:
+
+            LOGGER.info(f"Websocket message: f{msg.type}, f{msg.data}")
+            if msg.type in (WSMsgType.CLOSED, WSMsgType.ERROR):
+                return None
+            elif msg.data == 'refresh-cache':
                 self._refresh_cache()
-                msg = "refreshed %s" % BaseHandler.db_cache.dbchange["exported"]
+                msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
-                    self.websocket.write_message(msg)
+                    self.websocket.send_str(msg)
                 else:
                     self.websocket_response_queue.add(msg)
-        else:
-            LOGGER.warning("Connection to %s closed: %s (%s)", self.websocket_url,
-                           self.websocket.close_reason, self.websocket.close_code)
-            self.websocket = None
+            else:
+                LOGGER.warning(f"Unhandled websocket message {msg.data}")
 
 
 def load_cache_to_apis():
@@ -1294,39 +361,53 @@ def load_cache_to_apis():
 def create_app():
     """Create VmaaS application and servers"""
 
-    vmaas_app = Application()
+    with open('webapp.spec.yaml', 'rb') as specfile:
+        SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
 
-    def terminate(*_):
-        """Trigger shutdown."""
-        LOGGER.info("Signal received, stopping application.")
-        IOLoop.instance().add_callback_from_signal(vmaas_app.stop)
+    app = connexion.AioHttpApp(__name__, options={
+        'swagger_ui': True,
+        'openapi_spec_path': '/v1/apispec'
+    })
 
-    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-    for sig in signals:
-        signal.signal(sig, terminate)
+    def metrics(request, **kwargs):  # pylint: disable=unused-argument
+        # /metrics API shouldn't be visible in the API documentation,
+        # hence it's added here in the create_app step
+        return generate_latest()
 
-    server = tornado.httpserver.HTTPServer(vmaas_app)
-    server.bind(PUBLIC_API_PORT)
-    num_servers = int(os.getenv("MAX_VMAAS_SERVERS", MAX_SERVERS))
-    server.start(num_servers)  # start forking here
-    init_logging(num_servers)
-    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
-    LOGGER.info('Hotcache enabled: %s', os.getenv("HOTCACHE_ENABLED", "YES"))
+    async def on_prepare(request, response):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+
+    app.app.on_response_prepare.append(on_prepare)
+    app.app.router.add_get("/metrics", metrics)
+
+    app.add_api(SPEC, resolver=connexion.RestyResolver('app'),
+                validate_responses=False,
+                strict_validation=False,
+                base_path='/api',
+                pass_context_arg_name='request'
+                )
+
 
     # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
 
-    vmaas_app.websocket_reconnect()
-    vmaas_app.reconnect_callback = PeriodicCallback(vmaas_app.websocket_reconnect, WEBSOCKET_RECONNECT_INTERVAL * 1000)
-    vmaas_app.reconnect_callback.start()
+    return app
 
 
-def main():
-    """Run webapp."""
-    create_app()
-    IOLoop.instance().start()
+def init_websocket():
+    vmaas_app = Application()
 
+    def terminate(*_):
+        """Trigger shutdown."""
+        LOGGER.info("Signal received, stopping application.")
+        asyncio.get_event_loop().call_soon(vmaas_app.stop)
 
-if __name__ == '__main__':
-    main()
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for sig in signals:
+        signal.signal(sig, terminate)
+
+    # start websocket handling coroutine
+    asyncio.get_event_loop().create_task(vmaas_app.websocket_loop())
+
