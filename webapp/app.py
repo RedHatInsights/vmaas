@@ -6,14 +6,14 @@ Main web API module
 import os
 import signal
 import sre_constants
-import json
-import yaml
+import time
 import asyncio
+import yaml
 
 from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
-from aiohttp import web, ClientSession, WSMessage, WSMsgType, hdrs
 import connexion
+from aiohttp import web, ClientSession, WSMsgType, hdrs
 
 from cache import Cache
 from cve import CveAPI
@@ -30,7 +30,6 @@ from probes import REQUEST_COUNTS, REQUEST_TIME
 
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
-MAX_SERVERS = "1"
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
 LOGGER = get_logger(__name__)
@@ -48,25 +47,19 @@ class BaseHandler:
     vulnerabilities_api = None
     dbchange_api = None
 
-    def data_received(self, chunk):
-        pass
-
-    def options(self):
-        """Answer OPTIONS request."""
-
     @classmethod
     async def get_post_data(cls, request):
         """extract input JSON from POST request"""
-        data = None
-
         if request.headers[hdrs.CONTENT_TYPE] == 'application/json':
             return await request.json()
-        else:
-            raise ValueError("Only application/json supported for now")
+        raise web.HTTPBadRequest(reason="Only application/json supported for now")
 
     @classmethod
-    async def handle_request(cls, api_endpoint, api_version,  param_name=None, param=None, request = None,**kwargs):
+    async def handle_request(cls, api_endpoint, api_version, param_name=None, param=None, **kwargs):
         """Takes care of validation of input and execution of request."""
+        request = kwargs.get('request', None)
+        if request is None:
+            raise ValueError('request not provided')
 
         data = None
         try:
@@ -93,19 +86,14 @@ class BaseHandler:
             LOGGER.error("Input data for <%s>: %s", err_id, data)
         return web.json_response(res, status=code)
 
-    @classmethod
-    def on_finish(cls, request):
-        REQUEST_TIME.labels(request.method, request.path).observe(request.request_time())
-        REQUEST_COUNTS.labels(request.method, request.path, request.stats_code ).inc()
-        LOGGER.debug("request called - method: %s, status: %d, path: %s, request_time: %f", request.method,
-                     request.stats_code, request.path, request.request_time())
+
 
 
 class HealthHandler(BaseHandler):
     """Handler class providing health status."""
 
     @classmethod
-    async def get(cls, **kwargs):
+    async def get(cls, **kwargs): # pylint: disable=unused-argument
         """Get API status.
            ---
            description: Return API status
@@ -114,12 +102,14 @@ class HealthHandler(BaseHandler):
                description: Application is alive
         """
 
+        return web.Response(status=200)
+
 
 class VersionHandler(BaseHandler):
     """Handler class providing app version."""
 
     @classmethod
-    async def get(cls, **kwargs):
+    async def get(cls, **kwargs): #pylint: disable=unused-argument
         """Get app version.
            ---
            description: Get version of application
@@ -127,7 +117,7 @@ class VersionHandler(BaseHandler):
              200:
                description: Version of application returned
         """
-        return VMAAS_VERSION, 200
+        return web.Response(body=str(VMAAS_VERSION), status=200)
 
 
 class DBChangeHandler(BaseHandler):
@@ -136,7 +126,7 @@ class DBChangeHandler(BaseHandler):
     """
 
     @classmethod
-    async def get(cls, **kwargs):
+    async def get(cls, **kwargs): #pylint: disable=unused-argument
         """Get last-updated-times for VMaaS DB """
         return web.json_response(cls.dbchange_api.process())
 
@@ -282,14 +272,15 @@ class VulnerabilitiesHandlerPost(BaseHandler):
     @classmethod
     async def post(cls, **kwargs):
         """List of applicable CVEs to a package list. """
-        return await cls.handle_request(cls.vulnerabilities_api, 1,**kwargs)
+        return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
 
-class Application:
-    """ main webserver application class """
+class Websocket:
+    """ main websocket handling class"""
     def __init__(self):
         self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
         self.websocket = None
+        self.task = None
         self.websocket_response_queue = set()
 
     def stop(self):
@@ -297,9 +288,9 @@ class Application:
         if self.websocket is not None:
             self.websocket.close()
             self.websocket = None
-        # TODO: Which one here
-        asyncio.current_task().cancel()
-        #asyncio.get_event_loop().stop()
+
+        self.task.cancel()
+        self.task = None
 
     @staticmethod
     def _refresh_cache():
@@ -310,17 +301,17 @@ class Application:
         LOGGER.info("Cached data refreshed.")
 
     async def websocket_loop(self):
+        """Main loop for handling websocket connection"""
         async with ClientSession() as session:
             while True:
-                async with session.ws_connect(url=self.websocket_url) as ws:
+                async with session.ws_connect(url=self.websocket_url) as socket:
                     LOGGER.info("Connected to: %s", self.websocket_url)
-                    self.websocket = ws
-
+                    self.websocket = socket
+                    # subscribe for notifications
                     await self.websocket.send_str("subscribe-webapp")
-
+                    # Re-send queued messages
                     for item in self.websocket_response_queue:
                         await self.websocket.send_str(item)
-
                     self.websocket_response_queue.clear()
 
                     # handle websocket messages
@@ -329,14 +320,14 @@ class Application:
                     # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
                     await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL * 1000)
 
-
     async def websocket_msg_handler(self):
+        """Handle active websocket connection, returning upon close"""
         async for msg in self.websocket:
-
-            LOGGER.info(f"Websocket message: f{msg.type}, f{msg.data}")
+            LOGGER.debug("Websocket message: %s, %s", msg.type, msg.data)
             if msg.type in (WSMsgType.CLOSED, WSMsgType.ERROR):
                 return None
-            elif msg.data == 'refresh-cache':
+
+            if msg.data == 'refresh-cache':
                 self._refresh_cache()
                 msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
@@ -344,7 +335,7 @@ class Application:
                 else:
                     self.websocket_response_queue.add(msg)
             else:
-                LOGGER.warning(f"Unhandled websocket message {msg.data}")
+                LOGGER.warning("Unhandled websocket message %s", msg.data)
 
 
 def load_cache_to_apis():
@@ -361,20 +352,44 @@ def load_cache_to_apis():
 def create_app():
     """Create VmaaS application and servers"""
 
+    init_logging()
+
+    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+    LOGGER.info('Hotcache enabled: %s', os.getenv("HOTCACHE_ENABLED", "YES"))
+
     with open('webapp.spec.yaml', 'rb') as specfile:
         SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
 
+    @web.middleware
+    async def timing_middleware(request, handler, **kwargs):
+        """ Middleware that handles timing of requests"""
+        start_time = time.time()
+        if asyncio.iscoroutinefunction(handler):
+            res = await handler(request, **kwargs)
+        else:
+            res = handler(request, **kwargs)
+
+        duration = (time.time() - start_time)
+
+        REQUEST_TIME.labels(request.method, request.path).observe(duration)
+        REQUEST_COUNTS.labels(request.method, request.path, res.status).inc()
+
+        return res
+
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
-        'openapi_spec_path': '/v1/apispec'
+        'openapi_spec_path': '/v1/apispec',
+        'middlewares': [timing_middleware]
     })
 
-    def metrics(request, **kwargs):  # pylint: disable=unused-argument
+    def metrics(request, **kwargs): #pylint: disable=unused-argument
+        """Provide current prometheus metrics"""
         # /metrics API shouldn't be visible in the API documentation,
         # hence it's added here in the create_app step
-        return generate_latest()
+        return web.Response(body=generate_latest())
 
-    async def on_prepare(request, response):
+    async def on_prepare(request, response): #pylint: disable=unused-argument
+        """Hook for preparing new responses"""
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
 
@@ -388,8 +403,6 @@ def create_app():
                 pass_context_arg_name='request'
                 )
 
-
-    # The rest stuff must be done only after forking
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
 
@@ -397,17 +410,17 @@ def create_app():
 
 
 def init_websocket():
-    vmaas_app = Application()
+    """Init websocket conenction on main event loop"""
+    socket = Websocket()
 
     def terminate(*_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
-        asyncio.get_event_loop().call_soon(vmaas_app.stop)
+        asyncio.get_event_loop().call_soon(socket.stop)
 
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
     for sig in signals:
         signal.signal(sig, terminate)
 
     # start websocket handling coroutine
-    asyncio.get_event_loop().create_task(vmaas_app.websocket_loop())
-
+    socket.task = asyncio.get_event_loop().create_task(socket.websocket_loop())
