@@ -21,8 +21,8 @@ class TestRepoMD(unittest.TestCase):
         self.assertEqual(self.repomd.get_revision(), self.repomd_primary_only.get_revision())
 
     def _test_repomd(self, data):
-        intended_fields = ["location", "checksum_type", "checksum", "size"]
-        optional_fields = ["open-size"]
+        intended_fields = ["location", "checksum_type", "checksum"]
+        optional_fields = ["open-size", "size"]
         actual_fields = data.keys()
         for field in intended_fields:
             self.assertTrue(field in actual_fields, field)

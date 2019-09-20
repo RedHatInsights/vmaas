@@ -38,9 +38,10 @@ class RepoMD:
                 "location": location,
                 "checksum_type": checksum_type,
                 "checksum": checksum,
-                "size": int(size.text)
             }
 
+            if size:
+                self.data[data_type]["size"] = int(size.text)
             if open_size:
                 self.data[data_type]["open-size"] = int(open_size.text)
 

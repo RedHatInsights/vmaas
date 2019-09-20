@@ -246,7 +246,7 @@ class RepositoryController:
             try:
                 mdata = repomd.get_metadata(data_type)
                 # open-size is not present for uncompressed files
-                return int(mdata['size']) + int(mdata.get('open-size', '0'))
+                return int(mdata.get('size', 0)) + int(mdata.get('open-size', '0'))
             except RepoMDTypeNotFound:
                 return 0
 
