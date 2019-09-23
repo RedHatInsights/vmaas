@@ -73,7 +73,7 @@ def runStages() {
                         GIT_REF = "+refs/pull/${GIT_PR}/head"
                     }
                     // set needed env.yml
-                    // build vmaas-webapp from Dockerfile-webapp-qe - it won't start app.py
+                    // build vmaas-webapp from Dockerfile-webapp-qe - it won't start main.py
                     sh """
                         # Create an env.yaml to have the builder pull from a different branch
                         echo "vmaas/vmaas-apidoc:" > builder-env.yml
@@ -119,7 +119,7 @@ def runStages() {
                     // Start webapp as `coverage run ...` instead of `python ...` to collect coverage
                     sh '''
                         webapp_pod="$(oc get pods | grep 'Running' | grep 'webapp' | awk '{print $1}')"
-                        oc exec "${webapp_pod}" -- bash -c "coverage run webapp/app.py --source webapp &>/proc/1/fd/1" &
+                        oc exec "${webapp_pod}" -- bash -c "coverage run main.py --source webapp &>/proc/1/fd/1" &
                     '''
                 }
                 stage("Setup DB") {
@@ -181,8 +181,8 @@ def runStages() {
                 assert status == 0
             }
 
-            // run webapp's app.py again
-            sh "oc exec ${webapp_pod} -- bash -c 'webapp/app.py &>/proc/1/fd/1' &"
+            // run webapp's main.py again
+            sh "oc exec ${webapp_pod} -- bash -c 'main.py &>/proc/1/fd/1' &"
         }
 
         stage("Publish in Polarion") {
