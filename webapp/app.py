@@ -50,7 +50,7 @@ class BaseHandler:
     @classmethod
     async def get_post_data(cls, request):
         """extract input JSON from POST request"""
-        if request.headers[hdrs.CONTENT_TYPE] == 'application/json':
+        if request.headers.get(hdrs.CONTENT_TYPE, None) == 'application/json':
             return await request.json()
         raise web.HTTPBadRequest(reason="Only application/json supported for now")
 
