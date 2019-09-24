@@ -252,18 +252,19 @@ class UpdatesAPI:
         return valid_releasevers
 
     def _get_repositories(self, product_ids, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
-        repo_ids = []
+        repo_ids = set()
         errata_repo_ids = set()
         for errata_id in errata_ids:
-            for repo_id in self.db_cache.errataid2repoids.get(errata_id, []):
-                errata_repo_ids.add(repo_id)
+            errata_repo_ids.update(self.db_cache.errataid2repoids.get(errata_id, []))
 
-        for repo_id in self.db_cache.pkgid2repoids.get(update_pkg_id, []):
-            if repo_id in available_repo_ids \
-                    and self.db_cache.repo_detail[repo_id][REPO_PRODUCT_ID] in product_ids \
-                    and repo_id in errata_repo_ids \
-                    and self.db_cache.repo_detail[repo_id][REPO_RELEASEVER] in valid_releasevers:
-                repo_ids.append(repo_id)
+        res_repos = set(self.db_cache.pkgid2repoids.get(update_pkg_id, []))
+        res_repos.intersection_update(available_repo_ids, errata_repo_ids)
+
+        for repo_id in res_repos:
+            repo_detail = self.db_cache.repo_detail[repo_id]
+            if repo_detail[REPO_RELEASEVER] in valid_releasevers \
+              and repo_detail[REPO_PRODUCT_ID] in product_ids:
+                repo_ids.add(repo_id)
 
         return repo_ids
 
