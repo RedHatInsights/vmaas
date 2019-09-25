@@ -136,6 +136,15 @@ def runStages() {
                     }
  
                 }
+
+                // Experimental perf testing
+                stage("Perf tests") {
+                    checkOutRepo(targetDir: "wrk-git", repoUrl: "https://github.com/giltene/wrk2", credentialsId: "github")
+                    sh "cd wrk-git && make && cp wrk ../perftests/wrk"
+                    sh "cd perftests && python3 ./perftest.py bench -n tst --webapp http://vmaas-webapp.vmaas-qe.svc:8080"
+                    sh "cat perftests/out/tst.csv"
+                }
+
                 stage("Run tests") {
                     // Running pytest can result in six different exit codes:
                     // 0: All tests were collected and passed successfully
@@ -204,6 +213,14 @@ def runStages() {
                   reportDir: 'htmlcov',
                   reportFiles: 'index.html',
                   reportName: "Coverage Report"
+            ])
+            publishHTML (target: [
+                  allowMissing: true,
+                  alwaysLinkToLastBuild: true,
+                  keepAll: true,
+                  reportDir: 'perftests/out',
+                  reportFiles: 'tst.csv',
+                  reportName: "Performance reports"
             ])
             publishHTML (target: [
                   allowMissing: true,
