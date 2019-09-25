@@ -66,7 +66,7 @@ class CveAPI:
             cve_detail = self.cache.cve_detail.get(cve)
             if not cve_detail:
                 continue
-            elif cve_detail[CVE_PUBLISHED_DATE]:
+            if cve_detail[CVE_PUBLISHED_DATE]:
                 if cve_detail[CVE_PUBLISHED_DATE] >= published_since_dt:
                     filtered_cves_to_process.append(cve)
 

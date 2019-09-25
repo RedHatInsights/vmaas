@@ -11,16 +11,15 @@ def match(expected, given):
         if key == "cvss3_score" and value:
             if float(value) == float(given[key]):
                 continue
-            else:
-                not_match.update({key: given[key]})
+
+            not_match.update({key: given[key]})
         elif value and key in ("public_date", "modified_date"):
             value = iso8601.parse_date(value)
             if value != given[key]:
                 not_match.update({key: given[key]})
         elif value == given[key]:
             continue
-        else:
-            not_match.update({key: given[key]})
+        not_match.update({key: given[key]})
 
     if not_match:
         msg = """
