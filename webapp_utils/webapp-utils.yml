@@ -28,8 +28,8 @@ paths:
     
   /v1/packages:
     post:
-      summary: Get details about packages which does not have security errata, "package_list" must be a list of package NEVRAs.
-      operationId: packages.PostPackages.post
+      summary: Get details about packages, "package_list" must be a list of package NEVRAs.
+      operationId: packages.Packages.post
       responses:
         200:
           description: Return details about list of package NEVRAs
@@ -49,8 +49,8 @@ paths:
 
   /v1/packages/{Nevra}:
     get:
-      summary: Get details about package which does not have security errata.
-      operationId: packages.GetPackage.get
+      summary: Get details about package.
+      operationId: packages.Packages.get
       responses:
         200:
           description: Return details about package NEVRA.
@@ -63,10 +63,26 @@ paths:
       tags:
         - packages
   
-  /v1/packages/repositories:
+  /v1/packages/repositories/{Nevra}:
+    get:
+      summary: Get list of repositories where package belong to.
+      operationId: package_repositories.PackageRepositories.get
+      responses:
+        200:
+          description: Return repositories list based on given single NEVRA.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/PackageRepositories'
+      parameters:
+        - $ref: '#/components/parameters/Nevra'
+      tags:
+        - packages
+
+  /v1/packages/repositories/:
     post:
       summary: Get list of repositories where the packages belong to.
-      operationId: package_repositories.PostPackageRepositories.post
+      operationId: package_repositories.PackageRepositories.post
       responses:
         200:
           description: Return repositories list based on given NEVRAs.
@@ -86,8 +102,8 @@ paths:
   /v1/errata:
     post:
       summary: Errata details.
-      description: Get details about errata which are not of security type. "errata_list" parameter can be either a list of errata names OR a single POSIX regular expression.
-      operationId: errata.PostErrata.post
+      description: Get details about errata. "errata_list" parameter can be either a list of errata names OR a single POSIX regular expression.
+      operationId: errata.Errata.post
       responses:
         200:
           description: Return details about list of errata.
@@ -111,7 +127,7 @@ paths:
     get:
       summary: Errata details.
       description: Get details about errata. It is possible to use POSIX regular expression as a pettern for errata names.
-      operationId: errata.GetErrata.get
+      operationId: errata.Errata.get
       responses:
         200:
           description: Return details about errata.

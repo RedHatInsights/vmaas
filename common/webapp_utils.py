@@ -15,9 +15,14 @@ def join_packagename(name, epoch, version, release, arch):
     """
     Build a package name from the separate NEVRA parts
     """
-    epoch = ("%s:" % epoch) if int(epoch) else ''
-    return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
+    if name and epoch and version and release and arch:
+        try:
+            epoch = ("%s:" % epoch) if int(epoch) else ''
+        except Exception as _: # pylint: disable=broad-except
+            epoch = ''
+        return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
+    return None
 
 def pkg_detail2nevra(cache, pkg_detail):
     """Create package object from pkg_detail using cache object."""

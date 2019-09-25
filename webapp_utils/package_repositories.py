@@ -15,8 +15,8 @@ REPOSITORY_LABEL = 1
 LOGGER = get_logger(__name__)
 
 # pylint: disable=broad-except
-class PostPackageRepositories(Request):
-    """ POST to /v1/packages/repositories """
+class PackageRepositories(Request):
+    """ POST and GET to /v1/packages/repositories """
     @classmethod
     def handle_post(cls, **kwargs):
         response = 400
@@ -31,7 +31,15 @@ class PostPackageRepositories(Request):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        raise NotImplementedError
+        response = 400
+        repositories_api = PackagesRepositoriesAPI()
+        try:
+            repositories = repositories_api.process_nevra(kwargs.get("Nevra"))
+            response = 200
+        except Exception as _:
+            LOGGER.exception("Caught exception: %s", _)
+            return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
+        return repositories, response
 
 class PackagesRepositoriesAPI:
     """ Class for handling packages to repositories requests. """
@@ -40,7 +48,7 @@ class PackagesRepositoriesAPI:
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
 
     def process_nevras(self, data):
-        """ Method returns the list of repositories where package belongs. """
+        """ Method returns the list of repositories where packages belongs. """
         packages = data.get("package_list")
         response = {"data": {}}
 
@@ -74,3 +82,9 @@ class PackagesRepositoriesAPI:
                         response["data"][package].append(repository_data)
 
         return response
+
+    def process_nevra(self, nevra):
+        """ Method returns list of repositories where single package belongs. """
+        dummy_list = [str(nevra)]
+        dummy_schema = {"package_list": dummy_list}
+        return self.process_nevras(dummy_schema)

@@ -30,8 +30,8 @@ MIN_ERRATA_SEARCH_SIZE = 1
 LOGGER = get_logger(__name__)
 
 # pylint: disable=broad-except
-class PostErrata(Request):
-    """POST to /v1/errata"""
+class Errata(Request):
+    """POST and GET to /v1/errata"""
     @classmethod
     def handle_post(cls, **kwargs):
         response = 400
@@ -46,13 +46,6 @@ class PostErrata(Request):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        raise NotImplementedError
-
-
-class GetErrata(Request):
-    """GET to /v1/errata"""
-    @classmethod
-    def handle_get(cls, **kwargs):
         response = 400
         errata_api = ErrataAPI()
         try:
@@ -62,10 +55,6 @@ class GetErrata(Request):
             LOGGER.exception("Caught exception: %s", _)
             return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return errata, response
-
-    @classmethod
-    def handle_post(cls, **kwargs):
-        raise NotImplementedError
 
 class ErrataAPI:
     """Class handling errata API requests."""
