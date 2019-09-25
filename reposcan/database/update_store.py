@@ -138,7 +138,7 @@ class UpdateStore(ObjectStore):
                        from pkg_errata e inner join package p on p.id = e.pkg_id
                        where source_package_id is not null
                        except (select pkg_id, errata_id, module_stream_id from pkg_errata)""")
-        source_pkg_erratas = [item for item in cur.fetchall()]
+        source_pkg_erratas = cur.fetchall()
         if source_pkg_erratas:
             execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                            source_pkg_erratas, page_size=len(source_pkg_erratas))
