@@ -25,8 +25,8 @@ BINARY_PACKAGES = 11
 LOGGER = get_logger(__name__)
 
 # pylint: disable=broad-except
-class PostPackages(Request):
-    """ POST to /v1/packages """
+class Packages(Request):
+    """ POST and GET to /v1/packages """
     @classmethod
     def handle_post(cls, **kwargs):
         response = 400
@@ -41,12 +41,6 @@ class PostPackages(Request):
 
     @classmethod
     def handle_get(cls, **kwargs):
-        raise NotImplementedError
-
-class GetPackage(Request):
-    """ GET to /v1/packages/{Nevra} """
-    @classmethod
-    def handle_get(cls, **kwargs):
         response = 400
         packages_api = PackagesAPI()
         try:
@@ -56,10 +50,6 @@ class GetPackage(Request):
             LOGGER.exception("Caught exception: %s", _)
             return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return package, response
-
-    @classmethod
-    def handle_post(cls, **kwargs):
-        raise NotImplementedError
 
 class PackagesAPI:
     """ Class for handling packages API requests. """
