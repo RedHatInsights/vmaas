@@ -97,13 +97,13 @@ class RepositoryStore:
                              select 1 from pkg_repo pr where pr.pkg_id = p.id
                            ) and p.source_package_id is not null
                         """)
-            packages_to_delete = [pkg_id for pkg_id in cur.fetchall()]
+            packages_to_delete = cur.fetchall()
 
             cur.execute("""select e.id from errata e where not exists (
                              select 1 from errata_repo er where er.errata_id = e.id
                            )
                         """)
-            updates_to_delete = [update_id for update_id in cur.fetchall()]
+            updates_to_delete = cur.fetchall()
 
             if packages_to_delete:
                 cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s""", (tuple(packages_to_delete),))
@@ -129,7 +129,7 @@ class RepositoryStore:
         cur = self.conn.cursor()
         try:
             cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
-            repo_ids = [repo_id for repo_id in cur.fetchall()]
+            repo_ids = cur.fetchall()
             for repo_id in repo_ids:
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))

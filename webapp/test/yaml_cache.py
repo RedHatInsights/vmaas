@@ -63,7 +63,7 @@ def load_test_cache():
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage:\n./yaml_cache.py <vmaas.dbm path> <yaml output>")
-        exit(1)
+        sys.exit(1)
 
     CACHE = YamlCache(filename=sys.argv[1])
     CACHE.load_shelve()
