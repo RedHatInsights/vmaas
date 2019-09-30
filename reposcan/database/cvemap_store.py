@@ -142,7 +142,7 @@ class CvemapStore(CveStoreCommon):
         # now, deal with all items
         for name, values in cve_data.items():
             values["impact_id"] = cve_impact_map[values["impact"].capitalize()] \
-                        if values["impact"] is not None else cve_impact_map["NotSet"]
+                        if values["impact"] is not None else cve_impact_map["None"]
             # make sure everyting has all the keys, even if val is empty
             for a_key in cols:
                 if not a_key in values:
