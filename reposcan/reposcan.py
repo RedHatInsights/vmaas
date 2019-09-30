@@ -8,7 +8,7 @@ import os
 import signal
 from multiprocessing.pool import Pool
 import json
-
+from contextlib import contextmanager
 import yaml
 
 from prometheus_client import generate_latest
@@ -30,6 +30,7 @@ from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
+KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
 VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 DEFAULT_CHUNK_SIZE = "1048576"
@@ -304,7 +305,7 @@ class RepoDeleteHandler(SyncHandler):
     task_type = "Delete repositories"
 
     @classmethod
-    def delete(cls, repo, **kwargs): # pylint: disable=arguments-differ
+    def delete(cls, repo, **kwargs):  # pylint: disable=arguments-differ
         """Delete repository."""
         status_code, status_msg = cls.start_task(repo=repo)
         return status_msg, status_code
@@ -553,10 +554,11 @@ class SyncTask:
     @classmethod
     def cancel(cls):
         """Terminate the process pool."""
-        cls.workers.terminate()
-        cls.workers.join()
-        cls.workers = Pool(1)
-        cls.finish()
+        with disabled_signals():
+            cls.workers.terminate()
+            cls.workers.join()
+            cls.workers = Pool(1)
+            cls.finish()
 
 
 class ReposcanWebsocket():
@@ -619,6 +621,19 @@ def periodic_sync():
     AllSyncHandler.start_task()
 
 
+@contextmanager
+def disabled_signals():
+    """ Temporarily disables signal handlers, using contextlib to automatically re-enable them"""
+    handlers = {}
+    for sig in KILL_SIGNALS:
+        handlers[sig] = signal.signal(sig, signal.SIG_DFL)
+    try:
+        yield True
+    finally:
+        for sig in KILL_SIGNALS:
+            signal.signal(sig, handlers[sig])
+
+
 def create_app():
     """Create reposcan app."""
 
@@ -635,10 +650,12 @@ def create_app():
     def terminate(*_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
+        # Kill asyncio ioloop
         IOLoop.instance().add_callback_from_signal(ws_handler.stop)
+        # Kill background pool
+        SyncTask.cancel()
 
-    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-    for sig in signals:
+    for sig in KILL_SIGNALS:
         signal.signal(sig, terminate)
 
     ws_handler.websocket_reconnect()
@@ -669,7 +686,7 @@ def create_app():
         return generate_latest()
 
     @app.app.after_request
-    def set_headers(response): # pylint: disable=unused-variable
+    def set_headers(response):  # pylint: disable=unused-variable
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         return response
