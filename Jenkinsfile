@@ -18,98 +18,110 @@ node {
     }
 }
 
+def deployVmaas(project) {
+    withStatusContext.custom("deploy") {
+        dir(pipelineVars.e2eDeployDir) {
+            String GIT_REF = "${env.BRANCH_NAME}"
+            if (env.BRANCH_NAME.startsWith("PR")) {
+                String GIT_PR = "${env.BRANCH_NAME}" - "PR-"
+                GIT_REF = "+refs/pull/${GIT_PR}/head"
+            }
+            // set needed env.yml
+            // build vmaas-webapp from Dockerfile-webapp-qe - it won't start main.py
+            sh """
+                # Create an env.yaml to have the builder pull from a different branch
+                echo "vmaas/vmaas-apidoc:" > builder-env.yml
+                echo "  parameters:" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+                echo "vmaas/vmaas-reposcan:" >> builder-env.yml
+                echo "  parameters:" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+                echo "vmaas/vmaas-webapp:" >> builder-env.yml
+                echo "  parameters:" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+                echo "    DOCKERFILE_PATH: webapp/Dockerfile-qe" >> builder-env.yml
+                echo "vmaas/vmaas-websocket:" >> builder-env.yml
+                echo "  parameters:" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+                echo "vmaas/vmaas-db:" >> builder-env.yml
+                echo "  parameters:" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+
+                # Deploy these customized builders into 'vmaas-qe' project
+                ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
+                    -e builder-env.yml ${project} --secrets-local-dir secrets/sanitized
+            """
+            // deploy vmaas service set
+            sh "ocdeployer deploy -f --sets vmaas \
+                --template-dir ../vulnerability/openshift/templates \
+                -e ../vulnerability/openshift/env/env.yml \
+                ${project} --secrets-local-dir secrets/sanitized"
+        }
+    }
+}
 
 def runStages() {
     // withNode is a helper to spin up a jnlp slave using the Kubernetes plugin, and run the body code on that slave
     openShift.withNode(image: "docker-registry.default.svc:5000/jenkins/jenkins-slave-vmaas:latest") {
-        // check out source again to get it in this node"s workspace
-        scmVars = checkout scm
+        stage("Check out repos") {
+            // check out source again to get it in this node"s workspace
+            scmVars = checkout scm
+            checkOutRepo(targetDir: pipelineVars.e2eDeployDir, repoUrl: pipelineVars.e2eDeployRepoSsh, credentialsId: pipelineVars.gitSshCreds)
+            // checkout vmaas_tests git repository
+            checkOutRepo(targetDir: "vulnerability", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
+        }
 
-        // checkout vmaas_tests git repository
-        checkOutRepo(targetDir: "vulnerability", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
+        stage("Login to oc cluster") {
+            withCredentials([string(credentialsId: "openshift_token", variable: "TOKEN")]) {
+                sh "oc login https://${pipelineVars.devCluster} --token=${TOKEN}"
+            }
+            sh "oc project vmaas-qe"
+        }
 
         stage("Pip install") {
-            // withStatusContext runs the body code and notifies GitHub on whether it passed or failed
-            withStatusContext.pipInstall {
+            try {
                 sh "pip install -U iqe-integration-tests pytest-html"
                 sh "iqe plugin install vulnerability"
-                try {
-                    sh "pip check"
-                } catch (err) {
-                    echo err.toString()
-                    // workaround for old pinned version in iqe-tests
-                    sh "pip install -U simple-rest-client"
+
+                dir(pipelineVars.e2eDeployDir) {
+                    sh "pip install -r requirements.txt"
                 }
+
+                sh "pip check"
+            } catch (err) {
+                echo("Error during installing test dependencies!")
+                echo(err.toString())
+                throw err
             }
         }
 
-        stage('Inject local settings') {
+        stage("Inject local settings") {
             withCredentials([file(credentialsId: "vmaas-settings-local-yaml", variable: "settings")]) {
                 sh "cp ${settings} ${IQE_VENV}/lib/python3.6/site-packages/iqe_vulnerability/conf"
             }
         }
 
+        stage("Wipe test environment") {
+            sh "ocdeployer wipe -f vmaas-qe -l app=vmaas"
+            // make sure that DB volume is deleted
+            sh "oc delete pvc vmaas-db-data || true"
+        }
+
         stage("Deploy VMaaS") {
             // Deploy VMaaS to vmaas-qe project
-            withStatusContext.custom("deploy") {
-                stage("Login as deployer account") {
-                    withCredentials([string(credentialsId: "openshift_token", variable: "TOKEN")]) {
-                        sh "oc login https://${pipelineVars.devCluster} --token=${TOKEN}"
-                    }
-                    sh "oc project vmaas-qe"
-                }
-
-                checkOutRepo(targetDir: pipelineVars.e2eDeployDir, repoUrl: pipelineVars.e2eDeployRepoSsh, credentialsId: pipelineVars.gitSshCreds)
-                dir(pipelineVars.e2eDeployDir) {
-                    sh "${IQE_VENV}/bin/pip install -r requirements.txt"
-                    // wipe old deployment
-                    sh "${IQE_VENV}/bin/ocdeployer wipe -f vmaas-qe -l app=vmaas"
-                    // make sure that DB volume is deleted
-                    sh "oc delete pvc vmaas-db-data || true"
-                    // git reference
-                    String GIT_REF = "${env.BRANCH_NAME}"
-                    if (env.BRANCH_NAME.startsWith("PR")) {
-                        String GIT_PR = "${env.BRANCH_NAME}" - "PR-"
-                        GIT_REF = "+refs/pull/${GIT_PR}/head"
-                    }
-                    // set needed env.yml
-                    // build vmaas-webapp from Dockerfile-webapp-qe - it won't start main.py
-                    sh """
-                        # Create an env.yaml to have the builder pull from a different branch
-                        echo "vmaas/vmaas-apidoc:" > builder-env.yml
-                        echo "  parameters:" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "vmaas/vmaas-reposcan:" >> builder-env.yml
-                        echo "  parameters:" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "vmaas/vmaas-webapp:" >> builder-env.yml
-                        echo "  parameters:" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "    DOCKERFILE_PATH: webapp/Dockerfile-qe" >> builder-env.yml
-                        echo "vmaas/vmaas-websocket:" >> builder-env.yml
-                        echo "  parameters:" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                        echo "vmaas/vmaas-db:" >> builder-env.yml
-                        echo "  parameters:" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                        echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-
-                        # Deploy these customized builders into 'vmaas-qe' project
-                        ${IQE_VENV}/bin/ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
-                            -e builder-env.yml vmaas-qe --secrets-local-dir secrets/sanitized
-                    """
-                    // deploy vmaas service set
-                    sh "${IQE_VENV}/bin/ocdeployer deploy -f --sets vmaas \
-                        --template-dir ../vulnerability/openshift/templates \
-                        -e ../vulnerability/openshift/env/env.yml \
-                        vmaas-qe --secrets-local-dir secrets/sanitized"
-                }
+            try {
+                deployVmaas("vmaas-qe")
+            } catch (err) {
+                echo("Error during VMaaS deploy! Look at oc logs in Artifacts.")
+                echo(err.toString())
+                openShift.collectLogs(project: "vmaas-qe")
+                throw err
             }
-            
         }
 
         stage("Integration tests") {
@@ -125,16 +137,15 @@ def runStages() {
                 stage("Setup DB") {
                     withCredentials([string(credentialsId: "vmaas-bot-token", variable: "TOKEN"),
                                     file(credentialsId: "repolist-json", variable: "REPOLIST")]) {
-                    sh """
-                        cd vulnerability
-                        vmaas/scripts/setup_db.sh ${REPOLIST} \
-                            http://vmaas-reposcan.vmaas-qe.svc:8081 \
-                            http://vmaas-webapp.vmaas-qe.svc:8080 \
-                            ${TOKEN}
-                        sleep 10
-                    """   
+                        sh """
+                            cd vulnerability
+                            vmaas/scripts/setup_db.sh ${REPOLIST} \
+                                http://vmaas-reposcan.vmaas-qe.svc:8081 \
+                                http://vmaas-webapp.vmaas-qe.svc:8080 \
+                                ${TOKEN}
+                            sleep 10
+                        """
                     }
- 
                 }
                 stage("Run tests") {
                     // Running pytest can result in six different exit codes:
@@ -155,6 +166,7 @@ def runStages() {
                     '''
                 }
             }
+            openShift.collectLogs(project: "vmaas-qe")
             junit "iqe-junit-report.xml"
         }
 
