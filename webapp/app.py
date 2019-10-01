@@ -52,7 +52,7 @@ class BaseHandler:
         """extract input JSON from POST request"""
         if request.headers.get(hdrs.CONTENT_TYPE, None) == 'application/json':
             return await request.json()
-        raise web.HTTPBadRequest(reason="Only application/json supported for now")
+        raise web.HTTPBadRequest(reason="Invalid body")
 
     @classmethod
     async def handle_request(cls, api_endpoint, api_version, param_name=None, param=None, **kwargs):
@@ -69,6 +69,9 @@ class BaseHandler:
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
             code = 200
+        except web.HTTPError as exc:
+            # We cant return the e as response, this is being deprecated in aiohttp
+            return web.Response(body=exc.reason, status=exc.status_code, headers=exc.headers)
         except ValidationError as valid_err:
             if valid_err.absolute_path:
                 res = '%s : %s' % (valid_err.absolute_path.pop(), valid_err.message)
@@ -85,8 +88,6 @@ class BaseHandler:
             LOGGER.exception(res)
             LOGGER.error("Input data for <%s>: %s", err_id, data)
         return web.json_response(res, status=code)
-
-
 
 
 class HealthHandler(BaseHandler):
