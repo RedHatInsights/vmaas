@@ -6,6 +6,7 @@ from psycopg2.extras import execute_values
 from database.cve_common import CveStoreCommon
 from common.dateutil import format_datetime
 
+
 class CvemapStore(CveStoreCommon):
     """
     Interface to store cve list metadata (e.g lastmodified).
@@ -86,6 +87,23 @@ class CvemapStore(CveStoreCommon):
             finally:
                 cur.close()
 
+    def _delete_cves(self, to_delete):
+        if to_delete:
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur, """delete from errata_cve where cve_id in (%s)""",
+                               to_delete, page_size=len(to_delete))
+                execute_values(cur, """delete from cve_cwe where cve_id in (%s)""",
+                               to_delete, page_size=len(to_delete))
+                execute_values(cur, """delete from cve where id in (%s)""",
+                               to_delete, page_size=len(to_delete))
+                self.conn.commit()
+            except Exception:  # pylint: disable=broad-except
+                self.logger.exception("Failure while deleting CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
+
     def _populate_cves(self, cvemap):
         cve_impact_map = self._populate_cve_impacts()
         rh_source_id = self._get_source_id('Red Hat')
@@ -139,7 +157,14 @@ class CvemapStore(CveStoreCommon):
 
         to_import = []
         to_update = []
+        to_delete = []
         # now, deal with all items
+        cur.execute("select id, name from cve where source_id = %s", (rh_source_id,))
+        for cve_row in cur.fetchall():
+            cve_id = cve_row[0]
+            cve_name = cve_row[1]
+            if cve_name not in cve_data:
+                to_delete.append((cve_id,))
         for name, values in cve_data.items():
             values["impact_id"] = cve_impact_map[values["impact"].capitalize()] \
                         if values["impact"] is not None else cve_impact_map["None"]
@@ -160,10 +185,13 @@ class CvemapStore(CveStoreCommon):
         cur.close()
         self.logger.debug("CVEs to import: %d", len(to_import))
         self.logger.debug("CVEs to update: %d", len(to_update))
+        self.logger.debug("CVEs to delete: %d", len(to_delete))
 
         self._import_cves(to_import, cve_data)
 
         self._update_cves(to_update)
+
+        self._delete_cves(to_delete)
 
         cur = self.conn.cursor()
         try:
