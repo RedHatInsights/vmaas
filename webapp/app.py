@@ -371,9 +371,11 @@ def create_app():
             res = handler(request, **kwargs)
 
         duration = (time.time() - start_time)
-
-        REQUEST_TIME.labels(request.method, request.path).observe(duration)
-        REQUEST_COUNTS.labels(request.method, request.path, res.status).inc()
+        # (0)  /(1) /(2) /(3)
+        #     /api /v1  /updates
+        const_path = '/'.join(request.path.split('/')[:4])
+        REQUEST_TIME.labels(request.method, const_path).observe(duration)
+        REQUEST_COUNTS.labels(request.method, const_path, res.status).inc()
 
         return res
 
@@ -387,7 +389,7 @@ def create_app():
         """Provide current prometheus metrics"""
         # /metrics API shouldn't be visible in the API documentation,
         # hence it's added here in the create_app step
-        return web.Response(body=generate_latest())
+        return web.Response(text=generate_latest().decode('utf-8'))
 
     async def on_prepare(request, response): #pylint: disable=unused-argument
         """Hook for preparing new responses"""
