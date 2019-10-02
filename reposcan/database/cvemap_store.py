@@ -104,7 +104,7 @@ class CvemapStore(CveStoreCommon):
             finally:
                 cur.close()
 
-    def _populate_cves(self, cvemap):
+    def _populate_cves(self, cvemap):  # pylint: disable=too-many-branches
         cve_impact_map = self._populate_cve_impacts()
         rh_source_id = self._get_source_id('Red Hat')
         cur = self.conn.cursor()
