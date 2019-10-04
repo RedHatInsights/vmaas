@@ -44,7 +44,10 @@ class CvemapStore(CveStoreCommon):
                                                         cvss3_score, cvss3_metrics, iava,
                                                         redhat_url, secondary_url, source_id,
                                                         cvss2_score, cvss2_metrics)
-                                              values %s returning id, name""",
+                                              values %s on conflict on constraint cve_name_key
+                                              do update set source_id = (select id from cve_source
+                                                                         where name = 'Red Hat')
+                                              returning cve.id, cve.name""",
                                list(to_import), page_size=len(to_import))
                 for row in cur.fetchall():
                     cve_data[row[1]]["id"] = row[0]
@@ -86,23 +89,32 @@ class CvemapStore(CveStoreCommon):
             finally:
                 cur.close()
 
-    def _populate_cves(self, cvemap):
+    def _set_null_source_cves(self, to_delete):
+        if to_delete:
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur, """update cve set source_id = null where id in (%s)""",
+                               to_delete, page_size=len(to_delete))
+                self.conn.commit()
+            except Exception:  # pylint: disable=broad-except
+                self.logger.exception("Failure while deleting CVEs")
+                self.conn.rollback()
+            finally:
+                cur.close()
+
+    def _populate_cves(self, cvemap):  # pylint: disable=too-many-branches
         cve_impact_map = self._populate_cve_impacts()
         rh_source_id = self._get_source_id('Red Hat')
         cur = self.conn.cursor()
-
         cve_data = cvemap.list_cves()
-        cve_names = [(name,) for name in cve_data]
-        execute_values(cur, """select id, name, source_id,
+        cur.execute("""select cve.id, cve.name, source_id,
                                  description, impact_id,
                                  published_date, modified_date,
                                  cvss3_score, cvss3_metrics,
                                  iava, redhat_url,
                                  secondary_url, source_id,
                                  cvss2_score, cvss2_metrics
-                                 from cve
-                                 join (values %s) t(name)
-                                using (name)""", cve_names, page_size=len(cve_names))
+                                 from cve where source_id = %s""", (rh_source_id,))
         #
         # find and merge cves that have already been loaded
         #
@@ -124,18 +136,22 @@ class CvemapStore(CveStoreCommon):
             'cvss2_score':13,
             'cvss2_metrics': 14}
 
+        to_delete = []
         for a_db_row in cur.fetchall():
             # cve_data[row[1]] = incoming-cve-with-same-name-as-from-db
             # skip id, name, source_id (they are *always* filled in
             # for rest, use incoming unless null, then use from-db
             db_name = a_db_row[1]
             db_id = a_db_row[0]
-            cve_data[db_name]["id"] = db_id
-            for a_key in cols:
-                if not a_key in cve_data[db_name]:
-                    cve_data[db_name][a_key] = None
-                if not cve_data[db_name][a_key]:
-                    cve_data[db_name][a_key] = a_db_row[cols[a_key]]
+            if db_name in cve_data:
+                cve_data[db_name]["id"] = db_id
+                for a_key in cols:
+                    if not a_key in cve_data[db_name]:
+                        cve_data[db_name][a_key] = None
+                    if not cve_data[db_name][a_key]:
+                        cve_data[db_name][a_key] = a_db_row[cols[a_key]]
+            else:
+                to_delete.append((db_id,))
 
         to_import = []
         to_update = []
@@ -160,10 +176,13 @@ class CvemapStore(CveStoreCommon):
         cur.close()
         self.logger.debug("CVEs to import: %d", len(to_import))
         self.logger.debug("CVEs to update: %d", len(to_update))
+        self.logger.debug("CVEs to delete: %d", len(to_delete))
 
         self._import_cves(to_import, cve_data)
 
         self._update_cves(to_update)
+
+        self._set_null_source_cves(to_delete)
 
         cur = self.conn.cursor()
         try:
