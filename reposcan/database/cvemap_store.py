@@ -110,18 +110,14 @@ class CvemapStore(CveStoreCommon):
         cur = self.conn.cursor()
 
         cve_data = cvemap.list_cves()
-        cve_names = [(name,) for name in cve_data]
-        execute_values(cur, """select id, name, source_id,
-                                 description, impact_id,
-                                 published_date, modified_date,
-                                 cvss3_score, cvss3_metrics,
-                                 iava, redhat_url,
-                                 secondary_url, source_id,
-                                 cvss2_score, cvss2_metrics
-                                 from cve
-                                 join (values %s) t(name)
-                                using (name)""", cve_names, page_size=len(cve_names))
-        #
+        cur.execute("""select id, name, source_id,
+                         description, impact_id,
+                         published_date, modified_date,
+                         cvss3_score, cvss3_metrics,
+                         iava, redhat_url,
+                         secondary_url, source_id,
+                         cvss2_score, cvss2_metrics 
+                         from cve where source_id = %s""", (rh_source_id,))
         # find and merge cves that have already been loaded
         #
         # fields we care about potentially merging include:
@@ -142,29 +138,26 @@ class CvemapStore(CveStoreCommon):
             'cvss2_score':13,
             'cvss2_metrics': 14}
 
+        to_delete = []
         for a_db_row in cur.fetchall():
             # cve_data[row[1]] = incoming-cve-with-same-name-as-from-db
             # skip id, name, source_id (they are *always* filled in
             # for rest, use incoming unless null, then use from-db
             db_name = a_db_row[1]
             db_id = a_db_row[0]
-            cve_data[db_name]["id"] = db_id
-            for a_key in cols:
-                if not a_key in cve_data[db_name]:
-                    cve_data[db_name][a_key] = None
-                if not cve_data[db_name][a_key]:
-                    cve_data[db_name][a_key] = a_db_row[cols[a_key]]
+            if db_name in cve_data:
+                cve_data[db_name]["id"] = db_id
+                for a_key in cols:
+                    if not a_key in cve_data[db_name]:
+                        cve_data[db_name][a_key] = None
+                    if not cve_data[db_name][a_key]:
+                        cve_data[db_name][a_key] = a_db_row[cols[a_key]]
+            else:
+                to_delete.append((db_id,))
 
         to_import = []
         to_update = []
-        to_delete = []
         # now, deal with all items
-        cur.execute("select id, name from cve where source_id = %s", (rh_source_id,))
-        for cve_row in cur.fetchall():
-            cve_id = cve_row[0]
-            cve_name = cve_row[1]
-            if cve_name not in cve_data:
-                to_delete.append((cve_id,))
         for name, values in cve_data.items():
             values["impact_id"] = cve_impact_map[values["impact"].capitalize()] \
                         if values["impact"] is not None else cve_impact_map["None"]
