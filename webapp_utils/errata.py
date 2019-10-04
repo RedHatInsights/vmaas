@@ -1,6 +1,8 @@
 """
 Module for /errata API endpoint
 """
+import psycopg2
+
 from base import Request
 import database.db_handler as DB
 from common.webapp_utils import join_packagename
@@ -30,6 +32,8 @@ MIN_ERRATA_SEARCH_SIZE = 1
 LOGGER = get_logger(__name__)
 
 # pylint: disable=broad-except
+
+
 class Errata(Request):
     """POST and GET to /v1/errata"""
     @classmethod
@@ -56,8 +60,10 @@ class Errata(Request):
             return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return errata, response
 
+
 class ErrataAPI:
     """Class handling errata API requests."""
+
     def __init__(self):
         init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE)
@@ -142,23 +148,25 @@ class ErrataAPI:
             return errata_list
         db_connection = self.db_pool.get_connection()
         with db_connection.get_cursor() as cursor:
-            for errata in search:
-                errata = '%' + errata + '%'
-                cursor.execute("""select name from errata
-                                  where name like '%s'
-                               """ % errata)
-                query = cursor.fetchall()
-                for item in query:
-                    errata_list.append(item[0])
+            errata = "%" + search + "%"
+            cursor.execute("""select name from errata
+                              where name like %s""", (errata,))
+            query = cursor.fetchall()
+            for item in query:
+                errata_list.append(item[0])
         return errata_list
 
     def _errata_exists(self, errata):
         """Checks if given errata is in db."""
         db_connection = self.db_pool.get_connection()
         with db_connection.get_cursor() as cursor:
-            cursor.execute("""select name from errata
-                              where name = '%s'""" % errata)
-            errata_detail = cursor.fetchone()
+            try:
+                cursor.execute("""select name from errata
+                                  where name = %s""", (errata,))
+                errata_detail = cursor.fetchone()
+            except psycopg2.ProgrammingError as error:
+                LOGGER.error("Invalid user input: %s", error)
+                errata_detail = False
         self.db_pool.return_connection(db_connection)
         return errata_detail
 
