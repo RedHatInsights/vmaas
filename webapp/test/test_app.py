@@ -76,7 +76,7 @@ class TestWebappPosts(BaseCase):
         body = """{"package_list": []}"""
         resp = await self.fetch('/api/v1/updates', method='POST', data=body)
         assert HTTPStatus.BAD_REQUEST == resp.status
-        assert resp.body[:32] == '"package_list : [] is too short"'
+        assert resp.body[:40] == '{"errors": [{"detail": "[] is too short"'
 
     async def test_updates_v2_post_1(self):
         """Test updates post endpoint."""

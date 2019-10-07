@@ -3,13 +3,13 @@
 Main web API module
 """
 
+from json import loads
 import os
 import signal
 import sre_constants
 import time
 import asyncio
 import yaml
-from json import loads
 
 from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
@@ -380,6 +380,7 @@ def create_app():
 
     @web.middleware
     async def error_formater(request, handler, **kwargs):
+        #pylint: disable=broad-except
         def build_error(detail, status):
             errors = {"detail": detail, "status": status}
             return {"errors": [errors]}
