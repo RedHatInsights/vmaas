@@ -395,6 +395,9 @@ def create_app():
                 better_error = build_error(original_error["detail"], original_error["status"])
                 return web.json_response(better_error, status=res.status)
             return res
+        except TypeError: # The error response is not made by connexion
+            better_error = build_error(original_error, res.status)
+            return web.json_response(better_error, status=res.status)
         except Exception as _:
             LOGGER.exception(_)
             return web.json_response(build_error("Internal server error", 500), status=500)
