@@ -72,7 +72,8 @@ class BaseHandler:
             code = 200
         except web.HTTPError as exc:
             # We cant return the e as response, this is being deprecated in aiohttp
-            return web.Response(body=exc.reason, status=exc.status_code, headers=exc.headers)
+            response = {"detail": exc.reason, "status": exc.status_code}
+            return web.json_response(response, status=exc.status_code)
         except ValidationError as valid_err:
             if valid_err.absolute_path:
                 res = '%s : %s' % (valid_err.absolute_path.pop(), valid_err.message)
