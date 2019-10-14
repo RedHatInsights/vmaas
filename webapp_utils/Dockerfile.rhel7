@@ -12,7 +12,7 @@ ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
 
 WORKDIR /webapp_utils
 
-ADD /webapp_utils/Pipfile*      /webapp_utils/
+ADD /webapp_utils/Pipfile* /webapp_utils/
 
 ENV LC_ALL=en_US.utf8
 ENV LANG=en_US.utf8
