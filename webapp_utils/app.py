@@ -12,12 +12,13 @@ with open("webapp-utils.yml", "rb") as specfile:
 
 def create_app():
     """ Creates the application for webapp utils. """
-    utils_app = connexion.App("webapp-utils", options={'swagger_ui': False,
-                                                       'openapi_spec_path': 'openapi.json'})
+    utils_app = connexion.App("webapp-utils", options={'swagger_ui': True,
+                                                       'openapi_spec_path': '/openapi.json'})
     utils_app.add_api(SPEC,
-                      resolver=RestyResolver('api'),
+                      resolver=RestyResolver('app'),
                       validate_responses=True,
-                      strict_validation=True)
+                      strict_validation=True,
+                      base_path='/api')
 
     @utils_app.app.after_request
     def set_default_headers(response): # pylint: disable=unused-variable

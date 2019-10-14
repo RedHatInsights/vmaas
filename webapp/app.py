@@ -406,7 +406,7 @@ def create_app():
 
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
-        'openapi_spec_path': '/v1/apispec',
+        'openapi_spec_path': '/openapi.json',
         'middlewares': [error_formater,
                         timing_middleware]
     })
