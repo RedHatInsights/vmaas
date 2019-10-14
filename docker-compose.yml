@@ -60,21 +60,6 @@ services:
       - vmaas_websocket
       - vmaas_reposcan
 
-  vmaas_apidoc:
-    container_name: vmaas-apidoc
-    build:
-        context: .
-        dockerfile: ./Dockerfile-apidoc
-    image: vmaas/apidoc:0.13
-    restart: unless-stopped
-    env_file:
-      - ./conf/apidoc.env
-    ports:
-      - 8000:8080
-    depends_on:
-      - vmaas_reposcan
-      - vmaas_webapp
-      - vmaas_webapp_utils
     
   vmaas_webapp_utils:
     container_name: vmaas-webapp-utils

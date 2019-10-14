@@ -50,24 +50,12 @@ digraph G {
            fillcolor=orange
            shape=cylinder]
 
-    apidoc[label=<
-           <table border="0">
-            <tr>
-             <td><img src="icon_swagger.png"/></td>
-            </tr>
-            <tr>
-             <td>apidoc</td>
-            </tr>
-           </table>>
-           fillcolor=darkolivegreen1]
-
     client [fillcolor="pink"]
 
     clientp [label="client\n(privileged)"
              fillcolor="pink"]
 
     client -> webapp [label="http:8080"]
-    client -> apidoc [label="http:8000"]
     clientp -> reposcan [label="http:8081"]
 
     subgraph cluster_os {
@@ -80,6 +68,5 @@ digraph G {
         reposcan -> websocket [xlabel="http:8082"]
         webapp -> reposcan  [xlabel="rsync:8730\nvmaas.dbm"]
         reposcan -> db [label="postgresql:5432 (rw)"]
-        apidoc
     }
 }

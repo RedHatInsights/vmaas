@@ -668,7 +668,7 @@ def create_app():
 
     app = connexion.App(__name__, options={
         'swagger_ui': True,
-        'openapi_spec_path': '/v1/apispec'
+        'openapi_spec_path': '/openapi.json'
     })
 
     # Response validation is disabled due to returing streamed response in GET /pkgtree
