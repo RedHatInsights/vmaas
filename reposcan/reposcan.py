@@ -683,7 +683,7 @@ def create_app():
     def metrics():  # pylint: disable=unused-variable
         # /metrics API shouldn't be visible in the API documentation,
         # hence it's added here in the create_app step
-        return generate_latest()
+        return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
     @app.app.after_request
     def set_headers(response):  # pylint: disable=unused-variable
