@@ -10,7 +10,7 @@ CONFIG_FILE = os.environ['HOME'] + "/.list_rhsm_repos.json"
 CONFIG_OPTIONS = ["ENG_PRODUCT_API", "ENG_PRODUCT_API_CERT", "ENG_PRODUCT_API_KEY",
                   "PULP_API", "PULP_USER", "PULP_PASSWORD"]
 RHSM_CA_CERT = "/etc/rhsm/ca/redhat-uep.pem"
-VMAAS_ENTITLEMENT_NAME = "RHSM-CDN"
+VMAAS_ENTITLEMENT_NAME = "DEFAULT"
 EXAMPLE_TEXT = """usage:
   %(progname)s -l --show-content-sets
     prints products and content sets in human readable form
@@ -151,11 +151,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     options = parse_config_file()
 
-    # Require RHSM client certificate if producing target JSON request
-    if not args.list_products and (not args.rhsm_cert or not os.path.isfile(args.rhsm_cert)):
-        print("Please specify RHSM client certificate!")
-        sys.exit(3)
-
     eng_products_tuples, eng_products_content, cs_label_to_url = get_eng_products()
     arches_by_content_set, releasevers_by_content_set = get_pulp_repos(cs_label_to_url)
 
@@ -172,7 +167,12 @@ if __name__ == '__main__':
                                                                       cs_label, set()))))
     # List as JSON request for reposcan
     else:
-        ca_cert, client_cert, client_key = get_certs(args)
+        if args.rhsm_cert:
+            ca_cert, client_cert, client_key = get_certs(args)
+        else:
+            ca_cert = "$%s_CA_CERT" % VMAAS_ENTITLEMENT_NAME
+            client_cert = "$%s_CLIENT_CERT" % VMAAS_ENTITLEMENT_NAME
+            client_key = "$%s_CLIENT_KEY" % VMAAS_ENTITLEMENT_NAME
         output_dict = {"entitlement_cert": {"name": VMAAS_ENTITLEMENT_NAME,
                                             "ca_cert": ca_cert,
                                             "cert": client_cert,
@@ -187,7 +187,7 @@ if __name__ == '__main__':
                     output_dict["products"][product_name]["content_sets"][cs_label] = {
                         "name": cs_name,
                         "baseurl": "%s%s" % (args.cdn_url, cs_url),
-                        "basearch": list(arches_by_content_set.get(cs_label, set())),
-                        "releasever": list(releasevers_by_content_set.get(cs_label, set()))
+                        "basearch": sorted(list(arches_by_content_set.get(cs_label, set()))),
+                        "releasever": sorted(list(releasevers_by_content_set.get(cs_label, set())))
                     }
-        print(json.dumps([output_dict]))
+        print(json.dumps([output_dict], sort_keys=True, indent=4))
