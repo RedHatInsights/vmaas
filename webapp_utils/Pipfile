@@ -7,10 +7,11 @@ verify_ssl = true
 pur = ">=5.2.2"
 
 [packages]
-connexion = ">=2.3.0"
+connexion = {extras = ["swagger-ui"],version = "==2.3.0"}
 gunicorn= "==19.9.0"
 prometheus-client= "==0.6.0"
 psycopg2-binary = ">=2.8.3"
+python-dateutil = "==2.8.0"
 
 [requires]
 python_version = "3.6"
