@@ -1,15 +1,13 @@
 ---
 - hosts: all
   vars:
-    apidoc_container_port: 8080
     webapp_container_port: 8080
     reposcan_container_port: 8081
-    apidoc_config_map: vmaas-apidoc-conf-apidoc-env
     dockerfile_suffix: ".rhel7"
   tasks:
     - name: Prevent run without tags
       fail:
-        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, configure-apidoc, upgrade-start, upgrade-finish, upgrade-cleanup, centos-containers."
+        msg: "You must run this playbook with tags! Available tags: up, routes-up, down, routes-down, rebuild-images, upgrade-start, upgrade-finish, upgrade-cleanup, centos-containers."
 
     - name: Get current Git branch
       command: git rev-parse --abbrev-ref HEAD
@@ -52,13 +50,13 @@
         - centos-containers
 
     - name: Create OpenShift routes
-      shell: oc create route edge apidoc --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
+      shell: oc create route edge reposcan --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
       tags:
         - up
         - routes-up
 
     - name: Create temporary OpenShift routes
-      shell: oc create route edge apidoc-upgrade --service vmaas-apidoc-{{ app_id }} --port {{ apidoc_container_port }}; oc create route edge reposcan-upgrade --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
+      shell: oc create route edge reposcan-upgrade --service vmaas-reposcan-{{ app_id }} --port {{ reposcan_container_port }}; oc create route edge webapp-upgrade --service vmaas-webapp-{{ app_id }} --port {{ webapp_container_port }}
       tags:
         - upgrade-start
 
@@ -67,7 +65,6 @@
       register: reposcan_url
       tags:
         - up
-        - configure-apidoc
         - upgrade-finish
 
     - name: Get exposed webapp URL
@@ -75,7 +72,6 @@
       register: webapp_url
       tags:
         - up
-        - configure-apidoc
         - upgrade-finish
 
     - name: Get exposed reposcan temporary URL
@@ -97,29 +93,23 @@
         - upgrade-start
 
     - name: Rebuild VMaaS images
-      shell: oc start-build vmaas-apidoc-{{ app_id }}; oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}; oc start-build vmaas-websocket-{{ app_id }}
+      shell: oc start-build vmaas-database-{{ app_id }}; oc start-build vmaas-reposcan-{{ app_id }}; oc start-build vmaas-webapp-{{ app_id }}; oc start-build vmaas-websocket-{{ app_id }}
       tags:
         - rebuild-images
 
     - name: Point routes to the current deployment
-      shell: oc patch route/apidoc --patch '{"spec":{"to":{"name":"vmaas-apidoc-{{ app_id }}"}}}' && oc patch route/reposcan --patch '{"spec":{"to":{"name":"vmaas-reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"vmaas-webapp-{{ app_id }}"}}}'
+      shell: oc patch route/reposcan --patch '{"spec":{"to":{"name":"vmaas-reposcan-{{ app_id }}"}}}' && oc patch route/webapp --patch '{"spec":{"to":{"name":"vmaas-webapp-{{ app_id }}"}}}'
       tags:
         - upgrade-finish
 
     - name: Delete temporary OpenShift routes
-      shell: oc delete route apidoc-upgrade reposcan-upgrade webapp-upgrade
+      shell: oc delete route reposcan-upgrade webapp-upgrade
       tags:
         - upgrade-finish
       ignore_errors: True
 
-    - name: Configure API documentation
-      shell: oc rollout status dc/vmaas-apidoc-{{ app_id }} && oc patch configmap {{ apidoc_config_map }}-{{ app_id }} --patch '{"data":{"API_URLS":"[{\"url\":\"https://{{ webapp_url.stdout }}/api/v1/apispec\",\"name\":\"webapp\"},{\"url\":\"https://{{ reposcan_url.stdout }}/api/v1/apispec\",\"name\":\"reposcan\"}]"}}' && oc rollout latest dc/vmaas-apidoc-{{ app_id }}
-      tags:
-        - configure-apidoc
-        - upgrade-finish
-
     - name: Delete OpenShift routes
-      shell: oc delete route apidoc reposcan webapp
+      shell: oc delete route reposcan webapp
       tags:
         - down
         - routes-down
@@ -128,7 +118,6 @@
     - name: Delete old Config Maps
       shell: oc get cm | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete cm
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-database
@@ -139,7 +128,6 @@
     - name: Delete old Services
       shell: oc get svc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete svc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -151,7 +139,6 @@
     - name: Delete old Deployment Configs
       shell: oc get dc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete dc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -173,7 +160,6 @@
     - name: Delete old Image Streams
       shell: oc get is | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete is
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -185,7 +171,6 @@
     - name: Delete old Build Configs
       shell: oc get bc | awk '{print $1}' | grep {{ item }} | grep -v {{ app_id }} | xargs oc delete bc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -197,7 +182,6 @@
     - name: Delete all Config Maps
       shell: oc get cm | awk '{print $1}' | grep {{ item }} | xargs oc delete cm
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-database
@@ -208,7 +192,6 @@
     - name: Delete all Services
       shell: oc get svc | awk '{print $1}' | grep {{ item }} | xargs oc delete svc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -220,7 +203,6 @@
     - name: Delete all Deployment Configs
       shell: oc get dc | awk '{print $1}' | grep {{ item }} | xargs oc delete dc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -242,7 +224,6 @@
     - name: Delete all Image Streams
       shell: oc get is | awk '{print $1}' | grep {{ item }} | xargs oc delete is
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket
@@ -254,7 +235,6 @@
     - name: Delete all Build Configs
       shell: oc get bc | awk '{print $1}' | grep {{ item }} | xargs oc delete bc
       with_items:
-        - vmaas-apidoc
         - vmaas-reposcan
         - vmaas-webapp
         - vmaas-websocket

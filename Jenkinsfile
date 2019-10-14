@@ -30,10 +30,6 @@ def deployVmaas(project) {
             // build vmaas-webapp from Dockerfile-webapp-qe - it won't start main.py
             sh """
                 # Create an env.yaml to have the builder pull from a different branch
-                echo "vmaas/vmaas-apidoc:" > builder-env.yml
-                echo "  parameters:" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
                 echo "vmaas/vmaas-reposcan:" >> builder-env.yml
                 echo "  parameters:" >> builder-env.yml
                 echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
