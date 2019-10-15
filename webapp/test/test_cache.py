@@ -44,7 +44,7 @@ def test_cache(monkeypatch):
 
     cache.clear()
     variables = vars(cache)
-    assert len(variables) == 25
+    assert len(variables) == 26
     for name, var in variables.items():
         if name == "filename":
             assert var == TEST_DUMP_FILE
