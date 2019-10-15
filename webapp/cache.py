@@ -5,6 +5,7 @@ Module to cache data from file dump.
 import dbm
 import os
 import shelve
+import array
 
 from common.logging_utils import get_logger
 
@@ -65,8 +66,16 @@ ERRATA_URL = 13
 LOGGER = get_logger(__name__)
 
 
+def as_i64_arr(data):
+    """Make a native i64 array from list of ints"""
+    arr = array.array('q')
+    arr.fromlist(data)
+    return arr
+
+
 class Cache:
     """ Cache class. """
+
     # pylint: disable=too-many-instance-attributes
     def __init__(self, filename=DUMP):
         self.filename = filename
@@ -153,11 +162,11 @@ class Cache:
             elif relation == "productid2repoids":
                 self.productid2repoids[int(key)] = data[item]
             elif relation == "pkgid2repoids":
-                self.pkgid2repoids[int(key)] = data[item]
+                self.pkgid2repoids[int(key)] = as_i64_arr(data[item])
             elif relation == "errataid2name":
                 self.errataid2name[int(key)] = data[item]
             elif relation == "pkgid2errataids":
-                self.pkgid2errataids[int(key)] = data[item]
+                self.pkgid2errataids[int(key)] = as_i64_arr(list(data[item]))
             elif relation == "errataid2repoids":
                 self.errataid2repoids[int(key)] = data[item]
             elif relation == "cve_detail":
