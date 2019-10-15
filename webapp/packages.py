@@ -4,7 +4,7 @@ Module to handle /packages API calls.
 
 from jsonschema import validate
 
-from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY, PKG_DESC, PKG_SOURCE_PKG_ID
+from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
 import common.webapp_utils as utils
 
 JSON_SCHEMA = {
@@ -25,7 +25,7 @@ class PackagesAPI:
 
     def _get_source_package(self, pkg_detail):
         src_pkg_id = pkg_detail[PKG_SOURCE_PKG_ID]
-        if src_pkg_id is not None:
+        if src_pkg_id:
             src_pkg_detail = self.cache.package_details[src_pkg_id]
             src_pkg_nevra = utils.pkg_detail2nevra(self.cache, src_pkg_detail)
             return src_pkg_nevra
@@ -65,8 +65,8 @@ class PackagesAPI:
                 if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
                     pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
                     pkg_detail = self.cache.package_details[pkg_id]
-                    packagedata['summary'] = pkg_detail[PKG_SUMMARY]
-                    packagedata['description'] = pkg_detail[PKG_DESC]
+                    packagedata['summary'] = self.cache.strings.get(pkg_detail[PKG_SUMMARY_ID], None)
+                    packagedata['description'] = self.cache.strings.get(pkg_detail[PKG_DESC_ID], None)
                     packagedata['source_package'] = self._get_source_package(pkg_detail)
                     packagedata['repositories'] = []
                     packagedata['package_list'] = self._get_built_binary_packages(pkg_id)
