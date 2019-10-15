@@ -26,8 +26,8 @@ REPO_REVISION = 7
 PKG_NAME_ID = 0
 PKG_EVR_ID = 1
 PKG_ARCH_ID = 2
-PKG_SUMMARY = 3
-PKG_DESC = 4
+PKG_SUMMARY_ID = 3
+PKG_DESC_ID = 4
 PKG_SOURCE_PKG_ID = 5
 
 # cve detail indexes
@@ -66,7 +66,7 @@ ERRATA_URL = 13
 LOGGER = get_logger(__name__)
 
 
-def as_i64_arr(data):
+def as_long_arr(data):
     """Make a native i64 array from list of ints"""
     arr = array.array('q')
     arr.fromlist(data)
@@ -108,6 +108,7 @@ class Cache:
         self.dbchange = {}
         self.errata_detail = {}
         self.src_pkg_id2pkg_ids = {}
+        self.strings = {}
 
     def reload(self):
         """Update data and reload dictionaries."""
@@ -151,7 +152,7 @@ class Cache:
             elif relation == "arch_compat":
                 self.arch_compat[int(key)] = data[item]
             elif relation == "package_details":
-                self.package_details[int(key)] = data[item]
+                self.package_details[int(key)] = as_long_arr(list(data[item]))
             elif relation == "nevra2pkgid":
                 name_id, evr_id, arch_id = key.split(":", 2)
                 self.nevra2pkgid[(int(name_id), int(evr_id), int(arch_id))] = data[item]
@@ -162,11 +163,11 @@ class Cache:
             elif relation == "productid2repoids":
                 self.productid2repoids[int(key)] = data[item]
             elif relation == "pkgid2repoids":
-                self.pkgid2repoids[int(key)] = as_i64_arr(data[item])
+                self.pkgid2repoids[int(key)] = as_long_arr(list(data[item]))
             elif relation == "errataid2name":
                 self.errataid2name[int(key)] = data[item]
             elif relation == "pkgid2errataids":
-                self.pkgid2errataids[int(key)] = as_i64_arr(list(data[item]))
+                self.pkgid2errataids[int(key)] = as_long_arr(list(data[item]))
             elif relation == "errataid2repoids":
                 self.errataid2repoids[int(key)] = data[item]
             elif relation == "cve_detail":
@@ -183,6 +184,8 @@ class Cache:
                 self.modulename2id[(name, stream_name)] = data[item]
             elif relation == "src_pkg_id2pkg_ids":
                 self.src_pkg_id2pkg_ids[int(key)] = data[item]
+            elif relation == "strings":
+                self.strings[int(key)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
         LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))

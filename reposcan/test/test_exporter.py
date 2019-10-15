@@ -95,7 +95,13 @@ class TestExporter:
     def check_package_details(self, dbdump):
         """Check package details in dump."""
         assert "package_details:301" in dbdump
-        assert dbdump["package_details:301"] == (101, 201, 1, "summary1", "description1", None)
+        item = dbdump["package_details:301"]
+        assert item[0] == 101
+        assert item[1] == 201
+        assert item[2] == 1
+        assert dbdump["strings:%s" % item[3]] == "summary1"
+        assert dbdump["strings:%s" % item[4]] == "description1"
+        assert not item[5]
 
     def check_repo(self, dbdump):
         """Check repo data in dump."""

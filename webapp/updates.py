@@ -7,7 +7,7 @@ import hashlib
 from jsonschema import validate
 
 from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID
 from common.webapp_utils import join_packagename, split_packagename, none2empty
 
 
@@ -303,10 +303,12 @@ class UpdatesAPI:
                 continue
 
             if api_version == 1:
-                response['update_list'][pkg]['summary'] = \
-                    self.db_cache.package_details[current_nevra_pkg_id][3]
-                response['update_list'][pkg]['description'] = \
-                    self.db_cache.package_details[current_nevra_pkg_id][4]
+                sum_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_SUMMARY_ID]
+                response['update_list'][pkg]['summary'] = self.db_cache.strings.get(sum_id, None)
+
+                desc_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_DESC_ID]
+                response['update_list'][pkg]['description'] = self.db_cache.strings.get(desc_id, None)
+
             response['update_list'][pkg]['available_updates'] = []
 
             # No updates found for given NEVRA
