@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  vmaas_database:
+    container_name: vmaas-database
+    build:
+        context: .
+        dockerfile: ./database/Dockerfile
+    image: vmaas/database:latest
+    restart: unless-stopped
+    env_file:
+      - ./conf/database-connection-admin.env
+    ports:
+      - 5432:5432
+    
+  schema_spy:
+    container_name: schema-spy
+    privileged: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dbdocs
+    depends_on:
+      - vmaas_database
+    volumes:
+      - ./scripts/output:/output
+    env_file:
+      - ./conf/database-connection-admin.env
+    command: java -jar schemaspy.jar
