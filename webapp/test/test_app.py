@@ -226,14 +226,6 @@ class TestWebappSupportMethods(BaseCase):
         assert HTTPStatus.OK == resp.status
         assert resp.body == ''
 
-    async def test_apispec(self):
-        """Test apispec endpoint."""
-        resp = await self.fetch('/api/v1/apispec', method='GET')
-        assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == """{
-  "openapi": "3.0.0",
-  "inf"""
-
     async def test_version(self):
         """Test version endpoint."""
         resp = await self.fetch('/api/v1/version', method='GET')
