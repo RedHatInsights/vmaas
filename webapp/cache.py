@@ -6,7 +6,6 @@ import dbm
 import os
 import shelve
 import array
-
 from common.logging_utils import get_logger
 
 DUMP = '/data/vmaas.dbm'
@@ -120,7 +119,6 @@ class Cache:
     def download():
         """Download new version of data."""
         return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
-
     def load(self, filename):
         """Load data from shelve file into dictionaries."""
         # pylint: disable=too-many-branches,too-many-statements
@@ -169,7 +167,7 @@ class Cache:
             elif relation == "pkgid2errataids":
                 self.pkgid2errataids[int(key)] = as_long_arr(list(data[item]))
             elif relation == "errataid2repoids":
-                self.errataid2repoids[int(key)] = data[item]
+                self.errataid2repoids[int(key)] = as_long_arr(list(data[item]))
             elif relation == "cve_detail":
                 self.cve_detail[key] = data[item]
             elif relation == "dbchange":
@@ -183,9 +181,10 @@ class Cache:
                 name, stream_name = key.split(":", 1)
                 self.modulename2id[(name, stream_name)] = data[item]
             elif relation == "src_pkg_id2pkg_ids":
-                self.src_pkg_id2pkg_ids[int(key)] = data[item]
+                self.src_pkg_id2pkg_ids[int(key)] = as_long_arr(list(data[item]))
             elif relation == "strings":
                 self.strings[int(key)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
+
         LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))
