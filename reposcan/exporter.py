@@ -18,6 +18,7 @@ LOGGER = get_logger(__name__)
 
 class DataDump:
     """Class for creating disk dump from database."""
+
     def __init__(self, db_instance, filename):
         self.db_instance = db_instance
         self.filename = filename
@@ -48,7 +49,7 @@ class DataDump:
                 self._dump_modules(dump)
                 self._dump_dbchange(dump)
                 dump["dbchange:exported"] = timestamp
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump")
             remove_file_if_exists(dump_filename)
@@ -83,22 +84,29 @@ class DataDump:
         """Select ordered updates lists for previously selected package names"""
         if self.packagename_ids:
             with self._named_cursor() as cursor:
-                cursor.execute("""select p.name_id, p.id, p.evr_id
-                                    from package p
-                              inner join evr on p.evr_id = evr.id
-                                   where p.name_id in %s
-                                   order by p.name_id, evr.evr
-                                """, [tuple(self.packagename_ids)])
+                cursor.execute("""
+select p.name_id, compat.from_arch_id,  p.id, p.evr_id
+from package p
+         inner join evr on p.evr_id = evr.id
+         join arch_compatibility compat on p.arch_id = compat.to_arch_id
+where p.name_id in %s
+order by p.name_id, evr.evr
+            """, [tuple(self.packagename_ids)])
                 index_cnt = {}
                 updates = {}
                 updates_index = {}
-                for name_id, pkg_id, evr_id in cursor:
-                    idx = index_cnt.get(name_id, 0)
-                    updates.setdefault("updates:%s" % name_id, []).append(pkg_id)
-                    updates_index.setdefault("updates_index:%s" % name_id,
-                                             {}).setdefault(evr_id, []).append(idx)
+                for name_id, arch_id, pkg_id, evr_id in cursor:
+                    idx = index_cnt.get((name_id, arch_id), 0)
+
+                    updates.setdefault("updates:%s" % name_id, {})\
+                        .setdefault(arch_id, []) \
+                        .append(pkg_id)
+
+                    updates_index.setdefault("updates_index:%s" % name_id, {}) \
+                                 .setdefault(arch_id, {}) \
+                                 .setdefault(evr_id, []).append(idx)
                     idx += 1
-                    index_cnt[name_id] = idx
+                    index_cnt[(name_id, arch_id)] = idx
                 dump.update(updates)
                 dump.update(updates_index)
 
