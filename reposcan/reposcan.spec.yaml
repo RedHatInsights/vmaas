@@ -112,9 +112,19 @@ paths:
       tags:
         - Sync
 
+  /v1/sync/repo/git:
+    put:
+      summary: Import repolist from git and perform repo sync
+      operationId: reposcan.GitRepoListHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /v1/sync/repo:
     put:
-      summary: Sync the package tree
+      summary: Sync repositories from imported repolist
       operationId: reposcan.RepoSyncHandler.put
       <<: *secured
       responses:
@@ -124,7 +134,7 @@ paths:
 
   /v1/sync/cve:
     put:
-      summary: Sync the package tree
+      summary: Sync the CVE list
       operationId: reposcan.CveSyncHandler.put
       <<: *secured
       responses:
@@ -134,7 +144,7 @@ paths:
 
   /v1/sync/cvemap:
     put:
-      summary: Sync the package tree
+      summary: Sync the CVE map
       operationId: reposcan.CvemapSyncHandler.put
       <<: *secured
       responses:
