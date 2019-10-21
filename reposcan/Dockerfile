@@ -5,7 +5,7 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
 RUN yum -y install centos-release-scl && \
-    yum -y install rh-python36 which postgresql postgresql-libs rsync && \
+    yum -y install rh-python36 which postgresql postgresql-libs rsync git && \
     rm -rf /var/cache/yum/*
 
 ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
