@@ -9,7 +9,9 @@ import signal
 from multiprocessing.pool import Pool
 import json
 from contextlib import contextmanager
+import shutil
 import yaml
+import git
 
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
@@ -35,6 +37,12 @@ KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
 DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
+
+REPOLIST_DIR = '/tmp/repolist_git'
+REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
+REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '*')
+REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
+
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
 DEFAULT_CERT_NAME = "DEFAULT"
@@ -195,9 +203,8 @@ class SyncHandler:
         SyncTask.finish()
 
 
-class RepoListHandler(SyncHandler):
-    """Handler for repository list/add API."""
-
+class RepolistImportHandler(SyncHandler):
+    """Base class for importing repolists"""
     task_type = "Import repositories"
 
     @classmethod
@@ -220,18 +227,10 @@ class RepoListHandler(SyncHandler):
         return repos
 
     @classmethod
-    def _parse_input_list(cls):
+    def parse_repolist_json(cls, data):
+        """Parse JSON in standard repolist format, see yaml spec"""
         products = {}
         repos = []
-        json_data = ""
-        # check if JSON is passed as a file or as a body of POST request
-        data = None
-        if request.files:
-            json_data = request.files['file'][0]['body']  # pick up only first file (index 0)
-            data = json.loads(json_data)
-        elif request.data:
-            data = request.json
-
         for repo_group in data:
             # Entitlement cert is optional, use default if not specified in input JSON
             if "entitlement_cert" in repo_group:
@@ -257,18 +256,6 @@ class RepoListHandler(SyncHandler):
                                       cert_name, ca_cert, cert, key))
 
         return products, repos
-
-    @classmethod
-    def post(cls, **kwargs):
-        """Add repositories listed in request to the DB"""
-        try:
-            products, repos = cls._parse_input_list()
-            status_code, status_msg = cls.start_task(products=products, repos=repos)
-            return status_msg, status_code
-        except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
-            LOGGER.exception(msg)
-            return TaskStartResponse(msg, success=False), 400
 
     @staticmethod
     def run_task(*args, **kwargs):
@@ -297,6 +284,77 @@ class RepoListHandler(SyncHandler):
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK"
+
+
+class GitRepoListHandler(RepolistImportHandler):
+    """Handler for importing repolists from git"""
+    task_type = "Import repositories from git"
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Start importing from git"""
+
+        LOGGER.info("Downloading repolist.json from git %s", REPOLIST_GIT)
+        shutil.rmtree(REPOLIST_DIR, True)
+        os.makedirs(REPOLIST_DIR, exist_ok=True)
+
+        # Should we just use replacement or add a url handling library, which
+        # would be used replace the username in the provided URL ?
+        git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
+
+        repo = git.Git('/').clone(git_url, REPOLIST_DIR)
+        assert repo
+
+        if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + REPOLIST_PATH):
+            LOGGER.error("Downloading repolist failed: Directory was not created")
+
+        json_file = open(REPOLIST_DIR + '/' + REPOLIST_PATH, 'r')
+        data = json.load(json_file)
+        assert data
+
+        products, repos = RepolistImportHandler.parse_repolist_json(data)
+        return RepolistImportHandler.run_task(products=products, repos=repos)
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Add repositories listed in request to the DB"""
+        try:
+            status_code, status_msg = cls.start_task()
+            return status_msg, status_code
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            return TaskStartResponse(msg, success=False), 400
+
+
+class RepoListHandler(RepolistImportHandler):
+    """Handler for repository list/add API."""
+
+    task_type = "Import repositories"
+
+    @classmethod
+    def _parse_input_list(cls):
+        # check if JSON is passed as a file or as a body of POST request
+        data = None
+        if request.files:
+            json_data = request.files['file'][0]['body']  # pick up only first file (index 0)
+            data = json.loads(json_data)
+        elif request.data:
+            data = request.json
+
+        return cls.parse_repolist_json(data)
+
+    @classmethod
+    def post(cls, **kwargs):
+        """Add repositories listed in request to the DB"""
+        try:
+            products, repos = cls._parse_input_list()
+            status_code, status_msg = cls.start_task(products=products, repos=repos)
+            return status_msg, status_code
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            return TaskStartResponse(msg, success=False), 400
 
 
 class RepoDeleteHandler(SyncHandler):
@@ -533,7 +591,11 @@ class SyncTask:
         def _callback(result):
             ioloop.add_callback(lambda: callback(result))
 
-        cls.workers.apply_async(func, args, kwargs, _callback)
+        def _err_callback(err):
+            LOGGER.error("SyncTask error: %s", err)
+            SyncTask.finish()
+
+        cls.workers.apply_async(func, args, kwargs, _callback, _err_callback)
 
     @classmethod
     def finish(cls):
