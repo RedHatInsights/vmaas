@@ -77,8 +77,8 @@ class ErrataAPI:
             cursor.execute("""select er.type, er.name
                               from errata e
                               left join errata_refs er on e.id = er.errata_id
-                              where e.name = '%s'
-                           """ % errata)
+                              where e.name in %s
+                           """, [tuple(errata,)])
             query = cursor.fetchall()
         self.db_pool.return_connection(db_connection)
         for item in query:
@@ -99,8 +99,8 @@ class ErrataAPI:
                               from errata e
                               left join errata_cve ec on e.id = ec.errata_id
                               left join cve on ec.cve_id = cve.id
-                              where e.name = '%s'
-                           """ % errata)
+                              where e.name in %s
+                           """, [tuple(errata,)])
             query = cursor.fetchall()
         self.db_pool.return_connection(db_connection)
         for item in query:
@@ -121,8 +121,8 @@ class ErrataAPI:
                               left join package_name pn on p.name_id = pn.id
                               left join evr on p.evr_id = evr.id
                               left join arch a on p.arch_id = a.id
-                              where e.name = '%s'
-                           """ % errata)
+                              where e.name in %s
+                           """, [tuple(errata,)])
             query = cursor.fetchall()
         self.db_pool.return_connection(db_connection)
         for item in query:
@@ -141,34 +141,21 @@ class ErrataAPI:
             return source_package_list
         return package_list
 
-    def _fill_errata(self, search):
+    def _fill_errata(self, errata):
         """Returns existing errata acording to search string."""
         errata_list = []
-        if not len(search) >= MIN_ERRATA_SEARCH_SIZE:
+        if not len(errata) >= MIN_ERRATA_SEARCH_SIZE:
             return errata_list
         db_connection = self.db_pool.get_connection()
         with db_connection.get_cursor() as cursor:
-            errata = "%" + search + "%"
+            errata = '%' + errata + '%'
             cursor.execute("""select name from errata
-                              where name like %s""", (errata,))
+                              where name like %s
+                           """, (errata,))
             query = cursor.fetchall()
             for item in query:
                 errata_list.append(item[0])
         return errata_list
-
-    def _errata_exists(self, errata):
-        """Checks if given errata is in db."""
-        db_connection = self.db_pool.get_connection()
-        with db_connection.get_cursor() as cursor:
-            try:
-                cursor.execute("""select name from errata
-                                  where name = %s""", (errata,))
-                errata_detail = cursor.fetchone()
-            except psycopg2.ProgrammingError as error:
-                LOGGER.error("Invalid user input: %s", error)
-                errata_detail = False
-        self.db_pool.return_connection(db_connection)
-        return errata_detail
 
     def process_list(self, data):
         """Processes whole errata_list/errata_schema and returns info."""
@@ -188,35 +175,32 @@ class ErrataAPI:
         errata_page_to_process, pagination_response = paginate(errata_to_process, page, page_size)
         db_connection = self.db_pool.get_connection()
         with db_connection.get_cursor() as cursor:
-            for errata in errata_page_to_process:
-                result[errata] = {}
-                if not self._errata_exists(errata):
-                    continue
-                cursor.execute("""select distinct e.updated, es.name as severity,
+            cursor.execute("""select distinct e.updated, es.name as severity,
                                   e.issued, e.description,
                                   e.solution, e.summary, e.name as url, e.synopsis,
                                   et.name as type
                                   from errata e
                                   left join errata_severity es on e.severity_id = es.id
                                   left join errata_type et on e.errata_type_id = et.id
-                                  where e.name = '%s'
-                               """ % errata)
-                query = cursor.fetchone()
-                result[errata] = {
-                    "updated": query[ERRATA_UPDATED],
-                    "severity": query[ERRATA_SEVERITY],
-                    "reference_list": self._build_references(errata),
-                    "issued": query[ERRATA_ISSUED],
-                    "description": query[ERRATA_DESCRIPTION],
-                    "solution": query[ERRATA_SOLUTION],
-                    "summary": query[ERRATA_SUMMARY],
-                    "url": "https://access.redhat.com/errata/%s" % str(query[ERRATA_URL]),
-                    "synopsis": query[ERRATA_SYNOPSIS],
-                    "cve_list": self._build_cve_list(errata),
-                    "bugzilla_list": self._build_references(errata, bugzilla=True),
-                    "package_list": self._build_package_list(errata),
-                    "source_package_list": self._build_package_list(errata, source=True),
-                    "type": query[ERRATA_TYPE]
+                                  where e.name in %s
+                               """, [tuple(errata_page_to_process,)])
+            for i, errata in enumerate(cursor):
+                result[errata_page_to_process[i]] = {}
+                result[errata_page_to_process[i]] = {
+                    "updated": errata[ERRATA_UPDATED],
+                    "severity": errata[ERRATA_SEVERITY],
+                    "reference_list": self._build_references(errata_page_to_process),
+                    "issued": errata[ERRATA_ISSUED],
+                    "description": errata[ERRATA_DESCRIPTION],
+                    "solution": errata[ERRATA_SOLUTION],
+                    "summary": errata[ERRATA_SUMMARY],
+                    "url": "https://access.redhat.com/errata/%s" % str(errata[ERRATA_URL]),
+                    "synopsis": errata[ERRATA_SYNOPSIS],
+                    "cve_list": self._build_cve_list(errata_page_to_process),
+                    "bugzilla_list": self._build_references(errata_page_to_process, bugzilla=True),
+                    "package_list": self._build_package_list(errata_page_to_process),
+                    "source_package_list": self._build_package_list(errata_page_to_process, source=True),
+                    "type": errata[ERRATA_TYPE]
                 }
             response["errata_list"].update(result)
         response.update(pagination_response)
