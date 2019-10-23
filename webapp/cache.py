@@ -6,6 +6,7 @@ import dbm
 import os
 import shelve
 import array
+
 from common.logging_utils import get_logger
 
 DUMP = '/data/vmaas.dbm'
@@ -119,6 +120,7 @@ class Cache:
     def download():
         """Download new version of data."""
         return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
+
     def load(self, filename):
         """Load data from shelve file into dictionaries."""
         # pylint: disable=too-many-branches,too-many-statements
@@ -186,5 +188,4 @@ class Cache:
                 self.strings[int(key)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
-
         LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))
