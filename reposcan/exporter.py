@@ -18,6 +18,7 @@ LOGGER = get_logger(__name__)
 
 class DataDump:
     """Class for creating disk dump from database."""
+
     def __init__(self, db_instance, filename):
         self.db_instance = db_instance
         self.filename = filename
@@ -82,29 +83,55 @@ class DataDump:
     def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
         if self.packagename_ids:
-            with self._named_cursor() as cursor:
-                cursor.execute("""select p.name_id, p.id, p.arch_id, p.evr_id
-                                    from package p
-                              inner join evr on p.evr_id = evr.id
-                                   where p.name_id in %s
-                                   order by p.name_id, evr.evr
-                                """, [tuple(self.packagename_ids)])
-                index_cnt = {}
-                updates = {}
-                updates_index = {}
-                for name_id, pkg_id, arch_id, evr_id in cursor:
-                    idx = index_cnt.get((name_id, arch_id), 0)
-                    updates.setdefault("updates:%s" % name_id, {})\
-                        .setdefault(arch_id, []) \
-                        .append(pkg_id)
+            index_pos = {}
+            updates = {}
+            updates_index = {}
 
-                    updates_index.setdefault("updates_index:%s" % name_id, {})\
-                        .setdefault(arch_id, {}) \
-                        .setdefault(evr_id, []).append(idx)
-                    idx += 1
-                    index_cnt[(name_id, arch_id)] = idx
-                dump.update(updates)
-                dump.update(updates_index)
+            with self._named_cursor() as cursor:
+                cursor.execute("""
+                    select p.name_id, p.id, p.arch_id, p.evr_id
+                    from package p
+                             inner join evr on p.evr_id = evr.id
+                    where p.name_id in %s
+                    order by p.name_id, p.arch_id, evr.evr""", [tuple(self.packagename_ids)])
+                # Store packages, and in-memory index of where individual EVRs are located
+                for name_id, pkg_id, arch_id, evr_id in cursor:
+                    per_arch_list = updates.setdefault("updates:%s" % name_id, {}).setdefault(arch_id, [])
+                    per_arch_list.append(pkg_id)
+                    index_pos[(name_id, arch_id, evr_id)] = len(per_arch_list) - 1
+
+            with self._named_cursor() as cursor:
+                cursor.execute("""
+with items as (
+    select p.name_id, p.arch_id, p.id, p.evr_id, e.evr
+    from package p inner join evr e on p.evr_id = e.id
+    where p.name_id in %s
+    order by p.name_id, p.arch_id, e.evr
+    ),
+     smaller as (
+         select cur.name_id,
+                prev.arch_id as from_arch_id,
+                prev.evr_id  as from_evr_id,
+                cur.arch_id  as to_arch_id,
+                cur.evr_id   as to_evr_id
+         from items cur
+              inner join arch_compatibility c on c.to_arch_id = cur.arch_id
+              inner join items prev on prev.name_id = cur.name_id
+                     and prev.arch_id = c.from_arch_id
+                     and prev.evr <= cur.evr
+     )
+select * from smaller
+order by name_id, from_arch_id, from_evr_id, to_arch_id, to_evr_id""", [tuple(self.packagename_ids)])
+                # Based on previously stored packages and known upgrade paths, create index for finding all
+                # possible upgrades
+                for name_id, from_arch_id, from_evr_id, to_arch_id, to_evr_id in cursor:
+                    idx_obj = updates_index.setdefault("updates_index:%s" % name_id, {}).setdefault(to_arch_id, {})
+                    pos = index_pos.get((name_id, to_arch_id, to_evr_id), None)
+                    idx_obj[to_evr_id] = pos
+                    idx_obj.setdefault(from_evr_id, max(pos - 1, 0))
+
+            dump.update(updates)
+            dump.update(updates_index)
 
     def _dump_evr(self, dump):
         """Select all evrs and put them into dictionary"""

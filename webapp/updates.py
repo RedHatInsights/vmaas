@@ -7,7 +7,8 @@ import hashlib
 from jsonschema import validate
 
 from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
+    PKG_EVR_ID
 from common.webapp_utils import join_packagename, split_packagename, none2empty
 
 
@@ -277,6 +278,7 @@ class UpdatesAPI:
 
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
                          repo_ids_key, response, module_ids):
+
         # pylint: disable=too-many-branches
         module_filter = module_ids is not None
         for pkg, pkg_dict in packages_to_process.items():
@@ -285,56 +287,58 @@ class UpdatesAPI:
             evr_id = self.db_cache.evr2id.get((epoch, ver, rel), None)
             src_arch_id = self.db_cache.arch2id.get(arch, None)
 
+            orig_evr_idx = self.db_cache.updates_index[name_id] \
+                .get(src_arch_id, {}) \
+                .get(evr_id, None)
+
+            # Package with given NEVRA not found in cache/DB
+            if not orig_evr_idx:
+                continue
+
+            orig_nevra_pkg_id = self.db_cache.updates[name_id][src_arch_id][orig_evr_idx]
+
+            # Package with given NEVRA not found in cache/DB
+            if not orig_nevra_pkg_id:
+                continue
+
+            if api_version == 1:
+                sum_id = self.db_cache.package_details[orig_nevra_pkg_id][PKG_SUMMARY_ID]
+                response['update_list'][pkg]['summary'] = self.db_cache.strings.get(sum_id, None)
+
+                desc_id = self.db_cache.package_details[orig_nevra_pkg_id][PKG_DESC_ID]
+                response['update_list'][pkg]['description'] = self.db_cache.strings.get(desc_id, None)
+
+            response['update_list'][pkg]['available_updates'] = []
+
+            # Find updates for each compatible architecture separately
             for arch_id in self.db_cache.arch_compat[src_arch_id]:
-                current_evr_indexes = self.db_cache.updates_index[name_id]\
-                    .get(arch_id, {})\
-                    .get(evr_id, [])
 
-                if len(current_evr_indexes) > 1:
-                    print(f"f{current_evr_indexes}")
-
-                # Package with given NEVRA not found in cache/DB
-                if not current_evr_indexes:
-                    continue
-
-                current_nevra_pkg_id = self.db_cache.updates[name_id][arch_id][current_evr_indexes[0]]
+                # Evr for current compat architecture
+                update_evr_idx = self.db_cache.updates_index[name_id] \
+                    .get(arch_id, {}) \
+                    .get(evr_id, None)\
 
                 # Package with given NEVRA not found in cache/DB
-                if not current_nevra_pkg_id:
+                if not update_evr_idx:
                     continue
-
-                if api_version == 1:
-                    sum_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_SUMMARY_ID]
-                    response['update_list'][pkg]['summary'] = self.db_cache.strings.get(sum_id, None)
-
-                    desc_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_DESC_ID]
-                    response['update_list'][pkg]['description'] = self.db_cache.strings.get(desc_id, None)
-
-                response['update_list'][pkg]['available_updates'] = []
 
                 # No updates found for given NEVRA
                 last_version_pkg_id = self.db_cache.updates[name_id][arch_id][-1]
-                if last_version_pkg_id == current_nevra_pkg_id:
+                if last_version_pkg_id == orig_nevra_pkg_id:
                     continue
 
                 # Get associated product IDs
                 original_package_repo_ids = set()
-                original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(current_nevra_pkg_id, []))
+                original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(orig_nevra_pkg_id, []))
                 product_ids = self._get_related_products(original_package_repo_ids)
                 valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
 
                 # Get candidate package IDs
-                update_pkg_ids = self.db_cache.updates[name_id][arch_id][current_evr_indexes[-1] + 1:]
+                update_pkg_ids = self.db_cache.updates[name_id][arch_id][update_evr_idx + 1:]
 
                 for update_pkg_id in update_pkg_ids:
                     # Filter out packages without errata
                     if update_pkg_id not in self.db_cache.pkgid2errataids:
-                        continue
-
-                    # Filter arch compatibility
-                    updated_nevra_arch_id = self.db_cache.package_details[update_pkg_id][2]
-                    if (updated_nevra_arch_id != arch_id
-                            and updated_nevra_arch_id not in self.db_cache.arch_compat[arch_id]):
                         continue
 
                     errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
