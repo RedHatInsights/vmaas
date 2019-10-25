@@ -64,16 +64,15 @@ class TestExporter:
 
     def check_updates(self, dbdump):
         """Check updates in dump."""
-
         assert "updates:101" in dbdump
         updates1 = dbdump["updates:101"]
-        assert updates1[30] == [301, 302, 303]
+        assert updates1 == [301, 302, 303]
 
         assert "updates:102" not in dbdump
 
         assert "updates:103" in dbdump
         updates3 = dbdump["updates:103"]
-        assert updates3[5] == [305, 306]
+        assert updates3 == [305, 306]
 
     def check_evr(self, dbdump):
         """Check evr in dump."""
