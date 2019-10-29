@@ -5,21 +5,21 @@
  * Requires: https://github.com/RedHatInsights/insights-pipeline-lib
  */
 
-@Library("github.com/RedHatInsights/insights-pipeline-lib@v1.3") _
+@Library("github.com/RedHatInsights/insights-pipeline-lib@v3") _
 
 // Code coverage failure threshold
 codecovThreshold = 89
 
 node {
     // Cancel any prior builds that are running for this job
-    cancelPriorBuilds()
+    pipelineUtils.cancelPriorBuilds()
     lock("vmaas-qe-deploy") {
         runStages()
     }
 }
 
 def deployVmaas(project) {
-    withStatusContext.custom("deploy") {
+    gitUtils.withStatusContext("deploy") {
         dir(pipelineVars.e2eDeployDir) {
             String GIT_REF = "${env.BRANCH_NAME}"
             if (env.BRANCH_NAME.startsWith("PR")) {
@@ -63,13 +63,13 @@ def deployVmaas(project) {
 
 def runStages() {
     // withNode is a helper to spin up a jnlp slave using the Kubernetes plugin, and run the body code on that slave
-    openShift.withNode(image: "docker-registry.default.svc:5000/jenkins/jenkins-slave-vmaas:latest") {
+    openShiftUtils.withNode() {
         stage("Check out repos") {
             // check out source again to get it in this node"s workspace
             scmVars = checkout scm
-            checkOutRepo(targetDir: pipelineVars.e2eDeployDir, repoUrl: pipelineVars.e2eDeployRepoSsh, credentialsId: pipelineVars.gitSshCreds)
+            gitUtils.checkOutRepo(targetDir: pipelineVars.e2eDeployDir, repoUrl: pipelineVars.e2eDeployRepoSsh, credentialsId: pipelineVars.gitSshCreds)
             // checkout vmaas_tests git repository
-            checkOutRepo(targetDir: "vulnerability", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
+            gitUtils.checkOutRepo(targetDir: "vulnerability", repoUrl: "https://github.com/RedHatInsights/vmaas_tests", credentialsId: "github")
         }
 
         stage("Login to oc cluster") {
@@ -106,7 +106,7 @@ def runStages() {
 
         stage("Inject local settings") {
             withCredentials([file(credentialsId: "vmaas-settings-local-yaml", variable: "settings")]) {
-                sh "cp ${settings} ${IQE_VENV}/lib/python3.6/site-packages/iqe_vulnerability/conf"
+                sh "cp \$settings \$IQE_VENV/lib/python3.6/site-packages/iqe_vulnerability/conf"
             }
         }
 
@@ -123,14 +123,14 @@ def runStages() {
             } catch (err) {
                 echo("Error during VMaaS deploy! Look at oc logs in Artifacts.")
                 echo(err.toString())
-                openShift.collectLogs(project: "vmaas-qe")
+                openShiftUtils.collectLogs(project: "vmaas-qe")
                 throw err
             }
         }
 
         stage("Integration tests") {
             // Run integration tests
-            withStatusContext.custom("integration-tests") {
+            gitUtils.withStatusContext("integration-tests") {
                 stage("Run vmaas-webapp with coverage") {
                     // Start webapp as `coverage run ...` instead of `python ...` to collect coverage
                     sh '''
@@ -170,7 +170,7 @@ def runStages() {
                     '''
                 }
             }
-            openShift.collectLogs(project: "vmaas-qe")
+            openShiftUtils.collectLogs(project: "vmaas-qe")
             junit "iqe-junit-report.xml"
         }
 
@@ -193,7 +193,7 @@ def runStages() {
             sh "mkdir htmlcov"
             sh "oc cp ${webapp_pod}:/tmp/htmlcov htmlcov"
 
-            withStatusContext.coverage {
+            gitUtils.withStatusContext("coverage") {
                 assert status == 0
             }
 
