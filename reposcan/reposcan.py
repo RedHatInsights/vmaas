@@ -19,6 +19,7 @@ import connexion
 from flask import request, send_file, make_response
 
 from common.logging_utils import get_logger, init_logging
+from common.constants import VMAAS_VERSION
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from dbchange import DbChangeAPI
@@ -32,7 +33,6 @@ from repodata.repository_controller import RepositoryController
 LOGGER = get_logger(__name__)
 KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
-VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60

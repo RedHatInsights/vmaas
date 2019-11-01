@@ -25,3 +25,12 @@ fi
 
 ## Add prefix to all lines.
 sed -i -e 's/^/'${PREFIX}'/' ${MANIFEST_PATH}
+
+## Write precise version only in prod builds.
+if [[ "$MANIFEST_WRITE_VERSION" == "TRUE" ]]
+then
+    VERSION=$(${PYTHON} -c 'from common.constants import VMAAS_VERSION;print(VMAAS_VERSION)')
+    sed -i -e 's/:VERSION:/:'$VERSION':/' ${MANIFEST_PATH}
+else
+    sed -i -e 's/:VERSION:/:latest:/' ${MANIFEST_PATH}
+fi
