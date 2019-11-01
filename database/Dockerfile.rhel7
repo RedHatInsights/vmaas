@@ -7,8 +7,6 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
 # all environment variables are defined in conf/*.env
-# only VMAAS_VERSION is here because we want it to be hardcoded in the image
-ENV VMAAS_VERSION=latest
 
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
@@ -22,8 +20,9 @@ ADD /database/init_schema.sh ${CONTAINER_SCRIPTS_PATH}/start/
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV MANIFEST_PATH=/opt/app-root/manifest.txt
-ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-database\/"
+ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-database\/"
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
+ADD /common/*.py /opt/app-root/src/common/
 RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
     echo 'MANIFEST:' && cat $MANIFEST_PATH

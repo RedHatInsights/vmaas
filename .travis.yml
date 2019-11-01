@@ -2,11 +2,19 @@ branches:
   only:
     - vmaas-0.13
 sudo: required
+language: python
+python:
+  - "3.6"
 services:
   - docker
 notifications:
   email: false
 script:
+  - pip install -U pip
   - docker-compose -f docker-compose.test.yml up --build --exit-code-from test
 after_success:
   - bash scripts/db_docs_generator.sh
+  - git config --global user.name "vmaas-bot"
+  - git config --global user.email "40663028+vmaas-bot@users.noreply.github.com"
+  - pip install python-semantic-release
+  - semantic-release publish

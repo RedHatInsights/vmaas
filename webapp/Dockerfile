@@ -21,7 +21,7 @@ RUN pip install --upgrade pip && pip install --upgrade pipenv && \
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV VMAAS_VERSION=latest
-ENV MANIFEST_PREFIX="mgmt_services:${VMAAS_VERSION}:vmaas-webapp\/"
+ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-webapp\/"
 ENV MANIFEST_PYTHON=python
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
