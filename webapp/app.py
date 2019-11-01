@@ -26,10 +26,10 @@ from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from common.logging_utils import init_logging, get_logger
 from probes import REQUEST_COUNTS, REQUEST_TIME
+from common.constants import VMAAS_VERSION
 
 # pylint: disable=too-many-lines
 
-VMAAS_VERSION = os.getenv("VMAAS_VERSION", "unknown")
 PUBLIC_API_PORT = 8080
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
