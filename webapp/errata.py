@@ -3,7 +3,6 @@ Module contains classes for returning errata data from DB
 """
 
 import re
-from jsonschema import validate
 
 from common.webapp_utils import format_datetime, parse_datetime, none2empty, paginate, \
                   pkgidlist2packages, filter_item_if_exists
@@ -11,19 +10,6 @@ from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
                   ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
                   ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL
-
-JSON_SCHEMA = {
-    'type' : 'object',
-    'required': ['errata_list'],
-    'properties' : {
-        'errata_list': {
-            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
-            },
-        'modified_since' : {'type' : 'string'},
-        'page_size' : {'type' : 'number'},
-        'page' : {'type' : 'number'}
-    }
-}
 
 
 class ErrataAPI:
@@ -62,10 +48,7 @@ class ErrataAPI:
         :param data: data obtained from api, we're interested in data["errata_list"]
 
         :returns: dictionary containing detailed information for given errata list}
-
         """
-        validate(data, JSON_SCHEMA)
-
         modified_since = data.get("modified_since", None)
         modified_since_dt = parse_datetime(modified_since)
         errata_to_process = data.get("errata_list", None)
