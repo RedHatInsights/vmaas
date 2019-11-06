@@ -145,13 +145,6 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(2, UPDATES_JSON_NON_EXIST.copy())
         assert updates == NON_EXIST_RESPONSE
 
-    def test_process_list_empty_json(self):
-        """Test updates API with empty json."""
-        with pytest.raises(Exception) as context:
-            # NOTE: use copy of dict with json input, because process_list changes this dict
-            self.updates_api.process_list(1, UPDATES_JSON_EMPTY.copy())
-        assert "'package_list' is a required property" in str(context.value)
-
 
 class TestSplayTree(TestBase):
     """ Set of tests for Splay tree implementation. """

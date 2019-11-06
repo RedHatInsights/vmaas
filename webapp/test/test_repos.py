@@ -42,18 +42,6 @@ class TestRepoAPI(TestBase):
             self.repo.find_repos_by_regex("*")
         assert "nothing to repeat" in str(context.value)
 
-    def test_missing_required(self):
-        """Test missing required property 'repository_list'."""
-        with pytest.raises(Exception) as context:
-            self.repo.process_list(api_version="v1", data=REPO_JSON_BAD)
-        assert "'repository_list' is a required property" in str(context.value)
-
-    def test_empty_json(self):
-        """Test repos API with empty JSON."""
-        with pytest.raises(Exception) as context:
-            self.repo.process_list(api_version="v1", data=REPO_JSON_EMPTY)
-        assert "'repository_list' is a required property" in str(context.value)
-
     def test_empty_repository_list(self):
         """Test repos API with empty 'repository_list'."""
         response = self.repo.process_list(api_version="v1", data=REPO_JSON_EMPTY_LIST)

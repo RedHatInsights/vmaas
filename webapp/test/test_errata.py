@@ -15,8 +15,6 @@ from errata import ErrataAPI
 ERRATA_NAME = "RHBA-2015:0364"
 MODIFIED_IN_FUTURE = "2099-01-01T00:00:00+00:00"
 DATE_SINCE = "2014-04-06T01:23:45+02:00"
-ERRATA_JSON_EMPTY = {}
-ERRATA_JSON_BAD = {"modified_since": "2018-04-05T01:23:45+02:00"}
 ERRATA_JSON = {"errata_list": [ERRATA_NAME]}
 ERRATA_JSON_MODIFIED = {"errata_list": [ERRATA_NAME], "modified_since": DATE_SINCE}
 ERRATA_JSON_EMPTY_LIST = {"errata_list": [""]}
@@ -62,18 +60,6 @@ class TestErrataAPI(TestBase):
         """Test correct errata regex."""
         assert self.errata_api.find_errata_by_regex(ERRATA_NAME) == [ERRATA_NAME]
         assert self.errata_api.find_errata_by_regex("RHBA-2015:0.*") == [ERRATA_NAME]
-
-    def test_missing_required(self):
-        """Test missing required property 'errata_list'."""
-        with pytest.raises(Exception) as context:
-            self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_BAD)
-        assert "'errata_list' is a required property" in str(context.value)
-
-    def test_empty_json(self):
-        """Test errata API with empty JSON."""
-        with pytest.raises(Exception) as context:
-            self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_EMPTY)
-        assert "'errata_list' is a required property" in str(context.value)
 
     def test_empty_errata_list(self):
         """Test errata API with empty 'errata_list'."""
