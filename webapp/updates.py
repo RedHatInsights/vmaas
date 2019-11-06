@@ -4,38 +4,10 @@ Module to handle /updates API calls.
 
 import os
 import hashlib
-from jsonschema import validate
 
 from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID
 from common.webapp_utils import join_packagename, split_packagename, none2empty
-
-
-JSON_SCHEMA = {
-    'type' : 'object',
-    'required': ['package_list'],
-    'properties' : {
-        'package_list': {
-            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
-            },
-        'repository_list': {
-            'type': 'array', 'items': {'type' : 'string'}
-            },
-        'modules_list': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'required': ['module_name', 'module_stream'],
-                'properties': {
-                    'module_name': {'type': 'string'},
-                    'module_stream': {'type': 'string'}
-                }
-            }
-        },
-        'releasever' : {'type' : 'string'},
-        'basearch' : {'type' : 'string'}
-    }
-}
 
 
 class CacheNode:
@@ -376,8 +348,6 @@ class UpdatesAPI:
                   {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
         # pylint: disable=too-many-branches
-        validate(data, JSON_SCHEMA)
-
         response = {
             'update_list': {},
         }

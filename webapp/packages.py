@@ -2,20 +2,8 @@
 Module to handle /packages API calls.
 """
 
-from jsonschema import validate
-
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
 import common.webapp_utils as utils
-
-JSON_SCHEMA = {
-    'type' : 'object',
-    'required': ['package_list'],
-    'properties' : {
-        'package_list': {
-            'type': 'array', 'items': {'type': 'string'}, 'minItems' : 1
-            },
-    }
-}
 
 
 class PackagesAPI:
@@ -46,8 +34,6 @@ class PackagesAPI:
 
         :returns: json response with package details
         """
-        validate(data, JSON_SCHEMA)
-
         packages = data.get('package_list', None)
         packagelist = {}
         if not packages:
