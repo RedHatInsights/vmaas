@@ -11,7 +11,6 @@ from packages import PackagesAPI
 
 PKG = "my-pkg-1.1.0-1.el8.i686"
 PKG_SRC = "my-pkg-1.1.0-1.el8.src"
-PKG_JSON_EMPTY = {}
 PKG_JSON = {"package_list": [PKG]}
 PKG_SRC_JSON = {"package_list": [PKG_SRC]}
 PKG_JSON_EMPTY_LIST = {"package_list": [""]}
@@ -45,12 +44,6 @@ class TestPackagesAPI(TestBase):
         schemas.pkgs_list_schema.validate(response["package_list"][PKG_SRC])
         assert response["package_list"][PKG_SRC]["package_list"] == [PKG]
         assert not response["package_list"][PKG_SRC]["repositories"]  # source package is assigned to no repo
-
-    def test_empty_json(self):
-        """Test pkg api with empty json."""
-        with pytest.raises(Exception) as context:
-            self.pkg_api.process_list(1, PKG_JSON_EMPTY)
-        assert "'package_list' is a required property" in str(context.value)
 
     def test_empty_pkg_list(self):
         """Test pkg api with empty package_list."""

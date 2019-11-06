@@ -3,23 +3,9 @@ Module to handle /repos API calls.
 """
 
 import re
-from jsonschema import validate
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
 from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists
-
-JSON_SCHEMA = {
-    'type': 'object',
-    'required': ['repository_list'],
-    'properties': {
-        'repository_list': {
-            'type': 'array', 'items': {'type': 'string'}, 'minItems': 1
-        },
-        'modified_since': {'type': 'string'},
-        'page_size': {'type': 'number'},
-        'page': {'type': 'number'}
-    }
-}
 
 
 class RepoAPI:
@@ -70,8 +56,6 @@ class RepoAPI:
 
         :returns: json response with repository details
         """
-        validate(data, JSON_SCHEMA)
-
         repos = data.get('repository_list', None)
         modified_since = data.get('modified_since', None)
         modified_since_dt = parse_datetime(modified_since)
