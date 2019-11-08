@@ -42,3 +42,13 @@ services:
       - label=disable
     working_dir: /git
     command: ["sleep", "infinity"]
+
+  # we don't need grafana and prometheus in developer setup
+  # let's them exit immediatelly
+  vmaas_grafana:
+    entrypoint: 'true'
+    restart: 'no'
+
+  vmaas_prometheus:
+    entrypoint: 'true'
+    restart: 'no'
