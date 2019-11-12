@@ -37,6 +37,11 @@ DEFAULT_CHUNK_SIZE = "1048576"
 DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 WEBSOCKET_RECONNECT_INTERVAL = 60
 
+DEFAULT_CERT_NAME = "DEFAULT"
+DEFAULT_CA_CERT = os.getenv("DEFAULT_CA_CERT", "")
+DEFAULT_CERT = os.getenv("DEFAULT_CERT", "")
+DEFAULT_KEY = os.getenv("DEFAULT_KEY", "")
+
 
 class TaskStatusResponse(dict):
     """Object used as API response to user."""
@@ -228,22 +233,17 @@ class RepoListHandler(SyncHandler):
             data = request.json
 
         for repo_group in data:
-            # Entitlement cert is optional
+            # Entitlement cert is optional, use default if not specified in input JSON
             if "entitlement_cert" in repo_group:
                 cert_name = repo_group["entitlement_cert"]["name"]
-
-                ca_cert_var = repo_group["entitlement_cert"]["ca_cert"]
-                ca_cert = os.getenv(ca_cert_var[1:], ca_cert_var) \
-                    if ca_cert_var.startswith('$') else ca_cert_var
-
-                cert_var = repo_group["entitlement_cert"]["cert"]
-                cert = os.getenv(cert_var[1:], cert_var) \
-                    if cert_var.startswith('$') else cert_var
-
-                key_var = repo_group["entitlement_cert"]["key"]
-                key = os.getenv(key_var[1:], key_var) \
-                    if key_var.startswith('$') else key_var
-
+                ca_cert = repo_group["entitlement_cert"]["ca_cert"]
+                cert = repo_group["entitlement_cert"]["cert"]
+                key = repo_group["entitlement_cert"]["key"]
+            elif DEFAULT_CA_CERT or DEFAULT_CERT:
+                cert_name = DEFAULT_CERT_NAME
+                ca_cert = DEFAULT_CA_CERT
+                cert = DEFAULT_CERT
+                key = DEFAULT_KEY
             else:
                 cert_name, ca_cert, cert, key = None, None, None, None
 
