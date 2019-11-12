@@ -129,7 +129,7 @@ Congratulations!
 ### Run tests
 You can run all tests from scratch just after cloning repo using command:
 ~~~bash
-docker-compose -f docker-compose.test.yml up --build --exit-code-from test
+sudo podman-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 ~~~
 
 ### Developing / Debugging
