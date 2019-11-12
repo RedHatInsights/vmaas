@@ -2,11 +2,11 @@
 
 
 if [ -e /usr/bin/docker-compose ] ; then
-    exec docker-compose -f docker-compose.yml -f docker-compose.devel.yml "$@"
-else
     podman-compose ${PODMAN_PATH:+--podman-path=$PODMAN_PATH} \
                         -f docker-compose.yml \
                         -f docker-compose.devel.yml \
                         -f docker-compose.devel-podman.yml \
                         "$@"
+else
+    exec docker-compose -f docker-compose.yml -f docker-compose.devel.yml "$@"
 fi
