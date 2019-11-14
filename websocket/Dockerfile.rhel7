@@ -36,5 +36,6 @@ EXPOSE 8082
 
 ADD /websocket/*.py     /websocket/
 ADD /common/*.py        /websocket/common/
+ADD /websocket/entrypoint.sh   /websocket/
 
-CMD /websocket/websocket.py
+CMD /websocket/entrypoint.sh
