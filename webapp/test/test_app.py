@@ -8,7 +8,7 @@ from test import yaml_cache
 import pytest
 
 from app import create_app, BaseHandler, load_cache_to_apis
-
+from common.constants import VMAAS_VERSION
 
 
 @pytest.fixture()
@@ -230,7 +230,7 @@ class TestWebappSupportMethods(BaseCase):
         """Test version endpoint."""
         resp = await self.fetch('/api/v1/version', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == 'unknown'
+        assert resp.body[:30] == VMAAS_VERSION
 
     async def test_metrics(self):
         """Test metrics endpoint."""

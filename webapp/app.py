@@ -17,6 +17,8 @@ import connexion
 from aiohttp import web, ClientSession, WSMsgType, hdrs
 
 from cache import Cache
+from common.constants import VMAAS_VERSION
+from common.logging_utils import init_logging, get_logger
 from cve import CveAPI
 from repos import RepoAPI
 from updates import UpdatesAPI
@@ -24,9 +26,7 @@ from errata import ErrataAPI
 from packages import PackagesAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
-from common.logging_utils import init_logging, get_logger
 from probes import REQUEST_COUNTS, REQUEST_TIME
-from common.constants import VMAAS_VERSION
 
 # pylint: disable=too-many-lines
 
