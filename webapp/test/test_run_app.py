@@ -2,6 +2,7 @@
 
 import app
 from cache import Cache
+from common.constants import VMAAS_VERSION
 
 
 def test_run_app(monkeypatch, caplog):
@@ -11,5 +12,5 @@ def test_run_app(monkeypatch, caplog):
 
     app.create_app()
 
-    assert 'Starting (version unknown).' in caplog.messages
+    assert f'Starting (version {VMAAS_VERSION}).' in caplog.messages
     assert 'Hotcache enabled: YES'
