@@ -158,12 +158,17 @@ def runStages() {
                         // 3: Internal error happened while executing tests
                         // 4: pytest command line usage error
                         // 5: No tests were collected
+                        String LONG_RUNNING = ""
+                        if (env.BRANCH_NAME == "master") {
+                            LONG_RUNNING = "--long-running"
+                        }
+                        pytest_status = sh(
+                            script: "iqe tests plugin vulnerability -vvv -r s -k tests/vmaas ${LONG_RUNNING} --html='report.html' --self-contained-html --generate-report",
+                            returnStatus: true
+                        )
+                        assert pytest_status <= 0 : "Pytest error: ${pytest_status}"
+
                         sh '''
-                            pytest_status=0
-                            iqe tests plugin vulnerability -vvv -r s -k tests/vmaas --html="report.html" --self-contained-html --generate-report || pytest_status="$?"
-                            if [ "$pytest_status" -gt 1 ]; then
-                                exit "$pytest_status"
-                            fi
                             mkdir html_report
                             mv report.html html_report
                         '''
