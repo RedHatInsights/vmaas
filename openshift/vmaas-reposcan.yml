@@ -30,7 +30,8 @@ objects:
     REPOSCAN_SYNC_INTERVAL_MINUTES: '360'
     REPOLIST_GIT: 'https://github.com/RedHatInsights/vmaas-assets.git'
     REPOLIST_PATH: 'repolist.json'
-    REPOLIST_GIT_TOKEN: ''
+    GIT_COMMITTER_NAME: 'vmaas'
+    GIT_COMMITTER_EMAIL: 'vmaas@localhost'
 
     RETRY_COUNT: '3'
     THREADS: '8'
@@ -271,8 +272,18 @@ objects:
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
           - name: REPOLIST_GIT_TOKEN
             valueFrom:
+              secretKeyRef:
+                key: GIT_TOKEN
+                name: github-vmaas-bot
+          - name: GIT_COMMITTER_NAME
+            valueFrom:
               configMapKeyRef:
-                key: REPOLIST_GIT_TOKEN
+                key: GIT_COMMITTER_NAME
+                name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: GIT_COMMITTER_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                key: GIT_COMMITTER_EMAIL
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
 
           image: ' '
