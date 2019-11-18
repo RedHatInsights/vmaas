@@ -77,6 +77,19 @@ paths:
       tags:
         - Repos
 
+  /v1/repos/git:
+    put:
+      summary: Add repositories to the DB from git
+      operationId: reposcan.GitRepoListHandler.put
+      <<: *secured
+      responses:
+        <<: *repo_responses
+        <<: *running_resp
+        <<: *auth_resps
+        <<: *format_resps
+      tags:
+        - Repos
+
   /v1/repos/{repo}:
     delete:
       summary: Delete repo from the DB
@@ -109,16 +122,6 @@ paths:
                 $ref: "#/components/schemas/TaskStartResponse"
         <<: *running_resp
         <<: *auth_resps
-      tags:
-        - Sync
-
-  /v1/sync/repo/git:
-    put:
-      summary: Import repolist from git and perform repo sync
-      operationId: reposcan.GitRepoListHandler.put
-      <<: *secured
-      responses:
-        <<: *sync_responses
       tags:
         - Sync
 
