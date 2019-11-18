@@ -40,7 +40,7 @@ DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 
 REPOLIST_DIR = '/tmp/repolist_git'
 REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
-REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '*')
+REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
@@ -293,6 +293,10 @@ class GitRepoListHandler(RepolistImportHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Start importing from git"""
+
+        if not REPOLIST_GIT_TOKEN:
+            LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
+            return "SKIPPED"
 
         LOGGER.info("Downloading repolist.json from git %s", REPOLIST_GIT)
         shutil.rmtree(REPOLIST_DIR, True)
@@ -553,9 +557,10 @@ class CvemapSyncHandler(SyncHandler):
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s" % (RepoSyncHandler.task_type,
-                                  CvemapSyncHandler.task_type,
-                                  CveSyncHandler.task_type)
+    task_type = "%s + %s + %s + %s" % (GitRepoListHandler.task_type,
+                                       RepoSyncHandler.task_type,
+                                       CvemapSyncHandler.task_type,
+                                       CveSyncHandler.task_type)
 
     @classmethod
     def put(cls, **kwargs):
@@ -567,9 +572,10 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s" % (RepoSyncHandler.run_task(),
-                               CvemapSyncHandler.run_task(),
-                               CveSyncHandler.run_task())
+        return "%s, %s, %s, %s" % (GitRepoListHandler.run_task(),
+                                   RepoSyncHandler.run_task(),
+                                   CvemapSyncHandler.run_task(),
+                                   CveSyncHandler.run_task())
 
 
 class SyncTask:
