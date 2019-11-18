@@ -180,7 +180,7 @@ class SyncHandler:
     def run_task_and_export(cls, *args, **kwargs):
         """Run sync task of current class and export."""
         result = cls.run_task(*args, **kwargs)
-        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler):
+        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler):
             ExporterHandler.run_task()
             PkgTreeHandler.run_task()
         return result
@@ -193,7 +193,7 @@ class SyncHandler:
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
-        if cls not in (PkgTreeHandler, RepoListHandler):
+        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler):
             # Notify webapps to update it's cache
             if ReposcanWebsocket.websocket:
                 ReposcanWebsocket.websocket.write_message("invalidate-cache")
