@@ -285,6 +285,21 @@ objects:
               configMapKeyRef:
                 key: GIT_COMMITTER_EMAIL
                 name: vmaas-reposcan-conf-reposcan-env-${RELEASE}
+          - name: DEFAULT_CA_CERT
+            valueFrom:
+              secretKeyRef:
+                key: DEFAULT_CA_CERT
+                name: cdn-certificate
+          - name: DEFAULT_CERT
+            valueFrom:
+              secretKeyRef:
+                key: DEFAULT_CERT
+                name: cdn-certificate
+          - name: DEFAULT_KEY
+            valueFrom:
+              secretKeyRef:
+                key: DEFAULT_KEY
+                name: cdn-certificate
 
           image: ' '
           name: vmaas-reposcan
