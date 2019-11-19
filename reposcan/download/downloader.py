@@ -4,7 +4,6 @@ Module containing classes for downloading files using HTTP.
 import os
 from threading import Thread
 from queue import Queue, Empty
-import traceback
 
 from urllib3.exceptions import ProtocolError
 
@@ -19,6 +18,8 @@ DEFAULT_THREADS = "8"
 DEFAULT_RETRY_COUNT = "3"
 VALID_HTTP_CODES = [200]
 
+FAILED_THRESHOLD = 5
+
 class DownloadItem:
     """
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
@@ -30,7 +31,7 @@ class DownloadItem:
         self.ca_cert = ca_cert
         self.cert = cert
         self.key = key
-        self.status_code = None
+        self.status_code = -2
 
 
 class FileDownloadThread(Thread):
@@ -85,12 +86,12 @@ class FileDownloadThread(Thread):
                 self._download(download_item)
                 break
             except (ProtocolError, ConnectionError):
-                self.logger.warning("Download failed: %s", download_item.source_url)
-                self.logger.warning(traceback.format_exc())
+                self.logger.exception("Download of '%s' failed: ", download_item.source_url)
                 download_item.status_code = -1
 
     def run(self):
         """Method executed after thread start. Downloads items from shared queue as long as there are any."""
+        failed = 0
         while not self.queue.empty():
             try:
                 download_item = self.queue.get(block=False)
@@ -99,6 +100,15 @@ class FileDownloadThread(Thread):
             self._retry_download(download_item)
             self.progress_logger.update(source=download_item.source_url, target=download_item.target_path)
             self.queue.task_done()
+
+            # Add mechanism to interrupt downloading when FAILED_THRESHOLD number of items failed to download.
+            if download_item.status_code < 0:
+                failed += 1
+            else:
+                failed = 0
+            if failed >= FAILED_THRESHOLD:
+                self.logger.error("Failed %d downloads in a row, interrupting download.", failed)
+                break
 
         self.session.close()
 
