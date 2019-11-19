@@ -90,9 +90,11 @@ class RepositoryController:
             local_path = os.path.join(repo.tmp_directory, os.path.basename(md_path))
             if local_path in failed_items:
                 failed = True
-                self.logger.warning("Download failed: LABEL: %s URL: %s (HTTP CODE %d)",
-                                    repo.content_set, urljoin(repo.repo_url, md_path),
-                                    failed_items[local_path])
+                # Download errors with no HTTP code are logged in downloader, deduplicate error msgs
+                if failed_items[local_path] > 0:
+                    self.logger.warning("Download failed: LABEL: %s URL: %s (HTTP CODE %d)",
+                                        repo.content_set, urljoin(repo.repo_url, md_path),
+                                        failed_items[local_path])
         return failed
 
     def _download_metadata(self, batch):
