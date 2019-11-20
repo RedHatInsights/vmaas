@@ -85,7 +85,7 @@ class Cache:
     def clear(self):
         """Clear dictionaries and load new data."""
         self.packagename2id = {}
-        self.id2packagename = {}
+        self.id2packagename = {}  # sqlite
         self.updates = {}
         self.updates_index = {}
         self.evr2id = {}
