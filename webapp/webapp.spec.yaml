@@ -3,7 +3,6 @@ openapi: '3.0.0'
 
 info:
   title: VMaaS Webapp
-  version: latest
 
 
 x-format-resps: &format_resps
