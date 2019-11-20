@@ -733,6 +733,7 @@ def create_app():
 
     with open('reposcan.spec.yaml', 'rb') as specfile:
         SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+    SPEC['info']['version'] = VMAAS_VERSION
 
     app = connexion.App(__name__, options={
         'swagger_ui': True,

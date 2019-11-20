@@ -362,6 +362,7 @@ def create_app():
 
     with open('webapp.spec.yaml', 'rb') as specfile:
         SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+    SPEC['info']['version'] = VMAAS_VERSION
 
     @web.middleware
     async def timing_middleware(request, handler, **kwargs):

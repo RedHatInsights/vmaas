@@ -6,8 +6,11 @@ import yaml
 import connexion
 from connexion import RestyResolver
 
+from common.constants import VMAAS_VERSION
+
 with open("webapp-utils.yml", "rb") as specfile:
     SPEC = yaml.safe_load(specfile)
+SPEC['info']['version'] = VMAAS_VERSION
 
 
 def create_app():
