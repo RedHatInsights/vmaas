@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+    - stable
 sudo: required
 language: python
 python:
