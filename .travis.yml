@@ -1,6 +1,7 @@
 branches:
   only:
-    - vmaas-0.13
+    - master
+    - stable
 sudo: required
 language: python
 python:
