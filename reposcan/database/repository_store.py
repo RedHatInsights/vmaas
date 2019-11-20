@@ -175,11 +175,8 @@ class RepositoryStore:
                              repo.get_revision(), cert_id,))
                 repo_id = cur.fetchone()
             else:
-                # Update repository timestamp
-                cur.execute("""update repo set revision = %s, certificate_id = %s, content_set_id = %s,
-                                               basearch_id = %s, releasever = %s
-                            where id = %s""", (repo.get_revision(), cert_id, content_set_id, basearch_id,
-                                               repo.releasever, repo_id[0],))
+                cur.execute("""update repo set url = %s, certificate_id = %s where id = %s""",
+                            (repo.repo_url, cert_id, repo_id[0],))
             self.conn.commit()
             return repo_id[0]
         except Exception:
