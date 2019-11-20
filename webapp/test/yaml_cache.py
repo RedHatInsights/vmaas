@@ -4,6 +4,9 @@
 import shelve
 import sys
 import yaml
+import decimal
+import sqlite3
+import os
 
 sys.path.append("..")
 from cache import Cache  # pylint: disable=C0413
@@ -42,6 +45,32 @@ class YamlCache(Cache):
         with open(output, "w") as file:
             yaml.dump(attrs, file)
 
+    def dump_sqlite(self, output):
+        if os.path.isfile(output):
+            os.remove(output)
+
+        with open('vmaas_cache_init.sql') as f_init_sql:
+            with sqlite3.connect(output) as conn:
+                cur = conn.cursor()
+                cur.executescript(f_init_sql.read())
+                self.fill_id2name_table(cur, self.id2packagename, 'id2packagename')
+                self.fill_updates_table(cur, self.updates)
+
+                self.fill_id2name_table(cur, self.id2arch, 'id2arch')
+                self.fill_id2name_table(cur, self.errataid2name, 'errataid2name')
+
+    @staticmethod
+    def fill_id2name_table(cursor, dic, table):
+        for id, name in dic.items():
+            cursor.execute('insert into %s (id, name) values (?,?)' % table, (id, name))
+
+    @staticmethod
+    def fill_updates_table(cursor, dic):
+        for pkgname_id, archs in dic.items():
+            for arch_id, pkgs_ids in archs.items():
+                cursor.execute('insert into updates (pkgname_id, arch_id, pkg_ids) values (?,?,?)',
+                               (pkgname_id, arch_id, str(pkgs_ids)))
+
     def dump_shelve(self, output):
         """Dump data to Shelve file"""
         attrs = vars(self)
@@ -62,10 +91,11 @@ def load_test_cache():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage:\n./yaml_cache.py <vmaas.dbm path> <yaml output>")
-        sys.exit(1)
+    input_path = 'data/cache.yml'
+    output_path = 'full_vmaas_dump.db'
 
-    CACHE = YamlCache(filename=sys.argv[1])
-    CACHE.load_shelve()
-    CACHE.dump(output=sys.argv[2])
+    CACHE = YamlCache(filename=input_path)
+    # CACHE.load_shelve()
+    CACHE.load_yaml()
+    CACHE.dump_sqlite(output_path)
+    # CACHE.dump(output=output_path)
