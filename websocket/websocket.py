@@ -8,8 +8,12 @@ from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import Application, RequestHandler
 from tornado.websocket import WebSocketHandler
 
+from common.logging_utils import get_logger, init_logging
+
 WEBSOCKET_PING_INTERVAL = 60
 WEBSOCKET_TIMEOUT = 300
+
+LOGGER = get_logger("websocket")
 
 
 class NotificationHandler(WebSocketHandler):
@@ -35,6 +39,10 @@ class NotificationHandler(WebSocketHandler):
         pass
 
     def on_message(self, message):
+        if self.connections[self]:
+            LOGGER.info("Received message from %s: %s", self.connections[self], message)
+        else:
+            LOGGER.info("Received message from unsubscribed client: %s", message)
         if message == "subscribe-webapp":
             self.connections[self] = "webapp"
         elif message == "subscribe-reposcan":
@@ -74,6 +82,7 @@ class NotificationHandler(WebSocketHandler):
         for client, client_type in NotificationHandler.connections.items():
             if client_type == target_client_type:
                 client.write_message(message)
+                LOGGER.info("Sent message to %s: %s", target_client_type, message)
 
 
 class HealthHandler(RequestHandler):
@@ -126,6 +135,7 @@ def create_app():
 
 def main():
     """Main entrypoint."""
+    init_logging()
     create_app()
     IOLoop.instance().start()
 
