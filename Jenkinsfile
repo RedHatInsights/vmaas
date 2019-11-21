@@ -163,7 +163,7 @@ def runStages() {
                             script: "iqe tests plugin vulnerability -vvv -r s -k tests/vmaas ${LONG_RUNNING} --html='report.html' --self-contained-html --generate-report",
                             returnStatus: true
                         )
-                        assert pytest_status <= 0 : "Pytest error: ${pytest_status}"
+                        assert pytest_status <= 1 : "Pytest error: ${pytest_status}"
 
                         sh '''
                             mkdir html_report
