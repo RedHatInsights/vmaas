@@ -161,26 +161,31 @@ class RepositoryStore:
         cur = self.conn.cursor()
         try:
             content_set_id = self.content_set_to_db_id[repo.content_set]
-            cur.execute("""select id from repo where content_set_id = %s
+            cur.execute("""select id, revision from repo where content_set_id = %s
                            and ((%s is null and basearch_id is null) or basearch_id = %s)
                            and ((%s is null and releasever is null) or releasever = %s)
                         """,
                         (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever))
-            repo_id = cur.fetchone()
-            if not repo_id:
+            db_repo = cur.fetchone()
+            if not db_repo:
                 cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
                                                  revision, eol, certificate_id)
-                            values (%s, %s, %s, %s, %s, false, %s) returning id""",
+                            values (%s, %s, %s, %s, %s, false, %s) returning id, revision""",
                             (repo.repo_url, content_set_id, basearch_id, repo.releasever,
                              repo.get_revision(), cert_id,))
-                repo_id = cur.fetchone()
+                db_repo = cur.fetchone()
             else:
-                cur.execute("""update repo set url = %s, certificate_id = %s where id = %s""",
-                            (repo.repo_url, cert_id, repo_id[0],))
+                revision = repo.get_revision()
+                # if revision in repo object is None, re-use current revision from DB (don't update)
+                # this method is called from 2 different places with 2 different states of repo object
+                if not revision:
+                    revision = db_repo[1]
+                cur.execute("""update repo set revision = %s, url = %s, certificate_id = %s where id = %s""",
+                            (revision, repo.repo_url, cert_id, db_repo[0],))
             self.conn.commit()
-            return repo_id[0]
+            return db_repo[0]
         except Exception:
-            self.logger.exception("Failed to import repository.")
+            self.logger.exception("Failed to import or update repository.")
             self.conn.rollback()
             raise
         finally:
