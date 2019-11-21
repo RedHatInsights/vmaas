@@ -35,5 +35,6 @@ USER vmaas
 EXPOSE 8082
 
 ADD /websocket/*.py     /websocket/
+ADD /common/*.py        /websocket/common/
 
 CMD /websocket/websocket.py
