@@ -334,7 +334,7 @@ class Websocket:
                 self._refresh_cache()
                 msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
-                    self.websocket.send_str(msg)
+                    await self.websocket.send_str(msg)
                 else:
                     self.websocket_response_queue.add(msg)
             else:
