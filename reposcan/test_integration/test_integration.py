@@ -7,7 +7,6 @@ import shutil
 import pytest
 
 from repodata.repository_controller import RepositoryController
-from nistcve.cve_controller import CveRepoController
 
 from database import product_store
 from download.downloader import DownloadItem, FileDownloadThread
@@ -18,12 +17,7 @@ def download_mock(self, download_item: DownloadItem):
     testing data directory."""
     src = download_item.source_url.split('/')[-1]
     src_path = 'test_data/repodata/integration/' + src
-    if src.endswith('.json.gz'):  # prepare archive file
-        os.system(f"gzip -c test_data/nistcve/nvdcve-1.0-modified.json > /tmp/{src}")
-        src_path = f"/tmp/{src}"
-    elif src.endswith('.meta'):
-        src_path = 'test_data/nistcve/nvdcve-1.0-modified.meta'
-    elif src.endswith('.gz'):  # prepare archive file
+    if src.endswith('.gz'):  # prepare archive file
         base = src[:-3]
         os.system(f"gzip -c test_data/repodata/{base} > /tmp/{src}")
         src_path = f"/tmp/{src}"
@@ -83,27 +77,9 @@ def test_phase_1(db_conn, caplog, monkeypatch):
         assert len(rows) == 2
 
 
-def test_phase_2(db_conn, caplog, monkeypatch):
+def test_phase_2(db_conn, monkeypatch):
     """Test add cves and delete content set."""
     monkeypatch.setattr(FileDownloadThread, '_download', download_mock)
-
-    # Test store cve info
-    cve_ctr = CveRepoController()
-    cve_ctr.add_repos()
-    cve_ctr.store()
-
-    with db_conn.cursor() as cur:
-        cur.execute("""select * from cve""")
-        rows = cur.fetchall()
-        assert len(rows) == 13
-
-        cur.execute("""select * from metadata""")
-        rows = cur.fetchall()
-        assert len(rows) == 20
-
-    for year in range(2002, 2020):
-        assert f"Syncing CVE list: {year}" in caplog.messages
-        assert f"File nvdcve-1.0-{year}.meta mock-downloaded." in caplog.messages
 
     # Test delete content_set
     rep_con = RepositoryController()
