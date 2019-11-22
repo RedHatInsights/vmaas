@@ -134,16 +134,6 @@ paths:
       tags:
         - Sync
 
-  /v1/sync/cve:
-    put:
-      summary: Sync the CVE list
-      operationId: reposcan.CveSyncHandler.put
-      <<: *secured
-      responses:
-        <<: *sync_responses
-      tags:
-        - Sync
-
   /v1/sync/cvemap:
     put:
       summary: Sync the CVE map

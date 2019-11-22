@@ -96,11 +96,6 @@ class TestReposcanApp(FlaskTestCase):
         resp = self.fetch('/api/v1/sync/repo', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
 
-    def test_sync_cve(self):
-        """Test sync cve endpoint."""
-        resp = self.fetch('/api/v1/sync/cve', method='PUT', data="{}")
-        self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
-
     def test_sync_cvemap(self):
         """Test sync cvemap endpoint."""
         resp = self.fetch('/api/v1/sync/cvemap', method='PUT', data="{}")
