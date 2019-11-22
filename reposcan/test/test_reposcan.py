@@ -106,14 +106,14 @@ class TestReposcanApp(FlaskTestCase):
         resp = self.fetch('/api/v1/sync/cvemap', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
 
-    def test_sync_pkgtree(self):
-        """Test sync_pkgtree endpoint."""
-        resp = self.fetch('/api/v1/sync/pkgtree', method='PUT', data="{}")
+    def test_export_pkgtree(self):
+        """Test export_pkgtree endpoint."""
+        resp = self.fetch('/api/v1/export/pkgtree', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
 
-    def test_export(self):
-        """Test export endpoint."""
-        resp = self.fetch('/api/v1/export', method='PUT', data="{}")
+    def test_export_dump(self):
+        """Test export_dump endpoint."""
+        resp = self.fetch('/api/v1/export/dump', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
 
     def test_pkgtree(self):

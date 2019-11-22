@@ -154,17 +154,17 @@ paths:
       tags:
         - Sync
 
-  /v1/sync/pkgtree:
+  /v1/export/pkgtree:
     put:
-      summary: Sync the package tree
+      summary: Export package tree
       operationId: reposcan.PkgTreeHandler.put
       <<: *secured
       responses:
         <<: *sync_responses
       tags:
-        - Sync
+        - Export
 
-  /v1/export:
+  /v1/export/dump:
     put:
       summary: Export disk dump
       operationId: reposcan.ExporterHandler.put
@@ -180,7 +180,7 @@ paths:
         <<: *auth_resps
         <<: *running_resp
       tags:
-        - Sync
+        - Export
 
   /v1/pkgtree:
     get:
