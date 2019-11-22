@@ -487,7 +487,6 @@ CREATE INDEX ON errata_repo(repo_id);
 
 -- -----------------------------------------------------
 -- Table vmaas.cve_impact
--- from https://nvd.nist.gov/vuln-metrics
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cve_impact (
   id INT NOT NULL,
@@ -509,7 +508,7 @@ CREATE TABLE IF NOT EXISTS cve_source (
 )TABLESPACE pg_default;
 
 INSERT INTO cve_source (id, name) VALUES
-  (1, 'Red Hat'), (2, 'NIST');
+  (1, 'Red Hat');
 
 -- -----------------------------------------------------
 -- Table vmaas.cve
