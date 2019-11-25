@@ -73,18 +73,6 @@ class CveStoreCommon:
         cur.close()
         return source_id
 
-    @staticmethod
-    def _process_url_list(name, url_list):
-        redhat_url = None
-        secondary_url = None
-        url_list = [item for item in url_list if url_list is not None]
-        for item in url_list:
-            if not secondary_url and item["url"]: # isn't None or empty-str
-                secondary_url = item["url"]
-            if "redhat" in item["url"]:  # try to determine Red Hat CVE, suboptimal, but works so far
-                redhat_url = "https://access.redhat.com/security/cve/" + str.lower(name)
-        return redhat_url, secondary_url
-
 
 def _map_name_to_id(mapping_set, result):
     cve_cwe_map = []
