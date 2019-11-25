@@ -55,6 +55,7 @@ class CvemapBody:
                     'description': self._cve_description(elem.findall('Details[@{%s}lang="en:us"]' % NS)),
                     'iava': text_strip(elem.find('IAVA')),
                     'redhat_url': "https://access.redhat.com/security/cve/" + str.lower(name),
+                    'secondary_url': text_strip(elem.find('References'))
                 }
 
                 # Clear the XML tree continuously
