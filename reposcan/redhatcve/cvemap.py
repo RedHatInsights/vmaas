@@ -53,7 +53,8 @@ class CvemapBody:
                     'cvss3_metrics': text_strip(elem.find('CVSS3/CVSS3ScoringVector')),
                     'cwe_list': self._cwe_list(text_strip(elem.find('CWE'))),
                     'description': self._cve_description(elem.findall('Details[@{%s}lang="en:us"]' % NS)),
-                    'iava': text_strip(elem.find('IAVA'))
+                    'iava': text_strip(elem.find('IAVA')),
+                    'redhat_url': "https://access.redhat.com/security/cve/" + str.lower(name),
                 }
 
                 # Clear the XML tree continuously
