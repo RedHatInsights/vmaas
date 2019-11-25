@@ -149,7 +149,7 @@ class CvemapStore(CveStoreCommon):
                     values[a_key] = None
 
             item = (name, values["description"], values["impact_id"], values["published_date"],
-                    values["modified_date"], values["cvss3_score"], values["cvss3_metrics"], None,
+                    values["modified_date"], values["cvss3_score"], values["cvss3_metrics"], values["iava"],
                     values["redhat_url"], values["secondary_url"], rh_source_id,
                     values["cvss2_score"], values["cvss2_metrics"])
             # if we have an 'id', it means we're already in the db
