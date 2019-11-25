@@ -52,7 +52,8 @@ class CvemapBody:
                     'cvss3_score': text_strip(elem.find('CVSS3/CVSS3BaseScore')),
                     'cvss3_metrics': text_strip(elem.find('CVSS3/CVSS3ScoringVector')),
                     'cwe_list': self._cwe_list(text_strip(elem.find('CWE'))),
-                    'description': self._cve_description(elem.findall('Details[@{%s}lang="en:us"]' % NS))
+                    'description': self._cve_description(elem.findall('Details[@{%s}lang="en:us"]' % NS)),
+                    'iava': text_strip(elem.find('IAVA'))
                 }
 
                 # Clear the XML tree continuously
