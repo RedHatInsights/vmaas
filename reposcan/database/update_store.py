@@ -132,16 +132,53 @@ class UpdateStore(ObjectStore):
             cur.close()
         return update_map
 
-    @staticmethod
-    def _associate_source_packages(cur):
-        cur.execute("""select distinct source_package_id, errata_id, e.module_stream_id
-                       from pkg_errata e inner join package p on p.id = e.pkg_id
-                       where source_package_id is not null
-                       except (select pkg_id, errata_id, module_stream_id from pkg_errata)""")
-        source_pkg_erratas = cur.fetchall()
-        if source_pkg_erratas:
-            execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
-                           source_pkg_erratas, page_size=len(source_pkg_erratas))
+    def _associate_source_packages(self, update_map):
+        """
+        Process all missing source packages associations with errata.
+        """
+        cur = self.conn.cursor()
+        try:
+            to_associate = []
+            to_disassociate = []
+            if update_map:
+                # Select src packages already associated with updates
+                cur.execute("""select pkg_id, errata_id, module_stream_id
+                               from pkg_errata pe inner join
+                                    package p on p.id = pe.pkg_id
+                               where p.source_package_id is null
+                                 and pe.errata_id in %s""",
+                            (tuple(update_map.values()),))
+                already_associated = set(cur.fetchall())
+
+                # Select srpm packages that should be associated
+                cur.execute("""select distinct source_package_id, errata_id, pe.module_stream_id
+                               from pkg_errata pe inner join
+                                    package p on p.id = pe.pkg_id
+                               where source_package_id is not null
+                                 and pe.errata_id in %s""",
+                            (tuple(update_map.values()),))
+                for row in cur.fetchall():
+                    if row not in already_associated:
+                        to_associate.append(row)
+                    else:
+                        already_associated.remove(row)
+                to_disassociate = list(already_associated)
+
+            self.logger.debug("New update-src-package associations: %d", len(to_associate))
+            self.logger.debug("Update-src-package disassociations: %d", len(to_disassociate))
+
+            if to_associate:
+                execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
+                               to_associate, page_size=len(to_associate))
+            if to_disassociate:
+                cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
+                            (tuple(to_disassociate),))
+            self.conn.commit()
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failure changing src package associations.")
+            self.conn.rollback()
+        finally:
+            cur.close()
 
     def _associate_packages(self, updates, update_map, repo_id):
         cur = self.conn.cursor()
@@ -169,11 +206,9 @@ class UpdateStore(ObjectStore):
             if to_associate:
                 execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                                list(to_associate), page_size=len(to_associate))
-
             if to_disassociate:
                 cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
                             (tuple(to_disassociate),))
-            self._associate_source_packages(cur)
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
             self.logger.exception("Failure changing package associations.")
@@ -340,6 +375,7 @@ class UpdateStore(ObjectStore):
         self.logger.debug("Syncing %d updates.", len(updates))
         update_map = self._populate_updates(updates)
         self._associate_packages(updates, update_map, repo_id)
+        self._associate_source_packages(update_map)
         self._associate_updates(update_map, repo_id)
         cve_map = self._populate_cves(updates)
         self._associate_cves(updates, update_map, cve_map)
