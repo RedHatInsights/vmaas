@@ -72,7 +72,6 @@ class DataDump:
                                      errata e on pe.errata_id = e.id inner join
                                      errata_type et on e.errata_type_id = et.id left join
                                      errata_cve ec on e.id = ec.errata_id
-                               where et.name = 'security' or ec.cve_id is not null
                             """)
             for name_id, pkg_name in cursor:
                 dump["packagename2id:%s" % pkg_name] = name_id
@@ -200,7 +199,6 @@ class DataDump:
                                 from errata e
                           inner join errata_type et on e.errata_type_id = et.id
                            left join errata_cve ec on e.id = ec.errata_id
-                               where et.name = 'security' or ec.cve_id is not null
                            """)
             for errata_id, errata_name in cursor:
                 dump["errataid2name:%s" % errata_id] = errata_name
