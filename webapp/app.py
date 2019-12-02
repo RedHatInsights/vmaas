@@ -170,6 +170,24 @@ class UpdatesHandlerV2Post(BaseHandler):
         return await cls.handle_request(cls.updates_api, 2, **kwargs)
 
 
+class UpdatesHandlerV3Get(BaseHandler):
+    """Handler for processing /updates GET requests."""
+
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """List security updates for single package NEVRA """
+        return await cls.handle_request(cls.updates_api, 3, 'package_list', nevra, **kwargs)
+
+
+class UpdatesHandlerV3Post(BaseHandler):
+    """Handler for processing /updates POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """List security updates for list of package NEVRAs"""
+        return await cls.handle_request(cls.updates_api, 3, **kwargs)
+
+
 class CVEHandlerGet(BaseHandler):
     """Handler for processing /cves GET requests."""
 
