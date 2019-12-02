@@ -6,8 +6,11 @@ import os
 import hashlib
 
 from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
+    ERRATA_CVE, ERRATA_TYPE
 from common.webapp_utils import join_packagename, split_packagename, none2empty
+
+SECURITY_ERRATA_TYPE = 'security'
 
 
 class CacheNode:
@@ -248,7 +251,7 @@ class UpdatesAPI:
         return join_packagename(name, epoch, ver, rel, arch)
 
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
-                         repo_ids_key, response, module_ids):
+                         repo_ids_key, response, module_ids, security_only):
         # pylint: disable=too-many-branches
         module_filter = module_ids is not None
         for pkg, pkg_dict in packages_to_process.items():
@@ -311,6 +314,12 @@ class UpdatesAPI:
                 errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
                 nevra = self._build_nevra(update_pkg_id)
                 for errata_id in errata_ids:
+                    errata_name = self.db_cache.errataid2name[errata_id]
+                    # Filter out non-security updates
+                    if security_only and not (
+                            self.db_cache.errata_detail[errata_name][ERRATA_TYPE] == SECURITY_ERRATA_TYPE or \
+                            self.db_cache.errata_detail[errata_name][ERRATA_CVE]):
+                        continue
                     if (module_filter and (update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
                             self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
                         continue
@@ -320,7 +329,7 @@ class UpdatesAPI:
                         repo_details = self.db_cache.repo_detail[repo_id]
                         response['update_list'][pkg]['available_updates'].append({
                             'package': nevra,
-                            'erratum': self.db_cache.errataid2name[errata_id],
+                            'erratum': errata_name,
                             'repository': repo_details[REPO_LABEL],
                             'basearch': none2empty(repo_details[REPO_BASEARCH]),
                             'releasever': none2empty(repo_details[REPO_RELEASEVER])
@@ -328,7 +337,7 @@ class UpdatesAPI:
 
             if self.use_hot_cache.upper() == "YES":
                 HOT_CACHE_INSERTS.inc()
-                self.hot_cache.insert(repo_ids_key + pkg, response['update_list'][pkg])
+                self.hot_cache.insert(repo_ids_key + pkg + str(security_only), response['update_list'][pkg])
 
     def clear_hot_cache(self):
         """
@@ -375,6 +384,12 @@ class UpdatesAPI:
                 hashlib_elements.extend('no_enabled_modules')
         repo_ids_key = hashlib.md5('_'.join(hashlib_elements).encode('utf-8')).hexdigest()
 
+        # Backward compatibility of older APIs
+        if api_version < 3:
+            security_only = True
+        else:
+            security_only = data.get("security_only", False)
+
         all_pkgs = data.get('package_list', None)
         pkgs_not_in_cache = []
         self.use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
@@ -382,7 +397,7 @@ class UpdatesAPI:
         if all_pkgs is not None:
             for name in all_pkgs:
                 if self.use_hot_cache.upper() == "YES":
-                    resp = self.hot_cache.find(repo_ids_key + name)
+                    resp = self.hot_cache.find(repo_ids_key + name + str(security_only))
 
                     if resp is not None:
                         UPDATES_CACHE_HITS.inc()
@@ -405,6 +420,7 @@ class UpdatesAPI:
 
         # Process updated packages, errata and fill the response
         self._process_updates(packages_to_process, api_version,
-                              available_repo_ids, repo_ids_key, response, module_ids)
+                              available_repo_ids, repo_ids_key, response, module_ids,
+                              security_only)
 
         return response
