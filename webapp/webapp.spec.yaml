@@ -44,6 +44,7 @@ paths:
 
   /v1/updates:
     post:
+      deprecated: true
       description: List security updates for list of package NEVRAs
       operationId: app.UpdatesHandlerPost.post
       requestBody:
@@ -66,6 +67,7 @@ paths:
 
   '/v1/updates/{nevra}':
     get:
+      deprecated: true
       description: List security updates for single package NEVRA
       operationId: app.UpdatesHandlerGet.get
       parameters:
@@ -88,6 +90,7 @@ paths:
 
   /v2/updates:
     post:
+      deprecated: true
       description: List security updates for list of package NEVRAs
       operationId: app.UpdatesHandlerV2Post.post
       requestBody:
@@ -106,8 +109,10 @@ paths:
         <<: *format_resps
       tags:
         - updates
+  
   '/v2/updates/{nevra}':
     get:
+      deprecated: true
       description: List security updates for single package NEVRA
       operationId: app.UpdatesHandlerV2Get.get
       parameters:
@@ -127,6 +132,50 @@ paths:
                 $ref: '#/components/schemas/UpdatesV2Response'
       tags:
         - updates
+  
+  /v3/updates:
+    post:
+      description: List all updates for list of package NEVRAs
+      operationId: app.UpdatesHandlerV3Post.post
+      requestBody:
+        description: Input json
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatesV3Request'
+      responses:
+        '200':
+          description: Return list of all updates for single package NEVRA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesV2Response'
+        <<: *format_resps
+      tags:
+        - updates
+  
+  '/v3/updates/{nevra}':
+    get:
+      description: List all updates for single package NEVRA
+      operationId: app.UpdatesHandlerV3Get.get
+      parameters:
+        - name: nevra
+          description: Package NEVRA
+          required: true
+          schema:
+            type: string
+          in: path
+          x-example: kernel-2.6.32-696.20.1.el6.x86_64
+      responses:
+        '200':
+          description: Return list of all updates for single package NEVRA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatesV2Response'
+      tags:
+        - updates
+  
   /v1/cves:
     post:
       description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE names can be provided OR one POSIX regular expression.
@@ -317,6 +366,7 @@ paths:
         <<: *format_resps
       tags:
         - vulnerabilities
+  
   '/v1/vulnerabilities/{nevra}':
     get:
       description: List of applicable CVEs for a single package NEVRA
@@ -389,6 +439,46 @@ components:
         basearch:
           type: string
           example: x86_64
+      required:
+        - package_list
+
+    UpdatesV3Request:
+      type: object
+      properties:
+        package_list:
+          type: array
+          items:
+            type: string
+            example: kernel-2.6.32-696.20.1.el6.x86_64
+          minItems: 1
+        repository_list:
+          type: array
+          items:
+            type: string
+            example: rhel-6-server-rpms
+        modules_list:
+          type: array
+          items:
+            type: object
+            properties:
+              module_name:
+                type: string
+                example: rhn-tools
+              module_stream:
+                type: string
+                example: '1'
+            required:
+              - module_name
+              - module_stream
+        releasever:
+          type: string
+          example: 6Server
+        basearch:
+          type: string
+          example: x86_64
+        security_only:
+          type: boolean
+          example: true
       required:
         - package_list
 
