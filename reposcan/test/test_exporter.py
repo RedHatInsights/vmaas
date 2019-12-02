@@ -46,13 +46,13 @@ class TestExporter:
             assert dbdump[idkey] == arch
 
     def check_packagename(self, dbdump):
-        """Check packagename dump.  Only packages that received security update."""
+        """Check packagename dump."""
         assert "packagename2id:pkg-sec-errata1" in dbdump
         assert dbdump["packagename2id:pkg-sec-errata1"] == 101
         assert "id2packagename:101" in dbdump
         assert dbdump["id2packagename:101"] == "pkg-sec-errata1"
-        assert "packagename2id:pkg-no-sec-errata2" not in dbdump
-        assert "id2packagename:102" not in dbdump
+        assert "packagename2id:pkg-no-sec-errata2" in dbdump
+        assert "id2packagename:102" in dbdump
         assert "packagename2id:pkg-errata-cve3" in dbdump
         assert dbdump["packagename2id:pkg-errata-cve3"] == 103
         assert "id2packagename:103" in dbdump
@@ -68,7 +68,7 @@ class TestExporter:
         updates1 = dbdump["updates:101"]
         assert updates1 == [301, 302, 303]
 
-        assert "updates:102" not in dbdump
+        assert "updates:102" in dbdump
 
         assert "updates:103" in dbdump
         updates3 = dbdump["updates:103"]
@@ -123,7 +123,7 @@ class TestExporter:
         assert "pkgid2repoids:301" in dbdump
         assert "pkgid2repoids:302" in dbdump
         assert "pkgid2repoids:303" in dbdump
-        assert "pkgid2repoids:304" not in dbdump
+        assert "pkgid2repoids:304" in dbdump
         assert "pkgid2repoids:305" in dbdump
         assert "pkgid2repoids:306" in dbdump
         repo_list = dbdump["pkgid2repoids:306"]
@@ -135,7 +135,7 @@ class TestExporter:
         """Check errata in dump."""
         assert "errataid2name:401" in dbdump
         assert dbdump["errataid2name:401"] == "errata1"
-        assert "errataid2name:402" not in dbdump
+        assert "errataid2name:402" in dbdump
         assert "errataid2name:403" in dbdump
         assert dbdump["errataid2name:403"] == "errata3"
 
@@ -149,7 +149,7 @@ class TestExporter:
         assert "errataid2repoids:401" in dbdump
         assert 801 in dbdump["errataid2repoids:401"]
         assert 802 in dbdump["errataid2repoids:401"]
-        assert "errataid2repoids:402" not in dbdump
+        assert "errataid2repoids:402" in dbdump
         assert "errataid2repoids:403" in dbdump
         assert 801 in dbdump["errataid2repoids:403"]
 
@@ -171,7 +171,7 @@ class TestExporter:
     def check_src_pkg_id(self, dbdump):
         """Check source package to binary packages
         mapping in dump."""
-        assert len(dbdump["src_pkg_id2pkg_ids:301"]) == 2
-        assert set(dbdump["src_pkg_id2pkg_ids:301"]) == {303, 305}
+        assert len(dbdump["src_pkg_id2pkg_ids:301"]) == 3
+        assert set(dbdump["src_pkg_id2pkg_ids:301"]) == {303, 304, 305}
         assert len(dbdump["src_pkg_id2pkg_ids:302"]) == 2
         assert set(dbdump["src_pkg_id2pkg_ids:302"]) == {306, 307}
