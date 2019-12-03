@@ -160,7 +160,7 @@ def runStages() {
                             LONG_RUNNING = "--long-running"
                         }
                         pytest_status = sh(
-                            script: "iqe tests plugin vulnerability -vvv -r s -k vmaas ${LONG_RUNNING} --html='report.html' --self-contained-html --generate-report",
+                            script: "iqe tests plugin vulnerability -vvv -r s -k vmaas/ ${LONG_RUNNING} --html='report.html' --self-contained-html --generate-report",
                             returnStatus: true
                         )
                         assert pytest_status <= 1 : "Pytest error: ${pytest_status}"
