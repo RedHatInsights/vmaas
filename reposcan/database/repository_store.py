@@ -131,12 +131,26 @@ class RepositoryStore:
             cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
             repo_ids = cur.fetchall()
             for repo_id in repo_ids:
+                cur.execute("select id from module where repo_id = %s", (repo_id,))
+                module_ids = cur.fetchall()
+                if module_ids:
+                    cur.execute("select id from module_stream where module_id in %s", (module_ids,))
+                    module_stream_ids = cur.fetchall()
+                    if module_stream_ids:
+                        cur.execute("""delete from module_profile_pkg
+                                        where profile_id in (select id from module_profile
+                                                            where stream_id in %s)""", (module_stream_ids,))
+                        cur.execute("delete from module_rpm_artifact where stream_id in %s", (module_stream_ids,))
+                        cur.execute("delete from pkg_errata where module_stream_id in %s", (module_stream_ids,))
+                        cur.execute("delete from module_profile where stream_id in %s", (module_stream_ids,))
+                    cur.execute("delete from module_stream where module_id in %s", (module_ids,))
+                cur.execute("delete from module where repo_id = %s", (repo_id,))
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from repo where id = %s", (repo_id,))
             cur.execute("delete from content_set where id = %s", (content_set_id,))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failed to delete content set.")
             self.conn.rollback()
         finally:
