@@ -531,6 +531,9 @@ components:
               module_stream:
                 type: string
                 example: '1'
+            required:
+              - module_name
+              - module_stream
         releasever:
           type: string
           example: 6Server
@@ -580,6 +583,9 @@ components:
               module_stream:
                 type: string
                 example: '1'
+            required:
+              - module_name
+              - module_stream
         releasever:
           type: string
           example: 6Server
@@ -896,6 +902,9 @@ components:
               module_stream:
                 type: string
                 example: '1'
+            required:
+              - module_name
+              - module_stream
         releasever:
           type: string
           example: 6Server
