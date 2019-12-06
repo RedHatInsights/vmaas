@@ -2,7 +2,7 @@
 
 export PIPENV_CHECK=${PIPENV_CHECK:-0}
 
-if [ ! -e /usr/bin/docker-compose ] ; then
+if which podman-compose >/dev/null 2>&1; then
     podman-compose ${PODMAN_PATH:+--podman-path=$PODMAN_PATH} \
                         -f docker-compose.yml \
                         -f docker-compose.devel.yml \
