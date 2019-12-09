@@ -471,7 +471,7 @@ class SqliteDump:
     def _dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
         dump.execute("""create table if not exists packagename (
-                                id integer primary key,
+                                id integer,
                                 packagename text
                                 )""")
         with self._named_cursor() as cursor:
@@ -486,7 +486,6 @@ class SqliteDump:
             for name_id, pkg_name in cursor:
                 dump.execute("insert into packagename values (?, ?)", (name_id, pkg_name))
                 self.packagename_ids.append(name_id)
-        dump.execute("create unique index packagename_pn on packagename (packagename)")
 
     def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
@@ -517,13 +516,11 @@ class SqliteDump:
                     dump.execute("insert into updates_index values (?, ?, ?)", (name_id, evr_id, idx))
                     idx += 1
                     index_cnt[name_id] = idx
-        dump.execute("create unique index updates_nid on updates (name_id, package_order)")
-        dump.execute("create index updates_index_neid on updates_index (name_id, evr_id)")
 
     def _dump_evr(self, dump):
         """Select all evrs and put them into dictionary"""
         dump.execute("""create table if not exists evr (
-                                id integer primary key,
+                                id integer,
                                 epoch integer,
                                 version text,
                                 release text
@@ -532,19 +529,17 @@ class SqliteDump:
             cursor.execute("select id, epoch, version, release from evr")
             for evr_id, epoch, ver, rel in cursor:
                 dump.execute("insert into evr values (?, ?, ?, ?)", (evr_id, epoch, ver, rel))
-        dump.execute("create unique index evr_evr on evr (epoch, version, release)")
 
     def _dump_arch(self, dump):
         """Select all archs and put them into dictionary"""
         dump.execute("""create table if not exists arch (
-                                id integer primary key,
+                                id integer,
                                 arch text
                                )""")
         with self._named_cursor() as cursor:
             cursor.execute("select id, name from arch")
             for arch_id, name in cursor:
                 dump.execute("insert into arch values (?, ?)", (arch_id, name))
-        dump.execute("create unique index arch_arch on arch (arch)")
 
     def _dump_arch_compat(self, dump):
         """Select information about archs compatibility"""
@@ -556,16 +551,15 @@ class SqliteDump:
             cursor.execute("select from_arch_id, to_arch_id from arch_compatibility")
             for from_arch_id, to_arch_id in cursor:
                 dump.execute("insert into arch_compat values (?, ?)", (from_arch_id, to_arch_id))
-        dump.execute("create index arch_compat_fid on arch_compat (from_arch_id)")
 
     def _dump_package_details(self, dump):
         """Select details about packages (for previously selected package names)"""
         dump.execute("""create table if not exists string (
-                                id text primary key,
+                                id text,
                                 string text
                                )""")
         dump.execute("""create table if not exists package_detail (
-                                id text primary key,
+                                id text,
                                 name_id integer,
                                 evr_id integer,
                                 arch_id integer,
@@ -589,13 +583,11 @@ class SqliteDump:
                                  (pkg_id, name_id, evr_id, arch_id, sum_id, desc_id, source_package_id))
 
                     self.package_ids.append(pkg_id)
-        dump.execute("create unique index package_detail_nevra on package_detail (name_id, evr_id, arch_id)")
-        dump.execute("create index package_detail_srcid on package_detail (source_package_id)")
 
     def _dump_repo(self, dump):
         """Select repo mappings"""
         dump.execute("""create table if not exists repo_detail (
-                                id integer primary key,
+                                id integer,
                                 label text,
                                 name text,
                                 url text,
@@ -626,8 +618,6 @@ class SqliteDump:
                                                 (oid, label, name, url, basearch,
                                                  releasever, product, product_id,
                                                  format_datetime(revision)))
-        dump.execute("create index repo_detail_label on repo_detail (label)")
-        dump.execute("create index repo_detail_productid on repo_detail (product_id)")
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,
@@ -642,13 +632,12 @@ class SqliteDump:
                                """, [tuple(self.package_ids)])
                 for pkg_id, repo_id in cursor:
                     dump.execute("insert into pkg_repo values (?, ?)", (pkg_id, repo_id))
-        dump.execute("create unique index pkg_repo_uq on pkg_repo (pkg_id, repo_id)")
 
     def _dump_errata(self, dump):  # pylint: disable=too-many-branches
         """Select errata mappings"""
         # Select errata ID to name mapping
         dump.execute("""create table if not exists errata_detail (
-                                id integer primary key,
+                                id integer,
                                 name text,
                                 synopsis text,
                                 summary text,
@@ -710,8 +699,6 @@ class SqliteDump:
                                 """, [tuple(self.errata_ids)])
                 for pkg_id, errata_id in cursor:
                     dump.execute("insert into pkg_errata values (?, ?)", (pkg_id, errata_id))
-            dump.execute("create index pkg_errata_pid on pkg_errata (pkg_id)")
-            dump.execute("create index pkg_errata_eid on pkg_errata (errata_id)")
 
             # Select errata ID to repo IDs mapping, only for relevant errata
             with self._named_cursor() as cursor:
@@ -721,7 +708,6 @@ class SqliteDump:
                                 """, [tuple(self.errata_ids)])
                 for errata_id, repo_id in cursor:
                     dump.execute("insert into errata_repo values (?, ?)", (errata_id, repo_id))
-            dump.execute("create index errata_repo_eid on errata_repo (errata_id)")
 
             # Select errata detail for errata API
             with self._named_cursor() as cursor:
@@ -732,7 +718,6 @@ class SqliteDump:
                                """, [tuple(self.errata_ids)])
                 for errata_id, cve_name in cursor:
                     dump.execute("insert into errata_cve values (?, ?)", (errata_id, cve_name))
-            dump.execute("create index errata_cve_eid on errata_cve (errata_id)")
 
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata_id, type, name FROM errata_refs
@@ -743,8 +728,6 @@ class SqliteDump:
                         dump.execute("insert into errata_refs values (?, ?)", (errata_id, ref_name))
                     else:
                         dump.execute("insert into errata_bugzilla values (?, ?)", (errata_id, ref_name))
-            dump.execute("create index errata_refs_eid on errata_refs (errata_id)")
-            dump.execute("create index errata_bugzilla_eid on errata_bugzilla (errata_id)")
 
             # Select errata ID to module mapping
             with self._named_cursor() as cursor:
@@ -759,9 +742,7 @@ class SqliteDump:
                 for errata_id, module_name, module_stream_name, module_version, module_context in cursor:
                     dump.execute("insert into errata_module values (?, ?, ?, ?, ?)",
                                     (errata_id, module_name, module_stream_name, module_version, module_context))
-            dump.execute("create index errata_module_eid on errata_module (errata_id)")
             # Select module to package ID mapping
-            modules2pkgid = {}
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct errata_id, module_stream_id, pkg_id
                                   FROM pkg_errata
@@ -770,8 +751,6 @@ class SqliteDump:
                 for errata_id, module_stream_id, pkg_id in cursor:
                     dump.execute("insert into errata_modulepkg values (?, ?, ?)",
                                  (errata_id, module_stream_id, pkg_id))
-            dump.execute("create index errata_modulepkg_emid on errata_modulepkg (errata_id, module_stream_id)")
-            dump.execute("create index errata_modulepkg_pid on errata_modulepkg (pkg_id)")
 
             # Now pull all the data together for the dump
             with self._named_cursor() as cursor:
@@ -804,7 +783,7 @@ class SqliteDump:
                                 pkg_id integer
                                )""")
         dump.execute("""create table if not exists cve_detail (
-                                cve_id integer primary key,
+                                cve_id integer,
                                      name text,
                                      redhat_url text,
                                      secondary_url text,
@@ -828,10 +807,8 @@ class SqliteDump:
                            """)
             for cve_id, cwe in cursor:
                 dump.execute("insert into cve_cwe values (?, ?)", (cve_id, cwe))
-        dump.execute("create index cve_cwe_id on cve_cwe (cve_id)")
 
         # Select CVE to package-id mapping
-        cveid2pid = {}
         with self._named_cursor() as cursor:
             cursor.execute("""
                             select distinct cve.id as cve_id, pe.pkg_id
@@ -842,7 +819,6 @@ class SqliteDump:
                            """)
             for cve_id, pkg_id in cursor:
                 dump.execute("insert into cve_pkg values (?, ?)", (cve_id, pkg_id))
-        dump.execute("create index cve_pkg_id on cve_pkg (cve_id)")
 
         # Pull everything together
         with self._named_cursor() as cursor:
@@ -880,7 +856,7 @@ class SqliteDump:
     def _dump_modules(self, dump):
         """Select module information"""
         dump.execute("""create table if not exists module_stream (
-                                stream_id integer primary key,
+                                stream_id integer,
                                 module text,
                                 stream text
                                )""")
@@ -893,7 +869,6 @@ class SqliteDump:
                            """)
             for name, stream_name, stream_id in cursor:
                 dump.execute("insert into module_stream values (?, ?, ?)", (stream_id,  name, stream_name))
-        dump.execute("create index module_stream_ns on module_stream (module, stream)")
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
