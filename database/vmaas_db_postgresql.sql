@@ -1,4 +1,24 @@
 -- -----------------------------------------------------
+-- Vulnerability Metadata as a Service database
+--
+-- When making changes into this file, you need to increment
+-- the version number in db_version table and create update 
+-- script in the upgrade folder.
+-- ----------------------------------------------------- 
+
+-- -----------------------------------------------------
+-- Table db_version
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS db_version (
+  name TEXT NOT NULL,
+  version INT NOT NULL,
+  PRIMARY KEY (name)
+)TABLESPACE pg_default;
+
+-- Increment this when editing this file
+INSERT INTO db_version (name, version) VALUES ('schema_version', 0);
+
+-- -----------------------------------------------------
 -- evr type
 -- represents version and release as arrays of parsed components
 -- of proper type (numeric or varchar)
@@ -54,6 +74,19 @@ BEGIN
     return NULL;
 END;
 $$ language 'plpgsql';
+
+create or replace FUNCTION set_last_updated()
+  RETURNS TRIGGER AS
+$set_last_updated$
+  BEGIN
+    IF (TG_OP = 'UPDATE') OR
+       NEW.last_updated IS NULL THEN
+      NEW.last_updated := CURRENT_TIMESTAMP;
+    END IF;
+    RETURN NEW;
+  END;
+$set_last_updated$
+  LANGUAGE 'plpgsql';
 
 
 -- -----------------------------------------------------
@@ -756,6 +789,21 @@ WHERE module_stream_id IS NOT NULL;
 
 CREATE INDEX ON pkg_errata(errata_id);
 CREATE INDEX ON pkg_errata(module_stream_id);
+
+CREATE TABLE IF NOT EXISTS db_upgrade_log (
+  id SERIAL,
+  version INT NOT NULL,
+  status TEXT NOT NULL,
+  script TEXT,
+  returncode INT,
+  stdout TEXT,
+  stderr TEXT,
+  last_updated TIMESTAMP WITH TIME ZONE NOT NULL
+) TABLESPACE pg_default;
+
+CREATE TRIGGER db_upgrade_log_set_last_updated
+  BEFORE INSERT OR UPDATE ON db_upgrade_log
+  FOR EACH ROW EXECUTE PROCEDURE set_last_updated();
 
 
 -- -----------------------------------------------------
