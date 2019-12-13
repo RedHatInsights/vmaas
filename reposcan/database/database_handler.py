@@ -4,6 +4,11 @@ Module containing database handler class.
 import os
 import psycopg2
 
+DB_NAME = os.getenv('POSTGRESQL_DATABASE', "vmaas")
+DB_USER = os.getenv('POSTGRESQL_USER', "vmaas_writer")
+DB_PASS = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
+DB_HOST = os.getenv('POSTGRESQL_HOST', "database")
+DB_PORT = int(os.getenv('POSTGRESQL_PORT', "5432"))
 
 class NamedCursor:
     """Wrapper class for named cursor."""
