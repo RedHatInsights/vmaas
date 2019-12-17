@@ -134,16 +134,17 @@ class RepositoryStore:
                 cur.execute("select id from module where repo_id = %s", (repo_id,))
                 module_ids = cur.fetchall()
                 if module_ids:
-                    cur.execute("select id from module_stream where module_id in %s", (module_ids,))
+                    cur.execute("select id from module_stream where module_id in %s", (tuple(module_ids),))
                     module_stream_ids = cur.fetchall()
                     if module_stream_ids:
                         cur.execute("""delete from module_profile_pkg
                                         where profile_id in (select id from module_profile
-                                                            where stream_id in %s)""", (module_stream_ids,))
-                        cur.execute("delete from module_rpm_artifact where stream_id in %s", (module_stream_ids,))
-                        cur.execute("delete from pkg_errata where module_stream_id in %s", (module_stream_ids,))
-                        cur.execute("delete from module_profile where stream_id in %s", (module_stream_ids,))
-                    cur.execute("delete from module_stream where module_id in %s", (module_ids,))
+                                                            where stream_id in %s)""", (tuple(module_stream_ids),))
+                        cur.execute("delete from module_rpm_artifact where stream_id in %s",
+                                    (tuple(module_stream_ids),))
+                        cur.execute("delete from pkg_errata where module_stream_id in %s", (tuple(module_stream_ids),))
+                        cur.execute("delete from module_profile where stream_id in %s", (tuple(module_stream_ids),))
+                    cur.execute("delete from module_stream where module_id in %s", (tuple(module_ids),))
                 cur.execute("delete from module where repo_id = %s", (repo_id,))
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
