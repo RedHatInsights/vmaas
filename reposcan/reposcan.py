@@ -27,7 +27,7 @@ from database.product_store import ProductStore
 from dbchange import DbChangeAPI
 from exporter import DUMP, main as export_data
 from pkgtree import PKGTREE_FILE, main as export_pkgtree
-from mnm import FAILED_AUTH, FAILED_WEBSOCK
+from mnm import FAILED_AUTH, FAILED_WEBSOCK, FAILED_IMPORT_CVE, FAILED_IMPORT_REPO
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
@@ -327,6 +327,7 @@ class GitRepoListHandler(RepolistImportHandler):
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
+            FAILED_IMPORT_REPO.inc()
             return TaskStartResponse(msg, success=False), 400
 
 
@@ -357,6 +358,7 @@ class RepoListHandler(RepolistImportHandler):
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
+            FAILED_IMPORT_REPO.inc()
             return TaskStartResponse(msg, success=False), 400
 
 
@@ -519,6 +521,7 @@ class CvemapSyncHandler(SyncHandler):
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
+            FAILED_IMPORT_CVE.inc()
             DatabaseHandler.rollback()
             return "ERROR"
         return "OK"
