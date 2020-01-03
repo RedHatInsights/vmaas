@@ -5,6 +5,8 @@ from psycopg2.extras import execute_values
 
 from database.cve_common import CveStoreCommon
 from common.dateutil import format_datetime
+from mnm import FAILED_IMPORT_CVE, FAILED_UPDATE_CVE
+
 
 class CvemapStore(CveStoreCommon):
     """
@@ -51,6 +53,7 @@ class CvemapStore(CveStoreCommon):
                 self.conn.commit()
             except Exception: # pylint: disable=broad-except
                 self.logger.exception("Failure while importing CVEs")
+                FAILED_IMPORT_CVE.inc()
                 self.conn.rollback()
             finally:
                 cur.close()
@@ -82,6 +85,7 @@ class CvemapStore(CveStoreCommon):
                                list(to_update), page_size=len(to_update), template=tmpl_str)
             except Exception: # pylint: disable=broad-except
                 self.logger.exception("Failure while updating CVEs")
+                FAILED_UPDATE_CVE.inc()
                 self.conn.rollback()
             finally:
                 cur.close()
