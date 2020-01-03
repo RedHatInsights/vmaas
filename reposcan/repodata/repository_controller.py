@@ -13,7 +13,8 @@ from common.logging_utils import get_logger
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
-from mnm import FAILED_REPOMD
+from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO
+
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
 
@@ -224,6 +225,7 @@ class RepositoryController:
                 failures += 1
         if failures > 0:
             self.logger.warning("Failed to import %d repositories.", failures)
+            FAILED_IMPORT_REPO.inc(failures)
 
     def store(self):
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""

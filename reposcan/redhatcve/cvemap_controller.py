@@ -16,6 +16,7 @@ from redhatcve.cvemap import CvemapHead, CvemapBody
 URL = os.getenv('REDHAT_CVEMAP_URL',
                 'https://www.redhat.com/security/data/metrics/cvemap.xml')
 
+
 class CvemapController:
     """
     Controls import/sync of CVE map into the DB.
@@ -36,8 +37,7 @@ class CvemapController:
 
     def _download_head(self):
         item = DownloadItem(source_url=URL,
-                            target_path=self._tmp_head()
-                           )
+                            target_path=self._tmp_head())
         download_items = [item]
         self.downloader.add(item)
         self.downloader.run(headers_only=True)
@@ -52,7 +52,7 @@ class CvemapController:
 
             # already synced before?
             db_lastmodified = parse_datetime(self.cvemap_store.lastmodified())
-            #db_lastmodified = None
+            # db_lastmodified = None
             self.lastmodified = parse_datetime(header.get_lastmodified())
             # synced for the first time or has newer revision
             if (db_lastmodified is None
