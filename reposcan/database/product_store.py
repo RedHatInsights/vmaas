@@ -32,12 +32,13 @@ class ProductStore:
             self.logger.debug("Products to import: %d", len(missing_products))
             if missing_products:
                 execute_values(cur, """insert into product (redhat_eng_product_id, name) values %s
+                                       on conflict (redhat_eng_product_id) do update set name = excluded.name
                                        returning id, name""", missing_products,
                                page_size=len(missing_products))
                 for row in cur.fetchall():
                     product_to_dbid[row[1]] = row[0]
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure inserting into product.")
             self.conn.rollback()
         finally:
@@ -71,7 +72,7 @@ class ProductStore:
                     for row in cur.fetchall():
                         cs_to_dbid[row[1]] = row[0]
                 self.conn.commit()
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failed to insert into content_set.")
                 self.conn.rollback()
             finally:
