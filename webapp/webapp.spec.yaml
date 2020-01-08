@@ -356,7 +356,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PkgtreeRequest' # TODO necessary to define 'PkgtreeRequest' anywhere? Is it yaml or python class?
+              $ref: '#/components/schemas/PkgtreeRequest'
 
       responses:
         '200':
@@ -364,7 +364,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PkgtreeResponse' # TODO necessary to define 'PkgtreeResponse' anywhere? Is it yaml or python class?
+                $ref: '#/components/schemas/PkgtreeResponse'
         <<: *format_resps # TODO what is this good for?
       tags:
         - pkgtree # TODO what is this good for?
@@ -388,7 +388,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PkgtreeResponse' # TODO necessary to define 'PkgtreeResponse' anywhere? Is it yaml or python class?
+                $ref: '#/components/schemas/PkgtreeResponse'
       tags:
         - pkgtree
 
@@ -903,6 +903,35 @@ components:
                     releasever:
                       type: string
                       example: '6.9'
+
+    PkgtreeRequest:
+      type: object
+      properties:
+        package_name_list:
+          type: array
+          items:
+            type: string
+            example: kernel-rt
+          minItems: 1
+      required:
+        - package_name_list
+    PkgtreeResponse:
+      properties:
+        timestamp:
+          example: '2020-01-13T17:31:41+00:00'
+        package_name_list:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              properties:
+                nevra:
+                  type: string
+                  example: kernel-rt-4.18.0-147.rt24.93.el8
+              required:
+                - nevra
+
     DBChangeResponse:
       properties:
         dbchange:
