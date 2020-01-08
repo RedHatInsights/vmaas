@@ -109,7 +109,7 @@ paths:
         <<: *format_resps
       tags:
         - updates
-  
+
   '/v2/updates/{nevra}':
     get:
       deprecated: true
@@ -132,7 +132,7 @@ paths:
                 $ref: '#/components/schemas/UpdatesV2Response'
       tags:
         - updates
-  
+
   /v3/updates:
     post:
       description: List all updates for list of package NEVRAs
@@ -153,7 +153,7 @@ paths:
         <<: *format_resps
       tags:
         - updates
-  
+
   '/v3/updates/{nevra}':
     get:
       description: List all updates for single package NEVRA
@@ -175,7 +175,7 @@ paths:
                 $ref: '#/components/schemas/UpdatesV2Response'
       tags:
         - updates
-  
+
   /v1/cves:
     post:
       description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE names can be provided OR one POSIX regular expression.
@@ -347,6 +347,51 @@ paths:
       tags:
         - packages
 
+  # TODO - how to validate that and/or test that it actually runs?
+  /v1/pkgtree:
+    post:
+      description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names.
+      operationId: app.PkgtreeHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PkgtreeRequest' # TODO necessary to define 'PkgtreeRequest' anywhere? Is it yaml or python class?
+
+      responses:
+        '200':
+          description: Return package NEVRAs about list of package names
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PkgtreeResponse' # TODO necessary to define 'PkgtreeResponse' anywhere? Is it yaml or python class?
+        <<: *format_resps # TODO what is this good for?
+      tags:
+        - pkgtree # TODO what is this good for?
+
+  # TODO - how to validate that and/or test that it actually runs?
+  '/v1/pkgtree/{package_name}':
+    get:
+      description: Get package NEVRAs tree for a single package name.
+      operationId: app.PkgtreeHandlerGet.get
+      parameters:
+        - name: package_name
+          description: Package name
+          required: true
+          schema:
+            type: string
+          in: path
+          x-example: kernel-rt
+      responses:
+        '200':
+          description: Return package NEVRAs about single package name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PkgtreeResponse' # TODO necessary to define 'PkgtreeResponse' anywhere? Is it yaml or python class?
+      tags:
+        - pkgtree
+
   /v1/vulnerabilities:
     post:
       description: List of applicable CVEs to a package list.
@@ -366,7 +411,7 @@ paths:
         <<: *format_resps
       tags:
         - vulnerabilities
-  
+
   '/v1/vulnerabilities/{nevra}':
     get:
       description: List of applicable CVEs for a single package NEVRA
