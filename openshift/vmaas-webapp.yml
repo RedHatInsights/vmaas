@@ -13,9 +13,6 @@ parameters:
 - name: DOCKERFILE
   description: Dockerfile to build from
   value: webapp/Dockerfile
-- name: DOCKERFILE_SUFFIX
-  description: Dockerfile additional suffix (RHEL)
-  value: ""
 
 objects:
 - apiVersion: v1
@@ -60,7 +57,7 @@ objects:
       type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: ${DOCKERFILE}${DOCKERFILE_SUFFIX}
+        dockerfilePath: ${DOCKERFILE}
         forcePull: true
       type: Docker
     triggers:
