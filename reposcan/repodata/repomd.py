@@ -40,9 +40,9 @@ class RepoMD:
                 "checksum": checksum,
             }
 
-            if size:
+            if size is not None:
                 self.data[data_type]["size"] = int(size.text)
-            if open_size:
+            if open_size is not None:
                 self.data[data_type]["open-size"] = int(open_size.text)
 
     def get_revision(self):
