@@ -2,28 +2,6 @@
 
 rc=0
 
-# Check consistency of testing and production dockerfiles.
-for dockerfile in */Dockerfile
-do
-    if [ ! -f "$dockerfile" ]; then
-        echo "Dockerfile '$dockerfile' doesn't exist" >&2
-        rc=$(($rc+1))
-    fi
-    sed \
-        -e "s/centos:7/registry.access.redhat.com\/rhel7/" \
-        -e "s/centos\/postgresql-10-centos7/registry.access.redhat.com\/rhscl\/postgresql-10-rhel7/" \
-        -e "s/yum -y install centos-release-scl/yum-config-manager --enable rhel-server-rhscl-7-rpms/" \
-        "$dockerfile" | diff "${dockerfile}.rhel7" -
-    diff_rc=$?
-    if [ $diff_rc -gt 0 ]; then
-        echo "$dockerfile and $dockerfile.rhel7 are too different!"
-    else
-  echo "$dockerfile and $dockerfile.rhel7 are OK"
-    fi
-    rc=$(($rc+$diff_rc))
-done
-echo ""
-
 # Run tests.
 TESTDIR=$1
 if [ ! -d "$TESTDIR" ] ; then
