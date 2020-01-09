@@ -1,28 +1,23 @@
-FROM centos:7
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
 ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-RUN yum -y install centos-release-scl && \
-    yum -y install rh-python36 which rsync && \
-    rm -rf /var/cache/yum/*
-
-ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
+RUN microdnf install python3 which shadow-utils && microdnf clean all
 
 WORKDIR /webapp_utils
 
 ADD /webapp_utils/Pipfile* /webapp_utils/
 
-ENV LC_ALL=en_US.utf8
-ENV LANG=en_US.utf8
-RUN pip install --upgrade pip && pip install --upgrade pipenv && \
+ENV LC_ALL=C.utf8
+ENV LANG=C.utf8
+RUN pip3 install --upgrade pipenv && \
     pipenv install --system && pipenv check
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
-ENV VMAAS_VERSION=latest
 ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-webapp-utils\/"
-ENV MANIFEST_PYTHON=python
+ENV MANIFEST_PYTHON=python3
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
 RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt $MANIFEST_PYTHON && \
