@@ -6,7 +6,7 @@ set -e
 
 cmd="$@"
 
-until PGPASSWORD="$POSTGRESQL_PASSWORD" psql -h "$POSTGRESQL_HOST" -U "$POSTGRESQL_USER" -d "$POSTGRESQL_DATABASE" -c '\q' -q 2>/dev/null; do
+until python3 -c "import psycopg2;c=psycopg2.connect(host=\"$POSTGRESQL_HOST\",database=\"$POSTGRESQL_DATABASE\",user=\"$POSTGRESQL_USER\",port=\"$POSTGRESQL_PORT\",password=\"$POSTGRESQL_PASSWORD\");c.close()" &> /dev/null; do
   >&2 echo "PostgreSQL is unavailable - sleeping"
   sleep 1
 done
