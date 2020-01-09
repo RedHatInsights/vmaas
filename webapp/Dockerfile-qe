@@ -1,22 +1,14 @@
-FROM centos:7
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-# all environment variables are defined in conf/reposcan.env
-# only VMAAS_VERSION is here because we want it to be hardcoded in the image
-ENV VMAAS_VERSION=latest
-
-RUN yum -y install centos-release-scl && \
-    yum -y install rh-python36 which rsync procps-ng && \
-    rm -rf /var/cache/yum/*
-
-ENV PATH=/opt/rh/rh-python36/root/usr/bin:$PATH
+RUN microdnf install python3 which rsync procps-ng shadow-utils && microdnf clean all
 
 WORKDIR /webapp
 
 ADD /webapp/Pipfile* /webapp/
 
-ENV LC_ALL=en_US.utf8
-ENV LANG=en_US.utf8
-RUN pip install --upgrade pip pipenv && \
+ENV LC_ALL=C.utf8
+ENV LANG=C.utf8
+RUN pip3 install --upgrade pipenv && \
     cd /webapp && pipenv install --system --dev && pipenv check
 
 RUN install -m 1777 -d /data && \
