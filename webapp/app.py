@@ -279,64 +279,23 @@ class PackagesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.packages_api, 1, **kwargs)
 
 
-# class PkgtreeHandlerGet(BaseHandler):
-#     """Handler for processing /pkgtree GET requests."""
-# 
-#     def get(self, name=None):
-#         """
-#         ---
-#         description: Get package tree for a package.
-#         parameters:
-#           - name: package_name
-#             description: Package name
-#             required: True
-#             type: string
-#             in: path
-#             x-example: kernel-rt
-#         responses:
-#           200:
-#             description: Return package tree for a given package
-#             schema:
-#               $ref: "#/definitions/PkgtreeResponse"
-#         tags:
-#           - packages
-#         """
-#         self.handle_request(self.pkgtree_api, 1, 'package_name', name)
-# 
-# 
-# class PkgtreeHandlerPost(BaseHandler):
-#     """ /pkgtree API handler """
-# 
-#     def post(self):
-#         """
-#         ---
-#         description: Get package tree for a package. "package_name" must be just
-#          a name without epoch, version, release or architecture.
-#         parameters:
-#           - name: body
-#             description: Input JSON
-#             required: True
-#             in: body
-#             schema:
-#               type: object
-#               properties:
-#                 package_name:
-#                   type: string
-#                   example: kernel-rt
-#               required:
-#                 - package_name
-#         responses:
-#           200:
-#             description: Return package tree for a given package
-#             schema:
-#               $ref: "#/definitions/PkgtreeResponse"
-#           400:
-#             description: Invalid input JSON format
-#         tags:
-#           - pkgtree
-#         """
-#         self.handle_request(self.pkgtree_api, 1)
-# 
+class PkgtreeHandlerGet(BaseHandler):
+    """Handler for processing /pkgtree GET requests."""
+
+    @classmethod
+    async def get(cls, package_name=None, **kwargs):
+        """Get package NEVRAs tree for a single package name."""
+        return await cls.handle_request(cls.pkgtree_api, 1, 'package_name_list', package_name, **kwargs)
+
+
+class PkgtreeHandlerPost(BaseHandler):
+    """ /pkgtree API handler """
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
+        return await cls.handle_request(cls.pkgtree_api, 1, **kwargs)
+
 
 class VulnerabilitiesHandlerGet(BaseHandler):
     """Handler for processing /vulnerabilities GET requests."""

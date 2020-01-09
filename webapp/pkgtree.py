@@ -2,36 +2,26 @@
 Module to handle /pkgtree API calls.
 """
 
-from jsonschema import validate
-
-from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY, PKG_DESC, PKG_SOURCE_PKG_ID
-import utils
-
-JSON_SCHEMA = {
-    'type' : 'object',
-    'required': ['package_name'],
-    'properties' : {
-        'package_name': {
-            'type': 'string'
-            },
-    }
-}
+from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
+import common.webapp_utils as utils
 
 
 class PkgtreeAPI:
-    """ Main /pkgtree API class."""
+    """ Main /packages API class."""
     def __init__(self, cache):
         self.cache = cache
 
     def _get_source_package(self, pkg_detail):
+        # TODO implement this for pkgtree.
         src_pkg_id = pkg_detail[PKG_SOURCE_PKG_ID]
-        if src_pkg_id is not None:
+        if src_pkg_id:
             src_pkg_detail = self.cache.package_details[src_pkg_id]
             src_pkg_nevra = utils.pkg_detail2nevra(self.cache, src_pkg_detail)
             return src_pkg_nevra
         return None
 
     def _get_built_binary_packages(self, pkg_id: int) -> list:
+        # TODO implement this for pkgtree.
         if pkg_id in self.cache.src_pkg_id2pkg_ids:
             ids = self.cache.src_pkg_id2pkg_ids[pkg_id]
             pkgs_list, source_pkgs_list = utils.pkgidlist2packages(self.cache, ids)
@@ -46,8 +36,7 @@ class PkgtreeAPI:
 
         :returns: json response with package details
         """
-        validate(data, JSON_SCHEMA)
-
+        # TODO implement this for pkgtree.
         packages = data.get('package_list', None)
         packagelist = {}
         if not packages:
@@ -65,8 +54,8 @@ class PkgtreeAPI:
                 if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
                     pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
                     pkg_detail = self.cache.package_details[pkg_id]
-                    packagedata['summary'] = pkg_detail[PKG_SUMMARY]
-                    packagedata['description'] = pkg_detail[PKG_DESC]
+                    packagedata['summary'] = self.cache.strings.get(pkg_detail[PKG_SUMMARY_ID], None)
+                    packagedata['description'] = self.cache.strings.get(pkg_detail[PKG_DESC_ID], None)
                     packagedata['source_package'] = self._get_source_package(pkg_detail)
                     packagedata['repositories'] = []
                     packagedata['package_list'] = self._get_built_binary_packages(pkg_id)
@@ -81,7 +70,7 @@ class PkgtreeAPI:
                             }
                             packagedata['repositories'].append(repodata)
         response = {
-            'nevra_list': packagelist
+            'package_list': packagelist
         }
 
         return response
