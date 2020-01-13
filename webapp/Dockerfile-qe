@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-RUN microdnf install python3 which rsync procps-ng shadow-utils && microdnf clean all
+RUN microdnf install python3 which rsync procps-ng shadow-utils tar && microdnf clean all
 
 WORKDIR /webapp
 
