@@ -940,10 +940,10 @@ components:
                     properties:
                       label:
                         type: string
-                        example: rhel-6-server-rpms
+                        example: rhel-8-for-s390x-appstream-rpms
                       name:
                         type: string
-                        example: Red Hat Enterprise Linux 6 Server (RPMs)
+                        example: Red Hat Enterprise Linux 8 for IBM z Systems - AppStream (RPMs)
                       basearch:
                         type: string
                         example: x86_64
@@ -953,6 +953,18 @@ components:
                       revision:
                         type: string
                         example: '2019-11-19T09:41:05+00:00'
+                      module_name:
+                        type: string
+                        example: postgresql
+                      module_stream:
+                        type: string
+                        example: '9.6'
+                    required:
+                      - label
+                      - name
+                      - basearch
+                      - releasever
+                      - revision
                 errata:
                   type: array
                   items:
