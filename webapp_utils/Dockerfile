@@ -4,7 +4,7 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-RUN microdnf install python3 which shadow-utils && microdnf clean all
+RUN microdnf install python3 which shadow-utils diffutils && microdnf clean all
 
 WORKDIR /webapp_utils
 

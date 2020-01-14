@@ -16,7 +16,7 @@ then
     retry=0
     until [ $retry -ge 5 ]
     do
-        curl -H "Authorization: token $GIT_TOKEN" -X GET $API_ENDPOINT?ref=$GIT_BRANCH | python -c "import json,sys;a=json.load(sys.stdin);print(a.get('content',''))" | base64 -d | diff $SOURCE_FILE_PATH -
+        curl -H "Authorization: token $GIT_TOKEN" -X GET $API_ENDPOINT?ref=$GIT_BRANCH | python3 -c "import json,sys;a=json.load(sys.stdin);print(a.get('content',''))" | base64 -d | diff $SOURCE_FILE_PATH -
         diff_rc=$?
         if [ $diff_rc -eq 0 ]
         then
@@ -24,7 +24,7 @@ then
             break
         fi
         # fetch remote file sha (if exists)
-        remote_file_sha=$(curl -H "Authorization: token $GIT_TOKEN" -X GET $API_ENDPOINT?ref=$GIT_BRANCH | python -c "import json,sys;a=json.load(sys.stdin);print(a.get('sha',''))")
+        remote_file_sha=$(curl -H "Authorization: token $GIT_TOKEN" -X GET $API_ENDPOINT?ref=$GIT_BRANCH | python3 -c "import json,sys;a=json.load(sys.stdin);print(a.get('sha',''))")
         # insert or update file
         echo "{\"message\": \"Updating $GIT_FILE_PATH\", \"branch\": \"$GIT_BRANCH\", \"sha\": \"$remote_file_sha\", \"content\": \"$(base64 -w 0 $SOURCE_FILE_PATH)\"}" > /tmp/commit_payload.json
         new_commit_sha=$(curl -H "Authorization: token $GIT_TOKEN" -X PUT -d "@/tmp/commit_payload.json" $API_ENDPOINT | python -c "import json,sys;a=json.load(sys.stdin);print(a.get('commit',{}).get('sha',''))")
