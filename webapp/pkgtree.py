@@ -2,75 +2,58 @@
 Module to handle /pkgtree API calls.
 """
 
-from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
-import common.webapp_utils as utils
-
 
 class PkgtreeAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
         self.cache = cache
 
-    def _get_source_package(self, pkg_detail):
-        # TODO implement this for pkgtree.
-        src_pkg_id = pkg_detail[PKG_SOURCE_PKG_ID]
-        if src_pkg_id:
-            src_pkg_detail = self.cache.package_details[src_pkg_id]
-            src_pkg_nevra = utils.pkg_detail2nevra(self.cache, src_pkg_detail)
-            return src_pkg_nevra
-        return None
-
-    def _get_built_binary_packages(self, pkg_id: int) -> list:
-        # TODO implement this for pkgtree.
-        if pkg_id in self.cache.src_pkg_id2pkg_ids:
-            ids = self.cache.src_pkg_id2pkg_ids[pkg_id]
-            pkgs_list, source_pkgs_list = utils.pkgidlist2packages(self.cache, ids)
-            return pkgs_list + source_pkgs_list
-        return []
-
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
-        Returns package details.
+        Returns list of NEVRAs for given packge name.
 
         :param data: json request parsed into data structure
 
-        :returns: json response with package details
+        :returns: json response with list of NEVRAs
         """
-        # TODO implement this for pkgtree.
-        packages = data.get('package_list', None)
-        packagelist = {}
-        if not packages:
-            return packagelist
+        names = data.get('package_name_list', None)
+        pkgnamelist = {}
+        if not names:
+            return pkgnamelist
 
-        for pkg in packages:
-            packagedata = packagelist.setdefault(pkg, {})
-            name, epoch, ver, rel, arch = utils.split_packagename(pkg)
-            if name in self.cache.packagename2id \
-               and (epoch, ver, rel) in self.cache.evr2id \
-               and arch in self.cache.arch2id:
-                name_id = self.cache.packagename2id[name]
-                evr_id = self.cache.evr2id[(epoch, ver, rel)]
-                arch_id = self.cache.arch2id[arch]
-                if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
-                    pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
-                    pkg_detail = self.cache.package_details[pkg_id]
-                    packagedata['summary'] = self.cache.strings.get(pkg_detail[PKG_SUMMARY_ID], None)
-                    packagedata['description'] = self.cache.strings.get(pkg_detail[PKG_DESC_ID], None)
-                    packagedata['source_package'] = self._get_source_package(pkg_detail)
-                    packagedata['repositories'] = []
-                    packagedata['package_list'] = self._get_built_binary_packages(pkg_id)
-                    if pkg_id in self.cache.pkgid2repoids:
-                        for repo_id in self.cache.pkgid2repoids[pkg_id]:
-                            repodetail = self.cache.repo_detail[repo_id]
-                            repodata = {
-                                'label': repodetail[REPO_LABEL],
-                                'name': repodetail[REPO_NAME],
-                                'basearch': utils.none2empty(repodetail[REPO_BASEARCH]),
-                                'releasever': utils.none2empty(repodetail[REPO_RELEASEVER])
-                            }
-                            packagedata['repositories'].append(repodata)
+        for name in names:
+            # TODO implement this for pkgtree.
+            pkgtreedata = pkgnamelist.setdefault(name, [])
+
+            pkgtreedata.append(
+                {
+                    "nevra": "kernel-rt-4.18.0-147.rt24.93.el8",
+                    "first_published": "2020-01-13T17:31:41+00:00",
+                    "repositories": [
+                        {
+                            "label": "rhel-8-for-s390x-appstream-rpms",
+                            "name": "Red Hat Enterprise Linux 8 for IBM z Systems - AppStream (RPMs)",
+                            "basearch": "x86_64",
+                            "releasever": "6.9",
+                            "revision": "2019-11-19T09:41:05+00:00",
+                            "module_name": "postgresql",
+                            "module_stream": "9.6"
+                        }
+                    ],
+                    "errata": [
+                        {
+                            "name": "RHSA-2019:2730",
+                            "issued": "2019-11-19T09:41:05+00:00",
+                            "cve_list": [
+                              "CVE-2018-13405"
+                            ]
+                        }
+                    ]
+                }
+            )
+
         response = {
-            'package_list': packagelist
+            'package_name_list': pkgnamelist
         }
 
         return response
