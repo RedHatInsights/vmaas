@@ -45,7 +45,7 @@ class PkgtreeAPI:
                             "name": "RHSA-2019:2730",
                             "issued": "2019-11-19T09:41:05+00:00",
                             "cve_list": [
-                              "CVE-2018-13405"
+                                "CVE-2018-13405"
                             ]
                         }
                     ]
