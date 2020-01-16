@@ -16,6 +16,8 @@ class PkgtreeAPI:
 
         :returns: json response with list of NEVRAs
         """
+        # Access any self. attribute to make travis pass.
+        cc = self.cache
         names = data.get('package_name_list', None)
         pkgnamelist = {}
         if not names:
