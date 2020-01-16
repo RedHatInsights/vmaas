@@ -347,7 +347,6 @@ paths:
       tags:
         - packages
 
-  # TODO - how to validate that and/or test that it actually will run properly?
   /v1/pkgtree:
     post:
       description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names.
@@ -365,11 +364,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PkgtreeResponse'
-        <<: *format_resps # TODO what is this good for?
+        <<: *format_resps
       tags:
-        - pkgtree # TODO what is this good for?
+        - pkgtree
 
-  # TODO - how to validate that and/or test that it actually will run properly?
   '/v1/pkgtree/{package_name}':
     get:
       description: Get package NEVRAs tree for a single package name.
@@ -904,7 +902,6 @@ components:
                       type: string
                       example: '6.9'
 
-    # TODO validate somehow Pkgtree schemas - how? Run tests?
     PkgtreeRequest:
       type: object
       properties:
