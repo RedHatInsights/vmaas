@@ -8,7 +8,7 @@ class PkgtreeAPI:
     def __init__(self, cache):
         self.cache = cache
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument
+    def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
         Returns list of NEVRAs for given packge name.
 
@@ -17,7 +17,6 @@ class PkgtreeAPI:
         :returns: json response with list of NEVRAs
         """
         # Access any self. attribute to make travis pass.
-        cc = self.cache
         names = data.get('package_name_list', None)
         pkgnamelist = {}
         if not names:
