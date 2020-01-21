@@ -12,6 +12,7 @@ from pkgtree import PkgtreeAPI
 PKG_JSON_EMPTY_LIST = {"package_name_list": [""]}
 PKG_JSON_NON_EXIST = {"package_name_list": ["non-exist"]}
 
+
 EMPTY_RESPONSE = {"package_name_list": {"": {}}}
 NON_EXIST_RESPONSE = {"package_name_list": {"non-exist": {}}}
 
