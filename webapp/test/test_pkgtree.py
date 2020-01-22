@@ -13,11 +13,11 @@ PKG_JSON_EMPTY_LIST = {"package_name_list": [""]}
 PKG_JSON_NON_EXIST = {"package_name_list": ["non-exist"]}
 
 
-EMPTY_RESPONSE = {"package_name_list": {"": {}}}
-NON_EXIST_RESPONSE = {"package_name_list": {"non-exist": {}}}
+EMPTY_RESPONSE = {"package_name_list": {"": []}}
+NON_EXIST_RESPONSE = {"package_name_list": {"non-exist": []}}
 
 
-class TestPackagesAPI(TestBase):
+class TestPkgtreeAPI(TestBase):
     """Test pkgtree api class."""
 
     pkg_api = None
@@ -25,7 +25,7 @@ class TestPackagesAPI(TestBase):
     @pytest.fixture(autouse=True)
     def setup_api(self, load_cache):
         """Setup PkgtreeAPI object."""
-        self.pkg_api = PackagesAPI(self.cache)
+        self.pkg_api = PkgtreeAPI(self.cache)
 
     @pytest.mark.xfail
     def test_schema(self):
@@ -49,8 +49,8 @@ class TestPackagesAPI(TestBase):
 
     @pytest.mark.xfail
     def test_pkgname_multiple_items(self):
-        # TODO
-        assert False
+        response = self.pkg_api.process_list(1, PKG_JSON_EMPTY_LIST)
+        assert tools.match(EMPTY_RESPONSE, response) is True
 
     def test_pkgname_empty_list(self):
         """Test pkgtree api with empty package_name_list."""
