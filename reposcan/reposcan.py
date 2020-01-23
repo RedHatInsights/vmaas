@@ -230,6 +230,7 @@ class RepolistImportHandler(SyncHandler):
         """Parse JSON in standard repolist format, see yaml spec"""
         products = {}
         repos = []
+        seen = set()
         for repo_group in data:
             # Entitlement cert is optional, use default if not specified in input JSON
             if "entitlement_cert" in repo_group:
@@ -247,7 +248,10 @@ class RepolistImportHandler(SyncHandler):
 
             # Repository list with product and content set information
             for product_name, product in repo_group["products"].items():
-                products[product_name] = {"product_id": product.get("redhat_eng_product_id", None), "content_sets": {}}
+                product_id = product.get('redhat_eng_product_id', None)
+                products[product_name] = {"product_id": product_id, "content_sets": {}}
+                if product_id is not None and product_id in seen or seen.add(product_id):
+                    return None, None
                 for content_set_label, content_set in product["content_sets"].items():
                     products[product_name]["content_sets"][content_set_label] = content_set["name"]
                     for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
@@ -316,6 +320,9 @@ class GitRepoListHandler(RepolistImportHandler):
         assert data
 
         products, repos = RepolistImportHandler.parse_repolist_json(data)
+        if not products and not repos:
+            LOGGER.warning("Input json is not valid")
+            return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos)
 
     @classmethod
@@ -352,6 +359,10 @@ class RepoListHandler(RepolistImportHandler):
         """Add repositories listed in request to the DB"""
         try:
             products, repos = cls._parse_input_list()
+            if not products and not repos:
+                msg = "Input json is not valid"
+                LOGGER.warning(msg)
+                return TaskStartResponse(msg, success=False), 400
             status_code, status_msg = cls.start_task(products=products, repos=repos)
             return status_msg, status_code
         except Exception as err:  # pylint: disable=broad-except
