@@ -2,6 +2,8 @@
 Module to handle /pkgtree API calls.
 """
 
+from common.webapp_utils import format_datetime
+
 
 class PkgtreeAPI:
     """ Main /packages API class."""
@@ -16,6 +18,9 @@ class PkgtreeAPI:
 
         :returns: json response with list of NEVRAs
         """
+        # Date and time of last data change in the VMaaS DB
+        last_change = format_datetime(self.cache.dbchange['last_change'])
+
         KNOWN_NAMES = ['kernel', 'kernel-rt', 'samba']  # just for basic tests to pass
         names = data.get('package_name_list', None)
         pkgnamelist = {}
@@ -23,7 +28,7 @@ class PkgtreeAPI:
             return pkgnamelist
 
         for name in names:
-                # TODO implement this for pkgtree.
+                # TODO implement this for pkgtree. Read data from cache.
             pkgtreedata = pkgnamelist.setdefault(name, [])
             if name in KNOWN_NAMES:
 
@@ -57,7 +62,7 @@ class PkgtreeAPI:
         response = {
             'package_name_list': pkgnamelist,
             # TODO read this value properly as it is in DBCHANGE api
-            'last_change': '2020-04-16 20:07:58.500192+00',
+            'last_change': last_change,
         }
 
         return response

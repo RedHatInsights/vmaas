@@ -39,26 +39,40 @@ class TestPkgtreeAPI(TestBase):
         assert len(response["package_name_list"].keys()) == 1  # One package name is expected
         assert len(response["package_name_list"][PKG]) >= 1  # At least one NEVRA for a package name is expected
 
-    @pytest.mark.xfail
-    def test_schema_rhel8_modularity(self):
-        # TODO
-        assert False
-
-    @pytest.mark.xfail
     def test_schema_multiple_pkgnames(self):
-        # TODO
-        assert False
+        response = self.pkg_api.process_list(1, PKGS_JSON)
+        schemas.pkgtree_top_schema.validate(response)
+        assert len(response["package_name_list"].keys()) == 2  # Two package names are expected
+        for pkg in PKGS:
+            schemas.pkgtree_list_schema.validate(response["package_name_list"][pkg])
+            assert len(response["package_name_list"][pkg]) >= 1  # At least one NEVRA for a package name is expected
+
+    def test_schema_rhel8_modularity(self):
+        # For rhel8 modularity the only difference is that the rhel-8 nevras contain repositories
+        # with items 'module_name' and 'module_stream'.
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        # Find rhel-8 nevra
+        rhel8_repos = None
+        for n in response['package_name_list'][PKG]:
+            if n['nevra'].endswith('.el8'):
+                rhel8_repos = n['repositories']
+        assert rhel8_repos is not None
+        # Check its repository items
+        for r in rhel8_repos:
+            assert 'module_name' in r
+            assert 'module_stream' in r
 
     @pytest.mark.xfail
     def test_pkgname_one_item(self):
-        # TODO
+        # TODO - Is it acutally useful or possible to have a test like this?
+        response = self.pkg_api.process_list(1, PKG_JSON)
         assert False
 
     @pytest.mark.xfail
     def test_pkgname_multiple_items(self):
-        # TODO
-        response = self.pkg_api.process_list(1, PKG_JSON_EMPTY_LIST)
-        assert tools.match(EMPTY_RESPONSE, response) is True
+        # TODO - Is it acutally useful or possible to have a test like this?
+        response = self.pkg_api.process_list(1, PKGS_JSON)
+        assert False
 
     def test_pkgname_empty_list(self):
         """Test pkgtree api with empty package_name_list."""
@@ -70,4 +84,12 @@ class TestPkgtreeAPI(TestBase):
         response = self.pkg_api.process_list(1, PKG_JSON_NON_EXIST)
         assert tools.match(NON_EXIST_RESPONSE, response) is True
 
-    # TODO add tests for modularity - rhel-8 and its repos/modules
+    def test_last_change(self):
+        response = self.pkg_api.process_list(1, PKG_JSON_EMPTY_LIST)
+        assert 'last_change' in response
+        response = self.pkg_api.process_list(1, PKG_JSON_NON_EXIST)
+        assert 'last_change' in response
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        assert 'last_change' in response
+        response = self.pkg_api.process_list(1, PKGS_JSON)
+        assert 'last_change' in response
