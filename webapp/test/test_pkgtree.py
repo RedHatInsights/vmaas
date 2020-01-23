@@ -9,6 +9,10 @@ import pytest
 
 from pkgtree import PkgtreeAPI
 
+PKG = 'kernel'
+PKGS = ['kernel', 'kernel-rt']
+PKG_JSON = {"package_name_list": [PKG]}
+PKGS_JSON = {"package_name_list": PKGS}
 PKG_JSON_EMPTY_LIST = {"package_name_list": [""]}
 PKG_JSON_NON_EXIST = {"package_name_list": ["non-exist"]}
 
@@ -27,10 +31,13 @@ class TestPkgtreeAPI(TestBase):
         """Setup PkgtreeAPI object."""
         self.pkg_api = PkgtreeAPI(self.cache)
 
-    @pytest.mark.xfail
     def test_schema(self):
-        # TODO
-        assert False
+        """Test pkg api response schema of valid input."""
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        schemas.pkgtree_top_schema.validate(response)
+        schemas.pkgtree_list_schema.validate(response["package_name_list"][PKG])
+        assert len(response["package_name_list"].keys()) == 1  # One package name is expected
+        assert len(response["package_name_list"][PKG]) >= 1  # At least one NEVRA for a package name is expected
 
     @pytest.mark.xfail
     def test_schema_rhel8_modularity(self):
@@ -49,6 +56,7 @@ class TestPkgtreeAPI(TestBase):
 
     @pytest.mark.xfail
     def test_pkgname_multiple_items(self):
+        # TODO
         response = self.pkg_api.process_list(1, PKG_JSON_EMPTY_LIST)
         assert tools.match(EMPTY_RESPONSE, response) is True
 

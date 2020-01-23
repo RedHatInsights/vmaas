@@ -55,7 +55,9 @@ class PkgtreeAPI:
                 )
 
         response = {
-            'package_name_list': pkgnamelist
+            'package_name_list': pkgnamelist,
+            # TODO read this value properly as it is in DBCHANGE api
+            'last_change': '2020-04-16 20:07:58.500192+00',
         }
 
         return response

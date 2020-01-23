@@ -915,8 +915,8 @@ components:
         - package_name_list
     PkgtreeResponse:
       properties:
-        timestamp:
-          example: '2020-01-13T17:31:41+00:00'
+        last_change:
+          example: '2020-04-16 20:07:58.500192+00'
         package_name_list:
           type: object
           additionalProperties:
