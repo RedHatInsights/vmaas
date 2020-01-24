@@ -4,6 +4,8 @@ Module to handle /pkgtree API calls.
 
 from common.webapp_utils import format_datetime
 
+KNOWN_NAMES = ['kernel', 'kernel-rt', 'samba']  # just for basic tests to pass
+
 
 class PkgtreeAPI:
     """ Main /packages API class."""
@@ -21,7 +23,6 @@ class PkgtreeAPI:
         # Date and time of last data change in the VMaaS DB
         last_change = format_datetime(self.cache.dbchange['last_change'])
 
-        KNOWN_NAMES = ['kernel', 'kernel-rt', 'samba']  # just for basic tests to pass
         names = data.get('package_name_list', None)
         pkgnamelist = {}
         if not names:
