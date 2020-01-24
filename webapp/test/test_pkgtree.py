@@ -65,13 +65,13 @@ class TestPkgtreeAPI(TestBase):
             assert 'module_stream' in repo
 
     @pytest.mark.xfail
-    def test_pkgname_one_item(self):
+    def test_pkgname_one_item(self):  # pylint: disable=R0201
         """Test pkgtree api with one package name."""
         # TODO - Is it acutally useful or possible to have a test like this?
         assert False
 
     @pytest.mark.xfail
-    def test_pkgname_multiple_items(self):
+    def test_pkgname_multiple_items(self):  # pylint: disable=R0201
         """Test pkgtree api with several package names."""
         # TODO - Is it acutally useful or possible to have a test like this?
         assert False
