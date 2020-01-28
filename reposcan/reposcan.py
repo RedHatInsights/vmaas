@@ -293,6 +293,8 @@ class GitRepoListHandler(RepolistImportHandler):
     def run_task(*args, **kwargs):
         """Start importing from git"""
 
+        init_logging()
+
         if not REPOLIST_GIT_TOKEN:
             LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
             return "SKIPPED"
