@@ -307,9 +307,7 @@ class GitRepoListHandler(RepolistImportHandler):
         # would be used replace the username in the provided URL ?
         git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
 
-        repo = git.Git('/').clone(git_url, REPOLIST_DIR)
-        assert repo
-
+        git.Git('/').clone(git_url, REPOLIST_DIR)
         if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + REPOLIST_PATH):
             LOGGER.error("Downloading repolist failed: Directory was not created")
 
