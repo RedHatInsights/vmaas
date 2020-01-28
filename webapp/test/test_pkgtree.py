@@ -5,6 +5,8 @@ from test import schemas
 from test import tools
 from test.conftest import TestBase
 
+import decimal  # Necessary for loading successfully test data from .yml file
+
 import pytest
 
 from pkgtree import PkgtreeAPI
@@ -56,7 +58,7 @@ class TestPkgtreeAPI(TestBase):
         # Find rhel-8 nevra
         rhel8_repos = None
         for name in response['package_name_list'][PKG]:
-            if name['nevra'].endswith('.el8'):
+            if name['nevra'].endswith('.el8.x86_64'):
                 rhel8_repos = name['repositories']
         assert rhel8_repos is not None
         # Check its repository items
@@ -68,6 +70,7 @@ class TestPkgtreeAPI(TestBase):
     def test_pkgname_one_item(self):  # pylint: disable=R0201
         """Test pkgtree api with one package name."""
         # TODO - Is it acutally useful or possible to have a test like this?
+        response = self.pkg_api.process_list(1, PKG_JSON)
         assert False
 
     @pytest.mark.xfail

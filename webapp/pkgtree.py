@@ -2,15 +2,39 @@
 Module to handle /pkgtree API calls.
 """
 
-from common.webapp_utils import format_datetime
+# TODO FIXME - suggested SPEC.yaml and examples does not contain arch.
+#              how to handle arch? should it be returned or ust use 'nevr' without arch?
+#            - 'nevr' is usually built for every architecture?
+#            - how is it returned from reposcan pkgtree? Also it includes architecture?
 
-KNOWN_NAMES = ['kernel', 'kernel-rt', 'samba']  # just for basic tests to pass
+from cache import PKG_NAME_ID
+
+from common.webapp_utils import format_datetime, join_packagename, none2empty
 
 
+# TODO add test - to check pkgtree order that is generated
+# TODO add test with 'my-pkg',
+# TODO - create file ./webapp/test/data/cache_pkgtree.yml that will contain
+#        data for pkgtree tests - right ordering atp.
+#      - create that file from vmaas.dbm
+# TODO how to work with vmaas.dbm files? python 'shelve' module?
 class PkgtreeAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
         self.cache = cache
+
+    def _get_packages(self, pkgname_id):
+        pkg_ids = set()
+        for pkg_id, pkg_val in self.cache.package_details.items():
+            if pkgname_id == pkg_val[PKG_NAME_ID]:
+                pkg_ids.update(pkg_id)
+
+    def _build_nevra(self, pkg_id):
+        name_id, evr_id, arch_id, _, _, _ = self.db_cache.package_details[pkg_id]
+        name = self.db_cache.id2packagename[name_id]
+        epoch, ver, rel = self.db_cache.id2evr[evr_id]
+        arch = self.db_cache.id2arch[arch_id]
+        return join_packagename(name, epoch, ver, rel, arch)
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
@@ -29,13 +53,15 @@ class PkgtreeAPI:
             return pkgnamelist
 
         for name in names:
-                # TODO implement this for pkgtree. Read data from cache.
             pkgtreedata = pkgnamelist.setdefault(name, [])
-            if name in KNOWN_NAMES:
+            if name in self.cache.packagename2id:
+                name_id = self.cache.packagename2id[name]
+                pkg_ids = self._get_packages(name_id)
+                # TODO implement formating nevra from pkg
 
                 pkgtreedata.append(
                     {
-                        "nevra": "kernel-rt-4.18.0-147.rt24.93.el8",
+                        "nevra": "kernel-rt-4.18.0-147.rt24.93.el8.x86_64",
                         "first_published": "2020-01-13T17:31:41+00:00",
                         "repositories": [
                             {

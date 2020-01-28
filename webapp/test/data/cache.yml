@@ -175,6 +175,8 @@ package_details:
   - 0
 packagename2id:
   my-pkg: 2222
+  kernel: 32222
+  kernel-rt: 332222
 pkgerrata2module:
   ? !!python/tuple
   - 8110
