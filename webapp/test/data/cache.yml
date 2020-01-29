@@ -1,6 +1,10 @@
+# TODO add pkg "nevra": "kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
+# TODO add "nevra": "kernel-rt-4.18.0-80.rt9.138.el8.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
+# TODO add rhel-8 kernel-rt pkg
 arch2id:
   i686: 5
   src: 6
+  x86_64: 7
 arch_compat:
   5: !!set
     5: null
@@ -83,16 +87,31 @@ evr2id:
   - 2.1.0
   - 1.el8
   : 210
+  ? &id005 !!python/tuple
+  - '0'
+  - 2.6.33.9
+  - rt31.66.el6rt
+  : 310
+  ? &id006 !!python/tuple
+  - '0'
+  - 4.18.0
+  - 80.rt9.138.el8
+  : 320
 id2arch:
   5: i686
   6: src
+  7: x86_64
 id2evr:
   110: *id001
   120: *id002
   200: *id003
   210: *id004
+  310: *id005
+  320: *id006
 id2packagename:
   2222: my-pkg
+  32222: kernel
+  332222: kernel-rt
 modulename2id:
   ? !!python/tuple
   - my-pkg
@@ -173,6 +192,22 @@ package_details:
   - 6
   - 5
   - 0
+  8310: !!python/tuple # TODO
+  # TODO add pkg "nevra": "kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
+  - 332222
+  - 310
+  - 7
+  - null
+  - null
+  - null
+  8320: !!python/tuple # name_id, evr_id, arch_id
+  # TODO add "nevra": "kernel-rt-4.18.0-80.rt9.138.el8.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
+  - 332222
+  - 320
+  - 7
+  - null
+  - null
+  - null
 packagename2id:
   my-pkg: 2222
   kernel: 32222

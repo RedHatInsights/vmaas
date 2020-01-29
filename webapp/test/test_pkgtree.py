@@ -11,7 +11,7 @@ import pytest
 
 from pkgtree import PkgtreeAPI
 
-PKG = 'kernel'
+PKG = 'kernel-rt'
 PKGS = ['kernel', 'kernel-rt']
 PKG_JSON = {"package_name_list": [PKG]}
 PKGS_JSON = {"package_name_list": PKGS}
@@ -66,11 +66,13 @@ class TestPkgtreeAPI(TestBase):
             assert 'module_name' in repo
             assert 'module_stream' in repo
 
-    @pytest.mark.xfail
+    #@pytest.mark.xfail
     def test_pkgname_one_item(self):  # pylint: disable=R0201
         """Test pkgtree api with one package name."""
         # TODO - Is it acutally useful or possible to have a test like this?
         response = self.pkg_api.process_list(1, PKG_JSON)
+        import pprint
+        pprint.pprint(response)
         assert False
 
     @pytest.mark.xfail
