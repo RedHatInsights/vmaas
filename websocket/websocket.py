@@ -52,6 +52,10 @@ class NotificationHandler(WebSocketHandler):
         elif message == "invalidate-cache" and self.connections[self] == "reposcan":
             self.webapp_export_timestamps.clear()
             self.send_message("webapp", "refresh-cache")
+        elif message.startswith("refreshing") and self.connections[self] == "webapp":
+            self.send_message("listener", "webapps-refreshing")
+        elif message.startswith('evaluator-producer-paused') and self.connections[self] == 'listener':
+            self.send_message('webapp', 'ready-for-refresh')
         elif message.startswith("refreshed") and self.connections[self] == "webapp":
             _, timestamp = message.split()
             self.webapp_export_timestamps[self] = timestamp

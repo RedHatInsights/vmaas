@@ -356,6 +356,7 @@ class Websocket:
 
             if msg.data == 'refresh-cache':
                 await self._set_refreshing_status()
+            elif msg.data == 'ready-for-refresh':
                 self._refresh_cache()
                 msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
