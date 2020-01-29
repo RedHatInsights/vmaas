@@ -313,6 +313,12 @@ class Websocket:
         self.task.cancel()
         self.task = None
 
+    async def _set_refreshing_status(self):
+        if self.websocket:
+            await self.websocket.send_str("refreshing")
+        else:
+            self.websocket_response_queue.add("refreshing")
+
     @staticmethod
     def _refresh_cache():
         BaseHandler.db_cache.reload()
@@ -349,6 +355,7 @@ class Websocket:
                 return None
 
             if msg.data == 'refresh-cache':
+                await self._set_refreshing_status()
                 self._refresh_cache()
                 msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
