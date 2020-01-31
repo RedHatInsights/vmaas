@@ -1,6 +1,3 @@
-# TODO add pkg "nevra": "kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
-# TODO add "nevra": "kernel-rt-4.18.0-80.rt9.138.el8.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
-# TODO add rhel-8 kernel-rt pkg
 arch2id:
   i686: 5
   src: 6
@@ -61,8 +58,44 @@ errata_detail:
       source_package_list:
         - kernel-2.6.32-696.23.1.el6.src
   - https://access.redhat.com/errata/RHBA-2015:0364
+  RHEA-2011:0895: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2011-06-23 00:00:00
+  - 2011-06-23 00:00:00
+  - null
+  - null
+  - null
+  - null
+  - null
+  - null
+  RHSA-2019:1174: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2019-05-14 17:22:02
+  - 2019-05-14 17:22:02
+  - - CVE-2018-12126
+  - - CVE-2019-11091
+  - - CVE-2018-12130
+  - - CVE-2018-12127
+  - null
+  - null
+  - null
+  - null
+  - null
+  - null
 errataid2name:
+  111: RHEA-2011:0895
   444: RHBA-2015:0364
+  555: RHSA-2019:1174
 errataid2repoids:
   444: !!set
     1: null
@@ -97,6 +130,11 @@ evr2id:
   - 4.18.0
   - 80.rt9.138.el8
   : 320
+  ? &id007 !!python/tuple
+  - '0'
+  - 4.18.0
+  - 80.el8
+  : 410
 id2arch:
   5: i686
   6: src
@@ -108,6 +146,7 @@ id2evr:
   210: *id004
   310: *id005
   320: *id006
+  410: *id007
 id2packagename:
   2222: my-pkg
   32222: kernel
@@ -192,18 +231,26 @@ package_details:
   - 6
   - 5
   - 0
-  8310: !!python/tuple # TODO
-  # TODO add pkg "nevra": "kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
+  # kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64
+  8310: !!python/tuple
   - 332222
   - 310
   - 7
   - null
   - null
   - null
+  # kernel-rt-4.18.0-80.rt9.138.el8.x86_64
   8320: !!python/tuple # name_id, evr_id, arch_id
-  # TODO add "nevra": "kernel-rt-4.18.0-80.rt9.138.el8.x86_64", - evr2id, id2evr, nevra2pkgid, package_details
   - 332222
   - 320
+  - 7
+  - null
+  - null
+  - null
+  # kernel-4.18.0-80.el8.x86_64
+  8410:
+  - 32222
+  - 410
   - 7
   - null
   - null
@@ -249,6 +296,10 @@ pkgid2errataids:
     444: null
   8210: !!set
     444: null
+  32222: !!set
+    111: null
+  332222: !!set
+    555: null
 pkgid2repoids:
   8110:
   - 1
