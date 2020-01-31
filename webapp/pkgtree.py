@@ -7,7 +7,7 @@ Module to handle /pkgtree API calls.
 #            - 'nevr' is usually built for every architecture?
 #            - how is it returned from reposcan pkgtree? Also it includes architecture?
 
-from cache import PKG_NAME_ID
+from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE
 
 from common.webapp_utils import format_datetime, join_packagename, none2empty
 
@@ -41,6 +41,21 @@ class PkgtreeAPI:
         arch = self.cache.id2arch[arch_id]
         return join_packagename(name, epoch, ver, rel, arch)
 
+    def _get_erratas(self, pkg_id):
+        # TODO sort erratas by date from newest to oldest? Is it sorted in reposcan pkgtree?
+        erratas = []
+        if pkg_id in self.cache.pkgid2errataids:
+            errata_ids = self.cache.pkgid2errataids[pkg_id]
+            for err_id in errata_ids:
+                name = self.cache.errataid2name[err_id]
+                issued = self.cache.errata_detail[name][ERRATA_ISSUED]
+                cves = self.cache.errata_detail[name][ERRATA_CVE]
+                errata = {'name': name, 'issued': issued}
+                if cves:
+                    errata['cve_list'] = cves
+                erratas.append(errata)
+        return erratas
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
         Returns list of NEVRAs for given packge name.
@@ -64,9 +79,13 @@ class PkgtreeAPI:
                 pkg_ids = self._get_packages(name_id)
                 for pkg_id in pkg_ids:
                     pkg_nevra = self._build_nevra(pkg_id)
-                    # TODO published = TODO
+                    errata = self._get_erratas(pkg_id)
+                    # TODO Where does it come from this date? It is not in cache.
+                    #      It looks like it is the date of the oldest errata. Is it oldest repo where it was published?
+                    #      Check it out with related vmaas PR or bug report from jsvoboda
+                    # TODO first_published = TODO
+                    # TODO sort repositories by date from newest to oldest? Is it sorted in reposcan pkgtree?
                     # TODO repositories = TODO
-                    # TODO errata = TODO
                     # TODO right sorting of nevras according to pkgtree algorithm
                     pkgtreedata.append(
                         {
@@ -83,15 +102,7 @@ class PkgtreeAPI:
                                     "module_stream": "9.6"
                                 }
                             ],
-                            "errata": [
-                                {
-                                    "name": "RHSA-2019:2730",
-                                    "issued": "2019-11-19T09:41:05+00:00",
-                                    "cve_list": [
-                                        "CVE-2018-13405"
-                                    ]
-                                }
-                            ]
+                            "errata": errata,
                         }
                     )
 
