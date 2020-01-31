@@ -7,8 +7,8 @@ Module to handle /pkgtree API calls.
 #            - 'nevr' is usually built for every architecture?
 #            - how is it returned from reposcan pkgtree? Also it includes architecture?
 
-from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE
-
+from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
+    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
 from common.webapp_utils import format_datetime, join_packagename, none2empty
 
 
@@ -48,13 +48,29 @@ class PkgtreeAPI:
             errata_ids = self.cache.pkgid2errataids[pkg_id]
             for err_id in errata_ids:
                 name = self.cache.errataid2name[err_id]
-                issued = self.cache.errata_detail[name][ERRATA_ISSUED]
+                issued = format_datetime(self.cache.errata_detail[name][ERRATA_ISSUED])
                 cves = self.cache.errata_detail[name][ERRATA_CVE]
                 errata = {'name': name, 'issued': issued}
                 if cves:
                     errata['cve_list'] = cves
                 erratas.append(errata)
         return erratas
+
+    def _get_repositories(self, pkg_id):
+        # TODO Add support for modules and streams.
+        # TODO sort repositories by date from newest to oldest? Is it sorted in reposcan pkgtree?
+        repos = []
+        if pkg_id in self.cache.pkgid2repoids:
+            for repo_id in self.cache.pkgid2repoids[pkg_id]:
+                detail = self.cache.repo_detail[repo_id]
+                repos.append({
+                    'label': detail[REPO_LABEL],
+                    'name': detail[REPO_NAME],
+                    'basearch': none2empty(detail[REPO_BASEARCH]),
+                    'releasever': none2empty(detail[REPO_RELEASEVER]),
+                    'revision': format_datetime(detail[REPO_REVISION])
+                })
+        return repos
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
@@ -76,39 +92,27 @@ class PkgtreeAPI:
             pkgtreedata = pkgnamelist.setdefault(name, [])
             if name in self.cache.packagename2id:
                 name_id = self.cache.packagename2id[name]
+                # TODO right sorting of nevras according to pkgtree algorithm
                 pkg_ids = self._get_packages(name_id)
                 for pkg_id in pkg_ids:
                     pkg_nevra = self._build_nevra(pkg_id)
-                    errata = self._get_erratas(pkg_id)
                     # TODO Where does it come from this date? It is not in cache.
                     #      It looks like it is the date of the oldest errata. Is it oldest repo where it was published?
                     #      Check it out with related vmaas PR or bug report from jsvoboda
-                    # TODO first_published = TODO
-                    # TODO sort repositories by date from newest to oldest? Is it sorted in reposcan pkgtree?
-                    # TODO repositories = TODO
-                    # TODO right sorting of nevras according to pkgtree algorithm
+                    first_published = "2020-01-13T17:31:41+00:00"
+                    errata = self._get_erratas(pkg_id)
+                    repositories = self._get_repositories(pkg_id)
                     pkgtreedata.append(
                         {
                             "nevra": pkg_nevra,
-                            "first_published": "2020-01-13T17:31:41+00:00",
-                            "repositories": [
-                                {
-                                    "label": "rhel-8-for-s390x-appstream-rpms",
-                                    "name": "Red Hat Enterprise Linux 8 for IBM z Systems - AppStream (RPMs)",
-                                    "basearch": "x86_64",
-                                    "releasever": "6.9",
-                                    "revision": "2019-11-19T09:41:05+00:00",
-                                    "module_name": "postgresql",
-                                    "module_stream": "9.6"
-                                }
-                            ],
+                            "first_published": first_published,
+                            "repositories": repositories,
                             "errata": errata,
                         }
                     )
 
         response = {
             'package_name_list': pkgnamelist,
-            # TODO read this value properly as it is in DBCHANGE api
             'last_change': last_change,
         }
 

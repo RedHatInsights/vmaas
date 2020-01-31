@@ -83,9 +83,9 @@ errata_detail:
   - 2019-05-14 17:22:02
   - 2019-05-14 17:22:02
   - - CVE-2018-12126
-  - - CVE-2019-11091
-  - - CVE-2018-12130
-  - - CVE-2018-12127
+    - CVE-2019-11091
+    - CVE-2018-12130
+    - CVE-2018-12127
   - null
   - null
   - null
@@ -296,9 +296,9 @@ pkgid2errataids:
     444: null
   8210: !!set
     444: null
-  32222: !!set
+  8310: !!set
     111: null
-  332222: !!set
+  8320: !!set
     555: null
 pkgid2repoids:
   8110:
@@ -309,6 +309,11 @@ pkgid2repoids:
   - 1
   8210:
   - 1
+  8320:
+  - 2
+  - 3
+  - 4
+  - 5
 productid2repoids:
   1: !!set
     1: null
@@ -322,6 +327,42 @@ repo_detail:
   - Red Hat Enterprise Linux Server
   - 1
   - '2018-04-10T09:02:26+00:00'
+  2: !!python/tuple
+  - rhel-8-for-x86_64-rt-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
+  - null
+  - x86_64
+  - '8.1'
+  - null
+  - null
+  - '2020-01-03T05:24:17+00:00'
+  3: !!python/tuple
+  - rhel-8-for-x86_64-nfv-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
+  - null
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - '2019-09-20T06:25:14+00:00'
+  4: !!python/tuple
+  - rhel-8-for-x86_64-nfv-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
+  - null
+  - x86_64
+  - '8.1'
+  - null
+  - null
+  - '2020-01-03T05:24:24+00:00'
+  5: !!python/tuple
+  - rhel-8-for-x86_64-rt-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
+  - null
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - '2019-09-20T06:25:12+00:00'
 repolabel2ids:
   rhel-7-server-rpms:
   - 1
