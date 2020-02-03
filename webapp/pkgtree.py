@@ -7,18 +7,22 @@ Module to handle /pkgtree API calls.
 #            - 'nevr' is usually built for every architecture?
 #            - how is it returned from reposcan pkgtree? Also it includes architecture?
 
+from dateutil import parser as dateutil_parser
+
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
+from common.dateutil import parse_datetime
 from common.webapp_utils import format_datetime, join_packagename, none2empty
 
 
 # TODO add test - to check pkgtree order that is generated
 # TODO add test with 'my-pkg',
-# TODO - create file ./webapp/test/data/cache_pkgtree.yml that will contain
+# TODO - create file ./webapp/test/data/cache_pkgtiee.yml that will contain
 #        data for pkgtree tests - right ordering atp.
 #      - create that file from vmaas.dbm
 # TODO how to work with vmaas.dbm files? python 'shelve' module?
 # TODO add tests to test right order of returned PKG trees.
+# TODO use more utils from ./common/webapp_utils.py
 class PkgtreeAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
@@ -48,9 +52,11 @@ class PkgtreeAPI:
             errata_ids = self.cache.pkgid2errataids[pkg_id]
             for err_id in errata_ids:
                 name = self.cache.errataid2name[err_id]
-                issued = format_datetime(self.cache.errata_detail[name][ERRATA_ISSUED])
+                issued = self.cache.errata_detail[name][ERRATA_ISSUED]
                 cves = self.cache.errata_detail[name][ERRATA_CVE]
-                errata = {'name': name, 'issued': issued}
+                errata = {
+                    'name': name,
+                    'issued': none2empty(format_datetime(issued))}
                 if cves:
                     errata['cve_list'] = cves
                 erratas.append(errata)
@@ -71,6 +77,15 @@ class PkgtreeAPI:
                     'revision': format_datetime(detail[REPO_REVISION])
                 })
         return repos
+
+    def _get_first_published_from_erratas(self, erratas):
+        # 'first_published' is the 'issued' date of the oldest errata.
+        first_published = None
+        for ert in erratas:
+            issued = parse_datetime(ert['issued'])
+            if first_published is None or issued < first_published:
+                first_published = issued
+        return format_datetime(first_published)
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
@@ -96,18 +111,15 @@ class PkgtreeAPI:
                 pkg_ids = self._get_packages(name_id)
                 for pkg_id in pkg_ids:
                     pkg_nevra = self._build_nevra(pkg_id)
-                    # TODO Where does it come from this date? It is not in cache.
-                    #      It looks like it is the date of the oldest errata. Is it oldest repo where it was published?
-                    #      Check it out with related vmaas PR or bug report from jsvoboda
-                    first_published = "2020-01-13T17:31:41+00:00"
                     errata = self._get_erratas(pkg_id)
                     repositories = self._get_repositories(pkg_id)
+                    first_published = self._get_first_published_from_erratas(errata)
                     pkgtreedata.append(
                         {
                             "nevra": pkg_nevra,
-                            "first_published": first_published,
-                            "repositories": repositories,
-                            "errata": errata,
+                            "first_published": none2empty(first_published),
+                            "repositories": none2empty(repositories),
+                            "errata": none2empty(errata),
                         }
                     )
 
