@@ -46,7 +46,6 @@ class PkgtreeAPI:
         return join_packagename(name, epoch, ver, rel, arch)
 
     def _get_erratas(self, pkg_id):
-        # TODO sort erratas by date from newest to oldest? Is it sorted in reposcan pkgtree?
         erratas = []
         if pkg_id in self.cache.pkgid2errataids:
             errata_ids = self.cache.pkgid2errataids[pkg_id]
@@ -64,7 +63,6 @@ class PkgtreeAPI:
 
     def _get_repositories(self, pkg_id):
         # TODO Add support for modules and streams.
-        # TODO sort repositories by date from newest to oldest? Is it sorted in reposcan pkgtree?
         repos = []
         if pkg_id in self.cache.pkgid2repoids:
             for repo_id in self.cache.pkgid2repoids[pkg_id]:
