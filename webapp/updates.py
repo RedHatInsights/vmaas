@@ -390,30 +390,20 @@ class UpdatesAPI:
         else:
             security_only = data.get("security_only", False)
 
-        all_pkgs = data.get('package_list', None)
-        pkgs_not_in_cache = []
-        self.use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
-
-        if all_pkgs is not None:
-            for name in all_pkgs:
-                if self.use_hot_cache.upper() == "YES":
-                    resp = self.hot_cache.find(repo_ids_key + name + str(security_only))
-
-                    if resp is not None:
-                        UPDATES_CACHE_HITS.inc()
-                        response['update_list'][name] = resp
-                    else:
-                        UPDATES_CACHE_MISSES.inc()
-                        pkgs_not_in_cache.append(name)
-                else:
-                    # no need to put counter here as caching is disabled
-                    pkgs_not_in_cache.append(name)
-
-        # Start main processing of packages which are not in the hot cache
-        data['package_list'] = pkgs_not_in_cache
-
         # Return empty update list in case of empty input package list
         packages_to_process = self._process_input_packages(data, response)
+
+        self.use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
+        for name in list(packages_to_process.keys()):
+            if self.use_hot_cache.upper() == "YES":
+                resp = self.hot_cache.find(repo_ids_key + name + str(security_only))
+
+                if resp is not None:
+                    UPDATES_CACHE_HITS.inc()
+                    response['update_list'][name] = resp
+                    del packages_to_process[name]
+                else:
+                    UPDATES_CACHE_MISSES.inc()
 
         if not packages_to_process:
             return response
