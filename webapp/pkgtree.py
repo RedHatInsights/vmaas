@@ -7,7 +7,19 @@ Module to handle /pkgtree API calls.
 #            - 'nevr' is usually built for every architecture?
 #            - how is it returned from reposcan pkgtree? Also it includes architecture?
 
+
+# TODO 2020-02-04
+# TODO Add types to function arguments
+# TODO use natsort for sorting NEVRAs, erratas, repositories
+#      - rpm utils are not available
+#      - first_published cannot be used because it is not available for older versions
+# TODO 'first_published' is not mandatory for a NEVRA - update webapp.spec.yml?
+# TODO commit work
+# TODO ad tests for sorting
+
 from dateutil import parser as dateutil_parser
+from operator import attrgetter
+from natsort import natsorted
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
@@ -57,9 +69,9 @@ class PkgtreeAPI:
                     'name': name,
                     'issued': none2empty(format_datetime(issued))}
                 if cves:
-                    errata['cve_list'] = cves
+                    errata['cve_list'] = natsorted(cves)
                 erratas.append(errata)
-        return erratas
+        return natsorted(erratas, key=lambda err_dict: err_dict['name'])
 
     def _get_repositories(self, pkg_id):
         # TODO Add support for modules and streams.
@@ -74,7 +86,7 @@ class PkgtreeAPI:
                     'releasever': none2empty(detail[REPO_RELEASEVER]),
                     'revision': format_datetime(detail[REPO_REVISION])
                 })
-        return repos
+        return natsorted(repos, key=lambda repo_dict: repo_dict['label'])
 
     def _get_first_published_from_erratas(self, erratas):
         # 'first_published' is the 'issued' date of the oldest errata.
@@ -84,6 +96,12 @@ class PkgtreeAPI:
             if first_published is None or issued < first_published:
                 first_published = issued
         return format_datetime(first_published)
+
+    def _order_nevras_by_published_date(self):
+        # TODO ADD tests for pkgtre sorting of nevras
+        # Chronological ordering of nevras from oldest to newest.
+        pass
+        # use natsort
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
@@ -102,17 +120,16 @@ class PkgtreeAPI:
             return pkgnamelist
 
         for name in names:
-            pkgtreedata = pkgnamelist.setdefault(name, [])
+            pkgtree_list = pkgnamelist.setdefault(name, [])
             if name in self.cache.packagename2id:
                 name_id = self.cache.packagename2id[name]
-                # TODO right sorting of nevras according to pkgtree algorithm
                 pkg_ids = self._get_packages(name_id)
                 for pkg_id in pkg_ids:
                     pkg_nevra = self._build_nevra(pkg_id)
                     errata = self._get_erratas(pkg_id)
                     repositories = self._get_repositories(pkg_id)
                     first_published = self._get_first_published_from_erratas(errata)
-                    pkgtreedata.append(
+                    pkgtree_list.append(
                         {
                             "nevra": pkg_nevra,
                             "first_published": none2empty(first_published),
@@ -120,6 +137,7 @@ class PkgtreeAPI:
                             "errata": none2empty(errata),
                         }
                     )
+            pkgnamelist[name] = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
 
         response = {
             'package_name_list': pkgnamelist,
