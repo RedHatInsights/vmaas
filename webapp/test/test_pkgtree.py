@@ -23,6 +23,10 @@ EMPTY_RESPONSE = {"package_name_list": {"": []}}
 NON_EXIST_RESPONSE = {"package_name_list": {"non-exist": []}}
 
 
+# TODO add tests for sorting
+# TODO add tests for modularity
+
+
 class TestPkgtreeAPI(TestBase):
     """Test pkgtree api class."""
 
@@ -103,3 +107,30 @@ class TestPkgtreeAPI(TestBase):
         assert 'last_change' in response
         response = self.pkg_api.process_list(1, PKGS_JSON)
         assert 'last_change' in response
+
+    def test_sorting_nevras(self):
+        """Test sorting of NEVRAs in pkgtree api response."""
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        nevras = [val['nevra'] for val in response['package_name_list'][PKG]]
+        expected = ['kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64',
+                    'kernel-rt-4.18.0-80.rt9.138.el8.x86_64']
+        assert nevras == expected
+
+    def test_sorting_erratas(self):
+        """Test sorting of erratas in pkgtree api response."""
+        # Errata
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        erratas = response['package_name_list'][PKG][-1]['errata']
+        assert erratas[0]['name'] == 'RHSA-2019:1174'
+        assert erratas[1]['name'] == 'RHSA-2019:1175'
+        # CVE
+        assert erratas[0]['cve_list'] == ['CVE-2018-12126', 'CVE-2018-12127', 'CVE-2018-12130', 'CVE-2019-11091']
+        assert erratas[1]['cve_list'] == ['CVE-2018-10126']
+
+    def test_sorting_repositories(self):
+        """Test sorting of repositories in pkgtree api response."""
+        response = self.pkg_api.process_list(1, PKG_JSON)
+        repos = [val['label'] for val in response['package_name_list'][PKG][-1]['repositories']]
+        expected = ['rhel-8-for-x86_64-nfv-rpms', 'rhel-8-for-x86_64-nfv-rpms',
+                    'rhel-8-for-x86_64-rt-rpms', 'rhel-8-for-x86_64-rt-rpms']
+        assert repos == expected

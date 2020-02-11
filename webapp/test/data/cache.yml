@@ -92,10 +92,27 @@ errata_detail:
   - null
   - null
   - null
+  RHSA-2019:1175: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2019-06-14 18:22:02
+  - 2019-05-14 18:22:02
+  - - CVE-2018-10126
+  - null
+  - null
+  - null
+  - null
+  - null
+  - null
 errataid2name:
   111: RHEA-2011:0895
   444: RHBA-2015:0364
   555: RHSA-2019:1174
+  556: RHSA-2019:1175
 errataid2repoids:
   444: !!set
     1: null
@@ -300,6 +317,7 @@ pkgid2errataids:
     111: null
   8320: !!set
     555: null
+    556: null
 pkgid2repoids:
   8110:
   - 1
