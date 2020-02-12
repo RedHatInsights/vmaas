@@ -1,0 +1,27 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          login-server: quay.io
+      - name: Build and run VMaaS
+        run: docker-compose up --build -d
+      - name: Wait for build
+        run: |
+          resp=1
+          while [ "$resp" -ne 0 ]; do 
+            curl http://localhost:8080/api/v1/monitoring/health
+            resp=$?
+          done
+      - name: Sync VMaaS repolist
+        run: |
+          echo ${{ secrets.REPOLIST_JSON }} > repolist.json
