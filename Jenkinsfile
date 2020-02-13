@@ -10,8 +10,10 @@
 // Code coverage failure threshold
 codecovThreshold = 89
 
-pipelineUtils.cancelPriorBuilds()
-runStages()
+if (env.BRANCH_NAME == 'master') {
+    pipelineUtils.cancelPriorBuilds()
+    runStages()
+}
 
 def deployVmaas(project) {
     gitUtils.withStatusContext("deploy") {
