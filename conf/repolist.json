@@ -1,0 +1,93 @@
+[{
+  "products": {
+    "Red Hat Enterprise Linux Server": {
+      "redhat_eng_product_id": 69,
+      "content_sets": {
+        "rhel-7-server-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/server/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64", "ppc64"],
+          "releasever": ["7Server", "7.7"]
+        },
+        "rhel-8-for-x86_64-appstream-rpms": {
+          "name": "Red Hat Enterprise Linux 8.1 for x86_64 - AppStream (RPMs)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/appstream/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["8.1"]
+        }
+      }
+    },
+    "Red Hat Enterprise Linux Workstation": {
+      "content_sets": {
+        "rhel-7-workstation-rpms": {
+          "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/workstation/7/$releasever/$basearch/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["7Workstation"]
+        }
+      }
+    },
+    "VMaaS testing - same product": {
+      "content_sets": {
+        "vmaas-test-1": {
+          "name": "VMaaS testing repo 1 - arch2noar update",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-1/",
+          "basearch": ["x86_64"],
+          "releasever": ["7"]
+        },
+        "vmaas-test-2": {
+          "name": "VMaaS testing repo 2 - update in different repo",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-2/",
+          "basearch": ["x86_64"],
+          "releasever": ["7"]
+        }
+      }
+    },
+    "VMaaS testing - different product": {
+      "content_sets": {
+        "vmaas-test-3": {
+          "name": "VMaaS testing repo 3 - update in different repo - different product",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
+          "basearch": ["x86_64"],
+          "releasever": ["7"]
+        }
+      }
+    },
+    "VMaaS testing - empty basearch": {
+      "content_sets": {
+        "vmaas-test-4": {
+          "name": "VMaaS testing repo 4 - empty basearch (same repo as vmaas-test-3)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
+          "basearch": [""],
+          "releasever": ["6"]
+        }
+      }
+    },
+    "VMaaS testing - architectures": {
+      "content_sets": {
+        "vmaas-test-i386": {
+          "name": "VMaaS testing i386 arch repo",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-i386/",
+          "basearch": ["i386"],
+          "releasever": ["6"]
+        },
+        "vmaas-test-x86_64": {
+          "name": "VMaaS testing x86_64 arch repo",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-x86_64/",
+          "basearch": ["x86_64"],
+          "releasever": ["7"]
+        }
+      }
+    },
+    "VMaaS testing - modularity": {
+      "content_sets": {
+        "vmaas-test-rhel8-module": {
+          "name": "VMaaS testing RHEL8 modularity repo",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/module_repo/",
+          "basearch": ["x86_64"],
+          "releasever": ["8"]
+        }
+      }
+    }
+  }
+}]
