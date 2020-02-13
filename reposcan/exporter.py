@@ -496,6 +496,7 @@ class DataDump:
 
 class SqliteDump:
     """Class for creating sqlite disk dump from database."""
+
     def __init__(self, db_instance, filename):
         self.db_instance = db_instance
         self.filename = filename
@@ -526,7 +527,7 @@ class SqliteDump:
                 self._dump_cves(dump)
                 self._dump_modules(dump)
                 self._dump_dbchange(dump, timestamp)
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump")
             remove_file_if_exists(dump_filename)
@@ -543,7 +544,7 @@ class SqliteDump:
     def _dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
         dump.execute("""create table if not exists packagename (
-                                id integer,
+                                id integer primary key,
                                 packagename text
                                 )""")
         with self._named_cursor() as cursor:
@@ -592,7 +593,7 @@ class SqliteDump:
     def _dump_evr(self, dump):
         """Select all evrs and put them into dictionary"""
         dump.execute("""create table if not exists evr (
-                                id integer,
+                                id integer primary key,
                                 epoch integer,
                                 version text,
                                 release text
@@ -605,7 +606,7 @@ class SqliteDump:
     def _dump_arch(self, dump):
         """Select all archs and put them into dictionary"""
         dump.execute("""create table if not exists arch (
-                                id integer,
+                                id integer primary key,
                                 arch text
                                )""")
         with self._named_cursor() as cursor:
@@ -627,16 +628,16 @@ class SqliteDump:
     def _dump_package_details(self, dump):
         """Select details about packages (for previously selected package names)"""
         dump.execute("""create table if not exists string (
-                                id text,
+                                id integer primary key,
                                 string text
                                )""")
         dump.execute("""create table if not exists package_detail (
-                                id text,
+                                id integer primary key,
                                 name_id integer,
                                 evr_id integer,
                                 arch_id integer,
-                                summary_id text,
-                                description_id text,
+                                summary_id integer,
+                                description_id integer,
                                 source_package_id integer
                                )""")
         if self.packagename_ids:
@@ -659,7 +660,7 @@ class SqliteDump:
     def _dump_repo(self, dump):
         """Select repo mappings"""
         dump.execute("""create table if not exists repo_detail (
-                                id integer,
+                                id integer primary key,
                                 label text,
                                 name text,
                                 url text,
@@ -687,14 +688,15 @@ class SqliteDump:
                                  """)
             for oid, label, name, url, basearch, releasever, product, product_id, revision in cursor:
                 dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                                (oid, label, name, url, basearch,
-                                                 releasever, product, product_id,
-                                                 format_datetime(revision)))
+                             (oid, label, name, url, basearch,
+                              releasever, product, product_id,
+                              format_datetime(revision)))
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,
-                                repo_id integer
-                               )""")
+                                repo_id integer,
+                                primary key (pkg_id, repo_id)
+                               ) without rowid""")
         if self.package_ids:
             # Select package ID to repo IDs mapping
             with self._named_cursor() as cursor:
@@ -709,7 +711,7 @@ class SqliteDump:
         """Select errata mappings"""
         # Select errata ID to name mapping
         dump.execute("""create table if not exists errata_detail (
-                                id integer,
+                                id integer primary key,
                                 name text,
                                 synopsis text,
                                 summary text,
@@ -732,16 +734,19 @@ class SqliteDump:
 
         dump.execute("""create table if not exists pkg_errata (
                                 pkg_id integer,
-                                errata_id integer
-                                )""")
+                                errata_id integer,
+                                primary key (pkg_id, errata_id)
+                                ) without rowid""")
         dump.execute("""create table if not exists errata_repo (
                                 errata_id integer,
-                                repo_id integer
-                                )""")
+                                repo_id integer,
+                                primary key(errata_id, repo_id)
+                                ) without rowid""")
         dump.execute("""create table if not exists errata_cve (
                                 errata_id integer,
-                                cve text
-                               )""")
+                                cve_id integer,
+                                primary key(errata_id, cve_id)
+                               ) without rowid""")
         dump.execute("""create table if not exists errata_refs (
                                 errata_id integer,
                                 ref text
@@ -760,7 +765,8 @@ class SqliteDump:
         dump.execute("""create table if not exists errata_modulepkg (
                                 errata_id integer,
                                 module_stream_id integer,
-                                pkg_id integer
+                                pkg_id integer,
+                                primary key(errata_id, module_stream_id, pkg_id)
                                )""")
         if self.errata_ids:
             # Select package ID to errata IDs mapping, only for relevant errata
@@ -770,7 +776,7 @@ class SqliteDump:
                                    where errata_id in %s
                                 """, [tuple(self.errata_ids)])
                 for pkg_id, errata_id in cursor:
-                    dump.execute("insert into pkg_errata values (?, ?)", (pkg_id, errata_id))
+                    dump.execute("insert or ignore into pkg_errata values (?, ?)", (pkg_id, errata_id))
 
             # Select errata ID to repo IDs mapping, only for relevant errata
             with self._named_cursor() as cursor:
@@ -779,17 +785,17 @@ class SqliteDump:
                                    where errata_id in %s
                                 """, [tuple(self.errata_ids)])
                 for errata_id, repo_id in cursor:
-                    dump.execute("insert into errata_repo values (?, ?)", (errata_id, repo_id))
+                    dump.execute("insert or ignore into errata_repo values (?, ?)", (errata_id, repo_id))
 
             # Select errata detail for errata API
             with self._named_cursor() as cursor:
-                cursor.execute("""SELECT errata_cve.errata_id, cve.name
+                cursor.execute("""SELECT errata_cve.errata_id, cve.id
                                     FROM cve
                                     JOIN errata_cve ON cve_id = cve.id
                                    WHERE errata_id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, cve_name in cursor:
-                    dump.execute("insert into errata_cve values (?, ?)", (errata_id, cve_name))
+                    dump.execute("insert or ignore into errata_cve values (?, ?)", (errata_id, cve_name))
 
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata_id, type, name FROM errata_refs
@@ -813,7 +819,7 @@ class SqliteDump:
                                   AND p.errata_id in %s""", [tuple(self.errata_ids)])
                 for errata_id, module_name, module_stream_name, module_version, module_context in cursor:
                     dump.execute("insert into errata_module values (?, ?, ?, ?, ?)",
-                                    (errata_id, module_name, module_stream_name, module_version, module_context))
+                                 (errata_id, module_name, module_stream_name, module_version, module_context))
             # Select module to package ID mapping
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct errata_id, module_stream_id, pkg_id
@@ -838,11 +844,11 @@ class SqliteDump:
                     description, solution, issued, updated in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
                     dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                     (errata_id, e_name,
-                                      synopsis, summary, e_type,
-                                      e_severity, description,
-                                      solution, issued, updated, url)
-                                      )
+                                 (errata_id, e_name,
+                                  synopsis, summary, e_type,
+                                  e_severity, description,
+                                  solution, issued, updated, url)
+                                 )
 
     def _dump_cves(self, dump):
         """Select cve details"""
@@ -855,20 +861,20 @@ class SqliteDump:
                                 pkg_id integer
                                )""")
         dump.execute("""create table if not exists cve_detail (
-                                cve_id integer,
-                                     name text,
-                                     redhat_url text,
-                                     secondary_url text,
-                                     cvss3_score float,
-                                     cvss3_metrics text,
-                                     impact text,
-                                     published_date datetime,
-                                     modified_date datetime,
-                                     iava text,
-                                     description text,
-                                     cvss2_score float,
-                                     cvss2_metrics text,
-                                     source text
+                                id integer primary key ,
+                                name text,
+                                redhat_url text,
+                                secondary_url text,
+                                cvss3_score float,
+                                cvss3_metrics text,
+                                impact text,
+                                published_date datetime,
+                                modified_date datetime,
+                                iava text,
+                                description text,
+                                cvss2_score float,
+                                cvss2_metrics text,
+                                source text
                                )""")
         # Select CWE to CVE mapping
         cveid2cwe = {}
@@ -940,7 +946,7 @@ class SqliteDump:
                                 join module m on s.module_id = m.id
                            """)
             for name, stream_name, stream_id in cursor:
-                dump.execute("insert into module_stream values (?, ?, ?)", (stream_id,  name, stream_name))
+                dump.execute("insert into module_stream values (?, ?, ?)", (stream_id, name, stream_name))
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
@@ -969,6 +975,8 @@ def main(filename):
     data = SqliteDump(db_instance, filename)
     data.dump()
 
+    data2 = DataDump(db_instance, filename + "m")
+    data2.dump()
 
 if __name__ == '__main__':
     main(DUMP)
