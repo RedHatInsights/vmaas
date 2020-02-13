@@ -145,8 +145,6 @@ class TestPkgtreeAPI(TestBase):
     def test_pkgname_multiple_items(self):
         """Test pkgtree api with several package names."""
         response = self.pkg_api.process_list(1, PKGS_JSON)
-        import pprint
-        pprint.pprint(response)
         assert response == RESPONSE_PKGS
 
     def test_pkgname_empty_list(self):

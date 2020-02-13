@@ -2,10 +2,6 @@
 Module to handle /pkgtree API calls.
 """
 
-# TODO Add types to function arguments
-
-from dateutil import parser as dateutil_parser
-from operator import attrgetter
 from natsort import natsorted
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
