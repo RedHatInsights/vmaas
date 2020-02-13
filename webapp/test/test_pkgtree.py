@@ -5,7 +5,7 @@ from test import schemas
 from test import tools
 from test.conftest import TestBase
 
-import decimal  # Necessary for loading successfully test data from .yml file
+#import decimal  # Necessary for loading successfully test data from .yml file
 
 import pytest
 
@@ -15,16 +15,81 @@ PKG = 'kernel-rt'
 PKGS = ['kernel', 'kernel-rt']
 PKG_JSON = {"package_name_list": [PKG]}
 PKGS_JSON = {"package_name_list": PKGS}
+
+RESPONSE_PKG = {
+    'last_change': '2019-03-07T09:17:23.799995',
+    'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
+                                                     'name': 'RHEA-2011:0895'}],
+                                         'first_published': '2011-06-23T00:00:00',
+                                         'nevra': 'kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64',
+                                         'repositories': []},
+                                        {'errata': [{'cve_list': ['CVE-2018-12126',
+                                                                  'CVE-2018-12127',
+                                                                  'CVE-2018-12130',
+                                                                  'CVE-2019-11091'],
+                                                     'issued': '2019-05-14T17:22:02',
+                                                     'name': 'RHSA-2019:1174'},
+                                                    {'cve_list': ['CVE-2018-10126'],
+                                                     'issued': '2019-06-14T18:22:02',
+                                                     'name': 'RHSA-2019:1175'}],
+                                         'first_published': '2019-05-14T17:22:02',
+                                         'nevra': 'kernel-rt-4.18.0-80.rt9.138.el8.x86_64',
+                                         'repositories': [{'basearch': 'x86_64',
+                                                           'label': 'rhel-8-for-x86_64-nfv-rpms',
+                                                           'name': 'Red Hat '
+                                                                   'Enterprise '
+                                                                   'Linux 8 for '
+                                                                   'x86_64 - Real '
+                                                                   'Time for NFV '
+                                                                   '(RPMs)',
+                                                           'releasever': '8.0',
+                                                           'revision': '2019-09-20T06:25:14+00:00'},
+                                                          {'basearch': 'x86_64',
+                                                           'label': 'rhel-8-for-x86_64-nfv-rpms',
+                                                           'name': 'Red Hat '
+                                                                   'Enterprise '
+                                                                   'Linux 8 for '
+                                                                   'x86_64 - Real '
+                                                                   'Time for NFV '
+                                                                   '(RPMs)',
+                                                           'releasever': '8.1',
+                                                           'revision': '2020-01-03T05:24:24+00:00'},
+                                                          {'basearch': 'x86_64',
+                                                           'label': 'rhel-8-for-x86_64-rt-rpms',
+                                                           'name': 'Red Hat '
+                                                                   'Enterprise '
+                                                                   'Linux 8 for '
+                                                                   'x86_64 - Real '
+                                                                   'Time (RPMs)',
+                                                           'releasever': '8.1',
+                                                           'revision': '2020-01-03T05:24:17+00:00'},
+                                                          {'basearch': 'x86_64',
+                                                           'label': 'rhel-8-for-x86_64-rt-rpms',
+                                                           'name': 'Red Hat '
+                                                                   'Enterprise '
+                                                                   'Linux 8 for '
+                                                                   'x86_64 - Real '
+                                                                   'Time (RPMs)',
+                                                           'releasever': '8.0',
+                                                           'revision': '2019-09-20T06:25:12+00:00'}]}]}
+}
+
+RESPONSE_PKGS = {
+    'last_change': '2019-03-07T09:17:23.799995',
+    'package_name_list': {'kernel': [{'errata': [],
+                                      'first_published': '',
+                                      'nevra': 'kernel-4.18.0-80.el8.x86_64',
+                                      'repositories': []}],
+                          PKG: RESPONSE_PKG['package_name_list'][PKG]}
+}
+
+
 PKG_JSON_EMPTY_LIST = {"package_name_list": [""]}
 PKG_JSON_NON_EXIST = {"package_name_list": ["non-exist"]}
 
 
 EMPTY_RESPONSE = {"package_name_list": {"": []}}
 NON_EXIST_RESPONSE = {"package_name_list": {"non-exist": []}}
-
-
-# TODO add tests for sorting
-# TODO add tests for modularity
 
 
 class TestPkgtreeAPI(TestBase):
@@ -54,7 +119,8 @@ class TestPkgtreeAPI(TestBase):
             schemas.pkgtree_list_schema.validate(response["package_name_list"][pkg])
             assert len(response["package_name_list"][pkg]) >= 1  # At least one NEVRA for a package name is expected
 
-    @pytest.mark.xfail
+    # FIXME Add support for modules and streams to pkgtree and cache.yml test data.
+    @pytest.mark.xfail  # pylint: disable=R0201
     def test_schema_rhel8_modularity(self):
         """Test pkgtree api response with rhel8 modularity respositories."""
         # For rhel8 modularity the only difference is that the rhel-8 nevras contain repositories
@@ -62,7 +128,6 @@ class TestPkgtreeAPI(TestBase):
         response = self.pkg_api.process_list(1, PKG_JSON)
         # Find rhel-8 nevra
         rhel8_repos = None
-        # TODO Add support for modules and streams to pkgtree and cache.yml test data
         for name in response['package_name_list'][PKG]:
             if name['nevra'].endswith('.el8.x86_64'):
                 rhel8_repos = name['repositories']
@@ -72,20 +137,17 @@ class TestPkgtreeAPI(TestBase):
             assert 'module_name' in repo
             assert 'module_stream' in repo
 
-    #@pytest.mark.xfail
-    def test_pkgname_one_item(self):  # pylint: disable=R0201
+    def test_pkgname_one_item(self):
         """Test pkgtree api with one package name."""
-        # TODO - Is it acutally useful or possible to have a test like this?
         response = self.pkg_api.process_list(1, PKG_JSON)
+        assert response == RESPONSE_PKG
+
+    def test_pkgname_multiple_items(self):
+        """Test pkgtree api with several package names."""
+        response = self.pkg_api.process_list(1, PKGS_JSON)
         import pprint
         pprint.pprint(response)
-        assert False
-
-    @pytest.mark.xfail
-    def test_pkgname_multiple_items(self):  # pylint: disable=R0201
-        """Test pkgtree api with several package names."""
-        # TODO - Is it acutally useful or possible to have a test like this?
-        assert False
+        assert response == RESPONSE_PKGS
 
     def test_pkgname_empty_list(self):
         """Test pkgtree api with empty package_name_list."""

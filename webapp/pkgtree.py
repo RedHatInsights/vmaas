@@ -2,20 +2,7 @@
 Module to handle /pkgtree API calls.
 """
 
-# TODO FIXME - suggested SPEC.yaml and examples does not contain arch.
-#              how to handle arch? should it be returned or ust use 'nevr' without arch?
-#            - 'nevr' is usually built for every architecture?
-#            - how is it returned from reposcan pkgtree? Also it includes architecture?
-
-
-# TODO 2020-02-04
 # TODO Add types to function arguments
-# TODO use natsort for sorting NEVRAs, erratas, repositories
-#      - rpm utils are not available
-#      - first_published cannot be used because it is not available for older versions
-# TODO 'first_published' is not mandatory for a NEVRA - update webapp.spec.yml?
-# TODO commit work
-# TODO ad tests for sorting
 
 from dateutil import parser as dateutil_parser
 from operator import attrgetter
@@ -27,14 +14,6 @@ from common.dateutil import parse_datetime
 from common.webapp_utils import format_datetime, join_packagename, none2empty
 
 
-# TODO add test - to check pkgtree order that is generated
-# TODO add test with 'my-pkg',
-# TODO - create file ./webapp/test/data/cache_pkgtiee.yml that will contain
-#        data for pkgtree tests - right ordering atp.
-#      - create that file from vmaas.dbm
-# TODO how to work with vmaas.dbm files? python 'shelve' module?
-# TODO add tests to test right order of returned PKG trees.
-# TODO use more utils from ./common/webapp_utils.py
 class PkgtreeAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
@@ -74,7 +53,7 @@ class PkgtreeAPI:
         return natsorted(erratas, key=lambda err_dict: err_dict['name'])
 
     def _get_repositories(self, pkg_id):
-        # TODO Add support for modules and streams.
+        # FIXME Add support for modules and streams.
         repos = []
         if pkg_id in self.cache.pkgid2repoids:
             for repo_id in self.cache.pkgid2repoids[pkg_id]:
@@ -96,12 +75,6 @@ class PkgtreeAPI:
             if first_published is None or issued < first_published:
                 first_published = issued
         return format_datetime(first_published)
-
-    def _order_nevras_by_published_date(self):
-        # TODO ADD tests for pkgtre sorting of nevras
-        # Chronological ordering of nevras from oldest to newest.
-        pass
-        # use natsort
 
     def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
         """
