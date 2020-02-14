@@ -46,15 +46,12 @@ class CvemapStore(CveStoreCommon):
                                                         cvss3_score, cvss3_metrics, iava,
                                                         redhat_url, secondary_url, source_id,
                                                         cvss2_score, cvss2_metrics)
-                                              values %s on conflict on constraint cve_name_key
-                                              do update set source_id = (select id from cve_source
-                                                                         where name = 'Red Hat')
-                                              returning cve.id, cve.name""",
+                                              values %s returning id, name""",
                                list(to_import), page_size=len(to_import))
                 for row in cur.fetchall():
                     cve_data[row[1]]["id"] = row[0]
                 self.conn.commit()
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while importing CVEs")
                 FAILED_IMPORT_CVE.inc()
                 self.conn.rollback()
@@ -86,7 +83,7 @@ class CvemapStore(CveStoreCommon):
                                   cvss2_score, cvss2_metrics)
                                   where cve.id = v.id """,
                                list(to_update), page_size=len(to_update), template=tmpl_str)
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while updating CVEs")
                 FAILED_UPDATE_CVE.inc()
                 self.conn.rollback()
@@ -118,7 +115,7 @@ class CvemapStore(CveStoreCommon):
                                  iava, redhat_url,
                                  secondary_url, source_id,
                                  cvss2_score, cvss2_metrics
-                                 from cve where source_id = %s""", (rh_source_id,))
+                                 from cve""")
         #
         # find and merge cves that have already been loaded
         #
