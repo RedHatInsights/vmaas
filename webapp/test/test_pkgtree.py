@@ -5,8 +5,6 @@ from test import schemas
 from test import tools
 from test.conftest import TestBase
 
-#import decimal  # Necessary for loading successfully test data from .yml file
-
 import pytest
 
 from pkgtree import PkgtreeAPI

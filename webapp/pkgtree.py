@@ -63,7 +63,7 @@ class PkgtreeAPI:
                 })
         return natsorted(repos, key=lambda repo_dict: repo_dict['label'])
 
-    def _get_first_published_from_erratas(self, erratas):
+    def _get_first_published_from_erratas(self, erratas):  # pylint: disable=R0201
         # 'first_published' is the 'issued' date of the oldest errata.
         first_published = None
         for ert in erratas:
@@ -72,7 +72,7 @@ class PkgtreeAPI:
                 first_published = issued
         return format_datetime(first_published)
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument,R0201
+    def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns list of NEVRAs for given packge name.
 
