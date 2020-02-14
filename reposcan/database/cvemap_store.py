@@ -126,15 +126,15 @@ class CvemapStore(CveStoreCommon):
         # [9]iava, [10]redhat_url, [11]secondary_url,
         # [13]cvss2_score, [14]cvss2_metrics,
         cols = {
-            'description':3,
-            'published_date':5,
-            'modified_date':6,
-            'cvss3_score':7,
+            'description': 3,
+            'published_date': 5,
+            'modified_date': 6,
+            'cvss3_score': 7,
             'cvss3_metrics': 8,
-            'iava':9,
-            'redhat_url':10,
-            'secondary_url':11,
-            'cvss2_score':13,
+            'iava': 9,
+            'redhat_url': 10,
+            'secondary_url': 11,
+            'cvss2_score': 13,
             'cvss2_metrics': 14}
 
         to_delete = []
