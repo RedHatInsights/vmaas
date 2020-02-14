@@ -2,7 +2,7 @@
 Module to handle /pkgtree API calls.
 """
 
-from natsort import natsorted
+from natsort import natsorted  # pylint: disable=E0401
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
