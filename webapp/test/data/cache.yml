@@ -68,7 +68,8 @@ errata_detail:
   - 2011-06-23 00:00:00
   - 2011-06-23 00:00:00
   - null
-  - null
+  - - 8320
+  - - 83200
   - null
   - null
   - null
@@ -86,8 +87,8 @@ errata_detail:
     - CVE-2019-11091
     - CVE-2018-12130
     - CVE-2018-12127
-  - null
-  - null
+  - - 8320
+  - - 83200
   - null
   - null
   - null
@@ -102,8 +103,8 @@ errata_detail:
   - 2019-06-14 18:22:02
   - 2019-05-14 18:22:02
   - - CVE-2018-10126
-  - null
-  - null
+  - - 8320
+  - - 83200
   - null
   - null
   - null
@@ -253,25 +254,25 @@ package_details:
   - 332222
   - 310
   - 7
-  - null
-  - null
-  - null
+  - 0
+  - 0
+  - 0
   # kernel-rt-4.18.0-80.rt9.138.el8.x86_64
   8320: !!python/tuple # name_id, evr_id, arch_id
   - 332222
   - 320
   - 7
-  - null
-  - null
-  - null
+  - 0
+  - 0
+  - 0
   # kernel-4.18.0-80.el8.x86_64
   8410:
   - 32222
   - 410
   - 7
-  - null
-  - null
-  - null
+  - 0
+  - 0
+  - 0
 packagename2id:
   my-pkg: 2222
   kernel: 32222
@@ -403,3 +404,5 @@ updates_index:
 src_pkg_id2pkg_ids:
   81100:
     - 8110
+  83200:
+    - 8320
