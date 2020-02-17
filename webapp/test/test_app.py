@@ -113,6 +113,13 @@ class TestWebappPosts(BaseCase):
         assert HTTPStatus.OK == resp.status
         assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
 
+    async def test_pkgtree_post_1(self):
+        """Test pkgtree post endpoint."""
+        body = """{"package_name_list": ["my-pkg"]}"""
+        resp = await self.fetch('/api/v1/pkgtree', method='POST', data=body)
+        assert HTTPStatus.OK == resp.status
+        assert resp.body[:60] == '{"package_name_list": {"my-pkg": [{"nevra": "my-pkg-1.1.0-1.'
+
     async def test_vulnerabilities_post_1(self):
         """Test vulnerabilities post endpoint."""
         body = """{"package_list": ["my-pkg-1.1.0-1.el8.i686"]}"""
@@ -190,6 +197,12 @@ class TestWebappGets(BaseCase):
         resp = await self.fetch('/api/v1/packages/my-pkg-1.1.0-1^.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
         assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
+
+    async def test_pkgtree_get_1(self):
+        """Test pkgtree get endpoint."""
+        resp = await self.fetch('/api/v1/pkgtree/my-pkg', method='GET')
+        assert HTTPStatus.OK == resp.status
+        assert resp.body[:60] == '{"package_name_list": {"my-pkg": [{"nevra": "my-pkg-1.1.0-1.'
 
     async def test_dbchange(self):
         """Test dbchange endpoint."""
