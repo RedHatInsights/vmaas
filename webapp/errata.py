@@ -93,7 +93,7 @@ class ErrataAPI:
                 "synopsis": none2empty(errata_detail[ERRATA_SYNOPSIS]),
                 "summary": none2empty(errata_detail[ERRATA_SUMMARY]),
                 "type": none2empty(errata_detail[ERRATA_TYPE]),
-                "severity": none2empty(errata_detail[ERRATA_SEVERITY]),
+                "severity": errata_detail[ERRATA_SEVERITY],
                 "description": none2empty(errata_detail[ERRATA_DESCRIPTION]),
                 "solution": none2empty(errata_detail[ERRATA_SOLUTION]),
                 "issued": none2empty(format_datetime(errata_detail[ERRATA_ISSUED])),
