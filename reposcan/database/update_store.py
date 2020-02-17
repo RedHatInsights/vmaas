@@ -111,12 +111,13 @@ class UpdateStore(ObjectStore):
                 import_data = []
                 for update in updates:
                     if (update["id"],) in names:
-                        import_data.append((update["id"], update["title"],
-                                            errata_severity_map[str(update["severity"])],
-                                            errata_type_map[str(update["type"])],
-                                            update["summary"], update["description"],
-                                            update["issued"], update["updated"],
-                                            update["solution"]))
+                        import_data.append(
+                            (update["id"], update["title"],
+                             errata_severity_map[update["severity"]] if update["severity"] is not None else None,
+                             errata_type_map[str(update["type"])],
+                             update["summary"], update["description"],
+                             update["issued"], update["updated"],
+                             update["solution"]))
                 execute_values(cur,
                                """insert into errata (name, synopsis, severity_id,
                                errata_type_id, summary, description, issued, updated,
@@ -125,7 +126,7 @@ class UpdateStore(ObjectStore):
                 for row in cur.fetchall():
                     update_map[row[1]] = row[0]
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure inserting into errata.")
             self.conn.rollback()
         finally:

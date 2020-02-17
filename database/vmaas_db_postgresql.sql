@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS errata (
   id SERIAL,
   name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
   synopsis TEXT, CHECK (NOT empty(synopsis)),
-  severity_id INT NOT NULL,
+  severity_id INT,
   errata_type_id INT NOT NULL,
   summary TEXT, CHECK (NOT empty(summary)),
   description TEXT, CHECK (NOT empty(description)),
