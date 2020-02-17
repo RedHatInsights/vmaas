@@ -758,6 +758,7 @@ components:
               severity:
                 type: string
                 example: Important
+                nullable: true
               reference_list:
                 type: array
                 items:
