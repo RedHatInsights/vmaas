@@ -27,32 +27,32 @@ def deployVmaas(project) {
             // build vmaas-webapp from Dockerfile-webapp-qe - it won't start main.py
             sh """
                 # Create an env.yaml to have the builder pull from a different branch
-                echo "vmaas/vmaas-reposcan:" >> builder-env.yml
-                echo "  parameters:" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                echo "vmaas/vmaas-webapp:" >> builder-env.yml
-                echo "  parameters:" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                echo "    DOCKERFILE_PATH: webapp/Dockerfile-qe" >> builder-env.yml
-                echo "vmaas/vmaas-websocket:" >> builder-env.yml
-                echo "  parameters:" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
-                echo "vmaas/vmaas-db:" >> builder-env.yml
-                echo "  parameters:" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> builder-env.yml
-                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> builder-env.yml
+                echo "vmaas/vmaas-reposcan:" >> env/builder-env.yml
+                echo "  parameters:" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> env/builder-env.yml
+                echo "vmaas/vmaas-webapp:" >> env/builder-env.yml
+                echo "  parameters:" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> env/builder-env.yml
+                echo "    DOCKERFILE_PATH: webapp/Dockerfile-qe" >> env/builder-env.yml
+                echo "vmaas/vmaas-websocket:" >> env/builder-env.yml
+                echo "  parameters:" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> env/builder-env.yml
+                echo "vmaas/vmaas-database:" >> env/builder-env.yml
+                echo "  parameters:" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_REF: ${GIT_REF}" >> env/builder-env.yml
+                echo "    SOURCE_REPOSITORY_URL: ${scmVars.GIT_URL}" >> env/builder-env.yml
 
                 # Deploy these customized builders into 'vmaas-qe' project
                 ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
-                    -e builder-env.yml ${project} --secrets-local-dir secrets/sanitized
+                    -e builder-env ${project} --secrets-local-dir secrets/sanitized
             """
+            sh "cp ../vulnerability/openshift/env/env.yml env/deployer-env.yml"
             // deploy vmaas service set
             sh "ocdeployer deploy -f --sets vmaas \
-                --template-dir ../vulnerability/openshift/templates \
-                -e ../vulnerability/openshift/env/env.yml \
+                -e deployer-env \
                 ${project} --secrets-local-dir secrets/sanitized"
         }
     }
