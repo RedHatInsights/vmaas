@@ -111,7 +111,7 @@ def runStages() {
             stage("Wipe test environment") {
                 sh "ocdeployer wipe -f vmaas-qe -l app=vmaas"
                 // make sure that DB volume is deleted
-                sh "oc delete pvc vmaas-db-data || true"
+                sh "oc delete pvc vmaas-database-data || true"
             }
 
             stage("Deploy VMaaS") {
