@@ -53,7 +53,7 @@ class BaseHandler:
         """extract input JSON from POST request"""
         if request.headers.get(hdrs.CONTENT_TYPE, None) == 'application/json':
             return await request.json()
-        raise web.HTTPBadRequest(reason="Invalid body")
+        raise web.HTTPUnsupportedMediaType(reason="Application/json media type is needed")
 
     @classmethod
     async def handle_request(cls, api_endpoint, api_version, param_name=None, param=None, **kwargs):
@@ -401,42 +401,40 @@ def create_app():
         return res
 
     @web.middleware
-    async def error_formater(request, handler, **kwargs):
-        #pylint: disable=broad-except
+    async def error_formatter(request, handler, **kwargs):
+        # pylint: disable=broad-except
         def build_error(detail, status):
             errors = {"detail": detail, "status": status}
             return {"errors": [errors]}
 
         res = await handler(request, **kwargs)
-
         try:
             if res.status >= 400:
                 original_error = loads(res.body)
                 better_error = build_error(original_error["detail"], original_error["status"])
                 return web.json_response(better_error, status=res.status)
             return res
-        except TypeError: # The error response is not made by connexion
+        except TypeError:  # The error response is not made by connexion
             better_error = build_error(original_error, res.status)
             return web.json_response(better_error, status=res.status)
         except Exception as _:
             LOGGER.exception(_)
             return web.json_response(build_error("Internal server error", 500), status=500)
 
-
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
         'openapi_spec_path': '/openapi.json',
-        'middlewares': [error_formater,
+        'middlewares': [error_formatter,
                         timing_middleware]
     })
 
-    def metrics(request, **kwargs): #pylint: disable=unused-argument
+    def metrics(request, **kwargs):  # pylint: disable=unused-argument
         """Provide current prometheus metrics"""
         # /metrics API shouldn't be visible in the API documentation,
         # hence it's added here in the create_app step
         return web.Response(text=generate_latest().decode('utf-8'))
 
-    async def on_prepare(request, response): #pylint: disable=unused-argument
+    async def on_prepare(request, response):  # pylint: disable=unused-argument
         """Hook for preparing new responses"""
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
