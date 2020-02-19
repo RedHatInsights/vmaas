@@ -5,7 +5,6 @@
 **V**ulnerability **M**etadata **a**s **a** **S**ervice
 
 ## What Is This Thing?
-have to apply to the following set of RPMs?"
 
 The goal is to have a common set of data, that can be updated from multiple sources, and
 accessed from an arbitrary number of web-service instances. To that end, `database`
