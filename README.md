@@ -5,7 +5,6 @@
 **V**ulnerability **M**etadata **a**s **a** **S**ervice
 
 ## What Is This Thing?
-repositories, errata, and CVEs, and can answer the question "What security changes do I
 have to apply to the following set of RPMs?"
 
 The goal is to have a common set of data, that can be updated from multiple sources, and
