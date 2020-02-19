@@ -49,10 +49,8 @@ def deployVmaas(project) {
                 ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
                     -e builder-env ${project} --secrets-local-dir secrets/sanitized
             """
-            sh "cp ../vulnerability/openshift/env/env.yml env/deployer-env.yml"
             // deploy vmaas service set
-            sh "ocdeployer deploy -f --sets vmaas \
-                -e deployer-env \
+            sh "ocdeployer deploy -f --sets vmaas -e vmaas-qe
                 ${project} --secrets-local-dir secrets/sanitized"
         }
     }
