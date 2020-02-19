@@ -5,7 +5,6 @@
 **V**ulnerability **M**etadata **a**s **a** **S**ervice
 
 ## What Is This Thing?
-VMaaS is intended to be a microservice that has access to data connecting RPMs,
 repositories, errata, and CVEs, and can answer the question "What security changes do I
 have to apply to the following set of RPMs?"
 
