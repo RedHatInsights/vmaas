@@ -19,7 +19,7 @@ jobs:
       - name: Get user
         run: |
           curl --request GET \
-          --url https://api.github.com/user/repos \
+          --url https://api.github.com/ \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
       - name: Checkout
