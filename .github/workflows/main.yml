@@ -20,7 +20,7 @@ jobs:
         run: |
           curl \
           --request GET \
-          --url 'https://api.github.com/feeds' \
+          --url 'https://api.github.com/repos/RedHatInsights/vmaas/actions/jobs/461059508/logs' \
           --header 'authorization: token ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
       - name: Checkout
