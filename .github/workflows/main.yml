@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Get user
         run: |
-          curl \
+          curl -I \
           --request GET \
           --url 'https://api.github.com/repos/RedHatInsights/vmaas/actions/jobs/461059508/logs' \
           --header 'authorization: token ${{ secrets.GITHUB_TOKEN }}' \
