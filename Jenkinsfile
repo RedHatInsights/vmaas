@@ -50,7 +50,7 @@ def deployVmaas(project) {
                     -e builder-env ${project} --secrets-local-dir secrets/sanitized
             """
             // deploy vmaas service set
-            sh "ocdeployer deploy -f --sets vmaas -e vmaas-qe
+            sh "ocdeployer deploy -f --sets vmaas -e vmaas-qe \
                 ${project} --secrets-local-dir secrets/sanitized"
         }
     }
