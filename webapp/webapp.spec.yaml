@@ -913,6 +913,24 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+        type:
+          oneOf:
+            - type: string
+              example: 'security'
+            - type: array
+              items:
+                type: string
+                example: security
+        severity:
+          oneOf:
+            - type: string
+              example: 'Critical'
+              nullable: true
+            - type: array
+              items:
+                type: string
+                example: Important
+                nullable: true
         <<: *req_paging
       required:
         - errata_list
@@ -980,6 +998,17 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+        type:
+          type: array
+          items:
+            type: string
+            example: security
+        severity:
+          type: array
+          items:
+            type: string
+            example: Important
+            nullable: true
         <<: *resp_paging
 
     PackagesRequest:
