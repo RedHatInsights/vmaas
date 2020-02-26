@@ -38,6 +38,30 @@ _pkgs_list = {
     "repositories": [{"label": str, "name": str, "basearch": str, "releasever": str}],
 }
 
+_pkgtree_top = {
+    "package_name_list": {str: list},
+    "last_change": str,
+}
+
+_pkgtree_list = [{
+    "nevra": str,
+    "first_published": str,
+    "repositories": [{
+        "label": str,
+        "name": str,
+        "basearch": str,
+        "releasever": str,
+        "revision": str,
+        Optional("module_name"): str,
+        Optional("module_stream"): str,
+    }],
+    "errata": [{
+        "name": str,
+        "issued": str,
+        Optional("cve_list"): [str],
+    }],
+}]
+
 _repos = {
     "repository_list": {
         str: [
@@ -118,6 +142,9 @@ repos_schema = Schema(_repos)
 cves_schema = Schema(_cves)
 pkgs_top_schema = Schema(_pkgs_top)
 pkgs_list_schema = Schema(_pkgs_list)
+pkgtree_top_schema = Schema(_pkgtree_top)
+pkgtree_list_schema = Schema(_pkgtree_list)
+updates_top_schema = Schema(_updates_top)
 updates_top_schema = Schema(_updates_top)
 updates_top_repolist_schema = Schema(_updates_top_repolist)
 updates_top_basearch_schema = Schema(_updates_top_basearch)
