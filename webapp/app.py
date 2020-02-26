@@ -24,6 +24,7 @@ from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
+from pkgtree import PkgtreeAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
 from probes import REQUEST_COUNTS, REQUEST_TIME
@@ -45,6 +46,7 @@ class BaseHandler:
     cve_api = None
     errata_api = None
     packages_api = None
+    pkgtree_api = None
     vulnerabilities_api = None
     dbchange_api = None
 
@@ -277,6 +279,24 @@ class PackagesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.packages_api, 1, **kwargs)
 
 
+class PkgtreeHandlerGet(BaseHandler):
+    """Handler for processing /pkgtree GET requests."""
+
+    @classmethod
+    async def get(cls, package_name=None, **kwargs):
+        """Get package NEVRAs tree for a single package name."""
+        return await cls.handle_request(cls.pkgtree_api, 1, 'package_name_list', package_name, **kwargs)
+
+
+class PkgtreeHandlerPost(BaseHandler):
+    """ /pkgtree API handler """
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
+        return await cls.handle_request(cls.pkgtree_api, 1, **kwargs)
+
+
 class VulnerabilitiesHandlerGet(BaseHandler):
     """Handler for processing /vulnerabilities GET requests."""
 
@@ -366,6 +386,7 @@ def load_cache_to_apis():
     BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
     BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
+    BaseHandler.pkgtree_api = PkgtreeAPI(BaseHandler.db_cache)
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 

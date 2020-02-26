@@ -1,6 +1,7 @@
 arch2id:
   i686: 5
   src: 6
+  x86_64: 7
 arch_compat:
   5: !!set
     5: null
@@ -57,8 +58,62 @@ errata_detail:
       source_package_list:
         - kernel-2.6.32-696.23.1.el6.src
   - https://access.redhat.com/errata/RHBA-2015:0364
+  RHEA-2011:0895: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2011-06-23 00:00:00
+  - 2011-06-23 00:00:00
+  - null
+  - - 8320
+  - - 83200
+  - null
+  - null
+  - null
+  - null
+  RHSA-2019:1174: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2019-05-14 17:22:02
+  - 2019-05-14 17:22:02
+  - - CVE-2018-12126
+    - CVE-2019-11091
+    - CVE-2018-12130
+    - CVE-2018-12127
+  - - 8320
+  - - 83200
+  - null
+  - null
+  - null
+  - null
+  RHSA-2019:1175: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2019-06-14 18:22:02
+  - 2019-05-14 18:22:02
+  - - CVE-2018-10126
+  - - 8320
+  - - 83200
+  - null
+  - null
+  - null
+  - null
 errataid2name:
+  111: RHEA-2011:0895
   444: RHBA-2015:0364
+  555: RHSA-2019:1174
+  556: RHSA-2019:1175
 errataid2repoids:
   444: !!set
     1: null
@@ -83,16 +138,37 @@ evr2id:
   - 2.1.0
   - 1.el8
   : 210
+  ? &id005 !!python/tuple
+  - '0'
+  - 2.6.33.9
+  - rt31.66.el6rt
+  : 310
+  ? &id006 !!python/tuple
+  - '0'
+  - 4.18.0
+  - 80.rt9.138.el8
+  : 320
+  ? &id007 !!python/tuple
+  - '0'
+  - 4.18.0
+  - 80.el8
+  : 410
 id2arch:
   5: i686
   6: src
+  7: x86_64
 id2evr:
   110: *id001
   120: *id002
   200: *id003
   210: *id004
+  310: *id005
+  320: *id006
+  410: *id007
 id2packagename:
   2222: my-pkg
+  32222: kernel
+  332222: kernel-rt
 modulename2id:
   ? !!python/tuple
   - my-pkg
@@ -173,8 +249,34 @@ package_details:
   - 6
   - 5
   - 0
+  # kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64
+  8310: !!python/tuple
+  - 332222
+  - 310
+  - 7
+  - 0
+  - 0
+  - 0
+  # kernel-rt-4.18.0-80.rt9.138.el8.x86_64
+  8320: !!python/tuple # name_id, evr_id, arch_id
+  - 332222
+  - 320
+  - 7
+  - 0
+  - 0
+  - 0
+  # kernel-4.18.0-80.el8.x86_64
+  8410:
+  - 32222
+  - 410
+  - 7
+  - 0
+  - 0
+  - 0
 packagename2id:
   my-pkg: 2222
+  kernel: 32222
+  kernel-rt: 332222
 pkgerrata2module:
   ? !!python/tuple
   - 8110
@@ -212,6 +314,11 @@ pkgid2errataids:
     444: null
   8210: !!set
     444: null
+  8310: !!set
+    111: null
+  8320: !!set
+    555: null
+    556: null
 pkgid2repoids:
   8110:
   - 1
@@ -221,6 +328,11 @@ pkgid2repoids:
   - 1
   8210:
   - 1
+  8320:
+  - 2
+  - 3
+  - 4
+  - 5
 productid2repoids:
   1: !!set
     1: null
@@ -234,6 +346,42 @@ repo_detail:
   - Red Hat Enterprise Linux Server
   - 1
   - '2018-04-10T09:02:26+00:00'
+  2: !!python/tuple
+  - rhel-8-for-x86_64-rt-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
+  - null
+  - x86_64
+  - '8.1'
+  - null
+  - null
+  - '2020-01-03T05:24:17+00:00'
+  3: !!python/tuple
+  - rhel-8-for-x86_64-nfv-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
+  - null
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - '2019-09-20T06:25:14+00:00'
+  4: !!python/tuple
+  - rhel-8-for-x86_64-nfv-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
+  - null
+  - x86_64
+  - '8.1'
+  - null
+  - null
+  - '2020-01-03T05:24:24+00:00'
+  5: !!python/tuple
+  - rhel-8-for-x86_64-rt-rpms
+  - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
+  - null
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - '2019-09-20T06:25:12+00:00'
 repolabel2ids:
   rhel-7-server-rpms:
   - 1
@@ -256,3 +404,5 @@ updates_index:
 src_pkg_id2pkg_ids:
   81100:
     - 8110
+  83200:
+    - 8320
