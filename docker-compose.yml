@@ -50,7 +50,8 @@ services:
       - vmaas_websocket
       - vmaas_database
 
-  vmaas_webapp:
+  vmaas_webapp_py:
+    container_name: vmaas-webapp-py
     command: /vmaas/entrypoint.sh webapp
     container_name: vmaas-webapp
     hostname: vmaas-webapp
@@ -64,7 +65,22 @@ services:
       - vmaas_websocket
       - vmaas_reposcan
 
-    
+  vmaas_webapp:
+    container_name: vmaas-webapp
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    image: vmaas/webapp:latest
+    restart: unless-stopped
+    env_file:
+      - ./conf/webapp.env
+    ports:
+      - 1080:1080
+    depends_on:
+      - vmaas_websocket
+      - vmaas_reposcan
+      - vmaas_webapp_py
+
   vmaas_webapp_utils:
     command: /vmaas/entrypoint.sh webapp-utils
     container_name: vmaas-webapp-utils

@@ -29,7 +29,7 @@ services:
     command: /vmaas/entrypoint.sh sleep
     hostname: vmaas-reposcan
 
-  vmaas_webapp:
+  vmaas_webapp_py:
     volumes:
       - ./webapp:/git
       - ./common:/git/common
@@ -38,6 +38,15 @@ services:
     working_dir: /git
     command: /vmaas/entrypoint.sh sleep
     hostname: vmaas-webapp
+
+
+  vmaas_webapp:
+    volumes:
+      - ./webapp-next:/git
+    security_opt:
+      - label=disable
+    working_dir: /git
+    command: ["sleep", "infinity"]
 
   vmaas_webapp_utils:
     volumes:
