@@ -46,7 +46,7 @@ func LoadCache(path string) *Cache {
 	c.ErrataDetail, c.ErrataId2Name = loadErratas("ErrataDetail, ErrataId2Name")
 	c.PkgId2ErrataIds = LoadPkgErratas()
 	c.ErrataId2RepoIds = loadErrataRepoIds()
-	c.CveDetail = loadCves("CveDetail")
+	c.CveDetail, c.CveNames = loadCves("CveDetail")
 	c.PkgErrata2Module = loadPkgErrataModule("PkgErrata2Module")
 	c.ModuleName2Ids = loadModuleName2Ids("ModuleName2Ids")
 	c.DbChange = loadDbChanges("DbChange")
@@ -349,7 +349,7 @@ func loadRepoDetails(info string) (map[RepoID]RepoDetail, map[string][]RepoID, m
 func loadErratas(info string) (map[string]ErrataDetail, map[ErrataID]string) {
 	defer utils.TimeTrack(time.Now(), info)
 
-	erId2cves := loadInt2Strings("errata_cve", "errata_id,cve_id", "erId2cves")
+	erId2cves := loadInt2Ints("errata_cve", "errata_id,cve_id", "erId2cves")
 	erId2pkgIds := loadInt2Ints("pkg_errata", "errata_id,pkg_id", "erId2pkgId")
 	erId2modulePkgIds := loadInt2Ints("errata_modulepkg", "errata_id,pkg_id", "erId2modulePkgIds")
 	erId2bzs := loadInt2Strings("errata_bugzilla", "errata_id,bugzilla", "erId2bzs")
@@ -399,7 +399,7 @@ func loadErratas(info string) (map[string]ErrataDetail, map[ErrataID]string) {
 	return errataDetail, errataId2Name
 }
 
-func loadCves(info string) map[string]CveDetail {
+func loadCves(info string) (map[string]CveDetail, map[int]string) {
 	defer utils.TimeTrack(time.Now(), info)
 
 	cveId2cwes := loadInt2Strings("cve_cwe", "cve_id,cwe", "cveId2cwes")
@@ -408,6 +408,7 @@ func loadCves(info string) map[string]CveDetail {
 
 	rows := getAllRows("cve_detail", "*", "id")
 	cveDetails := map[string]CveDetail{}
+	cveNames := map[int]string{}
 	for rows.Next() {
 		var cveId int
 		var cveName string
@@ -434,8 +435,9 @@ func loadCves(info string) map[string]CveDetail {
 			det.ErrataIds = eids
 		}
 		cveDetails[cveName] = det
+		cveNames[cveId] = cveName
 	}
-	return cveDetails
+	return cveDetails, cveNames
 }
 
 func loadPkgErrataModule(info string) map[PkgErrata][]int {
@@ -503,7 +505,7 @@ func loadString(info string) map[int]string {
 	return m
 }
 
-func loadDbChanges(info string) []DbChange {
+func loadDbChanges(info string) DbChange {
 	defer utils.TimeTrack(time.Now(), info)
 
 	rows := getAllRows("dbchange", "*", "errata_changes")
@@ -517,7 +519,7 @@ func loadDbChanges(info string) []DbChange {
 		}
 		arr = append(arr, item)
 	}
-	return arr
+	return arr[0]
 }
 
 func loadInt2Ints(table, cols, info string) map[int][]int {

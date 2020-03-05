@@ -60,7 +60,7 @@ services:
     env_file:
       - ./conf/webapp.env
     ports:
-      - 8080:8080
+      - 1080:1080
     depends_on:
       - vmaas_websocket
       - vmaas_reposcan
@@ -69,17 +69,19 @@ services:
     container_name: vmaas-webapp
     build:
       context: .
-      dockerfile: webapp/Dockerfile
+      dockerfile: webapp-next/Dockerfile
     image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
       - ./conf/webapp.env
     ports:
-      - 1080:1080
+      - 8080:8080
     depends_on:
       - vmaas_websocket
       - vmaas_reposcan
       - vmaas_webapp_py
+    volumes:
+      - ./logs:/logs:Z
 
   vmaas_webapp_utils:
     command: /vmaas/entrypoint.sh webapp-utils

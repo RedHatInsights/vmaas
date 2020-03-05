@@ -837,7 +837,7 @@ class SqliteDump:
                                          description, solution, issued, updated
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
-                                    JOIN errata_severity ON severity_id = errata_severity.id
+                                    LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \

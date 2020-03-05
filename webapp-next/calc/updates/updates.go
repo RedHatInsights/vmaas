@@ -3,16 +3,33 @@ package updates
 import (
 	"app/cache"
 	"app/utils"
+	"github.com/pkg/errors"
+	"sort"
 	"strings"
 )
 
 type Request struct {
-	Packages   []string             `json:"package_list"`
-	RepoList   []string             `json:"repository_list"`
-	Modules    []cache.ModuleStream `json:"modules_list"`
+	Packages []string             `json:"package_list"`
+	RepoList []string             `json:"repository_list"`
+	Modules  []cache.ModuleStream `json:"modules_list"`
 
-	Releasever *string              `json:"releasever"`
-	BaseArch   *string              `json:"basearch"`
+	Releasever *string `json:"releasever"`
+	BaseArch   *string `json:"basearch"`
+}
+
+func (r Request) Validate() (int, error) {
+	if r.Packages == nil {
+		return 400, errors.New("package_list is a required property")
+	}
+	for _, m := range r.Modules {
+		if len(m.Module) == 0 {
+			return 400, errors.New("module_name is a required property")
+		}
+		if len(m.Stream) == 0 {
+			return 400, errors.New("module_stream is a required property")
+		}
+	}
+	return 200, nil
 }
 
 type Update struct {
@@ -33,8 +50,8 @@ type NameUpdateDetail struct {
 
 type Response struct {
 	UpdateList map[string]NameUpdateDetail `json:"update_list"`
-	RepoList   []string                    `json:"repository_list"`
-	ModuleList []cache.ModuleStream        `json:"modules_list,omitempty"`
+	RepoList   []string                    `json:"repository_list,omitempty"`
+	ModuleList *[]cache.ModuleStream       `json:"modules_list,omitempty"`
 	Releasever *string                     `json:"releasever,omitempty"`
 	BaseArch   *string                     `json:"basearch,omitempty"`
 }
@@ -75,8 +92,9 @@ func ProcessRepositories(c *cache.Cache, req Request, resp *Response) (map[cache
 	if req.Releasever != nil {
 		for r := range repos {
 			det := c.RepoDetails[r]
-			repos[r] = repos[r] && det.ReleaseVer == nil && strings.Contains(det.Url, *req.Releasever) ||
-				*det.ReleaseVer == *req.Releasever
+			repos[r] = repos[r] &&
+				(det.ReleaseVer == nil && strings.Contains(det.Url, *req.Releasever)) ||
+				(det.ReleaseVer != nil && *det.ReleaseVer == *req.Releasever)
 		}
 		resp.Releasever = req.Releasever
 	}
@@ -84,9 +102,9 @@ func ProcessRepositories(c *cache.Cache, req Request, resp *Response) (map[cache
 	if req.BaseArch != nil {
 		for r := range repos {
 			det := c.RepoDetails[r]
-			repos[r] = repos[r] && det.BaseArch == nil && strings.Contains(det.Url, *req.BaseArch) ||
-				*det.BaseArch == *req.BaseArch
-
+			repos[r] = repos[r] &&
+				(det.BaseArch == nil && strings.Contains(det.Url, *req.BaseArch)) ||
+				(det.BaseArch != nil && *det.BaseArch == *req.BaseArch)
 		}
 		resp.BaseArch = req.BaseArch
 	}
@@ -178,7 +196,10 @@ func checkSecurityOnly(c *cache.Cache, securityOnly bool, errataId cache.ErrataI
 	if !securityOnly {
 		return true
 	}
-	errataName := c.ErrataId2Name[errataId]
+	errataName, has := c.ErrataId2Name[errataId]
+	if !has {
+		utils.Log("err", "errataid").Error("Missing entry in errataid2name")
+	}
 	if c.ErrataDetail[errataName].Type == "security" || len(c.ErrataDetail[errataName].CVEs) != 0 {
 		return true
 	}
@@ -188,7 +209,7 @@ func checkSecurityOnly(c *cache.Cache, securityOnly bool, errataId cache.ErrataI
 func checkModules(c *cache.Cache, modules map[int]bool, updatePkgId cache.PkgID, errataId cache.ErrataID) bool {
 
 	if len(modules) == 0 {
-		return true
+		return false
 	}
 
 	pkgErrata := cache.PkgErrata{
@@ -215,7 +236,8 @@ func ProcessUpdates(c *cache.Cache,
 	modules map[int]bool,
 	response *Response,
 	includeTexts,
-	securityOnly bool,
+	securityOnly,
+	filterModules bool,
 ) error {
 	for pkgString, pkg := range pkgs {
 		evr := cache.Evr{
@@ -246,11 +268,9 @@ func ProcessUpdates(c *cache.Cache,
 			continue
 		}
 
-
 		response.UpdateList[pkgString] = NameUpdateDetail{
 			AvailableUpdates: &[]Update{},
 		}
-
 
 		if includeTexts {
 			updateList := response.UpdateList[pkgString]
@@ -259,7 +279,7 @@ func ProcessUpdates(c *cache.Cache,
 			response.UpdateList[pkgString] = updateList
 		}
 
-		lastVersionPkgId := c.Updates[nameId][len(c.Updates[nameId])-1 ]
+		lastVersionPkgId := c.Updates[nameId][len(c.Updates[nameId])-1]
 		if lastVersionPkgId == currentNevraPkgId {
 			continue
 		}
@@ -291,7 +311,7 @@ func ProcessUpdates(c *cache.Cache,
 				if !checkSecurityOnly(c, securityOnly, errataId) {
 					continue
 				}
-				if !checkModules(c, modules, updatePkgId, errataId) {
+				if filterModules && !checkModules(c, modules, updatePkgId, errataId) {
 					continue
 				}
 				repoIds := getRepositories(c, updatePkgId, productIds, validReleaseVers, []cache.ErrataID{errataId}, repos)
@@ -312,28 +332,34 @@ func ProcessUpdates(c *cache.Cache,
 				}
 
 			}
+			slice := *response.UpdateList[pkgString].AvailableUpdates
+			sort.Slice(slice, func(i, j int) bool {
+				return slice[i].Package < slice[j].Package
+			})
 		}
 
 	}
 	return nil
 }
 
-func Updates(cache *cache.Cache, data Request) (Response, error) {
+func Updates(cache *cache.Cache, data Request, includeStrings, securityOnly bool) (Response, error) {
 	response := Response{}
 	pkgs := ProcessInputPackages(cache, data, &response)
 
 	repos, err := ProcessRepositories(cache, data, &response)
 
 	modules := map[int]bool{}
-	if len(data.Modules) > 0 {
+	var filterModules bool
+	if data.Modules != nil {
+		filterModules = true
 		for _, m := range data.Modules {
 			for _, mid := range cache.ModuleName2Ids[m] {
 				modules[mid] = true
 			}
 		}
-		response.ModuleList = data.Modules
+		response.ModuleList = &data.Modules
 	}
 
-	err = ProcessUpdates(cache, pkgs, repos, modules, &response, false, false)
+	err = ProcessUpdates(cache, pkgs, repos, modules, &response, includeStrings, securityOnly, filterModules)
 	return response, err
 }

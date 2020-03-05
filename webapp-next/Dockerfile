@@ -30,8 +30,9 @@ ADD webapp-next/websocket   /go/src/app/websocket
 ADD webapp-next/main.go     /go/src/app/
 ADD webapp-next/*.sh     /go/src/app/
 
-RUN go build -v main.go
+#RUN go build -v main.go
 
 EXPOSE 1080
 
-CMD /go/src/app/wait-for-services.sh /go/src/app/main
+#CMD /go/src/app/wait-for-services.sh /go/src/app/main
+CMD /go/src/app/wait-for-services.sh go run main.go

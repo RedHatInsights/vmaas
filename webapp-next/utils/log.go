@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -16,6 +17,15 @@ func ConfigureLogging() {
 		strlevel = "TRACE"
 	}
 	level := parseLogLevel(strlevel)
+	// TODO:container
+	file, err := os.Create("/logs/log.txt")
+	if err != nil {
+		panic(err)
+	}
+	file.Truncate(0)
+	file.Seek(0, 0)
+	writer := io.MultiWriter(os.Stdout, file)
+	log.SetOutput(writer)
 	log.SetLevel(level)
 	style := os.Getenv("LOG_STYLE")
 	if style == "json" {

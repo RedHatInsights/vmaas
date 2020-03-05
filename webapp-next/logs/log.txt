@@ -1,0 +1,14 @@
+time="2020-04-22T13:57:31+02:00" level=trace msg="Downloading dump from reposcan"
+time="2020-04-22T13:57:31+02:00" level=info msg="Running download command" cmd="/usr/bin/rsync -a --copy-links --quiet rsync://localhost:8730/data/vmaas.db ./data/vmaas.db"
+time="2020-04-22T13:57:33+02:00" level=info msg="Refreshed cache" fields.msg="refreshed 2020-04-22 11:16:32.441645 +0000 UTC"
+time="2020-04-22T13:57:33+02:00" level=info msg="Listening for websocket database dump updates"
+time="2020-04-22T13:57:47+02:00" level=info msg=Callling url="http://localhost:1080/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm"
+time="2020-04-22T13:57:47+02:00" level=info msg=Call go= path="/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm" py="{\"type\": \"about:blank\", \"title\": \"Method Not Allowed\", \"detail\": \"Specified method is invalid for this resource\", \"status\": 405}\n" req=
+time="2020-04-22T13:57:49+02:00" level=info msg=Callling url="http://localhost:1080/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm"
+time="2020-04-22T13:57:49+02:00" level=info msg=Call go= path="/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm" py="{\"type\": \"about:blank\", \"title\": \"Method Not Allowed\", \"detail\": \"Specified method is invalid for this resource\", \"status\": 405}\n" req=
+time="2020-04-22T13:57:51+02:00" level=info msg=Callling url="http://localhost:1080/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm"
+time="2020-04-22T13:57:51+02:00" level=info msg=Call go= path="/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm" py="{\"type\": \"about:blank\", \"title\": \"Method Not Allowed\", \"detail\": \"Specified method is invalid for this resource\", \"status\": 405}\n" req=
+time="2020-04-22T13:58:10+02:00" level=info msg=Callling url="http://localhost:1080/api/v1/vulnerabilitiess/bash-0:4.2.46-20.el7_2.x86_64.rpm"
+time="2020-04-22T13:58:10+02:00" level=info msg=Call go= path="/api/v1/vulnerabilitiess/bash-0:4.2.46-20.el7_2.x86_64.rpm" py="{\"type\": \"about:blank\", \"title\": \"Not Found\", \"detail\": \"Nothing matches the given URI\", \"status\": 404}\n" req=
+time="2020-04-22T13:58:26+02:00" level=info msg=Callling url="http://localhost:1080/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm"
+time="2020-04-22T13:58:26+02:00" level=info msg=Call go= path="/api/v1/vulnerabilities/bash-0:4.2.46-20.el7_2.x86_64.rpm" py="{\"type\": \"about:blank\", \"title\": \"Method Not Allowed\", \"detail\": \"Specified method is invalid for this resource\", \"status\": 405}\n" req=

@@ -6,6 +6,7 @@ import (
 	"os/exec"
 )
 
+// TODO: Docker
 var DumpFileName = "/data/vmaas.db"
 var RemoteDumpName = "rsync://" + utils.MustGetEnv("REPOSCAN_HOST") + ":8730/data/vmaas.db"
 
@@ -27,5 +28,5 @@ func TryRefreshCache() (string, error) {
 		return "", err
 	}
 	cache.C = cache.LoadCache(DumpFileName)
-	return "refreshed " + cache.C.DbChange[0].Exported.String(), nil
+	return "refreshed " + cache.C.DbChange.Exported.String(), nil
 }

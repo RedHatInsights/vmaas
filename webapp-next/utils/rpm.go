@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -34,6 +35,7 @@ func (n Nevra) String() string {
 
 // parse package components
 func ParseNevra(nevra string) (*Nevra, error) {
+	nevra = strings.TrimSuffix(nevra, ".rpm")
 	parsed := nevraRegex.FindStringSubmatch(nevra)
 	if len(parsed) != 9 {
 		return nil, errors.New("unable to parse nevra")

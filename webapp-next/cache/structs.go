@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -12,12 +13,11 @@ type ArchID int
 type ErrataID int
 
 type Cache struct {
-
 	Packagename2Id map[string]NameID
 	Id2Packagename map[NameID]string
 
 	// name -> []pkg ordered by e-v-r ordering
-	Updates      map[NameID][]PkgID
+	Updates map[NameID][]PkgID
 	// name -> evr -> idx into updates[name]
 	UpdatesIndex map[NameID]map[EvrID][]int
 
@@ -38,18 +38,19 @@ type Cache struct {
 	ProductId2RepoIds map[int][]RepoID
 	PkgId2RepoIds     map[PkgID][]RepoID
 
-	ErrataId2Name     map[ErrataID]string
-	PkgId2ErrataIds   map[PkgID][]ErrataID
-	ErrataId2RepoIds  map[ErrataID][]RepoID
+	ErrataId2Name    map[ErrataID]string
+	PkgId2ErrataIds  map[PkgID][]ErrataID
+	ErrataId2RepoIds map[ErrataID][]RepoID
 
-	CveDetail         map[string]CveDetail
+	CveDetail map[string]CveDetail
+	CveNames  map[int]string
 
-	PkgErrata2Module  map[PkgErrata][]int
-	ModuleName2Ids    map[ModuleStream][]int
-	DbChange          []DbChange
-	ErrataDetail      map[string]ErrataDetail
-	SrcPkgId2PkgId    map[PkgID][]PkgID
-	String            map[int]string
+	PkgErrata2Module map[PkgErrata][]int
+	ModuleName2Ids   map[ModuleStream][]int
+	DbChange         DbChange
+	ErrataDetail     map[string]ErrataDetail
+	SrcPkgId2PkgId   map[PkgID][]PkgID
+	String           map[int]string
 }
 
 type PackageDetail struct {
@@ -59,7 +60,7 @@ type PackageDetail struct {
 	SummaryId     int
 	DescriptionId int
 
-	SrcPkgId      *PkgID
+	SrcPkgId *PkgID
 }
 
 type Evr struct {
@@ -99,9 +100,9 @@ type CveDetail struct {
 	Cvss2Metrics  *string
 	Source        string
 
-	CWEs          []string
-	PkgIds        []int
-	ErrataIds     []int
+	CWEs      []string
+	PkgIds    []int
+	ErrataIds []int
 }
 
 type PkgErrata struct {
@@ -115,26 +116,26 @@ type ModuleStream struct {
 }
 
 type DbChange struct {
-	ErrataChanges time.Time
-	CveChanges    time.Time
-	RepoChanges   time.Time
-	LastChange    time.Time
-	Exported      time.Time
+	ErrataChanges time.Time `json:"errata_changes"`
+	CveChanges    time.Time `json:"cve_changes"`
+	RepoChanges   time.Time `json:"repository_changes"`
+	LastChange    time.Time `json:"last_change"`
+	Exported      time.Time `json:"exported"`
 }
 
 type ErrataDetail struct {
 	Synopsis     string
-	Summary      string
+	Summary      sql.NullString
 	Type         string
-	Severity     string
-	Description  *string
-	CVEs         []string
+	Severity     sql.NullString
+	Description  sql.NullString
+	CVEs         []int
 	PkgIds       []int
 	ModulePkgIds []int
 	Bugzillas    []string
 	Refs         []string
 	Modules      []Module
-	Solution     string
+	Solution     sql.NullString
 	Issued       time.Time
 	Updated      time.Time
 	Url          string
