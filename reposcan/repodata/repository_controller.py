@@ -13,7 +13,7 @@ from common.logging_utils import get_logger
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
-from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO
+from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
 
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
@@ -96,6 +96,7 @@ class RepositoryController:
                     self.logger.warning("Download failed: LABEL: %s URL: %s (HTTP CODE %d)",
                                         repo.content_set, urljoin(repo.repo_url, md_path),
                                         failed_items[local_path])
+                    FAILED_REPO_WITH_HTTP_CODE.labels(failed_items[local_path]).inc()
         return failed
 
     def _download_metadata(self, batch):
