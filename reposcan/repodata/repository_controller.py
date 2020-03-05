@@ -4,8 +4,11 @@ Module containing class for syncing set of repositories into the DB.
 import os
 import shutil
 import tempfile
+from datetime import datetime
 from urllib.parse import urljoin
 import re
+
+from OpenSSL import crypto
 
 from common.batch_list import BatchList
 from common.logging_utils import get_logger
@@ -13,7 +16,7 @@ from common.logging_utils import get_logger
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
-from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
+from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE, CERT_EXPIRATION
 
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
@@ -43,10 +46,16 @@ class RepositoryController:
 
     def _download_repomds(self):
         download_items = []
+        cert_name_tmp = ''
         for repository in self.repositories:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
+            # Check certificate expiration date and set state in prometheus
+            if cert_name_tmp != repository.cert_name:
+                self._check_cert_expiration_date(cert, repository.cert_name)
+            cert_name_tmp = repository.cert_name
+
             item = DownloadItem(
                 source_url=repomd_url,
                 target_path=os.path.join(repository.tmp_directory, "repomd.xml"),
@@ -61,6 +70,24 @@ class RepositoryController:
         # Return failed downloads
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
+
+    def _check_cert_expiration_date(self, cert, cert_name):
+        try:
+            loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
+            expire_date = datetime.strptime(loaded_cert.get_notAfter(), "%Y%m%d%H%M%SZ")
+            expire_in = expire_date - datetime.now()
+            if expire_in.days > 7:
+                self.logger.debug('Certificate %s is ok', cert_name)
+                CERT_EXPIRATION.labels(cert_name).state('valid')
+            elif 7 >= expire_in.days > 0:
+                self.logger.warning('Certificate %s will expire in %s', cert_name, expire_in.days)
+                CERT_EXPIRATION.labels(cert_name).state('expire_soon')
+            else:
+                self.logger.warning('Certificate %s expired!', cert_name)
+                CERT_EXPIRATION.labels(cert_name).state('expired')
+        except Exception:
+            self.logger.debug('Certificate not provided')
+            CERT_EXPIRATION.state('expired')
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
