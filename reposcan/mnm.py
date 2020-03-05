@@ -11,6 +11,8 @@ FAILED_CVEMAP = Counter('vmaas_reposcan_failed_cvemap_reads', '# of failures att
 
 FAILED_REPOMD = Counter('vmaas_reposcan_failed_repo_metadata', '# of failed repo-metadata-download attempts')
 FAILED_REPO = Counter('vmaas_reposcan_failed_repository', '# of failed repo-download attempts')
+FAILED_REPO_WITH_HTTP_CODE = Counter('vmaas_reposcan_failed_repository_download_with_code',
+                                     '# of failed repo-download attempts with http code', ['http_code'])
 
 FAILED_IMPORT_REPO = Counter('vmaas_reposcan_failed_repository_import', '# of failed repo-import/update attempts')
 FAILED_IMPORT_CVE = Counter('vmaas_reposcan_failed_cve_import', '# of failed cve-import attempts')
