@@ -3,7 +3,6 @@
 Main web API module
 """
 
-from json import loads
 import os
 import signal
 import sre_constants
@@ -421,32 +420,10 @@ def create_app():
 
         return res
 
-    @web.middleware
-    async def error_formatter(request, handler, **kwargs):
-        # pylint: disable=broad-except
-        def build_error(detail, status):
-            errors = {"detail": detail, "status": status}
-            return {"errors": [errors]}
-
-        res = await handler(request, **kwargs)
-        try:
-            if res.status >= 400:
-                original_error = loads(res.body)
-                better_error = build_error(original_error["detail"], original_error["status"])
-                return web.json_response(better_error, status=res.status)
-            return res
-        except TypeError:  # The error response is not made by connexion
-            better_error = build_error(original_error, res.status)
-            return web.json_response(better_error, status=res.status)
-        except Exception as _:
-            LOGGER.exception(_)
-            return web.json_response(build_error("Internal server error", 500), status=500)
-
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
         'openapi_spec_path': '/openapi.json',
-        'middlewares': [error_formatter,
-                        timing_middleware]
+        'middlewares': [timing_middleware]
     })
 
     def metrics(request, **kwargs):  # pylint: disable=unused-argument
