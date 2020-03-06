@@ -28,6 +28,7 @@ requests = ">=2.22.0"
 gitpython = ">=3.0.3"
 podman-compose = {file = "https://github.com/containers/podman-compose/archive/devel.tar.gz"}
 podman = ">=1.4.4"
+pyopenssl = ">=19.1.0"
 
 [requires]
 python_version = "3.6"

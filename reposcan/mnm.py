@@ -2,7 +2,7 @@
 Measurement aNd Monitoring - prometheus probes used by reposcan subsystem
 """
 
-from prometheus_client import Counter, Enum
+from prometheus_client import Counter, Enum as En
 
 FAILED_AUTH = Counter('vmaas_reposcan_failed_auth_attempts', '# of failed authentication attempts')
 FAILED_WEBSOCK = Counter('vmaas_reposcan_websocket_errors', '# of websocket-cnx errors')
@@ -18,5 +18,5 @@ FAILED_IMPORT_REPO = Counter('vmaas_reposcan_failed_repository_import', '# of fa
 FAILED_IMPORT_CVE = Counter('vmaas_reposcan_failed_cve_import', '# of failed cve-import attempts')
 FAILED_UPDATE_CVE = Counter('vmaas_reposcan_failed_cve_update', '# of failed cve-update attempts')
 
-CERT_EXPIRATION = Enum('vmaas_cdn_cert_expiration', 'state of vmaas CDN certificate', ['cert_name'],
-                       states=['valid', 'expire_soon', 'expired'])
+CERT_EXPIRATION = En('vmaas_cdn_cert_expiration', 'state of vmaas CDN certificate', ['name'],
+                     states=['valid', 'expire_soon', 'expired'])

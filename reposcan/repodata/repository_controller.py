@@ -46,15 +46,14 @@ class RepositoryController:
 
     def _download_repomds(self):
         download_items = []
-        cert_name_tmp = ''
+        certs_tmp_dict = {}
         for repository in self.repositories:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
             # Check certificate expiration date and set state in prometheus
-            if cert_name_tmp != repository.cert_name:
-                self._check_cert_expiration_date(cert, repository.cert_name)
-            cert_name_tmp = repository.cert_name
+            if repository.cert_name:
+                certs_tmp_dict[repository.cert_name] = cert
 
             item = DownloadItem(
                 source_url=repomd_url,
@@ -66,12 +65,15 @@ class RepositoryController:
             # Save for future status code check
             download_items.append(item)
             self.downloader.add(item)
+
+        for cert_name, cert in certs_tmp_dict.items():
+            self._check_cert_expiration_date(cert_name, cert)
         self.downloader.run()
         # Return failed downloads
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
 
-    def _check_cert_expiration_date(self, cert, cert_name):
+    def _check_cert_expiration_date(self, cert_name, cert):
         try:
             loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
             expire_date = datetime.strptime(loaded_cert.get_notAfter(), "%Y%m%d%H%M%SZ")
@@ -85,9 +87,13 @@ class RepositoryController:
             else:
                 self.logger.warning('Certificate %s expired!', cert_name)
                 CERT_EXPIRATION.labels(cert_name).state('expired')
-        except Exception:
-            self.logger.debug('Certificate not provided')
-            CERT_EXPIRATION.state('expired')
+        except crypto.Error:
+            if cert_name:
+                self.logger.warning('Certificate not provided or incorrect: %s', cert_name)
+                CERT_EXPIRATION.labels(cert_name).state('expired')
+            else:
+                self.logger.warning('Certificate not provided or incorrect')
+                CERT_EXPIRATION.labels('None').state('expired')
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
