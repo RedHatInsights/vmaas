@@ -228,6 +228,11 @@ class TestWebappGets(BaseCase):
         assert HTTPStatus.OK == resp.status
         assert resp.body == '{"cve_list": []}'
 
+    async def test_error_formatter(self):
+        """Test error formater"""
+        resp = await self.fetch('/api/v1/cves/*', method='GET')
+        assert HTTPStatus.BAD_REQUEST == resp.status
+        assert resp.body[24:] == '"detail": "error(\'nothing to repeat at position 1\',)", "status": 400}'
 
 @pytest.mark.usefixtures('client')
 class TestWebappSupportMethods(BaseCase):
