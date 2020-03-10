@@ -76,6 +76,26 @@ objects:
     - name: latest
   status: {dockerImageRepository: ''}
 
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+    labels:
+      app: vmaas-${RELEASE}
+      component: vmaas-webapp-${RELEASE}
+    name: vmaas-webapp-${RELEASE}
+  spec:
+    scaleTargetRef:
+      apiVersion: apps.openshift.io/v1
+      kind: DeploymentConfig
+      name: vmaas-webapp-${RELEASE}
+      subresource: scale
+    minReplicas: 1
+    maxReplicas: 8
+    # Autoscaler takes the `requests` not limits into account
+    # Attempt to run at 0.5 cores per pod, and if there is a peak,
+    # use the remaining capacity to handle it.
+    targetCPUUtilizationPercentage: 100
+
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -162,7 +182,7 @@ objects:
           - {containerPort: 8080}
           resources:
             limits: {cpu: '1', memory: 2Gi}
-            requests: {cpu: 200m, memory: 2Gi}
+            requests: {cpu: 500m, memory: 2Gi}
           readinessProbe:
             httpGet:
               path: /api/v1/monitoring/health
