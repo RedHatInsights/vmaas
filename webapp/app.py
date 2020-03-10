@@ -3,6 +3,7 @@
 Main web API module
 """
 
+from json import loads
 import os
 import signal
 import sre_constants
@@ -420,10 +421,30 @@ def create_app():
 
         return res
 
+    @web.middleware
+    async def error_handler(request, handler, **kwargs):
+        def format_error(detail, status):
+            res = {}
+            res["type"] = "about:blank"
+            res["detail"] = detail
+            res["status"] = status
+
+            return res
+
+        res = await handler(request, **kwargs)
+
+        if res.status >= 400:
+            body = loads(res.body)
+            better_error = format_error(body, res.status)
+            return web.json_response(better_error, status=res.status)
+
+        return res
+
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
         'openapi_spec_path': '/openapi.json',
-        'middlewares': [timing_middleware]
+        'middlewares': [error_handler,
+                        timing_middleware]
     })
 
     def metrics(request, **kwargs):  # pylint: disable=unused-argument
