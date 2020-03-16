@@ -84,6 +84,7 @@ class TestUpgrade:
         enviroment = dict(os.environ)
         os.environ.clear()
         yield
+        os.environ.clear()
         shutil.rmtree(DB_UPDATES_FIXTURE_PATH)
         os.environ.update(enviroment)
 
