@@ -19,11 +19,12 @@ from aiohttp import web, ClientSession, WSMsgType, hdrs
 from cache import Cache
 from common.constants import VMAAS_VERSION
 from common.logging_utils import init_logging, get_logger
+from common.es_handler import EsHandler
 from cve import CveAPI
 from repos import RepoAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
-from packages import PackagesAPI
+from packages import PackagesAPI, PackagesSearchAPI
 from pkgtree import PkgtreeAPI
 from vulnerabilities import VulnerabilitiesAPI
 from dbchange import DBChange
@@ -47,6 +48,7 @@ class BaseHandler:
     errata_api = None
     packages_api = None
     pkgtree_api = None
+    packages_search_api = None
     vulnerabilities_api = None
     dbchange_api = None
 
@@ -278,6 +280,14 @@ class PackagesHandlerPost(BaseHandler):
         """Get details about packages. "package_list" must be a list of"""
         return await cls.handle_request(cls.packages_api, 1, **kwargs)
 
+class PackagesHandlerSearchPost(BaseHandler):
+    """ /packages/search API handler """
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Search corresponding packages with NEVRA regex json."""
+        return await cls.handle_request(cls.packages_search_api, 1, **kwargs)
+
 
 class PkgtreeHandlerGet(BaseHandler):
     """Handler for processing /pkgtree GET requests."""
@@ -389,6 +399,8 @@ def load_cache_to_apis():
     BaseHandler.pkgtree_api = PkgtreeAPI(BaseHandler.db_cache)
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
+    EsHandler.init_es()
+    BaseHandler.packages_search_api = PackagesSearchAPI(EsHandler.get_connection())
 
 
 def create_app():

@@ -51,5 +51,6 @@ ADD /reposcan/rsyncd.conf    /etc/
 ADD /common/*.py             /reposcan/common/
 ADD /database/upgrade/*.sh   /reposcan/
 ADD /database/upgrade_scripts/* /reposcan/database/upgrade_scripts/
+ADD /common/documents/*.py   /reposcan/common/documents/
 
 CMD /reposcan/entrypoint.sh

@@ -1,11 +1,14 @@
 """
 Module to handle /packages API calls.
 """
+from elasticsearch.exceptions import NotFoundError
+from elasticsearch_dsl.serializer import serializer
 
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
 import common.webapp_utils as utils
+from common.documents.nevra import Nevra
 
-
+# pylint: disable=unused-argument
 class PackagesAPI:
     """ Main /packages API class."""
     def __init__(self, cache):
@@ -26,7 +29,7 @@ class PackagesAPI:
             return pkgs_list + source_pkgs_list
         return []
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument
+    def process_list(self, api_version, data):
         """
         Returns package details.
 
@@ -71,3 +74,49 @@ class PackagesAPI:
         }
 
         return response
+
+class PackagesSearchAPI:
+    """ Main /packages/search endpoint class. """
+    def __init__(self, es_conn):
+        self.es_connection = es_conn
+
+    def process_list(self, api_version, data):
+        """
+        Returns package repositories and source package, based on the given NEVRA regex.
+
+        :param data: json with the request
+
+        :returns: json with the info details about corresponding packages
+        """
+        result_res = {"nevra_list": {}}
+        results = {}
+        data = data.get("nevra_pattern")
+
+        if not data:
+            return result_res
+
+        name = data.get("name", "")
+        epoch = data.get("epoch", "")
+        ver = data.get("version", "")
+        release = data.get("release", "")
+        arch = data.get("arch", "")
+
+        try:
+            for doc in Nevra().search(using=self.es_connection) \
+                                       .query("regexp", name=name) \
+                                       .query("regexp", epoch=epoch) \
+                                       .query("regexp", version=ver) \
+                                       .query("regexp", release=release) \
+                                       .query("regexp", arch=arch) \
+                                       .scan():
+                pkg_nevra = utils.join_packagename(doc.name, doc.epoch, doc.version,
+                                                   doc.release, doc.arch)
+                results[pkg_nevra] = {}
+                results[pkg_nevra]["repositories"] = serializer.default(doc.repo_label)
+                results[pkg_nevra]["source_pkg"] = doc.source_pkg
+
+        except NotFoundError:
+            return result_res
+
+        result_res["nevra_list"] = results
+        return result_res

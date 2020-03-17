@@ -111,6 +111,32 @@ services:
       - ./monitoring/grafana/grafana.conf
     user: "104"
     restart: always
+  
+  vmaas_indexer:
+    container_name: vmaas-indexer
+    image: vmaas/indexer-elastic:7.5.2
+    build:
+      context: .
+      dockerfile: ./indexer/Dockerfile
+    volumes:
+      - vmaas-indexer-data:/usr/share/elasticsearch/data:rw
+    depends_on:
+      - vmaas_reposcan
+      - vmaas_database
+    ports:
+      - 9300:9300
+      - 9200:9200
+    env_file:
+      ./conf/indexer.env
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
+
 
 volumes:
   vmaas-db-data:
@@ -118,3 +144,4 @@ volumes:
   vmaas-reposcan-tmp:
   prometheus-data:
   grafana-data:
+  vmaas-indexer-data:

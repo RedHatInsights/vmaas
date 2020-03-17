@@ -34,5 +34,6 @@ ADD /webapp/*.spec.yaml /webapp/
 ADD /webapp/*.sh        /webapp/
 ADD /webapp/*.py        /webapp/
 ADD /common/*.py        /webapp/common/
+ADD /common/documents/*.py /webapp/common/documents/
 
 CMD /webapp/entrypoint.sh

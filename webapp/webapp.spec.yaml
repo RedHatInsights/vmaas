@@ -347,6 +347,25 @@ paths:
       tags:
         - packages
 
+  /v1/packages/search:
+    post:
+      description: Search packages by NEVRA and regex.
+      operationId: app.PackagesHandlerSearchPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PackagesSearchRequest'
+      responses:
+        '200':
+          description: Return matched NEVRAs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackagesSearchResponse'
+      tags:
+        - packages
+
   /v1/pkgtree:
     post:
       description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names.
@@ -356,7 +375,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PkgtreeRequest'
-
       responses:
         '200':
           description: Return package NEVRAs about list of package names
@@ -1048,3 +1066,32 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+    PackagesSearchRequest:
+      type: object
+      properties:
+        nevra_pattern:
+          type: object
+          properties:
+            name:
+              type: string
+            epoch:
+              type: string
+            version:
+              type: string
+            release:
+              type: string
+            arch:
+              type: string
+    PackagesSearchResponse:
+      properties:
+        nevra_list:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              source_pkg:
+                type: string
+              repositories:
+                type: array
+                items:
+                  type: string

@@ -16,5 +16,10 @@ until curl http://$REPOSCAN_HOST:8081/api/v1/monitoring/health &>/dev/null; do
   sleep 1
 done
 
+until curl http://$INDEXER_HOST:9300/ &>/dev/null; do
+  >&2 echo "Indexer elastic is unavailable - sleeping"
+  sleep 1
+done
+
 >&2 echo "Everything is up - executing command"
 exec $cmd

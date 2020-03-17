@@ -74,7 +74,7 @@ def _parse_dsn(dsn_string):
 
     return host, user, db_name, port
 
-class TestUpgrade:
+class TestUpgrader:
     """ Test for the upgrades. """
 
     @pytest.fixture
@@ -84,11 +84,10 @@ class TestUpgrade:
         enviroment = dict(os.environ)
         os.environ.clear()
         yield
-        os.environ.clear()
         shutil.rmtree(DB_UPDATES_FIXTURE_PATH)
         os.environ.update(enviroment)
 
-    def test_upgrade_empty(self, db_conn, setup_teardown):
+    def test_upgrader_empty(self, db_conn, setup_teardown):
         """ Test with 0 upgrade tests. """
         conn = db_conn
 
@@ -117,7 +116,7 @@ class TestUpgrade:
         logs = _fetch_version_logs(conn)
         assert not logs
 
-    def test_upgrade_single(self, db_conn, setup_teardown):
+    def test_upgrader_single(self, db_conn, setup_teardown):
         """ Test with only single upgrade script. """
         conn = db_conn
 
@@ -155,7 +154,7 @@ class TestUpgrade:
         assert log[SCRIPT] == script_location.split("/")[-1]
         assert log[RETURNCODE] == 0
 
-    def test_upgrade_multiple(self, db_conn, setup_teardown):
+    def test_upgrader_multiple(self, db_conn, setup_teardown):
         """ Test with multiple test upgrade scripts. """
         conn = db_conn
 

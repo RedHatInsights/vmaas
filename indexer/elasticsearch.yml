@@ -1,0 +1,15 @@
+cluster:
+  name: vmaas-indexer
+
+node:
+  name: vmaas-indexer-1
+
+network:
+  bind_host: 0.0.0.0
+  host: 0.0.0.0
+
+discovery:
+  type: single-node
+
+bootstrap:
+  memory_lock: true

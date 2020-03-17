@@ -10,6 +10,7 @@ pytest = ">=5.0.1"
 pylint = ">=2.3.1"
 pytest-cov = ">=2.7.1"
 testing-postgresql = ">=1.3.0"
+pytest-elasticsearch = ">=2.0.1"
 
 [packages]
 connexion = {extras = ["swagger-ui"],version = "==2.6.0"}
@@ -25,7 +26,8 @@ schema = "==0.7.0"
 aiohttp = "==3.6"
 aiohttp-jinja2 = "==1.1.2"
 natsort = ">=7.0.1"
-
+elasticsearch-dsl= ">=7.0.0, <8.0.0"
+elasticsearch = ">7.0.0, <8.0.0"
 
 [requires]
 python_version = "3.6"

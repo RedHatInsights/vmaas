@@ -3,13 +3,17 @@
 Tool for exporting preprocessed data from database for webapp nodes.
 """
 
-import glob
 import os
+
+import glob
 import shelve
+
 from common.logging_utils import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from common.fileutil import remove_file_if_exists
+from common.es_handler import EsHandler
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
+from importer import Importer
 
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.dbm'
@@ -428,7 +432,9 @@ def main(filename):
     db_instance = DatabaseHandler.get_connection()
     data = DataDump(db_instance, filename)
     data.dump()
-
+    es_connection = EsHandler.get_connection()
+    importer = Importer(db_instance, es_connection)
+    importer.update_es()
 
 if __name__ == '__main__':
     main(DUMP)
