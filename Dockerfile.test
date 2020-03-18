@@ -21,11 +21,11 @@ ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
 
 ENV LC_ALL=en_US.utf8
 ENV LANG=en_US.utf8
-RUN cd /vmaas/webapp && pipenv install --dev && pipenv check -i 37752 && \
-    cd /vmaas/reposcan && pipenv install --dev && pipenv check -i 37752 && \
-    cd /vmaas/websocket && pipenv install --dev && pipenv check -i 37752 && \
-    cd /vmaas/webapp_utils && pipenv install --dev && pipenv check -i 37752 && \
-    cd /vmaas/ && pipenv install --dev && pipenv check -i 37752
+RUN cd /vmaas/webapp && pipenv install --dev && pipenv check && \
+    cd /vmaas/reposcan && pipenv install --dev && pipenv check && \
+    cd /vmaas/websocket && pipenv install --dev && pipenv check && \
+    cd /vmaas/webapp_utils && pipenv install --dev && pipenv check && \
+    cd /vmaas/ && pipenv install --dev && pipenv check
 
 ADD . /vmaas/
 
