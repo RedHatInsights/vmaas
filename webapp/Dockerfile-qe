@@ -9,7 +9,7 @@ ADD /webapp/Pipfile* /webapp/
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 RUN pip3 install --upgrade pipenv && \
-    cd /webapp && pipenv install --system --dev && pipenv check
+    cd /webapp && pipenv install --system --dev && ln -s /usr/bin/python3 /usr/bin/python && pipenv check --system
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /webapp --no-create-home vmaas
