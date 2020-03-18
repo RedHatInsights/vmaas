@@ -13,7 +13,7 @@ from database.test.conftest import create_pg, VMAAS_DIR
 # pylint: disable=no-self-use
 # pylint: disable=unnecessary-comprehension
 
-UPGRADE_FROM = os.getenv("UPGRADE_FROM", "d38766771b2b5a23e1e33fcf94335b7a3b82444a")
+UPGRADE_FROM = os.getenv("UPGRADE_FROM", "d5ce37e4b9ae8fd93adab80946ede0e36f5a5565")
 UPGRADE_TO = os.getenv("UPGRADE_TO", None)
 
 STATIC_TABLES = ["db_version"]
