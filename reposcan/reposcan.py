@@ -192,8 +192,8 @@ class SyncHandler:
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
-        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler):
-            # Notify webapps to update it's cache
+        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler) and "ERROR" not in task_result:
+            # Notify webapps to update their cache
             if ReposcanWebsocket.websocket:
                 ReposcanWebsocket.websocket.write_message("invalidate-cache")
             else:
