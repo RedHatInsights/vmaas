@@ -4,7 +4,17 @@ ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
 RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
 
-RUN microdnf install python3 which rsync git shadow-utils diffutils && microdnf clean all
+ARG PG_REPO=https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-8-x86_64/
+ARG PG_RPM=postgresql12-12.2-2PGDG.rhel8.x86_64.rpm
+ARG PG_LIBS_RPM=postgresql12-libs-12.2-2PGDG.rhel8.x86_64.rpm
+ADD /reposcan/RPM-GPG-KEY-PGDG /etc/pki/rpm-gpg/
+RUN microdnf install python3 which rsync git shadow-utils diffutils systemd libicu && microdnf clean all && \
+    curl -o /tmp/${PG_RPM} ${PG_REPO}${PG_RPM} && \
+    curl -o /tmp/${PG_LIBS_RPM} ${PG_REPO}${PG_LIBS_RPM} && \
+    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG && \
+    rpm -K /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM} && \
+    rpm -ivh /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM} && \
+    rm /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM}
 
 WORKDIR /reposcan
 
