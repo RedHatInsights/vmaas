@@ -1,6 +1,6 @@
 # Dockerfile uses postgresql 12 latest image
 # with applied vmaas database schema
-FROM registry.redhat.io/rhscl/postgresql-12-rhel7
+FROM docker.io/centos/postgresql-12-centos7
 
 ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest

@@ -2,6 +2,19 @@
 
 rc=0
 
+# Check database Dockerfile consistency
+dockerfile=database/Dockerfile
+sed \
+    -e "s/docker.io\/centos\/postgresql-12-centos7/registry.redhat.io\/rhscl\/postgresql-12-rhel7/" \
+    "$dockerfile".centos | diff "$dockerfile" -
+diff_rc=$?
+if [ $diff_rc -gt 0 ]; then
+    echo "$dockerfile and $dockerfile.centos are too different!"
+else
+    echo "$dockerfile and $dockerfile.centos are OK"
+fi
+rc=$(($rc+$diff_rc))
+
 # Run tests.
 TESTDIR=$1
 if [ ! -d "$TESTDIR" ] ; then
