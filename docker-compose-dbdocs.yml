@@ -5,7 +5,7 @@ services:
     container_name: vmaas-database
     build:
         context: .
-        dockerfile: ./database/Dockerfile
+        dockerfile: ./database/Dockerfile.centos
     image: vmaas/database:latest
     restart: unless-stopped
     env_file:
