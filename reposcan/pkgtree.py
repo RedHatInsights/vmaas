@@ -98,7 +98,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
     def _update_pkgtree_timestamp(self, timestamp):
         """ Updates the pkgtree_change column in db. """
         with self.db_instance.cursor() as cursor:
-            cursor.execute("""update dbchange set pkgtree_change = to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.US')
+            cursor.execute("""update dbchange set pkgtree_change = to_timestamp('%s', 'YYYY-MM-DDTHH24:MI:SS.US')
                               at time zone 'UTC'
                            """ % timestamp)
         self.db_instance.commit()
