@@ -1,11 +1,13 @@
-FROM fedora:28
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-RUN dnf install -y python3 python3-pip postgresql-server findutils git which && \
+RUN rpm -Uvh https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    microdnf install python3 python3-pip postgresql12-server findutils git which rsync && \
+    microdnf clean all && \
     pip3 install --upgrade pipenv pip
 
 # for testing.posgres python package to find postgres commands
-RUN ln -s /usr/bin/initdb /usr/local/bin/initdb && \
-    ln -s /usr/bin/postgres /usr/local/bin/postgres
+RUN ln -s /usr/pgsql-12/bin/initdb /usr/local/bin/initdb && \
+    ln -s /usr/pgsql-12/bin/postgres /usr/local/bin/postgres
 
 RUN mkdir -p /vmaas/webapp /vmaas/reposcan /vmaas/websocket /vmaas/webapp_utils && \
     chown -R postgres:postgres /vmaas
@@ -19,13 +21,13 @@ ADD /webapp_utils/Pipfile* /vmaas/webapp_utils/
 ADD Pipfile*               /vmaas/
 ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
 
-ENV LC_ALL=en_US.utf8
-ENV LANG=en_US.utf8
-RUN cd /vmaas/webapp && pipenv install --dev && pipenv check && \
-    cd /vmaas/reposcan && pipenv install --dev && pipenv check && \
-    cd /vmaas/websocket && pipenv install --dev && pipenv check && \
-    cd /vmaas/webapp_utils && pipenv install --dev && pipenv check && \
-    cd /vmaas/ && pipenv install --dev && pipenv check
+ENV LC_ALL=C.utf8
+ENV LANG=C.utf8
+RUN cd /vmaas/webapp && pipenv install --ignore-pipfile --deploy --dev && pipenv check && \
+    cd /vmaas/reposcan && pipenv install --ignore-pipfile --deploy --dev && pipenv check && \
+    cd /vmaas/websocket && pipenv install --ignore-pipfile --deploy --dev && pipenv check && \
+    cd /vmaas/webapp_utils && pipenv install --ignore-pipfile --deploy --dev && pipenv check && \
+    cd /vmaas/ && pipenv install --ignore-pipfile --deploy --dev && pipenv check
 
 ADD . /vmaas/
 
