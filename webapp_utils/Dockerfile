@@ -13,7 +13,7 @@ ADD /webapp_utils/Pipfile* /webapp_utils/
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 RUN pip3 install --upgrade pipenv && \
-    pipenv install --system && ln -s /usr/bin/python3 /usr/bin/python && pipenv check --system
+    pipenv install --ignore-pipfile --deploy --system && ln -s /usr/bin/python3 /usr/bin/python && pipenv check --system
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-webapp-utils\/"
