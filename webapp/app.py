@@ -15,6 +15,7 @@ from jsonschema.exceptions import ValidationError
 from prometheus_client import generate_latest
 import connexion
 from aiohttp import web, ClientSession, WSMsgType, hdrs
+from aiohttp.client_exceptions import ClientConnectionError
 
 from cache import Cache
 from common.constants import VMAAS_VERSION
@@ -34,6 +35,8 @@ from probes import REQUEST_COUNTS, REQUEST_TIME
 PUBLIC_API_PORT = 8080
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
+WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
+
 LOGGER = get_logger(__name__)
 
 
@@ -345,21 +348,25 @@ class Websocket:
         """Main loop for handling websocket connection"""
         async with ClientSession() as session:
             while True:
-                async with session.ws_connect(url=self.websocket_url) as socket:
-                    LOGGER.info("Connected to: %s", self.websocket_url)
-                    self.websocket = socket
-                    # subscribe for notifications
-                    await self.websocket.send_str("subscribe-webapp")
-                    # Re-send queued messages
-                    for item in self.websocket_response_queue:
-                        await self.websocket.send_str(item)
-                    self.websocket_response_queue.clear()
+                try:
+                    async with session.ws_connect(url=self.websocket_url) as socket:
+                        LOGGER.info("Connected to: %s", self.websocket_url)
+                        self.websocket = socket
+                        # subscribe for notifications
+                        await self.websocket.send_str("subscribe-webapp")
+                        # Re-send queued messages
+                        for item in self.websocket_response_queue:
+                            await self.websocket.send_str(item)
+                        self.websocket_response_queue.clear()
 
-                    # handle websocket messages
-                    await self.websocket_msg_handler()
-                    self.websocket = None
-                    # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
-                    await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL * 1000)
+                        # handle websocket messages
+                        await self.websocket_msg_handler()
+                        self.websocket = None
+                        # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
+                        await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
+                except ClientConnectionError:
+                    LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
+                    await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
 
     async def websocket_msg_handler(self):
         """Handle active websocket connection, returning upon close"""
