@@ -37,6 +37,10 @@ PUBLIC_API_PORT = 8080
 WEBSOCKET_RECONNECT_INTERVAL = 60
 WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
 
+REPOSCAN_HOST = os.getenv("REPOSCAN_HOST", "localhost")
+REPOSCAN_PORT = int(os.getenv("REPOSCAN_PORT", "8081"))
+LATEST_DUMP_ENDPOINT = "/api/v1/latestdump"
+
 LOGGER = get_logger(__name__)
 
 
@@ -359,14 +363,31 @@ class Websocket:
                             await self.websocket.send_str(item)
                         self.websocket_response_queue.clear()
 
+                        # check if webapp missed dump
+                        latest_dump = await self.fetch_latest_dump()
+                        if latest_dump != BaseHandler.db_cache.dbchange['exported']:
+                            LOGGER.info("Fetching missed dump: %s.", latest_dump)
+                            self._refresh_cache()
+                            msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
+                            if self.websocket:
+                                await self.websocket.send_str(msg)
+                            else:
+                                self.websocket_response_queue.add(msg)
+
                         # handle websocket messages
                         await self.websocket_msg_handler()
-                        self.websocket = None
                         # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
+                        self.websocket = None
                         await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
                 except ClientConnectionError:
                     LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
                     await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
+
+    async def fetch_latest_dump(self):
+        """Method fetches latest dump from reposcan"""
+        async with ClientSession() as session:
+            async with session.get("http://%s:%s/%s" % (REPOSCAN_HOST, REPOSCAN_PORT, LATEST_DUMP_ENDPOINT)) as resp:
+                return await resp.text()
 
     async def websocket_msg_handler(self):
         """Handle active websocket connection, returning upon close"""
