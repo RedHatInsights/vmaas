@@ -25,7 +25,7 @@ from common.constants import VMAAS_VERSION
 from database.database_handler import DatabaseHandler, init_db
 from database.product_store import ProductStore
 from dbchange import DbChangeAPI
-from exporter import DUMP, main as export_data
+from exporter import DUMP, DataDump, main as export_data
 from pkgtree import PKGTREE_FILE, main as export_pkgtree
 from mnm import FAILED_AUTH, FAILED_WEBSOCK, FAILED_IMPORT_CVE, FAILED_IMPORT_REPO
 from redhatcve.cvemap_controller import CvemapController
@@ -152,6 +152,13 @@ class TaskCancelHandler():
             LOGGER.warning("Background task terminated.")
         return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
+class DumpVersionHandler():
+    """Handler class for getting latest dump version."""
+
+    @classmethod
+    def get(cls, **kwargs):
+        """Get the latest version."""
+        return DataDump.fetch_latest_dump()
 
 class SyncHandler:
     """Base handler class providing common methods for different sync types."""

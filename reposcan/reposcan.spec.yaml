@@ -238,6 +238,18 @@ paths:
       tags:
         - DbChange
 
+  /v1/latestdump:
+    get:
+      summary: Get latest version of database dump
+      operationId: reposcan.DumpVersionHandler.get
+      responses:
+        200:
+          description: Returns version of latest dump
+          content:
+            text/plain:
+              schema: {type: string, example: "vmaas.dbm-2020-03-30T13:13:46.156455+00:00"}
+      tags:
+        - Metadata
 
 components:
   securitySchemes:

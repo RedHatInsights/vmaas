@@ -18,6 +18,7 @@ LOGGER = get_logger(__name__)
 
 class DataDump:
     """Class for creating disk dump from database."""
+
     def __init__(self, db_instance, filename):
         self.db_instance = db_instance
         self.filename = filename
@@ -25,6 +26,14 @@ class DataDump:
         self.package_ids = []
         self.errata_ids = []
         self.keep_copies = int(os.getenv('KEEP_COPIES', DEFAULT_KEEP_COPIES))
+
+    @staticmethod
+    def fetch_latest_dump():
+        """Read the symlink, to know what is latest dump."""
+        try:
+            return os.readlink(DUMP).split("-", 1)[1]
+        except FileNotFoundError:
+            return "Unknown"
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
