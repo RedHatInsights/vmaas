@@ -41,10 +41,13 @@ def test_cache(monkeypatch):
     assert len(cache.src_pkg_id2pkg_ids) == 2
     assert len(cache.updates) == 1
     assert len(cache.updates_index) == 1
+    assert len(cache.content_set_id2label) == 2
+    assert len(cache.label2content_set_id) == 2
+    assert len(cache.content_set_id2pkg_name_ids) == 2
 
     cache.clear()
     variables = vars(cache)
-    assert len(variables) == 26
+    assert len(variables) == 29
     for name, var in variables.items():
         if name == "filename":
             assert var == TEST_DUMP_FILE

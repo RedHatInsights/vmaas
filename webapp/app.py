@@ -22,6 +22,7 @@ from common.constants import VMAAS_VERSION
 from common.logging_utils import init_logging, get_logger
 from cve import CveAPI
 from repos import RepoAPI
+from srpm_pkg_names import SRPMPkgNamesAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
@@ -48,6 +49,7 @@ LOGGER = get_logger(__name__)
 class BaseHandler:
     """Base class containing individual repositories"""
 
+    srpm_pkg_names_api = None
     db_cache = None
     updates_api = None
     repo_api = None
@@ -349,6 +351,24 @@ class PatchesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.patches_api, 1, **kwargs)
 
 
+class SRPMPkgNamesHandlerPost(BaseHandler):
+    """Handler for processing /package_names POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """RPM list or Content Set list by SRPM list or RPM list"""
+        return await cls.handle_request(cls.srpm_pkg_names_api, 1, **kwargs)
+
+
+class SRPMPkgNamesHandlerGet(BaseHandler):
+    """Handler for processing /package_names GET requests."""
+
+    @classmethod
+    async def get(cls, srpm=None, **kwargs):
+        """RPM list or Content Set list by SRPM list or RPM list"""
+        return await cls.handle_request(cls.srpm_pkg_names_api, 1, 'srpm_name_list', srpm, **kwargs)
+
+
 class Websocket:
     """ main websocket handling class"""
     def __init__(self):
@@ -447,6 +467,7 @@ def load_cache_to_apis():
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.patches_api = PatchesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
+    BaseHandler.srpm_pkg_names_api = SRPMPkgNamesAPI(BaseHandler.db_cache)
 
 
 def create_app():

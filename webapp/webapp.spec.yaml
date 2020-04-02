@@ -473,6 +473,50 @@ paths:
                 $ref: '#/components/schemas/PatchesResponse'
       tags:
         - patches
+
+  /v1/package_names/srpms:
+    post:
+      description: List of content sets with associated rpm names by given srpm and content set.
+      operationId: app.SRPMPkgNamesHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SRPMPkgNamesRequest'
+      responses:
+        '200':
+          description: List of content sets with associated rpm names by given srpm names and content set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SRPMPkgNamesResponse'
+        <<: *format_resps
+      tags:
+        - package_names
+
+  /v1/package_names/srpms/{srpm}:
+    get:
+      description: List of content sets with associated rpm names by given srpm.
+      operationId: app.SRPMPkgNamesHandlerGet.get
+      parameters:
+        - name: srpm
+          description: Source package name
+          required: true
+          schema:
+            type: string
+          in: path
+          x-example: openssl
+      responses:
+        '200':
+          description: List of content sets with associated rpm names by given srpm names and content set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SRPMPkgNamesResponse'
+        <<: *format_resps
+      tags:
+        - package_names
+
 tags: []
 
 x-paging-info: &req_paging
@@ -1090,6 +1134,7 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+
     PatchesRequest:
       type: object
       properties:
@@ -1132,3 +1177,31 @@ components:
           items:
             type: string
             example: RHSA-2018:0151
+
+    SRPMPkgNamesRequest:
+      type: object
+      properties:
+        srpm_name_list:
+          type: array
+          items:
+            type: string
+            example: openssl
+        content_set_list:
+          type: array
+          items:
+            type: string
+            example: rhel-7-desktop-rpms
+
+    SRPMPkgNamesResponse:
+        properties:
+          last_change:
+            example: '2020-04-16 20:07:58.500192+00'
+          srpm_name_list:
+            type: object
+            additionalProperties:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+                  example: 'openssl-libs'
