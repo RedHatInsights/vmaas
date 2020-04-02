@@ -46,6 +46,7 @@ class DataDump:
         try:
             with shelve.open(dump_filename, 'c') as dump:
                 self._dump_packagename(dump)
+                self._dump_all_packagenames(dump)
                 self._dump_updates(dump)
                 self._dump_evr(dump)
                 self._dump_arch(dump)
@@ -86,6 +87,17 @@ class DataDump:
                 dump["packagename2id:%s" % pkg_name] = name_id
                 dump["id2packagename:%s" % name_id] = pkg_name
                 self.packagename_ids.append(name_id)
+
+    def _dump_all_packagenames(self, dump):
+        """Select all packages"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select distinct p.id, pn.name
+                                from package_name pn inner join package p on pn.id = p.name_id""")
+            pkg_ids = {}
+            for pkg_id, pkg_name in cursor:
+                dump["pkg_id2pkg_name:%s" % pkg_id] = pkg_name
+                pkg_ids.setdefault("pkg_name2pkg_ids:%s" % pkg_name, []).append(pkg_id)
+            dump.update(pkg_ids)
 
     def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""

@@ -22,6 +22,7 @@ from common.constants import VMAAS_VERSION
 from common.logging_utils import init_logging, get_logger
 from cve import CveAPI
 from repos import RepoAPI
+from rpm import RpmAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
 from packages import PackagesAPI
@@ -58,6 +59,7 @@ class BaseHandler:
     vulnerabilities_api = None
     patches_api = None
     dbchange_api = None
+    rpm_api = None
 
     @classmethod
     async def get_post_data(cls, request):
@@ -325,6 +327,7 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
 
+
 class PatchesHandlerGet(BaseHandler):
     """Handler for processing /patches GET requests."""
 
@@ -342,6 +345,14 @@ class PatchesHandlerPost(BaseHandler):
     async def post(cls, **kwargs):
         """List of applicable errata to a package list. """
         return await cls.handle_request(cls.patches_api, 1, **kwargs)
+
+class RpmsHandlerPost(BaseHandler):
+    """Handler for processing /rpms POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """RPM list or Content Set list by SRPM list or RPM list"""
+        return await cls.handle_request(cls.rpm_api, 1, **kwargs)
 
 
 class Websocket:
@@ -439,6 +450,7 @@ def load_cache_to_apis():
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.patches_api = PatchesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
+    BaseHandler.rpm_api = RpmAPI(BaseHandler.db_cache)
 
 
 def create_app():

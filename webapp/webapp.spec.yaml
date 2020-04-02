@@ -432,6 +432,7 @@ paths:
       tags:
         - vulnerabilities
 
+
   /v1/patches:
     post:
       description: List of applicable errata to a package list.
@@ -451,6 +452,26 @@ paths:
         <<: *format_resps
       tags:
         - patches
+
+  /v1/rpms:
+    post:
+      description: List of rpms by given srpm or rpm list and content set.
+      operationId: app.RpmsHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RpmsRequest'
+      responses:
+        '200':
+          description: List of rpms or content sets by given srpm or rpm list and content set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RpmsResponse'
+        <<: *format_resps
+      tags:
+        - rpms
 
   '/v1/patches/{nevra}':
     get:
@@ -473,6 +494,7 @@ paths:
                 $ref: '#/components/schemas/PatchesResponse'
       tags:
         - patches
+
 tags: []
 
 x-paging-info: &req_paging
@@ -1090,6 +1112,7 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+
     PatchesRequest:
       type: object
       properties:
@@ -1132,3 +1155,46 @@ components:
           items:
             type: string
             example: RHSA-2018:0151
+
+    RpmsRequest:
+      type: object
+      properties:
+        srpm_name_list:
+          type: array
+          items:
+            type: string
+            example: openssl
+        rpm_name_list:
+          type: array
+          items:
+            type: string
+            example: openssl
+        content_set_list:
+          type: array
+          items:
+            type: string
+            example: rhel-7-desktop-rpms
+
+    RpmsResponse:
+        properties:
+          last_change:
+            example: '2020-04-16 20:07:58.500192+00'
+          srpm_name_list:
+            type: object
+            properties:
+              openssl:
+                type: object
+                properties:
+                  rhel-7-desktop-rpms:
+                    type: array
+                    items:
+                      type: string
+                      example: 'openssl-libs'
+          rpm_name_list:
+            type: object
+            properties:
+              openssl:
+                type: array
+                items:
+                  type: string
+                  example: 'rhel-7-desktop'
