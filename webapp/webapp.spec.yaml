@@ -1112,6 +1112,7 @@ components:
             type: string
             example: CVE-2016-0800
 
+
     PatchesRequest:
       type: object
       properties:
@@ -1173,6 +1174,7 @@ components:
           items:
             type: string
             example: rhel-7-desktop-rpms
+
 
     PackageNamesResponse:
         properties:

@@ -22,6 +22,7 @@ from common.constants import VMAAS_VERSION
 from common.logging_utils import init_logging, get_logger
 from cve import CveAPI
 from repos import RepoAPI
+
 from package_names import PackageNamesAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
@@ -327,6 +328,7 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
 
+
 class PatchesHandlerGet(BaseHandler):
     """Handler for processing /patches GET requests."""
 
@@ -353,6 +355,7 @@ class PackageNamesHandlerPost(BaseHandler):
     async def post(cls, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
         return await cls.handle_request(cls.package_names_api, 1, **kwargs)
+
 
 
 class Websocket:
