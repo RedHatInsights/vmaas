@@ -54,23 +54,6 @@ docker-compose start vmaas_database
 docker-compose stop vmaas_database
 ~~~
 
-### OpenShift deployment (stable)
-Login to OpenShift cluster and select target project
-~~~bash
-oc login <openshift URL>
-oc project my-project
-~~~
-
-Deploy latest builds from https://hub.docker.com/u/vmaas/
-~~~bash
-ansible-playbook openshift-deployment.yml --tags up
-~~~
-
-Delete deployment completely
-~~~bash
-ansible-playbook openshift-deployment.yml --tags down
-~~~
-
 ## Initial Setup
 
 This "Initial Setup" section was put together as I set up on my Fedora 27 system.  Your mileage may vary.
