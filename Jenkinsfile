@@ -47,11 +47,11 @@ def deployVmaas(project) {
 
                 # Deploy these customized builders into 'vmaas-qe' project
                 ocdeployer deploy -f --sets vmaas --template-dir buildfactory \
-                    -e builder-env ${project} --secrets-local-dir secrets/sanitized
+                    -e builder-env ${project} --secrets-src-project secrets
             """
             // deploy vmaas service set
             sh "ocdeployer deploy -f --sets vmaas -e vmaas-qe \
-                ${project} --secrets-local-dir secrets/sanitized"
+                ${project} --secrets-src-project secrets"
         }
     }
 }
