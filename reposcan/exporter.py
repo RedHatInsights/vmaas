@@ -46,6 +46,8 @@ class DataDump:
         try:
             with shelve.open(dump_filename, 'c') as dump:
                 self._dump_packagename(dump)
+                self._dump_content_set_with_pkg_names(dump)
+                self._dump_all_content_sets(dump)
                 self._dump_updates(dump)
                 self._dump_evr(dump)
                 self._dump_arch(dump)
@@ -57,7 +59,7 @@ class DataDump:
                 self._dump_modules(dump)
                 self._dump_dbchange(dump)
                 dump["dbchange:exported"] = timestamp
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump")
             remove_file_if_exists(dump_filename)
@@ -86,6 +88,27 @@ class DataDump:
                 dump["packagename2id:%s" % pkg_name] = name_id
                 dump["id2packagename:%s" % name_id] = pkg_name
                 self.packagename_ids.append(name_id)
+
+    def _dump_content_set_with_pkg_names(self, dump):
+        """Select all packages"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select distinct p.name_id, cs.id
+                                from package p
+                          inner join pkg_repo pr on p.id = pr.pkg_id
+                          inner join repo r on pr.repo_id = r.id
+                          inner join content_set cs on r.content_set_id = cs.id""")
+            pkg_name_ids = {}
+            for name_id, content_set_id in cursor:
+                pkg_name_ids.setdefault("content_set_id2pkg_name_ids:%s" % content_set_id, []).append(name_id)
+            dump.update(pkg_name_ids)
+
+    def _dump_all_content_sets(self, dump):
+        """Select all content sets"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select distinct cs.label, cs.id from content_set cs""")
+            for label, content_set_id in cursor:
+                dump["content_set_id2label:%s" % content_set_id] = label
+                dump["label2content_set_id:%s" % label] = content_set_id
 
     def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
