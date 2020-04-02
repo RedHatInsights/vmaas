@@ -141,6 +141,16 @@ _patches_response = {
     'errata_list': [str]
 }
 
+_pkg_names_srpm_resp = {
+    'last_change': str,
+    'srpm_name_list': {str: {str: [str]}}
+}
+
+_pkg_names_rpm_resp = {
+    'last_change': str,
+    'rpm_name_list': {str: [str]}
+}
+
 errata_schema = Schema(_errata)
 repos_schema = Schema(_repos)
 cves_schema = Schema(_cves)
@@ -158,3 +168,5 @@ updates_package_schema = Schema(_updates_package)
 updates_package_schema_v2 = Schema(_updates_package_v2)
 vulnerabilities_schema = Schema(_vulnerabilities_response)
 patches_schema = Schema(_patches_response)
+pkg_names_srpm_schema = Schema(_pkg_names_srpm_resp)
+pkg_names_rpm_schema = Schema(_pkg_names_rpm_resp)
