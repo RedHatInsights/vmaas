@@ -432,7 +432,6 @@ paths:
       tags:
         - vulnerabilities
 
-
   /v1/patches:
     post:
       description: List of applicable errata to a package list.
@@ -453,22 +452,22 @@ paths:
       tags:
         - patches
 
-  /v1/rpms:
+  /v1/package_names:
     post:
       description: List of rpms by given srpm or rpm list and content set.
-      operationId: app.RpmsHandlerPost.post
+      operationId: app.PackageNamesHandlerPost.post
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RpmsRequest'
+              $ref: '#/components/schemas/PackageNamesRequest'
       responses:
         '200':
           description: List of rpms or content sets by given srpm or rpm list and content set.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RpmsResponse'
+                $ref: '#/components/schemas/PackageNamesResponse'
         <<: *format_resps
       tags:
         - rpms
@@ -1156,7 +1155,7 @@ components:
             type: string
             example: RHSA-2018:0151
 
-    RpmsRequest:
+    PackageNamesRequest:
       type: object
       properties:
         srpm_name_list:
@@ -1175,7 +1174,7 @@ components:
             type: string
             example: rhel-7-desktop-rpms
 
-    RpmsResponse:
+    PackageNamesResponse:
         properties:
           last_change:
             example: '2020-04-16 20:07:58.500192+00'

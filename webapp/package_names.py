@@ -1,5 +1,5 @@
 """
-Module contains classes for matching RPM by SRPM and Content Set
+Module contains classes for matching RPM name by SRPM name and Content Set
 """
 import re
 
@@ -7,8 +7,8 @@ from cache import REPO_LABEL
 from common.webapp_utils import format_datetime
 
 
-class RpmAPI:
-    """Main /rpms API class"""
+class PackageNamesAPI:
+    """Main /package_names API class"""
 
     def __init__(self, cache):
         self.cache = cache
