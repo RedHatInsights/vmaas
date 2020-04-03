@@ -1175,7 +1175,6 @@ components:
             type: string
             example: rhel-7-desktop-rpms
 
-
     PackageNamesResponse:
         properties:
           last_change:

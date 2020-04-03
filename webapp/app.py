@@ -328,7 +328,6 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
 
-
 class PatchesHandlerGet(BaseHandler):
     """Handler for processing /patches GET requests."""
 
@@ -355,7 +354,6 @@ class PackageNamesHandlerPost(BaseHandler):
     async def post(cls, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
         return await cls.handle_request(cls.package_names_api, 1, **kwargs)
-
 
 
 class Websocket:
