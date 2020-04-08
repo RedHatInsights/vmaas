@@ -6,6 +6,7 @@ import dbm
 import os
 import shelve
 import array
+import asyncio
 
 from common.logging_utils import get_logger
 
@@ -110,6 +111,11 @@ class Cache:
         self.src_pkg_id2pkg_ids = {}
         self.strings = {}
 
+    async def reload_async(self):
+        """Update data and reload dictionaries asynchronously."""
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self.reload)
+
     def reload(self):
         """Update data and reload dictionaries."""
         if self.download():
@@ -124,6 +130,7 @@ class Cache:
     def load(self, filename):
         """Load data from shelve file into dictionaries."""
         # pylint: disable=too-many-branches,too-many-statements
+        LOGGER.info("Loading cache dump...")
         try:
             data = shelve.open(filename, 'r')
         except dbm.error as err:
@@ -188,4 +195,4 @@ class Cache:
                 self.strings[int(key)] = data[item]
             else:
                 raise KeyError("Unknown relation in data: %s" % relation)
-        LOGGER.info("Loaded data version %s.", self.dbchange.get('exported', 'unknown'))
+        LOGGER.info("Loaded dump version: %s", self.dbchange.get('exported', 'unknown'))
