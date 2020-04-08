@@ -362,8 +362,9 @@ class Websocket:
         self.task = None
 
     @staticmethod
-    def _refresh_cache():
-        BaseHandler.db_cache.reload()
+    async def _refresh_cache():
+        LOGGER.info("Starting cached data refresh.")
+        await BaseHandler.db_cache.reload_async()
         use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
         if use_hot_cache.upper() == "YES":
             BaseHandler.updates_api.clear_hot_cache()
@@ -388,7 +389,7 @@ class Websocket:
                         latest_dump = await self.fetch_latest_dump()
                         if latest_dump != BaseHandler.db_cache.dbchange['exported']:
                             LOGGER.info("Fetching missed dump: %s.", latest_dump)
-                            self._refresh_cache()
+                            await self._refresh_cache()
                             msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                             if self.websocket:
                                 await self.websocket.send_str(msg)
@@ -418,7 +419,7 @@ class Websocket:
                 return None
 
             if msg.data == 'refresh-cache':
-                self._refresh_cache()
+                await self._refresh_cache()
                 msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
                 if self.websocket:
                     await self.websocket.send_str(msg)
