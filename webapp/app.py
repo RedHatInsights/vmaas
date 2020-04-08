@@ -58,6 +58,7 @@ class BaseHandler:
     vulnerabilities_api = None
     patches_api = None
     dbchange_api = None
+    refreshing = False
 
     @classmethod
     async def get_post_data(cls, request):
@@ -69,6 +70,10 @@ class BaseHandler:
     @classmethod
     async def handle_request(cls, api_endpoint, api_version, param_name=None, param=None, **kwargs):
         """Takes care of validation of input and execution of request."""
+        # If refreshing cache, return 503 so apps can detect this state
+        if cls.refreshing:
+            return web.json_response("Data refresh in progress, please try again later.", status=503)
+
         request = kwargs.get('request', None)
         if request is None:
             raise ValueError('request not provided')
@@ -103,7 +108,7 @@ class BaseHandler:
         return web.json_response(res, status=code)
 
 
-class HealthHandler(BaseHandler):
+class HealthHandler:
     """Handler class providing health status."""
 
     @classmethod
@@ -119,7 +124,7 @@ class HealthHandler(BaseHandler):
         return web.Response(status=200)
 
 
-class VersionHandler(BaseHandler):
+class VersionHandler:
     """Handler class providing app version."""
 
     @classmethod
@@ -364,10 +369,12 @@ class Websocket:
     @staticmethod
     async def _refresh_cache():
         LOGGER.info("Starting cached data refresh.")
+        BaseHandler.refreshing = True
         await BaseHandler.db_cache.reload_async()
         use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
         if use_hot_cache.upper() == "YES":
             BaseHandler.updates_api.clear_hot_cache()
+        BaseHandler.refreshing = False
         LOGGER.info("Cached data refreshed.")
 
     async def websocket_loop(self):
