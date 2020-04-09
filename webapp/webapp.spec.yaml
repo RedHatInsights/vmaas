@@ -454,7 +454,7 @@ paths:
 
   /v1/package_names:
     post:
-      description: List of rpms by given srpm or rpm list and content set.
+      description: List of content sets with associated rpm names by given srpm or rpm name list and content set.
       operationId: app.PackageNamesHandlerPost.post
       requestBody:
         content:
@@ -463,14 +463,14 @@ paths:
               $ref: '#/components/schemas/PackageNamesRequest'
       responses:
         '200':
-          description: List of rpms or content sets by given srpm or rpm list and content set.
+          description: List of content sets with associated rpm names by given srpm names or list content sets by given rpm names.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PackageNamesResponse'
         <<: *format_resps
       tags:
-        - rpms
+        - package_names
 
   '/v1/patches/{nevra}':
     get:
@@ -1167,7 +1167,7 @@ components:
           type: array
           items:
             type: string
-            example: openssl
+            example: openssl-libs
         content_set_list:
           type: array
           items:
@@ -1180,19 +1180,18 @@ components:
             example: '2020-04-16 20:07:58.500192+00'
           srpm_name_list:
             type: object
-            properties:
-              openssl:
-                type: object
-                properties:
-                  rhel-7-desktop-rpms:
-                    type: array
-                    items:
-                      type: string
-                      example: 'openssl-libs'
+            additionalProperties:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+                  example: 'openssl-libs'
           rpm_name_list:
             type: object
-            properties:
-              openssl:
+            additionalProperties:
+              type: object
+              additionalProperties:
                 type: array
                 items:
                   type: string
