@@ -1,9 +1,7 @@
 """
 Module contains classes for matching RPM name by SRPM name and Content Set
 """
-from natsort import natsorted
-
-import re
+from natsort import natsorted  # pylint: disable=E0401
 
 from cache import PKG_NAME_ID
 from common.webapp_utils import format_datetime
@@ -85,16 +83,15 @@ class PackageNamesAPI:
                 pkg_name_id in self.cache.content_set_id2pkg_name_ids[csid])
 
     def _get_content_set_labels(self, content_set_ids):
-        """Returns list of content set labels"""
+        """Returns list of content set labels for given content set ids"""
         return [self.cache.content_set_id2label[csid] for csid in content_set_ids if
                 csid in self.cache.content_set_id2label]
 
     def _process_content_set(self, content_set_labels):
-        """Returns list of available repo_ids for given content sets."""
+        """Returns dict of name ids for given content sets."""
         label2name_ids = {}
         for label in content_set_labels:
             if label in self.cache.label2content_set_id:
                 label2name_ids.setdefault(label, []).extend(
                     self.cache.content_set_id2pkg_name_ids[self.cache.label2content_set_id[label]])
         return label2name_ids
-
