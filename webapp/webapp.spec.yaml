@@ -431,6 +431,48 @@ paths:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
       tags:
         - vulnerabilities
+
+  /v1/patches:
+    post:
+      description: List of applicable errata to a package list.
+      operationId: app.PatchesHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchesRequest'
+      responses:
+        '200':
+          description: List of applicable errata to a package list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchesResponse'
+        <<: *format_resps
+      tags:
+        - patches
+
+  '/v1/patches/{nevra}':
+    get:
+      description: List of applicable CVEs for a single package NEVRA
+      operationId: app.PatchesHandlerGet.get
+      parameters:
+        - name: nevra
+          description: Package NEVRA
+          required: true
+          schema:
+            type: string
+          in: path
+          x-example: kernel-2.6.32-696.20.1.el6.x86_64
+      responses:
+        '200':
+          description: Return list of applicable errata for a single NEVRA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchesResponse'
+      tags:
+        - patches
 tags: []
 
 x-paging-info: &req_paging
@@ -1048,3 +1090,45 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+    PatchesRequest:
+      type: object
+      properties:
+        package_list:
+          type: array
+          items:
+            type: string
+            example: kernel-2.6.32-696.20.1.el6.x86_64
+        repository_list:
+          type: array
+          items:
+            type: string
+            example: rhel-6-server-rpms
+        modules_list:
+          type: array
+          items:
+            type: object
+            properties:
+              module_name:
+                type: string
+                example: rhn-tools
+              module_stream:
+                type: string
+                example: '1'
+            required:
+              - module_name
+              - module_stream
+        releasever:
+          type: string
+          example: 6Server
+        basearch:
+          type: string
+          example: x86_64
+      required:
+        - package_list
+    PatchesResponse:
+      properties:
+        errata_list:
+          type: array
+          items:
+            type: string
+            example: RHSA-2018:0151

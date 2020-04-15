@@ -27,6 +27,7 @@ from errata import ErrataAPI
 from packages import PackagesAPI
 from pkgtree import PkgtreeAPI
 from vulnerabilities import VulnerabilitiesAPI
+from patches import PatchesAPI
 from dbchange import DBChange
 from probes import REQUEST_COUNTS, REQUEST_TIME
 
@@ -55,6 +56,7 @@ class BaseHandler:
     packages_api = None
     pkgtree_api = None
     vulnerabilities_api = None
+    patches_api = None
     dbchange_api = None
 
     @classmethod
@@ -323,6 +325,25 @@ class VulnerabilitiesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
 
 
+class PatchesHandlerGet(BaseHandler):
+    """Handler for processing /patches GET requests."""
+
+    @classmethod
+    async def get(cls, nevra=None, **kwargs):
+        """ List of applicable errata for a single package NEVRA
+        """
+        return await cls.handle_request(cls.patches_api, 1, 'package_list', nevra, **kwargs)
+
+
+class PatchesHandlerPost(BaseHandler):
+    """Handler for processing /patches POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """List of applicable errata to a package list. """
+        return await cls.handle_request(cls.patches_api, 1, **kwargs)
+
+
 class Websocket:
     """ main websocket handling class"""
     def __init__(self):
@@ -416,6 +437,7 @@ def load_cache_to_apis():
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
     BaseHandler.pkgtree_api = PkgtreeAPI(BaseHandler.db_cache)
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
+    BaseHandler.patches_api = PatchesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
 
 
