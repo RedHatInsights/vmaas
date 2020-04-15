@@ -85,7 +85,6 @@ class Cache:
     def clear(self):
         """Clear dictionaries and load new data."""
         self.packagename2id = {}
-        self.pkg_name_id2content_set_id = {}
         self.content_set_id2pkg_name_ids = {}
         self.content_set_id2label = {}
         self.label2content_set_id = {}
@@ -140,8 +139,6 @@ class Cache:
                 self.packagename2id[key] = data[item]
             elif relation == "id2packagename":
                 self.id2packagename[int(key)] = data[item]
-            elif relation == "pkg_name_id2content_set_id":
-                self.pkg_name_id2content_set_id[int(key)] = data[item]
             elif relation == "content_set_id2pkg_name_ids":
                 self.content_set_id2pkg_name_ids[int(key)] = data[item]
             elif relation == "content_set_id2label":

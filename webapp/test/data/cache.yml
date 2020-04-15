@@ -406,3 +406,16 @@ src_pkg_id2pkg_ids:
     - 8110
   83200:
     - 8320
+content_set_id2label:
+  1: rhel-7-server-rpms
+  2: my-content-set
+label2content_set_id:
+  rhel-7-server-rpms: 1
+  my-content-set: 2
+content_set_id2pkg_name_ids:
+  1:
+    - 32222
+    - 332222
+    - 2222
+  2:
+    - 2222

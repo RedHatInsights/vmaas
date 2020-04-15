@@ -59,7 +59,7 @@ class DataDump:
                 self._dump_modules(dump)
                 self._dump_dbchange(dump)
                 dump["dbchange:exported"] = timestamp
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump")
             remove_file_if_exists(dump_filename)
@@ -99,7 +99,6 @@ class DataDump:
                           inner join content_set cs on r.content_set_id = cs.id""")
             pkg_name_ids = {}
             for name_id, content_set_id in cursor:
-                dump["pkg_name_id2content_set_id:%s" % name_id] = content_set_id
                 pkg_name_ids.setdefault("content_set_id2pkg_name_ids:%s" % content_set_id, []).append(name_id)
             dump.update(pkg_name_ids)
 

@@ -30,6 +30,7 @@ class PackageNamesAPI:
         response['last_change'] = format_datetime(self.cache.dbchange['last_change'])
         rpm_data = {}
         for srpm in srpm_list:
+            label2pkg_name_filtered = {}
             if srpm in self.cache.packagename2id:
                 src_pkg_name_id = self.cache.packagename2id[srpm]
                 content_set_ids = self._get_content_set_ids(src_pkg_name_id)
@@ -42,10 +43,13 @@ class PackageNamesAPI:
 
                 content_set_labels = []
                 if content_set_list:
+                    # filter content set labels by given content set list
                     content_set_labels.extend([label for label in content_set_list if
-                                               self.cache.label2content_set_id[label] in content_set_ids])
+                                               label in self.cache.label2content_set_id
+                                               and self.cache.label2content_set_id[label] in content_set_ids])
                     label2name_ids = self._process_content_set(content_set_labels)
                 else:
+                    # get all content set labels for given source package name id
                     content_set_labels = self._get_content_set_labels(content_set_ids)
                     label2name_ids = self._process_content_set(content_set_labels)
 
@@ -53,24 +57,24 @@ class PackageNamesAPI:
                 for pkg in src2pkgid.values():
                     pkg_ids.extend(pkg)
 
-                label2pkg_name_filtered = {}
                 for label in content_set_labels:
                     pkg_names = set(
                         self.cache.id2packagename[self.cache.package_details[pid][PKG_NAME_ID]] for pid in pkg_ids if
                         self.cache.package_details[pid][PKG_NAME_ID] in label2name_ids[label])
                     label2pkg_name_filtered.setdefault(label, []).extend(natsorted(pkg_names))
-                rpm_data.setdefault(srpm, {}).update(label2pkg_name_filtered)
+            rpm_data.setdefault(srpm, {}).update(label2pkg_name_filtered)
 
         if rpm_data:
             response['srpm_name_list'] = rpm_data
 
         content_data = {}
         for rpm in rpm_list:
+            content_set_labels = []
             if rpm in self.cache.packagename2id:
                 pkg_name_id = self.cache.packagename2id[rpm]
                 content_set_ids = self._get_content_set_ids(pkg_name_id)
-                content_set_labels = self._get_content_set_labels(content_set_ids)
-                content_data.setdefault(rpm, []).extend(natsorted(content_set_labels))
+                content_set_labels.extend(self._get_content_set_labels(content_set_ids))
+            content_data.setdefault(rpm, []).extend(natsorted(content_set_labels))
 
         if content_data:
             response['rpm_name_list'] = content_data
