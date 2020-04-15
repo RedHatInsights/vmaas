@@ -11,6 +11,7 @@ services:
   vmaas_websocket:
     volumes:
       - ./websocket:/git
+      - ./common:/git/common
     security_opt:
       - label=disable
     working_dir: /git
