@@ -23,7 +23,7 @@ ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
 
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
-ENV PIPENV_CHECK=1
+ARG PIPENV_CHECK=1
 RUN cd /vmaas/webapp && pipenv install --ignore-pipfile --deploy --dev && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
     cd /vmaas/reposcan && pipenv install --ignore-pipfile --deploy --dev && \
