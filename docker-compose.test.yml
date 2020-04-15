@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
+      args:
+          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     environment:
       CI: "true"
       TRAVIS: "true"
