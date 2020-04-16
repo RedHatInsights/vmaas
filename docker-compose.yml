@@ -8,6 +8,7 @@ services:
         dockerfile: ./database/Dockerfile.centos
     image: vmaas/database:latest
     restart: unless-stopped
+    shm_size: '256mb'
     env_file:
       - ./conf/database-connection-admin.env
     ports:
