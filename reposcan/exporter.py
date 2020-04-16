@@ -33,7 +33,7 @@ class DataDump:
         try:
             return os.readlink(DUMP).split("-", 1)[1]
         except FileNotFoundError:
-            return "Unknown"
+            return None
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
