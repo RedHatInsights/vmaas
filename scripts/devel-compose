@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export PIPENV_CHECK=${PIPENV_CHECK:-0}
 
 if [ ! -e /usr/bin/docker-compose ] ; then
     podman-compose ${PODMAN_PATH:+--podman-path=$PODMAN_PATH} \

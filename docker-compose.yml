@@ -20,6 +20,8 @@ services:
     build:
         context: .
         dockerfile: ./websocket/Dockerfile
+        args:
+          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/websocket:latest
     restart: unless-stopped
     ports:
@@ -30,6 +32,8 @@ services:
     build:
         context: .
         dockerfile: ./reposcan/Dockerfile
+        args:
+          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/reposcan:latest
     restart: unless-stopped
     env_file:
@@ -50,6 +54,8 @@ services:
     build:
         context: .
         dockerfile: ./webapp/Dockerfile
+        args:
+          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/webapp:latest
     restart: unless-stopped
     env_file:
@@ -66,6 +72,8 @@ services:
     build:
         context: .
         dockerfile: ./webapp_utils/Dockerfile
+        args:
+          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/webapp_utils:latest
     restart: unless-stopped
     env_file:
