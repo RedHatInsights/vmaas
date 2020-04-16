@@ -3,13 +3,7 @@ version: '3'
 services:
   vmaas_database:
     user: root
-    command:
-      - 'sh'
-      - '-c'
-      - 'chown -R postgres /var/lib/pgsql/data ; exec runuser postgres -c run-postgresql'
+    command: sh -c 'chown -R postgres /var/lib/pgsql/data ; exec runuser postgres -c run-postgresql'
   vmaas_reposcan:
     user: root
-    command:
-      - 'sh'
-      - '-c'
-      - 'chown -R vmaas /data ; exec sleep infinity'
+    command: sh -c 'chown -R vmaas /data ; exec sleep infinity'
