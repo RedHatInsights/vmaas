@@ -394,7 +394,7 @@ class Websocket:
 
                         # check if webapp missed dump
                         latest_dump = await self.fetch_latest_dump()
-                        if latest_dump != BaseHandler.db_cache.dbchange['exported']:
+                        if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
                             LOGGER.info("Fetching missed dump: %s.", latest_dump)
                             await self._refresh_cache()
                             msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
