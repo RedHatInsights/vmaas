@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
           login-server: quay.io
       - name: Build and run VMaaS
-        run: docker-compose up --build -d
+        run: PIPENV_CHECK=0 docker-compose up --build -d
       - name: Wait for VMaaS to run
         run: |
           set +e
