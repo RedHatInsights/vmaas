@@ -247,7 +247,7 @@ paths:
           description: Returns version of latest dump
           content:
             text/plain:
-              schema: {type: string, example: "vmaas.dbm-2020-03-30T13:13:46.156455+00:00"}
+              schema: {type: string, example: "vmaas.dbm-2020-03-30T13:13:46.156455+00:00", nullable: true}
       tags:
         - Metadata
 
