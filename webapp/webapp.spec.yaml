@@ -517,6 +517,49 @@ paths:
       tags:
         - package_names
 
+  /v1/package_names/rpms:
+    post:
+      description: List of content sets by given rpm name and content set.
+      operationId: app.RPMPkgNamesHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RPMPkgNamesRequest'
+      responses:
+        '200':
+          description: List of content sets by given rpm names and content set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RPMPkgNamesResponse'
+        <<: *format_resps
+      tags:
+        - package_names
+
+  /v1/package_names/rpms/{rpm}:
+    get:
+      description: List of content sets by given rpm name.
+      operationId: app.RPMPkgNamesHandlerGet.get
+      parameters:
+        - name: rpm
+          description: Package name
+          required: true
+          schema:
+            type: string
+          in: path
+          x-example: openssl-libs
+      responses:
+        '200':
+          description: List of content sets by given rpm names.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RPMPkgNamesResponse'
+        <<: *format_resps
+      tags:
+        - package_names
+
 tags: []
 
 x-paging-info: &req_paging
@@ -1191,6 +1234,8 @@ components:
           items:
             type: string
             example: rhel-7-desktop-rpms
+      required:
+        - srpm_name_list
 
     SRPMPkgNamesResponse:
         properties:
@@ -1205,3 +1250,31 @@ components:
                 items:
                   type: string
                   example: 'openssl-libs'
+
+    RPMPkgNamesRequest:
+      type: object
+      properties:
+        rpm_name_list:
+          type: array
+          items:
+            type: string
+            example: openssl-libs
+        content_set_list:
+          type: array
+          items:
+            type: string
+            example: rhel-7-desktop-rpms
+      required:
+        - rpm_name_list
+
+    RPMPkgNamesResponse:
+      properties:
+        last_change:
+          example: '2020-04-16 20:07:58.500192+00'
+        rpm_name_list:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              example: 'rhel-7-desktop-rpms'
