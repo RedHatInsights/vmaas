@@ -14,7 +14,8 @@ class PatchesAPI:
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """Return list of potential security issues"""
-        updates = self.updates_api.process_list(2, data)
+        data['security_only'] = False
+        updates = self.updates_api.process_list(3, data)
         errata_list = set()
         for package in updates['update_list']:
             for update in updates['update_list'][package].get('available_updates', []):
