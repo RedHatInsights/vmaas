@@ -22,6 +22,7 @@ from common.constants import VMAAS_VERSION
 from common.logging_utils import init_logging, get_logger
 from cve import CveAPI
 from repos import RepoAPI
+from rpm_pkg_names import RPMPkgNamesAPI
 from srpm_pkg_names import SRPMPkgNamesAPI
 from updates import UpdatesAPI
 from errata import ErrataAPI
@@ -50,6 +51,7 @@ class BaseHandler:
     """Base class containing individual repositories"""
 
     srpm_pkg_names_api = None
+    rpm_pkg_names_api = None
     db_cache = None
     updates_api = None
     repo_api = None
@@ -352,7 +354,7 @@ class PatchesHandlerPost(BaseHandler):
 
 
 class SRPMPkgNamesHandlerPost(BaseHandler):
-    """Handler for processing /package_names POST requests."""
+    """Handler for processing /package_names/srpms POST requests."""
 
     @classmethod
     async def post(cls, **kwargs):
@@ -361,12 +363,30 @@ class SRPMPkgNamesHandlerPost(BaseHandler):
 
 
 class SRPMPkgNamesHandlerGet(BaseHandler):
-    """Handler for processing /package_names GET requests."""
+    """Handler for processing /package_names/srpms GET requests."""
 
     @classmethod
     async def get(cls, srpm=None, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
         return await cls.handle_request(cls.srpm_pkg_names_api, 1, 'srpm_name_list', srpm, **kwargs)
+
+
+class RPMPkgNamesHandlerPost(BaseHandler):
+    """Handler for processing /package_names/rpms POST requests."""
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """RPM list or Content Set list by SRPM list or RPM list"""
+        return await cls.handle_request(cls.rpm_pkg_names_api, 1, **kwargs)
+
+
+class RPMPkgNamesHandlerGet(BaseHandler):
+    """Handler for processing /package_names/rpms GET requests."""
+
+    @classmethod
+    async def get(cls, rpm=None, **kwargs):
+        """RPM list or Content Set list by SRPM list or RPM list"""
+        return await cls.handle_request(cls.rpm_pkg_names_api, 1, 'rpm_name_list', rpm, **kwargs)
 
 
 class Websocket:
@@ -468,6 +488,7 @@ def load_cache_to_apis():
     BaseHandler.patches_api = PatchesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.dbchange_api = DBChange(BaseHandler.db_cache)
     BaseHandler.srpm_pkg_names_api = SRPMPkgNamesAPI(BaseHandler.db_cache)
+    BaseHandler.rpm_pkg_names_api = RPMPkgNamesAPI(BaseHandler.db_cache)
 
 
 def create_app():
