@@ -18,10 +18,11 @@ SRPM_JSON_EMPTY_LIST = {"srpm_name_list": [""]}
 SRPM_CS_JSON_EMPTY_LIST = {"srpm_name_list": [""], "content_set": [""]}
 SRPM_JSON_NON_EXIST = {"srpm_name_list": [NONE_EXIST]}
 SRPM_CS_JSON_NON_EXIST = {"srpm_name_list": [NONE_EXIST], "content_set": [NONE_EXIST]}
+SRPM_CS_NON_EXIST = {"srpm_name_list": [SRPM], "content_set": [NONE_EXIST]}
 
 LAST_CHANGE = "2019-03-07T09:17:23.799995"
 EMPTY_SRPM_RESPONSE = {"": {}}
-NON_EXIST_SRPM_RESPONSE = {"none-exist": {}}
+NON_EXIST_SRPM_RESPONSE = {"my-pkg": {}}
 
 
 class TestSRPMPkgNamesAPI(TestBase):
@@ -61,12 +62,17 @@ class TestSRPMPkgNamesAPI(TestBase):
     def test_non_existing_srpms(self):
         """Test PackageNamesAPI with non existing srpm."""
         srpm_resp = self.package_names_api.process_list(1, SRPM_JSON_NON_EXIST)
-        assert NON_EXIST_SRPM_RESPONSE == srpm_resp['srpm_name_list']
+        assert EMPTY_SRPM_RESPONSE == srpm_resp['srpm_name_list']
 
     def test_non_existing_content_set(self):
         """Test PackageNamesAPI with non existing srpm and content set."""
         srpm_cs_resp = self.package_names_api.process_list(1, SRPM_CS_JSON_NON_EXIST)
-        assert NON_EXIST_SRPM_RESPONSE == srpm_cs_resp['srpm_name_list']
+        assert EMPTY_SRPM_RESPONSE == srpm_cs_resp['srpm_name_list']
+
+    def test_noex_content_set_ex_srpm(self):
+        """Test PackageNamesAPI with existing srpm and nonexisting content set."""
+        srpm_resp = self.package_names_api.process_list(1, SRPM_CS_NON_EXIST)
+        assert NON_EXIST_SRPM_RESPONSE == srpm_resp["srpm_name_list"]
 
     def test_last_change_in_resp(self):
         """Test PackageNamesAPI response contains last_change."""
