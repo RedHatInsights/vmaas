@@ -15,14 +15,14 @@ NONE_EXIST = "none-exist"
 SRPM_NAMES_JSON = {"srpm_name_list": [SRPM]}
 SRPM_CS_JSON = {"srpm_name_list": [SRPM], "content_set_list": [CS_LABEL]}
 SRPM_JSON_EMPTY_LIST = {"srpm_name_list": [""]}
-SRPM_CS_JSON_EMPTY_LIST = {"srpm_name_list": [""], "content_set": [""]}
+SRPM_CS_JSON_EMPTY_LIST = {"srpm_name_list": [""], "content_set_list": [""]}
 SRPM_JSON_NON_EXIST = {"srpm_name_list": [NONE_EXIST]}
-SRPM_CS_JSON_NON_EXIST = {"srpm_name_list": [NONE_EXIST], "content_set": [NONE_EXIST]}
-SRPM_CS_NON_EXIST = {"srpm_name_list": [SRPM], "content_set": [NONE_EXIST]}
+SRPM_CS_JSON_NON_EXIST = {"srpm_name_list": [NONE_EXIST], "content_set_list": [NONE_EXIST]}
+SRPM_CS_NON_EXIST = {"srpm_name_list": [SRPM], "content_set_list": [NONE_EXIST]}
 
 LAST_CHANGE = "2019-03-07T09:17:23.799995"
-EMPTY_SRPM_RESPONSE = {"": {}}
-NON_EXIST_SRPM_RESPONSE = {"my-pkg": {}}
+EMPTY_SRPM_RESPONSE = {}
+NON_EXIST_SRPM_RESPONSE = {f"{SRPM}": {}}
 
 
 class TestSRPMPkgNamesAPI(TestBase):
