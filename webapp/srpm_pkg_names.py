@@ -64,8 +64,6 @@ class SRPMPkgNamesAPI:
 
                 if src_pkg_name_id in src_pkg_ids2names.values():
                     rpm_data.setdefault(srpm, {}).update(label2pkg_name_filtered)
-            else:
-                rpm_data.setdefault(srpm, {})
 
         response['srpm_name_list'] = rpm_data
         return response
