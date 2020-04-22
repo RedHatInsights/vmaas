@@ -33,8 +33,6 @@ class RPMPkgNamesAPI:
                 content_set_ids = self._get_content_set_ids(pkg_name_id)
                 content_set_labels.extend(self._get_content_set_labels(content_set_ids, content_set_list))
                 content_data.setdefault(rpm, []).extend(natsorted(content_set_labels))
-            else:
-                content_data.setdefault(rpm, [])
 
         response['rpm_name_list'] = content_data
         return response
