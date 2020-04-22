@@ -2,4 +2,4 @@
 Common constants declaration module.
 """
 
-VMAAS_VERSION = "1.13.1"
+VMAAS_VERSION = "1.13.2"
