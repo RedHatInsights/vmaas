@@ -86,7 +86,7 @@ def github_auth(github_token, required_scopes=None):
 
     if user_info_response.status_code != 200:
         FAILED_AUTH.inc()
-        LOGGER.warning("Cannot execute github API with provided %s", github_token)
+        LOGGER.warning("Cannot execute github API with provided token")
         return None
     github_user_login = user_info_response.json()['login']
     orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
