@@ -57,3 +57,10 @@ func ParseNevra(nevra string) (*Nevra, error) {
 	}
 	return &res, nil
 }
+
+func FormatNevra(name string, epoch int, version, release, arch string) string {
+	if epoch > 0 {
+		return fmt.Sprintf("%s-%d:%s-%s.%s", name, epoch, version, release, arch)
+	}
+	return fmt.Sprintf("%s-%s-%s.%s", name, version, release, arch)
+}

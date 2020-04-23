@@ -89,14 +89,14 @@ type RepoDetail struct {
 type CveDetail struct {
 	RedHatUrl     *string
 	SecondaryUrl  *string
-	Cvss3Score    *float64
+	Cvss3Score    *string
 	Cvss3Metrics  *string
 	Impact        string
 	PublishedDate *time.Time
 	ModifiedDate  *time.Time
 	Iava          *string
 	Description   string
-	Cvss2Score    *float64
+	Cvss2Score    *string
 	Cvss2Metrics  *string
 	Source        string
 

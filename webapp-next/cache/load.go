@@ -404,7 +404,7 @@ func loadCves(info string) (map[string]CveDetail, map[int]string) {
 
 	cveId2cwes := loadInt2Strings("cve_cwe", "cve_id,cwe", "cveId2cwes")
 	cveId2pkg := loadInt2Ints("cve_pkg", "cve_id,pkg_id", "cveId2pkg")
-	cve2eid := loadString2Ints("errata_cve", "cve_id,errata_id", "cve2eid")
+	cve2eid := loadInt2Ints("errata_cve", "cve_id,errata_id", "cve2eid")
 
 	rows := getAllRows("cve_detail", "*", "id")
 	cveDetails := map[string]CveDetail{}
@@ -430,7 +430,7 @@ func loadCves(info string) (map[string]CveDetail, map[int]string) {
 			det.PkgIds = pkgs
 		}
 
-		eids, ok := cve2eid[cveName]
+		eids, ok := cve2eid[cveId]
 		if ok {
 			det.ErrataIds = eids
 		}

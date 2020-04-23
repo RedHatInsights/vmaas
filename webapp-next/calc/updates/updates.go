@@ -2,6 +2,7 @@ package updates
 
 import (
 	"app/cache"
+	"app/calc"
 	"app/utils"
 	"github.com/pkg/errors"
 	"sort"
@@ -56,12 +57,6 @@ type Response struct {
 	BaseArch   *string                     `json:"basearch,omitempty"`
 }
 
-func nil2empty(s *string) string {
-	if s != nil {
-		return *s
-	}
-	return ""
-}
 func nil2debug(s *string) string {
 	if s != nil {
 		return *s
@@ -149,7 +144,7 @@ func getReleaseVersions(c *cache.Cache, originalRepoIds map[cache.RepoID]bool) m
 	releasevers := map[string]bool{}
 	for rid := range originalRepoIds {
 		rv := c.RepoDetails[rid].ReleaseVer
-		releasevers[nil2empty(rv)] = true
+		releasevers[calc.NilToEmpty(rv)] = true
 	}
 	return releasevers
 }
@@ -169,7 +164,7 @@ func getRepositories(c *cache.Cache, updatePkgid cache.PkgID, productIds map[int
 	for _, rid := range c.PkgId2RepoIds[updatePkgid] {
 		if errataRepoIds[rid] {
 			detail := c.RepoDetails[rid]
-			if productIds[detail.ProductId] && relesevers[nil2empty(detail.ReleaseVer)] {
+			if productIds[detail.ProductId] && relesevers[calc.NilToEmpty(detail.ReleaseVer)] {
 				repoids[rid] = true
 			}
 		}
@@ -324,8 +319,8 @@ func ProcessUpdates(c *cache.Cache,
 						Erratum:    c.ErrataId2Name[errataId],
 						Repository: detail.Label,
 
-						Basearch:   nil2empty(detail.BaseArch),
-						Releasever: nil2empty(detail.ReleaseVer),
+						Basearch:   calc.NilToEmpty(detail.BaseArch),
+						Releasever: calc.NilToEmpty(detail.ReleaseVer),
 					})
 					updates.AvailableUpdates = &tmp
 					response.UpdateList[pkgString] = updates

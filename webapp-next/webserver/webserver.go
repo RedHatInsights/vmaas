@@ -106,10 +106,8 @@ func Run() {
 
 	r.GET("/api/v1/dbchange", calc.DBChange)
 
-	r.POST("/api/v1/cves", Proxy)
-	r.POST("/api/v1/cves/", Proxy)
-	//r.GET("/api/v1/cves/:id", Proxy)
-	r.GET("/api/v1/cves/*rest", Proxy)
+	r.GET("/api/v1/cves/:cve", GetCVEs)
+	r.POST("/api/v1/cves", PostCVEs)
 
 	r.POST("/api/v1/repos", Proxy)
 	r.POST("/api/v1/repos/", Proxy)
