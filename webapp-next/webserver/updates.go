@@ -7,18 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ReportError struct {
-	Code  int
-	Inner error
-}
 
-func (r ReportError) Error() string {
-	return r.Inner.Error()
-}
-
-type ErrResp struct {
-	Error string `json:"error"`
-}
 
 func MakeGetUpdates(version int) gin.HandlerFunc {
 	includeStrings := version == 1
@@ -38,7 +27,7 @@ func MakeGetUpdates(version int) gin.HandlerFunc {
 
 		res, err := updates.Updates(cache.C, req, includeStrings, secOnly)
 		if err != nil {
-			c.AbortWithStatusJSON(500, ErrResp{err.Error()})
+			c.AbortWithStatusJSON(500, ApiError{err.Error()})
 			return
 		} else {
 			c.JSON(200, res)
@@ -59,20 +48,19 @@ func MakePostUpdates(version int) gin.HandlerFunc {
 			secOnly = c.Param("security_only") == "true"
 		}
 
-		err := c.BindJSON(&req)
-		if err != nil {
-			c.AbortWithStatusJSON(400, ErrResp{errors.Wrapf(err, "malformed json").Error() })
+		if err := c.ShouldBind(&req); err != nil {
+			c.AbortWithStatusJSON(400, ApiError{errors.Wrapf(err, "malformed json").Error()})
 			return
 		}
 
 		if code, err := req.Validate(); err != nil {
-			c.AbortWithStatusJSON(code, ErrResp{err.Error()})
+			c.AbortWithStatusJSON(code, ApiError{err.Error()})
 			return
 		}
 
 		res, err := updates.Updates(cache.C, req, includeStrings, secOnly)
 		if err != nil {
-			c.AbortWithStatusJSON(500, ErrResp{err.Error()})
+			c.AbortWithStatusJSON(500, ApiError{err.Error()})
 			return
 		} else {
 			c.JSON(200, res)

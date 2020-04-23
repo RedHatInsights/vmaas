@@ -15,9 +15,8 @@ func GetVulnerabilities(c *gin.Context) {
 
 	res, err := vulnerabilities.CalcVulnerabilities(cache.C, req)
 
-	//upda(cache.C, req, includeStrings, supportsNonSec && !requestedSecOnly)
 	if err != nil {
-		c.AbortWithStatusJSON(500, err.Error())
+		c.AbortWithStatusJSON(500, ApiError{err.Error()})
 		return
 	} else {
 		c.JSON(200, res)
@@ -27,15 +26,14 @@ func GetVulnerabilities(c *gin.Context) {
 func PostVulnerabilities(c *gin.Context) {
 	var req vulnerabilities.Request
 
-	err := c.BindJSON(&req)
-	if err != nil {
-		c.AbortWithStatusJSON(500, err.Error())
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatusJSON(500, ApiError{err.Error()})
 		return
 	}
 
 	res, err := vulnerabilities.CalcVulnerabilities(cache.C, req)
 	if err != nil {
-		c.AbortWithStatusJSON(500, err.Error())
+		c.AbortWithStatusJSON(500, ApiError{err.Error()})
 		return
 	} else {
 		c.JSON(200, res)

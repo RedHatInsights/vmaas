@@ -19,14 +19,14 @@ type Request struct {
 
 func (r Request) Validate() (int, error) {
 	if r.Packages == nil {
-		return 400, errors.New("package_list is a required property")
+		return 400, errors.New("'package_list' is a required property")
 	}
 	for _, m := range r.Modules {
 		if len(m.Module) == 0 {
-			return 400, errors.New("module_name is a required property")
+			return 400, errors.New("'module_name' is a required property")
 		}
 		if len(m.Stream) == 0 {
-			return 400, errors.New("module_stream is a required property")
+			return 400, errors.New("'module_stream' is a required property")
 		}
 	}
 	return 200, nil

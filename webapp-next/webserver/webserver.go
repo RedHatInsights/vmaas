@@ -13,6 +13,19 @@ import (
 	"net/url"
 )
 
+type ReportError struct {
+	Code  int
+	Inner error
+}
+
+func (r ReportError) Error() string {
+	return r.Inner.Error()
+}
+
+type ApiError struct {
+	Error string `json:"detail"`
+}
+
 type bodyLogWriter struct {
 	gin.ResponseWriter
 	body *bytes.Buffer
@@ -36,10 +49,9 @@ func ProxyCompareMw(c *gin.Context) {
 	c.Writer = blw
 	c.Next()
 
-
 	// Proxy request processing
 	destUrl := utils.MustGetEnv("PROXY_ADDRESS") + c.Request.URL.Path
-	utils.Log("url", destUrl).Info("Callling")
+	utils.Log("url", destUrl).Info("Calling")
 
 	proxyReq, err := http.NewRequest(c.Request.Method, destUrl, &proxyBuf)
 	if err != nil {
@@ -76,9 +88,9 @@ func Run() {
 	r.Use(gin.Logger())
 	r.RedirectTrailingSlash = true
 	r.Use(ProxyCompareMw)
-
+	r.Use(gin.ErrorLogger())
 	r.GET("/api/v1/version", func(c *gin.Context) {
-		c.String(200, "1.12.2")
+		c.String(200, "1.12.2%v", "")
 	})
 	r.GET("/api/v3/updates/:nevra", MakeGetUpdates(3))
 	r.POST("/api/v3/updates", MakePostUpdates(3))
@@ -119,7 +131,7 @@ func Run() {
 	r.GET("/api/v1/pkgtree/*rest", Proxy)
 
 	r.GET("/metrics", func(c *gin.Context) {
-		c.Status(200)
+		ginprometheus.NewPrometheus("gin").HandlerFunc()(c)
 	})
 
 	r.GET("/api/v1/monitoring/health", func(c *gin.Context) {

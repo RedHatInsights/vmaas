@@ -21,7 +21,7 @@ func runWebsocket(conn *websocket.Conn, handler Handler) error {
 	for {
 		typ, msg, err := conn.ReadMessage()
 		if err != nil {
-			utils.Log("err", err.Error()).Fatal("Failed to retrieve VMaaS websocket message")
+			utils.Log("err", err.Error()).Error("Failed to retrieve VMaaS websocket message")
 			return err
 		}
 		utils.Log("messageType", typ).Info("websocket message received")
