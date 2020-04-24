@@ -127,7 +127,7 @@ func ProcessInputPackages(cache *cache.Cache, data Request, resp *Response) map[
 		if _, has := cache.Packagename2Id[nevra.Name]; !has {
 			continue
 		}
-		pkgs[p] = *nevra
+		pkgs[p] = nevra
 	}
 	return pkgs
 }

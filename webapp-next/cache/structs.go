@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -83,7 +82,7 @@ type RepoDetail struct {
 	ReleaseVer *string
 	Product    string
 	ProductId  int
-	Revision   string
+	Revision   *time.Time
 }
 
 type CveDetail struct {
@@ -124,19 +123,20 @@ type DbChange struct {
 }
 
 type ErrataDetail struct {
+	ID           ErrataID
 	Synopsis     string
-	Summary      sql.NullString
+	Summary      *string
 	Type         string
-	Severity     sql.NullString
-	Description  sql.NullString
+	Severity     *string
+	Description  *string
 	CVEs         []int
 	PkgIds       []int
 	ModulePkgIds []int
 	Bugzillas    []string
 	Refs         []string
 	Modules      []Module
-	Solution     sql.NullString
-	Issued       time.Time
-	Updated      time.Time
+	Solution     *string
+	Issued       *time.Time
+	Updated      *time.Time
 	Url          string
 }

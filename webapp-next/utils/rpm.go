@@ -34,18 +34,18 @@ func (n Nevra) String() string {
 }
 
 // parse package components
-func ParseNevra(nevra string) (*Nevra, error) {
+func ParseNevra(nevra string) (Nevra, error) {
 	nevra = strings.TrimSuffix(nevra, ".rpm")
 	parsed := nevraRegex.FindStringSubmatch(nevra)
 	if len(parsed) != 9 {
-		return nil, errors.New("unable to parse nevra")
+		return Nevra{}, errors.New("unable to parse nevra")
 	}
 	var epoch int
 	var err error
 	if parsed[5] != "" {
 		epoch, err = strconv.Atoi(parsed[5])
 		if err != nil {
-			return nil, err
+			return Nevra{}, err
 		}
 	}
 	res := Nevra{
@@ -55,7 +55,7 @@ func ParseNevra(nevra string) (*Nevra, error) {
 		Release: parsed[7],
 		Arch:    parsed[8],
 	}
-	return &res, nil
+	return res, nil
 }
 
 func FormatNevra(name string, epoch int, version, release, arch string) string {

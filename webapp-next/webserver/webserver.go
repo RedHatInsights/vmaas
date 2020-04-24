@@ -109,20 +109,15 @@ func Run() {
 	r.GET("/api/v1/cves/:cve", GetCVEs)
 	r.POST("/api/v1/cves", PostCVEs)
 
-	r.POST("/api/v1/repos", Proxy)
-	r.POST("/api/v1/repos/", Proxy)
-	//r.GET("/api/v1/repos/:label", Proxy)
-	r.GET("/api/v1/repos/*rest", Proxy)
+	r.GET("/api/v1/repos/:label", GetRepos)
+	r.POST("/api/v1/repos", PostRepos)
 
-	r.POST("/api/v1/errata", Proxy)
-	r.POST("/api/v1/errata/", Proxy)
-	//r.GET("/api/v1/errata/:name", Proxy)
-	r.GET("/api/v1/errata/*rest", Proxy)
+	r.GET("/api/v1/errata/:erratum", GetErrata)
+	r.POST("/api/v1/errata", PostErrata)
 
-	r.POST("/api/v1/packages", Proxy)
-	r.POST("/api/v1/packages/", Proxy)
-	//r.GET("/api/v1/packages/:nevra", Proxy)
-	r.GET("/api/v1/packages/*rest", Proxy)
+
+	r.POST("/api/v1/packages", PostPackages)
+	r.GET("/api/v1/packages/:pkg", GetPackages)
 
 	r.POST("/api/v1/pkgtree", Proxy)
 	r.POST("/api/v1/pkgtree/", Proxy)

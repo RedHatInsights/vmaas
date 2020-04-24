@@ -5,12 +5,17 @@ import (
 	"app/utils"
 	"github.com/gin-gonic/gin"
 	"math"
+	"regexp"
 	"sort"
+	"strings"
 	"time"
 )
 
 const DefaultPage = 1
 const DefaultPageSize = 5000
+// Go datetime parser does not like slightly incorrect RFC 3339 which we are using (missing Z )
+const Rfc3339NoTz = "2006-01-02T15:04:05-07:00"
+
 
 type RequestPaging struct {
 	Page     int `json:"page"`
@@ -31,6 +36,7 @@ func PaginateStrings(data []string, info RequestPaging, filter func(string) bool
 			res = append(res, d)
 		}
 	}
+
 	if info.Page <= 0 {
 		info.Page = DefaultPage
 	}
@@ -84,10 +90,21 @@ func NilToEmpty(s *string) string {
 
 func FormatDateOpt(d * time.Time) *string {
 	if d != nil {
-		res := d.String()
+		res := d.Format(Rfc3339NoTz)
 		return &res
 	}
 	return nil
+}
+
+func AnchorRegex(reg string) (*regexp.Regexp, error) {
+	if !strings.HasPrefix(reg, "^") {
+		reg = "^" + reg
+	}
+
+	if !strings.HasSuffix(reg, "$") {
+		reg = reg + "$"
+	}
+	return regexp.Compile(reg)
 }
 
 func DBChange(c *gin.Context) {

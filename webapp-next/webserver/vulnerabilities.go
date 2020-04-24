@@ -4,6 +4,7 @@ import (
 	"app/cache"
 	"app/calc/vulnerabilities"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 func GetVulnerabilities(c *gin.Context) {
@@ -26,8 +27,12 @@ func GetVulnerabilities(c *gin.Context) {
 func PostVulnerabilities(c *gin.Context) {
 	var req vulnerabilities.Request
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(500, ApiError{err.Error()})
+	if err := c.ShouldBind(&req); err != nil {
+		c.AbortWithStatusJSON(400, ApiError{errors.Wrapf(err, "malformed json").Error()})
+		return
+	}
+	if code, err := req.Validate(); err != nil {
+		c.AbortWithStatusJSON(code, ApiError{err.Error()})
 		return
 	}
 

@@ -581,8 +581,6 @@ class SqliteDump:
                                    order by p.name_id, evr.evr
                                 """, [tuple(self.packagename_ids)])
                 index_cnt = {}
-                updates = {}
-                updates_index = {}
                 for name_id, pkg_id, evr_id in cursor:
                     idx = index_cnt.get(name_id, 0)
                     dump.execute("insert into updates values (?, ?, ?)", (name_id, pkg_id, idx))
@@ -646,7 +644,6 @@ class SqliteDump:
                                     from package
                                    where name_id in %s
                                """, [tuple(self.packagename_ids)])
-                src_pkg_id2pkg_ids = dict()
                 for pkg_id, name_id, evr_id, arch_id, summary, description, source_package_id in cursor:
                     sum_id = hash(summary)
                     desc_id = hash(description)
@@ -668,7 +665,7 @@ class SqliteDump:
                                 releasever text,
                                 product text,
                                 product_id integer,
-                                revision text
+                                revision datetime
                                )""")
         # Select repo detail mapping
         with self._named_cursor() as cursor:
@@ -690,7 +687,8 @@ class SqliteDump:
                 dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                              (oid, label, name, url, basearch,
                               releasever, product, product_id,
-                              format_datetime(revision)))
+                              # Use NULLs in export
+                              format_datetime(revision) if revision is not None else None))
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,
@@ -724,12 +722,12 @@ class SqliteDump:
                                 url text
                                )""")
         with self._named_cursor() as cursor:
-            cursor.execute("""select distinct e.id, e.name
+            cursor.execute("""select distinct e.id
                                 from errata e
                           inner join errata_type et on e.errata_type_id = et.id
                            left join errata_cve ec on e.id = ec.errata_id
                            """)
-            for errata_id, errata_name in cursor:
+            for errata_id in cursor:
                 self.errata_ids.append(errata_id)
 
         dump.execute("""create table if not exists pkg_errata (
@@ -803,9 +801,9 @@ class SqliteDump:
                                """, [tuple(self.errata_ids)])
                 for errata_id, ref_type, ref_name in cursor:
                     if ref_type == 'bugzilla':
-                        dump.execute("insert into errata_refs values (?, ?)", (errata_id, ref_name))
-                    else:
                         dump.execute("insert into errata_bugzilla values (?, ?)", (errata_id, ref_name))
+                    else:
+                        dump.execute("insert into errata_refs values (?, ?)", (errata_id, ref_name))
 
             # Select errata ID to module mapping
             with self._named_cursor() as cursor:
@@ -877,7 +875,6 @@ class SqliteDump:
                                 source text
                                )""")
         # Select CWE to CVE mapping
-        cveid2cwe = {}
         with self._named_cursor() as cursor:
             cursor.execute("""select cve_id, cwe.name
                                 from cve_cwe

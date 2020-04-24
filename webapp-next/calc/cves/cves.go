@@ -3,10 +3,19 @@ package cves
 import (
 	"app/cache"
 	"app/calc"
-	"regexp"
-	"strings"
+	"errors"
+	"strconv"
 	"time"
 )
+
+type FormatFloat float64
+
+func (f FormatFloat) MarshalJSON() ([]byte, error) {
+	if float64(f) == float64(int(f)) {
+		return []byte(strconv.FormatFloat(float64(f), 'f', 3, 64)), nil
+	}
+	return []byte(strconv.FormatFloat(float64(f), 'f', -3, 64)), nil
+}
 
 type Request struct {
 	CveList        []string   `json:"cve_list"`
@@ -14,6 +23,16 @@ type Request struct {
 	PublishedSince *time.Time `json:"published_since"`
 	RhOnly         bool       `json:"rh_only"`
 	calc.RequestPaging
+}
+
+func (r Request) Validate() (int, error) {
+	if r.CveList == nil {
+		return 400, errors.New("'cve_list' is a required property")
+	}
+	if len(r.CveList) == 0 {
+		return 400, errors.New("[] is too short - 'cve_list'")
+	}
+	return 200, nil
 }
 
 type CveInfo struct {
@@ -40,19 +59,12 @@ type CveInfo struct {
 type Response struct {
 	calc.ResponsePaging
 	CveList        *map[string]CveInfo `json:"cve_list,omitempty"`
-	ModifiedSince  *time.Time          `json:"modified_since,omitempty"`
-	PublishedSince *time.Time          `json:"published_since,omitempty"`
+	ModifiedSince  string              `json:"modified_since,omitempty"`
+	PublishedSince string              `json:"published_since,omitempty"`
 }
 
 func FindByRegex(cache *cache.Cache, reg string) ([]string, error) {
-	if !strings.HasPrefix(reg, "^") {
-		reg = "^" + reg
-	}
-
-	if !strings.HasSuffix(reg, "$") {
-		reg = reg + "$"
-	}
-	re, err := regexp.Compile(reg)
+	re, err := calc.AnchorRegex(reg)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +146,7 @@ func CalcCves(c *cache.Cache, req Request) (*Response, error) {
 	}
 
 	resp.ResponsePaging = paging
-	resp.ModifiedSince = req.ModifiedSince
-	resp.PublishedSince = req.PublishedSince
+	resp.ModifiedSince = calc.NilToEmpty(calc.FormatDateOpt(req.ModifiedSince))
+	resp.PublishedSince = calc.NilToEmpty(calc.FormatDateOpt(req.PublishedSince))
 	return &resp, nil
 }

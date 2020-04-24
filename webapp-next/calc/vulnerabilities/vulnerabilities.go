@@ -8,6 +8,12 @@ import (
 
 type Request updates.Request
 
+func (r Request) Validate() (int, error) {
+	return updates.Request(r).Validate()
+}
+
+
+
 type Response struct {
 	CveList []string `json:"cve_list"`
 }

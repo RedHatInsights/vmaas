@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"sort"
 	"sync"
 	"time"
 )
@@ -67,15 +68,16 @@ func loadErrataRepoIds() map[ErrataID][]RepoID {
 	return res
 }
 
-func LoadPkgErratas() map[PkgID][]ErrataID {
-	res := make(map[PkgID][]ErrataID)
+func LoadPkgErratas() (map[PkgID][]ErrataID) {
+	pkgToErrata := make(map[PkgID][]ErrataID)
 	for k, v := range loadInt2Ints("pkg_errata", "pkg_id,errata_id", "PkgId2ErrataIds") {
 		id := PkgID(k)
 		for _, i := range v {
-			res[id] = append(res[id], ErrataID(i))
+			pkgToErrata[id] = append(pkgToErrata[id], ErrataID(i))
 		}
 	}
-	return res
+
+	return pkgToErrata
 }
 
 func loadPkgRepos() map[PkgID][]RepoID {
@@ -324,11 +326,13 @@ func loadRepoDetails(info string) (map[RepoID]RepoDetail, map[string][]RepoID, m
 	for rows.Next() {
 		var repoId RepoID
 		var det RepoDetail
+
 		err := rows.Scan(&repoId, &det.Label, &det.Name, &det.Url, &det.BaseArch, &det.ReleaseVer,
 			&det.Product, &det.ProductId, &det.Revision)
 		if err != nil {
 			panic(err)
 		}
+
 		id2repoDetail[repoId] = det
 
 		_, ok := repoLabel2id[det.Label]
@@ -371,6 +375,7 @@ func loadErratas(info string) (map[string]ErrataDetail, map[ErrataID]string) {
 		}
 		errataId2Name[errataId] = errataName
 
+		det.ID = errataId
 		if cves, ok := erId2cves[int(errataId)]; ok {
 			det.CVEs = cves
 		}
@@ -421,6 +426,7 @@ func loadCves(info string) (map[string]CveDetail, map[int]string) {
 		}
 
 		cwes, ok := cveId2cwes[cveId]
+		sort.Strings(cwes)
 		if ok {
 			det.CWEs = cwes
 		}

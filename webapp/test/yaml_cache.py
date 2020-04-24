@@ -3,10 +3,9 @@
 
 import shelve
 import sys
-import yaml
-import decimal
 import sqlite3
 import os
+import yaml
 
 sys.path.append("..")
 from cache import Cache  # pylint: disable=C0413
@@ -46,6 +45,7 @@ class YamlCache(Cache):
             yaml.dump(attrs, file)
 
     def dump_sqlite(self, output):
+        """Dump SQLITE DB from YAML cache"""
         if os.path.isfile(output):
             os.remove(output)
 
@@ -61,11 +61,13 @@ class YamlCache(Cache):
 
     @staticmethod
     def fill_id2name_table(cursor, dic, table):
-        for id, name in dic.items():
-            cursor.execute('insert into %s (id, name) values (?,?)' % table, (id, name))
+        """ Fill the id2name table """
+        for pkg_id, name in dic.items():
+            cursor.execute('insert into %s (id, name) values (?,?)' % table, (pkg_id, name))
 
     @staticmethod
     def fill_updates_table(cursor, dic):
+        """ Fill the updates table """
         for pkgname_id, archs in dic.items():
             for arch_id, pkgs_ids in archs.items():
                 cursor.execute('insert into updates (pkgname_id, arch_id, pkg_ids) values (?,?,?)',
@@ -91,11 +93,11 @@ def load_test_cache():
 
 
 if __name__ == "__main__":
-    input_path = 'data/cache.yml'
-    output_path = 'full_vmaas_dump.db'
+    INPUT_PATH = 'data/cache.yml'
+    OUTPUT_PATH = 'full_vmaas_dump.db'
 
-    CACHE = YamlCache(filename=input_path)
+    CACHE = YamlCache(filename=INPUT_PATH)
     # CACHE.load_shelve()
     CACHE.load_yaml()
-    CACHE.dump_sqlite(output_path)
+    CACHE.dump_sqlite(OUTPUT_PATH)
     # CACHE.dump(output=output_path)
