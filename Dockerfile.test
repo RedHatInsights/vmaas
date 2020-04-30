@@ -21,6 +21,12 @@ ADD /webapp_utils/Pipfile* /vmaas/webapp_utils/
 ADD Pipfile*               /vmaas/
 ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
 
+# copy common modules to fix import check in pylint >= 2.5.0
+ADD /common/*.py           /vmaas/webapp/common/
+ADD /common/*.py           /vmaas/reposcan/common/
+ADD /common/*.py           /vmaas/websocket/common/
+ADD /common/*.py           /vmaas/webapp_utils/common/
+
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
