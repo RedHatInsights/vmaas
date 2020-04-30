@@ -13,4 +13,3 @@ def test_run_app(monkeypatch, caplog):
     app.create_app()
 
     assert f'Starting (version {VMAAS_VERSION}).' in caplog.messages
-    assert 'Hotcache enabled: YES'
