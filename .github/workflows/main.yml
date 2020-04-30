@@ -215,9 +215,9 @@ jobs:
         run: |
           oc project vmaas-qe
           mkdir -p applogs/
-          PODS=$(oc get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\\n"}')
+          PODS=$(oc get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}')
           for pod in $PODS; do
-              CONTAINERS=$(oc get pod $pod -o jsonpath='{range .spec.containers[*]}{.name}{"\\n"}' || echo "")
+              CONTAINERS=$(oc get pod $pod -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}' || echo "")
               if [ -z "$CONTAINERS" ]; then
                   echo "get logs: pod $pod not found"
               fi;
