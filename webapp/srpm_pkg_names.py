@@ -39,17 +39,8 @@ class SRPMPkgNamesAPI:
                 for src_pkg_id in src_pkg_ids2names:
                     src2pkgid.setdefault(src_pkg_id, []).extend(self.cache.src_pkg_id2pkg_ids[src_pkg_id])
 
-                content_set_labels = []
-                if content_set_list:
-                    # filter content set labels by given content set list
-                    content_set_labels.extend([label for label in content_set_list if
-                                               label in self.cache.label2content_set_id
-                                               and self.cache.label2content_set_id[label] in content_set_ids])
-                    label2name_ids = self._process_content_set(content_set_labels)
-                else:
-                    # get all content set labels for given source package name id
-                    content_set_labels = self._get_content_set_labels(content_set_ids)
-                    label2name_ids = self._process_content_set(content_set_labels)
+                content_set_labels = self._get_content_set_labels(content_set_ids, content_set_list)
+                label2name_ids = self._process_content_set(content_set_labels)
 
                 pkg_ids = []
                 for pkg in src2pkgid.values():
@@ -73,10 +64,16 @@ class SRPMPkgNamesAPI:
         return (csid for csid in self.cache.content_set_id2pkg_name_ids if
                 pkg_name_id in self.cache.content_set_id2pkg_name_ids[csid])
 
-    def _get_content_set_labels(self, content_set_ids):
+    def _get_content_set_labels(self, content_set_ids, content_set_list=None):
         """Returns list of content set labels for given content set ids"""
-        return [self.cache.content_set_id2label[csid] for csid in content_set_ids if
-                csid in self.cache.content_set_id2label]
+        if content_set_list:
+            labels = [self.cache.content_set_id2label[csid] for csid in content_set_ids if
+                      csid in self.cache.content_set_id2label and self.cache.content_set_id2label[
+                          csid] in content_set_list]
+        else:
+            labels = [self.cache.content_set_id2label[csid] for csid in content_set_ids if
+                      csid in self.cache.content_set_id2label]
+        return labels
 
     def _process_content_set(self, content_set_labels):
         """Returns dict of name ids for given content sets."""
