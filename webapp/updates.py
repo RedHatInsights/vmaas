@@ -5,7 +5,6 @@ Module to handle /updates API calls.
 import os
 import hashlib
 
-from probes import HOT_CACHE_INSERTS, HOT_CACHE_REMOVAL, UPDATES_CACHE_HITS, UPDATES_CACHE_MISSES
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
 from common.webapp_utils import join_packagename, split_packagename, none2empty
@@ -13,160 +12,10 @@ from common.webapp_utils import join_packagename, split_packagename, none2empty
 SECURITY_ERRATA_TYPE = 'security'
 
 
-class CacheNode:
-    """Node of a binary tree"""
-
-    def __init__(self, key, cached_response=None):
-        self.key = key
-        self.cached_response = cached_response
-        self.left = self.right = None
-
-
-class HotCache:
-    """Splay Tree implementaion, see https://en.wikipedia.org/wiki/Splay_tree for the details
-
-        We use this tree to store cached data in nodes,
-        as a key we use NEVRA of a package as a data - cached response with updates
-        There is no delete node method, instead of this there is pruning() method, which
-        works as a primitive 'stop-the-world' Garbage Collector.
-        Every 'max_inserts_per_pruning' the cache runs pruning() and removes all the nodes which
-        lie lower than 'max cache level'. So the total number of nodes depends on balance factor.
-        For the total unbalanced tree (linked-list in other words), we have only
-        'max_cache_levels' nodes. On the other hand, a complete binary tree can contain
-        2^max_cache_levels * 2 - 1 nodes.
-    """
-
-    def __init__(self):
-        self.root = None
-        self.header = CacheNode(None)  # workaround, need for the splay()
-        self.inserts = 0
-        self.max_inserts_per_pruning = int(os.getenv("HOTCACHE_PRUNING", "1024"))
-        self.max_cache_levels = int(os.getenv("HOTCACHE_LEVELS", "11"))
-
-    def insert(self, key, cached_response):
-        """
-        Insert new node or update an existing.
-        :param key: NEVRA of a package
-        :param cached_response: dictionary with updates
-        :return:
-        """
-
-        if self.root is None:
-            self.root = CacheNode(key, cached_response)
-            self.inserts = 1
-            return
-
-        self._splay(key)
-
-        if self.root.key == key:
-            # update only, we already have this key in the tree
-            self.root.cached_response = cached_response
-            return
-
-        new_node = CacheNode(key, cached_response)
-
-        if key < self.root.key:
-            new_node.left = self.root.left
-            new_node.right = self.root
-            self.root.left = None
-        else:
-            new_node.right = self.root.right
-            new_node.left = self.root
-            self.root.right = None
-        self.root = new_node
-
-        self.inserts += 1
-        if self.inserts > self.max_inserts_per_pruning:
-            self._pruning(self.root, 1)
-            self.inserts = 0
-
-    def find(self, key):
-        """
-        Find a node.
-        :param key: key of node
-        :return:  CacheNode object or None if node with this key doesn't exist
-        """
-
-        if self.root is None:
-            return None
-        self._splay(key)
-        if self.root.key != key:
-            return None
-        return self.root.cached_response
-
-    def _splay(self, key):
-        """
-        Perform splaying operations - Zig, Zig-Zig or Zig-Zag
-        rotations
-        :param key:
-        :return:
-        """
-        left = right = self.header
-        cur = self.root
-        self.header.left = self.header.right = None
-        while True:
-            if key < cur.key:
-                if cur.left is None:
-                    break
-                if key < cur.left.key:
-                    tmp = cur.left
-                    cur.left = tmp.right
-                    tmp.right = cur
-                    cur = tmp
-                    if cur.left is None:
-                        break
-                right.left = cur
-                right = cur
-                cur = cur.left
-            elif key > cur.key:
-                if cur.right is None:
-                    break
-                if key > cur.right.key:
-                    tmp = cur.right
-                    cur.right = tmp.left
-                    tmp.left = cur
-                    cur = tmp
-                    if cur.right is None:
-                        break
-                left.right = cur
-                left = cur
-                cur = cur.right
-            else:
-                break
-        left.right = cur.left
-        right.left = cur.right
-        cur.left = self.header.right
-        cur.right = self.header.left
-        self.root = cur
-
-    def _pruning(self, node, level):
-        """
-        Recursively remove all nodes from the tree which lie lower than self.max_cache_levels
-        :param node: current processing node
-        :param level: current cache level
-        :return:
-        """
-        if level == self.max_cache_levels:
-            HOT_CACHE_REMOVAL.inc()
-            node.left = None
-            node.right = None
-            return
-
-        # pruning left child
-        if node.left is not None:
-            self._pruning(node.left, level=level + 1)
-
-        # pruning right child
-        if node.right is not None:
-            self._pruning(node.right, level=level + 1)
-
-
 class UpdatesAPI:
     """ Main /updates API class."""
     def __init__(self, db_cache):
         self.db_cache = db_cache      # DB dump in memory, stored like a dict
-        self.hot_cache = HotCache()   # hot cache of the application, splay tree
-        self.use_hot_cache = "YES"
 
     def _process_repositories(self, data, response):
         # Read list of repositories
@@ -335,17 +184,6 @@ class UpdatesAPI:
                             'releasever': none2empty(repo_details[REPO_RELEASEVER])
                         })
 
-            if self.use_hot_cache.upper() == "YES":
-                HOT_CACHE_INSERTS.inc()
-                self.hot_cache.insert(repo_ids_key + pkg + str(security_only), response['update_list'][pkg])
-
-    def clear_hot_cache(self):
-        """
-        This method clears HotCache
-        """
-
-        self.hot_cache = HotCache()
-
     def process_list(self, api_version, data):
         """
         This method is looking for updates of a package, including name of package to update to,
@@ -389,28 +227,6 @@ class UpdatesAPI:
             security_only = True
         else:
             security_only = data.get("security_only", False)
-
-        all_pkgs = data.get('package_list', None)
-        pkgs_not_in_cache = []
-        self.use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
-
-        if all_pkgs is not None:
-            for name in all_pkgs:
-                if self.use_hot_cache.upper() == "YES":
-                    resp = self.hot_cache.find(repo_ids_key + name + str(security_only))
-
-                    if resp is not None:
-                        UPDATES_CACHE_HITS.inc()
-                        response['update_list'][name] = resp
-                    else:
-                        UPDATES_CACHE_MISSES.inc()
-                        pkgs_not_in_cache.append(name)
-                else:
-                    # no need to put counter here as caching is disabled
-                    pkgs_not_in_cache.append(name)
-
-        # Start main processing of packages which are not in the hot cache
-        data['package_list'] = pkgs_not_in_cache
 
         # Return empty update list in case of empty input package list
         packages_to_process = self._process_input_packages(data, response)
