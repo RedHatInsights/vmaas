@@ -411,9 +411,6 @@ class Websocket:
         LOGGER.info("Starting cached data refresh.")
         BaseHandler.refreshing = True
         await BaseHandler.db_cache.reload_async()
-        use_hot_cache = os.getenv("HOTCACHE_ENABLED", "YES")
-        if use_hot_cache.upper() == "YES":
-            BaseHandler.updates_api.clear_hot_cache()
         BaseHandler.refreshing = False
         LOGGER.info("Cached data refreshed.")
 
@@ -497,7 +494,6 @@ def create_app():
     init_logging()
 
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
-    LOGGER.info('Hotcache enabled: %s', os.getenv("HOTCACHE_ENABLED", "YES"))
 
     with open('webapp.spec.yaml', 'rb') as specfile:
         SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
