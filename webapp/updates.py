@@ -2,9 +2,6 @@
 Module to handle /updates API calls.
 """
 
-import os
-import hashlib
-
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
 from common.webapp_utils import join_packagename, split_packagename, none2empty
@@ -100,7 +97,7 @@ class UpdatesAPI:
         return join_packagename(name, epoch, ver, rel, arch)
 
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
-                         repo_ids_key, response, module_ids, security_only):
+                         response, module_ids, security_only):
         # pylint: disable=too-many-branches
         module_filter = module_ids is not None
         for pkg, pkg_dict in packages_to_process.items():
@@ -212,16 +209,6 @@ class UpdatesAPI:
         else:
             module_ids = None
 
-        hashlib_elements = []
-        hashlib_elements.append(str(api_version))
-        hashlib_elements.extend([str(r_id) for r_id in sorted(available_repo_ids)])
-        if module_ids is not None:
-            if module_ids:
-                hashlib_elements.extend([str(m_id) for m_id in sorted(module_ids)])
-            else:
-                hashlib_elements.extend('no_enabled_modules')
-        repo_ids_key = hashlib.md5('_'.join(hashlib_elements).encode('utf-8')).hexdigest()
-
         # Backward compatibility of older APIs
         if api_version < 3:
             security_only = True
@@ -236,7 +223,7 @@ class UpdatesAPI:
 
         # Process updated packages, errata and fill the response
         self._process_updates(packages_to_process, api_version,
-                              available_repo_ids, repo_ids_key, response, module_ids,
+                              available_repo_ids, response, module_ids,
                               security_only)
 
         return response
