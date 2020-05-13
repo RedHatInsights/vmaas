@@ -2,7 +2,7 @@
 Module to handle /updates API calls.
 """
 
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT_ID, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
 from common.webapp_utils import join_packagename, split_packagename, none2empty
 
@@ -60,19 +60,13 @@ class UpdatesAPI:
                         filtered_packages_to_process[pkg] = {'parsed_nevra': (name, epoch, ver, rel, arch)}
         return filtered_packages_to_process
 
-    def _get_related_products(self, original_package_repo_ids):
-        product_ids = set()
-        for original_package_repo_id in original_package_repo_ids:
-            product_ids.add(self.db_cache.repo_detail[original_package_repo_id][REPO_PRODUCT_ID])
-        return product_ids
-
     def _get_valid_releasevers(self, original_package_repo_ids):
         valid_releasevers = set()
         for original_package_repo_id in original_package_repo_ids:
             valid_releasevers.add(self.db_cache.repo_detail[original_package_repo_id][REPO_RELEASEVER])
         return valid_releasevers
 
-    def _get_repositories(self, product_ids, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
+    def _get_repositories(self, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
         repo_ids = set()
         errata_repo_ids = set()
         for errata_id in errata_ids:
@@ -83,8 +77,7 @@ class UpdatesAPI:
 
         for repo_id in res_repos:
             repo_detail = self.db_cache.repo_detail[repo_id]
-            if repo_detail[REPO_RELEASEVER] in valid_releasevers \
-              and repo_detail[REPO_PRODUCT_ID] in product_ids:
+            if repo_detail[REPO_RELEASEVER] in valid_releasevers:
                 repo_ids.add(repo_id)
 
         return repo_ids
@@ -140,7 +133,6 @@ class UpdatesAPI:
             # Get associated product IDs
             original_package_repo_ids = set()
             original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(current_nevra_pkg_id, []))
-            product_ids = self._get_related_products(original_package_repo_ids)
             valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
 
             # Get candidate package IDs
@@ -169,7 +161,7 @@ class UpdatesAPI:
                     if (module_filter and (update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
                             self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
                         continue
-                    repo_ids = self._get_repositories(product_ids, update_pkg_id, [errata_id], available_repo_ids,
+                    repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,
                                                       valid_releasevers)
                     for repo_id in repo_ids:
                         repo_details = self.db_cache.repo_detail[repo_id]
