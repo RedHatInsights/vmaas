@@ -30,6 +30,7 @@ ADD /common/*.py           /vmaas/webapp_utils/common/
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
+ARG PIPENV_PYUP_API_KEY=""
 RUN cd /vmaas/webapp && pipenv install --ignore-pipfile --deploy --dev && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
     cd /vmaas/reposcan && pipenv install --ignore-pipfile --deploy --dev && \

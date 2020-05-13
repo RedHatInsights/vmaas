@@ -13,7 +13,7 @@ ADD /websocket/Pipfile* /websocket/
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
-
+ARG PIPENV_PYUP_API_KEY=""
 RUN pip3 install --upgrade pipenv && \
     pipenv install --ignore-pipfile --deploy --system && ln -s /usr/bin/python3 /usr/bin/python && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system ; fi
