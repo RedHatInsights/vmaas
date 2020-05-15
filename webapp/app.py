@@ -9,6 +9,8 @@ import signal
 import sre_constants
 import time
 import asyncio
+from distutils.util import strtobool
+import gzip
 import yaml
 
 from jsonschema.exceptions import ValidationError
@@ -42,6 +44,8 @@ WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
 
 REPOSCAN_HOST = os.getenv("REPOSCAN_HOST", "localhost")
 REPOSCAN_PORT = int(os.getenv("REPOSCAN_PORT", "8081"))
+GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
+GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
 LATEST_DUMP_ENDPOINT = "/api/v1/latestdump"
 
 LOGGER = get_logger(__name__)
@@ -518,6 +522,17 @@ def create_app():
         return res
 
     @web.middleware
+    async def gzip_middleware(request, handler, **kwargs):
+        """ Middleware that compress response using gzip"""
+        res = await handler(request, **kwargs)
+        header = 'Accept-Encoding'
+        if header in request.headers and "gzip" in request.headers[header]:
+            gzipped_body = gzip.compress(res.body, compresslevel=GZIP_COMPRESS_LEVEL)
+            res.body = gzipped_body
+            res.headers["Content-Encoding"] = "gzip"
+        return res
+
+    @web.middleware
     async def error_handler(request, handler, **kwargs):
         def format_error(detail, status):
             res = {}
@@ -536,11 +551,15 @@ def create_app():
 
         return res
 
+    middlewares = []
+    if GZIP_RESPONSE_ENABLE:
+        middlewares.append(gzip_middleware)
+    middlewares.extend([error_handler, timing_middleware])
+
     app = connexion.AioHttpApp(__name__, options={
         'swagger_ui': True,
         'openapi_spec_path': '/openapi.json',
-        'middlewares': [error_handler,
-                        timing_middleware]
+        'middlewares': middlewares
     })
 
     def metrics(request, **kwargs):  # pylint: disable=unused-argument
