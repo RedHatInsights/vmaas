@@ -53,7 +53,7 @@ class TestUpgrades:
         self.repo.head.reference = self.head
         self.repo.head.reset(index=True, working_tree=True)
         if commit:
-            self.repo.delete_head(commit[:7])
+            self.repo.delete_head(commit[:7], force=True)
         if stashed:
             self.repo.git.stash("pop")
 
