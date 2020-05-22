@@ -12,11 +12,12 @@ from OpenSSL import crypto
 
 from common.batch_list import BatchList
 from common.logging_utils import get_logger
+from common.slack_notifications import send_slack_notification, prepare_msg_for_slack
 
 from database.repository_store import RepositoryStore
 from download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from download.unpacker import FileUnpacker
-from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE, CERT_EXPIRATION
+from mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
 
 from repodata.repomd import RepoMD, RepoMDTypeNotFound
 from repodata.repository import Repository
@@ -30,6 +31,7 @@ class RepositoryController:
     First, repomd from all repositories are downloaded and parsed.
     Second, primary and updateinfo repodata from repositories needing update are downloaded, parsed and imported.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.downloader = FileDownloader()
@@ -51,7 +53,7 @@ class RepositoryController:
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
-            # Check certificate expiration date and set state in prometheus
+            # Check certificate expiration date
             if repository.cert_name:
                 certs_tmp_dict[repository.cert_name] = cert
 
@@ -75,25 +77,24 @@ class RepositoryController:
 
     def _check_cert_expiration_date(self, cert_name, cert):
         try:
+            # Load certificate
             loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
-            expire_date = datetime.strptime(loaded_cert.get_notAfter(), "%Y%m%d%H%M%SZ")
-            expire_in = expire_date - datetime.now()
-            if expire_in.days > 7:
-                self.logger.debug('Certificate %s is ok', cert_name)
-                CERT_EXPIRATION.labels(cert_name).state('valid')
-            elif 7 >= expire_in.days > 0:
-                self.logger.warning('Certificate %s will expire in %s', cert_name, expire_in.days)
-                CERT_EXPIRATION.labels(cert_name).state('expire_soon')
+            # Get expiration date and parse it to datetime object
+            valid_to_dt = datetime.strptime(loaded_cert.get_notAfter(), "%Y%m%d%H%M%SZ")
+            expire_in_days_td = (valid_to_dt - datetime.utcnow()).days
+            expire_tuple = (valid_to_dt, expire_in_days_td)
+            if 30 >= expire_in_days_td > 0:
+                self.logger.warning('Certificate %s will expire in %s', cert_name, expire_in_days_td)
+                msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate will expire soon', expire_tuple)
+                send_slack_notification(msg)
             else:
                 self.logger.warning('Certificate %s expired!', cert_name)
-                CERT_EXPIRATION.labels(cert_name).state('expired')
+                msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate expired', expire_tuple)
+                send_slack_notification(msg)
         except crypto.Error:
-            if cert_name:
-                self.logger.warning('Certificate not provided or incorrect: %s', cert_name)
-                CERT_EXPIRATION.labels(cert_name).state('expired')
-            else:
-                self.logger.warning('Certificate not provided or incorrect')
-                CERT_EXPIRATION.labels('None').state('expired')
+            self.logger.warning('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
+            msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate not provided or incorrect')
+            send_slack_notification(msg)
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
@@ -255,7 +256,7 @@ class RepositoryController:
         for repository in self.repositories:
             try:
                 self.repo_store.import_repository(repository)
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 failures += 1
         if failures > 0:
             self.logger.warning("Failed to import %d repositories.", failures)
