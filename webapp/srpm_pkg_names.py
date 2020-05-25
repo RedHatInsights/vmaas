@@ -32,7 +32,7 @@ class SRPMPkgNamesAPI:
                 src_pkg_name_id = self.cache.packagename2id[srpm]
                 content_set_ids = self._get_content_set_ids(src_pkg_name_id)
                 src_pkg_ids2names = {pkg_id: src_pkg_name_id for (name_id, _, _), pkg_id in
-                                     self.cache.nevra2pkgid.items() if
+                                     iter(self.cache.nevra2pkgid.items()) if
                                      src_pkg_name_id == name_id and pkg_id in self.cache.src_pkg_id2pkg_ids}
 
                 src2pkgid = {}
