@@ -12,7 +12,7 @@ class SRPMPkgNamesAPI:
 
     def __init__(self, cache):
         self.cache = cache
-
+    @profile
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         This method returns RPM names for given SRPM list filtered by content set
@@ -37,14 +37,14 @@ class SRPMPkgNamesAPI:
 
                 src2pkgid = {}
                 for src_pkg_id in src_pkg_ids2names:
-                    src2pkgid.setdefault(src_pkg_id, []).extend(self.cache.src_pkg_id2pkg_ids[src_pkg_id])
+                    src2pkgid.setdefault(src_pkg_id, set()).update(self.cache.src_pkg_id2pkg_ids[src_pkg_id])
 
                 content_set_labels = self._get_content_set_labels(content_set_ids, content_set_list)
                 label2name_ids = self._process_content_set(content_set_labels)
 
-                pkg_ids = []
+                pkg_ids = set()
                 for pkg in src2pkgid.values():
-                    pkg_ids.extend(pkg)
+                    pkg_ids.update(pkg)
 
                 label2pkg_name_filtered = {}
                 for label in content_set_labels:
@@ -80,6 +80,6 @@ class SRPMPkgNamesAPI:
         label2name_ids = {}
         for label in content_set_labels:
             if label in self.cache.label2content_set_id:
-                label2name_ids.setdefault(label, []).extend(
+                label2name_ids.setdefault(label, set()).update(
                     self.cache.content_set_id2pkg_name_ids[self.cache.label2content_set_id[label]])
         return label2name_ids
