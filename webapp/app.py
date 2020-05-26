@@ -526,7 +526,8 @@ def create_app():
         """ Middleware that compress response using gzip"""
         res = await handler(request, **kwargs)
         header = 'Accept-Encoding'
-        if header in request.headers and "gzip" in request.headers[header]:
+        if res.body is not None and header in request.headers and \
+            "gzip" in request.headers[header]:
             gzipped_body = gzip.compress(res.body, compresslevel=GZIP_COMPRESS_LEVEL)
             res.body = gzipped_body
             res.headers["Content-Encoding"] = "gzip"
