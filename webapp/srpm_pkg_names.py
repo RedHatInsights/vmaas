@@ -12,7 +12,7 @@ class SRPMPkgNamesAPI:
 
     def __init__(self, cache):
         self.cache = cache
-    @profile
+
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         This method returns RPM names for given SRPM list filtered by content set
