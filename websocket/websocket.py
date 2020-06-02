@@ -10,8 +10,8 @@ from tornado.websocket import WebSocketHandler
 
 from common.logging_utils import get_logger, init_logging
 
-WEBSOCKET_PING_INTERVAL = 60
-WEBSOCKET_TIMEOUT = 300
+WEBSOCKET_PING_INTERVAL = 5
+WEBSOCKET_TIMEOUT = 60
 
 LOGGER = get_logger("websocket")
 
@@ -19,7 +19,10 @@ LOGGER = get_logger("websocket")
 class NotificationHandler(WebSocketHandler):
     """Websocket handler to send messages to subscribed clients."""
     connections = {}
+    # What is the freshest data each webapp has
     webapp_export_timestamps = {}
+    # What time did we advertise last
+    last_refresh_sent = None
 
     def __init__(self, application, request, **kwargs):
         super(NotificationHandler, self).__init__(application, request, **kwargs)
@@ -37,6 +40,21 @@ class NotificationHandler(WebSocketHandler):
 
     def data_received(self, chunk):
         pass
+
+    @classmethod
+    def poll_notify(cls):
+        """Check and possibly send updates to listeners"""
+        refresh_time = list(set(cls.webapp_export_timestamps))[0] if len(cls.webapp_export_timestamps) > 0 else None
+        if cls.webapps_ready() and cls.last_refresh_sent != refresh_time:
+            LOGGER.info("All webapps have fresh data")
+            cls.send_message("listener", "webapps-refreshed")
+            cls.last_refresh_sent = refresh_time
+
+    @classmethod
+    def webapps_ready(cls):
+        """Check whether all of available webapps are ready"""
+        app_count = len([c for c in cls.connections.values() if c == "webapp"])
+        return app_count == len(cls.webapp_export_timestamps) and len(set(cls.webapp_export_timestamps.values())) == 1
 
     def on_message(self, message):
         if self.connections[self]:
@@ -56,13 +74,12 @@ class NotificationHandler(WebSocketHandler):
             _, timestamp = message.split()
             self.webapp_export_timestamps[self] = timestamp
             # All webapp connections are refreshed with same dump version
-            if (len([c for c in self.connections.values() if c == "webapp"]) == len(self.webapp_export_timestamps)
-                    and len(set(self.webapp_export_timestamps.values())) == 1):
-                self.send_message("listener", "webapps-refreshed")
+        self.poll_notify()
 
     def on_close(self):
         self.timeout_callback.stop()
         del self.connections[self]
+        del self.webapp_export_timestamps[self]
 
     def timeout_check(self):
         """Check time since we received last pong. Send ping again."""
@@ -72,14 +89,19 @@ class NotificationHandler(WebSocketHandler):
             return
         self.ping(b"")
 
+    def on_ping(self, data):
+        super().on_ping(data)
+        self.poll_notify()
+
     def on_pong(self, data):
         """Pong received from client."""
         self.last_pong = IOLoop.current().time()
+        self.poll_notify()
 
-    @staticmethod
-    def send_message(target_client_type, message):
+    @classmethod
+    def send_message(cls, target_client_type, message):
         """Send message to selected group of connected clients."""
-        for client, client_type in NotificationHandler.connections.items():
+        for client, client_type in cls.connections.items():
             if client_type == target_client_type:
                 client.write_message(message)
                 LOGGER.info("Sent message to %s: %s", target_client_type, message)
