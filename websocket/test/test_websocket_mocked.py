@@ -9,8 +9,8 @@ from websocket import websocket as ws
 class NotificationHandlerMock(ws.NotificationHandler):
     """Mock NotificationHandler for testing."""
 
-    @staticmethod
-    def send_message(target_client_type, message):
+    @classmethod
+    def send_message(cls, target_client_type, message):
         """Modify method not to send messages to
         given components but back to testing code."""
         if target_client_type == "webapp":
@@ -28,7 +28,7 @@ class TestVMaaSWebSocket(tornado.testing.AsyncHTTPTestCase):
 
     def _init_ws_client(self):
         ws_url = f"ws://localhost:{self.get_http_port()}/"
-        return tornado.websocket.websocket_connect(ws_url)
+        return tornado.websocket.websocket_connect(ws_url, ping_interval=5, ping_timeout=10)
 
     @tornado.testing.gen_test
     def test_reposcan_invalidate_cache(self):
@@ -39,7 +39,7 @@ class TestVMaaSWebSocket(tornado.testing.AsyncHTTPTestCase):
         received_msg = yield ws_client.read_message()
         self.assertEqual(received_msg, "refresh-cache")
 
-    @tornado.testing.gen_test
+    @tornado.testing.gen_test()
     def test_webapp_refreshed(self):
         """Test webapp refreshed notification."""
         ws_client = yield self._init_ws_client()
