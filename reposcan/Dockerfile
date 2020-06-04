@@ -52,6 +52,7 @@ ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
 ADD /reposcan/repodata/*.py  /reposcan/repodata/
 ADD /reposcan/rsyncd.conf    /etc/
 ADD /common/*.py             /reposcan/common/
+ADD /database/*.sql          /reposcan/
 ADD /database/upgrade/*.sh   /reposcan/
 ADD /database/upgrade_scripts/* /reposcan/database/upgrade_scripts/
 
