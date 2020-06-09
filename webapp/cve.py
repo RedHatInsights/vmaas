@@ -30,6 +30,10 @@ class CveAPI:
         return [cve for cve in cves_to_process if self.cache.cve_detail.get(cve)
                 and self.cache.cve_detail.get(cve)[CVE_SOURCE] == 'Red Hat']
 
+    def _filter_errata_only(self, cves_to_process):
+        return [cve for cve in cves_to_process if self.cache.cve_detail.get(cve)
+                and self.cache.cve_detail.get(cve)[CVE_EID]]
+
     def _filter_modified_since(self, cves_to_process, modified_since_dt):
         filtered_cves_to_process = []
         for cve in cves_to_process:
@@ -69,6 +73,7 @@ class CveAPI:
         modified_since = data.get("modified_since", None)
         published_since = data.get("published_since", None)
         rh_only = data.get('rh_only', False)
+        errata_only = data.get('errata_associated', False)
         modified_since_dt = parse_datetime(modified_since)
         published_since_dt = parse_datetime(published_since)
         page = data.get("page", None)
@@ -86,6 +91,8 @@ class CveAPI:
         filters = [(filter_item_if_exists, [self.cache.cve_detail])]
         if rh_only:
             filters.append((self._filter_redhat_only, []))
+        if errata_only:
+            filters.append((self._filter_errata_only, []))
         # if we have information about modified/published dates and receive "modified_since"
         # or "published_since" in request,
         # compare the dates
