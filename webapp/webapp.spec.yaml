@@ -783,6 +783,10 @@ components:
         rh_only:
           type: boolean
           example: true
+        errata_associated:
+          type: boolean
+          example: true
+          description: Return only those CVEs which are associated with at least one errata. Defaults to false.
         <<: *req_paging
       required:
         - cve_list
