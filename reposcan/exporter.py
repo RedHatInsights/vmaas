@@ -97,6 +97,19 @@ class DataDump:
             for name_id, content_set_id in cursor:
                 pkg_name_ids.setdefault("content_set_id2pkg_name_ids:%s" % content_set_id, []).append(name_id)
             dump.update(pkg_name_ids)
+        with self._named_cursor() as cursor:
+            cursor.execute("""select distinct pn.id, cs.id
+                                from package_name pn
+                             inner join package p on pn.id = p.name_id
+                             inner join package p2 on p2.source_package_id = p.id
+                             inner join package_name bpn on p2.name_id = bpn.id
+                             inner join pkg_repo on pkg_repo.pkg_id = p2.id
+                             inner join repo on repo.id = pkg_repo.repo_id
+                             inner join content_set cs on cs.id = repo.content_set_id""")
+            cs_ids = {}
+            for src_name_id, content_set_id in cursor:
+                cs_ids.setdefault("src_pkg_name_id2cs_ids:%s" % src_name_id, []).append(content_set_id)
+            dump.update(cs_ids)
 
     def _dump_all_content_sets(self, dump):
         """Select all content sets"""
