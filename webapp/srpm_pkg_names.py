@@ -62,7 +62,9 @@ class SRPMPkgNamesAPI:
     def _get_content_set_ids(self, pkg_name_id):
         """Returns list of content set ids for given package name id"""
         return (csid for csid in self.cache.content_set_id2pkg_name_ids if
-                pkg_name_id in self.cache.content_set_id2pkg_name_ids[csid])
+                pkg_name_id in self.cache.content_set_id2pkg_name_ids[csid]
+                or (pkg_name_id in self.cache.src_pkg_name_id2cs_ids
+                    and csid in self.cache.src_pkg_name_id2cs_ids[pkg_name_id]))
 
     def _get_content_set_labels(self, content_set_ids, content_set_list=None):
         """Returns list of content set labels for given content set ids"""
