@@ -113,6 +113,7 @@ class Cache:
         self.errata_detail = {}
         self.src_pkg_id2pkg_ids = {}
         self.strings = {}
+        self.src_pkg_name_id2cs_ids = {}
 
     async def reload_async(self):
         """Update data and reload dictionaries asynchronously."""
@@ -146,6 +147,8 @@ class Cache:
                 self.packagename2id[key] = data[item]
             elif relation == "id2packagename":
                 self.id2packagename[int(key)] = data[item]
+            elif relation == "src_pkg_name_id2cs_ids":
+                self.src_pkg_name_id2cs_ids[int(key)] = data[item]
             elif relation == "content_set_id2pkg_name_ids":
                 self.content_set_id2pkg_name_ids[int(key)] = data[item]
             elif relation == "content_set_id2label":
