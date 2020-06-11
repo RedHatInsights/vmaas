@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 0);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 1);
 
 -- -----------------------------------------------------
 -- evr type
@@ -452,12 +452,12 @@ CREATE INDEX ON pkg_repo(repo_id);
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS errata_severity (
   id INT NOT NULL,
-  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  name TEXT UNIQUE, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
 INSERT INTO errata_severity (id, name) VALUES
-  (1, 'None'), (2, 'Low'), (3, 'Moderate'), (4, 'Important'), (5, 'Critical');
+  (1, NULL), (2, 'Low'), (3, 'Moderate'), (4, 'Important'), (5, 'Critical');
 
 
 -- -----------------------------------------------------
