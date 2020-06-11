@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.1-407
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
 ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
 # make sure (redhat|centos|fedora)-release is always included in the manifest
