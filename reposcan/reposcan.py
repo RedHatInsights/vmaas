@@ -293,6 +293,8 @@ class RepolistImportHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
@@ -405,6 +407,8 @@ class RepoDeleteHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
@@ -430,6 +434,8 @@ class ExporterHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
@@ -455,6 +461,8 @@ class PkgTreeHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
@@ -513,6 +521,8 @@ class RepoSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
@@ -542,6 +552,8 @@ class CvemapSyncHandler(SyncHandler):
             FAILED_IMPORT_CVE.inc()
             DatabaseHandler.rollback()
             return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
         return "OK"
 
 
