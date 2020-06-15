@@ -66,18 +66,14 @@ def create_pg(vmaas_user=VMAAS_USER, vmaas_pg=VMAAS_PG):
             cursor.execute("GRANT ALL ON SCHEMA public TO public")
 
         with conn.cursor() as cursor:
-            pg_env = postgresql.dsn()
-            cursor.execute("CREATE USER vmaas_db_admin WITH CREATEROLE")
-            cursor.execute("ALTER USER vmaas_db_admin WITH PASSWORD 'vmaas_db_admin_pwd'")
-            cursor.execute(f"ALTER DATABASE {pg_env['database']} OWNER TO vmaas_db_admin")
-
-        with conn.cursor() as cursor:
             cursor.execute(vmaas_user.read_text())
             cursor.execute(vmaas_pg.read_text())
 
         conn.commit()
+        conn.close()
 
     # pylint: disable=invalid-name
     Postgresql = testing.postgresql.PostgresqlFactory(cache_initialized_db=True, on_initialized=_handler)
+    postgresql = Postgresql()
 
-    return Postgresql
+    return postgresql
