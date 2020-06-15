@@ -39,8 +39,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DBChangeResponse'
-      tags:
-        - dbchange
 
   /v1/updates:
     post:
@@ -62,8 +60,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpdatesResponse'
         <<: *format_resps
-      tags:
-        - updates
 
   '/v1/updates/{nevra}':
     get:
@@ -85,8 +81,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UpdatesResponse'
-      tags:
-        - updates
 
   /v2/updates:
     post:
@@ -107,8 +101,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpdatesV2Response'
         <<: *format_resps
-      tags:
-        - updates
 
   '/v2/updates/{nevra}':
     get:
@@ -130,8 +122,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UpdatesV2Response'
-      tags:
-        - updates
 
   /v3/updates:
     post:
@@ -151,8 +141,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpdatesV2Response'
         <<: *format_resps
-      tags:
-        - updates
 
   '/v3/updates/{nevra}':
     get:
@@ -173,8 +161,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UpdatesV2Response'
-      tags:
-        - updates
 
   /v1/cves:
     post:
@@ -194,8 +180,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/CvesResponse'
         <<: *format_resps
-      tags:
-        - cves
 
   '/v1/cves/{cve}':
     get:
@@ -216,8 +200,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CvesResponse'
-      tags:
-        - cves
 
   /v1/repos:
     post:
@@ -237,8 +219,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReposResponse'
         <<: *format_resps
-      tags:
-        - repos
 
   '/v1/repos/{repo}':
     get:
@@ -259,8 +239,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReposResponse'
-      tags:
-        - repos
 
   /v1/errata:
     post:
@@ -279,8 +257,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrataResponse'
         <<: *format_resps
-      tags:
-        - errata
 
   '/v1/errata/{erratum}':
     get:
@@ -301,8 +277,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrataResponse'
-      tags:
-        - errata
 
   /v1/packages:
     post:
@@ -322,8 +296,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/PackagesResponse'
         <<: *format_resps
-      tags:
-        - packages
 
   '/v1/packages/{nevra}':
     get:
@@ -344,8 +316,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PackagesResponse'
-      tags:
-        - packages
 
   /v1/pkgtree:
     post:
@@ -365,8 +335,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/PkgtreeResponse'
         <<: *format_resps
-      tags:
-        - pkgtree
 
   '/v1/pkgtree/{package_name}':
     get:
@@ -387,8 +355,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PkgtreeResponse'
-      tags:
-        - pkgtree
 
   /v1/vulnerabilities:
     post:
@@ -407,8 +373,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
         <<: *format_resps
-      tags:
-        - vulnerabilities
 
   '/v1/vulnerabilities/{nevra}':
     get:
@@ -429,8 +393,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
-      tags:
-        - vulnerabilities
 
   /v1/patches:
     post:
@@ -449,8 +411,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/PatchesResponse'
         <<: *format_resps
-      tags:
-        - patches
 
   '/v1/patches/{nevra}':
     get:
@@ -471,8 +431,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatchesResponse'
-      tags:
-        - patches
 
   /v1/package_names/srpms:
     post:
@@ -492,7 +450,7 @@ paths:
                 $ref: '#/components/schemas/SRPMPkgNamesResponse'
         <<: *format_resps
       tags:
-        - package_names
+        - experimental
 
   /v1/package_names/srpms/{srpm}:
     get:
@@ -515,7 +473,7 @@ paths:
                 $ref: '#/components/schemas/SRPMPkgNamesResponse'
         <<: *format_resps
       tags:
-        - package_names
+        - experimental
 
   /v1/package_names/rpms:
     post:
@@ -535,7 +493,7 @@ paths:
                 $ref: '#/components/schemas/RPMPkgNamesResponse'
         <<: *format_resps
       tags:
-        - package_names
+        - experimental
 
   /v1/package_names/rpms/{rpm}:
     get:
@@ -558,9 +516,12 @@ paths:
                 $ref: '#/components/schemas/RPMPkgNamesResponse'
         <<: *format_resps
       tags:
-        - package_names
+        - experimental
 
-tags: []
+tags:
+  - name: default
+  - name: experimental
+    description: Endpoints with preview functionality
 
 x-paging-info: &req_paging
   page:
