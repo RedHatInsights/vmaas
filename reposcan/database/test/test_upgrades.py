@@ -70,26 +70,22 @@ class TestUpgrades:
     def pg_old(self, commit=UPGRADE_FROM):
         """Setup DB with old schema."""
         stashed = self._git_checkout(commit)
-        pg_factory = create_pg()
-        pg_instance = pg_factory()
+        pg_instance = create_pg()
 
         yield pg_instance
 
         pg_instance.stop()
-        pg_factory.clear_cache()
         self._git_co_teardown(commit, stashed)
 
     @pytest.fixture
     def pg_new(self, commit=UPGRADE_TO):
         """Setup DB with new schema."""
         stashed = self._git_checkout(commit)
-        pg_factory = create_pg()
-        pg_instance = pg_factory()
+        pg_instance = create_pg()
 
         yield pg_instance
 
         pg_instance.stop()
-        pg_factory.clear_cache()
         self._git_co_teardown(commit, stashed)
 
     def test_upgrade(self, pg_old, pg_new):
@@ -98,7 +94,7 @@ class TestUpgrades:
         dsn_new = pg_new.dsn()
 
         os.environ["POSTGRESQL_DATABASE"] = str(dsn_old["database"])
-        os.environ["POSTGRESQL_USER"] = "vmaas_db_admin"
+        os.environ["POSTGRESQL_USER"] = str(dsn_old["user"])
         os.environ["POSTGRESQL_HOST"] = str(dsn_old["host"])
         os.environ["POSTGRESQL_PORT"] = str(dsn_old["port"])
 
