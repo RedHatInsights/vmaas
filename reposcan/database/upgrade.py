@@ -36,6 +36,8 @@ class DatabaseUpgrade:
     def __init__(self):
         LOGGER.info('DatabaseUpgrade initializing.')
 
+        DatabaseHandler.close_connection()
+
         init_db()
 
         # get upgrade sql scripts directory

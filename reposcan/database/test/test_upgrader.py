@@ -190,7 +190,7 @@ class TestUpgrade:
 
         logs = _fetch_version_logs(conn)
         script_num = 0
-        while script_num < max_script:
+        while script_num < SCRIPT_COUNT:
             correct_result = (current_version + script_num,
                               "complete",
                               script_locations[script_num].split("/")[-1],
