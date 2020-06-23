@@ -107,6 +107,8 @@ class RepositoryStore:
 
             if packages_to_delete:
                 cur.execute("""delete from pkg_errata pe where pe.pkg_id in %s""", (tuple(packages_to_delete),))
+                cur.execute("""delete from module_rpm_artifact mra where mra.pkg_id in %s""",
+                            (tuple(packages_to_delete),))
                 cur.execute("""delete from package p where p.id in %s""", (tuple(packages_to_delete),))
 
             if updates_to_delete:
