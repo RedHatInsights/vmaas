@@ -92,7 +92,6 @@ class UpdatesAPI:
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
                          response, module_ids, security_only):
         # pylint: disable=too-many-branches
-        module_filter = module_ids is not None
         for pkg, pkg_dict in packages_to_process.items():
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.db_cache.packagename2id[name]
@@ -158,7 +157,7 @@ class UpdatesAPI:
                             self.db_cache.errata_detail[errata_name][ERRATA_TYPE] == SECURITY_ERRATA_TYPE or \
                             self.db_cache.errata_detail[errata_name][ERRATA_CVE]):
                         continue
-                    if (module_filter and (update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
+                    if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not \
                             self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
                         continue
                     repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,
@@ -190,16 +189,14 @@ class UpdatesAPI:
 
         # Get list of valid repository IDs based on input paramaters
         available_repo_ids = self._process_repositories(data, response)
-        modules_list = data.get('modules_list', None)
-        if modules_list is not None:
-            module_info = [(x['module_name'], x['module_stream']) for x in modules_list]
-            module_ids = set()
-            for module in module_info:
-                if module in self.db_cache.modulename2id:
-                    module_ids.update(self.db_cache.modulename2id[module])
+        modules_list = data.get('modules_list', [])
+        module_info = [(x['module_name'], x['module_stream']) for x in modules_list]
+        module_ids = set()
+        for module in module_info:
+            if module in self.db_cache.modulename2id:
+                module_ids.update(self.db_cache.modulename2id[module])
+        if 'modules_list' in data:
             response['modules_list'] = modules_list
-        else:
-            module_ids = None
 
         # Backward compatibility of older APIs
         if api_version < 3:
