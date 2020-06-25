@@ -113,7 +113,8 @@ class UpdateStore(ObjectStore):
                     if (update["id"],) in names:
                         import_data.append(
                             (update["id"], update["title"],
-                             errata_severity_map[update["severity"]] if update["severity"] is not None else None,
+                             errata_severity_map[update["severity"]] if update["severity"] in errata_severity_map
+                             else None,
                              errata_type_map[str(update["type"])],
                              update["summary"], update["description"],
                              update["issued"], update["updated"],
