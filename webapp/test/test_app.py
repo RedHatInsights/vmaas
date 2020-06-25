@@ -122,7 +122,8 @@ class TestWebappPosts(BaseCase):
 
     async def test_vulnerabilities_post_1(self):
         """Test vulnerabilities post endpoint."""
-        body = """{"package_list": ["my-pkg-1.1.0-1.el8.i686"]}"""
+        body = """{"package_list": ["my-pkg-1.1.0-1.el8.i686"],
+                   "modules_list": [{"module_name": "my-pkg", "module_stream": "1"}]}"""
         resp = await self.fetch('/api/v1/vulnerabilities', method='POST', data=body)
         assert HTTPStatus.OK == resp.status
         assert resp.body[:30] == '{"cve_list": ["CVE-2014-1545"]'

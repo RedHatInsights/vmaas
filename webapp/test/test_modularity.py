@@ -19,19 +19,19 @@ MODULE_JSONS = [{'module_name': 'my-pkg', 'module_stream': '1'},
                 {'module_name': 'sharks', 'module_stream': 'are_dangerous'}]
 
 OLD_OLD = [
-    ('without_modularity', None, {PKG_NEVRAS[1], PKG_NEVRAS[2], PKG_NEVRAS[3]}),
+    ('without_modularity', None, set()),
     ('with_modularity', [MODULE_JSONS[0]], {PKG_NEVRAS[1]}),
     ('multiple_modules', MODULE_JSONS, {PKG_NEVRAS[1], PKG_NEVRAS[2], PKG_NEVRAS[3]})
 ]
 
 NEW_OLD = [
-    ('without_modularity', None, {PKG_NEVRAS[2], PKG_NEVRAS[3]}),
+    ('without_modularity', None, set()),
     ('correct_stream_enabled', [MODULE_JSONS[0]], None),
     ('incorrect_stream_enabled', [MODULE_JSONS[1]], {PKG_NEVRAS[2], PKG_NEVRAS[3]})
 ]
 
 NEW_MODULE = [
-    ('without_modularity', None, {PKG_NEVRAS[3]}),
+    ('without_modularity', None, set()),
     ('with_modularity', [MODULE_JSONS[1]], {PKG_NEVRAS[3]})
 ]
 
