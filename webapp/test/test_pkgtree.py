@@ -15,63 +15,35 @@ PKGS = ['kernel', 'kernel-rt']
 PKG_JSON = {"package_name_list": [PKG]}
 PKGS_JSON = {"package_name_list": PKGS}
 
-RESPONSE_PKG = {
-    'last_change': '2019-03-07T09:17:23.799995',
-    'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
-                                                     'name': 'RHEA-2011:0895'}],
-                                         'first_published': '2011-06-23T00:00:00',
-                                         'nevra': 'kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64',
-                                         'repositories': []},
-                                        {'errata': [{'cve_list': ['CVE-2018-12126',
-                                                                  'CVE-2018-12127',
-                                                                  'CVE-2018-12130',
-                                                                  'CVE-2019-11091'],
-                                                     'issued': '2019-05-14T17:22:02',
-                                                     'name': 'RHSA-2019:1174'},
-                                                    {'cve_list': ['CVE-2018-10126'],
-                                                     'issued': '2019-06-14T18:22:02',
-                                                     'name': 'RHSA-2019:1175'}],
-                                         'first_published': '2019-05-14T17:22:02',
-                                         'nevra': 'kernel-rt-4.18.0-80.rt9.138.el8.x86_64',
-                                         'repositories': [{'basearch': 'x86_64',
-                                                           'label': 'rhel-8-for-x86_64-nfv-rpms',
-                                                           'name': 'Red Hat '
-                                                                   'Enterprise '
-                                                                   'Linux 8 for '
-                                                                   'x86_64 - Real '
-                                                                   'Time for NFV '
-                                                                   '(RPMs)',
-                                                           'releasever': '8.0',
-                                                           'revision': '2019-09-20T06:25:14+00:00'},
-                                                          {'basearch': 'x86_64',
-                                                           'label': 'rhel-8-for-x86_64-nfv-rpms',
-                                                           'name': 'Red Hat '
-                                                                   'Enterprise '
-                                                                   'Linux 8 for '
-                                                                   'x86_64 - Real '
-                                                                   'Time for NFV '
-                                                                   '(RPMs)',
-                                                           'releasever': '8.1',
-                                                           'revision': '2020-01-03T05:24:24+00:00'},
-                                                          {'basearch': 'x86_64',
-                                                           'label': 'rhel-8-for-x86_64-rt-rpms',
-                                                           'name': 'Red Hat '
-                                                                   'Enterprise '
-                                                                   'Linux 8 for '
-                                                                   'x86_64 - Real '
-                                                                   'Time (RPMs)',
-                                                           'releasever': '8.1',
-                                                           'revision': '2020-01-03T05:24:17+00:00'},
-                                                          {'basearch': 'x86_64',
-                                                           'label': 'rhel-8-for-x86_64-rt-rpms',
-                                                           'name': 'Red Hat '
-                                                                   'Enterprise '
-                                                                   'Linux 8 for '
-                                                                   'x86_64 - Real '
-                                                                   'Time (RPMs)',
-                                                           'releasever': '8.0',
-                                                           'revision': '2019-09-20T06:25:12+00:00'}]}]}
-}
+RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995',
+                'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
+                                                                 'name': 'RHEA-2011:0895'}],
+                                                     'first_published': '2011-06-23T00:00:00',
+                                                     'nevra': 'kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64',
+                                                     'repositories': [{'basearch': 'x86_64',
+                                                                       'label': 'rhel-8-for-x86_64-rt-rpms',
+                                                                       'name': 'Red Hat '
+                                                                               'Enterprise '
+                                                                               'Linux 8 for '
+                                                                               'x86_64 - Real '
+                                                                               'Time (RPMs)',
+                                                                       'releasever': '8.1',
+                                                                       'revision': '2020-01-03T05:24:17+00:00'}]},
+                                                    {'errata': [{'cve_list': ['CVE-2018-10126'],
+                                                                 'issued': '2019-06-14T18:22:02',
+                                                                 'name': 'RHSA-2019:1175'}],
+                                                     'first_published': '2019-06-14T18:22:02',
+                                                     'nevra': 'kernel-rt-4.18.0-80.rt9.138.el8.x86_64',
+                                                     'repositories': [{'basearch': 'x86_64',
+                                                                       'label': 'rhel-8-for-x86_64-rt-rpms',
+                                                                       'name': 'Red Hat '
+                                                                               'Enterprise '
+                                                                               'Linux 8 for '
+                                                                               'x86_64 - Real '
+                                                                               'Time (RPMs)',
+                                                                       'releasever': '8.1',
+                                                                       'revision': '2020-01-03T05:24:17+00:00'}]}]}}
+
 
 RESPONSE_PKGS = {
     'last_change': '2019-03-07T09:17:23.799995',
@@ -180,16 +152,13 @@ class TestPkgtreeAPI(TestBase):
         # Errata
         response = self.pkg_api.process_list(1, PKG_JSON)
         erratas = response['package_name_list'][PKG][-1]['errata']
-        assert erratas[0]['name'] == 'RHSA-2019:1174'
-        assert erratas[1]['name'] == 'RHSA-2019:1175'
+        assert erratas[0]['name'] == 'RHSA-2019:1175'
         # CVE
-        assert erratas[0]['cve_list'] == ['CVE-2018-12126', 'CVE-2018-12127', 'CVE-2018-12130', 'CVE-2019-11091']
-        assert erratas[1]['cve_list'] == ['CVE-2018-10126']
+        assert erratas[0]['cve_list'] == ['CVE-2018-10126']
 
     def test_sorting_repositories(self):
         """Test sorting of repositories in pkgtree api response."""
         response = self.pkg_api.process_list(1, PKG_JSON)
         repos = [val['label'] for val in response['package_name_list'][PKG][-1]['repositories']]
-        expected = ['rhel-8-for-x86_64-nfv-rpms', 'rhel-8-for-x86_64-nfv-rpms',
-                    'rhel-8-for-x86_64-rt-rpms', 'rhel-8-for-x86_64-rt-rpms']
+        expected = ['rhel-8-for-x86_64-rt-rpms']
         assert repos == expected

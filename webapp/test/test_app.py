@@ -213,9 +213,9 @@ class TestWebappGets(BaseCase):
 
     async def test_vuln_get_1(self):
         """Test vulnerabilities get endpoint."""
-        resp = await self.fetch('/api/v1/vulnerabilities/my-pkg-1.1.0-1.el8.i686', method='GET')
+        resp = await self.fetch('/api/v1/vulnerabilities/kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == '{"cve_list": ["CVE-2014-1545"]'
+        assert resp.body[:30] == '{"cve_list": ["CVE-2018-10126"'
 
     async def test_vuln_get_2_tilda(self):
         """Test vulnerabilities get endpoint."""

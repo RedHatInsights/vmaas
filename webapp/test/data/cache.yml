@@ -117,6 +117,8 @@ errataid2name:
 errataid2repoids:
   444: !!set
     1: null
+  556: !!set
+    2: null
 evr2id:
   ? &id001 !!python/tuple
   - '0'
@@ -317,7 +319,6 @@ pkgid2errataids:
   8310: !!set
     111: null
   8320: !!set
-    555: null
     556: null
 pkgid2repoids:
   8110:
@@ -328,11 +329,10 @@ pkgid2repoids:
   - 1
   8210:
   - 1
+  8310:
+  - 2
   8320:
   - 2
-  - 3
-  - 4
-  - 5
 productid2repoids:
   1: !!set
     1: null
@@ -391,6 +391,9 @@ updates:
   - 8120
   - 8200
   - 8210
+  332222:
+  - 8310
+  - 8320
 updates_index:
   2222:
     110:
@@ -401,6 +404,9 @@ updates_index:
     - 2
     210:
     - 3
+  332222:
+    310:
+    - 0
 src_pkg_id2pkg_ids:
   81100:
     - 8110
