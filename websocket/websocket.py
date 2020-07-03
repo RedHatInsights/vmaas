@@ -44,7 +44,8 @@ class NotificationHandler(WebSocketHandler):
     @classmethod
     def poll_notify(cls):
         """Check and possibly send updates to listeners"""
-        refresh_time = list(set(cls.webapp_export_timestamps))[0] if len(cls.webapp_export_timestamps) > 0 else None
+        refresh_time = list(set(cls.webapp_export_timestamps.values()))[0] \
+            if len(cls.webapp_export_timestamps) > 0 else None
         if cls.webapps_ready() and cls.last_refresh_sent != refresh_time:
             LOGGER.info("All webapps have fresh data")
             cls.send_message("listener", "webapps-refreshed")
@@ -79,7 +80,8 @@ class NotificationHandler(WebSocketHandler):
     def on_close(self):
         self.timeout_callback.stop()
         del self.connections[self]
-        del self.webapp_export_timestamps[self]
+        if self in self.webapp_export_timestamps:
+            del self.webapp_export_timestamps[self]
 
     def timeout_check(self):
         """Check time since we received last pong. Send ping again."""
