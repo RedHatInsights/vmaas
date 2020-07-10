@@ -275,7 +275,7 @@ class DataDump:
                 cursor.execute("""SELECT errata_cve.errata_id, cve.name
                                     FROM cve
                                     JOIN errata_cve ON cve_id = cve.id
-                                   WHERE errata_id in %s
+                                   WHERE errata_id in %s AND cve.source_id IS NOT NULL
                                """, [tuple(self.errata_ids)])
                 for errata_id, cve_name in cursor:
                     errataid2cves.setdefault(errata_id, []).append(cve_name)
@@ -357,9 +357,11 @@ class DataDump:
         # Select CWE to CVE mapping
         cveid2cwe = {}
         with self._named_cursor() as cursor:
-            cursor.execute("""select cve_id, cwe.name
-                                from cve_cwe
-                                join cwe on cve_cwe.cwe_id = cwe.id
+            cursor.execute("""select cve_cwe.cve_id, cwe.name
+                                from cve_cwe cve_cwe
+                                join cwe cwe on cve_cwe.cwe_id = cwe.id
+                                join cve cve on cve.id = cve_cwe.cve_id
+                                where cve.source_id is not null
                            """)
             for cve_id, cwe in cursor:
                 cveid2cwe.setdefault(cve_id, []).append(cwe)
@@ -372,6 +374,7 @@ class DataDump:
                               from cve cve
                                    inner join errata_cve ec on cve.id = ec.cve_id
                                    inner join pkg_errata pe on ec.errata_id = pe.errata_id
+                              where cve.source_id is not null
                             order by cve.id, pe.pkg_id
                            """)
             for cve_id, pkg_id in cursor:
@@ -383,6 +386,8 @@ class DataDump:
             cursor.execute("""
                            select ec.cve_id as cve_id, ec.errata_id
                              from errata_cve ec
+                             join cve c on ec.cve_id = c.id
+                             where c.source_id is not null
                            order by ec.cve_id, ec.errata_id
                            """)
             for cve_id, errata_id in cursor:
