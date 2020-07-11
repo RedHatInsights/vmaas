@@ -33,7 +33,7 @@ paths:
             text/plain:
               schema:
                 type: boolean
-                example: true
+                enum: [true, false]
       tags: [ Metadata ]
 
   /v1/version:
@@ -330,6 +330,7 @@ components:
       properties:
         running:
           type: boolean
+          enum: [true, false]
         task_type:
           type: string
           example: Sync CVEs
@@ -340,14 +341,14 @@ components:
     TaskStartResponse:
       type: object
       properties:
-        success: { type: boolean }
+        success: { type: boolean, enum: [true, false] }
         msg: { type: string, example: 'Repo sync has started' }
 
     ErrataObj:
       type: object
       properties:
         name: { type: string, example: RHSA-2010:0842 }
-        issued: { type: string, example: '2010-11-10T00:00:00+00:00' }
+        issued: { type: string, example: '2010-11-10T00:00:00+00:00', format: date-time }
         cve_list:
           type: array
           items: { type: string, example: CVE-2010-3437}
@@ -361,6 +362,7 @@ components:
         first_published:
           type: string
           example: '2010-11-10T00:00:00+00:00'
+          format: date-time
         repositories:
           type: object
           properties:
@@ -379,6 +381,7 @@ components:
             revision:
               type: string
               example: '2018-08-20T15:11:29+00:00'
+              format: date-time
         errata:
           $ref: '#/components/schemas/ErrataObj'
 
