@@ -611,7 +611,7 @@ components:
           example: x86_64
         security_only:
           type: boolean
-          example: true
+          enum: [true, false]
       required:
         - package_list
 
@@ -738,15 +738,17 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         published_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         rh_only:
           type: boolean
-          example: true
+          enum: [true, false]
         errata_associated:
           type: boolean
-          example: true
+          enum: [true, false]
           description: Return only those CVEs which are associated with at least one errata. Defaults to false.
         <<: *req_paging
       required:
@@ -761,10 +763,11 @@ components:
             properties:
               impact:
                 type: string
-                example: Medium
+                enum: [NotSet, None, Low, Medium, Moderate, Important, High, Critical]
               public_date:
                 type: string
                 example: '2018-01-04T13:29:00+00:00'
+                format: date-time
               synopsis:
                 type: string
                 example: CVE-2017-5715
@@ -774,6 +777,7 @@ components:
               modified_date:
                 type: string
                 example: '2018-03-31T01:29:00+00:00'
+                format: date-time
               redhat_url:
                 type: string
                 example: 'https://access.redhat.com/security/cve/cve-2017-5715'
@@ -815,6 +819,7 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         <<: *resp_paging
 
     ReposRequest:
@@ -829,6 +834,7 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
           description: Return only repositories changed after the given date
         <<: *req_paging
       required:
@@ -878,6 +884,7 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         type:
           oneOf:
             - type: string
@@ -889,12 +896,12 @@ components:
         severity:
           oneOf:
             - type: string
-              example: 'Critical'
+              enum: [Low, Moderate, Important, Critical, null]
               nullable: true
             - type: array
               items:
                 type: string
-                example: Important
+                enum: [Low, Moderate, Important, Critical, null]
                 nullable: true
         <<: *req_paging
       required:
@@ -912,7 +919,7 @@ components:
                 example: '2018-03-13T17:31:41+00:00'
               severity:
                 type: string
-                example: Important
+                enum: [Low, Moderate, Important, Critical, null]
                 nullable: true
               reference_list:
                 type: array
@@ -922,6 +929,7 @@ components:
               issued:
                 type: string
                 example: '2018-03-13T17:31:28+00:00'
+                format: date-time
               description:
                 type: string
                 example: description text
@@ -963,6 +971,7 @@ components:
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         type:
           type: array
           items:
@@ -972,7 +981,7 @@ components:
           type: array
           items:
             type: string
-            example: Important
+            enum: [Low, Moderate, Important, Critical, null]
             nullable: true
         <<: *resp_paging
 
@@ -1054,6 +1063,7 @@ components:
                 first_published:
                   type: string
                   example: '2020-01-13T17:31:41+00:00'
+                  format: date-time
                 repositories:
                   type: array
                   items:
@@ -1074,6 +1084,7 @@ components:
                       revision:
                         type: string
                         example: '2019-11-19T09:41:05+00:00'
+                        format: date-time
                       module_name:
                         type: string
                         example: postgresql
@@ -1097,6 +1108,7 @@ components:
                       issued:
                         type: string
                         example: '2019-11-19T09:41:05+00:00'
+                        format: date-time
                       cve_list:
                         type: array
                         items:
