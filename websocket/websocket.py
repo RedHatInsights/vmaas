@@ -4,7 +4,7 @@ Main entrypoint of websocket server.
 """
 import signal
 
-from tornado.ioloop import IOLoop, PeriodicCallback
+from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
 from tornado.websocket import WebSocketHandler
 
@@ -19,43 +19,70 @@ LOGGER = get_logger("websocket")
 class NotificationHandler(WebSocketHandler):
     """Websocket handler to send messages to subscribed clients."""
     connections = {}
+    # Timestamp of the last data dump reported by reposcan
+    last_dump_version = None
+    last_advertised_version = None
     # What is the freshest data each webapp has
     webapp_export_timestamps = {}
-    # What time did we advertise last
-    last_refresh_sent = None
-
-    def __init__(self, application, request, **kwargs):
-        super(NotificationHandler, self).__init__(application, request, **kwargs)
-        self.last_pong = None
-        self.timeout_callback = None
+    webapp_statuses = {}
 
     def open(self, *args, **kwargs):
         self.connections[self] = None
-        # Set last pong timestamp to current timestamp and ping client
-        self.last_pong = IOLoop.current().time()
-        self.ping(b"")
-        # Start periodic callback checking time since last received pong
-        self.timeout_callback = PeriodicCallback(self.timeout_check, WEBSOCKET_PING_INTERVAL * 1000)
-        self.timeout_callback.start()
 
     def data_received(self, chunk):
         pass
 
     @classmethod
     def poll_notify(cls):
-        """Check and possibly send updates to listeners"""
-        refresh_time = list(set(cls.webapp_export_timestamps.values()))[0] \
-            if len(cls.webapp_export_timestamps) > 0 else None
-        if cls.webapps_ready() and cls.last_refresh_sent != refresh_time:
-            LOGGER.info("All webapps have fresh data")
+        """Check and possibly send updates to webapps and listeners"""
+        total_count = cls.webapps_count()
+        ready_count = cls.webapps_ready_count()
+        updated_count = cls.webapps_updated_count()
+        outdated_count = total_count - cls.webapps_updated_count()
+
+        # At least one webapp is outdated
+        if total_count != updated_count:
+
+            # Outdated, but currently not updating webapps
+            updatable = [conn for conn in cls.connections if cls.connections[conn] == "webapp"
+                         and cls.webapp_export_timestamps.get(conn) != cls.last_dump_version
+                         and cls.webapp_statuses.get(conn) == "ready"]
+
+            # If we have 1 webapp left to update, perform the update, if more, keep at least one
+            # in its current state
+            to_update = 1 if outdated_count == 1 else min(ready_count, outdated_count) - 1
+            updatable = updatable[:to_update]
+            if len(updatable) > 0:
+                LOGGER.info("Updating %d webapps", len(updatable))
+
+            # Send refresh message to webapps, removing status, since from this point their
+            # status is indeterminate (They should start updating themselves, but we don't know that until
+            # the status is reported by webapps)
+            for conn in updatable:
+                conn.write_message("refresh-cache")
+                del cls.webapp_statuses[conn]
+
+        # We have all webapps up to date, but advertised version is outdated
+        if cls.last_dump_version != cls.last_advertised_version and cls.webapps_count() == cls.webapps_ready_count() \
+                and cls.webapps_count() > 0:
+            LOGGER.info("Advertising dump version %s to listeners", cls.last_dump_version)
+            cls.last_advertised_version = cls.last_dump_version
             cls.send_message("listener", "webapps-refreshed")
-            cls.last_refresh_sent = refresh_time
 
     @classmethod
-    def webapps_ready(cls):
-        """Check whether all of available webapps are ready"""
-        app_count = len([c for c in cls.connections.values() if c == "webapp"])
-        return app_count == len(cls.webapp_export_timestamps) and len(set(cls.webapp_export_timestamps.values())) == 1
+    def webapps_count(cls):
+        """ count of webapps"""
+        return len([c for c in cls.connections.values() if c == "webapp"])
+
+    @classmethod
+    def webapps_ready_count(cls):
+        """ All webapps report ready state, and have the same export timestamp"""
+        return len([s for s in cls.webapp_statuses.values() if s == "ready"])
+
+    @classmethod
+    def webapps_updated_count(cls):
+        """ Count of webapps serving latest data """
+        return len([s for s in cls.webapp_export_timestamps.values() if s == cls.last_dump_version])
 
     def on_message(self, message):
         if self.connections[self]:
@@ -68,37 +95,25 @@ class NotificationHandler(WebSocketHandler):
             self.connections[self] = "reposcan"
         elif message == "subscribe-listener":
             self.connections[self] = "listener"
-        elif message == "invalidate-cache" and self.connections[self] == "reposcan":
-            self.webapp_export_timestamps.clear()
-            self.send_message("webapp", "refresh-cache")
-        elif message.startswith("refreshed") and self.connections[self] == "webapp":
+        elif message.startswith("version") and self.connections[self] == "reposcan":
+            _, timestamp = message.split()
+            self.__class__.last_dump_version = timestamp
+        elif message.startswith("version") and self.connections[self] == "webapp":
             _, timestamp = message.split()
             self.webapp_export_timestamps[self] = timestamp
-            # All webapp connections are refreshed with same dump version
+        elif message.startswith("status") and self.connections[self] == "webapp":
+            _, status = message.split("-")
+            self.webapp_statuses[self] = status
         self.poll_notify()
 
     def on_close(self):
-        self.timeout_callback.stop()
+        super().on_close()
+        LOGGER.error("Closing")
         del self.connections[self]
         if self in self.webapp_export_timestamps:
             del self.webapp_export_timestamps[self]
-
-    def timeout_check(self):
-        """Check time since we received last pong. Send ping again."""
-        now = IOLoop.current().time()
-        if now - self.last_pong > WEBSOCKET_TIMEOUT:
-            self.close(1000, "Connection timed out.")
-            return
-        self.ping(b"")
-
-    def on_ping(self, data):
-        super().on_ping(data)
-        self.poll_notify()
-
-    def on_pong(self, data):
-        """Pong received from client."""
-        self.last_pong = IOLoop.current().time()
-        self.poll_notify()
+        if self in self.webapp_statuses:
+            del self.webapp_statuses[self]
 
     @classmethod
     def send_message(cls, target_client_type, message):
@@ -128,13 +143,15 @@ class HealthHandler(RequestHandler):
 
 class WebsocketApplication(Application):
     """Class defining API handlers."""
+
     def __init__(self):
         handlers = [
             (r"/?", NotificationHandler),
             (r"/api/v1/monitoring/health/?", HealthHandler),
         ]
 
-        Application.__init__(self, handlers)
+        Application.__init__(self, handlers, websocket_ping_interval=WEBSOCKET_PING_INTERVAL,
+                             websocket_ping_timeout=WEBSOCKET_TIMEOUT)
 
     @staticmethod
     def stop():

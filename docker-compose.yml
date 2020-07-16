@@ -94,6 +94,8 @@ services:
       - vmaas_reposcan
       - vmaas_webapp
     restart: always
+    logging:
+      driver: none
 
   vmaas_grafana:
     container_name: vmaas-grafana
@@ -109,6 +111,8 @@ services:
       - ./monitoring/grafana/grafana.conf
     user: "104"
     restart: always
+    logging:
+      driver: none
 
 volumes:
   vmaas-db-data:
