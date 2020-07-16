@@ -152,6 +152,7 @@ class TaskCancelHandler():
             LOGGER.warning("Background task terminated.")
         return TaskStatusResponse(running=SyncTask.is_running(), task_type=SyncTask.get_task_type())
 
+
 class DumpVersionHandler():
     """Handler class for getting latest dump version."""
 
@@ -159,6 +160,7 @@ class DumpVersionHandler():
     def get(cls, **kwargs):
         """Get the latest version."""
         return DataDump.fetch_latest_dump()
+
 
 class SyncHandler:
     """Base handler class providing common methods for different sync types."""
@@ -201,10 +203,7 @@ class SyncHandler:
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler) and "ERROR" not in task_result:
             # Notify webapps to update their cache
-            if ReposcanWebsocket.websocket:
-                ReposcanWebsocket.websocket.write_message("invalidate-cache")
-            else:
-                ReposcanWebsocket.websocket_response_queue.add("invalidate-cache")
+            ReposcanWebsocket.report_version()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
 
@@ -635,7 +634,6 @@ class ReposcanWebsocket():
 
     websocket = None
     websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
-    websocket_response_queue = set()
     reconnect_callback = None
 
     @staticmethod
@@ -653,12 +651,19 @@ class ReposcanWebsocket():
                               callback=cls._websocket_connect_status)
 
     @classmethod
+    def report_version(cls):
+        """Report current dump version"""
+        cls.websocket.write_message(f"version {DataDump.fetch_latest_dump()}")
+
+    @classmethod
     def _websocket_connect_status(cls, future):
         """Check if connection attempt succeeded."""
         try:
             result = future.result()
         except:  # pylint: disable=bare-except
             result = None
+
+        cls.websocket = result
 
         if result is None:
             # TODO: print the traceback as debug message when we use logging module instead of prints here
@@ -667,11 +672,8 @@ class ReposcanWebsocket():
         else:
             LOGGER.info("Connected to: %s", cls.websocket_url)
             result.write_message("subscribe-reposcan")
-            for item in cls.websocket_response_queue:
-                result.write_message(item)
-            cls.websocket_response_queue.clear()
+            cls.report_version()
 
-        cls.websocket = result
 
     @classmethod
     def _read_websocket_message(cls, message):
