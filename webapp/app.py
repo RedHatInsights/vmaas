@@ -120,7 +120,7 @@ class HealthHandler:
     """Handler class providing health status."""
 
     @classmethod
-    async def get(cls, **kwargs): # pylint: disable=unused-argument
+    async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get API status.
            ---
            description: Return API status
@@ -132,11 +132,20 @@ class HealthHandler:
         return web.Response(status=200)
 
 
+class ReadyHandler(BaseHandler):
+    """Handler class for providing pod status"""
+
+    @classmethod
+    async def get(cls, **kwargs):  # pylint: disable=unused-argument
+        """Get app status(whether the app is ready to serve requests)"""
+        return web.Response(status=503 if cls.refreshing else 200)
+
+
 class VersionHandler:
     """Handler class providing app version."""
 
     @classmethod
-    async def get(cls, **kwargs): #pylint: disable=unused-argument
+    async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get app version.
            ---
            description: Get version of application
@@ -153,7 +162,7 @@ class DBChangeHandler(BaseHandler):
     """
 
     @classmethod
-    async def get(cls, **kwargs): #pylint: disable=unused-argument
+    async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get last-updated-times for VMaaS DB """
         return web.json_response(cls.dbchange_api.process())
 
@@ -395,11 +404,11 @@ class RPMPkgNamesHandlerGet(BaseHandler):
 
 class Websocket:
     """ main websocket handling class"""
+
     def __init__(self):
         self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
         self.websocket = None
         self.task = None
-        self.websocket_response_queue = set()
 
     def stop(self):
         """Stop vmaas application"""
@@ -410,55 +419,59 @@ class Websocket:
         self.task.cancel()
         self.task = None
 
-    @staticmethod
-    async def _refresh_cache():
+    async def _refresh_cache(self):
         LOGGER.info("Starting cached data refresh.")
         BaseHandler.refreshing = True
+        await self.websocket.send_str("status-refreshing")
         await BaseHandler.db_cache.reload_async()
+        await self.report_version()
+        await self.websocket.send_str("status-ready")
         BaseHandler.refreshing = False
         LOGGER.info("Cached data refreshed.")
 
-    async def websocket_loop(self):
-        """Main loop for handling websocket connection"""
+    async def run_websocket(self):
+        """Infinite loop handling websocket connection"""
         async with ClientSession() as session:
             while True:
-                try:
-                    # Automatically send pings very frequently
-                    async with session.ws_connect(url=self.websocket_url, autoping=True, heartbeat=6) as socket:
-                        LOGGER.info("Connected to: %s", self.websocket_url)
-                        self.websocket = socket
-                        # subscribe for notifications
-                        await self.websocket.send_str("subscribe-webapp")
-                        # Re-send queued messages
-                        for item in self.websocket_response_queue:
-                            await self.websocket.send_str(item)
-                        self.websocket_response_queue.clear()
+                await self.websocket_session(session)
 
-                        # check if webapp missed dump
-                        latest_dump = await self.fetch_latest_dump()
-                        if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
-                            LOGGER.info("Fetching missed dump: %s.", latest_dump)
-                            await self._refresh_cache()
-                            msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
-                            if self.websocket:
-                                await self.websocket.send_str(msg)
-                            else:
-                                self.websocket_response_queue.add(msg)
+    async def websocket_session(self, session):
+        """Main loop for handling websocket connection"""
+        try:
+            async with session.ws_connect(url=self.websocket_url) as socket:
+                LOGGER.info("Connected to: %s", self.websocket_url)
+                self.websocket = socket
+                # subscribe for notifications
+                await self.websocket.send_str("subscribe-webapp")
+                # Report version before status, so websocket doesn't send us the refresh message
+                await self.report_version()
+                await self.websocket.send_str("status-ready")
 
-                        # handle websocket messages
-                        await self.websocket_msg_handler()
-                        # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
-                        self.websocket = None
-                        await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
-                except ClientConnectionError:
-                    LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
-                    await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
+                # check if webapp missed dump
+                latest_dump = await self.fetch_latest_dump(session)
+                if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
+                    LOGGER.info("Fetching missed dump: %s.", latest_dump)
+                    await self._refresh_cache()
+                    await self.report_version()
+                # handle websocket messages
+                await self.websocket_msg_handler()
+                self.websocket = None
+                await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
+        except ClientConnectionError:
+            LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
+            await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
+        finally:
+            # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
+            self.websocket = None
 
-    async def fetch_latest_dump(self):
+    async def fetch_latest_dump(self, session):
         """Method fetches latest dump from reposcan"""
-        async with ClientSession() as session:
-            async with session.get("http://%s:%s/%s" % (REPOSCAN_HOST, REPOSCAN_PORT, LATEST_DUMP_ENDPOINT)) as resp:
-                return await resp.text()
+        async with session.get("http://%s:%s/%s" % (REPOSCAN_HOST, REPOSCAN_PORT, LATEST_DUMP_ENDPOINT)) as resp:
+            return await resp.text()
+
+    async def report_version(self):
+        """Report currently used dump version"""
+        await self.websocket.send_str(f"version {BaseHandler.db_cache.dbchange['exported']}")
 
     async def websocket_msg_handler(self):
         """Handle active websocket connection, returning upon close"""
@@ -469,11 +482,6 @@ class Websocket:
 
             if msg.data == 'refresh-cache':
                 await self._refresh_cache()
-                msg = f"refreshed {BaseHandler.db_cache.dbchange['exported']}"
-                if self.websocket:
-                    await self.websocket.send_str(msg)
-                else:
-                    self.websocket_response_queue.add(msg)
             else:
                 LOGGER.warning("Unhandled websocket message %s", msg.data)
 
@@ -609,4 +617,4 @@ def init_websocket():
         signal.signal(sig, terminate)
 
     # start websocket handling coroutine
-    socket.task = asyncio.get_event_loop().create_task(socket.websocket_loop())
+    socket.task = asyncio.get_event_loop().create_task(socket.run_websocket())
