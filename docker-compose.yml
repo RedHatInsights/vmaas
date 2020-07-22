@@ -17,10 +17,11 @@ services:
       - vmaas-db-data:/var/lib/pgsql/data
 
   vmaas_websocket:
+    command: /vmaas/entrypoint.sh websocket
     container_name: vmaas-websocket
     build:
         context: .
-        dockerfile: ./websocket/Dockerfile
+        dockerfile: ./Dockerfile
         args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/websocket:latest
@@ -29,10 +30,11 @@ services:
       - 8082:8082
 
   vmaas_reposcan:
+    command: /vmaas/entrypoint.sh reposcan
     container_name: vmaas-reposcan
     build:
         context: .
-        dockerfile: ./reposcan/Dockerfile
+        dockerfile: ./Dockerfile
         args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/reposcan:latest
@@ -51,10 +53,11 @@ services:
       - vmaas_database
 
   vmaas_webapp:
+    command: /vmaas/entrypoint.sh webapp
     container_name: vmaas-webapp
     build:
         context: .
-        dockerfile: ./webapp/Dockerfile
+        dockerfile: ./Dockerfile
         args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/webapp:latest
@@ -69,10 +72,11 @@ services:
 
     
   vmaas_webapp_utils:
+    command: /vmaas/entrypoint.sh webapp-utils
     container_name: vmaas-webapp-utils
     build:
         context: .
-        dockerfile: ./webapp_utils/Dockerfile
+        dockerfile: ./Dockerfile
         args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/webapp_utils:latest

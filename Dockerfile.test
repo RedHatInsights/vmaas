@@ -14,10 +14,6 @@ RUN mkdir -p /vmaas/webapp /vmaas/reposcan /vmaas/websocket /vmaas/webapp_utils 
 
 USER postgres
 
-ADD /webapp/Pipfile*       /vmaas/webapp/
-ADD /reposcan/Pipfile*     /vmaas/reposcan/
-ADD /websocket/Pipfile*    /vmaas/websocket/
-ADD /webapp_utils/Pipfile* /vmaas/webapp_utils/
 ADD Pipfile*               /vmaas/
 ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
 
@@ -31,15 +27,7 @@ ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
 ARG PIPENV_PYUP_API_KEY=""
-RUN cd /vmaas/webapp && pipenv install --ignore-pipfile --deploy --dev && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
-    cd /vmaas/reposcan && pipenv install --ignore-pipfile --deploy --dev && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
-    cd /vmaas/websocket && pipenv install --ignore-pipfile --deploy --dev && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
-    cd /vmaas/webapp_utils && pipenv install --ignore-pipfile --deploy --dev && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi && \
-    cd /vmaas/ && pipenv install --ignore-pipfile --deploy --dev && \
+RUN cd /vmaas/ && pipenv install --ignore-pipfile --deploy --dev && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi
 
 ADD . /vmaas/
