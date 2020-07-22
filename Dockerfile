@@ -16,9 +16,9 @@ RUN microdnf install python3 which rsync git shadow-utils diffutils systemd libi
     rpm -ivh /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM} && \
     rm /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM}
 
-WORKDIR /reposcan
+WORKDIR /vmaas
 
-ADD /reposcan/Pipfile*       /reposcan/
+ADD /Pipfile* /vmaas/
 
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
@@ -29,31 +29,37 @@ RUN pip3 install --upgrade pipenv && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system ; fi
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
-ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-reposcan\/"
+ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-app\/"
 ENV MANIFEST_PYTHON=python3
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh /push_manifest.sh
 RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt $MANIFEST_PYTHON && \
     echo 'MANIFEST:' && cat manifest.txt
 
-RUN install -d -m 775 -g root /data && \
-    adduser --gid 0 -d /reposcan --no-create-home vmaas
+RUN install -m 1777 -d /data && \
+    adduser --gid 0 -d /vmaas --no-create-home vmaas
 
 USER vmaas
 
-EXPOSE 8081 8730
-
-ADD /reposcan/*.spec.yaml    /reposcan/
-ADD /reposcan/*.sh           /reposcan/
-ADD /reposcan/*.py           /reposcan/
-ADD /reposcan/database/*.py  /reposcan/database/
-ADD /reposcan/download/*.py  /reposcan/download/
-ADD /reposcan/redhatcve/*.py /reposcan/redhatcve/
-ADD /reposcan/repodata/*.py  /reposcan/repodata/
-ADD /reposcan/rsyncd.conf    /etc/
-ADD /common/*.py             /reposcan/common/
-ADD /database/*.sql          /reposcan/
-ADD /database/upgrade/*.sh   /reposcan/
-ADD /database/upgrade_scripts/* /reposcan/database/upgrade_scripts/
-
-CMD /reposcan/entrypoint.sh
+ADD wait-for-services.sh        /vmaas/
+ADD entrypoint.sh               /vmaas/
+ADD /common/*.py                /vmaas/webapp/common/
+ADD /common/*.py                /vmaas/reposcan/common/
+ADD /common/*.py                /vmaas/websocket/common/
+ADD /common/*.py                /vmaas/webapp_utils/common/
+ADD /webapp/*.spec.yaml         /vmaas/webapp/
+ADD /webapp/*.py                /vmaas/webapp/
+ADD /reposcan/*.spec.yaml       /vmaas/reposcan/
+ADD /reposcan/*.py              /vmaas/reposcan/
+ADD /reposcan/database/*.py     /vmaas/reposcan/database/
+ADD /reposcan/download/*.py     /vmaas/reposcan/download/
+ADD /reposcan/redhatcve/*.py    /vmaas/reposcan/redhatcve/
+ADD /reposcan/repodata/*.py     /vmaas/reposcan/repodata/
+ADD /reposcan/rsyncd.conf       /etc/
+ADD /database/*.sql             /vmaas/reposcan/
+ADD /database/upgrade/*.sh      /vmaas/reposcan/
+ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
+ADD /websocket/*.py             /vmaas/websocket/
+ADD /webapp_utils/*.py          /vmaas/webapp_utils/
+ADD /webapp_utils/*.yml         /vmaas/webapp_utils/
+ADD /webapp_utils/database/*.py /vmaas/webapp_utils/database/
