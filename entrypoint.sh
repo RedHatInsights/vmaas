@@ -5,7 +5,8 @@ cd $(dirname $0)
 if [[ ! -z $1 ]]; then
     if [[ "$1" == "webapp" ]]; then
         cd webapp
-        exec ../wait-for-services.sh python3 -m main
+        [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="python3 -m main"
+        exec ../wait-for-services.sh "$cmd"
     elif [[ "$1" == "reposcan" ]]; then
         rsync --daemon --verbose
         cd reposcan
