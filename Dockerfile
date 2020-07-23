@@ -8,7 +8,7 @@ ARG PG_REPO=https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-8-x86_6
 ARG PG_RPM=postgresql12-12.2-2PGDG.rhel8.x86_64.rpm
 ARG PG_LIBS_RPM=postgresql12-libs-12.2-2PGDG.rhel8.x86_64.rpm
 ADD /reposcan/RPM-GPG-KEY-PGDG /etc/pki/rpm-gpg/
-RUN microdnf install python3 which rsync git shadow-utils diffutils systemd libicu && microdnf clean all && \
+RUN microdnf install python3 which rsync git shadow-utils diffutils systemd libicu $([ ! -z $QE_BUILD ] && echo 'procps-ng') && microdnf clean all && \
     curl -o /tmp/${PG_RPM} ${PG_REPO}${PG_RPM} && \
     curl -o /tmp/${PG_LIBS_RPM} ${PG_REPO}${PG_LIBS_RPM} && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG && \
@@ -63,3 +63,6 @@ ADD /websocket/*.py             /vmaas/websocket/
 ADD /webapp_utils/*.py          /vmaas/webapp_utils/
 ADD /webapp_utils/*.yml         /vmaas/webapp_utils/
 ADD /webapp_utils/database/*.py /vmaas/webapp_utils/database/
+
+
+ENV COVERAGE_FILE='/tmp/.coverage'
