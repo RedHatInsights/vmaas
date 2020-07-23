@@ -109,19 +109,11 @@ jobs:
         run: |
           cd ${{ env.E2E_DEPLOY_PATH }}
           cat <<EOF > env/builder-env.yml
-          vmaas/vmaas-reposcan:
+          vmaas/vmaas-app:
             parameters:
               SOURCE_REPOSITORY_REF: "${{ github.ref }}"
               SOURCE_REPOSITORY_URL: "https://github.com/${{ github.repository }}"
-          vmaas/vmaas-webapp:
-            parameters:
-              SOURCE_REPOSITORY_REF: "${{ github.ref }}"
-              SOURCE_REPOSITORY_URL: "https://github.com/${{ github.repository }}"
-              DOCKERFILE_PATH: webapp/Dockerfile-qe
-          vmaas/vmaas-websocket:
-            parameters:
-              SOURCE_REPOSITORY_REF: "${{ github.ref }}"
-              SOURCE_REPOSITORY_URL: "https://github.com/${{ github.repository }}"
+              QE_BUILD: TRUE
           vmaas/vmaas-database:
             parameters:
               SOURCE_REPOSITORY_REF: "${{ github.ref }}"
