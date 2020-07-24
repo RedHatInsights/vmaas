@@ -2,8 +2,22 @@ version: '3'
 
 services:
   vmaas_database:
+    depends_on:
+      - vmaas_databasefix
+  vmaas_databasefix:
+    container_name: vmaas-databasefix
+    image: vmaas/database:latest
+    volumes:
+      - vmaas-db-data:/var/lib/pgsql/data
     user: root
-    command: sh -c 'chown -R postgres /var/lib/pgsql/data ; exec runuser postgres -c run-postgresql'
+    command: chown -R postgres /var/lib/pgsql/data
   vmaas_reposcan:
+    depends_on:
+      - vmaas_podmanfix
+  vmaas_podmanfix:
+    container_name: vmaas-podmanfix
+    image: vmaas/reposcan:latest
+    volumes:
+      - vmaas-dump-data:/data:z
     user: root
-    command: sh -c 'chown -R vmaas /data ; exec sleep infinity'
+    command: chown -R vmaas /data
