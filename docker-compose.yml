@@ -24,7 +24,7 @@ services:
         dockerfile: ./Dockerfile
         args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/websocket:latest
+    image: vmaas/app:latest
     restart: unless-stopped
     ports:
       - 8082:8082
@@ -32,12 +32,7 @@ services:
   vmaas_reposcan:
     command: /vmaas/entrypoint.sh reposcan
     container_name: vmaas-reposcan
-    build:
-        context: .
-        dockerfile: ./Dockerfile
-        args:
-          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/reposcan:latest
+    image: vmaas/app:latest
     restart: unless-stopped
     env_file:
       - ./conf/database-connection-writer.env
@@ -55,12 +50,7 @@ services:
   vmaas_webapp:
     command: /vmaas/entrypoint.sh webapp
     container_name: vmaas-webapp
-    build:
-        context: .
-        dockerfile: ./Dockerfile
-        args:
-          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/webapp:latest
+    image: vmaas/app:latest
     restart: unless-stopped
     env_file:
       - ./conf/webapp.env
@@ -74,12 +64,7 @@ services:
   vmaas_webapp_utils:
     command: /vmaas/entrypoint.sh webapp-utils
     container_name: vmaas-webapp-utils
-    build:
-        context: .
-        dockerfile: ./Dockerfile
-        args:
-          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/webapp_utils:latest
+    image: vmaas/app:latest
     restart: unless-stopped
     env_file:
       - ./conf/webapp_utils.env
