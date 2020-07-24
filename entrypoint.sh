@@ -17,6 +17,10 @@ if [[ ! -z $1 ]]; then
     elif [[ "$1" == "webapp-utils" ]]; then
         cd webapp_utils
         exec gunicorn -c gunicorn_conf.py -w ${GUNICORN_WORKERS:-4} --bind=0.0.0.0:8083 app
+    elif [[ "$1" == "sleep" ]]; then
+        # "developer" mode
+        echo "Sleeping ..."
+        exec sleep infinity
     fi
 fi
 
