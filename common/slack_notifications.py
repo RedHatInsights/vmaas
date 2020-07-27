@@ -45,11 +45,13 @@ def prepare_msg_for_slack(cert_name, header, expire_tuple=None):
     """Prepare msg_dict for format_message method"""
     msg = {'header': header,
            'name': cert_name if cert_name else 'None'}
-    (valid_to_dt, expire_in_days_td) = expire_tuple
 
-    if valid_to_dt and isinstance(expire_in_days_td, int):
-        msg['date'] = {'valid_to': valid_to_dt,
-                       'expire_in': 0 if expire_in_days_td < 0 else expire_in_days_td}
+    if expire_tuple:
+        (valid_to_dt, expire_in_days_td) = expire_tuple
+
+        if valid_to_dt and isinstance(expire_in_days_td, int):
+            msg['date'] = {'valid_to': valid_to_dt,
+                           'expire_in': 0 if expire_in_days_td < 0 else expire_in_days_td}
 
     return msg
 
