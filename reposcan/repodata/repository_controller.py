@@ -55,7 +55,7 @@ class RepositoryController:
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
             # Check certificate expiration date
             if repository.cert_name:
-                certs_tmp_dict[repository.cert_name] = cert
+                certs_tmp_dict[repository.cert_name] = repository.cert
 
             item = DownloadItem(
                 source_url=repomd_url,
@@ -80,19 +80,21 @@ class RepositoryController:
             # Load certificate
             loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
             # Get expiration date and parse it to datetime object
-            valid_to_dt = datetime.strptime(loaded_cert.get_notAfter(), "%Y%m%d%H%M%SZ")
+            valid_to_dt = datetime.strptime(loaded_cert.get_notAfter().decode("utf-8"), "%Y%m%d%H%M%SZ")
             expire_in_days_td = (valid_to_dt - datetime.utcnow()).days
             expire_tuple = (valid_to_dt, expire_in_days_td)
             if 30 >= expire_in_days_td > 0:
-                self.logger.warning('Certificate %s will expire in %s', cert_name, expire_in_days_td)
+                self.logger.warning('Certificate %s will expire in %s days!', cert_name, expire_in_days_td)
                 msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate will expire soon', expire_tuple)
                 send_slack_notification(msg)
-            else:
-                self.logger.warning('Certificate %s expired!', cert_name)
+            elif expire_in_days_td <= 0:
+                self.logger.error('Certificate %s expired!', cert_name)
                 msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate expired', expire_tuple)
                 send_slack_notification(msg)
+            else:
+                self.logger.info('Certificate %s will expire in %s days.', cert_name, expire_in_days_td)
         except crypto.Error:
-            self.logger.warning('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
+            self.logger.error('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
             msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate not provided or incorrect')
             send_slack_notification(msg)
 
