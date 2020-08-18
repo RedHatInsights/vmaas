@@ -1179,10 +1179,12 @@ components:
     VulnerabilitiesResponse:
       properties:
         cve_list:
-          type: array
-          items:
-            type: string
-            example: CVE-2016-0800
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              example: RHSA-2017:1931
 
     PatchesRequest:
       type: object

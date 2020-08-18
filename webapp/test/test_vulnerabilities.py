@@ -21,7 +21,7 @@ UPDATES_JSON_NON_EXIST = {"package_list": ["non-exist"]}
 UPDATES_JSON_EMPTY = {}
 UPDATES_JSON_EMPTY_LIST = {"package_list": [""]}
 
-EMPTY_RESPONSE = {"cve_list": []}
+EMPTY_RESPONSE = {"cve_list": {}}
 
 
 class TestVulnerabilitiesAPI(TestBase):

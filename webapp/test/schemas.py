@@ -134,7 +134,7 @@ _updates_package_v2 = {
 }
 
 _vulnerabilities_response = {
-    'cve_list': [str]
+    'cve_list': {str: [str]}
 }
 
 _patches_response = {
