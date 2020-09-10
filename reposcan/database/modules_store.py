@@ -97,7 +97,8 @@ class ModulesStore(ObjectStore):
             for module in modules:
                 if 'artifacts' in module:
                     for artifact in module['artifacts']:
-                        split_pkg_name = rpm.parse_rpm_name(artifact, default_epoch='0')
+                        split_pkg_name = rpm.parse_rpm_name(artifact, default_epoch='0',
+                                                            raise_exception=True)
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))
                         else:
