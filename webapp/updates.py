@@ -4,7 +4,7 @@ Module to handle /updates API calls.
 
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
-from common.webapp_utils import none2empty
+from common.webapp_utils import none2empty, filter_package_list
 from common.rpm import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
@@ -50,7 +50,8 @@ class UpdatesAPI:
 
     def _process_input_packages(self, data, response):
         """Parse input NEVRAs and filter out unknown (or without updates) package names."""
-        packages_to_process = data.get('package_list', None)
+        latest_only = data.get("latest_only", False)
+        packages_to_process = filter_package_list(data.get('package_list', None), latest_only)
         filtered_packages_to_process = {}
         if packages_to_process is not None:
             for pkg in packages_to_process:
