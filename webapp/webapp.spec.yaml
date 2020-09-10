@@ -581,6 +581,9 @@ components:
         basearch:
           type: string
           example: x86_64
+        latest_only:
+          type: boolean
+          enum: [true, false]
       required:
         - package_list
 
@@ -619,6 +622,9 @@ components:
           type: string
           example: x86_64
         security_only:
+          type: boolean
+          enum: [true, false]
+        latest_only:
           type: boolean
           enum: [true, false]
       required:
