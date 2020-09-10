@@ -44,6 +44,19 @@ def parse_rpm_name(rpm_name, default_epoch=None, raise_exception=False):
     arch = match.group('arch')
     return name, epoch, version, release, arch
 
+def join_rpm_name(name, epoch, version, release, arch):
+    """
+    Build a package name from the separate NEVRA parts
+    """
+    if name and epoch and version and release and arch:
+        try:
+            epoch = ("%s:" % epoch) if int(epoch) else ''
+        except Exception as _: # pylint: disable=broad-except
+            epoch = ''
+        return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
+
+    return None
+
 def rpmver2array(rpm_version: str) -> list:
     """
     Convert RPM version string to comparable array

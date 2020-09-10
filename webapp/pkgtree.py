@@ -7,8 +7,8 @@ from natsort import natsorted  # pylint: disable=E0401
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
 from common.dateutil import parse_datetime
-from common.webapp_utils import format_datetime, join_packagename, none2empty
-
+from common.webapp_utils import format_datetime, none2empty
+from common.rpm import join_rpm_name
 
 class PkgtreeAPI:
     """ Main /packages API class."""
@@ -30,7 +30,7 @@ class PkgtreeAPI:
         name = self.cache.id2packagename[name_id]
         epoch, ver, rel = self.cache.id2evr[evr_id]
         arch = self.cache.id2arch[arch_id]
-        return join_packagename(name, epoch, ver, rel, arch)
+        return join_rpm_name(name, epoch, ver, rel, arch)
 
     def _get_erratas(self, pkg_id):
         erratas = []

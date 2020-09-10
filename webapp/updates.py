@@ -4,8 +4,8 @@ Module to handle /updates API calls.
 
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
-from common.webapp_utils import join_packagename, none2empty
-from common.rpm import parse_rpm_name
+from common.webapp_utils import none2empty
+from common.rpm import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
 
@@ -88,7 +88,7 @@ class UpdatesAPI:
         name = self.db_cache.id2packagename[name_id]
         epoch, ver, rel = self.db_cache.id2evr[evr_id]
         arch = self.db_cache.id2arch[arch_id]
-        return join_packagename(name, epoch, ver, rel, arch)
+        return join_rpm_name(name, epoch, ver, rel, arch)
 
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
                          response, module_ids, security_only):
