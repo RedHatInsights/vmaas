@@ -16,7 +16,7 @@ services:
       - vmaas_podmanfix
   vmaas_podmanfix:
     container_name: vmaas-podmanfix
-    image: vmaas/reposcan:latest
+    image: vmaas/app:latest
     volumes:
       - vmaas-dump-data:/data:z
     user: root
