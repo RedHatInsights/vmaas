@@ -5,7 +5,8 @@ Set of functions and procedures shared between different modules.
 import math
 from datetime import datetime
 from dateutil import parser as dateutil_parser
-from common.rpm import join_rpm_name
+import rpm
+from common.rpm import join_rpm_name, parse_rpm_name
 
 PKG_NAME_ID = 0
 PKG_EVR_ID = 1
@@ -100,3 +101,22 @@ def filter_item_if_exists(list_to_process, item_details):
         if item_detail:
             filtered_list_to_process.append(item)
     return filtered_list_to_process
+
+def filter_package_list(package_list, latest_only=False):
+    """
+    Filter packages with latest NEVRA
+    :param package_list: list of package NEVRAs
+    :param latest_only: boolean switch to return only latest NEVRA for given name.arch
+    :return: filtered list of NEVRAs
+    """
+    if not latest_only:
+        return package_list
+    latest_pkgs = {}
+    for pkg in package_list:
+        name, epoch, ver, rel, arch = parse_rpm_name(pkg)
+        if (name, arch) in latest_pkgs:
+            latest = latest_pkgs[(name, arch)][0:3]
+            if rpm.labelCompare((epoch, ver, rel), latest) < 1: # pylint: disable=no-member
+                continue
+        latest_pkgs[(name, arch)] = (epoch, ver, rel, pkg)
+    return [val[3] for val in latest_pkgs.values()]
