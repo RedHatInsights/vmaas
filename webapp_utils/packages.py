@@ -3,8 +3,9 @@ Module for API /packages.
 """
 from base import Request
 import database.db_handler as DB
-from common.webapp_utils import split_packagename, join_packagename
+from common.webapp_utils import join_packagename
 from common.logging_utils import init_logging, get_logger
+from common.rpm import parse_rpm_name
 
 POOL_SIZE = 10
 
@@ -93,7 +94,7 @@ class PackagesAPI:
         db_connection = self.db_pool.get_connection()
         with db_connection.get_cursor() as cursor:
             for package in packages:
-                name, epoch, version, release, arch = split_packagename(package)
+                name, epoch, version, release, arch = parse_rpm_name(package, default_epoch='0')
                 cursor.execute("""select distinct p.summary, p.description,
                                   pn2.name, evr2.epoch, evr2.version, evr2.release, a2.name,
                                   cs.label, cs.name, a.name, r.releasever,

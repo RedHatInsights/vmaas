@@ -4,6 +4,7 @@ Module to handle /packages API calls.
 
 from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
 import common.webapp_utils as utils
+from common.rpm import parse_rpm_name
 
 
 class PackagesAPI:
@@ -41,7 +42,7 @@ class PackagesAPI:
 
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
-            name, epoch, ver, rel, arch = utils.split_packagename(pkg)
+            name, epoch, ver, rel, arch = parse_rpm_name(pkg, default_epoch='0')
             if name in self.cache.packagename2id \
                and (epoch, ver, rel) in self.cache.evr2id \
                and arch in self.cache.arch2id:
