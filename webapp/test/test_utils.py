@@ -6,6 +6,7 @@ import re
 from test.conftest import TestBase
 
 import common.webapp_utils as utils
+import common.rpm as rpm
 
 
 class TestUtils(TestBase):
@@ -36,7 +37,7 @@ class TestUtils(TestBase):
     def test_split_packagename(self):
         """Test splitting package name into N,E,V,R,A."""
         pkg_name = "bash-0:4.2.46-20.el7_2.x86_64.rpm"
-        name, epoch, version, release, arch = utils.split_packagename(pkg_name)
+        name, epoch, version, release, arch = rpm.parse_rpm_name(pkg_name, default_epoch='0')
         assert name == "bash"
         assert epoch == "0"
         assert version == "4.2.46"

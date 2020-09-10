@@ -4,7 +4,8 @@ Module to handle /updates API calls.
 
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE
-from common.webapp_utils import join_packagename, split_packagename, none2empty
+from common.webapp_utils import join_packagename, none2empty
+from common.rpm import parse_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
 
@@ -54,7 +55,7 @@ class UpdatesAPI:
         if packages_to_process is not None:
             for pkg in packages_to_process:
                 response['update_list'][pkg] = {}
-                name, epoch, ver, rel, arch = split_packagename(pkg)
+                name, epoch, ver, rel, arch = parse_rpm_name(pkg, default_epoch='0')
                 if name in self.db_cache.packagename2id:
                     if self.db_cache.packagename2id[name] in self.db_cache.updates_index:
                         filtered_packages_to_process[pkg] = {'parsed_nevra': (name, epoch, ver, rel, arch)}

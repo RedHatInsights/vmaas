@@ -19,7 +19,7 @@ class RPMParseException(Exception):
 NEVRA_RE = re.compile(
     r'((?P<e1>[0-9]+):)?(?P<pn>[^:]+)(?(e1)-|-((?P<e2>[0-9]+):)?)(?P<ver>[^-:]+)-(?P<rel>[^-:]+)\.(?P<arch>[a-z0-9_]+)')
 
-def parse_rpm_name(rpm_name, default_epoch=None):
+def parse_rpm_name(rpm_name, default_epoch=None, raise_exception=False):
     """
     Extract components from rpm name.
     """
@@ -29,7 +29,9 @@ def parse_rpm_name(rpm_name, default_epoch=None):
 
     match = NEVRA_RE.match(filename)
     if not match:
-        raise RPMParseException("Failed to parse rpm name '%s'!" % rpm_name)
+        if raise_exception:
+            raise RPMParseException("Failed to parse rpm name '%s'!" % rpm_name)
+        return ('', default_epoch, '', '', '')
 
     name = match.group('pn')
     epoch = match.group('e1')
