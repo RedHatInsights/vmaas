@@ -20,7 +20,7 @@ class TestUtils(TestBase):
 
     def test_join_pkgname(self):
         """Test joining package name"""
-        pkg_name = utils.join_packagename("test", "2", "1.2", "4.el7", "x86_64")
+        pkg_name = rpm.join_rpm_name("test", "2", "1.2", "4.el7", "x86_64")
         assert pkg_name == "test-2:1.2-4.el7.x86_64"
 
     # pylint: disable=unused-argument
