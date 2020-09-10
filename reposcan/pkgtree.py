@@ -11,6 +11,7 @@ import gzip
 from common.logging_utils import get_logger, init_logging
 from common.dateutil import format_datetime, now
 from common.fileutil import remove_file_if_exists
+from common.rpm import join_rpm_name
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"
@@ -18,14 +19,6 @@ PKGTREE_FILE = '/data/pkg_tree.json.gz'
 DEFAULT_PKGTREE_INDENT = "0"
 
 LOGGER = get_logger(__name__)
-
-# copied from webapp/utils.py
-def _join_packagename(name, epoch, version, release, arch):
-    """
-    Build a package name from the separate NEVRA parts
-    """
-    epoch = ("%s:" % epoch) if int(epoch) else ''
-    return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
 class JsonPkgTree: # pylint: disable=too-many-instance-attributes
     """Class for creating package tree json file from database."""
@@ -195,7 +188,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         if arch_id not in self.archid2arch:
             LOGGER.error("INCONSISTENT DATA: pkg id %s - arch id %s not found", pkg_id, arch_id)
         (epoch, ver, rel) = self.evrid2evr[evr_id]
-        package_nevra = _join_packagename(self.pkgnameid2pkgname[name_id], epoch, ver, rel, self.archid2arch[arch_id])
+        package_nevra = join_rpm_name(self.pkgnameid2pkgname[name_id], epoch, ver, rel, self.archid2arch[arch_id])
         self.packagedata[pkg_id] = {'data': {'nevra': package_nevra,
                                              'repositories':[]}
                                    }

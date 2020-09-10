@@ -5,30 +5,18 @@ Set of functions and procedures shared between different modules.
 import math
 from datetime import datetime
 from dateutil import parser as dateutil_parser
+from common.rpm import join_rpm_name
 
 PKG_NAME_ID = 0
 PKG_EVR_ID = 1
 PKG_ARCH_ID = 2
-
-def join_packagename(name, epoch, version, release, arch):
-    """
-    Build a package name from the separate NEVRA parts
-    """
-    if name and epoch and version and release and arch:
-        try:
-            epoch = ("%s:" % epoch) if int(epoch) else ''
-        except Exception as _: # pylint: disable=broad-except
-            epoch = ''
-        return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
-
-    return None
 
 def pkg_detail2nevra(cache, pkg_detail):
     """Create package object from pkg_detail using cache object."""
     name = cache.id2packagename[pkg_detail[PKG_NAME_ID]]
     epoch, ver, rel = cache.id2evr[pkg_detail[PKG_EVR_ID]]
     arch = cache.id2arch[pkg_detail[PKG_ARCH_ID]]
-    return join_packagename(name, epoch, ver, rel, arch)
+    return join_rpm_name(name, epoch, ver, rel, arch)
 
 
 def pkgidlist2packages(cache, pkgid_list):

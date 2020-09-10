@@ -3,9 +3,8 @@ Module for API /packages.
 """
 from base import Request
 import database.db_handler as DB
-from common.webapp_utils import join_packagename
 from common.logging_utils import init_logging, get_logger
-from common.rpm import parse_rpm_name
+from common.rpm import parse_rpm_name, join_rpm_name
 
 POOL_SIZE = 10
 
@@ -125,11 +124,11 @@ class PackagesAPI:
                 for item in query:
                     pkgs[package] = {"summary": item[PACKAGE_SUMMARY],
                                      "description": item[PACKAGE_DESCRIPTION],
-                                     "source_package": join_packagename(item[SOURCE_PACKAGE_NAME],
-                                                                        item[SOURCE_PACKAGE_EPOCH],
-                                                                        item[SOURCE_PACKAGE_VERSION],
-                                                                        item[SOURCE_PACKAGE_RELEASE],
-                                                                        item[SOURCE_PACKAGE_ARCH]),
+                                     "source_package": join_rpm_name(item[SOURCE_PACKAGE_NAME],
+                                                                     item[SOURCE_PACKAGE_EPOCH],
+                                                                     item[SOURCE_PACKAGE_VERSION],
+                                                                     item[SOURCE_PACKAGE_RELEASE],
+                                                                     item[SOURCE_PACKAGE_ARCH]),
                                      "repositories": self._build_repositories(query),
                                      "binary_package_list": self._build_binary_packages(query)
                                     }
