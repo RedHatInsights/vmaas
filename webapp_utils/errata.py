@@ -5,8 +5,8 @@ import psycopg2
 
 from base import Request
 import database.db_handler as DB
-from common.webapp_utils import join_packagename
 from common.logging_utils import get_logger, init_logging
+from common.rpm import join_rpm_name
 from pagination import paginate
 
 POOL_SIZE = 10
@@ -126,7 +126,7 @@ class ErrataAPI:
             query = cursor.fetchall()
         self.db_pool.return_connection(db_connection)
         for item in query:
-            package = join_packagename(
+            package = join_rpm_name(
                 item[ERRATA_PKG_NAME],
                 item[ERRATA_PKG_EPOCH],
                 item[ERRATA_PKG_VERSION],
