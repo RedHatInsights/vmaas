@@ -420,14 +420,17 @@ class Websocket:
         self.task = None
 
     async def _refresh_cache(self):
-        LOGGER.info("Starting cached data refresh.")
-        BaseHandler.refreshing = True
-        await self.websocket.send_str("status-refreshing")
-        await BaseHandler.db_cache.reload_async()
-        await self.report_version()
-        await self.websocket.send_str("status-ready")
-        BaseHandler.refreshing = False
-        LOGGER.info("Cached data refreshed.")
+        if not BaseHandler.refreshing:
+            LOGGER.info("Starting cached data refresh.")
+            BaseHandler.refreshing = True
+            await self.websocket.send_str("status-refreshing")
+            await BaseHandler.db_cache.reload_async()
+            await self.report_version()
+            await self.websocket.send_str("status-ready")
+            BaseHandler.refreshing = False
+            LOGGER.info("Cached data refreshed.")
+        else:
+            LOGGER.warning("Cached data refresh already in progress.")
 
     async def run_websocket(self):
         """Infinite loop handling websocket connection"""
@@ -451,8 +454,7 @@ class Websocket:
                 latest_dump = await self.fetch_latest_dump(session)
                 if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
                     LOGGER.info("Fetching missed dump: %s.", latest_dump)
-                    await self._refresh_cache()
-                    await self.report_version()
+                    asyncio.get_event_loop().create_task(self._refresh_cache())
                 # handle websocket messages
                 await self.websocket_msg_handler()
                 self.websocket = None
@@ -481,7 +483,7 @@ class Websocket:
                 return None
 
             if msg.data == 'refresh-cache':
-                await self._refresh_cache()
+                asyncio.get_event_loop().create_task(self._refresh_cache())
             else:
                 LOGGER.warning("Unhandled websocket message %s", msg.data)
 
