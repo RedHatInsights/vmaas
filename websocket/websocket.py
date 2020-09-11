@@ -3,6 +3,7 @@
 Main entrypoint of websocket server.
 """
 import signal
+import uuid
 
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
@@ -27,7 +28,9 @@ class NotificationHandler(WebSocketHandler):
     webapp_statuses = {}
 
     def open(self, *args, **kwargs):
-        self.connections[self] = None
+        # Uuid just for reference in logs
+        self.connections[self] = [uuid.uuid4().hex[:8], "unsubscribed"]
+        LOGGER.info("New connection: %s", self.connections[self][0])
 
     def data_received(self, chunk):
         pass
@@ -44,7 +47,7 @@ class NotificationHandler(WebSocketHandler):
         if total_count != updated_count:
 
             # Outdated, but currently not updating webapps
-            updatable = [conn for conn in cls.connections if cls.connections[conn] == "webapp"
+            updatable = [conn for conn in cls.connections if cls.connections[conn][1] == "webapp"
                          and cls.webapp_export_timestamps.get(conn) != cls.last_dump_version
                          and cls.webapp_statuses.get(conn) == "ready"]
 
@@ -53,7 +56,8 @@ class NotificationHandler(WebSocketHandler):
             to_update = 1 if outdated_count == 1 else min(ready_count, outdated_count) - 1
             updatable = updatable[:to_update]
             if len(updatable) > 0:
-                LOGGER.info("Updating %d webapps", len(updatable))
+                LOGGER.info("Updating %d webapps: %s", len(updatable),
+                            ", ".join([cls.connections[conn][0] for conn in updatable]))
 
             # Send refresh message to webapps, removing status, since from this point their
             # status is indeterminate (They should start updating themselves, but we don't know that until
@@ -72,7 +76,7 @@ class NotificationHandler(WebSocketHandler):
     @classmethod
     def webapps_count(cls):
         """ count of webapps"""
-        return len([c for c in cls.connections.values() if c == "webapp"])
+        return len([c for c in cls.connections.values() if c[1] == "webapp"])
 
     @classmethod
     def webapps_ready_count(cls):
@@ -85,30 +89,27 @@ class NotificationHandler(WebSocketHandler):
         return len([s for s in cls.webapp_export_timestamps.values() if s == cls.last_dump_version])
 
     def on_message(self, message):
-        if self.connections[self]:
-            LOGGER.info("Received message from %s: %s", self.connections[self], message)
-        else:
-            LOGGER.info("Received message from unsubscribed client: %s", message)
+        LOGGER.info("Received message from %s (%s): %s", self.connections[self][1], self.connections[self][0], message)
         if message == "subscribe-webapp":
-            self.connections[self] = "webapp"
+            self.connections[self][1] = "webapp"
         elif message == "subscribe-reposcan":
-            self.connections[self] = "reposcan"
+            self.connections[self][1] = "reposcan"
         elif message == "subscribe-listener":
-            self.connections[self] = "listener"
-        elif message.startswith("version") and self.connections[self] == "reposcan":
+            self.connections[self][1] = "listener"
+        elif message.startswith("version") and self.connections[self][1] == "reposcan":
             _, timestamp = message.split()
             self.__class__.last_dump_version = timestamp
-        elif message.startswith("version") and self.connections[self] == "webapp":
+        elif message.startswith("version") and self.connections[self][1] == "webapp":
             _, timestamp = message.split()
             self.webapp_export_timestamps[self] = timestamp
-        elif message.startswith("status") and self.connections[self] == "webapp":
+        elif message.startswith("status") and self.connections[self][1] == "webapp":
             _, status = message.split("-")
             self.webapp_statuses[self] = status
         self.poll_notify()
 
     def on_close(self):
         super().on_close()
-        LOGGER.error("Closing")
+        LOGGER.warning("Closing connection: %s", self.connections[self][0])
         del self.connections[self]
         if self in self.webapp_export_timestamps:
             del self.webapp_export_timestamps[self]
@@ -118,10 +119,10 @@ class NotificationHandler(WebSocketHandler):
     @classmethod
     def send_message(cls, target_client_type, message):
         """Send message to selected group of connected clients."""
-        for client, client_type in cls.connections.items():
+        for client, (client_id, client_type) in cls.connections.items():
             if client_type == target_client_type:
                 client.write_message(message)
-                LOGGER.info("Sent message to %s: %s", target_client_type, message)
+                LOGGER.info("Sent message to %s (%s): %s", target_client_type, client_id, message)
 
 
 class HealthHandler(RequestHandler):
