@@ -4,7 +4,7 @@ import http
 import tornado.testing
 import tornado.web
 
-from websocket import websocket as ws
+from websocket import websocket as ws  # pylint: disable=no-name-in-module
 
 
 class TestWebSocket(tornado.testing.AsyncHTTPTestCase):
