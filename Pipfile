@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 coverage = ">=4.5.3"
-podman-compose = {file = "https://github.com/containers/podman-compose/archive/devel.tar.gz"}
 podman = ">=1.4.4"
 pur = ">=5.2.2"
 pytest = ">=5.0.1"
