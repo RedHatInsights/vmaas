@@ -25,14 +25,14 @@ class OneLineExceptionFormatter(logging.Formatter):
         """
         Make sure exception-tracebacks end up on a single line.
         """
-        result = super(OneLineExceptionFormatter, self).formatException(exc_info)
+        result = super().formatException(exc_info)
         return repr(result)
 
     def format(self, record):
         """
         Convert newlines in each record to |
         """
-        fmt_str = super(OneLineExceptionFormatter, self).format(record)
+        fmt_str = super().format(record)
         if record.exc_text:
             fmt_str = fmt_str.replace('\n', '') + '|'
         return fmt_str

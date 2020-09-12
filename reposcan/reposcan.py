@@ -54,7 +54,7 @@ class TaskStatusResponse(dict):
     """Object used as API response to user."""
 
     def __init__(self, running=False, task_type=None):
-        super(TaskStatusResponse, self).__init__()
+        super().__init__()
         self['running'] = running
         self['task_type'] = task_type
 
@@ -63,7 +63,7 @@ class TaskStartResponse(dict):
     """Object used as API response to user."""
 
     def __init__(self, msg, success=True):
-        super(TaskStartResponse, self).__init__()
+        super().__init__()
         self['msg'] = msg
         self['success'] = success
 

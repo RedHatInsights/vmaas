@@ -3,7 +3,7 @@ import tornado.testing
 import tornado.websocket
 import tornado.web
 
-from websocket import websocket as ws
+from websocket import websocket as ws  # pylint: disable=no-name-in-module
 
 
 class NotificationHandlerMock(ws.NotificationHandler):
