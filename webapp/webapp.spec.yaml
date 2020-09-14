@@ -13,12 +13,21 @@ x-format-resps: &format_resps
 paths:
   /v1/monitoring/health:
     get:
-      summary: Return API status
+      summary: Return API liveness status
       operationId: app.HealthHandler.get
       responses:
         '200':
           description: Application is alive
 
+  /v1/monitoring/ready:
+    get:
+      summary: Return API readiness status
+      operationId: app.ReadyHandler.get
+      responses:
+        '200':
+          description: Application is ready
+        '503':
+          description: Application is not ready
 
   /v1/version:
     get:
