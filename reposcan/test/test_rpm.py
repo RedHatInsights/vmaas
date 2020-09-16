@@ -57,13 +57,28 @@ class TestSrpm(unittest.TestCase):
     def test_parse_6_invalid_rpmname(self):
         """Test parsing invalid rpm name."""
         with self.assertRaises(rpm.RPMParseException):
-            rpm.parse_rpm_name('foo')
+            rpm.parse_rpm_name('foo', raise_exception=True)
         with self.assertRaises(rpm.RPMParseException):
-            rpm.parse_rpm_name('foo.rpm')
+            rpm.parse_rpm_name('foo.rpm', raise_exception=True)
         with self.assertRaises(rpm.RPMParseException):
-            rpm.parse_rpm_name('foo-1.3.x86.rpm')
+            rpm.parse_rpm_name('foo-1.3.x86.rpm', raise_exception=True)
         with self.assertRaises(rpm.RPMParseException):
-            rpm.parse_rpm_name('2:389-ds-base-4:1.3.7.8-1.fc27.src.rpm')
+            rpm.parse_rpm_name('2:389-ds-base-4:1.3.7.8-1.fc27.src.rpm', raise_exception=True)
+
+    def test_parse_7_invalid_noraise(self):
+        """Test parsing invalid rpm name."""
+        for name in [
+                'foo',
+                'foo.rpm',
+                'foo-1.3.x86.rpm',
+                '2:389-ds-base-4:1.3.7.8-1.fc27.src.rpm',
+                ]:
+            name, epoch, ver, rel, arch = rpm.parse_rpm_name(name)
+            self.assertEqual(None, epoch)
+            self.assertEqual("", name)
+            self.assertEqual("", ver)
+            self.assertEqual("", rel)
+            self.assertEqual("", arch)
 
 
 def test_rpmver2array_1():
