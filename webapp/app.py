@@ -473,7 +473,7 @@ class Websocket:
 
     async def report_version(self):
         """Report currently used dump version"""
-        await self.websocket.send_str(f"version {BaseHandler.db_cache.dbchange['exported']}")
+        await self.websocket.send_str(f"version {BaseHandler.db_cache.dbchange.get('exported')}")
 
     async def websocket_msg_handler(self):
         """Handle active websocket connection, returning upon close"""
