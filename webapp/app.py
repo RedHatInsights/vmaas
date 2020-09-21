@@ -423,7 +423,8 @@ class Websocket:
         async with ClientSession() as session:
             while True:
                 try:
-                    async with session.ws_connect(url=self.websocket_url) as socket:
+                    # Automatically send pings very frequently
+                    async with session.ws_connect(url=self.websocket_url, autoping=True, heartbeat=6) as socket:
                         LOGGER.info("Connected to: %s", self.websocket_url)
                         self.websocket = socket
                         # subscribe for notifications
