@@ -41,7 +41,7 @@ jobs:
         run: |
           docker run --name iqe --network host \
             -e IQE_TESTS_LOCAL_CONF_PATH=/iqe_settings ${{ secrets.IQE_TESTS_IMAGE }} \
-            iqe tests plugin vulnerability -k 'vmaas and not reconnect' --long-running --html=report.html --self-contained-html
+            iqe tests plugin vulnerability -k 'not reconnect' -m vmaas --long-running --html=report.html --self-contained-html
       - run: docker-compose logs > logs
         if: always()
       - run: docker cp iqe:/iqe_venv/report.html .
@@ -192,7 +192,7 @@ jobs:
           docker run --name iqe --network host \
             -v $(readlink -f settings.local.yaml):/iqe_settings/settings.local.yaml:z \
             -e IQE_TESTS_LOCAL_CONF_PATH=/iqe_settings ${{ secrets.IQE_TESTS_IMAGE }} \
-            iqe tests plugin vulnerability -k 'vmaas' --html=report.html --self-contained-html
+            iqe tests plugin vulnerability -m vmaas --html=report.html --self-contained-html
       - name: Collect code-coverage
         if: always()
         run: |
