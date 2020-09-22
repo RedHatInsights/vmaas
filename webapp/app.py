@@ -21,7 +21,7 @@ from aiohttp.client_exceptions import ClientConnectionError
 
 from cache import Cache
 from common.constants import VMAAS_VERSION
-from common.logging_utils import init_logging, get_logger
+from common.logging_utils import get_logger
 from cve import CveAPI
 from repos import RepoAPI
 from rpm_pkg_names import RPMPkgNamesAPI
@@ -505,8 +505,6 @@ def load_cache_to_apis():
 
 def create_app():
     """Create VmaaS application and servers"""
-
-    init_logging()
 
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
 
