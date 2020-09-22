@@ -125,6 +125,8 @@ def init_logging(num_servers=1):
         if num_servers > 1:
             uuid += ":%d" % os.getpid()
         log_fmt = uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"
+    level = os.getenv('LOGGING_LEVEL_LIBS', "WARNING")
+    logger.setLevel(getattr(logging, level, logging.WARNING))
     if not logger.handlers:
         handler = logging.StreamHandler()
         formatter = OneLineExceptionFormatter(log_fmt)
@@ -139,6 +141,6 @@ def get_logger(name):
     Don't set custom logging level in root handler to not display debug messages from underlying libraries.
     """
     logger = logging.getLogger(name)
-    level = os.getenv('LOGGING_LEVEL', "INFO")
+    level = os.getenv('LOGGING_LEVEL_APP', "INFO")
     logger.setLevel(getattr(logging, level, logging.INFO))
     return logger
