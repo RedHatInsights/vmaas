@@ -560,7 +560,7 @@ def create_app():
 
         res = await handler(request, **kwargs)
 
-        if res.status >= 400:
+        if res.status >= 400 and res.body:
             body = loads(res.body)
             better_error = format_error(body, res.status)
             return web.json_response(better_error, status=res.status)
