@@ -12,4 +12,4 @@ if __name__ == '__main__':
     application = create_app()
     init_websocket()
 
-    web.run_app(application.app, port=PUBLIC_API_PORT)
+    web.run_app(application.app, port=PUBLIC_API_PORT, access_log_format="%s %r (%a) %Tfs")
