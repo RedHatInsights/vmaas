@@ -171,7 +171,7 @@ jobs:
       - name: Start VMaaS webapp with coverage
         run: |
           webapp_pod="$(oc get pods | grep 'Running' | grep 'webapp' | awk '{print $1}')"
-          oc exec "${webapp_pod}" -- bash -c "coverage run main.py --source webapp &>/proc/1/fd/1" &
+          oc exec "${webapp_pod}" -- bash -c "coverage-3 run main.py --source webapp &>/proc/1/fd/1" &
       - name: Sync VMaaS repolist
         run: |
           ./scripts/setup_db.sh conf/repolist.json \
@@ -197,8 +197,8 @@ jobs:
         if: always()
         run: |
           webapp_pod="$(oc get pods | grep 'Running' | grep 'webapp' | awk '{print $1}')"
-          oc exec ${webapp_pod} -- pkill -sigint coverage
-          oc exec ${webapp_pod} -- coverage html --omit /usr/\\* -d /tmp/htmlcov
+          oc exec ${webapp_pod} -- pkill -sigint coverage-3
+          oc exec ${webapp_pod} -- coverage-3 html --omit /usr/\\* -d /tmp/htmlcov
           mkdir htmlcov
           oc cp ${webapp_pod}:/tmp/htmlcov htmlcov
           oc exec ${webapp_pod} -- bash -c 'main.py &>/proc/1/fd/1' &
