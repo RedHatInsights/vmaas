@@ -102,7 +102,7 @@ class ModulesStore(ObjectStore):
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))
                         else:
-                            self.logger.info('Nevra %s missing in repo %s', artifact, repo_id)
+                            self.logger.debug('Nevra %s missing in repo %s', artifact, repo_id)
             if to_associate:
                 execute_values(cur,
                                """select pkg_id, stream_id from module_rpm_artifact
