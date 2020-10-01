@@ -12,6 +12,7 @@ services:
       TRAVIS: "true"
     command: >
       bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
+                         && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
                          && ./run_tests.sh reposcan \
                          && ./run_tests.sh webapp \
                          && ./run_tests.sh websocket \

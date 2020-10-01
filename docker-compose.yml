@@ -77,7 +77,7 @@ services:
 
   vmaas_prometheus:
     container_name: vmaas-prometheus
-    image: prom/prometheus:v2.1.0
+    image: prom/prometheus:v2.21.0
     volumes:
       - prometheus-data:/prometheus
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -99,17 +99,14 @@ services:
 
   vmaas_grafana:
     container_name: vmaas-grafana
-    image: grafana/grafana:6.2.5
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+    build:
+      context: ./
+      dockerfile: ./monitoring/grafana/Dockerfile
+    image: vmaas-grafana:latest
     depends_on:
       - vmaas_prometheus
     ports:
       - 3000:3000
-    env_file:
-      - ./monitoring/grafana/grafana.conf
-    user: "104"
     restart: always
     logging:
       driver: none
