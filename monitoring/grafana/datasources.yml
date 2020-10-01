@@ -1,11 +1,11 @@
 apiVersion: 1
 
 deleteDatasources:
-  - name: Insights-Prometheus
+  - name: devel-prometheus
     orgId: 1
 
 datasources:
-- name: Insights-Prometheus
+- name: devel-prometheus
   type: prometheus
   access: proxy
   orgId: 1
