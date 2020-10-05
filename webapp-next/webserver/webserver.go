@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 type ReportError struct {
@@ -67,8 +68,10 @@ func ProxyCompareMw(c *gin.Context) {
 		panic(err)
 	}
 
-	// Logging for analysis
-	utils.Log("path", c.Request.URL.Path, "go", blw.body.String(), "py", string(respData), "req", logBuf.String()).Info("Call")
+	// Logging for analysis, skip metrics
+	if !strings.HasSuffix(c.Request.URL.Path, "metrics") {
+		utils.Log("path", c.Request.URL.Path, "go", blw.body.String(), "py", string(respData), "req", logBuf.String()).Info("Call")
+	}
 }
 
 func Proxy(c *gin.Context) {
@@ -123,9 +126,8 @@ func Run() {
 	r.POST("/api/v1/pkgtree/", Proxy)
 	r.GET("/api/v1/pkgtree/*rest", Proxy)
 
-	r.GET("/metrics", func(c *gin.Context) {
-		ginprometheus.NewPrometheus("gin").HandlerFunc()(c)
-	})
+	ginprom := ginprometheus.NewPrometheus("gin")
+	r.GET("/metrics", ginprom.HandlerFunc())
 
 	r.GET("/api/v1/monitoring/health", func(c *gin.Context) {
 		c.Status(200)

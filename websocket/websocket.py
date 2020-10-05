@@ -2,6 +2,7 @@
 """
 Main entrypoint of websocket server.
 """
+from dateutil.parser import parse, isoparse
 import signal
 import uuid
 
@@ -46,6 +47,10 @@ class NotificationHandler(WebSocketHandler):
         updated_count = cls.webapps_updated_count()
         outdated_count = total_count - cls.webapps_updated_count()
 
+        # Skip if we don't have information from reposcan yet
+        if cls.last_dump_version is None:
+            return
+
         # At least one webapp is outdated
         if total_count != updated_count:
 
@@ -53,7 +58,7 @@ class NotificationHandler(WebSocketHandler):
             updatable = [conn for conn in cls.connections if cls.connections[conn][1] == "webapp"
                          and cls.webapp_export_timestamps.get(conn) != cls.last_dump_version
                          and cls.webapp_statuses.get(conn) == "ready"]
-
+            LOGGER.info(f"Updateble data {cls.webapp_export_timestamps} , {cls.last_dump_version}- {updatable}")
             # If we have 1 webapp left to update, perform the update, if more, keep at least one
             # in its current state
             to_update = 1 if outdated_count == 1 else min(ready_count, outdated_count) - 1
@@ -101,10 +106,10 @@ class NotificationHandler(WebSocketHandler):
             self.connections[self][1] = "listener"
         elif message.startswith("version") and self.connections[self][1] == "reposcan":
             _, timestamp = message.split()
-            self.__class__.last_dump_version = timestamp
+            self.last_dump_version =  isoparse(timestamp).replace(microsecond=0).isoformat()
         elif message.startswith("version") and self.connections[self][1] == "webapp":
             _, timestamp = message.split()
-            self.webapp_export_timestamps[self] = timestamp
+            self.webapp_export_timestamps[self] = isoparse(timestamp).replace(microsecond=0).isoformat()
         elif message.startswith("status") and self.connections[self][1] == "webapp":
             _, status = message.split("-")
             self.webapp_statuses[self] = status

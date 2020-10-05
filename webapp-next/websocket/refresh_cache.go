@@ -1,12 +1,11 @@
 package websocket
 
 import (
-	"app/cache"
 	"app/utils"
 	"os/exec"
 )
 
-// TODO: Docker
+
 var DumpFileName = "/data/vmaas.db"
 var RemoteDumpName = "rsync://" + utils.MustGetEnv("REPOSCAN_HOST") + ":8730/data/vmaas.db"
 
@@ -20,13 +19,4 @@ func download() error {
 		return err
 	}
 	return nil
-}
-
-func TryRefreshCache() (string, error) {
-	err := download()
-	if err != nil {
-		return "", err
-	}
-	cache.C = cache.LoadCache(DumpFileName)
-	return "refreshed " + cache.C.DbChange.Exported.String(), nil
 }

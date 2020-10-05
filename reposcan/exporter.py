@@ -39,9 +39,8 @@ class DataDump:
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
 
-    def dump(self):
+    def dump(self, timestamp):
         """Dump necessary data tu disk file"""
-        timestamp = format_datetime(now())
         dump_filename = "%s-%s" % (self.filename, timestamp)
         LOGGER.info("Exporting data to %s", dump_filename)
         try:
@@ -508,9 +507,8 @@ class SqliteDump:
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
 
-    def dump(self):
+    def dump(self, timestamp):
         """Dump necessary data to disk file"""
-        timestamp = format_datetime(now())
         dump_filename = "%s-%s" % (self.filename, timestamp)
         LOGGER.info("Exporting data to %s", dump_filename)
         try:
@@ -969,11 +967,14 @@ def main(filename):
     init_logging()
     init_db()
     db_instance = DatabaseHandler.get_connection()
+    timestamp = format_datetime(now())
+
     data = SqliteDump(db_instance, filename)
-    data.dump()
+    data.dump(timestamp)
 
     data2 = DataDump(db_instance, filename + "m")
-    data2.dump()
+    data2.dump(timestamp)
+
 
 if __name__ == '__main__':
     main(DUMP)

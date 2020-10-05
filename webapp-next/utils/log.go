@@ -17,8 +17,7 @@ func ConfigureLogging() {
 		strlevel = "TRACE"
 	}
 	level := parseLogLevel(strlevel)
-	// TODO:container
-	file, err := os.Create("/logs/log.txt")
+	file, err := os.Create("log.txt")
 	if err != nil {
 		panic(err)
 	}

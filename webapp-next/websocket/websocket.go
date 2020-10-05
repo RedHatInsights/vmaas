@@ -1,21 +1,65 @@
 package websocket //nolint:golint,stylecheck
 
 import (
+	"app/cache"
 	"app/utils"
+	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 	"os"
 	"time"
 )
 
+var Ready = true
+
 type Handler func(data []byte, conn *websocket.Conn) error
+
+func sendMsg(conn *websocket.Conn, msg string) error {
+	utils.Log("msg", msg).Info("Sending ws message")
+	return conn.WriteMessage(websocket.TextMessage, []byte(msg))
+}
+
+func informWebsocket(conn *websocket.Conn) error {
+	if cache.C != nil {
+		version := fmt.Sprintf("version %s", cache.C.DbChange.Exported.Format(time.RFC3339))
+		return errors.Wrap(sendMsg(conn, version), "Sending version")
+	}
+
+	msg := "status-ready"
+	if !Ready {
+		msg = "status-refreshing"
+	}
+
+	return errors.Wrap(sendMsg(conn, msg), "Sending status")
+}
+
+func TryRefreshCache(conn *websocket.Conn) error {
+	Ready = false
+	if err := informWebsocket(conn); err != nil {
+		return errors.Wrap(err, "Informing about state")
+	}
+
+	if err := download(); err != nil {
+		return errors.Wrap(err, "downloading dump")
+	}
+	cache.C = cache.LoadCache(DumpFileName)
+	Ready = true
+	if err := informWebsocket(conn); err != nil {
+		return errors.Wrap(err, "Informing about state")
+	}
+	return nil
+}
 
 func runWebsocket(conn *websocket.Conn, handler Handler) error {
 	defer conn.Close()
+	var err error
+	utils.Log().Info("Starting websocket handler")
+	if err = sendMsg(conn, "subscribe-webapp"); err != nil {
+		return errors.Wrap(err, "Could not subscribe")
+	}
 
-	err := conn.WriteMessage(websocket.TextMessage, []byte("subscribe-webapp"))
-	if err != nil {
-		utils.Log("err", err.Error()).Fatal("Could not subscribe for updates")
-		return err
+	if err = TryRefreshCache(conn); err != nil {
+		return errors.Wrap(err, "Refreshing cache at start")
 	}
 
 	for {
@@ -48,23 +92,16 @@ func runWebsocket(conn *websocket.Conn, handler Handler) error {
 	}
 }
 
-func loadDumpHandler(data []byte, conn *websocket.Conn) error {
+func websocketHandler(data []byte, conn *websocket.Conn) error {
 	text := string(data)
 	utils.Log("data", string(data)).Info("Received VMaaS websocket message")
 
 	if text == "refresh-cache" {
-		msg, err := TryRefreshCache()
-		if err != nil {
-			utils.Log("err", err.Error()).Fatal("Failed to refresh cache")
-		} else {
-			err = conn.WriteMessage(websocket.TextMessage, []byte(msg))
-			if err != nil {
-				utils.Log("err", err.Error()).Fatal("Failed to notify websocket about cache update")
-				return err
-			}
-		}
+		err := TryRefreshCache(conn)
+		return errors.Wrap(err, "Failed to update cache")
+	} else {
+		return errors.Errorf("Unknown message %s", text)
 	}
-	return nil
 }
 
 func RunWebsocketListener() {
@@ -77,7 +114,7 @@ func RunWebsocketListener() {
 			utils.Log("err", err.Error()).Fatal("Failed to connect to VMaaS")
 		}
 
-		err = runWebsocket(conn, loadDumpHandler)
+		err = runWebsocket(conn, websocketHandler)
 		if err != nil {
 			utils.Log("err", err.Error()).Error("Websocket error occurred, waiting")
 		}

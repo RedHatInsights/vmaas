@@ -13,6 +13,5 @@ var (
 
 )
 func init() {
-
 	prometheus.MustRegister(RequestTime)
 }

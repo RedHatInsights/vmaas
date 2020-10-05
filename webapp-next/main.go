@@ -1,20 +1,21 @@
 package main
 
 import (
+	"app/cache"
 	"app/utils"
 	"app/webserver"
 	"app/websocket"
+	"os"
 )
 
 func main() {
 	utils.ConfigureLogging()
 
-	msg, err := websocket.TryRefreshCache()
+	_, err := os.Stat(websocket.DumpFileName)
 	if err != nil {
-		utils.Log("err", err.Error()).Error("Could not refresh cache")
-	} else {
-		utils.Log("msg", msg).Info("Refreshed cache")
+		cache.LoadCache(websocket.DumpFileName)
 	}
+
 	go websocket.RunWebsocketListener()
 
 	webserver.Run()
