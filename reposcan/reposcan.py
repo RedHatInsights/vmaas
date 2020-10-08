@@ -585,6 +585,7 @@ class SyncTask:
     """
     _running = False
     _running_task_type = None
+    _pid = None
     workers = Pool(1)
 
     @classmethod
@@ -592,6 +593,7 @@ class SyncTask:
         """Start specified function with given parameters in separate worker."""
         cls._running = True
         cls._running_task_type = task_type
+        cls._pid = cls.workers._pool[0].pid  # pylint: disable=protected-access
         ioloop = IOLoop.instance()
 
         def _callback(result):
@@ -608,11 +610,13 @@ class SyncTask:
         """Mark work as done."""
         cls._running = False
         cls._running_task_type = None
+        cls._pid = None
 
     @classmethod
     def is_running(cls):
         """Return True when some sync is running."""
-        return cls._running
+        # If process is killed during sync, no exception is thrown but Pool respawns process
+        return cls._running and cls._pid == cls.workers._pool[0].pid  # pylint: disable=protected-access
 
     @classmethod
     def get_task_type(cls):
