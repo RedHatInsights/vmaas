@@ -90,6 +90,13 @@ class TestUpdatesAPI(TestBase):
         assert schemas.updates_top_all_schema.validate(updates)
         assert schemas.updates_package_schema_v2.validate(updates["update_list"][PKG])
 
+    def test_schema_v3(self):
+        """Test schema of updates api v3."""
+        updates = self.updates_api.process_list(3, UPDATES_JSON.copy())
+        print(updates)
+        assert schemas.updates_top_all_schema.validate(updates)
+        assert schemas.updates_package_schema_v3.validate(updates["update_list"][PKG])
+
     def test_schema_repolist(self):
         """Test repolist schema of updates api v2."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
@@ -120,6 +127,11 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(2, UPDATES_JSON.copy())
         assert updates
 
+    def test_process_list_v3(self):
+        """Test looking for package updates api v3."""
+        updates = self.updates_api.process_list(3, UPDATES_JSON.copy())
+        assert updates
+
     def test_process_empty_pkg_list_v1(self):
         """Test empty package_list updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
@@ -132,6 +144,11 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(2, UPDATES_JSON_EMPTY_LIST.copy())
         assert updates == EMPTY_RESPONSE
 
+    def test_process_empty_pkg_list_v3(self):
+        """Test empty package_list updates api v3."""
+        updates = self.updates_api.process_list(3, UPDATES_JSON_EMPTY_LIST.copy())
+        assert updates == EMPTY_RESPONSE
+
     def test_process_non_exist_v1(self):
         """Test non-existing package updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
@@ -142,4 +159,9 @@ class TestUpdatesAPI(TestBase):
         """Test non-existing package updates api v2."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON_NON_EXIST.copy())
+        assert updates == NON_EXIST_RESPONSE
+
+    def test_process_non_exist_v3(self):
+        """Test non-existing package updates api v3."""
+        updates = self.updates_api.process_list(3, UPDATES_JSON_NON_EXIST.copy())
         assert updates == NON_EXIST_RESPONSE

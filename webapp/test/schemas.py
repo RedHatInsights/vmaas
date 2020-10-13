@@ -133,6 +133,12 @@ _updates_package_v2 = {
     ]
 }
 
+_updates_package_v3 = {
+    str: {
+        "available_updates": []
+    }
+}
+
 _vulnerabilities_response = {
     'cve_list': [str]
 }
@@ -166,6 +172,7 @@ updates_top_releasever_schema = Schema(_updates_top_releasever)
 updates_top_all_schema = Schema(_updates_top_all)
 updates_package_schema = Schema(_updates_package)
 updates_package_schema_v2 = Schema(_updates_package_v2)
+updates_package_schema_v3 = Schema(_updates_package_v3)
 vulnerabilities_schema = Schema(_vulnerabilities_response)
 patches_schema = Schema(_patches_response)
 pkg_names_srpm_schema = Schema(_pkg_names_srpm_resp)

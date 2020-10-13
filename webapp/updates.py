@@ -124,7 +124,8 @@ class UpdatesAPI:
                 desc_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_DESC_ID]
                 response['update_list'][pkg]['description'] = self.db_cache.strings.get(desc_id, None)
 
-            response['update_list'][pkg]['available_updates'] = []
+            if api_version != 3:
+                response['update_list'][pkg]['available_updates'] = []
 
             # No updates found for given NEVRA
             last_version_pkg_id = self.db_cache.updates[name_id][-1]
@@ -152,6 +153,10 @@ class UpdatesAPI:
 
                 errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
                 nevra = self._build_nevra(update_pkg_id)
+                if api_version == 3:
+                    response['update_list'][pkg][nevra] = {}
+                    response['update_list'][pkg][nevra]['available_updates'] = []
+
                 for errata_id in errata_ids:
                     errata_name = self.db_cache.errataid2name[errata_id]
                     # Filter out non-security updates
@@ -166,13 +171,21 @@ class UpdatesAPI:
                                                       valid_releasevers)
                     for repo_id in repo_ids:
                         repo_details = self.db_cache.repo_detail[repo_id]
-                        response['update_list'][pkg]['available_updates'].append({
-                            'package': nevra,
-                            'erratum': errata_name,
-                            'repository': repo_details[REPO_LABEL],
-                            'basearch': none2empty(repo_details[REPO_BASEARCH]),
-                            'releasever': none2empty(repo_details[REPO_RELEASEVER])
-                        })
+                        if api_version != 3:
+                            response['update_list'][pkg]['available_updates'].append({
+                                'package': nevra,
+                                'erratum': errata_name,
+                                'repository': repo_details[REPO_LABEL],
+                                'basearch': none2empty(repo_details[REPO_BASEARCH]),
+                                'releasever': none2empty(repo_details[REPO_RELEASEVER])
+                            })
+                        else:
+                            response['update_list'][pkg][nevra]['available_updates'].append({
+                                'erratum': errata_name,
+                                'repository': repo_details[REPO_LABEL],
+                                'basearch': none2empty(repo_details[REPO_BASEARCH]),
+                                'releasever': none2empty(repo_details[REPO_RELEASEVER])
+                            })
 
     def process_list(self, api_version, data):
         """

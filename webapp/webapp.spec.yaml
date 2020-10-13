@@ -148,7 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdatesV2Response'
+                $ref: '#/components/schemas/UpdatesV3Response'
         <<: *format_resps
 
   '/v3/updates/{nevra}':
@@ -715,6 +715,62 @@ components:
                     package:
                       type: string
                       example: kernel-2.6.32-696.23.1.el6.x86_64
+        repository_list:
+          type: array
+          items:
+            type: string
+            example: rhel-6-server-rpms
+        modules_list:
+          type: array
+          items:
+            type: object
+            properties:
+              module_name:
+                type: string
+                example: rhn-tools
+              module_stream:
+                type: string
+                example: '1'
+            required:
+              - module_name
+              - module_stream
+        releasever:
+          type: string
+          example: 6Server
+        basearch:
+          type: string
+          example: x86_64
+
+    UpdatesV3Response:
+      properties:
+        update_list:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              NEVRA:
+                type: object
+                properties:
+                  available_updates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        repository:
+                          type: string
+                          example: rhel-6-server-rpms
+                        releasever:
+                          type: string
+                          example: 6Server
+                        basearch:
+                          type: string
+                          example: x86_64
+                        erratum:
+                          type: string
+                          example: 'RHSA-2018:0512'
+                        package:
+                          type: string
+                          example: kernel-2.6.32-696.23.1.el6.x86_64
         repository_list:
           type: array
           items:
