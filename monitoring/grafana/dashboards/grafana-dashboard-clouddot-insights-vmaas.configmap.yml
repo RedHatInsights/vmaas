@@ -18,7 +18,7 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "iteration": 1601572232593,
+      "iteration": 1603108278235,
       "links": [],
       "panels": [
         {
@@ -46,6 +46,12 @@ data:
             "#d44a3a"
           ],
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {}
+            },
+            "overrides": []
+          },
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -77,7 +83,6 @@ data:
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "postfix": "",
           "postfixFontSize": "50%",
           "prefix": "",
@@ -159,6 +164,12 @@ data:
             "#d44a3a"
           ],
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {}
+            },
+            "overrides": []
+          },
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -190,7 +201,6 @@ data:
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "postfix": "",
           "postfixFontSize": "50%",
           "prefix": "",
@@ -272,6 +282,12 @@ data:
             "#d44a3a"
           ],
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {}
+            },
+            "overrides": []
+          },
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -303,7 +319,6 @@ data:
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "postfix": "",
           "postfixFontSize": "50%",
           "prefix": "",
@@ -385,6 +400,12 @@ data:
             "#d44a3a"
           ],
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {}
+            },
+            "overrides": []
+          },
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -416,7 +437,6 @@ data:
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "postfix": "",
           "postfixFontSize": "50%",
           "prefix": "",
@@ -508,6 +528,13 @@ data:
           "dashLength": 10,
           "dashes": false,
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "links": []
+            },
+            "overrides": []
+          },
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
@@ -534,9 +561,10 @@ data:
           "links": [],
           "nullPointMode": "null",
           "options": {
-            "dataLinks": []
+            "alertThreshold": true
           },
           "percentage": false,
+          "pluginVersion": "7.2.1",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -599,12 +627,19 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$datasource",
+          "datasource": "$datasource_rds",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "links": []
+            },
+            "overrides": []
+          },
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
             "h": 7,
-            "w": 4,
+            "w": 6,
             "x": 12,
             "y": 4
           },
@@ -624,9 +659,10 @@ data:
           "links": [],
           "nullPointMode": "null",
           "options": {
-            "dataLinks": []
+            "alertThreshold": true
           },
           "percentage": false,
+          "pluginVersion": "7.2.1",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -638,10 +674,11 @@ data:
             {
               "alias": "",
               "dimensions": {},
-              "expr": "aws_rds_free_storage_space_average{dbinstance_identifier=~\"vmaas-.*|vulnerability-engine-.*\"}",
+              "expr": "sum(rdsosmetrics_fileSys_usedPercent{exported_instance=~\"vmaas-.*\"}) by (mount_point)",
               "expression": "",
               "id": "",
-              "legendFormat": "{{dbinstance_identifier}}",
+              "interval": "",
+              "legendFormat": "{{mount_point}}",
               "matchExact": true,
               "metricName": "",
               "namespace": "",
@@ -656,7 +693,7 @@ data:
           "timeFrom": null,
           "timeRegions": [],
           "timeShift": null,
-          "title": "RDS free storage space",
+          "title": "RDS storage usage",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -672,14 +709,16 @@ data:
           },
           "yaxes": [
             {
-              "format": "decbytes",
+              "$$hashKey": "object:201",
+              "format": "percent",
               "label": "",
               "logBase": 1,
-              "max": null,
-              "min": null,
+              "max": "100",
+              "min": "0",
               "show": true
             },
             {
+              "$$hashKey": "object:202",
               "format": "short",
               "label": null,
               "logBase": 1,
@@ -698,100 +737,20 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "$datasource",
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 7,
-            "w": 4,
-            "x": 16,
-            "y": 4
-          },
-          "hiddenSeries": false,
-          "id": 132,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
-          "options": {
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "aws_rds_database_connections_average{dbinstance_identifier=~\"vmaas-.*|vulnerability-engine-.*\"}",
-              "legendFormat": "{{dbinstance_identifier}}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "RDS database connections",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+          "datasource": "$datasource_rds",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "links": []
             },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "$datasource",
+            "overrides": []
+          },
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
             "h": 7,
-            "w": 4,
-            "x": 20,
+            "w": 6,
+            "x": 18,
             "y": 4
           },
           "hiddenSeries": false,
@@ -809,9 +768,10 @@ data:
           "linewidth": 1,
           "nullPointMode": "null",
           "options": {
-            "dataLinks": []
+            "alertThreshold": true
           },
           "percentage": false,
+          "pluginVersion": "7.2.1",
           "pointradius": 2,
           "points": false,
           "renderer": "flot",
@@ -821,8 +781,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "aws_rds_cpuutilization_average{dbinstance_identifier=~\"vmaas-.*|vulnerability-engine-.*\"}",
-              "legendFormat": "{{dbinstance_identifier}}",
+              "expr": "sum(label_replace(rdsosmetrics_processList_cpuUsedPc{exported_instance=~\"vmaas-.*\", name=~\"postgres:.*\"}, \"db_user\", \"$1\", \"name\", \"postgres: ([^ ]+) .+\")) by (db_user)",
+              "interval": "",
+              "legendFormat": "{{db_user}}",
               "refId": "A"
             }
           ],
@@ -846,6 +807,7 @@ data:
           },
           "yaxes": [
             {
+              "$$hashKey": "object:331",
               "format": "percent",
               "label": null,
               "logBase": 1,
@@ -854,6 +816,7 @@ data:
               "show": true
             },
             {
+              "$$hashKey": "object:332",
               "format": "short",
               "label": null,
               "logBase": 1,
@@ -881,6 +844,12 @@ data:
           },
           "dataFormat": "timeseries",
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {}
+            },
+            "overrides": []
+          },
           "gridPos": {
             "h": 7,
             "w": 12,
@@ -895,7 +864,6 @@ data:
             "show": true
           },
           "links": [],
-          "options": {},
           "reverseYBuckets": false,
           "targets": [
             {
@@ -938,6 +906,13 @@ data:
           "dashLength": 10,
           "dashes": false,
           "datasource": "$datasource",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {},
+              "links": []
+            },
+            "overrides": []
+          },
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
@@ -962,9 +937,10 @@ data:
           "links": [],
           "nullPointMode": "null",
           "options": {
-            "dataLinks": []
+            "alertThreshold": true
           },
           "percentage": false,
+          "pluginVersion": "7.2.1",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1070,13 +1046,14 @@ data:
         }
       ],
       "refresh": "1m",
-      "schemaVersion": 22,
+      "schemaVersion": 26,
       "style": "dark",
       "tags": [],
       "templating": {
         "list": [
           {
             "current": {
+              "selected": false,
               "text": "crcp01ue1-prometheus",
               "value": "crcp01ue1-prometheus"
             },
@@ -1089,6 +1066,25 @@ data:
             "query": "prometheus",
             "refresh": 1,
             "regex": "/devel-prometheus|crc-stg-01-prometheus|crcp01ue1-prometheus/",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": "app-sre-prod-01-prometheus",
+              "value": "app-sre-prod-01-prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": null,
+            "multi": false,
+            "name": "datasource_rds",
+            "options": [],
+            "query": "prometheus",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "/devel-prometheus|app-sre-stage-01-prometheus|app-sre-prod-01-prometheus/",
             "skipUrlSync": false,
             "type": "datasource"
           }
