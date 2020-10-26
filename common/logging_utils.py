@@ -50,12 +50,6 @@ def setup_cw_logging(main_logger):
         logger.info('CloudWatch logging disabled due to missing access key')
         return
 
-    try:
-        with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'r') as namespace_file:
-            namespace = namespace_file.read()  # pragma: no cover
-    except Exception:  # pylint: disable=broad-except
-        namespace = 'vmaas-development'
-
     session = Session(
         aws_access_key_id=key_id,
         aws_secret_access_key=secret,
@@ -66,7 +60,7 @@ def setup_cw_logging(main_logger):
         handler = watchtower.CloudWatchLogHandler(
             boto3_session=session,
             log_group=os.environ.get('CW_LOG_GROUP', 'platform-dev'),
-            stream_name=namespace
+            stream_name=os.environ.get('HOSTNAME', 'vmaas')
         )
     except ClientError:
         logger.exception("Unable to enable CloudWatch logging: ")
