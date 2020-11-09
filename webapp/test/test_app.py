@@ -155,7 +155,7 @@ class TestWebappGets(BaseCase):
         """Test updates get endpoint."""
         resp = await self.fetch('/api/v1/updates/my-pkg-1.1.0-1^.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:50] == '{"update_list": {"my-pkg-1.1.0-1^.el8.i686": {}}}'
+        assert resp.body[:50] == '{"update_list": {"my-pkg-1.1.0-1%5E.el8.i686": {}}'
 
     async def test_updates_v2_get(self):
         """Test updates post endpoint."""
