@@ -1,0 +1,35 @@
+name: Semantic release
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false # The auth token is persisted in the local git config. semantic-release picks this one instead of GH_TOKEN
+      - name: Cancel previous builds
+        uses: rokroskar/workflow-run-cleanup-action@master
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run python-semantic-release
+        run: |
+          git config --global user.name "vmaas-bot"
+          git config --global user.email "40663028+vmaas-bot@users.noreply.github.com"
+          pip install python-semantic-release
+          semantic-release publish
+        env:
+          GH_TOKEN: "${{ secrets.GH_TOKEN }}"
