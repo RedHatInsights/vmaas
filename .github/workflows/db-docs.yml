@@ -1,0 +1,28 @@
+name: DB documentation generator
+
+on:
+  push:
+    branches:
+      - "master"
+      - "stable"
+
+jobs:
+  db-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cancel previous builds
+        uses: rokroskar/workflow-run-cleanup-action@master
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Extract branch name
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: Generate DB docs
+        run: |
+          bash scripts/db_docs_generator.sh
+        env:
+          BRANCH_NAME: "${{ steps.extract_branch.outputs.branch }}"
+          VULNERABILITY_DOCS_TOKEN: "${{ secrets.VULNERABILITY_DOCS_TOKEN }}"
