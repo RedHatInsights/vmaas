@@ -8,8 +8,13 @@ services:
       args:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     environment:
-      CI: "true"
-      TRAVIS: "true"
+      CI: "${CI:-false}"
+      GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
+      GITHUB_REF: "${GITHUB_REF:-}"
+      GITHUB_HEAD_REF: "${GITHUB_HEAD_REF:-}"
+      GITHUB_SHA: "${GITHUB_SHA:-}"
+      GITHUB_REPOSITORY: "${GITHUB_REPOSITORY:-}"
+      GITHUB_RUN_ID: "${GITHUB_RUN_ID:-}"
     command: >
       bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
                          && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
