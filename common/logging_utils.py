@@ -126,7 +126,7 @@ def init_logging(num_servers=1):
         formatter = OneLineExceptionFormatter(log_fmt)
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-    setup_cw_logging(logger)
+        setup_cw_logging(logger)
 
 
 def get_logger(name):
