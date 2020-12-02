@@ -7,6 +7,7 @@ import tempfile
 from datetime import datetime
 from urllib.parse import urljoin
 import re
+import sqlite3
 
 from OpenSSL import crypto
 
@@ -264,7 +265,8 @@ class RepositoryController:
             self.logger.warning("Failed to import %d repositories.", failures)
             FAILED_IMPORT_REPO.inc(failures)
 
-    def store(self):
+    # TODO: refactor - split to smaller functions
+    def store(self):  # pylint: disable=too-many-branches,too-many-statements
         """Sync all queued repositories. Process repositories in batches due to disk space and memory usage."""
         self.logger.info("Checking %d repositories.", len(self.repositories))
 
@@ -313,7 +315,7 @@ class RepositoryController:
         self.logger.info("%d repositories need to be synced.", total_repositories)
 
         # Download and process repositories in batches (unpacked metadata files can consume lot of disk space)
-        try:
+        try:  # pylint: disable=too-many-nested-blocks
             for batch in batches:
                 self.logger.info("Syncing a batch of %d repositories", len(batch))
                 try:
@@ -325,13 +327,21 @@ class RepositoryController:
                         batch = [repo for repo in batch if repo not in failed_repos]
                     self._unpack_metadata(batch)
                     for repository in batch:
-                        repository.load_metadata()
                         completed_repositories += 1
-                        self.logger.info("Syncing repository: %s [%s/%s]", ", ".join(
-                            filter(None, (repository.content_set, repository.basearch, repository.releasever))),
-                                         completed_repositories, total_repositories)
-                        self.repo_store.store(repository)
-                        repository.unload_metadata()
+                        try:
+                            repository.load_metadata()
+                            self.logger.info("Syncing repository: %s [%s/%s]", ", ".join(
+                                filter(None, (repository.content_set, repository.basearch, repository.releasever))),
+                                             completed_repositories, total_repositories)
+                            self.repo_store.store(repository)
+                        except sqlite3.Error:
+                            self.logger.warning("Syncing repository failed due to sqlite error: %s [%s/%s]", ", ".join(
+                                filter(None, (repository.content_set, repository.basearch, repository.releasever))),
+                                             completed_repositories, total_repositories)
+                            self.logger.exception("Exception: ")
+                            FAILED_IMPORT_REPO.inc()
+                        finally:
+                            repository.unload_metadata()
                 finally:
                     self.clean_repodata(batch)
         finally:
