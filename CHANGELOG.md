@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.20.6 (2020-12-03)
+### Fix
+* Skip repos with invalid sqlite database ([`35388b5`](https://github.com/RedHatInsights/vmaas/commit/35388b551c3de19f745f50451601e898c3b09b7b))
+
 ## v1.20.5 (2020-11-19)
 ### Fix
 * Duplicate messages in kibana ([`a296cb9`](https://github.com/RedHatInsights/vmaas/commit/a296cb97cc6b2c4ad344f323ddbc3835963a9b01))
