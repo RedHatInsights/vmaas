@@ -408,6 +408,7 @@ class Websocket:
     def __init__(self):
         self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
         self.websocket = None
+        self.websocket_lock = asyncio.Lock()
         self.task = None
 
     def stop(self):
@@ -419,14 +420,21 @@ class Websocket:
         self.task.cancel()
         self.task = None
 
+    async def _send_msg(self, msg):
+        async with self.websocket_lock:
+            if self.websocket:
+                await self.websocket.send_str(msg)
+            else:
+                LOGGER.warning("Unable to send websocket message: %s.", msg)
+
     async def _refresh_cache(self):
         if not BaseHandler.refreshing:
             LOGGER.info("Starting cached data refresh.")
             BaseHandler.refreshing = True
-            await self.websocket.send_str("status-refreshing")
+            await self._send_msg("status-refreshing")
             await BaseHandler.db_cache.reload_async()
             await self.report_version()
-            await self.websocket.send_str("status-ready")
+            await self._send_msg("status-ready")
             BaseHandler.refreshing = False
             LOGGER.info("Cached data refreshed.")
         else:
@@ -443,12 +451,13 @@ class Websocket:
         try:
             async with session.ws_connect(url=self.websocket_url) as socket:
                 LOGGER.info("Connected to: %s", self.websocket_url)
-                self.websocket = socket
+                async with self.websocket_lock:
+                    self.websocket = socket
                 # subscribe for notifications
-                await self.websocket.send_str("subscribe-webapp")
+                await self._send_msg("subscribe-webapp")
                 # Report version before status, so websocket doesn't send us the refresh message
                 await self.report_version()
-                await self.websocket.send_str("status-ready")
+                await self._send_msg("status-ready")
 
                 # check if webapp missed dump
                 latest_dump = await self.fetch_latest_dump(session)
@@ -457,14 +466,16 @@ class Websocket:
                     asyncio.get_event_loop().create_task(self._refresh_cache())
                 # handle websocket messages
                 await self.websocket_msg_handler()
-                self.websocket = None
+                async with self.websocket_lock:
+                    self.websocket = None
                 await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
         except ClientConnectionError:
             LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
             await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
         finally:
             # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
-            self.websocket = None
+            async with self.websocket_lock:
+                self.websocket = None
 
     async def fetch_latest_dump(self, session):
         """Method fetches latest dump from reposcan"""
@@ -473,7 +484,7 @@ class Websocket:
 
     async def report_version(self):
         """Report currently used dump version"""
-        await self.websocket.send_str(f"version {BaseHandler.db_cache.dbchange.get('exported')}")
+        await self._send_msg(f"version {BaseHandler.db_cache.dbchange.get('exported')}")
 
     async def websocket_msg_handler(self):
         """Handle active websocket connection, returning upon close"""
