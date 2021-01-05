@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.20.7 (2021-01-05)
+### Fix
+* **webapp:** Check if websocket is open before message is sent and ensure concurrency ([`6f529d1`](https://github.com/RedHatInsights/vmaas/commit/6f529d1a014441c7341bd89f32bc32fde728685f))
+
 ## v1.20.6 (2020-12-03)
 ### Fix
 * Skip repos with invalid sqlite database ([`35388b5`](https://github.com/RedHatInsights/vmaas/commit/35388b551c3de19f745f50451601e898c3b09b7b))
