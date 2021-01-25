@@ -514,14 +514,29 @@ def load_cache_to_apis():
     BaseHandler.rpm_pkg_names_api = RPMPkgNamesAPI(BaseHandler.db_cache)
 
 
+def load_spec_files():
+    """Open and load spec yamls."""
+    with open('webapp.v1.spec.yaml', 'rb') as specfile:
+        spec_v1 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+    spec_v1['info']['version'] = VMAAS_VERSION
+
+    with open('webapp.v2.spec.yaml', 'rb') as specfile:
+        spec_v2 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+    spec_v2['info']['version'] = VMAAS_VERSION
+
+    with open('webapp.v3.spec.yaml', 'rb') as specfile:
+        spec_v3 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
+    spec_v3['info']['version'] = VMAAS_VERSION
+
+    return spec_v1, spec_v2, spec_v3
+
+
 def create_app():
     """Create VmaaS application and servers"""
 
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
 
-    with open('webapp.spec.yaml', 'rb') as specfile:
-        SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
-    SPEC['info']['version'] = VMAAS_VERSION
+    spec_v1, spec_v2, spec_v3 = load_spec_files()
 
     @web.middleware
     async def timing_middleware(request, handler, **kwargs):
@@ -601,12 +616,19 @@ def create_app():
     app.app.on_response_prepare.append(on_prepare)
     app.app.router.add_get("/metrics", metrics)
 
-    app.add_api(SPEC, resolver=connexion.RestyResolver('app'),
-                validate_responses=False,
-                strict_validation=False,
-                base_path='/api',
-                pass_context_arg_name='request'
-                )
+    for api_version, spec in [("v1", spec_v1), ("v2", spec_v2), ("v3", spec_v3)]:
+        app.add_api(spec, resolver=connexion.RestyResolver('app'),
+                    validate_responses=False,
+                    strict_validation=False,
+                    base_path=f"/api/{api_version}",
+                    pass_context_arg_name='request'
+                    )
+        app.add_api(spec, resolver=connexion.RestyResolver('app'),
+                    validate_responses=False,
+                    strict_validation=False,
+                    base_path=f"/api/vmaas/{api_version}",
+                    pass_context_arg_name='request'
+                    )
 
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()

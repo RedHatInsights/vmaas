@@ -20,7 +20,7 @@ x-secured: &secured
     - GhAuth: []
 
 paths:
-  /v1/monitoring/health:
+  /monitoring/health:
     get:
       summary: Application availability
       description: Check whether this application is live
@@ -36,7 +36,7 @@ paths:
                 enum: [true, false]
       tags: [ Metadata ]
 
-  /v1/version:
+  /version:
     get:
       summary: Application version
       operationId: reposcan.VersionHandler.get
@@ -49,7 +49,7 @@ paths:
               schema: { type: string, example: '0.0.0'}
       tags: [ Metadata ]
 
-  /v1/repos:
+  /repos:
     post:
       summary:  Add repositories to the DB
       operationId: reposcan.RepoListHandler.post
@@ -76,7 +76,7 @@ paths:
       tags:
         - Repos
 
-  /v1/repos/git:
+  /repos/git:
     put:
       summary: Add repositories to the DB from git
       operationId: reposcan.GitRepoListHandler.put
@@ -89,7 +89,7 @@ paths:
       tags:
         - Repos
 
-  /v1/repos/{repo}:
+  /repos/{repo}:
     delete:
       summary: Delete repo from the DB
       operationId: reposcan.RepoDeleteHandler.delete
@@ -107,7 +107,7 @@ paths:
       tags:
         - Repos
 
-  /v1/sync:
+  /sync:
     put:
       summary: Sync repositories stored in DB and CVE lists
       operationId: reposcan.AllSyncHandler.put
@@ -124,7 +124,7 @@ paths:
       tags:
         - Sync
 
-  /v1/sync/repo:
+  /sync/repo:
     put:
       summary: Sync repositories from imported repolist
       operationId: reposcan.RepoSyncHandler.put
@@ -134,7 +134,7 @@ paths:
       tags:
         - Sync
 
-  /v1/sync/cvemap:
+  /sync/cvemap:
     put:
       summary: Sync the CVE map
       operationId: reposcan.CvemapSyncHandler.put
@@ -144,7 +144,7 @@ paths:
       tags:
         - Sync
 
-  /v1/export/pkgtree:
+  /export/pkgtree:
     put:
       summary: Export package tree
       operationId: reposcan.PkgTreeHandler.put
@@ -154,7 +154,7 @@ paths:
       tags:
         - Export
 
-  /v1/export/dump:
+  /export/dump:
     put:
       summary: Export disk dump
       operationId: reposcan.ExporterHandler.put
@@ -172,7 +172,7 @@ paths:
       tags:
         - Export
 
-  /v1/pkgtree:
+  /pkgtree:
     get:
       summary: Download the package tree.
       operationId: reposcan.PkgTreeDownloadHandler.get
@@ -194,7 +194,7 @@ paths:
       tags:
         - PkgTree
 
-  /v1/task/status:
+  /task/status:
     get:
       summary: Get status of currently running background task
       operationId: reposcan.TaskStatusHandler.get
@@ -208,7 +208,7 @@ paths:
       tags:
         - Task
 
-  /v1/task/cancel:
+  /task/cancel:
     put:
       summary: Cancel currently running background task
       operationId: reposcan.TaskCancelHandler.put
@@ -224,7 +224,7 @@ paths:
       tags:
         - Task
 
-  /v1/dbchange:
+  /dbchange:
     get:
       summary: Information about database sync
       operationId: reposcan.DbChangeHandler.get
@@ -238,7 +238,7 @@ paths:
       tags:
         - DbChange
 
-  /v1/latestdump:
+  /latestdump:
     get:
       summary: Get latest version of database dump
       operationId: reposcan.DumpVersionHandler.get
