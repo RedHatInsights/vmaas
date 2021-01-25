@@ -752,7 +752,12 @@ def create_app():
     app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
                 validate_responses=False,
                 strict_validation=True,
-                base_path='/api'
+                base_path='/api/v1'
+                )
+    app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
+                validate_responses=False,
+                strict_validation=True,
+                base_path='/api/vmaas/v1'
                 )
 
     @app.app.route('/metrics', methods=['GET'])

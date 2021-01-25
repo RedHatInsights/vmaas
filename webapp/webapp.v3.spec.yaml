@@ -11,7 +11,7 @@ x-format-resps: &format_resps
 
 
 paths:
-  /v1/monitoring/health:
+  /monitoring/health:
     get:
       summary: Return API liveness status
       operationId: app.HealthHandler.get
@@ -19,7 +19,7 @@ paths:
         '200':
           description: Application is alive
 
-  /v1/monitoring/ready:
+  /monitoring/ready:
     get:
       summary: Return API readiness status
       operationId: app.ReadyHandler.get
@@ -29,7 +29,7 @@ paths:
         '503':
           description: Application is not ready
 
-  /v1/version:
+  /version:
     get:
       description: Get version of application
       operationId: app.VersionHandler.get
@@ -37,7 +37,7 @@ paths:
         '200':
           description: Version of application returned
 
-  /v1/dbchange:
+  /dbchange:
     get:
       description: Get last-updated-times for VMaaS DB
       operationId: app.DBChangeHandler.get
@@ -49,90 +49,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DBChangeResponse'
 
-  /v1/updates:
-    post:
-      deprecated: true
-      description: List security updates for list of package NEVRAs
-      operationId: app.UpdatesHandlerPost.post
-      requestBody:
-        description: Input json
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdatesRequest'
-
-      responses:
-        '200':
-          description: Return list of security updates for list of package NEVRAs
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdatesResponse'
-        <<: *format_resps
-
-  '/v1/updates/{nevra}':
-    get:
-      deprecated: true
-      description: List security updates for single package NEVRA
-      operationId: app.UpdatesHandlerGet.get
-      parameters:
-        - name: nevra
-          description: Package NEVRA
-          required: true
-          schema:
-            type: string
-          in: path
-          x-example: kernel-2.6.32-696.20.1.el6.x86_64
-      responses:
-        '200':
-          description: Return list of security updates for single package NEVRA
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdatesResponse'
-
-  /v2/updates:
-    post:
-      deprecated: true
-      description: List security updates for list of package NEVRAs
-      operationId: app.UpdatesHandlerV2Post.post
-      requestBody:
-        description: Input json
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdatesRequest'
-      responses:
-        '200':
-          description: Return list of security updates for single package NEVRA
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdatesV2Response'
-        <<: *format_resps
-
-  '/v2/updates/{nevra}':
-    get:
-      deprecated: true
-      description: List security updates for single package NEVRA
-      operationId: app.UpdatesHandlerV2Get.get
-      parameters:
-        - name: nevra
-          description: Package NEVRA
-          required: true
-          schema:
-            type: string
-          in: path
-          x-example: kernel-2.6.32-696.20.1.el6.x86_64
-      responses:
-        '200':
-          description: Return list of security updates for single package NEVRA
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdatesV2Response'
-
-  /v3/updates:
+  /updates:
     post:
       description: List all updates for list of package NEVRAs
       operationId: app.UpdatesHandlerV3Post.post
@@ -151,7 +68,7 @@ paths:
                 $ref: '#/components/schemas/UpdatesV2Response'
         <<: *format_resps
 
-  '/v3/updates/{nevra}':
+  '/updates/{nevra}':
     get:
       description: List all updates for single package NEVRA
       operationId: app.UpdatesHandlerV3Get.get
@@ -171,7 +88,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpdatesV2Response'
 
-  /v1/cves:
+  /cves:
     post:
       description: Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE names can be provided OR one POSIX regular expression.
       operationId: app.CVEHandlerPost.post
@@ -190,7 +107,7 @@ paths:
                 $ref: '#/components/schemas/CvesResponse'
         <<: *format_resps
 
-  '/v1/cves/{cve}':
+  '/cves/{cve}':
     get:
       description: Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
       operationId: app.CVEHandlerGet.get
@@ -210,7 +127,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CvesResponse'
 
-  /v1/repos:
+  /repos:
     post:
       description: 'Get details about list of repositories. "repository_list" can be either a list of repository names, OR a single POSIX regular expression.'
       operationId: app.ReposHandlerPost.post
@@ -229,7 +146,7 @@ paths:
                 $ref: '#/components/schemas/ReposResponse'
         <<: *format_resps
 
-  '/v1/repos/{repo}':
+  '/repos/{repo}':
     get:
       description: Get details about a repository or repository-expression. It is allowed to use POSIX regular expression as a pattern for repository names.
       operationId: app.ReposHandlerGet.get
@@ -249,7 +166,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReposResponse'
 
-  /v1/errata:
+  /errata:
     post:
       description: Get details about errata with additional parameters. "errata_list" parameter can be either a list of errata names OR a single POSIX regular expression.
       operationId: app.ErrataHandlerPost.post
@@ -267,7 +184,7 @@ paths:
                 $ref: '#/components/schemas/ErrataResponse'
         <<: *format_resps
 
-  '/v1/errata/{erratum}':
+  '/errata/{erratum}':
     get:
       description: Get details about errata. It is possible to use POSIX regular expression as a pattern for errata names.
       operationId: app.ErrataHandlerGet.get
@@ -287,7 +204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrataResponse'
 
-  /v1/packages:
+  /packages:
     post:
       description: Get details about packages. "package_list" must be a list of package NEVRAs.
       operationId: app.PackagesHandlerPost.post
@@ -306,7 +223,7 @@ paths:
                 $ref: '#/components/schemas/PackagesResponse'
         <<: *format_resps
 
-  '/v1/packages/{nevra}':
+  '/packages/{nevra}':
     get:
       description: Get details about packages.
       operationId: app.PackagesHandlerGet.get
@@ -326,7 +243,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PackagesResponse'
 
-  /v1/pkgtree:
+  /pkgtree:
     post:
       description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names.
       operationId: app.PkgtreeHandlerPost.post
@@ -345,7 +262,7 @@ paths:
                 $ref: '#/components/schemas/PkgtreeResponse'
         <<: *format_resps
 
-  '/v1/pkgtree/{package_name}':
+  '/pkgtree/{package_name}':
     get:
       description: Get package NEVRAs tree for a single package name.
       operationId: app.PkgtreeHandlerGet.get
@@ -365,7 +282,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PkgtreeResponse'
 
-  /v1/vulnerabilities:
+  /vulnerabilities:
     post:
       description: List of applicable CVEs to a package list.
       operationId: app.VulnerabilitiesHandlerPost.post
@@ -383,7 +300,7 @@ paths:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
         <<: *format_resps
 
-  '/v1/vulnerabilities/{nevra}':
+  '/vulnerabilities/{nevra}':
     get:
       description: List of applicable CVEs for a single package NEVRA
       operationId: app.VulnerabilitiesHandlerGet.get
@@ -403,7 +320,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VulnerabilitiesResponse'
 
-  /v1/patches:
+  /patches:
     post:
       description: List of applicable errata to a package list.
       operationId: app.PatchesHandlerPost.post
@@ -421,7 +338,7 @@ paths:
                 $ref: '#/components/schemas/PatchesResponse'
         <<: *format_resps
 
-  '/v1/patches/{nevra}':
+  '/patches/{nevra}':
     get:
       description: List of applicable CVEs for a single package NEVRA
       operationId: app.PatchesHandlerGet.get
@@ -441,7 +358,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PatchesResponse'
 
-  /v1/package_names/srpms:
+  /package_names/srpms:
     post:
       description: List of content sets with associated rpm names by given srpm and content set.
       operationId: app.SRPMPkgNamesHandlerPost.post
@@ -461,7 +378,7 @@ paths:
       tags:
         - experimental
 
-  /v1/package_names/srpms/{srpm}:
+  /package_names/srpms/{srpm}:
     get:
       description: List of content sets with associated rpm names by given srpm.
       operationId: app.SRPMPkgNamesHandlerGet.get
@@ -484,7 +401,7 @@ paths:
       tags:
         - experimental
 
-  /v1/package_names/rpms:
+  /package_names/rpms:
     post:
       description: List of content sets by given rpm name and content set.
       operationId: app.RPMPkgNamesHandlerPost.post
@@ -504,7 +421,7 @@ paths:
       tags:
         - experimental
 
-  /v1/package_names/rpms/{rpm}:
+  /package_names/rpms/{rpm}:
     get:
       description: List of content sets by given rpm name.
       operationId: app.RPMPkgNamesHandlerGet.get
@@ -547,46 +464,6 @@ x-paging-resp: &resp_paging
 
 components:
   schemas:
-    UpdatesRequest:
-      type: object
-      properties:
-        package_list:
-          type: array
-          items:
-            type: string
-            example: kernel-2.6.32-696.20.1.el6.x86_64
-          minItems: 1
-        repository_list:
-          type: array
-          items:
-            type: string
-            example: rhel-6-server-rpms
-        modules_list:
-          type: array
-          items:
-            type: object
-            properties:
-              module_name:
-                type: string
-                example: rhn-tools
-              module_stream:
-                type: string
-                example: '1'
-            required:
-              - module_name
-              - module_stream
-        releasever:
-          type: string
-          example: 6Server
-        basearch:
-          type: string
-          example: x86_64
-        latest_only:
-          type: boolean
-          enum: [true, false]
-      required:
-        - package_list
-
     UpdatesV3Request:
       type: object
       properties:
@@ -630,64 +507,6 @@ components:
       required:
         - package_list
 
-    UpdatesResponse:
-      properties:
-        update_list:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              available_updates:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    repository:
-                      type: string
-                      example: rhel-6-server-rpms
-                    releasever:
-                      type: string
-                      example: 6Server
-                    basearch:
-                      type: string
-                      example: x86_64
-                    erratum:
-                      type: string
-                      example: 'RHSA-2018:0512'
-                    package:
-                      type: string
-                      example: kernel-2.6.32-696.23.1.el6.x86_64
-              description:
-                type: string
-                example: package description
-              summary:
-                type: string
-                example: package summary
-        repository_list:
-          type: array
-          items:
-            type: string
-            example: rhel-6-server-rpms
-        modules_list:
-          type: array
-          items:
-            type: object
-            properties:
-              module_name:
-                type: string
-                example: rhn-tools
-              module_stream:
-                type: string
-                example: '1'
-            required:
-              - module_name
-              - module_stream
-        releasever:
-          type: string
-          example: 6Server
-        basearch:
-          type: string
-          example: x86_64
     UpdatesV2Response:
       properties:
         update_list:
