@@ -26,7 +26,7 @@ ARG PIPENV_CHECK=1
 ARG PIPENV_PYUP_API_KEY=""
 RUN pip3 install --upgrade pipenv && \
     pipenv install --ignore-pipfile --deploy --system && ln -s /usr/bin/python3 /usr/bin/python && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system ; fi
+    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 39462 ; fi
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-app\/"
