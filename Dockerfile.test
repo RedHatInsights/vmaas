@@ -28,7 +28,7 @@ ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
 ARG PIPENV_PYUP_API_KEY=""
 RUN cd /vmaas/ && pipenv --site-packages install --ignore-pipfile --deploy --dev && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check ; fi
+    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check -i 39462 ; fi
 
 ADD . /vmaas/
 
