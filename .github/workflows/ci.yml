@@ -200,7 +200,7 @@ jobs:
           oc exec ${webapp_pod} -- coverage-3 html --omit /usr/\\* -d /tmp/htmlcov
           mkdir htmlcov
           oc cp ${webapp_pod}:/tmp/htmlcov htmlcov
-          oc exec ${webapp_pod} -- bash -c 'main.py &>/proc/1/fd/1' &
+          oc exec ${webapp_pod} -- bash -c 'cd webapp && python3 -m main &>/proc/1/fd/1' &
       - name: Get OpenShift logs
         if: always()
         run: |
