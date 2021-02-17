@@ -4,6 +4,7 @@ Main entrypoint of reposcan tool. It provides and API and allows to sync specifi
 into specified PostgreSQL database.
 """
 
+import base64
 import os
 import signal
 from multiprocessing.pool import Pool
@@ -16,7 +17,6 @@ import git
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
-import requests
 import connexion
 from flask import request, send_file, make_response
 
@@ -27,7 +27,7 @@ from database.product_store import ProductStore
 from dbchange import DbChangeAPI
 from exporter import DUMP, DataDump, main as export_data
 from pkgtree import PKGTREE_FILE, main as export_pkgtree
-from mnm import FAILED_AUTH, FAILED_WEBSOCK, FAILED_IMPORT_CVE, FAILED_IMPORT_REPO
+from mnm import FAILED_AUTH, FAILED_WEBSOCK, FAILED_IMPORT_CVE, FAILED_IMPORT_REPO, ADMIN_REQUESTS
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
@@ -68,46 +68,34 @@ class TaskStartResponse(dict):
         self['success'] = success
 
 
-# pylint: disable=unused-argument
-def github_auth(github_token, required_scopes=None):
-    """Performs authorization using github"""
+def get_identity(x_rh_identity: str) -> dict:
+    """Get identity from given b64 string."""
+    try:
+        decoded_value = base64.b64decode(x_rh_identity).decode("utf-8")
+    except Exception:  # pylint: disable=broad-except
+        LOGGER.warning("Error decoding b64 string: %s", x_rh_identity)
+        decoded_value = ""
+    else:
+        LOGGER.debug("Identity decoded: %s", decoded_value)
+    try:
+        identity = json.loads(decoded_value)
+    except json.decoder.JSONDecodeError:
+        LOGGER.warning("Error parsing JSON identity: %s", decoded_value)
+        identity = None
+    return identity
 
-    host_request = request.host.split(':')[0]
 
-    if host_request in ('localhost', '127.0.0.1'):
-        return {'scopes': ['local']}
-
-    if not github_token:
-        FAILED_AUTH.inc()
-        return None
-
-    user_info_response = requests.get('https://api.github.com/user',
-                                      headers={'Authorization': github_token})
-
-    if user_info_response.status_code != 200:
-        FAILED_AUTH.inc()
-        LOGGER.warning("Cannot execute github API with provided token")
-        return None
-    github_user_login = user_info_response.json()['login']
-    orgs_response = requests.get('https://api.github.com/users/' + github_user_login + '/orgs',
-                                 headers={'Authorization': github_token})
-
-    if orgs_response.status_code != 200:
-        FAILED_AUTH.inc()
-        LOGGER.warning("Cannot request github organizations for the user %s", github_user_login)
-        return None
-
-    authorized_org = os.getenv('AUTHORIZED_API_ORG', DEFAULT_AUTHORIZED_API_ORG)
-
-    for org_info in orgs_response.json():
-        if org_info['login'] == authorized_org:
-            request_str = str(request)
-            LOGGER.warning("User %s (id %s) got an access to API: %s", github_user_login,
-                           user_info_response.json()['id'], request_str)
-            return {'scopes': ['local', 'authorized']}
-
+def auth_admin(x_rh_identity, required_scopes=None):  # pylint: disable=unused-argument
+    """
+    Parses user name from the x-rh-identity header
+    """
+    identity = get_identity(x_rh_identity)
+    user = identity.get("identity", {}).get("associate", {}).get("email")
+    if user:
+        LOGGER.info("User '%s' accessed admin API.", user)
+        ADMIN_REQUESTS.inc()
+        return {"uid": user}
     FAILED_AUTH.inc()
-    LOGGER.warning("User %s does not belong to %s organization", authorized_org, github_user_login)
     return None
 
 
