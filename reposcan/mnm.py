@@ -4,6 +4,7 @@ Measurement aNd Monitoring - prometheus probes used by reposcan subsystem
 
 from prometheus_client import Counter
 
+ADMIN_REQUESTS = Counter('vmaas_reposcan_admin_invocations', 'Number of calls on admin API')
 FAILED_AUTH = Counter('vmaas_reposcan_failed_auth_attempts', '# of failed authentication attempts')
 FAILED_WEBSOCK = Counter('vmaas_reposcan_websocket_errors', '# of websocket-cnx errors')
 

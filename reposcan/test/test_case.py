@@ -1,12 +1,33 @@
 """
 Fixtures and utility methods for testing flask application using pytest
 """
+import base64
 import json
 from http import HTTPStatus
 import pytest
 import reposcan
 
 URL_BASE = ""
+
+TURNPIKE_IDENTITY = {
+    "identity": {
+        "associate": {
+            "Role": [
+                "vulnerability-admins"
+            ],
+            "email": "jschmoe@redhat.com",
+            "givenName": "Joseph",
+            "rhatUUID": "01234567-89ab-cdef-0123-456789abcdef",
+            "surname": "Schmoe"
+        },
+        "auth_type": "saml-auth",
+        "type": "Associate"
+    }
+}
+
+RH_TURNPIKE_IDENTITY_HEADER = {
+    "x-rh-identity": base64.b64encode(json.dumps(TURNPIKE_IDENTITY).encode("utf-8"))
+}
 
 
 @pytest.mark.usefixtures('client_class')
@@ -23,7 +44,7 @@ class FlaskTestCase:
         """Fetch method for vulnerability API."""
         path = "{}/{}".format(URL_BASE, path.lstrip("/"))
         headers = kwargs.get("headers") or {}
-        headers["Authorization"] = "token 0000000"
+        headers.update(RH_TURNPIKE_IDENTITY_HEADER)
         kwargs["headers"] = headers
         if 'data' in kwargs or 'json' in kwargs:
             headers.update({'Content-type': 'application/json'})
