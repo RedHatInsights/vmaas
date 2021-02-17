@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import base64
+import argparse
+
+
+DEFAULT_IDENTITY_FILE = os.environ['HOME'] + "/.turnpike-mock"
+DEFAULT_IDENTITY = """
+{
+  "identity": {
+    "associate": {
+      "Role": [
+        "vulnerability-admins"
+      ],
+      "email": "jschmoe@redhat.com",
+      "givenName": "Joseph",
+      "rhatUUID": "01234567-89ab-cdef-0123-456789abcdef",
+      "surname": "Schmoe"
+    },
+    "auth_type": "saml-auth",
+    "type": "Associate"
+  }
+}
+"""
+
+debug = False
+
+def load_identity(filepath):
+    if os.path.isfile(filepath):
+        if debug:
+            print('Attempting to load identity from %s' % filepath)
+        with open(filepath, 'r') as identity_file:
+            return json.load(identity_file)
+    if filepath == DEFAULT_IDENTITY_FILE:
+        if debug:
+            print('Using default identity, no identity file %s' % filepath)
+        return json.loads(DEFAULT_IDENTITY)
+    return None
+
+def save_identity(identity, filepath):
+    if debug:
+        print('Saving identity to file %s' % filepath)
+    with open(filepath, 'w') as identity_file:
+        identity_file.write(json.dumps(identity))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-f', '--file', dest='input_file',
+                        default=DEFAULT_IDENTITY_FILE,
+                        help='file containing identity to use [default: %s]' % DEFAULT_IDENTITY_FILE)
+    parser.add_argument('-e', '--email',
+                        help='email to use in identity')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='output additional information and details')
+    subparsers = parser.add_subparsers(help='commands', dest='command')
+    parser_save = subparsers.add_parser('save', help='save identity')
+    parser_save.add_argument('output_file', nargs='?',
+                             default=DEFAULT_IDENTITY_FILE,
+                             help='file to save [default: %s]' % DEFAULT_IDENTITY_FILE)
+
+    parser_print = subparsers.add_parser('print', help='print base64 encoded identity')
+
+    parser_curl = subparsers.add_parser('curl', help='issue curl command')
+
+    options, remaining = parser.parse_known_args()
+    if options.debug:
+        debug = True
+
+    identity = load_identity(options.input_file)
+    if not identity:
+        print('Unable to load identity from file %s' % options.input_file)
+        sys.exit(1)
+
+    if options.email:
+        identity['identity']['associate']['email'] = options.email
+
+    if options.command == 'save':
+        if remaining:
+            print('Unexpected args %s' % remaining)
+            sys.exit(1)
+        save_identity(identity, options.output_file)
+        print('Identity saved to file %s' % options.output_file)
+        sys.exit(0)
+
+    encoded_identity = base64.b64encode(json.dumps(identity).encode('utf-8')).decode('utf-8')
+
+    if options.command == 'print':
+        if remaining:
+            print('Unexpected args %s' % remaining)
+            sys.exit(1)        
+        print(encoded_identity)
+        sys.exit(0)
+
+    if options.command == 'curl':
+        if remaining:
+            args = remaining
+        else:
+            args = []
+        curl_command = 'curl'
+        curl_command += ' -H "x-rh-identity: %s"' % encoded_identity
+        curl_command += ' %s' % ' '.join('%s' % s if not True in [ c.isspace() or c in [';', '&'] for c in s ] else "'%s'" % s for s in args)
+
+        if debug:
+            print('Issuing the following curl command:')
+            print(curl_command)
+        os.system(curl_command)

@@ -17,7 +17,7 @@ x-running-resp: &running_resp
 
 x-secured: &secured
   security:
-    - GhAuth: []
+    - ApiKeyAuthAdmin: []
 
 paths:
   /monitoring/health:
@@ -263,15 +263,12 @@ paths:
 
 components:
   securitySchemes:
-    GhAuth:
+    ApiKeyAuthAdmin:
       type: apiKey
       in: header
-      name: Authorization
-      x-apikeyInfoFunc: reposcan.github_auth
-      description: '
-      Authorization using Github Api token in the
-      token <token value> format
-      '
+      name: x-rh-identity
+      description: Identity header provided by Turnpike.
+      x-apikeyInfoFunc: reposcan.auth_admin
 
   schemas:
     CertItem:
