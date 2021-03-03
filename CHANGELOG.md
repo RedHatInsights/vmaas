@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.1 (2021-03-03)
+### Fix
+* **reposcan:** Replace github auth with turnpike ([`d0e5a4f`](https://github.com/RedHatInsights/vmaas/commit/d0e5a4f639fd00f9a9a5c12238ab1bb734526d87))
+
 ## v2.1.0 (2021-01-28)
 ### Feature
 * **webapp:** Install rpm module ([`675c4e6`](https://github.com/RedHatInsights/vmaas/commit/675c4e67c1786f7074b33a1ab33f22c4032b3553))
