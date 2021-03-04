@@ -42,7 +42,9 @@ RUN install -m 1777 -d /data && \
 USER vmaas
 
 ADD wait-for-services.sh        /vmaas/
+ADD wait_for_services.py        /vmaas/
 ADD entrypoint.sh               /vmaas/
+ADD /common/*.py                /vmaas/common/
 ADD /common/*.py                /vmaas/webapp/common/
 ADD /common/*.py                /vmaas/reposcan/common/
 ADD /common/*.py                /vmaas/websocket/common/

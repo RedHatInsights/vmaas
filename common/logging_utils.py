@@ -3,15 +3,17 @@ Common logging functionality to be used for multiple apps
 (should be identical to reposcan/common/logging.py)
 TODO: packaging changes that let this live in one place please
 """
-
-from distutils.util import strtobool  # pylint: disable=import-error, no-name-in-module
 import logging
 import os
-from threading import Lock
 import time
+from distutils.util import strtobool  # pylint: disable=import-error, no-name-in-module
+from threading import Lock
+
 import watchtower
 from boto3.session import Session
 from botocore.exceptions import ClientError
+
+from common.config import Config
 
 
 class OneLineExceptionFormatter(logging.Formatter):
@@ -41,11 +43,12 @@ class OneLineExceptionFormatter(logging.Formatter):
 def setup_cw_logging(main_logger):
     """Setup CloudWatch logging"""
     logger = get_logger(__name__)
+    cfg = Config()
     if not strtobool(os.getenv('CW_ENABLED', 'FALSE')):
         logger.info('CloudWatch logging disabled')
         return
-    key_id = os.environ.get('CW_AWS_ACCESS_KEY_ID')
-    secret = os.environ.get('CW_AWS_SECRET_ACCESS_KEY')
+    key_id = cfg.cw_aws_access_key_id
+    secret = cfg.cw_aws_secret_access_key
     if not (key_id and secret):
         logger.info('CloudWatch logging disabled due to missing access key')
         return
@@ -53,13 +56,13 @@ def setup_cw_logging(main_logger):
     session = Session(
         aws_access_key_id=key_id,
         aws_secret_access_key=secret,
-        region_name=os.environ.get('AWS_REGION', 'us-east-1'),
+        region_name=cfg.cw_aws_region
     )
 
     try:
         handler = watchtower.CloudWatchLogHandler(
             boto3_session=session,
-            log_group=os.environ.get('CW_LOG_GROUP', 'platform-dev'),
+            log_group=cfg.cw_aws_log_group,
             stream_name=os.environ.get('HOSTNAME', 'vmaas')
         )
     except ClientError:

@@ -5,29 +5,42 @@ into specified PostgreSQL database.
 """
 
 import base64
-import os
-import signal
-from multiprocessing.pool import Pool
 import json
-from contextlib import contextmanager
+import os
 import shutil
-import yaml
-import git
+import signal
+from contextlib import contextmanager
+from multiprocessing.pool import Pool
 
-from prometheus_client import generate_latest
-from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.websocket import websocket_connect
 import connexion
-from flask import request, send_file, make_response
+import git
+import yaml
+from flask import make_response
+from flask import request
+from flask import send_file
+from prometheus_client import generate_latest
+from tornado.ioloop import IOLoop
+from tornado.ioloop import PeriodicCallback
+from tornado.websocket import websocket_connect
 
-from common.logging_utils import get_logger, init_logging
+from common.config import Config
 from common.constants import VMAAS_VERSION
-from database.database_handler import DatabaseHandler, init_db
+from common.logging_utils import get_logger
+from common.logging_utils import init_logging
+from database.database_handler import DatabaseHandler
+from database.database_handler import init_db
 from database.product_store import ProductStore
 from dbchange import DbChangeAPI
-from exporter import DUMP, DataDump, main as export_data
-from pkgtree import PKGTREE_FILE, main as export_pkgtree
-from mnm import FAILED_AUTH, FAILED_WEBSOCK, FAILED_IMPORT_CVE, FAILED_IMPORT_REPO, ADMIN_REQUESTS
+from exporter import DataDump
+from exporter import DUMP
+from exporter import main as export_data
+from mnm import ADMIN_REQUESTS
+from mnm import FAILED_AUTH
+from mnm import FAILED_IMPORT_CVE
+from mnm import FAILED_IMPORT_REPO
+from mnm import FAILED_WEBSOCK
+from pkgtree import main as export_pkgtree
+from pkgtree import PKGTREE_FILE
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
@@ -623,9 +636,9 @@ class SyncTask:
 
 class ReposcanWebsocket():
     """Class defining API handlers."""
-
+    cfg = Config()
     websocket = None
-    websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
+    websocket_url = cfg.websocket_url
     reconnect_callback = None
 
     @staticmethod
