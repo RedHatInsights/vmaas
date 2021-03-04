@@ -2,48 +2,51 @@
 """
 Main web API module
 """
-
-from json import loads
+import asyncio
+import gzip
 import os
 import signal
 import sre_constants
 import time
-import asyncio
 from distutils.util import strtobool
-import gzip
-import yaml
+from json import loads
 
-from jsonschema.exceptions import ValidationError
-from prometheus_client import generate_latest
 import connexion
-from aiohttp import web, ClientSession, WSMsgType, hdrs
+import yaml
+from aiohttp import ClientSession
+from aiohttp import hdrs
+from aiohttp import web
+from aiohttp import WSMsgType
 from aiohttp.client_exceptions import ClientConnectionError
-
+from prometheus_client import generate_latest
+from jsonschema.exceptions import ValidationError
 from cache import Cache
-from common.constants import VMAAS_VERSION
-from common.logging_utils import get_logger
 from cve import CveAPI
+from dbchange import DBChange
+from errata import ErrataAPI
+from packages import PackagesAPI
+from patches import PatchesAPI
+from pkgtree import PkgtreeAPI
+from probes import REQUEST_COUNTS
+from probes import REQUEST_TIME
 from repos import RepoAPI
 from rpm_pkg_names import RPMPkgNamesAPI
 from srpm_pkg_names import SRPMPkgNamesAPI
 from updates import UpdatesAPI
-from errata import ErrataAPI
-from packages import PackagesAPI
-from pkgtree import PkgtreeAPI
 from vulnerabilities import VulnerabilitiesAPI
-from patches import PatchesAPI
-from dbchange import DBChange
-from probes import REQUEST_COUNTS, REQUEST_TIME
+
+from common.config import Config
+from common.constants import VMAAS_VERSION
+from common.logging_utils import get_logger
 
 # pylint: disable=too-many-lines
-
-PUBLIC_API_PORT = 8080
+CFG = Config()
 
 WEBSOCKET_RECONNECT_INTERVAL = 60
 WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
 
-REPOSCAN_HOST = os.getenv("REPOSCAN_HOST", "localhost")
-REPOSCAN_PORT = int(os.getenv("REPOSCAN_PORT", "8081"))
+REPOSCAN_HOST = CFG.reposcan_host
+REPOSCAN_PORT = CFG.reposcan_port
 GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
 GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
 LATEST_DUMP_ENDPOINT = "/api/v1/latestdump"
@@ -406,7 +409,7 @@ class Websocket:
     """ main websocket handling class"""
 
     def __init__(self):
-        self.websocket_url = "ws://%s:8082/" % os.getenv("WEBSOCKET_HOST", "vmaas_websocket")
+        self.websocket_url = CFG.websocket_url
         self.websocket = None
         self.websocket_lock = asyncio.Lock()
         self.task = None

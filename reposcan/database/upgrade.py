@@ -2,21 +2,24 @@
 """
 database upgrade
 """
-
 import os
 import subprocess
 
 import psycopg2
 
-
-from database.database_handler import init_db, DatabaseHandler
-from common.logging_utils import init_logging, get_logger
+from common.config import Config
+from common.logging_utils import get_logger
+from common.logging_utils import init_logging
+from database.database_handler import DatabaseHandler
+from database.database_handler import init_db
 
 LOGGER = get_logger(__name__)
 
 SCHEMA_VER_NAME = 'schema_version'
 
 DB_UPGRADES_PATH = "./database/upgrade_scripts"
+USER_CREATE_SQL_PATH = "/vmaas/reposcan/vmaas_user_create_postgresql.sql"
+DB_CREATE_SQL_PATH = "/vmaas/reposcan/vmaas_db_postgresql.sql"
 
 class DatabaseUpgrade:
     """ This class contains logic for upgrading the database.
@@ -39,6 +42,7 @@ class DatabaseUpgrade:
         DatabaseHandler.close_connection()
 
         init_db()
+        self.init_schema()
 
         # get upgrade sql scripts directory
         self.scripts_dir = os.getenv('DB_UPGRADE_SCRIPTS_DIR',
@@ -48,6 +52,27 @@ class DatabaseUpgrade:
 
         # load the version2file_map and version_max
         self.version2file_map, self.version_max = self._load_upgrade_file_list(self.scripts_dir)
+
+    def init_schema(self):
+        """Initialize database schema."""
+        cfg = Config()
+        conn = DatabaseHandler.get_connection()
+        if self._is_initialized(conn):
+            LOGGER.info("DB schema is already initialized.")
+            return
+
+        try:
+            self._get_db_lock(conn)
+            LOGGER.info("Empty database, initializing...")
+            with conn.cursor() as cur:
+                cur.execute(open(USER_CREATE_SQL_PATH, "r").read())
+                cur.execute(open(DB_CREATE_SQL_PATH, "r").read())
+                cur.execute(f"ALTER USER vmaas_writer WITH PASSWORD '{cfg.postgresql_writer_password}'")
+                cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_writer_password}'")
+
+            conn.commit()
+        finally:
+            self._release_db_lock(conn)
 
     def upgrade(self):
         """perform database upgrade"""
@@ -198,6 +223,19 @@ class DatabaseUpgrade:
                         values (%s, %s, %s, %s, %s, %s)""",
                         (version, status, script, returncode, stdout, stderr))
         conn.commit()
+
+    @staticmethod
+    def _is_initialized(conn):
+        initialized = True
+        try:
+            with conn.cursor() as cur:
+                cur.execute("select count(*) from pg_stat_user_tables")
+                initialized = bool(int(cur.fetchone()[0]))
+        except (psycopg2.ProgrammingError, IndexError):
+            initialized = False
+        finally:
+            conn.commit()
+        return initialized
 
 
 def main():

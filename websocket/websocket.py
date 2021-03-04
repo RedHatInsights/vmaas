@@ -6,10 +6,13 @@ import signal
 import uuid
 
 from tornado.ioloop import IOLoop
-from tornado.web import Application, RequestHandler
+from tornado.web import Application
+from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler
 
-from common.logging_utils import get_logger, init_logging
+from common.config import Config
+from common.logging_utils import get_logger
+from common.logging_utils import init_logging
 
 WEBSOCKET_PING_INTERVAL = 5
 WEBSOCKET_TIMEOUT = 60
@@ -163,6 +166,7 @@ class WebsocketApplication(Application):
 def create_app():
     """Create websocket tornado app."""
     app = WebsocketApplication()
+    cfg = Config()
 
     def terminate(*_):
         """Trigger shutdown."""
@@ -172,7 +176,9 @@ def create_app():
     for sig in signals:
         signal.signal(sig, terminate)
 
-    app.listen(8082)
+    port = cfg.private_port or cfg.websocket_port
+    LOGGER.info("Websocket is listening on port %s", port)
+    app.listen(port)
 
 
 def main():
