@@ -135,7 +135,7 @@ class ModulesStore(ObjectStore):
             return modules[0]
         except Exception: # pylint: disable=broad-except
             # exception already logged.
-            pass
+            return {}
 
     def store(self, repo_id, modules):
         """Import all modules from repository into all related DB tables."""

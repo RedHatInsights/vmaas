@@ -1,15 +1,10 @@
 """
 Module for connecting and working with vmaas database.
 """
-import os
 from psycopg2 import pool
 
+from common.config import Config
 
-VMAAS_DB_LOGIN = os.getenv("POSTGRESQL_USER", None)
-VMAAS_DB_PASSWD = os.getenv("POSTGRESQL_PASSWORD", None)
-VMAAS_DB_NAME = os.getenv("POSTGRESQL_DATABASE", None)
-VMAAS_DB_HOST = os.getenv("POSTGRESQL_HOST", None)
-VMAAS_DB_PORT = os.getenv("POSTGRESQL_PORT", None)
 
 class DatabasePoolConnection:
     """ Wrapper for psycopg2 one connection pool from DatabasePoolHandler. """
@@ -20,6 +15,7 @@ class DatabasePoolConnection:
         """ Gets one cursor based on connection from pool. """
         return self.conn.cursor()
 
+
 class DatabasePoolHandler:
     """ Handler class for pool connection into db and querying. """
 
@@ -29,10 +25,11 @@ class DatabasePoolHandler:
                                                        dbname=dsn["database"], user=dsn["user"],
                                                        host=dsn["host"], port=dsn["port"])
         else:
+            cfg = Config()
             self.db_pool = pool.ThreadedConnectionPool(1, size,
-                                                       dbname=VMAAS_DB_NAME, user=VMAAS_DB_LOGIN,
-                                                       password=VMAAS_DB_PASSWD,
-                                                       host=VMAAS_DB_HOST, port=VMAAS_DB_PORT)
+                                                       dbname=cfg.db_name, user=cfg.db_user,
+                                                       password=cfg.db_pass,
+                                                       host=cfg.db_host, port=cfg.db_port)
 
     def get_connection(self):
         """ Gets one connection from pool. """
