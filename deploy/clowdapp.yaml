@@ -1,0 +1,485 @@
+---
+apiVersion: v1
+kind: Template
+metadata:
+  name: vmaas
+objects:
+- apiVersion: cloud.redhat.com/v1alpha1
+  kind: ClowdApp
+  metadata:
+    name: vmaas
+  spec:
+    envName: ${ENV_NAME}
+    deployments:
+    - name: websocket
+      minReplicas: ${{REPLICAS_WEBSOCKET}}
+      webServices:
+        public:
+          enabled: false
+        private:
+          enabled: true
+        metrics:
+          enabled: false
+      podSpec:
+        image: ${IMAGE}:${IMAGE_TAG}
+        command:
+          - /vmaas/entrypoint.sh
+          - websocket
+        readinessProbe:
+          httpGet:
+            path: /api/v1/monitoring/health
+            port: 10000
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/v1/monitoring/health
+            port: 10000
+          initialDelaySeconds: 120
+          timeoutSeconds: 1
+          periodSeconds: 60
+        env:
+        - name: CW_ENABLED
+          value: ${{CW_ENABLED}}
+        - name: CLOWDER_ENABLED
+          value: ${CLOWDER_ENABLED}
+        resources:
+          limits: {cpu: 100m, memory: 100Mi}
+          requests: {cpu: 100m, memory: 100Mi}
+
+    - name: webapp
+      minReplicas: ${{REPLICAS_WEBAPP}}
+      webServices:
+        public:
+          enabled: true
+        private:
+          enabled: false
+        metrics:
+          enabled: true
+      podSpec:
+        image: ${IMAGE}:${IMAGE_TAG}
+        command:
+          - /vmaas/entrypoint.sh
+          - webapp
+        readinessProbe:
+          httpGet:
+            path: /api/v1/monitoring/ready
+            port: 8000
+          initialDelaySeconds: 0
+          timeoutSeconds: 3
+          periodSeconds: 1
+          failureThreshold: 1
+          successThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /api/v1/monitoring/health
+            port: 8000
+          initialDelaySeconds: 240
+          timeoutSeconds: 3
+          periodSeconds: 60
+        env:
+        - name: HOTCACHE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              key: HOTCACHE_ENABLED
+              name: vmaas-webapp-conf-webapp-env
+        - name: HOTCACHE_LEVELS
+          valueFrom:
+            configMapKeyRef:
+              key: HOTCACHE_LEVELS
+              name: vmaas-webapp-conf-webapp-env
+        - name: HOTCACHE_PRUNING
+          valueFrom:
+            configMapKeyRef:
+              key: HOTCACHE_PRUNING
+              name: vmaas-webapp-conf-webapp-env
+        - name: LOGGING_LEVEL_APP
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_LEVEL_APP
+              name: vmaas-webapp-conf-webapp-env
+        - name: LOGGING_LEVEL_LIBS
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_LEVEL_LIBS
+              name: vmaas-webapp-conf-webapp-env
+        - name: LOGGING_TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_TYPE
+              name: vmaas-webapp-conf-webapp-env
+        - name: MAX_VMAAS_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: MAX_VMAAS_SERVERS
+              name: vmaas-webapp-conf-webapp-env
+        - name: GZIP_RESPONSE_ENABLE
+          valueFrom:
+            configMapKeyRef:
+              key: GZIP_RESPONSE_ENABLE
+              name: vmaas-webapp-conf-webapp-env
+        - name: GZIP_COMPRESS_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: GZIP_COMPRESS_LEVEL
+              name: vmaas-webapp-conf-webapp-env
+        - name: CW_ENABLED
+          value: ${{CW_ENABLED}}
+        - name: CLOWDER_ENABLED
+          value: ${CLOWDER_ENABLED}
+        resources:
+          limits:
+            cpu: '1'
+            memory: ${MEMORY_LIMIT}
+          requests:
+            cpu: 500m
+            memory: 2Gi
+
+    - name: reposcan
+      minReplicas: ${{REPLICAS_REPOSCAN}}
+      webServices:
+        public:
+          enabled: true
+        private:
+          enabled: true
+        metrics:
+          enabled: true
+      podSpec:
+        image: ${IMAGE}:${IMAGE_TAG}
+        initContainers:
+          - command: 
+            - sh
+            - -c
+            - >-
+              cd reposcan && exec python3 ../wait_for_services.py python3 -m database.upgrade &&
+              if [ "${MANIFEST_PUSH}" == "TRUE" ]; then
+              /push_manifest.sh
+              RedHatInsights/manifests ${MANIFEST_BRANCH} /vmaas/manifest.txt
+              vmaas/vmaas-app.txt; fi
+            env:
+            - name: DB_UPGRADE_SCRIPTS_DIR
+              value: /vmaas/reposcan/database/upgrade_scripts/
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GIT_TOKEN
+                  name: github-vulnerability-bot
+            - name: CLOWDER_ENABLED
+              value: ${CLOWDER_ENABLED}
+            - name: CW_ENABLED
+              value: ${{CW_ENABLED}}
+        command:
+        - /vmaas/entrypoint.sh
+        - reposcan
+        resources:
+          limits: {cpu: '1', memory: 2Gi}
+          requests: {cpu: 200m, memory: 1Gi}
+        volumes:
+        - name: vmaas-reposcan-tmp
+          persistentVolumeClaim:
+            claimName: vmaas-reposcan-tmp
+        - name: vmaas-dump-data
+          persistentVolumeClaim:
+            claimName: vmaas-dump-data
+        volumeMounts:
+        - mountPath: /tmp
+          name: vmaas-reposcan-tmp
+        - mountPath: /data
+          name: vmaas-dump-data
+        readinessProbe:
+          httpGet:
+            path: /api/v1/monitoring/health
+            port: 8000
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/v1/monitoring/health
+            port: 8000
+          initialDelaySeconds: 120
+          timeoutSeconds: 1
+          periodSeconds: 60
+        env:
+        - name: BATCH_MAX_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: BATCH_MAX_SIZE
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: BATCH_MAX_FILESIZE
+          valueFrom:
+            configMapKeyRef:
+              key: BATCH_MAX_FILESIZE
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: CHUNK_SIZE
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: LOGGING_LEVEL_APP
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_LEVEL_APP
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: LOGGING_LEVEL_LIBS
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_LEVEL_LIBS
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: LOGGING_TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: LOGGING_TYPE
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: PKGTREE_INDENT
+          valueFrom:
+            configMapKeyRef:
+              key: PKGTREE_INDENT
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: PKGTREE_KEEP_COPIES
+          valueFrom:
+            configMapKeyRef:
+              key: PKGTREE_KEEP_COPIES
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: REPOSCAN_SYNC_INTERVAL_MINUTES
+          valueFrom:
+            configMapKeyRef:
+              key: REPOSCAN_SYNC_INTERVAL_MINUTES
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: RETRY_COUNT
+          valueFrom:
+            configMapKeyRef:
+              key: RETRY_COUNT
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: THREADS
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: YEAR_SINCE
+          valueFrom:
+            configMapKeyRef:
+              key: YEAR_SINCE
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: KEEP_COPIES
+          valueFrom:
+            configMapKeyRef:
+              key: KEEP_COPIES
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: REPOLIST_GIT
+          valueFrom:
+            configMapKeyRef:
+              key: REPOLIST_GIT
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: REPOLIST_PATH
+          valueFrom:
+            configMapKeyRef:
+              key: REPOLIST_PATH
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: REPOLIST_GIT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: GIT_TOKEN
+              name: github-vulnerability-bot
+        - name: GIT_COMMITTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: GIT_COMMITTER_NAME
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: GIT_COMMITTER_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              key: GIT_COMMITTER_EMAIL
+              name: vmaas-reposcan-conf-reposcan-env
+        - name: DEFAULT_CA_CERT
+          valueFrom:
+            secretKeyRef:
+              key: DEFAULT_CA_CERT
+              name: cdn-certificate
+        - name: DEFAULT_CERT
+          valueFrom:
+            secretKeyRef:
+              key: DEFAULT_CERT
+              name: cdn-certificate
+        - name: DEFAULT_KEY
+          valueFrom:
+            secretKeyRef:
+              key: DEFAULT_KEY
+              name: cdn-certificate
+        - name: POSTGRESQL_WRITER_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRESQL_WRITER_PASSWORD
+              name: vmaas-database-conf-database-connection-admin-env
+        - name: POSTGRESQL_READER_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRESQL_READER_PASSWORD
+              name: vmaas-database-conf-database-connection-admin-env
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRESQL_PASSWORD
+              name: vmaas-reposcan-conf-database-connection-writer-env
+        - name: POSTGRESQL_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRESQL_USER
+              name: vmaas-reposcan-conf-database-connection-writer-env
+        - name: CW_ENABLED
+          value: ${{CW_ENABLED}}
+        - name: CLOWDER_ENABLED
+          value: ${CLOWDER_ENABLED}
+
+    database:
+      name: vmaas
+      version: 12
+
+- kind: ConfigMap
+  apiVersion: v1
+  data:
+    HOTCACHE_ENABLED: 'YES'
+    HOTCACHE_LEVELS: '11'
+    HOTCACHE_PRUNING: '1024'
+    LOGGING_LEVEL_APP: INFO
+    LOGGING_LEVEL_LIBS: WARNING
+    LOGGING_TYPE: OPENSHIFT
+    MAX_VMAAS_SERVERS: '1'
+    GZIP_RESPONSE_ENABLE: "on"
+    GZIP_COMPRESS_LEVEL: "5"
+  metadata:
+    labels:
+      app: vmaas
+    name: vmaas-webapp-conf-webapp-env
+
+- kind: ConfigMap
+  apiVersion: v1
+  data:
+    BATCH_MAX_SIZE: '500'
+    BATCH_MAX_FILESIZE: '14_000_000_000'
+    CHUNK_SIZE: '1048576'
+    LOGGING_LEVEL_APP: INFO
+    LOGGING_LEVEL_LIBS: WARNING
+    LOGGING_TYPE: OPENSHIFT
+    PKGTREE_INDENT: '0'
+    PKGTREE_KEEP_COPIES: '2'
+    REPOSCAN_SYNC_INTERVAL_MINUTES: '360'
+    REPOLIST_GIT: 'https://github.com/RedHatInsights/vmaas-assets.git'
+    REPOLIST_PATH: 'repolist.json'
+    GIT_COMMITTER_NAME: 'vmaas'
+    GIT_COMMITTER_EMAIL: 'vmaas@localhost'
+    RETRY_COUNT: '3'
+    THREADS: '8'
+    YEAR_SINCE: '2002'
+    KEEP_COPIES: '3'
+  metadata:
+    labels:
+      app: vmaas
+    name: vmaas-reposcan-conf-reposcan-env
+
+- kind: ConfigMap
+  apiVersion: v1
+  data:
+    POSTGRESQL_PASSWORD: vmaas_writer_pwd
+    POSTGRESQL_USER: vmaas_writer
+  metadata:
+    labels:
+      app: vmaas
+    name: vmaas-reposcan-conf-database-connection-writer-env
+
+- kind: ConfigMap
+  apiVersion: v1
+  data:
+    POSTGRESQL_READER_PASSWORD: vmaas_reader_pwd
+    POSTGRESQL_WRITER_PASSWORD: vmaas_writer_pwd
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: vmaas
+    name: vmaas-database-conf-database-connection-admin-env
+
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    labels:
+      app: vmaas
+    name: vmaas-reposcan-tmp
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 15Gi
+
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    labels:
+      app: vmaas
+    name: vmaas-dump-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+
+- apiVersion: v1
+  data:
+    GIT_TOKEN: ""
+  kind: Secret
+  metadata:
+    name: github-vulnerability-bot
+    namespace: test
+  type: Opaque
+
+- apiVersion: v1
+  data:
+    DEFAULT_CA_CERT: ""
+    DEFAULT_CERT: ""
+    DEFAULT_KEY: ""
+  kind: Secret
+  metadata:
+    name: cdn-certificate
+    namespace: test
+  type: Opaque
+
+
+parameters:
+- name: MEMORY_LIMIT
+  description: Maximum memory limit for pod
+  # value: "{{ '4Gi' if env == 'prod' else '2Gi' }}"
+  value: '2Gi'
+- name: REPLICAS_WEBAPP
+  description: Number of pods for webapp
+  # value: "{{ 8 if env == 'prod' else 1 }}"
+  value: '1'
+- name: REPLICAS_REPOSCAN
+  description: Number of pods for reposcan
+  value: '1'
+- name: REPLICAS_WEBSOCKET
+  description: Number of pods for webapp
+  value: '1'
+- name: IMAGE_TAG
+  description: Version of VMaaS
+  value: latest
+- description: Image name
+  name: IMAGE
+  value: quay.io/cloudservices/vmaas-app
+- description: Determines Clowder deployment
+  name: CLOWDER_ENABLED
+  value: "True"
+- description: ClowdEnv Name
+  name: ENV_NAME
+  # value: insights-ephemeral
+  required: false
+- name: CW_ENABLED
+  description: CloudWatch enabled
+  value: 'FALSE'
+- name: MANIFEST_PUSH
+  description: Push manifest to git
+  value: 'FALSE'
+- name: MANIFEST_BRANCH
+  description: Git branch for manifests
+  value: master

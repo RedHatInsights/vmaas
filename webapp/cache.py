@@ -1,17 +1,18 @@
 """
 Module to cache data from file dump.
 """
-
+import array
+import asyncio
 import dbm
 import os
 import shelve
-import array
-import asyncio
 
+from common.config import Config
 from common.logging_utils import get_logger
 
+CFG = Config()
 DUMP = '/data/vmaas.dbm'
-REMOTE_DUMP = 'rsync://%s:8730/data/vmaas.dbm' % os.getenv("REPOSCAN_HOST", "reposcan")
+REMOTE_DUMP = CFG.remote_dump
 
 # repo_detail indexes
 REPO_LABEL = 0

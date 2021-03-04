@@ -2,13 +2,11 @@
 Module containing database handler class.
 """
 import os
+
 import psycopg2
 
-DB_NAME = os.getenv('POSTGRESQL_DATABASE', "vmaas")
-DB_USER = os.getenv('POSTGRESQL_USER', "vmaas_writer")
-DB_PASS = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
-DB_HOST = os.getenv('POSTGRESQL_HOST', "database")
-DB_PORT = int(os.getenv('POSTGRESQL_PORT', "5432"))
+from common.config import Config
+
 
 class NamedCursor:
     """Wrapper class for named cursor."""
@@ -22,6 +20,7 @@ class NamedCursor:
         self.cursor.close()
         # NOTE: An exception is raised and passes to the caller
         # if a db exception occurs
+
 
 class DatabaseHandler:
     """Static class maintaining single PostgreSQL connection."""
@@ -53,10 +52,13 @@ class DatabaseHandler:
         if cls.connection is not None:
             cls.connection.rollback()
 
+
 def init_db():
-    """Setup DB connection parameters"""
-    DatabaseHandler.db_name = os.getenv('POSTGRESQL_DATABASE', "vmaas")
-    DatabaseHandler.db_user = os.getenv('POSTGRESQL_USER', "vmaas_writer")
-    DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', "vmaas_writer_passwd")
-    DatabaseHandler.db_host = os.getenv('POSTGRESQL_HOST', "database")
-    DatabaseHandler.db_port = int(os.getenv('POSTGRESQL_PORT', "5432"))
+    """Setup DB connection parameters and initialize DB schema"""
+    cfg = Config()
+    # allow override by ENV, used in tests and during schema initialization
+    DatabaseHandler.db_name = os.getenv("POSTGRESQL_DATABASE", cfg.db_name)
+    DatabaseHandler.db_user = os.getenv('POSTGRESQL_USER', cfg.db_user)
+    DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', cfg.db_pass)
+    DatabaseHandler.db_host = os.getenv("POSTGRESQL_HOST", cfg.db_host)
+    DatabaseHandler.db_port = int(os.getenv("POSTGRESQL_PORT", cfg.db_port))
