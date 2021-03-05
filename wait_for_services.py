@@ -42,7 +42,7 @@ def main():
     init_logging()
     init_db()
     config = Config()
-    if config.db_name:
+    if config.db_available:
         wait(DatabaseHandler.get_connection, service="PostgreSQL")
     else:
         LOGGER.info("Skipping PostgreSQL check")
