@@ -8,7 +8,7 @@ if [[ ! -z $1 ]]; then
         [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="python3 -m main"
         exec python3 ../wait_for_services.py $cmd
     elif [[ "$1" == "reposcan" ]]; then
-        rsync --daemon --verbose --port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort)")
+        rsync --daemon --verbose --port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8730)")
         cd reposcan
         exec python3 ../wait_for_services.py python3 -m main
     elif [[ "$1" == "websocket" ]]; then
