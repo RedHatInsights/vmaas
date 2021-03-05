@@ -7,6 +7,7 @@ services:
     security_opt:
       - label=disable
     working_dir: /git
+    hostname: vmaas-database
 
   vmaas_websocket:
     volumes:
@@ -16,6 +17,7 @@ services:
       - label=disable
     working_dir: /git
     command: /vmaas/entrypoint.sh sleep
+    hostname: vmaas-websocket
 
   vmaas_reposcan:
     volumes:
@@ -25,6 +27,7 @@ services:
       - label=disable
     working_dir: /git
     command: /vmaas/entrypoint.sh sleep
+    hostname: vmaas-reposcan
 
   vmaas_webapp:
     volumes:
@@ -34,6 +37,7 @@ services:
       - label=disable
     working_dir: /git
     command: /vmaas/entrypoint.sh sleep
+    hostname: vmaas-webapp
 
   vmaas_webapp_utils:
     volumes:
@@ -43,6 +47,7 @@ services:
       - label=disable
     working_dir: /git
     command: /vmaas/entrypoint.sh sleep
+    hostname: vmaas-webapp-utils
 
   # we don't need grafana and prometheus in developer setup
   # let's them exit immediatelly

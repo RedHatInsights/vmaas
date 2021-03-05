@@ -28,6 +28,10 @@ class BaseConfig:
             "POSTGRESQL_READER_PASSWORD", "vmaas_reader_pwd"
         )
         self.pod_hostname = os.environ.get("HOSTNAME")
+        self.web_port = None
+        self.public_port = None
+        self.private_port = None
+        self.webapp_port = None
 
 
 # pylint: disable=too-many-instance-attributes
@@ -35,11 +39,11 @@ class Config(BaseConfig, metaclass=Singleton):
     """VMaaS configuration singleton."""
 
     def __init__(self):
+        super().__init__()
         if app_common_python.isClowderEnabled():
             self.clowder()
         else:
             self.legacy()
-        super().__init__()
 
     def clowder(self):
         """Configuration from Clowder."""
@@ -50,6 +54,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_pass = getattr(cfg.database, "password", "")
         self.db_host = getattr(cfg.database, "hostname", "")
         self.db_port = getattr(cfg.database, "port", "")
+        self.db_available = bool(self.db_name)
 
         self.cw_aws_access_key_id = cfg.logging.cloudwatch.accessKeyId
         self.cw_aws_secret_access_key = cfg.logging.cloudwatch.secretAccessKey
@@ -79,6 +84,7 @@ class Config(BaseConfig, metaclass=Singleton):
 
     def legacy(self):
         """Configuration fro environment variables."""
+        self.db_available = bool(os.getenv("POSTGRESQL_DATABASE"))
         self.db_name = os.getenv("POSTGRESQL_DATABASE", "vmaas")
         self.db_user = os.getenv("POSTGRESQL_USER", "vmaas_writer")
         self.db_pass = os.getenv("POSTGRESQL_PASSWORD", "vmaas_writer_pwd")
@@ -97,8 +103,3 @@ class Config(BaseConfig, metaclass=Singleton):
         self.reposcan_port = int(os.getenv("REPOSCAN_PORT", "8081"))
         self.webapp_port = "8080"
         self.remote_dump = f"rsync://{self.reposcan_host}:8730/data/vmaas.dbm"
-
-        # compatibility
-        self.web_port = None
-        self.public_port = None
-        self.private_port = None
