@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.1 (2021-03-08)
+### Fix
+* Waiting for DB and rsync port in e2e-deploy and docker-compose ([`9aad355`](https://github.com/RedHatInsights/vmaas/commit/9aad35511be74ef0dfa74ca5b8c8a829b08da3db))
+
 ## v2.2.0 (2021-03-05)
 ### Feature
 * **clowder:** Integrate with clowder ([`e419895`](https://github.com/RedHatInsights/vmaas/commit/e419895249391f3a6c00f363435f97084ae2b215))
