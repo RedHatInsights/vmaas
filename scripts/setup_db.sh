@@ -9,10 +9,10 @@ Mandatory parameters:
 Optional parameters:
   TARGET_HOSTNAME - Hostname of the target machine where reposcan is running (default: localhost)
   WEBAPP_HOSTNAME - Hostname of the target machine where webapp is running (default: localhost)
-  AUTH_TOKEN      - GitHub token for authentication
 "
 
 CHECK_PACKAGE="bash-4.2.45-5.el7_0.4.x86_64"
+TURNPIKE_MOCK=$(readlink -f $(find . -name turnpike-mock))
 
 wait_and_run() {
   count=60
@@ -68,16 +68,16 @@ if [ -n "$4" ]; then
 else
   token="sometoken"
 fi
-headers=(-H "Authorization: token $token" -H "Content-type: application/json")
+headers=(-H "Content-type: application/json")
 
 printf "Step 1/4: Import Repos\nAPI Response: "
-wait_and_run curl -sS "${headers[@]}" -d "@${1}" -X POST "${url}/api/v1/repos"
+wait_and_run $TURNPIKE_MOCK curl -sS "${headers[@]}" -d "@${1}" -X POST "${url}/api/v1/repos"
 
 printf "Step 2/4: Repo + CVEmap + CVE sync\nAPI Response: "
-wait_and_run curl -sS "${headers[@]}" -X PUT "${url}/api/v1/sync"
+wait_and_run $TURNPIKE_MOCK curl -sS "${headers[@]}" -X PUT "${url}/api/v1/sync"
 
 printf "Step 3/4 Check that no reposcan task is running\nAPI Response"
-wait_and_run curl -sS "${headers[@]}" -X GET "${url}/api/v1/task/status"
+wait_and_run $TURNPIKE_MOCK curl -sS "${headers[@]}" -X GET "${url}/api/v1/task/status"
 
 echo "Step 4/4 Wait for webapp to load latest data and refresh cache"
 wait_for_cache
