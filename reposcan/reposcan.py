@@ -48,7 +48,6 @@ LOGGER = get_logger(__name__)
 KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
 DEFAULT_CHUNK_SIZE = "1048576"
-DEFAULT_AUTHORIZED_API_ORG = "RedHatInsights"
 
 REPOLIST_DIR = '/tmp/repolist_git'
 REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
