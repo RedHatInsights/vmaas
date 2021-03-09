@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 1);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 2);
 
 -- -----------------------------------------------------
 -- evr type
@@ -365,6 +365,17 @@ CREATE TABLE IF NOT EXISTS product (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.cpe
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cpe (
+  id SERIAL,
+  label TEXT NOT NULL UNIQUE, CHECK (NOT empty(label)),
+  name TEXT NULL, CHECK (NOT empty(name)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.content_set
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS content_set (
@@ -377,6 +388,24 @@ CREATE TABLE IF NOT EXISTS content_set (
     FOREIGN KEY (product_id)
     REFERENCES product (id)
 )TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.cpe_content_set
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cpe_content_set (
+  cpe_id INT NOT NULL,
+  content_set_id INT NOT NULL,
+  UNIQUE (cpe_id, content_set_id),
+  CONSTRAINT cpe_id
+    FOREIGN KEY (cpe_id)
+    REFERENCES cpe (id),
+  CONSTRAINT content_set_id
+    FOREIGN KEY (content_set_id)
+    REFERENCES content_set (id)
+)TABLESPACE pg_default;
+
+CREATE INDEX ON cpe_content_set(content_set_id);
 
 
 -- -----------------------------------------------------
