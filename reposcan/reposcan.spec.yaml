@@ -110,7 +110,7 @@ paths:
 
   /sync:
     put:
-      summary: Sync repositories stored in DB and CVE lists
+      summary: Sync repositories from git, CVE map and CPE metadata
       operationId: reposcan.AllSyncHandler.put
       <<: *secured
       responses: &sync_responses
@@ -139,6 +139,16 @@ paths:
     put:
       summary: Sync the CVE map
       operationId: reposcan.CvemapSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
+  /sync/cpe:
+    put:
+      summary: Sync CPE metadata
+      operationId: reposcan.CpeSyncHandler.put
       <<: *secured
       responses:
         <<: *sync_responses
