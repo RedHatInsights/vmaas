@@ -37,10 +37,12 @@ from exporter import main as export_data
 from mnm import ADMIN_REQUESTS
 from mnm import FAILED_AUTH
 from mnm import FAILED_IMPORT_CVE
+from mnm import FAILED_IMPORT_CPE
 from mnm import FAILED_IMPORT_REPO
 from mnm import FAILED_WEBSOCK
 from pkgtree import main as export_pkgtree
 from pkgtree import PKGTREE_FILE
+from redhatcpe.cpe_controller import CpeController
 from redhatcve.cvemap_controller import CvemapController
 from repodata.repository_controller import RepositoryController
 
@@ -556,12 +558,44 @@ class CvemapSyncHandler(SyncHandler):
         return "OK"
 
 
+class CpeSyncHandler(SyncHandler):
+    """Handler for Cpe sync API."""
+
+    task_type = "Sync CPE metadata"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Sync CPE metadata."""
+
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing all CVEs."""
+        try:
+            init_logging()
+            init_db()
+            controller = CpeController()
+            controller.store()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            FAILED_IMPORT_CPE.inc()
+            DatabaseHandler.rollback()
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s" % (GitRepoListHandler.task_type,
-                                  RepoSyncHandler.task_type,
-                                  CvemapSyncHandler.task_type)
+    task_type = "%s + %s + %s + %s" % (GitRepoListHandler.task_type,
+                                       RepoSyncHandler.task_type,
+                                       CvemapSyncHandler.task_type,
+                                       CpeSyncHandler.task_type)
 
     @classmethod
     def put(cls, **kwargs):
@@ -573,9 +607,10 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s" % (GitRepoListHandler.run_task(),
-                               RepoSyncHandler.run_task(),
-                               CvemapSyncHandler.run_task())
+        return "%s, %s, %s, %s" % (GitRepoListHandler.run_task(),
+                                   RepoSyncHandler.run_task(),
+                                   CvemapSyncHandler.run_task(),
+                                   CpeSyncHandler.run_task())
 
 
 class SyncTask:
