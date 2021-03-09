@@ -59,6 +59,14 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+create or replace FUNCTION cpes_changed()
+RETURNS TRIGGER as $$
+BEGIN
+    update dbchange set cpe_changes = CURRENT_TIMESTAMP;
+    return NULL;
+END;
+$$ language 'plpgsql';
+
 create or replace FUNCTION cves_changed()
 RETURNS TRIGGER as $$
 BEGIN
@@ -373,6 +381,9 @@ CREATE TABLE IF NOT EXISTS cpe (
   name TEXT NULL, CHECK (NOT empty(name)),
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER cpe_changed AFTER INSERT OR UPDATE OR DELETE ON cpe
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cpes_changed();
 
 
 -- -----------------------------------------------------
@@ -404,6 +415,9 @@ CREATE TABLE IF NOT EXISTS cpe_content_set (
     FOREIGN KEY (content_set_id)
     REFERENCES content_set (id)
 )TABLESPACE pg_default;
+CREATE TRIGGER cpe_changed AFTER INSERT OR UPDATE OR DELETE ON cpe_content_set
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cpes_changed();
 
 CREATE INDEX ON cpe_content_set(content_set_id);
 
@@ -689,15 +703,16 @@ CREATE TABLE IF NOT EXISTS metadata (
 -- since they last talked to the db
 CREATE TABLE IF NOT EXISTS  dbchange (
   errata_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cpe_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   cve_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   repository_changes TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   pkgtree_change TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 )TABLESPACE pg_default;
-CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cve_changes, repository_changes, pkgtree_change ON dbchange
+CREATE TRIGGER last_change AFTER UPDATE OF errata_changes, cpe_changes, cve_changes, repository_changes, pkgtree_change ON dbchange
   FOR EACH STATEMENT EXECUTE PROCEDURE last_change();
-INSERT INTO dbchange (errata_changes, cve_changes, repository_changes, pkgtree_change)
-  VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO dbchange (errata_changes, cpe_changes, cve_changes, repository_changes, pkgtree_change)
+  VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- -----------------------------------------------------
 -- Table vmaas.module
