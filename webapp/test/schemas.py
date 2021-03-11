@@ -73,6 +73,7 @@ _repos = {
                 "basearch": Or(str, None),
                 "revision": str,
                 "label": str,
+                "cpes": [str],
             }
         ]
     },
