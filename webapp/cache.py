@@ -89,6 +89,9 @@ class Cache:
         self.packagename2id = {}
         self.content_set_id2pkg_name_ids = {}
         self.content_set_id2label = {}
+        self.cpe_id2label = {}
+        self.label2cpe_id = {}
+        self.content_set_id2cpe_ids = {}
         self.label2content_set_id = {}
         self.id2packagename = {}
         self.updates = {}
@@ -156,6 +159,12 @@ class Cache:
                 self.content_set_id2label[int(key)] = data[item]
             elif relation == "label2content_set_id":
                 self.label2content_set_id[key] = data[item]
+            elif relation == "cpe_id2label":
+                self.cpe_id2label[int(key)] = data[item]
+            elif relation == "label2cpe_id":
+                self.label2cpe_id[key] = data[item]
+            elif relation == "content_set_id2cpe_ids":
+                self.content_set_id2cpe_ids[int(key)] = data[item]
             elif relation == "updates":
                 self.updates[int(key)] = data[item]
             elif relation == "updates_index":
