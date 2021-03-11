@@ -84,6 +84,7 @@ class RepoAPI:
         actual_page_size = 0
         repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
         for label in repo_page_to_process:
+            cs_id = self.cache.label2content_set_id[label]
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
@@ -94,7 +95,9 @@ class RepoAPI:
                         "basearch": none2empty(repo_detail[REPO_BASEARCH]),
                         "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
                         "product": repo_detail[REPO_PRODUCT],
-                        "revision": repo_detail[REPO_REVISION]
+                        "revision": repo_detail[REPO_REVISION],
+                        "cpes": [self.cache.cpe_id2label[cpe_id]
+                                 for cpe_id in self.cache.content_set_id2cpe_ids.get(cs_id, [])]
                     })
             actual_page_size += len(repolist[label])
 
