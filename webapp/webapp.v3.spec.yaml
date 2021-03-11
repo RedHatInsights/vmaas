@@ -705,6 +705,11 @@ components:
                 label:
                   type: string
                   example: rhel-6-server-rpms
+                cpes:
+                  type: array
+                  items:
+                    type: string
+                    example: cpe:/a:redhat
         <<: *resp_paging
 
     ErrataRequest:
