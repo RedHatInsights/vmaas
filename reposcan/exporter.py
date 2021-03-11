@@ -48,6 +48,7 @@ class DataDump:
                 self._dump_packagename(dump)
                 self._dump_content_set_with_pkg_names(dump)
                 self._dump_all_content_sets(dump)
+                self._dump_cpes(dump)
                 self._dump_updates(dump)
                 self._dump_evr(dump)
                 self._dump_arch(dump)
@@ -118,6 +119,23 @@ class DataDump:
             for label, content_set_id in cursor:
                 dump["content_set_id2label:%s" % content_set_id] = label
                 dump["label2content_set_id:%s" % label] = content_set_id
+
+    def _dump_cpes(self, dump):
+        """Select all CPEs and mappings to content sets"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select id, label from cpe""")
+            for cpe_id, label in cursor:
+                dump["cpe_id2label:%s" % cpe_id] = label
+                dump["label2cpe_id:%s" % label] = cpe_id
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select cpe_id, content_set_id
+                                from cpe_content_set
+                            """)
+            content_set_id2cpe_ids = {}
+            for cpe_id, content_set_id in cursor:
+                content_set_id2cpe_ids.setdefault("content_set_id2cpe_ids:%s" % content_set_id, []).append(cpe_id)
+            dump.update(content_set_id2cpe_ids)
 
     def _dump_updates(self, dump):
         """Select ordered updates lists for previously selected package names"""
