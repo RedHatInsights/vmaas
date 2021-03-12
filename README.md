@@ -1,5 +1,6 @@
 [![Tests](https://github.com/RedHatInsights/vmaas/actions/workflows/tests.yml/badge.svg)](https://github.com/RedHatInsights/vmaas/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/RedHatInsights/vmaas/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/vmaas)
+[![GitHub release](https://img.shields.io/github/release/RedHatInsights/vmaas.svg)](https://github.com/RedHatInsights/vmaas/releases/latest)
 
 # VMaaS
 **V**ulnerability **M**etadata **a**s **a** **S**ervice
