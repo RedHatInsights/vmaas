@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/RedHatInsights/vmaas.svg?branch=master)](https://travis-ci.org/RedHatInsights/vmaas)
+[![Tests](https://github.com/RedHatInsights/vmaas/actions/workflows/tests.yml/badge.svg)](https://github.com/RedHatInsights/vmaas/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/RedHatInsights/vmaas/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/vmaas)
 
 # VMaaS
