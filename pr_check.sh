@@ -19,6 +19,10 @@ CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
 curl -s $CICD_URL/bootstrap.sh -o bootstrap.sh
 source bootstrap.sh  # checks out bonfire and changes to "cicd" dir...
 
+echo "$(env)"
+git ls-remote origin | grep "$GIT_COMMIT"
+[ "$?" -ne 0 ] && echo "Rebase your pull request, please." && exit 1
+
 source build.sh
 source deploy_ephemeral_env.sh
 source smoke_test.sh
