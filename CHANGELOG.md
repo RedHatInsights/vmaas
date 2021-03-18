@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.0 (2021-03-18)
+### Feature
+* **webapp:** Show CPEs in /repos API ([`e080845`](https://github.com/RedHatInsights/vmaas/commit/e080845f5a3523f851dea20711fabd4a5f16ad0e))
+* **reposcan:** Export imported CPE metadata ([`c1e441b`](https://github.com/RedHatInsights/vmaas/commit/c1e441bed7cc4e73c47fe203da7790d3c6545cc2))
+* **reposcan:** Sync CPE metadata into DB ([`b688f9f`](https://github.com/RedHatInsights/vmaas/commit/b688f9f8eeee1d766a3b41c1e6c45978c6fd22f9))
+* **database:** Introduce cpe tables ([`8247fde`](https://github.com/RedHatInsights/vmaas/commit/8247fded0468b7f19846b8d3827cdc13c1935bba))
+
 ## v2.2.1 (2021-03-08)
 ### Fix
 * Waiting for DB and rsync port in e2e-deploy and docker-compose ([`9aad355`](https://github.com/RedHatInsights/vmaas/commit/9aad35511be74ef0dfa74ca5b8c8a829b08da3db))
