@@ -22,3 +22,4 @@ FAILED_IMPORT_CVE = Counter('vmaas_reposcan_failed_cve_import', '# of failed cve
 FAILED_UPDATE_CVE = Counter('vmaas_reposcan_failed_cve_update', '# of failed cve-update attempts')
 FAILED_IMPORT_CPE = Counter('vmaas_reposcan_failed_cpe_import', '# of failed cpe-import attempts')
 FAILED_UPDATE_CPE = Counter('vmaas_reposcan_failed_cpe_update', '# of failed cpe-update attempts')
+FAILED_IMPORT_OVAL = Counter('vmaas_reposcan_failed_oval_import', '# of failed oval-import attempts')

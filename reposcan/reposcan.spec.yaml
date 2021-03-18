@@ -155,6 +155,16 @@ paths:
       tags:
         - Sync
 
+  /sync/oval:
+    put:
+      summary: Sync OVAL metadata
+      operationId: reposcan.OvalSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /export/pkgtree:
     put:
       summary: Export package tree
