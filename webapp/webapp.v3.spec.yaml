@@ -1013,6 +1013,12 @@ components:
         basearch:
           type: string
           example: x86_64
+        oval:
+          type: boolean
+          enum: [true, false]
+        oval_only:
+          type: boolean
+          enum: [true, false]
       required:
         - package_list
     VulnerabilitiesResponse:
@@ -1022,6 +1028,14 @@ components:
           items:
             type: string
             example: CVE-2016-0800
+        unpatched_cve_list:
+          type: array
+          items:
+            type: string
+            example: CVE-2017-15089
+      required:
+        - cve_list
+        - unpatched_cve_list
 
     PatchesRequest:
       type: object

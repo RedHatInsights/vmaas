@@ -221,13 +221,13 @@ class TestWebappGets(BaseCase):
         """Test vulnerabilities get endpoint."""
         resp = await self.fetch('/api/v1/vulnerabilities/my-pkg-1.1.0-1~beta.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body == '{"cve_list": []}'
+        assert resp.body == '{"cve_list": [], "unpatched_cve_list": []}'
 
     async def test_vuln_get_3_caret(self):
         """Test vulnerabilities get endpoint."""
         resp = await self.fetch('/api/v1/vulnerabilities/my-pkg-1.1.0-1^.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body == '{"cve_list": []}'
+        assert resp.body == '{"cve_list": [], "unpatched_cve_list": []}'
 
     async def test_error_formatter(self):
         """Test error formater"""
