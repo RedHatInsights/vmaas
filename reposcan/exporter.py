@@ -222,7 +222,7 @@ class DataDump:
                                       p.name as product_name,
                                       p.id as product_id,
                                       r.revision,
-                                      r.third_party
+                                      cs.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
@@ -352,7 +352,14 @@ class DataDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated, errata.third_party
+                                         description, solution, issued, updated, 
+                                         true = ANY (
+                                            SELECT cs.third_party
+                                            FROM errata_repo er
+                                            JOIN repo r ON er.repo_id = r.id
+                                            JOIN content_set cs ON cs.id = r.content_set_id
+                                            WHERE er.errata_id = errata.id
+                                         ) AS third_party
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id

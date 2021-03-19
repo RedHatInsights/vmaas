@@ -12,7 +12,6 @@ class RepositoryStore:
     """
     Class providing interface for listing repositories stored in DB and storing repositories one by one.
     """
-
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
@@ -33,7 +32,7 @@ class RepositoryStore:
     def list_repositories(self):
         """List repositories stored in DB. Dictionary with repository label as key is returned."""
         cur = self.conn.cursor()
-        cur.execute("""select cs.label, a.name, r.releasever, r.id, r.url, r.revision, r.third_party, cs.id,
+        cur.execute("""select cs.label, a.name, r.releasever, r.id, r.url, r.revision, cs.id,
                               c.name, c.ca_cert, c.cert, c.key
                        from repo r
                        left join arch a on r.basearch_id = a.id
@@ -42,9 +41,9 @@ class RepositoryStore:
         repos = {}
         for row in cur.fetchall():
             # (content_set_label, repo_arch, repo_releasever) -> repo_id, repo_url, repo_revision...
-            repos[(row[0], row[1], row[2])] = {"id": row[3], "url": row[4], "revision": row[5], "third_party": row[6],
-                                               "content_set_id": row[7], "cert_name": row[8], "ca_cert": row[9],
-                                               "cert": row[10], "key": row[11]}
+            repos[(row[0], row[1], row[2])] = {"id": row[3], "url": row[4], "revision": row[5],
+                                               "content_set_id": row[6], "cert_name": row[7], "ca_cert": row[8],
+                                               "cert": row[9], "key": row[10]}
         cur.close()
         return repos
 
@@ -118,7 +117,7 @@ class RepositoryStore:
                 cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
                 cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
             self.conn.commit()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:  #pylint: disable=broad-except
             self.logger.exception("Failed to clean up unused data.")
             self.conn.rollback()
         finally:
@@ -187,10 +186,10 @@ class RepositoryStore:
             db_repo = cur.fetchone()
             if not db_repo:
                 cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
-                                                 revision, eol, certificate_id, third_party)
-                            values (%s, %s, %s, %s, %s, false, %s, %s) returning id, revision""",
+                                                 revision, eol, certificate_id)
+                            values (%s, %s, %s, %s, %s, false, %s) returning id, revision""",
                             (repo.repo_url, content_set_id, basearch_id, repo.releasever,
-                             repo.get_revision(), cert_id, repo.third_party))
+                             repo.get_revision(), cert_id,))
                 db_repo = cur.fetchone()
             else:
                 revision = repo.get_revision()
@@ -216,11 +215,10 @@ class RepositoryStore:
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
         try:
-            print(repository, repository.third_party)
             repo_id = self.import_repository(repository)
             self.package_store.store(repo_id, repository.list_packages())
             self.module_store.store(repo_id, repository.list_modules())
-            self.update_store.store(repo_id, repository.list_updates(), repository.third_party)
-        except Exception:  # pylint: disable=broad-except
+            self.update_store.store(repo_id, repository.list_updates())
+        except Exception:  #pylint: disable=broad-except
             # exception already logged.
             pass

@@ -65,13 +65,23 @@ class ErrataAPI:
                 filtered_errata_to_process.append(errata)
         return filtered_errata_to_process
 
-    def _filter_third_party(self, errata_to_process: list, third_party: bool) -> list:
-        """ Filter erratata by third party flag. By default include only RedHats errata, only include third party ones
+    def _filter_third_party(self, errata_to_process: list, include_third_party: bool) -> list:
+        """
+        Filter errata by third party flag. By default include only RedHats errata, only include third party ones
         when requested
-        :return list of filtered errata"""
-        if third_party:
+        :return list of filtered errata
+        """
+
+        print(errata_to_process)
+        if include_third_party:
             return errata_to_process
-        return [erratum for erratum in errata_to_process if self.cache.errata_detail.get(erratum)[ERRATA_THIRD_PARTY]]
+
+        # Return only those errata, which have third party set to false
+        res = [erratum for erratum in errata_to_process
+               if not self.cache.errata_detail.get(erratum)[ERRATA_THIRD_PARTY]]
+        print(res)
+        print([self.cache.errata_detail.get(erratum)[ERRATA_THIRD_PARTY] for erratum in errata_to_process])
+        return res
 
     @staticmethod
     def _prepare_severity(severity):
@@ -106,7 +116,7 @@ class ErrataAPI:
 
         response = {"errata_list": {}}
         filters = [(filter_item_if_exists, [self.cache.errata_detail]),
-                   (self._filter_third_party, ["third_party", third_party])]
+                   (self._filter_third_party, [third_party])]
         if modified_since:
             response["modified_since"] = modified_since
             # if we have information about modified/published dates and receive "modified_since" in request,
@@ -162,7 +172,9 @@ class ErrataAPI:
                 "bugzilla_list": errata_detail[ERRATA_BUGZILLA],
                 "reference_list": errata_detail[ERRATA_REFERENCE],
                 "modules_list": errata_detail[ERRATA_MODULE],
-                "url": none2empty(errata_detail[ERRATA_URL])}
+                "url": none2empty(errata_detail[ERRATA_URL]),
+                "third_party": errata_detail[ERRATA_THIRD_PARTY]
+            }
         response["errata_list"] = errata_list
         response.update(pagination_response)
         return response

@@ -270,11 +270,11 @@ class RepolistImportHandler(SyncHandler):
                 if product_id is not None and product_id in seen or seen.add(product_id):
                     return None, None
                 for content_set_label, content_set in product["content_sets"].items():
-                    products[product_name]["content_sets"][content_set_label] = content_set["name"]
+                    products[product_name]["content_sets"][content_set_label] = content_set
 
                     for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
                         repos.append((repo_url, content_set_label, basearch, releasever,
-                                      cert_name, ca_cert, cert, key, content_set.get("third_party", False)))
+                                      cert_name, ca_cert, cert, key))
 
         return products, repos
 
@@ -294,10 +294,10 @@ class RepolistImportHandler(SyncHandler):
             if repos:
                 repository_controller = RepositoryController()
                 # Sync repos from input
-                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key, third_party in repos:
+                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
                     repository_controller.add_repository(repo_url, content_set, basearch, releasever,
                                                          cert_name=cert_name, ca_cert=ca_cert,
-                                                         cert=cert, key=key, third_party=third_party)
+                                                         cert=cert, key=key)
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()

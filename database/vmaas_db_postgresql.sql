@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 2);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 3);
 
 -- -----------------------------------------------------
 -- evr type
@@ -394,6 +394,7 @@ CREATE TABLE IF NOT EXISTS content_set (
   label TEXT NOT NULL UNIQUE, CHECK (NOT empty(label)),
   name TEXT NULL, CHECK (NOT empty(name)),
   product_id INT NOT NULL,
+  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT product_id
     FOREIGN KEY (product_id)
@@ -448,7 +449,6 @@ CREATE TABLE IF NOT EXISTS repo (
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NULL,
   certificate_id INT NULL,
-  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT content_set_id
     FOREIGN KEY (content_set_id)
@@ -528,7 +528,6 @@ CREATE TABLE IF NOT EXISTS errata (
   solution TEXT, CHECK (NOT empty(solution)),
   issued TIMESTAMP WITH TIME ZONE NOT NULL,
   updated TIMESTAMP WITH TIME ZONE NOT NULL,
-  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)

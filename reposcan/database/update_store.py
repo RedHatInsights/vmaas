@@ -86,7 +86,7 @@ class UpdateStore(ObjectStore):
             cur.close()
         return errata_types
 
-    def _populate_updates(self, updates, third_party):
+    def _populate_updates(self, updates):
         errata_severity_map = self._populate_errata_severities()
         errata_type_map = self._populate_errata_types(updates)
         cur = self.conn.cursor()
@@ -118,11 +118,11 @@ class UpdateStore(ObjectStore):
                              errata_type_map[str(update["type"])],
                              update["summary"], update["description"],
                              update["issued"], update["updated"],
-                             update["solution"], third_party))
+                             update["solution"]))
                 execute_values(cur,
                                """insert into errata (name, synopsis, severity_id,
                                errata_type_id, summary, description, issued, updated,
-                               solution, third_party) values %s returning id, name""",
+                               solution) values %s returning id, name""",
                                import_data, page_size=len(import_data))
                 for row in cur.fetchall():
                     update_map[row[1]] = row[0]
@@ -370,12 +370,12 @@ class UpdateStore(ObjectStore):
         finally:
             cur.close()
 
-    def store(self, repo_id, updates, third_party = False):
+    def store(self, repo_id, updates):
         """
         Import all updates from repository into all related DB tables.
         """
         self.logger.debug("Syncing %d updates.", len(updates))
-        update_map = self._populate_updates(updates, third_party)
+        update_map = self._populate_updates(updates)
         self._associate_packages(updates, update_map, repo_id)
         self._associate_source_packages(update_map)
         self._associate_updates(update_map, repo_id)

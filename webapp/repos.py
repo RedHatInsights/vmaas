@@ -48,6 +48,19 @@ class RepoAPI:
                     break
         return filtered_repos_to_process
 
+    def _filter_third_party(self, repos_to_process, include_third_party):
+        if include_third_party:
+            return repos_to_process
+
+        filtered_repos = []
+        for label in repos_to_process:
+            for repo_id in self.cache.repolabel2ids.get(label, []):
+                repo_detail = self.cache.repo_detail[repo_id]
+                # If we don't want third party repo, and this repo is flagged as third party, skip it
+                if not repo_detail[REPO_THIRD_PARTY]:
+                    filtered_repos.append(label)
+        return filtered_repos
+
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns repository details.
@@ -61,6 +74,10 @@ class RepoAPI:
         modified_since_dt = parse_datetime(modified_since)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
+
+        # By default, don't include third party data
+        want_third_party = data.get('third_party', False)
+
         repolist = {}
         if not repos:
             return repolist
@@ -68,6 +85,8 @@ class RepoAPI:
         filters = []
         if modified_since:
             filters.append((self._filter_modified_since, [modified_since_dt]))
+
+        filters.append((self._filter_third_party, [want_third_party]))
 
         if len(repos) == 1:
             # treat single-label like a regex, get all matching names
