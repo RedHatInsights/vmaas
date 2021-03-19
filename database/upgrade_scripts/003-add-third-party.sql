@@ -1,0 +1,7 @@
+ALTER TABLE errata
+    ADD COLUMN IF NOT EXISTS
+        third_party BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE repo
+    ADD COLUMN IF NOT EXISTS
+        third_party BOOLEAN NOT NULL DEFAULT false;
