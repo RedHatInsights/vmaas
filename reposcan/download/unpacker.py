@@ -40,6 +40,13 @@ class FileUnpacker:
             return bz2.open
         return None
 
+    @staticmethod
+    def get_unpacked_file_path(file_path):
+        """Get unpacked file path for supported archive type."""
+        if file_path.endswith(".gz") or file_path.endswith(".xz") or file_path.endswith(".bz2"):
+            file_path = file_path.rsplit(".", maxsplit=1)[0]
+        return file_path
+
     def _unpack(self, file_path):
         unpack_func = self._get_unpack_func(file_path)
         if unpack_func:
