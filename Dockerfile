@@ -57,6 +57,7 @@ ADD /reposcan/database/*.py     /vmaas/reposcan/database/
 ADD /reposcan/download/*.py     /vmaas/reposcan/download/
 ADD /reposcan/redhatcpe/*.py    /vmaas/reposcan/redhatcpe/
 ADD /reposcan/redhatcve/*.py    /vmaas/reposcan/redhatcve/
+ADD /reposcan/redhatoval/*.py   /vmaas/reposcan/redhatoval/
 ADD /reposcan/repodata/*.py     /vmaas/reposcan/repodata/
 ADD /reposcan/rsyncd.conf       /etc/
 ADD /database/*.sql             /vmaas/reposcan/
