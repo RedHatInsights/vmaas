@@ -174,12 +174,9 @@ class RepositoryController:
     def _unpack_metadata(self, batch):
         for repository in batch:
             for md_type in repository.md_files:
-                self.unpacker.add(os.path.join(repository.tmp_directory,
-                                               os.path.basename(repository.md_files[md_type])))
-                # FIXME: this should be done in different place?
-                repository.md_files[md_type] = os.path.join(
-                    repository.tmp_directory,
-                    os.path.basename(repository.md_files[md_type])).rsplit(".", maxsplit=1)[0]
+                local_path = os.path.join(repository.tmp_directory, os.path.basename(repository.md_files[md_type]))
+                self.unpacker.add(local_path)
+                repository.md_files[md_type] = self.unpacker.get_unpacked_file_path(local_path)
         self.unpacker.run()
 
     def clean_repodata(self, batch):
