@@ -219,7 +219,7 @@ class RepositoryStore:
             repo_id = self.import_repository(repository)
             self.package_store.store(repo_id, repository.list_packages())
             self.module_store.store(repo_id, repository.list_modules())
-            self.update_store.store(repo_id, repository.list_updates())
+            self.update_store.store(repo_id, repository.list_updates(), repository.third_party)
         except Exception:  # pylint: disable=broad-except
             # exception already logged.
             pass

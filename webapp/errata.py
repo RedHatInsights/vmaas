@@ -9,7 +9,7 @@ from common.webapp_utils import format_datetime, parse_datetime, none2empty, pag
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
                   ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
                   ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
-                  ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL
+                  ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY
 
 
 class ErrataAPI:

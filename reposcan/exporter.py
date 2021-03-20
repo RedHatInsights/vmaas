@@ -352,14 +352,14 @@ class DataDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated
+                                         description, solution, issued, updated, errata.third_party
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated in cursor:
+                    description, solution, issued, updated, third_party in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
                     dump["errata_detail:%s" % e_name] = (synopsis, summary, e_type,
                                                          e_severity, description,
@@ -369,7 +369,7 @@ class DataDump:
                                                          errataid2bzs.get(errata_id, []),
                                                          errataid2refs.get(errata_id, []),
                                                          errataid2modules.get(errata_id, []),
-                                                         url)
+                                                         url, third_party)
 
     def _dump_cves(self, dump):
         """Select cve details"""
