@@ -4,7 +4,7 @@ Module to handle /repos API calls.
 
 import re
 
-from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION
+from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION, REPO_THIRD_PARTY
 from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists
 
 
@@ -97,7 +97,8 @@ class RepoAPI:
                         "product": repo_detail[REPO_PRODUCT],
                         "revision": repo_detail[REPO_REVISION],
                         "cpes": [self.cache.cpe_id2label[cpe_id]
-                                 for cpe_id in self.cache.content_set_id2cpe_ids.get(cs_id, [])]
+                                 for cpe_id in self.cache.content_set_id2cpe_ids.get(cs_id, [])],
+                        "third_party": repo_detail[REPO_THIRD_PARTY]
                     })
             actual_page_size += len(repolist[label])
 

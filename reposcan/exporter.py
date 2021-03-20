@@ -221,7 +221,8 @@ class DataDump:
                                       r.releasever,
                                       p.name as product_name,
                                       p.id as product_id,
-                                      r.revision
+                                      r.revision,
+                                      r.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
@@ -229,10 +230,10 @@ class DataDump:
                                  """)
             repolabel2ids = {}
             productid2repoids = {}
-            for oid, label, name, url, basearch, releasever, product, product_id, revision in cursor:
+            for oid, label, name, url, basearch, releasever, product, product_id, revision, third_party in cursor:
                 dump["repo_detail:%s" % oid] = (label, name, url, basearch,
                                                 releasever, product, product_id,
-                                                format_datetime(revision))
+                                                format_datetime(revision), third_party)
                 repolabel2ids.setdefault("repolabel2ids:%s" % label, []).append(oid)
                 productid2repoids.setdefault("productid2repoids:%s" % product_id, []).append(oid)
             dump.update(repolabel2ids)

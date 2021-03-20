@@ -204,7 +204,8 @@ class RepositoryController:
             self.repo_store.content_set_to_db_id[content_set] = repo_dict["content_set_id"]
             self.repositories.add(Repository(repo_dict["url"], content_set, basearch, releasever,
                                              cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
-                                             cert=repo_dict["cert"], key=repo_dict["key"]))
+                                             cert=repo_dict["cert"], key=repo_dict["key"],
+                                             third_party=repo_dict["third_party"]))
 
     def add_repository(self, repo_url, content_set, basearch, releasever,
                        cert_name=None, ca_cert=None, cert=None, key=None, third_party=False):
@@ -213,7 +214,7 @@ class RepositoryController:
         if not repo_url.endswith("/"):
             repo_url += "/"
         self.repositories.add(Repository(repo_url, content_set, basearch, releasever, cert_name=cert_name,
-                                         ca_cert=ca_cert, cert=cert, key=key))
+                                         ca_cert=ca_cert, cert=cert, key=key, third_party=third_party))
 
     def _write_certificate_cache(self):
         certs = {}
@@ -337,7 +338,7 @@ class RepositoryController:
                         except sqlite3.Error:
                             self.logger.warning("Syncing repository failed due to sqlite error: %s [%s/%s]", ", ".join(
                                 filter(None, (repository.content_set, repository.basearch, repository.releasever))),
-                                             completed_repositories, total_repositories)
+                                                completed_repositories, total_repositories)
                             self.logger.exception("Exception: ")
                             FAILED_IMPORT_REPO.inc()
                         finally:
