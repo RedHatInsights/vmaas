@@ -448,6 +448,7 @@ CREATE TABLE IF NOT EXISTS repo (
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NULL,
   certificate_id INT NULL,
+  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT content_set_id
     FOREIGN KEY (content_set_id)
@@ -741,9 +742,9 @@ CREATE TABLE IF NOT EXISTS module (
 CREATE TABLE IF NOT EXISTS module_stream (
   id SERIAL,
   module_id INT NOT NULL,
-  stream_name VARCHAR(8) NOT NULL,
+  stream_name VARCHAR NOT NULL,
   version BIGINT NOT NULL,
-  context VARCHAR(8) NOT NULL,
+  context VARCHAR NOT NULL,
   is_default BOOLEAN NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT module_id

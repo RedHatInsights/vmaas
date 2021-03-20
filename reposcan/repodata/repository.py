@@ -12,7 +12,8 @@ class Repository:
     Class aggregating information about metadata files available in repository.
     """
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, repo_url, content_set, basearch, releasever, cert_name=None, ca_cert=None, cert=None, key=None):
+    def __init__(self, repo_url, content_set, basearch, releasever, cert_name=None, ca_cert=None, cert=None, key=None,
+                 third_party=False):
         self.repo_url = repo_url
         self.repomd = None
         self.primary = None
@@ -27,6 +28,7 @@ class Repository:
         self.ca_cert = ca_cert
         self.cert = cert
         self.key = key
+        self.third_party = third_party
 
     def get_package_count(self):
         """Returns package count in repository (from primary XML or SQLite if available)."""
