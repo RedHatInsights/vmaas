@@ -528,6 +528,7 @@ CREATE TABLE IF NOT EXISTS errata (
   solution TEXT, CHECK (NOT empty(solution)),
   issued TIMESTAMP WITH TIME ZONE NOT NULL,
   updated TIMESTAMP WITH TIME ZONE NOT NULL,
+  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)

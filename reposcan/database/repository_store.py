@@ -216,6 +216,7 @@ class RepositoryStore:
         Some steps may be skipped if given data doesn't exist or are already synced.
         """
         try:
+            print(repository, repository.third_party)
             repo_id = self.import_repository(repository)
             self.package_store.store(repo_id, repository.list_packages())
             self.module_store.store(repo_id, repository.list_modules())

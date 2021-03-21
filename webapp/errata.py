@@ -5,15 +5,16 @@ Module contains classes for returning errata data from DB
 import re
 
 from common.webapp_utils import format_datetime, parse_datetime, none2empty, paginate, \
-                  pkgidlist2packages, filter_item_if_exists
+    pkgidlist2packages, filter_item_if_exists
 from cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
-                  ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
-                  ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
-                  ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY
+    ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
+    ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
+    ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY
 
 
 class ErrataAPI:
     """ Main /errata API class. """
+
     def __init__(self, cache):
         self.cache = cache
 
@@ -64,6 +65,14 @@ class ErrataAPI:
                 filtered_errata_to_process.append(errata)
         return filtered_errata_to_process
 
+    def _filter_third_party(self, errata_to_process: list, third_party: bool) -> list:
+        """ Filter erratata by third party flag. By default include only RedHats errata, only include third party ones
+        when requested
+        :return list of filtered errata"""
+        if third_party:
+            return errata_to_process
+        return [erratum for erratum in errata_to_process if self.cache.errata_detail.get(erratum)[ERRATA_THIRD_PARTY]]
+
     @staticmethod
     def _prepare_severity(severity):
         if isinstance(severity, str):
@@ -88,6 +97,7 @@ class ErrataAPI:
         """
         modified_since = data.get("modified_since", None)
         modified_since_dt = parse_datetime(modified_since)
+        third_party = data.get("third_party", False)
         errata_to_process = data.get("errata_list", None)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
@@ -95,7 +105,8 @@ class ErrataAPI:
         severity = data.get("severity", [])
 
         response = {"errata_list": {}}
-        filters = [(filter_item_if_exists, [self.cache.errata_detail])]
+        filters = [(filter_item_if_exists, [self.cache.errata_detail]),
+                   (self._filter_third_party, ["third_party", third_party])]
         if modified_since:
             response["modified_since"] = modified_since
             # if we have information about modified/published dates and receive "modified_since" in request,
