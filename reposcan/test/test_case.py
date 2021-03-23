@@ -37,7 +37,9 @@ class FlaskTestCase:
     @pytest.fixture
     def app(self):  # pylint: disable=no-self-use
         """Fixture for the application"""
-        connexion_app = reposcan.create_app()
+        connexion_app = reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
+                                             reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
+                                             "": "reposcan.healthz.spec.yaml"})
         return connexion_app.app
 
     def fetch(self, path, **kwargs):

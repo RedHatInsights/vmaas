@@ -25,20 +25,6 @@ objects:
         command:
           - /vmaas/entrypoint.sh
           - websocket
-        readinessProbe:
-          httpGet:
-            path: /api/v1/monitoring/health
-            port: 10000
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /api/v1/monitoring/health
-            port: 10000
-          initialDelaySeconds: 120
-          timeoutSeconds: 1
-          periodSeconds: 60
         env:
         - name: CW_ENABLED
           value: ${{CW_ENABLED}}
@@ -62,22 +48,6 @@ objects:
         command:
           - /vmaas/entrypoint.sh
           - webapp
-        readinessProbe:
-          httpGet:
-            path: /api/v1/monitoring/ready
-            port: 8000
-          initialDelaySeconds: 0
-          timeoutSeconds: 3
-          periodSeconds: 1
-          failureThreshold: 1
-          successThreshold: 1
-        livenessProbe:
-          httpGet:
-            path: /api/v1/monitoring/health
-            port: 8000
-          initialDelaySeconds: 240
-          timeoutSeconds: 3
-          periodSeconds: 60
         env:
         - name: HOTCACHE_ENABLED
           valueFrom:
@@ -187,20 +157,6 @@ objects:
           name: vmaas-reposcan-tmp
         - mountPath: /data
           name: vmaas-dump-data
-        readinessProbe:
-          httpGet:
-            path: /api/v1/monitoring/health
-            port: 8000
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /api/v1/monitoring/health
-            port: 8000
-          initialDelaySeconds: 120
-          timeoutSeconds: 1
-          periodSeconds: 60
         env:
         - name: BATCH_MAX_SIZE
           valueFrom:
