@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.0 (2021-03-23)
+### Feature
+* **webapp:** Define interface for patched/unpatched CVEs and OVAL evaluation toggles ([`125c839`](https://github.com/RedHatInsights/vmaas/commit/125c8397041c138b09c611d19095258151321aae))
+
 ## v2.3.0 (2021-03-18)
 ### Feature
 * **webapp:** Show CPEs in /repos API ([`e080845`](https://github.com/RedHatInsights/vmaas/commit/e080845f5a3523f851dea20711fabd4a5f16ad0e))
