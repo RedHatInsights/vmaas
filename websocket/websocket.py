@@ -152,6 +152,7 @@ class WebsocketApplication(Application):
         handlers = [
             (r"/?", NotificationHandler),
             (r"/api/v1/monitoring/health/?", HealthHandler),
+            (r"/healthz/?", HealthHandler)
         ]
 
         Application.__init__(self, handlers, websocket_ping_interval=WEBSOCKET_PING_INTERVAL,
