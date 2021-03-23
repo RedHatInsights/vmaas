@@ -7,14 +7,19 @@ from http import HTTPStatus
 from test import yaml_cache
 import pytest
 
-from app import create_app, BaseHandler, load_cache_to_apis
+from app import create_app, BaseHandler, load_cache_to_apis, DEFAULT_PATH, DEFAULT_PATH_API
 from common.constants import VMAAS_VERSION
 
 
 @pytest.fixture()
 async def server(aiohttp_server):
     """Setup testing app."""
-    app = create_app()
+    app = create_app({DEFAULT_PATH + "/v1": "webapp.v1.spec.yaml",
+                      DEFAULT_PATH + "/v2": "webapp.v2.spec.yaml",
+                      DEFAULT_PATH + "/v3": "webapp.v3.spec.yaml",
+                      DEFAULT_PATH_API + "/v1": "webapp.v1.spec.yaml",
+                      DEFAULT_PATH_API + "/v2": "webapp.v2.spec.yaml",
+                      DEFAULT_PATH_API + "/v3": "webapp.v3.spec.yaml"})
     BaseHandler.db_cache = yaml_cache.load_test_cache()
     load_cache_to_apis()
     return await aiohttp_server(app.app)
