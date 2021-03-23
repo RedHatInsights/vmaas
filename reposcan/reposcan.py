@@ -14,7 +14,6 @@ from multiprocessing.pool import Pool
 
 import connexion
 import git
-import yaml
 from flask import make_response
 from flask import request
 from flask import send_file
@@ -60,6 +59,9 @@ DEFAULT_CERT_NAME = "DEFAULT"
 DEFAULT_CA_CERT = os.getenv("DEFAULT_CA_CERT", "")
 DEFAULT_CERT = os.getenv("DEFAULT_CERT", "")
 DEFAULT_KEY = os.getenv("DEFAULT_KEY", "")
+
+DEFAULT_PATH_API = "/api"
+DEFAULT_PATH = "/api/vmaas"
 
 
 class TaskStatusResponse(dict):
@@ -744,7 +746,7 @@ def disabled_signals():
             signal.signal(sig, handlers[sig])
 
 
-def create_app():
+def create_app(specs):
     """Create reposcan app."""
 
     init_logging()
@@ -773,9 +775,6 @@ def create_app():
                                                      WEBSOCKET_RECONNECT_INTERVAL * 1000)
     ws_handler.reconnect_callback.start()
 
-    with open('reposcan.spec.yaml', 'rb') as specfile:
-        SPEC = yaml.safe_load(specfile)  # pylint: disable=invalid-name
-    SPEC['info']['version'] = VMAAS_VERSION
 
     app = connexion.App(__name__, options={
         'swagger_ui': True,
@@ -784,16 +783,14 @@ def create_app():
 
     # Response validation is disabled due to returing streamed response in GET /pkgtree
     # https://github.com/zalando/connexion/pull/467 should fix it
-    app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
-                validate_responses=False,
-                strict_validation=True,
-                base_path='/api/v1'
-                )
-    app.add_api(SPEC, resolver=connexion.RestyResolver('reposcan'),
-                validate_responses=False,
-                strict_validation=True,
-                base_path='/api/vmaas/v1'
-                )
+    for route, spec in specs.items():
+        app.add_api(spec, resolver=connexion.RestyResolver('reposcan'),
+                    validate_responses=False,
+                    strict_validation=True,
+                    base_path=route,
+                    arguments={"vmaas_version": VMAAS_VERSION}
+                    )
+
 
     @app.app.route('/metrics', methods=['GET'])
     def metrics():  # pylint: disable=unused-variable

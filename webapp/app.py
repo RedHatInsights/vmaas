@@ -12,7 +12,6 @@ from distutils.util import strtobool
 from json import loads
 
 import connexion
-import yaml
 from aiohttp import ClientSession
 from aiohttp import hdrs
 from aiohttp import web
@@ -52,6 +51,9 @@ GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
 LATEST_DUMP_ENDPOINT = "/api/v1/latestdump"
 
 LOGGER = get_logger(__name__)
+
+DEFAULT_PATH_API = "/api"
+DEFAULT_PATH = "/api/vmaas"
 
 
 class BaseHandler:
@@ -123,7 +125,7 @@ class HealthHandler:
     """Handler class providing health status."""
 
     @classmethod
-    async def get(cls, **kwargs):  # pylint: disable=unused-argument
+    async def get(cls, *args, **kwargs):  # pylint: disable=unused-argument
         """Get API status.
            ---
            description: Return API status
@@ -517,29 +519,10 @@ def load_cache_to_apis():
     BaseHandler.rpm_pkg_names_api = RPMPkgNamesAPI(BaseHandler.db_cache)
 
 
-def load_spec_files():
-    """Open and load spec yamls."""
-    with open('webapp.v1.spec.yaml', 'rb') as specfile:
-        spec_v1 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
-    spec_v1['info']['version'] = VMAAS_VERSION
-
-    with open('webapp.v2.spec.yaml', 'rb') as specfile:
-        spec_v2 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
-    spec_v2['info']['version'] = VMAAS_VERSION
-
-    with open('webapp.v3.spec.yaml', 'rb') as specfile:
-        spec_v3 = yaml.safe_load(specfile)  # pylint: disable=invalid-name
-    spec_v3['info']['version'] = VMAAS_VERSION
-
-    return spec_v1, spec_v2, spec_v3
-
-
-def create_app():
+def create_app(specs):
     """Create VmaaS application and servers"""
 
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
-
-    spec_v1, spec_v2, spec_v3 = load_spec_files()
 
     @web.middleware
     async def timing_middleware(request, handler, **kwargs):
@@ -618,20 +601,16 @@ def create_app():
 
     app.app.on_response_prepare.append(on_prepare)
     app.app.router.add_get("/metrics", metrics)
+    app.app.router.add_get("/healthz", HealthHandler.get)
 
-    for api_version, spec in [("v1", spec_v1), ("v2", spec_v2), ("v3", spec_v3)]:
+    for route, spec in specs.items():
         app.add_api(spec, resolver=connexion.RestyResolver('app'),
                     validate_responses=False,
                     strict_validation=False,
-                    base_path=f"/api/{api_version}",
-                    pass_context_arg_name='request'
-                    )
-        app.add_api(spec, resolver=connexion.RestyResolver('app'),
-                    validate_responses=False,
-                    strict_validation=False,
-                    base_path=f"/api/vmaas/{api_version}",
-                    pass_context_arg_name='request'
-                    )
+                    base_path=route,
+                    pass_context_arg_name='request',
+                    arguments={'vmaas_version': VMAAS_VERSION})
+
 
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
