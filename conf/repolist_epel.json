@@ -1,0 +1,47 @@
+[
+    {
+        "products": {
+            "Extra Packages for Enterprise Linux (EPEL)": {
+                "content_sets": {
+                    "epel-7": {
+                        "name": "Extra Packages for Enterprise Linux 7",
+                        "baseurl": "http://download.fedoraproject.org/pub/epel/$releasever/$basearch",
+                        "basearch": [
+                            "x86_64",
+                            "ppc64le"
+                        ],
+                        "releasever": [
+                            "7Server",
+                            "7"
+                        ],
+                        "third_party": true
+                    },
+                    "epel-8": {
+                        "name": "Extra Packages for Enterprise Linux 8",
+                        "baseurl": "https://download.fedoraproject.org/pub/epel/$releasever/Everything/$basearch",
+                        "basearch": [
+                            "x86_64",
+                            "ppc64le"
+                        ],
+                        "releasever": [
+                            "8"
+                        ],
+                        "third_party": true
+                    },
+                    "epel-8-modular": {
+                        "name": "Extra Packages for Enterprise Linux Modular 8",
+                        "baseurl": "https://download.fedoraproject.org/pub/epel/$releasever/Modular/$basearch",
+                        "basearch": [
+                            "x86_64",
+                            "ppc64le"
+                        ],
+                        "releasever": [
+                            "8"
+                        ],
+                        "third_party": true
+                    }
+                }
+            }
+        }
+    }
+]

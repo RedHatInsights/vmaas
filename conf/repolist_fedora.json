@@ -1,0 +1,54 @@
+[
+    {
+        "products": {
+            "Fedora repos": {
+                "content_sets": {
+                    "fedora": {
+                        "name": "Fedora release",
+                        "baseurl": "https://download.fedoraproject.org/pub/fedora/linux/releases/$releasever/Everything/$basearch/os/",
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "releasever": [
+                            "32"
+                        ],
+                        "third_party": true
+                    },
+                    "fedora-updates": {
+                        "name": "Fedora updates",
+                        "baseurl": "https://download.fedoraproject.org/pub/fedora/linux/updates/$releasever/Everything/$basearch/",
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "releasever": [
+                            "32"
+                        ],
+                        "third_party": true
+                    },
+                    "fedora-modular": {
+                        "name": "Fedora modular",
+                        "baseurl": "https://download.fedoraproject.org/pub/fedora/linux/releases/$releasever/Modular/$basearch/os/",
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "releasever": [
+                            "32"
+                        ],
+                        "third_party": true
+                    },
+                    "fedora-modular-updates": {
+                        "name": "Fedora modular updates",
+                        "baseurl": "https://download.fedoraproject.org/pub/fedora/linux/updates/$releasever/Modular/$basearch/",
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "releasever": [
+                            "32"
+                        ],
+                        "third_party": true
+                    }
+                }
+            }
+        }
+    }
+]
