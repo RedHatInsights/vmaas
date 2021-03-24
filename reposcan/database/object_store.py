@@ -42,17 +42,17 @@ class ObjectStore:
         cur.close()
         return modules_in_repo
 
-    def _prepare_table_map(self, cols, table):
+    def _prepare_table_map(self, cols, table, to_col="id"):
         """Create map from table map[columns] -> id."""
         table_map = {}
         cur = self.conn.cursor()
         if len(cols) == 1:
-            sql = "select id, %s from %s" % (cols[0], table)
+            sql = "select %s, %s from %s" % (to_col, cols[0], table)
             cur.execute(sql)
             for row in cur.fetchall():
                 table_map[row[1]] = row[0]  # column value is a key
         else:
-            sql = "select id, %s from %s" % (",".join(cols), table)
+            sql = "select %s, %s from %s" % (to_col, ",".join(cols), table)
             cur.execute(sql)
             for row in cur.fetchall():
                 table_map[tuple(row[1:])] = row[0]  # tuple of columns values is a key
