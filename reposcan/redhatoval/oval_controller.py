@@ -95,12 +95,12 @@ class OvalController:
         with open(self.feed_path, 'r') as feed_file:
             feed = json.load(feed_file)
         for entry in feed["feed"]["entry"]:
-            db_timestamp = db_oval_definitions.get(f"{entry['id']}:updated")
+            db_timestamp = db_oval_definitions.get(entry['id'])
             feed_timestamp = parse_datetime(entry["updated"])
             if not db_timestamp or feed_timestamp > db_timestamp:
-                local_path = os.path.join(self.tmp_directory, entry["link"][0]["href"].replace(OVAL_FEED_BASE_URL, ""))
+                local_path = os.path.join(self.tmp_directory, entry["content"]["src"].replace(OVAL_FEED_BASE_URL, ""))
                 oval_definitions_file = OvalDefinitions(entry["id"], feed_timestamp,
-                                                        entry["link"][0]["href"], local_path)
+                                                        entry["content"]["src"], local_path)
                 batches.add_item(oval_definitions_file)
             else:
                 up_to_date += 1
@@ -129,6 +129,6 @@ class OvalController:
                     finally:
                         oval_definitions_file.unload_metadata()
             # Timestamp of main feed file
-            self.oval_store.save_lastmodified(feed_updated, self.oval_store.OVAL_FEED_UPDATED_KEY)
+            self.oval_store.save_lastmodified(feed_updated)
         finally:
             self.clean()
