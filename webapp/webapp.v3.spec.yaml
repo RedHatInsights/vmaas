@@ -504,6 +504,9 @@ components:
         latest_only:
           type: boolean
           enum: [true, false]
+        optimistic_updates:
+          type: boolean
+          enum: [true, false]
       required:
         - package_list
 

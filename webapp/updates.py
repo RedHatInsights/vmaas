@@ -2,7 +2,7 @@
 Module to handle /updates API calls.
 """
 
-from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
+from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_EVR_ID, \
     ERRATA_CVE, ERRATA_TYPE
 from common.webapp_utils import none2empty, filter_package_list
 from common.rpm import parse_rpm_name, join_rpm_name
@@ -92,14 +92,23 @@ class UpdatesAPI:
         return join_rpm_name(name, epoch, ver, rel, arch)
 
     def _process_updates(self, packages_to_process, api_version, available_repo_ids,
-                         response, module_ids, security_only):
+                         response, module_ids, security_only, optimistic_updates):
         # pylint: disable=too-many-branches
         for pkg, pkg_dict in packages_to_process.items():
             name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
             name_id = self.db_cache.packagename2id[name]
             evr_id = self.db_cache.evr2id.get((epoch, ver, rel), None)
             arch_id = self.db_cache.arch2id.get(arch, None)
-            current_evr_indexes = self.db_cache.updates_index[name_id].get(evr_id, [])
+            current_evr_indexes = []
+
+            if evr_id is not None:
+                current_evr_indexes = self.db_cache.updates_index[name_id].get(evr_id, [])
+            elif optimistic_updates:
+                # Try to find an evra, which can be used as an anchor point
+                for idx, pkg_id in enumerate(self.db_cache.updates[name_id]):
+                    evr = self.db_cache.id2evr.get(self.db_cache.package_details[PKG_EVR_ID], None)
+                    if evr > (epoch, ver, rel):
+                        current_evr_indexes = list(range(idx, len(self.db_cache.updates[name_id])))
 
             # Package with given NEVRA not found in cache/DB
             if not current_evr_indexes:
@@ -206,6 +215,8 @@ class UpdatesAPI:
         else:
             security_only = data.get("security_only", False)
 
+        optimistic_updates = data.get("optimistic_updates", False)
+
         # Return empty update list in case of empty input package list
         packages_to_process = self._process_input_packages(data, response)
 
@@ -215,6 +226,6 @@ class UpdatesAPI:
         # Process updated packages, errata and fill the response
         self._process_updates(packages_to_process, api_version,
                               available_repo_ids, response, module_ids,
-                              security_only)
+                              security_only, optimistic_updates)
 
         return response
