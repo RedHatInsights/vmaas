@@ -14,7 +14,31 @@ UPDATES_JSON = {
     "repository_list": ["rhel-7-server-rpms"],
     "releasever": "7Server",
     "basearch": "x86_64",
+    "modules_list": [{'module_name': 'my-pkg', 'module_stream': '1'}]
 }
+UPDATES_RESPONSE_1 = {
+    'update_list': {'my-pkg-1.1.0-1.el8.i686':
+                        {'summary': 'Testing package summary...',
+                         'description': 'Testing package (1.1.0) description...',
+                         'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
+                                                'erratum': 'RHBA-2015:0364',
+                                                'repository': 'rhel-7-server-rpms',
+                                                'basearch': 'x86_64', 'releasever': '7Server'}]}
+                    },
+    'repository_list': ['rhel-7-server-rpms'], 'releasever': '7Server', 'basearch': 'x86_64',
+    'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}]}
+
+UPDATES_RESPONSE_2 = {
+    'update_list': {'my-pkg-1.1.0-1.el8.i686':
+                        {'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
+                                                'erratum': 'RHBA-2015:0364',
+                                                'repository': 'rhel-7-server-rpms',
+                                                'basearch': 'x86_64', 'releasever': '7Server'}]}},
+    'repository_list': ['rhel-7-server-rpms'],
+    'releasever': '7Server',
+    'basearch': 'x86_64',
+    'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}]}
+
 UPDATES_JSON_REPO = {"package_list": [PKG], "repository_list": ["rhel-6-server-rpms"]}
 UPDATES_JSON_RELEASE = {"package_list": [PKG], "releasever": "6Server"}
 UPDATES_JSON_ARCH = {"package_list": [PKG], "basearch": "i386"}
@@ -112,13 +136,13 @@ class TestUpdatesAPI(TestBase):
         """Test looking for package updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(1, UPDATES_JSON.copy())
-        assert updates
+        assert updates == UPDATES_RESPONSE_1
 
     def test_process_list_v2(self):
         """Test looking for package updates api v2."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON.copy())
-        assert updates
+        assert updates == UPDATES_RESPONSE_2
 
     def test_process_empty_pkg_list_v1(self):
         """Test empty package_list updates api v1."""
