@@ -60,45 +60,17 @@ class TestUpdatesAPI(TestBase):
         """Setup UpdatesAPI object."""
         self.updates_api = UpdatesAPI(self.cache)
 
-    def test_process_repos(self):
-        """Test repos processing."""
-        response = {}
-        repo_ids = self.updates_api._process_repositories(UPDATES_JSON, response)
-        assert len(repo_ids) == 1
-
-    def test_process_repos_repo(self):
-        """Test repos processing - filter out repository_list."""
-        response = {}
-        repo_ids = self.updates_api._process_repositories(UPDATES_JSON_REPO, response)
-        assert repo_ids == set()
-
-    def test_process_repos_release(self):
-        """Test repos processing - filter out releasever."""
-        response = {}
-        repo_ids = self.updates_api._process_repositories(UPDATES_JSON_RELEASE, response)
-        assert repo_ids == set()
-
-    def test_process_repos_arch(self):
-        """Test repos processing - filter out basearch."""
-        response = {}
-        repo_ids = self.updates_api._process_repositories(UPDATES_JSON_ARCH, response)
-        assert repo_ids == set()
-
     def test_process_input_pkg(self):
         """Test filtering out unknown (or without updates) package names."""
-        response = {}
-        response["update_list"] = {}
-        response["update_list"][PKG] = {}
-        pkgs = self.updates_api._process_input_packages(UPDATES_JSON, response)
-        assert pkgs
+        pkgs, update_list = self.updates_api._process_input_packages(UPDATES_JSON)
+        assert pkgs == {'my-pkg-1.1.0-1.el8.i686': {'parsed_nevra': ('my-pkg', '0', '1.1.0', '1.el8', 'i686')}}
+        assert update_list == {'my-pkg-1.1.0-1.el8.i686': {}}
 
     def test_process_input_non_exist(self):
         """Test filtering out unknown non existing package."""
-        response = {}
-        response["update_list"] = {}
-        response["update_list"][PKG] = {}
-        pkgs = self.updates_api._process_input_packages(UPDATES_JSON_NON_EXIST, response)
+        pkgs, update_list = self.updates_api._process_input_packages(UPDATES_JSON_NON_EXIST)
         assert pkgs == {}
+        assert update_list == {'non-exist': {}}
 
     def test_schema_v1(self):
         """Test schema of updates api v1."""
@@ -167,3 +139,86 @@ class TestUpdatesAPI(TestBase):
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON_NON_EXIST.copy())
         assert updates == NON_EXIST_RESPONSE
+
+class TestInternalUpdatesAPI(TestBase):
+    """Test internal methods of updates api class."""
+
+    updates_api = None
+
+    @pytest.fixture(autouse=True)
+    def setup_api(self, load_cache):
+        """Setup UpdatesAPI object."""
+        self.updates_api = UpdatesAPI(self.cache)
+
+    def test_get_repository_list_1(self):
+        """Test with complete request."""
+        repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON)
+        assert repositories_list == ['rhel-7-server-rpms']
+        assert repo_ids == [1]
+
+    def test_get_repository_list_3(self):
+        """Test with 'repository_list' only request."""
+        repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_REPO)
+        assert repositories_list == ['rhel-6-server-rpms']
+        assert repo_ids == []
+
+    def test_get_repository_list_4(self):
+        """Test with 'releasever' only request."""
+        repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_RELEASE)
+        assert repositories_list is None
+        assert list(repo_ids) == [1, 2, 3, 4, 5]
+
+    def test_get_repository_list_5(self):
+        """Test with 'basearch' only request."""
+        repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_ARCH)
+        assert repositories_list is None
+        assert list(repo_ids) == [1, 2, 3, 4, 5]
+
+    def test_get_releasever_1(self):
+        """Test with complete request"""
+        repo_ids_in = [1]
+        releasever, repo_ids = self.updates_api._get_releasever(UPDATES_JSON, repo_ids_in)
+        assert releasever == '7Server'
+        assert repo_ids == [1]
+
+    def test_get_releasever_2(self):
+        """Test with 'releasever' only request."""
+        repo_ids_in = [1, 2, 3, 4, 5]
+        releasever, repo_ids = self.updates_api._get_releasever(UPDATES_JSON_RELEASE, repo_ids_in)
+        assert releasever == '6Server'
+        assert repo_ids == []
+
+    def test_get_releasever_3(self):
+        """Test with 'basearch' only request."""
+        repo_ids_in = [1, 2, 3, 4, 5]
+        releasever, repo_ids = self.updates_api._get_releasever(UPDATES_JSON_ARCH, repo_ids_in)
+        assert releasever is None
+        assert repo_ids == repo_ids_in
+
+    def test_get_basearch_1(self):
+        """Test with complete request."""
+        repo_ids_in = [1]
+        basearch, repo_ids = self.updates_api._get_basearch(UPDATES_JSON, repo_ids_in)
+        assert basearch == 'x86_64'
+        assert repo_ids == {1}
+
+    def test_get_basearch_2(self):
+        """Test with 'repository_list' only request."""
+        repo_ids_in = []
+        basearch, repo_ids = self.updates_api._get_basearch(UPDATES_JSON_REPO, repo_ids_in)
+        assert basearch is None
+        assert repo_ids == set()
+
+    def test_get_basearch_3(self):
+        """Test with 'releasever' only request."""
+        repo_ids_in = []
+        basearch, repo_ids = self.updates_api._get_basearch(UPDATES_JSON_RELEASE, repo_ids_in)
+        assert basearch is None
+        assert repo_ids == set()
+
+    def test_get_basearch_4(self):
+        """Test with 'basearch' only request."""
+        repo_ids_in = [1, 2, 3, 4, 5]
+        basearch, repo_ids = self.updates_api._get_basearch(UPDATES_JSON_ARCH, repo_ids_in)
+        assert basearch == 'i386'
+        assert repo_ids == set()
