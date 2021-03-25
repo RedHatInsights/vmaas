@@ -10,13 +10,38 @@ from common.rpm import parse_rpm_name, join_rpm_name
 SECURITY_ERRATA_TYPE = 'security'
 
 
+def filter_non_security(errata_detail: dict, security_only: bool) -> bool:
+    """Decide whether the errata should be filtered base on 'securiyt only' rule."""
+    if not security_only:
+        return False
+    is_security = errata_detail[ERRATA_TYPE] == SECURITY_ERRATA_TYPE or errata_detail[ERRATA_CVE]
+    return not is_security
+
+
+def get_security_only(api_version: int, data: dict) -> bool:
+    """Set 'security_only' flag based on input data and API version.
+       For API version < 3 only security updates are provided."""
+    if api_version < 3:
+        security_only = True
+    else:
+        security_only = data.get("security_only", False)
+    return security_only
+
+
+def insert_if_not_empty(struct: dict, key: str, value) -> dict:
+    """Insert value to the struct under the key, if the value is not None"""
+    if value is not None:
+        struct[key] = value
+    return struct
+
+
 class UpdatesAPI:
     """ Main /updates API class."""
-    def __init__(self, db_cache):
-        self.db_cache = db_cache      # DB dump in memory, stored like a dict
 
-    def _process_repositories(self, data, response):
-        # Read list of repositories
+    def __init__(self, db_cache):
+        self.db_cache = db_cache  # DB dump in memory, stored like a dict
+
+    def _get_repository_list(self, data: dict) -> (list, list):
         repo_list = data.get('repository_list', None)
         if repo_list is not None:
             repo_ids = []
@@ -24,51 +49,62 @@ class UpdatesAPI:
                 repo_id = self.db_cache.repolabel2ids.get(label, None)
                 if repo_id:
                     repo_ids.extend(repo_id)
-            response['repository_list'] = repo_list
         else:
             repo_ids = self.db_cache.repo_detail.keys()
+        return repo_list, repo_ids
 
-        # Filter out repositories of different releasever
+    def _get_releasever(self, data: dict, repo_ids: list) -> (str, list):
         releasever = data.get('releasever', None)
         if releasever is not None:
             repo_ids = [oid for oid in repo_ids
                         if self.db_cache.repo_detail[oid][REPO_RELEASEVER] == releasever
                         or (self.db_cache.repo_detail[oid][REPO_RELEASEVER] is None
                             and releasever in self.db_cache.repo_detail[oid][REPO_URL])]
-            response['releasever'] = releasever
+        return releasever, repo_ids
 
-        # Filter out repositories of different basearch
+    def _get_basearch(self, data: dict, repo_ids: list) -> (str, set):
         basearch = data.get('basearch', None)
         if basearch is not None:
             repo_ids = [oid for oid in repo_ids
                         if self.db_cache.repo_detail[oid][REPO_BASEARCH] == basearch
                         or (self.db_cache.repo_detail[oid][REPO_BASEARCH] is None
                             and basearch in self.db_cache.repo_detail[oid][REPO_URL])]
-            response['basearch'] = basearch
+        repo_ids = set(repo_ids)
+        return basearch, repo_ids
 
-        return set(repo_ids)
+    def _get_modules_list(self, data: dict) -> (list, set):
+        modules_list_arr = data.get('modules_list', [])
+        module_info = [(x['module_name'], x['module_stream']) for x in modules_list_arr]
+        module_ids = set()
+        for module in module_info:
+            if module in self.db_cache.modulename2id:
+                module_ids.update(self.db_cache.modulename2id[module])
+        modules_list = data.get('modules_list', None)
+        return modules_list, module_ids
 
-    def _process_input_packages(self, data, response):
+    def _process_input_packages(self, data: dict) -> (dict, dict):
         """Parse input NEVRAs and filter out unknown (or without updates) package names."""
         latest_only = data.get("latest_only", False)
         packages_to_process = filter_package_list(data.get('package_list', None), latest_only)
         filtered_packages_to_process = {}
+        update_list = {}
         if packages_to_process is not None:
             for pkg in packages_to_process:
-                response['update_list'][pkg] = {}
+                update_list[pkg] = {}
                 name, epoch, ver, rel, arch = parse_rpm_name(pkg, default_epoch='0')
                 if name in self.db_cache.packagename2id:
                     if self.db_cache.packagename2id[name] in self.db_cache.updates_index:
                         filtered_packages_to_process[pkg] = {'parsed_nevra': (name, epoch, ver, rel, arch)}
-        return filtered_packages_to_process
+        return filtered_packages_to_process, update_list
 
-    def _get_valid_releasevers(self, original_package_repo_ids):
+    def _get_valid_releasevers(self, original_package_repo_ids: set) -> set:
         valid_releasevers = set()
         for original_package_repo_id in original_package_repo_ids:
             valid_releasevers.add(self.db_cache.repo_detail[original_package_repo_id][REPO_RELEASEVER])
         return valid_releasevers
 
-    def _get_repositories(self, update_pkg_id, errata_ids, available_repo_ids, valid_releasevers):
+    def _get_repositories(self, update_pkg_id: int, errata_ids: list,
+                          available_repo_ids: set, valid_releasevers: set) -> set:
         repo_ids = set()
         errata_repo_ids = set()
         for errata_id in errata_ids:
@@ -84,137 +120,164 @@ class UpdatesAPI:
 
         return repo_ids
 
-    def _build_nevra(self, update_pkg_id):
+    def _build_nevra(self, update_pkg_id: int) -> str:
         name_id, evr_id, arch_id, _, _, _ = self.db_cache.package_details[update_pkg_id]
         name = self.db_cache.id2packagename[name_id]
         epoch, ver, rel = self.db_cache.id2evr[evr_id]
         arch = self.db_cache.id2arch[arch_id]
-        return join_rpm_name(name, epoch, ver, rel, arch)
+        nevra = join_rpm_name(name, epoch, ver, rel, arch)
+        return nevra
 
-    def _process_updates(self, packages_to_process, api_version, available_repo_ids,
-                         response, module_ids, security_only):
-        # pylint: disable=too-many-branches
-        for pkg, pkg_dict in packages_to_process.items():
-            name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
-            name_id = self.db_cache.packagename2id[name]
-            evr_id = self.db_cache.evr2id.get((epoch, ver, rel), None)
-            arch_id = self.db_cache.arch2id.get(arch, None)
-            current_evr_indexes = self.db_cache.updates_index[name_id].get(evr_id, [])
+    def _get_package_string(self, pkg_id: int, label_id: int) -> str:
+        str_id = self.db_cache.package_details[pkg_id][label_id]
+        result_str = self.db_cache.strings.get(str_id, None)
+        return result_str
 
-            # Package with given NEVRA not found in cache/DB
-            if not current_evr_indexes:
-                continue
+    def _get_pkg_errata_updates(self, update_pkg_id: int, errata_id: int, module_ids: set, available_repo_ids: set,
+                                valid_releasevers: set, nevra: str, security_only: bool) -> list:
+        errata_name = self.db_cache.errataid2name[errata_id]
+        # Filter out non-security updates
+        if filter_non_security(self.db_cache.errata_detail[errata_name], security_only):
+            return []
 
-            current_nevra_pkg_id = None
-            for current_evr_index in current_evr_indexes:
-                pkg_id = self.db_cache.updates[name_id][current_evr_index]
-                current_nevra_arch_id = self.db_cache.package_details[pkg_id][2]
-                if current_nevra_arch_id == arch_id:
-                    current_nevra_pkg_id = pkg_id
-                    break
+        if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not \
+                self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
+            return []
+        repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,
+                                          valid_releasevers)
+        pkg_errata_updates = []
+        for repo_id in repo_ids:
+            repo_details = self.db_cache.repo_detail[repo_id]
+            pkg_errata_updates.append({
+                'package': nevra,
+                'erratum': errata_name,
+                'repository': repo_details[REPO_LABEL],
+                'basearch': none2empty(repo_details[REPO_BASEARCH]),
+                'releasever': none2empty(repo_details[REPO_RELEASEVER])
+            })
+        return pkg_errata_updates
 
-            # Package with given NEVRA not found in cache/DB
-            if not current_nevra_pkg_id:
-                continue
+    def _get_pkg_updates(self, update_pkg_id: int, arch_id: int, security_only: bool, module_ids: set,
+                         available_repo_ids: set, valid_releasevers: set) -> list:
+        # Filter out packages without errata
+        if update_pkg_id not in self.db_cache.pkgid2errataids:
+            return []
 
-            if api_version == 1:
-                sum_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_SUMMARY_ID]
-                response['update_list'][pkg]['summary'] = self.db_cache.strings.get(sum_id, None)
+        # Filter arch compatibility
+        updated_nevra_arch_id = self.db_cache.package_details[update_pkg_id][2]
+        if (updated_nevra_arch_id != arch_id
+                and updated_nevra_arch_id not in self.db_cache.arch_compat[arch_id]):
+            return []
 
-                desc_id = self.db_cache.package_details[current_nevra_pkg_id][PKG_DESC_ID]
-                response['update_list'][pkg]['description'] = self.db_cache.strings.get(desc_id, None)
+        errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
+        nevra = self._build_nevra(update_pkg_id)
+        pkg_updates = []
+        for errata_id in errata_ids:
+            pkg_errata_updates = self._get_pkg_errata_updates(update_pkg_id, errata_id, module_ids, available_repo_ids,
+                                                              valid_releasevers, nevra, security_only)
+            pkg_updates.extend(pkg_errata_updates)
+        return pkg_updates
 
-            response['update_list'][pkg]['available_updates'] = []
+    def _process_package_updates(self, api_version: int, pkg_dict: dict,
+                                 available_repo_ids: set, module_ids: set, security_only: bool) -> dict:
+        pkg_data = {}
+        name_id, current_evr_indexes, arch_id = self._extract_nevra_ids(pkg_dict)
+        # Package with given NEVRA not found in cache/DB
+        if not current_evr_indexes:
+            return pkg_data
 
-            # No updates found for given NEVRA
-            last_version_pkg_id = self.db_cache.updates[name_id][-1]
-            if last_version_pkg_id == current_nevra_pkg_id:
-                continue
+        current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_indexes, arch_id)
+        # Package with given NEVRA not found in cache/DB
+        if not current_nevra_pkg_id:
+            return pkg_data
 
-            # Get associated product IDs
-            original_package_repo_ids = set()
-            original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(current_nevra_pkg_id, []))
-            valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
+        if api_version == 1:
+            pkg_data['summary'] = self._get_package_string(current_nevra_pkg_id, PKG_SUMMARY_ID)
+            pkg_data['description'] = self._get_package_string(current_nevra_pkg_id, PKG_DESC_ID)
 
-            # Get candidate package IDs
-            update_pkg_ids = self.db_cache.updates[name_id][current_evr_indexes[-1] + 1:]
+        pkg_data['available_updates'] = []
+        # No updates found for given NEVRA
+        last_version_pkg_id = self.db_cache.updates[name_id][-1]
+        if last_version_pkg_id == current_nevra_pkg_id:
+            return pkg_data
 
-            for update_pkg_id in update_pkg_ids:
-                # Filter out packages without errata
-                if update_pkg_id not in self.db_cache.pkgid2errataids:
-                    continue
+        # Get associated product IDs
+        valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
 
-                # Filter arch compatibility
-                updated_nevra_arch_id = self.db_cache.package_details[update_pkg_id][2]
-                if (updated_nevra_arch_id != arch_id
-                        and updated_nevra_arch_id not in self.db_cache.arch_compat[arch_id]):
-                    continue
+        # Get candidate package IDs
+        update_pkg_ids = self.db_cache.updates[name_id][current_evr_indexes[-1] + 1:]
 
-                errata_ids = self.db_cache.pkgid2errataids.get(update_pkg_id, set())
-                nevra = self._build_nevra(update_pkg_id)
-                for errata_id in errata_ids:
-                    errata_name = self.db_cache.errataid2name[errata_id]
-                    # Filter out non-security updates
-                    if security_only and not (
-                            self.db_cache.errata_detail[errata_name][ERRATA_TYPE] == SECURITY_ERRATA_TYPE or \
-                            self.db_cache.errata_detail[errata_name][ERRATA_CVE]):
-                        continue
-                    if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not \
-                            self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
-                        continue
-                    repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,
-                                                      valid_releasevers)
-                    for repo_id in repo_ids:
-                        repo_details = self.db_cache.repo_detail[repo_id]
-                        response['update_list'][pkg]['available_updates'].append({
-                            'package': nevra,
-                            'erratum': errata_name,
-                            'repository': repo_details[REPO_LABEL],
-                            'basearch': none2empty(repo_details[REPO_BASEARCH]),
-                            'releasever': none2empty(repo_details[REPO_RELEASEVER])
-                        })
+        for update_pkg_id in update_pkg_ids:
+            pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
+                                                available_repo_ids, valid_releasevers)
+            pkg_data['available_updates'].extend(pkg_updates)
+        return pkg_data
 
-    def process_list(self, api_version, data):
+    def _get_pkg_releasevers(self, pkg_id: int) -> set:
+        original_package_repo_ids = set()
+        original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(pkg_id, []))
+        valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
+        return valid_releasevers
+
+    def _process_updates(self, api_version: int, update_list: dict, packages: dict,
+                         repo_ids: set, module_ids: set, security_only: bool) -> dict:
+        for pkg, pkg_dict in packages.items():
+            update_list[pkg] = self._process_package_updates(api_version, pkg_dict, repo_ids, module_ids,
+                                                             security_only)
+        return update_list
+
+    def _get_nevra_pkg_id(self, name_id: int, evr_indexes: list, arch_id: int) -> int:
+        nevra_pkg_id = None
+        for current_evr_index in evr_indexes:
+            pkg_id = self.db_cache.updates[name_id][current_evr_index]
+            nevra_arch_id = self.db_cache.package_details[pkg_id][2]
+            if nevra_arch_id == arch_id:
+                nevra_pkg_id = pkg_id
+                break
+        return nevra_pkg_id
+
+    def _extract_nevra_ids(self, pkg_dict: dict) -> (int, list, int):
+        name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
+        name_id = self.db_cache.packagename2id[name]
+        evr_id = self.db_cache.evr2id.get((epoch, ver, rel), None)
+        arch_id = self.db_cache.arch2id.get(arch, None)
+        current_evr_indexes = self.db_cache.updates_index[name_id].get(evr_id, [])
+        return name_id, current_evr_indexes, arch_id
+
+    def process_list(self, api_version: int, data: dict) -> dict:
         """
         This method is looking for updates of a package, including name of package to update to,
         associated erratum and repository this erratum is from.
 
+        :param api_version: API version of the function
         :param data: input json, must contain package_list to find updates for them
 
         :returns: json with updates_list as a list of dictionaries
                   {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
-        # pylint: disable=too-many-branches
-        response = {
-            'update_list': {},
-        }
-
-        # Get list of valid repository IDs based on input paramaters
-        available_repo_ids = self._process_repositories(data, response)
-        modules_list = data.get('modules_list', [])
-        module_info = [(x['module_name'], x['module_stream']) for x in modules_list]
-        module_ids = set()
-        for module in module_info:
-            if module in self.db_cache.modulename2id:
-                module_ids.update(self.db_cache.modulename2id[module])
-        if 'modules_list' in data:
-            response['modules_list'] = modules_list
-
-        # Backward compatibility of older APIs
-        if api_version < 3:
-            security_only = True
-        else:
-            security_only = data.get("security_only", False)
-
         # Return empty update list in case of empty input package list
-        packages_to_process = self._process_input_packages(data, response)
-
-        if not packages_to_process:
+        packages_to_process, update_list = self._process_input_packages(data)
+        response = {'update_list': update_list}
+        if len(packages_to_process) == 0:
             return response
 
-        # Process updated packages, errata and fill the response
-        self._process_updates(packages_to_process, api_version,
-                              available_repo_ids, response, module_ids,
-                              security_only)
+        repository_list, repo_ids = self._get_repository_list(data)
+        response = insert_if_not_empty(response, 'repository_list', repository_list)
 
+        releasever, repo_ids = self._get_releasever(data, repo_ids)
+        response = insert_if_not_empty(response, 'releasever', releasever)
+
+        # Get list of valid repository IDs based on input paramaters
+        basearch, available_repo_ids = self._get_basearch(data, repo_ids)
+        response = insert_if_not_empty(response, 'basearch', basearch)
+
+        modules_list, module_ids = self._get_modules_list(data)
+        response = insert_if_not_empty(response, 'modules_list', modules_list)
+
+        # Backward compatibility of older APIs
+        security_only = get_security_only(api_version, data)
+        # Process updated packages, errata and fill the response
+        update_list = self._process_updates(api_version, update_list, packages_to_process,
+                                            available_repo_ids, module_ids, security_only)
+        response['update_list'] = update_list
         return response
