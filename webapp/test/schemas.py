@@ -118,6 +118,7 @@ _updates_top_all = {
     "releasever": str,
     "basearch": str,
     "update_list": {str: dict},
+    "modules_list": [dict]
 }
 
 _updates_package = {
