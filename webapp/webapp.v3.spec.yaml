@@ -504,6 +504,11 @@ components:
         latest_only:
           type: boolean
           enum: [true, false]
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - package_list
 
@@ -584,6 +589,11 @@ components:
           type: boolean
           enum: [true, false]
           description: Return only those CVEs which are associated with at least one errata. Defaults to false.
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
         <<: *req_paging
       required:
         - cve_list
@@ -670,6 +680,11 @@ components:
           example: '2018-04-05T01:23:45+02:00'
           format: date-time
           description: Return only repositories changed after the given date
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
         <<: *req_paging
       required:
         - repository_list
@@ -709,6 +724,8 @@ components:
                   items:
                     type: string
                     example: cpe:/a:redhat
+                third_party:
+                  type: boolean
         <<: *resp_paging
 
     ErrataRequest:
@@ -724,6 +741,11 @@ components:
           type: string
           example: '2018-04-05T01:23:45+02:00'
           format: date-time
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
         type:
           oneOf:
             - type: string
@@ -807,6 +829,8 @@ components:
               type:
                 type: string
                 example: security
+              third_party:
+                type: boolean
         modified_since:
           type: string
           example: '2018-04-05T01:23:45+02:00'
@@ -833,6 +857,11 @@ components:
             type: string
             example: kernel-2.6.32-696.20.1.el6.x86_64
           minItems: 1
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - package_list
     PackagesResponse:
@@ -883,6 +912,11 @@ components:
             type: string
             example: kernel-rt
           minItems: 1
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - package_name_list
     PkgtreeResponse:
@@ -1019,6 +1053,11 @@ components:
         oval_only:
           type: boolean
           enum: [true, false]
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - package_list
     VulnerabilitiesResponse:
@@ -1070,6 +1109,11 @@ components:
         basearch:
           type: string
           example: x86_64
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - package_list
     PatchesResponse:
@@ -1093,6 +1137,11 @@ components:
           items:
             type: string
             example: rhel-7-desktop-rpms
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - srpm_name_list
 
@@ -1123,6 +1172,11 @@ components:
           items:
             type: string
             example: rhel-7-desktop-rpms
+        third_party:
+          type: boolean
+          enum: [ true, false ]
+          description: Include content from "third party" repositories into the response, disabled by default.
+          default: false
       required:
         - rpm_name_list
 
