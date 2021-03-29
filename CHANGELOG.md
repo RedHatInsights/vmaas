@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.5.0 (2021-03-29)
+### Feature
+* **reposcan:** Third-party content support, reposcan ([`7d203aa`](https://github.com/RedHatInsights/vmaas/commit/7d203aa6beb56a68d9e2338615472a89548e3e94))
+
 ## v2.4.1 (2021-03-26)
 ### Fix
 * **webapp:** Fixed asserts in test_updates.py ([`f31e3dc`](https://github.com/RedHatInsights/vmaas/commit/f31e3dc3047a8a5d0edabbc4d32bdb9c1ad5332d))
