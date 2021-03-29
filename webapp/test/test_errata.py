@@ -16,6 +16,7 @@ ERRATA_NAME = "RHBA-2015:0364"
 MODIFIED_IN_FUTURE = "2099-01-01T00:00:00+00:00"
 DATE_SINCE = "2014-04-06T01:23:45+02:00"
 ERRATA_JSON = {"errata_list": [ERRATA_NAME]}
+ERRATA_JSON_ALL = {"errata_list": [".*"]}
 ERRATA_JSON_MODIFIED = {"errata_list": [ERRATA_NAME], "modified_since": DATE_SINCE}
 ERRATA_JSON_EMPTY_LIST = {"errata_list": [""]}
 ERRATA_JSON_NON_EXIST = {"errata_list": ["RHSA-9999:9999"]}
@@ -70,6 +71,19 @@ class TestErrataAPI(TestBase):
         """Test errata API repsonse for non-existent errata."""
         response = self.errata_api.process_list(api_version="v1", data=ERRATA_JSON_NON_EXIST)
         assert tools.match(EMPTY_RESPONSE, response) is True
+
+    def test_third_party(self):
+        """Test filtering with third party enabled"""
+        data = {**ERRATA_JSON_ALL, "third_party": True}
+        response = self.errata_api.process_list(api_version="v3", data=data)
+        assert len(response["errata_list"]) == 6
+
+    def test_non_third_party(self):
+        """Test filtering with third-party content disabled"""
+        data = {**ERRATA_JSON_ALL}
+        data.pop("third_party", None)
+        response = self.errata_api.process_list(api_version="v3", data=data)
+        assert len(response["errata_list"]) == 5
 
     def test_errata_response(self):
         """Test errata API response."""
