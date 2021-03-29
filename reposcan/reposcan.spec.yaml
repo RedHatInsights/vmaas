@@ -302,8 +302,13 @@ components:
                 type: string
                 example: Red Hat Enterprise Linux 6 Server (RPMs)
               baseurl:
-                type: string
-                example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+                oneOf:
+                  - type: string
+                    example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+                  - type: array
+                    items:
+                      type: string
+                      example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
               basearch:
                 type: array
                 items:
