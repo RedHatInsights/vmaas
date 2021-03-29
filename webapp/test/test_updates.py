@@ -205,13 +205,13 @@ class TestInternalUpdatesAPI(TestBase):
         """Test with 'releasever' only request."""
         repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_RELEASE)
         assert repositories_list is None
-        assert list(repo_ids) == [1, 2, 3, 4, 5]
+        assert list(repo_ids) == [1, 2, 3, 4, 5, 6]
 
     def test_get_repository_list_5(self):
         """Test with 'basearch' only request."""
         repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_ARCH)
         assert repositories_list is None
-        assert list(repo_ids) == [1, 2, 3, 4, 5]
+        assert list(repo_ids) == [1, 2, 3, 4, 5, 6]
 
     def test_get_releasever_1(self):
         """Test with complete request"""

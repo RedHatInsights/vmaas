@@ -21,9 +21,9 @@ def test_cache(monkeypatch):
     assert len(cache.arch_compat) == 2
     assert len(cache.cve_detail) == 1
     assert len(cache.dbchange) == 5
-    assert len(cache.errata_detail) == 4
-    assert len(cache.errataid2name) == 4
-    assert len(cache.errataid2repoids) == 2
+    assert len(cache.errata_detail) == 5
+    assert len(cache.errataid2name) == 5
+    assert len(cache.errataid2repoids) == 3
     assert len(cache.evr2id) == 7
     assert len(cache.id2arch) == 3
     assert len(cache.id2evr) == 7
@@ -36,14 +36,14 @@ def test_cache(monkeypatch):
     assert len(cache.pkgid2errataids) == 7
     assert len(cache.pkgid2repoids) == 6
     assert len(cache.productid2repoids) == 1
-    assert len(cache.repo_detail) == 5
-    assert len(cache.repolabel2ids) == 1
+    assert len(cache.repo_detail) == 6
+    assert len(cache.repolabel2ids) == 2
     assert len(cache.src_pkg_id2pkg_ids) == 2
     assert len(cache.updates) == 2
     assert len(cache.updates_index) == 2
-    assert len(cache.content_set_id2label) == 2
-    assert len(cache.label2content_set_id) == 2
-    assert len(cache.content_set_id2pkg_name_ids) == 2
+    assert len(cache.content_set_id2label) == 3
+    assert len(cache.label2content_set_id) == 3
+    assert len(cache.content_set_id2pkg_name_ids) == 3
 
     cache.clear()
     variables = vars(cache)

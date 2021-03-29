@@ -5,7 +5,7 @@ Module to handle /pkgtree API calls.
 from natsort import natsorted  # pylint: disable=E0401
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
-    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION
+    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY
 from common.dateutil import parse_datetime
 from common.webapp_utils import format_datetime, none2empty
 from common.rpm import join_rpm_name
@@ -38,8 +38,12 @@ class PkgtreeAPI:
             errata_ids = self.cache.pkgid2errataids[pkg_id]
             for err_id in errata_ids:
                 name = self.cache.errataid2name[err_id]
-                issued = self.cache.errata_detail[name][ERRATA_ISSUED]
-                cves = self.cache.errata_detail[name][ERRATA_CVE]
+                detail = self.cache.errata_detail[name]
+                issued = detail[ERRATA_ISSUED]
+                cves = detail[ERRATA_CVE]
+                # Skip third party errata
+                if detail[ERRATA_THIRD_PARTY]:
+                    continue
                 errata = {
                     'name': name,
                     'issued': none2empty(format_datetime(issued))}
@@ -54,6 +58,9 @@ class PkgtreeAPI:
         if pkg_id in self.cache.pkgid2repoids:
             for repo_id in self.cache.pkgid2repoids[pkg_id]:
                 detail = self.cache.repo_detail[repo_id]
+                # Skip third party repos
+                if detail[REPO_THIRD_PARTY]:
+                    continue
                 repos.append({
                     'label': detail[REPO_LABEL],
                     'name': detail[REPO_NAME],
@@ -97,6 +104,7 @@ class PkgtreeAPI:
                     pkg_nevra = self._build_nevra(pkg_id)
                     errata = self._get_erratas(pkg_id)
                     repositories = self._get_repositories(pkg_id)
+                    # Skip content with no repos and no erratas (Should skip third party content)
                     first_published = self._get_first_published_from_erratas(errata)
                     pkgtree_list.append(
                         {
