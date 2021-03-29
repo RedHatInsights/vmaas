@@ -58,6 +58,7 @@ errata_detail:
       source_package_list:
         - kernel-2.6.32-696.23.1.el6.src
   - https://access.redhat.com/errata/RHBA-2015:0364
+  - false
   RHEA-2011:0895: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -73,7 +74,7 @@ errata_detail:
   - null
   - null
   - null
-  - null
+  - false
   RHSA-2019:1174: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -92,7 +93,7 @@ errata_detail:
   - null
   - null
   - null
-  - null
+  - false
   RHSA-2019:1175: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -108,17 +109,36 @@ errata_detail:
   - null
   - null
   - null
+  - false
+  RHSA-2222:1234: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2019-06-14 18:22:02
+  - 2019-05-14 18:22:02
+  - - CVE-2018-10126
+  - - 8320
+  - - 83200
   - null
+  - null
+  - null
+  - true
 errataid2name:
   111: RHEA-2011:0895
   444: RHBA-2015:0364
   555: RHSA-2019:1174
   556: RHSA-2019:1175
+  123: RHSA-2222:1234
 errataid2repoids:
   444: !!set
     1: null
   556: !!set
     2: null
+  123: !!set
+    6: null
 evr2id:
   ? &id001 !!python/tuple
   - '0'
@@ -346,6 +366,7 @@ repo_detail:
   - Red Hat Enterprise Linux Server
   - 1
   - '2018-04-10T09:02:26+00:00'
+  - false
   2: !!python/tuple
   - rhel-8-for-x86_64-rt-rpms
   - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
@@ -355,6 +376,7 @@ repo_detail:
   - null
   - null
   - '2020-01-03T05:24:17+00:00'
+  - false
   3: !!python/tuple
   - rhel-8-for-x86_64-nfv-rpms
   - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
@@ -364,6 +386,7 @@ repo_detail:
   - null
   - null
   - '2019-09-20T06:25:14+00:00'
+  - false
   4: !!python/tuple
   - rhel-8-for-x86_64-nfv-rpms
   - Red Hat Enterprise Linux 8 for x86_64 - Real Time for NFV (RPMs)
@@ -373,6 +396,7 @@ repo_detail:
   - null
   - null
   - '2020-01-03T05:24:24+00:00'
+  - false
   5: !!python/tuple
   - rhel-8-for-x86_64-rt-rpms
   - Red Hat Enterprise Linux 8 for x86_64 - Real Time (RPMs)
@@ -382,9 +406,22 @@ repo_detail:
   - null
   - null
   - '2019-09-20T06:25:12+00:00'
+  - false
+  6: !!python/tuple
+  - third-party-repo1
+  - Third party data repo
+  - null
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - '2019-09-20T06:25:12+00:00'
+  - true
 repolabel2ids:
   rhel-7-server-rpms:
   - 1
+  third-party-repo1:
+  - 6
 updates:
   2222:
   - 8110
@@ -415,9 +452,11 @@ src_pkg_id2pkg_ids:
 content_set_id2label:
   1: rhel-7-server-rpms
   2: my-content-set
+  3: third-party-repo1
 label2content_set_id:
   rhel-7-server-rpms: 1
   my-content-set: 2
+  third-party-repo1: 3
 content_set_id2pkg_name_ids:
   1:
     - 32222
@@ -425,3 +464,4 @@ content_set_id2pkg_name_ids:
     - 2222
   2:
     - 2222
+  3: []

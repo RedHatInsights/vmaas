@@ -2,7 +2,8 @@
 Module to handle /packages API calls.
 """
 
-from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, PKG_SOURCE_PKG_ID
+from cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, \
+    PKG_SOURCE_PKG_ID, REPO_THIRD_PARTY
 import common.webapp_utils as utils
 from common.rpm import parse_rpm_name
 
@@ -36,12 +37,17 @@ class PackagesAPI:
         :returns: json response with package details
         """
         packages = data.get('package_list', None)
+        # By default, don't include third party data
+        want_third_party = data.get('third_party', False)
+
         packagelist = {}
         if not packages:
             return packagelist
 
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
+            is_third_party = False
+
             name, epoch, ver, rel, arch = parse_rpm_name(pkg, default_epoch='0')
             if name in self.cache.packagename2id \
                and (epoch, ver, rel) in self.cache.evr2id \
@@ -60,13 +66,19 @@ class PackagesAPI:
                     if pkg_id in self.cache.pkgid2repoids:
                         for repo_id in self.cache.pkgid2repoids[pkg_id]:
                             repodetail = self.cache.repo_detail[repo_id]
+                            is_third_party = is_third_party or bool(repodetail[REPO_THIRD_PARTY])
                             repodata = {
                                 'label': repodetail[REPO_LABEL],
                                 'name': repodetail[REPO_NAME],
                                 'basearch': utils.none2empty(repodetail[REPO_BASEARCH]),
-                                'releasever': utils.none2empty(repodetail[REPO_RELEASEVER])
+                                'releasever': utils.none2empty(repodetail[REPO_RELEASEVER]),
                             }
                             packagedata['repositories'].append(repodata)
+
+            # If the package is third party, then remove it from result
+            if not want_third_party and is_third_party:
+                del packagelist[pkg]
+
         response = {
             'package_list': packagelist
         }
