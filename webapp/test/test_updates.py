@@ -3,12 +3,14 @@
 # pylint: disable=unused-argument
 from test import schemas
 from test.conftest import TestBase
+from copy import deepcopy
 
 import pytest
 
 from updates import UpdatesAPI
 
 PKG = "my-pkg-1.1.0-1.el8.i686"
+PKG_UNKNOWN = "my-pkg-1.1.1-1.el8.i686"
 UPDATES_JSON = {
     "package_list": [PKG],
     "repository_list": ["rhel-7-server-rpms"],
@@ -16,20 +18,17 @@ UPDATES_JSON = {
     "basearch": "x86_64",
     "modules_list": [{'module_name': 'my-pkg', 'module_stream': '1'}]
 }
-UPDATES_RESPONSE_1 = {
-    'update_list': {'my-pkg-1.1.0-1.el8.i686':
-                        {'summary': 'Testing package summary...',
-                         'description': 'Testing package (1.1.0) description...',
-                         'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
-                                                'erratum': 'RHBA-2015:0364',
-                                                'repository': 'rhel-7-server-rpms',
-                                                'basearch': 'x86_64', 'releasever': '7Server'}]}
-                    },
-    'repository_list': ['rhel-7-server-rpms'], 'releasever': '7Server', 'basearch': 'x86_64',
-    'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}]}
+UPDATES_JSON_UNKNOWN = UPDATES_JSON.copy()
+UPDATES_JSON_UNKNOWN['package_list'] = [PKG_UNKNOWN]
+
+UPDATES_JSON_UNKNOWN_OPT_UPD = UPDATES_JSON_UNKNOWN.copy()
+UPDATES_JSON_UNKNOWN_OPT_UPD['optimistic_updates'] = True
+
+UPDATES_JSON_UNKNOWN_OPT_UPD_2 = UPDATES_JSON_UNKNOWN_OPT_UPD.copy()
+UPDATES_JSON_UNKNOWN_OPT_UPD_2["modules_list"] = [{'module_name': 'my-pkg', 'module_stream': '2'}]
 
 UPDATES_RESPONSE_2 = {
-    'update_list': {'my-pkg-1.1.0-1.el8.i686':
+    'update_list': {PKG:
                         {'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
                                                 'erratum': 'RHBA-2015:0364',
                                                 'repository': 'rhel-7-server-rpms',
@@ -39,6 +38,27 @@ UPDATES_RESPONSE_2 = {
     'basearch': 'x86_64',
     'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}]}
 
+UPDATES_RESPONSE_1 = deepcopy(UPDATES_RESPONSE_2)
+UPDATES_RESPONSE_1['update_list'][PKG]['summary'] = 'Testing package summary...'
+UPDATES_RESPONSE_1['update_list'][PKG]['description'] = 'Testing package (1.1.0) description...'
+
+UPDATES_RESPONSE_2_UNKNOWN = deepcopy(UPDATES_RESPONSE_2)
+UPDATES_RESPONSE_2_UNKNOWN['update_list'] = {PKG_UNKNOWN: UPDATES_RESPONSE_2['update_list'][PKG]}
+UPDATES_RESPONSE_2_UNKNOWN_NONE = UPDATES_RESPONSE_2_UNKNOWN.copy()
+UPDATES_RESPONSE_2_UNKNOWN_NONE['update_list'] = {PKG_UNKNOWN: {}}
+UPDATES_RESPONSE_2_UNKNOWN_2 = deepcopy(UPDATES_RESPONSE_2_UNKNOWN)
+UPDATES_RESPONSE_2_UNKNOWN_2['update_list'] = {PKG_UNKNOWN:
+                                                   {'available_updates': [{'basearch': 'x86_64',
+                                                                           'erratum': 'RHBA-2015:0364',
+                                                                           'package': 'my-pkg-2.0.0-1.el8.i686',
+                                                                           'releasever': '7Server',
+                                                                           'repository': 'rhel-7-server-rpms'},
+                                                                          {'basearch': 'x86_64',
+                                                                           'erratum': 'RHBA-2015:0364',
+                                                                           'package': 'my-pkg-2.1.0-1.el8.i686',
+                                                                           'releasever': '7Server',
+                                                                           'repository': 'rhel-7-server-rpms'}]}}
+UPDATES_RESPONSE_2_UNKNOWN_2["modules_list"] = [{'module_name': 'my-pkg', 'module_stream': '2'}]
 UPDATES_JSON_REPO = {"package_list": [PKG], "repository_list": ["rhel-6-server-rpms"]}
 UPDATES_JSON_RELEASE = {"package_list": [PKG], "releasever": "6Server"}
 UPDATES_JSON_ARCH = {"package_list": [PKG], "basearch": "i386"}
@@ -116,6 +136,24 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(2, UPDATES_JSON.copy())
         assert updates == UPDATES_RESPONSE_2
 
+    def test_process_list_v2_unknown(self):
+        """Test looking for unknown EVRA updates, disabled optimistic_updates."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN.copy())
+        assert updates == UPDATES_RESPONSE_2_UNKNOWN_NONE
+
+    def test_process_list_v2_unknown_opt_1(self):
+        """Test looking for unknown EVRA updates (module_stream: 1)."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN_OPT_UPD.copy())
+        assert updates == UPDATES_RESPONSE_2_UNKNOWN
+
+    def test_process_list_v2_unknown_opt_2(self):
+        """Test looking for unknown EVRA updates (module_stream: 2)."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN_OPT_UPD_2.copy())
+        assert updates == UPDATES_RESPONSE_2_UNKNOWN_2
+
     def test_process_empty_pkg_list_v1(self):
         """Test empty package_list updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
@@ -139,6 +177,7 @@ class TestUpdatesAPI(TestBase):
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON_NON_EXIST.copy())
         assert updates == NON_EXIST_RESPONSE
+
 
 class TestInternalUpdatesAPI(TestBase):
     """Test internal methods of updates api class."""
