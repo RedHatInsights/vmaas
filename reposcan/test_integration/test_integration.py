@@ -36,7 +36,7 @@ def test_phase_1(db_conn, caplog, monkeypatch):
     content_set_label = 'Content set 1'
 
     # Test store product.
-    products = dict(prod1=dict(product_id=None, content_sets={content_set: content_set_label}))
+    products = dict(prod1=dict(product_id=None, content_sets={content_set: {"name": content_set_label}}))
     prod_store = product_store.ProductStore()
     prod_store.store(products)
 
