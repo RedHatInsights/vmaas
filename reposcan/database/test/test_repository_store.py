@@ -25,7 +25,7 @@ from repodata.updateinfo import UpdateInfoMD
 PRIMARY_DB = PrimaryDatabaseMD("test_data/repodata/primary_db.sqlite")
 PRIMARY = PrimaryMD("test_data/repodata/primary.xml")
 UPDATEINFO = UpdateInfoMD("test_data/repodata/updateinfo.xml")
-PRODUCTS = {"product": {"product_id": 9, "content_sets": {"cs_label": "cs_name"}}}
+PRODUCTS = {"product": {"product_id": 9, "content_sets": {"cs_label": {"name": "cs_name"}}}}
 
 REPOSITORY = Repository("repo_url1", "cs_label", "x86_64", "27")
 REPOSITORY.primary = PRIMARY_DB
