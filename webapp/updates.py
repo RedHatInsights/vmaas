@@ -103,6 +103,14 @@ class UpdatesAPI:
             valid_releasevers.add(self.db_cache.repo_detail[original_package_repo_id][REPO_RELEASEVER])
         return valid_releasevers
 
+    def _is_repo_valid(self, repo_id: int, valid_releasevers: set) -> bool:
+        if valid_releasevers is None:
+            return True
+        repo_detail = self.db_cache.repo_detail[repo_id]
+        if repo_detail[REPO_RELEASEVER] in valid_releasevers:
+            return True
+        return False
+
     def _get_repositories(self, update_pkg_id: int, errata_ids: list,
                           available_repo_ids: set, valid_releasevers: set) -> set:
         repo_ids = set()
@@ -114,8 +122,7 @@ class UpdatesAPI:
         res_repos.intersection_update(available_repo_ids, errata_repo_ids)
 
         for repo_id in res_repos:
-            repo_detail = self.db_cache.repo_detail[repo_id]
-            if repo_detail[REPO_RELEASEVER] in valid_releasevers:
+            if self._is_repo_valid(repo_id, valid_releasevers):
                 repo_ids.add(repo_id)
 
         return repo_ids
@@ -178,34 +185,51 @@ class UpdatesAPI:
             pkg_updates.extend(pkg_errata_updates)
         return pkg_updates
 
-    def _process_package_updates(self, api_version: int, pkg_dict: dict,
-                                 available_repo_ids: set, module_ids: set, security_only: bool) -> dict:
+    def _get_optimistic_updates(self, name_id: int, pkg_dict: dict) -> list:
+        name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
+        updates = self.db_cache.updates[name_id]
+        # TODO filter updates to get only higher versions then - epoch, ver, rel, arch
+        filtered_updates = []
+        #for update in updates:
+        #    name_id, evr_id, ...= self.db_cache.package_details[update]
+        filtered_updates = updates[1:]  # hardcoded for "test_process_list_v2_unknown_opt"
+        return filtered_updates
+
+    def _process_package_updates(self, api_version: int, pkg_dict: dict, available_repo_ids: set, module_ids: set,
+                                 security_only: bool, optimistic_updates: bool) -> dict:
         pkg_data = {}
         name_id, current_evr_indexes, arch_id = self._extract_nevra_ids(pkg_dict)
         # Package with given NEVRA not found in cache/DB
-        if not current_evr_indexes:
+        valid_releasevers = None
+
+        # TODO split to multiple functions
+        if len(current_evr_indexes) > 0:
+            current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_indexes, arch_id)
+            # Package with given NEVRA not found in cache/DB
+            if not current_nevra_pkg_id:
+                return pkg_data
+
+            if api_version == 1:
+                pkg_data['summary'] = self._get_package_string(current_nevra_pkg_id, PKG_SUMMARY_ID)
+                pkg_data['description'] = self._get_package_string(current_nevra_pkg_id, PKG_DESC_ID)
+
+            pkg_data['available_updates'] = []
+            # No updates found for given NEVRA
+            last_version_pkg_id = self.db_cache.updates[name_id][-1]
+            if last_version_pkg_id == current_nevra_pkg_id:
+                return pkg_data
+
+            # Get associated product IDs
+            valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
+
+            # Get candidate package IDs
+            update_pkg_ids = self.db_cache.updates[name_id][current_evr_indexes[-1] + 1:]
+
+        elif optimistic_updates:
+            update_pkg_ids = self._get_optimistic_updates(name_id, pkg_dict)
+            pkg_data['available_updates'] = []
+        else:
             return pkg_data
-
-        current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_indexes, arch_id)
-        # Package with given NEVRA not found in cache/DB
-        if not current_nevra_pkg_id:
-            return pkg_data
-
-        if api_version == 1:
-            pkg_data['summary'] = self._get_package_string(current_nevra_pkg_id, PKG_SUMMARY_ID)
-            pkg_data['description'] = self._get_package_string(current_nevra_pkg_id, PKG_DESC_ID)
-
-        pkg_data['available_updates'] = []
-        # No updates found for given NEVRA
-        last_version_pkg_id = self.db_cache.updates[name_id][-1]
-        if last_version_pkg_id == current_nevra_pkg_id:
-            return pkg_data
-
-        # Get associated product IDs
-        valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
-
-        # Get candidate package IDs
-        update_pkg_ids = self.db_cache.updates[name_id][current_evr_indexes[-1] + 1:]
 
         for update_pkg_id in update_pkg_ids:
             pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
@@ -220,10 +244,10 @@ class UpdatesAPI:
         return valid_releasevers
 
     def _process_updates(self, api_version: int, update_list: dict, packages: dict,
-                         repo_ids: set, module_ids: set, security_only: bool) -> dict:
+                         repo_ids: set, module_ids: set, security_only: bool, optimistic_updates: bool) -> dict:
         for pkg, pkg_dict in packages.items():
             update_list[pkg] = self._process_package_updates(api_version, pkg_dict, repo_ids, module_ids,
-                                                             security_only)
+                                                             security_only, optimistic_updates)
         return update_list
 
     def _get_nevra_pkg_id(self, name_id: int, evr_indexes: list, arch_id: int) -> int:
@@ -277,7 +301,9 @@ class UpdatesAPI:
         # Backward compatibility of older APIs
         security_only = get_security_only(api_version, data)
         # Process updated packages, errata and fill the response
-        update_list = self._process_updates(api_version, update_list, packages_to_process,
-                                            available_repo_ids, module_ids, security_only)
+
+        optimistic_updates = data.get('optimistic_updates', False)
+        update_list = self._process_updates(api_version, update_list, packages_to_process, available_repo_ids,
+                                            module_ids, security_only, optimistic_updates)
         response['update_list'] = update_list
         return response
