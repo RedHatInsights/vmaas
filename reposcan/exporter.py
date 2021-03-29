@@ -221,7 +221,8 @@ class DataDump:
                                       r.releasever,
                                       p.name as product_name,
                                       p.id as product_id,
-                                      r.revision
+                                      r.revision,
+                                      cs.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
@@ -229,10 +230,10 @@ class DataDump:
                                  """)
             repolabel2ids = {}
             productid2repoids = {}
-            for oid, label, name, url, basearch, releasever, product, product_id, revision in cursor:
+            for oid, label, name, url, basearch, releasever, product, product_id, revision, third_party in cursor:
                 dump["repo_detail:%s" % oid] = (label, name, url, basearch,
                                                 releasever, product, product_id,
-                                                format_datetime(revision))
+                                                format_datetime(revision), third_party)
                 repolabel2ids.setdefault("repolabel2ids:%s" % label, []).append(oid)
                 productid2repoids.setdefault("productid2repoids:%s" % product_id, []).append(oid)
             dump.update(repolabel2ids)
@@ -351,14 +352,21 @@ class DataDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated
+                                         description, solution, issued, updated, 
+                                         true = ANY (
+                                            SELECT cs.third_party
+                                            FROM errata_repo er
+                                            JOIN repo r ON er.repo_id = r.id
+                                            JOIN content_set cs ON cs.id = r.content_set_id
+                                            WHERE er.errata_id = errata.id
+                                         ) AS third_party
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated in cursor:
+                    description, solution, issued, updated, third_party in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
                     dump["errata_detail:%s" % e_name] = (synopsis, summary, e_type,
                                                          e_severity, description,
@@ -368,7 +376,7 @@ class DataDump:
                                                          errataid2bzs.get(errata_id, []),
                                                          errataid2refs.get(errata_id, []),
                                                          errataid2modules.get(errata_id, []),
-                                                         url)
+                                                         url, third_party)
 
     def _dump_cves(self, dump):
         """Select cve details"""

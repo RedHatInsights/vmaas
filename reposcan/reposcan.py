@@ -219,22 +219,31 @@ class RepolistImportHandler(SyncHandler):
 
     @classmethod
     def _content_set_to_repos(cls, content_set):
-        baseurl = content_set["baseurl"]
+        baseurls = content_set["baseurl"]
         basearches = content_set["basearch"]
         releasevers = content_set["releasever"]
+        all_repos = []
 
-        # (repo_url, basearch, releasever)
-        repos = [(baseurl, None, None)]
-        # Replace basearch
-        if basearches:
-            repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
-                     for basearch in basearches for repo in repos]
-        # Replace releasever
-        if releasevers:
-            repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
-                     for releasever in releasevers for repo in repos]
+        # Accept a list or single baseurl
+        if not isinstance(baseurls, list):
+            if not isinstance(baseurls, str):
+                raise ValueError("baseurl has to be either a list or a string")
+            baseurls = [baseurls]
 
-        return repos
+        for baseurl in baseurls:
+            repos = [(baseurl, None, None)]
+            # Replace basearch
+            if basearches:
+                repos = [(repo[0].replace("$basearch", basearch), basearch, repo[2])
+                         for basearch in basearches for repo in repos]
+            # Replace releasever
+            if releasevers:
+                repos = [(repo[0].replace("$releasever", releasever), repo[1], releasever)
+                         for releasever in releasevers for repo in repos]
+
+            all_repos.extend(repos)
+
+        return all_repos
 
     @classmethod
     def parse_repolist_json(cls, data):
@@ -264,7 +273,8 @@ class RepolistImportHandler(SyncHandler):
                 if product_id is not None and product_id in seen or seen.add(product_id):
                     return None, None
                 for content_set_label, content_set in product["content_sets"].items():
-                    products[product_name]["content_sets"][content_set_label] = content_set["name"]
+                    products[product_name]["content_sets"][content_set_label] = content_set
+
                     for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
                         repos.append((repo_url, content_set_label, basearch, releasever,
                                       cert_name, ca_cert, cert, key))
@@ -749,7 +759,6 @@ class ReposcanWebsocket():
             LOGGER.info("Connected to: %s", cls.websocket_url)
             result.write_message("subscribe-reposcan")
             cls.report_version()
-
 
     @classmethod
     def _read_websocket_message(cls, message):

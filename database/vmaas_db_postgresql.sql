@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 2);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 3);
 
 -- -----------------------------------------------------
 -- evr type
@@ -394,6 +394,7 @@ CREATE TABLE IF NOT EXISTS content_set (
   label TEXT NOT NULL UNIQUE, CHECK (NOT empty(label)),
   name TEXT NULL, CHECK (NOT empty(name)),
   product_id INT NOT NULL,
+  third_party BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT product_id
     FOREIGN KEY (product_id)
@@ -741,9 +742,9 @@ CREATE TABLE IF NOT EXISTS module (
 CREATE TABLE IF NOT EXISTS module_stream (
   id SERIAL,
   module_id INT NOT NULL,
-  stream_name VARCHAR(8) NOT NULL,
+  stream_name VARCHAR NOT NULL,
   version BIGINT NOT NULL,
-  context VARCHAR(8) NOT NULL,
+  context VARCHAR NOT NULL,
   is_default BOOLEAN NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT module_id
