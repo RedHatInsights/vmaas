@@ -74,6 +74,7 @@ _repos = {
                 "revision": str,
                 "label": str,
                 "cpes": [str],
+                "third_party": bool
             }
         ]
     },
@@ -100,7 +101,8 @@ _errata = {
             "package_list": [str],
             "source_package_list": [str],
             "type": str,
-            "modules_list": [dict]
+            "modules_list": [dict],
+            "third_party": bool
         }
     },
     Optional("modified_since"): str,

@@ -10,6 +10,7 @@ from repos import RepoAPI
 REPO_JSON_EMPTY = {}
 REPO_JSON_BAD = {"page_size": 9}
 REPO_JSON = {"repository_list": ["rhel-7-server-rpms"]}
+REPO_JSON_ALL = {"repository_list": ["rhel-7-server-rpms", "third-party-repo1"]}
 REPO_JSON_MODIFIED_SINCE = {
     "repository_list": ["rhel-7-server-rpms"],
     "modified_since": "2099-01-01T00:00:00+00:00"
@@ -51,6 +52,19 @@ class TestRepoAPI(TestBase):
         """Test repos API response for non-existent repo."""
         response = self.repo.process_list(api_version="v1", data=REPO_JSON_NON_EXIST)
         assert response == EMPTY_RESPONSE
+
+    def test_third_party(self):
+        """Test filtering with third party enabled"""
+        data = {**REPO_JSON_ALL, "third_party": True}
+        response = self.repo.process_list(api_version="v1", data=data)
+        assert len(response["repository_list"]) == 2
+
+    def test_non_third_party(self):
+        """Test filtering with third-party content disabled"""
+        data = {**REPO_JSON_ALL}
+        data.pop("third_party", None)
+        response = self.repo.process_list(api_version="v1", data=data)
+        assert len(response["repository_list"]) == 1
 
     def test_schema(self):
         """Test schema of valid repos API response."""
