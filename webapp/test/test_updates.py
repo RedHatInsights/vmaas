@@ -142,13 +142,13 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN.copy())
         assert updates == UPDATES_RESPONSE_2_UNKNOWN_NONE
 
-    def test_process_list_v2_unknown_opt_1(self):
+    def test_optimistic_updates_1(self):
         """Test looking for unknown EVRA updates (module_stream: 1)."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN_OPT_UPD.copy())
         assert updates == UPDATES_RESPONSE_2_UNKNOWN
 
-    def test_process_list_v2_unknown_opt_2(self):
+    def test_optimistic_updates_2(self):
         """Test looking for unknown EVRA updates (module_stream: 2)."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN_OPT_UPD_2.copy())

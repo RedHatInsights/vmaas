@@ -1,9 +1,9 @@
 """
 Module to handle /updates API calls.
 """
-
+import rpm
 from cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
-    ERRATA_CVE, ERRATA_TYPE
+    ERRATA_CVE, ERRATA_TYPE, PKG_EVR_ID
 from common.webapp_utils import none2empty, filter_package_list
 from common.rpm import parse_rpm_name, join_rpm_name
 
@@ -186,13 +186,21 @@ class UpdatesAPI:
         return pkg_updates
 
     def _get_optimistic_updates(self, name_id: int, pkg_dict: dict) -> list:
-        name, epoch, ver, rel, arch = pkg_dict['parsed_nevra']
+        _, epoch, ver, rel, _ = pkg_dict['parsed_nevra']
         updates = self.db_cache.updates[name_id]
-        # TODO filter updates to get only higher versions then - epoch, ver, rel, arch
-        filtered_updates = []
-        #for update in updates:
-        #    name_id, evr_id, ...= self.db_cache.package_details[update]
-        filtered_updates = updates[1:]  # hardcoded for "test_process_list_v2_unknown_opt"
+        i = len(updates) - 1
+        while i >= 0:
+            # go from the end of list because we expect most system is up2date
+            # therefore we will test just a few pkgs at the end
+            update_pkg_id = updates[i]
+            update_pkg = self.db_cache.package_details[update_pkg_id]
+            update_evr_id = update_pkg[PKG_EVR_ID]
+            update_epoch, update_ver, update_rel = self.db_cache.id2evr[update_evr_id]
+            vercmp = rpm.labelCompare((str(update_epoch), update_ver, update_rel), (str(epoch), ver, rel))
+            if vercmp <= 0:
+                break
+            i -= 1
+        filtered_updates = updates[i + 1:]
         return filtered_updates
 
     def _process_package_updates(self, api_version: int, pkg_dict: dict, available_repo_ids: set, module_ids: set,
