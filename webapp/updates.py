@@ -203,41 +203,46 @@ class UpdatesAPI:
         filtered_updates = updates[i + 1:]
         return filtered_updates
 
+    def _append_metadata(self, pkg_data: dict, pkg_id: int, api_version: int) -> dict:
+        if api_version == 1:
+            pkg_data['summary'] = self._get_package_string(pkg_id, PKG_SUMMARY_ID)
+            pkg_data['description'] = self._get_package_string(pkg_id, PKG_DESC_ID)
+        return pkg_data
+
+    def _get_nevra_updates(self, name_id: int, current_evr_ids: list, arch_id: int,
+                           api_version: int) -> (dict, list, list):
+        pkg_data = {'available_updates': []}
+        current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_ids, arch_id)
+        # Package with given NEVRA not found in cache/DB
+        if not current_nevra_pkg_id:
+            return pkg_data, [], None
+
+        # append metadata according to API version
+        pkg_data = self._append_metadata(pkg_data, current_nevra_pkg_id, api_version)
+
+        # No updates found for given NEVRA
+        last_version_pkg_id = self.db_cache.updates[name_id][-1]
+        if last_version_pkg_id == current_nevra_pkg_id:
+            return pkg_data, [], None
+
+        # Get candidate package IDs
+        update_pkg_ids = self.db_cache.updates[name_id][current_evr_ids[-1] + 1:]
+        # Get associated product IDs
+        valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
+        return pkg_data, update_pkg_ids, valid_releasevers
+
     def _process_package_updates(self, api_version: int, pkg_dict: dict, available_repo_ids: set, module_ids: set,
                                  security_only: bool, optimistic_updates: bool) -> dict:
-        pkg_data = {}
-        name_id, current_evr_indexes, arch_id = self._extract_nevra_ids(pkg_dict)
-        # Package with given NEVRA not found in cache/DB
-        valid_releasevers = None
-
-        # TODO split to multiple functions
-        if len(current_evr_indexes) > 0:
-            current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_indexes, arch_id)
-            # Package with given NEVRA not found in cache/DB
-            if not current_nevra_pkg_id:
-                return pkg_data
-
-            if api_version == 1:
-                pkg_data['summary'] = self._get_package_string(current_nevra_pkg_id, PKG_SUMMARY_ID)
-                pkg_data['description'] = self._get_package_string(current_nevra_pkg_id, PKG_DESC_ID)
-
-            pkg_data['available_updates'] = []
-            # No updates found for given NEVRA
-            last_version_pkg_id = self.db_cache.updates[name_id][-1]
-            if last_version_pkg_id == current_nevra_pkg_id:
-                return pkg_data
-
-            # Get associated product IDs
-            valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
-
-            # Get candidate package IDs
-            update_pkg_ids = self.db_cache.updates[name_id][current_evr_indexes[-1] + 1:]
-
+        name_id, current_evr_ids, arch_id = self._extract_nevra_ids(pkg_dict)
+        if current_evr_ids:
+            pkg_data, update_pkg_ids, valid_releasevers = self._get_nevra_updates(name_id, current_evr_ids, arch_id,
+                                                                                  api_version)
         elif optimistic_updates:
             update_pkg_ids = self._get_optimistic_updates(name_id, pkg_dict)
-            pkg_data['available_updates'] = []
+            pkg_data = {'available_updates': []}
+            valid_releasevers = None
         else:
-            return pkg_data
+            return {}
 
         for update_pkg_id in update_pkg_ids:
             pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
