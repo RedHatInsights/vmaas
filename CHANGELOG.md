@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.0 (2021-04-06)
+### Feature
+* **reposcan:** Parse and store OVAL data ([`c66d0e4`](https://github.com/RedHatInsights/vmaas/commit/c66d0e46931148a9dd57a14819b6d60f8d3be0b9))
+* **reposcan:** Download OVAL files to tmp dir and unpack ([`737c0f3`](https://github.com/RedHatInsights/vmaas/commit/737c0f33baf748e2ee84561eeba5cadd26ec72b6))
+* **reposcan:** Register sync API for OVAL files ([`9673f42`](https://github.com/RedHatInsights/vmaas/commit/9673f4224f06a1cd78a007f941a32cea113d4407))
+
 ## v2.5.0 (2021-03-29)
 ### Feature
 * **reposcan:** Third-party content support, reposcan ([`7d203aa`](https://github.com/RedHatInsights/vmaas/commit/7d203aa6beb56a68d9e2338615472a89548e3e94))
