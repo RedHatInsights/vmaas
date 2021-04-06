@@ -1,0 +1,38 @@
+[
+  {
+    "products": {
+      "Extra Packages for Enterprise Linux (EPEL)": {
+        "content_sets": {
+          "epel": {
+            "name": "Extra Packages for Enterprise Linux (RPMs)",
+             "baseurl": [
+                "https://download.fedoraproject.org/pub/epel/$releasever/$basearch",
+                "https://download.fedoraproject.org/pub/epel/$releasever/Everything/$basearch"
+            ],
+            "basearch": [
+              "aarch64",
+              "x86_64",
+              "ppc64",
+              "ppc64le"
+            ],
+            "releasever": ["7", "7Server", "8"],
+            "third_party": true
+          },
+          "epel-modular": {
+            "name": "Extra Packages for Enterprise Linux Modular 8 - $basearch",
+            "baseurl": "https://download.fedoraproject.org/pub/epel/8/Modular/$basearch",
+            "basearch": [
+              "aarch64",
+              "x86_64",
+              "ppc64",
+              "ppc64le",
+              "s390x"
+            ],
+            "releasever": ["8"],
+            "third_party": true
+          }
+        }
+      }
+    }
+  }
+]
