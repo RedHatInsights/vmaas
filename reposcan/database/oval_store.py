@@ -266,8 +266,10 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             child_criteria_id = self._populate_definition_criteria(cur, child_criteria)  # Recursion
             dependencies_to_import.append((criteria_id, child_criteria_id, None))  # test_id is null
         # Import dependencies
-        execute_values(cur, """insert into oval_criteria_dependency (parent_criteria_id, dep_criteria_id, dep_test_id)
-                               values %s""", dependencies_to_import, page_size=len(dependencies_to_import))
+        if dependencies_to_import:
+            execute_values(cur, """insert into oval_criteria_dependency
+                                   (parent_criteria_id, dep_criteria_id, dep_test_id)
+                                   values %s""", dependencies_to_import, page_size=len(dependencies_to_import))
         return criteria_id
 
     def _definition_import_check(self, item):
