@@ -227,10 +227,10 @@ class RepolistImportHandler(SyncHandler):
         all_repos = []
 
         # Accept a list or single baseurl
-        if not isinstance(baseurls, list):
-            if not isinstance(baseurls, str):
-                raise ValueError("baseurl has to be either a list or a string")
+        if isinstance(baseurls, str):
             baseurls = [baseurls]
+        if not isinstance(baseurls, list):
+            raise ValueError("baseurl has to be either a list or a string")
 
         for baseurl in baseurls:
             repos = [(baseurl, None, None)]
