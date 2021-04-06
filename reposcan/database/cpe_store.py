@@ -95,6 +95,14 @@ class CpeStore:
                 cur.close()
 
     def _populate_repo_mappings(self, repo_mapping):  # pylint: disable=too-many-branches, too-many-statements
+        # Make sure all CPEs are in DB, even if they are not in CPE dict
+        unknown_cpes = {}
+        for content_set_label in repo_mapping["data"]:
+            for cpe_label in repo_mapping["data"][content_set_label]["cpes"]:
+                if cpe_label not in self.cpe_label_to_id:
+                    unknown_cpes[cpe_label] = None
+        self._populate_cpes(unknown_cpes)
+
         cur = self.conn.cursor()
         cur.execute("select label, id from content_set")
         content_set_label_to_id = dict(cur.fetchall())
@@ -108,7 +116,6 @@ class CpeStore:
         to_import = []
         to_delete = []
         unknown_content_sets = set()
-        unknown_cpes = set()
         for content_set_label in repo_mapping["data"]:
             cs_id = content_set_label_to_id.get(content_set_label)
             if cs_id is None:
@@ -117,11 +124,7 @@ class CpeStore:
                 continue
             cpe_ids = set()
             for cpe_label in repo_mapping["data"][content_set_label]["cpes"]:
-                cpe_id = self.cpe_label_to_id.get(cpe_label)
-                if cpe_id is None:
-                    self.logger.debug("Unknown CPE: %s", cpe_label)
-                    unknown_cpes.add(cpe_label)
-                    continue
+                cpe_id = self.cpe_label_to_id[cpe_label]
                 cpe_ids.add(cpe_id)
 
             # Find missing pairs to import and eliminate already existing
@@ -141,9 +144,6 @@ class CpeStore:
 
         if unknown_content_sets:
             self.logger.warning("Unknown content sets in mapping file: %s", len(unknown_content_sets))
-
-        if unknown_cpes:
-            self.logger.warning("Unknown CPEs in mapping file: %s", len(unknown_cpes))
 
         if to_import:
             cur = self.conn.cursor()
