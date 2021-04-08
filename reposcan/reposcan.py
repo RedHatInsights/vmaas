@@ -188,7 +188,7 @@ class SyncHandler:
     def run_task_and_export(cls, *args, **kwargs):
         """Run sync task of current class and export."""
         result = cls.run_task(*args, **kwargs)
-        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler):
+        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler):
             ExporterHandler.run_task()
             PkgTreeHandler.run_task()
         return result
@@ -201,7 +201,8 @@ class SyncHandler:
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
-        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler) and "ERROR" not in task_result:
+        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler) \
+            and "ERROR" not in task_result:
             # Notify webapps to update their cache
             ReposcanWebsocket.report_version()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
@@ -576,6 +577,40 @@ class AllSyncHandler(SyncHandler):
         return "%s, %s, %s" % (GitRepoListHandler.run_task(),
                                RepoSyncHandler.run_task(),
                                CvemapSyncHandler.run_task())
+
+
+class CleanTmpHandler(SyncHandler):
+    """Handler for /tmp cleaning API."""
+
+    task_type = "Clean temporary data"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Clean temporary data."""
+
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start cleaning temporary data."""
+        try:
+            init_logging()
+            for item in os.listdir("/tmp"):
+                full_path = os.path.join("/tmp", item)
+                try:
+                    if os.path.isdir(full_path):
+                        shutil.rmtree(full_path)
+                    else:
+                        os.unlink(full_path)
+                    LOGGER.info("Deleted file or directory: %s", full_path)
+                except Exception as err:  # pylint: disable=broad-except
+                    LOGGER.warning("Unable to delete file or directory: %s", full_path)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            return "ERROR"
+        return "OK"
 
 
 class SyncTask:

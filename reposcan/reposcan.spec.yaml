@@ -250,6 +250,16 @@ paths:
               schema: {type: string, example: "vmaas.dbm-2020-03-30T13:13:46.156455+00:00", nullable: true}
       tags:
         - Metadata
+  
+  /cleantmp:
+    put:
+      summary: Clean /tmp data
+      operationId: reposcan.CleanTmpHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Maintenance
 
 components:
   securitySchemes:
