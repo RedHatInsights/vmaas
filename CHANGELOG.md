@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.8.2 (2021-04-08)
+### Fix
+* **webapp:** Close dbm after loading cache ([`e6aad5c`](https://github.com/RedHatInsights/vmaas/commit/e6aad5c3f3e34527dd74ab347d5a272170d337b3))
+
 ## v2.8.1 (2021-04-08)
 ### Fix
 * **reposcan:** Import CPEs even if not found in CPE dict ([`fba7ffb`](https://github.com/RedHatInsights/vmaas/commit/fba7ffb5e83ec89ce3d128cd5d40f3715e8df9da))
