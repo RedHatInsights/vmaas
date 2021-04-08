@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.8.0 (2021-04-08)
+### Feature
+* **reposcan:** Support cleaning /tmp manually ([`504aa3d`](https://github.com/RedHatInsights/vmaas/commit/504aa3dd34839ee9b281b566c8f90ee711f80aef))
+
 ## v2.7.1 (2021-04-07)
 ### Fix
 * **reposcan:** Handling of repolist urls ([`de3b8a0`](https://github.com/RedHatInsights/vmaas/commit/de3b8a0595bb5d0ff95d63258100ba47ab4a5445))
