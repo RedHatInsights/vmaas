@@ -9,6 +9,7 @@ from common.rpm import parse_rpm_name
 
 class PackagesAPI:
     """ Main /packages API class."""
+
     def __init__(self, cache):
         self.cache = cache
 
@@ -27,7 +28,7 @@ class PackagesAPI:
             return pkgs_list + source_pkgs_list
         return []
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument
+    def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns package details.
 
@@ -44,13 +45,13 @@ class PackagesAPI:
             packagedata = packagelist.setdefault(pkg, {})
             name, epoch, ver, rel, arch = parse_rpm_name(pkg, default_epoch='0')
             if name in self.cache.packagename2id \
-               and (epoch, ver, rel) in self.cache.evr2id \
-               and arch in self.cache.arch2id:
+                    and (epoch, ver, rel) in self.cache.evr2id \
+                    and arch in self.cache.arch2id:
                 name_id = self.cache.packagename2id[name]
                 evr_id = self.cache.evr2id[(epoch, ver, rel)]
                 arch_id = self.cache.arch2id[arch]
-                if (name_id, evr_id, arch_id) in self.cache.nevra2pkgid:
-                    pkg_id = self.cache.nevra2pkgid[(name_id, evr_id, arch_id)]
+                pkg_id = self.cache.nevra2pkgid.get((name_id, evr_id, arch_id), None)
+                if pkg_id:
                     pkg_detail = self.cache.package_details[pkg_id]
                     packagedata['summary'] = self.cache.strings.get(pkg_detail[PKG_SUMMARY_ID], None)
                     packagedata['description'] = self.cache.strings.get(pkg_detail[PKG_DESC_ID], None)
