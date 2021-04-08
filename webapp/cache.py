@@ -141,82 +141,84 @@ class Cache:
         """Load data from shelve file into dictionaries."""
         # pylint: disable=too-many-branches,too-many-statements
         LOGGER.info("Loading cache dump...")
+
         try:
-            data = shelve.open(filename, 'r')
+            with shelve.open(filename, 'r') as data:
+                for item in data:
+                    relation, key = item.split(":", 1)
+                    if relation == "packagename2id":
+                        self.packagename2id[key] = data[item]
+                    elif relation == "id2packagename":
+                        self.id2packagename[int(key)] = data[item]
+                    elif relation == "src_pkg_name_id2cs_ids":
+                        self.src_pkg_name_id2cs_ids[int(key)] = data[item]
+                    elif relation == "content_set_id2pkg_name_ids":
+                        self.content_set_id2pkg_name_ids[int(key)] = data[item]
+                    elif relation == "content_set_id2label":
+                        self.content_set_id2label[int(key)] = data[item]
+                    elif relation == "label2content_set_id":
+                        self.label2content_set_id[key] = data[item]
+                    elif relation == "cpe_id2label":
+                        self.cpe_id2label[int(key)] = data[item]
+                    elif relation == "label2cpe_id":
+                        self.label2cpe_id[key] = data[item]
+                    elif relation == "content_set_id2cpe_ids":
+                        self.content_set_id2cpe_ids[int(key)] = data[item]
+                    elif relation == "updates":
+                        self.updates[int(key)] = data[item]
+                    elif relation == "updates_index":
+                        self.updates_index[int(key)] = data[item]
+                    elif relation == "evr2id":
+                        epoch, version, release = key.split(":", 2)
+                        self.evr2id[(epoch, version, release)] = data[item]
+                    elif relation == "id2evr":
+                        self.id2evr[int(key)] = data[item]
+                    elif relation == "arch2id":
+                        self.arch2id[key] = data[item]
+                    elif relation == "id2arch":
+                        self.id2arch[int(key)] = data[item]
+                    elif relation == "arch_compat":
+                        self.arch_compat[int(key)] = data[item]
+                    elif relation == "package_details":
+                        self.package_details[int(key)] = as_long_arr(list(data[item]))
+                    elif relation == "nevra2pkgid":
+                        name_id, evr_id, arch_id = key.split(":", 2)
+                        self.nevra2pkgid[(int(name_id), int(evr_id), int(arch_id))] = data[item]
+                    elif relation == "repo_detail":
+                        self.repo_detail[int(key)] = data[item]
+                    elif relation == "repolabel2ids":
+                        self.repolabel2ids[key] = data[item]
+                    elif relation == "productid2repoids":
+                        self.productid2repoids[int(key)] = data[item]
+                    elif relation == "pkgid2repoids":
+                        self.pkgid2repoids[int(key)] = as_long_arr(list(data[item]))
+                    elif relation == "errataid2name":
+                        self.errataid2name[int(key)] = data[item]
+                    elif relation == "pkgid2errataids":
+                        self.pkgid2errataids[int(key)] = as_long_arr(list(data[item]))
+                    elif relation == "errataid2repoids":
+                        self.errataid2repoids[int(key)] = data[item]
+                    elif relation == "cve_detail":
+                        self.cve_detail[key] = data[item]
+                    elif relation == "dbchange":
+                        self.dbchange[key] = data[item]
+                    elif relation == "errata_detail":
+                        self.errata_detail[key] = data[item]
+                    elif relation == "pkgerrata2module":
+                        pkg_id, errata_id = key.split(":", 1)
+                        self.pkgerrata2module[(int(pkg_id), int(errata_id))] = data[item]
+                    elif relation == "modulename2id":
+                        name, stream_name = key.split(":", 1)
+                        self.modulename2id[(name, stream_name)] = data[item]
+                    elif relation == "src_pkg_id2pkg_ids":
+                        self.src_pkg_id2pkg_ids[int(key)] = data[item]
+                    elif relation == "strings":
+                        self.strings[int(key)] = data[item]
+                    else:
+                        raise KeyError("Unknown relation in data: %s" % relation)
+
         except dbm.error as err:
             # file does not exist or has wrong type
             LOGGER.warning("Failed to load data %s: %s", filename, err)
             return
-        for item in data:
-            relation, key = item.split(":", 1)
-            if relation == "packagename2id":
-                self.packagename2id[key] = data[item]
-            elif relation == "id2packagename":
-                self.id2packagename[int(key)] = data[item]
-            elif relation == "src_pkg_name_id2cs_ids":
-                self.src_pkg_name_id2cs_ids[int(key)] = data[item]
-            elif relation == "content_set_id2pkg_name_ids":
-                self.content_set_id2pkg_name_ids[int(key)] = data[item]
-            elif relation == "content_set_id2label":
-                self.content_set_id2label[int(key)] = data[item]
-            elif relation == "label2content_set_id":
-                self.label2content_set_id[key] = data[item]
-            elif relation == "cpe_id2label":
-                self.cpe_id2label[int(key)] = data[item]
-            elif relation == "label2cpe_id":
-                self.label2cpe_id[key] = data[item]
-            elif relation == "content_set_id2cpe_ids":
-                self.content_set_id2cpe_ids[int(key)] = data[item]
-            elif relation == "updates":
-                self.updates[int(key)] = data[item]
-            elif relation == "updates_index":
-                self.updates_index[int(key)] = data[item]
-            elif relation == "evr2id":
-                epoch, version, release = key.split(":", 2)
-                self.evr2id[(epoch, version, release)] = data[item]
-            elif relation == "id2evr":
-                self.id2evr[int(key)] = data[item]
-            elif relation == "arch2id":
-                self.arch2id[key] = data[item]
-            elif relation == "id2arch":
-                self.id2arch[int(key)] = data[item]
-            elif relation == "arch_compat":
-                self.arch_compat[int(key)] = data[item]
-            elif relation == "package_details":
-                self.package_details[int(key)] = as_long_arr(list(data[item]))
-            elif relation == "nevra2pkgid":
-                name_id, evr_id, arch_id = key.split(":", 2)
-                self.nevra2pkgid[(int(name_id), int(evr_id), int(arch_id))] = data[item]
-            elif relation == "repo_detail":
-                self.repo_detail[int(key)] = data[item]
-            elif relation == "repolabel2ids":
-                self.repolabel2ids[key] = data[item]
-            elif relation == "productid2repoids":
-                self.productid2repoids[int(key)] = data[item]
-            elif relation == "pkgid2repoids":
-                self.pkgid2repoids[int(key)] = as_long_arr(list(data[item]))
-            elif relation == "errataid2name":
-                self.errataid2name[int(key)] = data[item]
-            elif relation == "pkgid2errataids":
-                self.pkgid2errataids[int(key)] = as_long_arr(list(data[item]))
-            elif relation == "errataid2repoids":
-                self.errataid2repoids[int(key)] = data[item]
-            elif relation == "cve_detail":
-                self.cve_detail[key] = data[item]
-            elif relation == "dbchange":
-                self.dbchange[key] = data[item]
-            elif relation == "errata_detail":
-                self.errata_detail[key] = data[item]
-            elif relation == "pkgerrata2module":
-                pkg_id, errata_id = key.split(":", 1)
-                self.pkgerrata2module[(int(pkg_id), int(errata_id))] = data[item]
-            elif relation == "modulename2id":
-                name, stream_name = key.split(":", 1)
-                self.modulename2id[(name, stream_name)] = data[item]
-            elif relation == "src_pkg_id2pkg_ids":
-                self.src_pkg_id2pkg_ids[int(key)] = data[item]
-            elif relation == "strings":
-                self.strings[int(key)] = data[item]
-            else:
-                raise KeyError("Unknown relation in data: %s" % relation)
         LOGGER.info("Loaded dump version: %s", self.dbchange.get('exported', 'unknown'))
