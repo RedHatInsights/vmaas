@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.8.1 (2021-04-08)
+### Fix
+* **reposcan:** Import CPEs even if not found in CPE dict ([`fba7ffb`](https://github.com/RedHatInsights/vmaas/commit/fba7ffb5e83ec89ce3d128cd5d40f3715e8df9da))
+* **reposcan:** Empty insert ([`49022a4`](https://github.com/RedHatInsights/vmaas/commit/49022a415a964999b5ac45097f15c96d98be3990))
+
 ## v2.8.0 (2021-04-08)
 ### Feature
 * **reposcan:** Support cleaning /tmp manually ([`504aa3d`](https://github.com/RedHatInsights/vmaas/commit/504aa3dd34839ee9b281b566c8f90ee711f80aef))
