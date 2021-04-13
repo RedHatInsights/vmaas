@@ -5,6 +5,7 @@ Unit test classes for exporter module.
 
 import shelve
 
+import time
 from common.dateutil import parse_datetime
 from exporter import DataDump
 
@@ -16,8 +17,9 @@ class TestExporter:
 
     def test_dump(self, exporter_db_conn):
         """Test database dump."""
+
         ddump = DataDump(exporter_db_conn, TEST_DUMP_FILE)
-        ddump.dump()
+        ddump.dump(time.time())
         with shelve.open(TEST_DUMP_FILE) as dbdump:
             # from IPython import embed; embed()
 
