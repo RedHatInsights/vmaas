@@ -1,11 +1,8 @@
 """
 Module contains functions and CVE class for returning data from DB
 """
-
-import re
-
 from common.webapp_utils import format_datetime, parse_datetime, none2empty, paginate, \
-                  pkgidlist2packages, filter_item_if_exists
+                  pkgidlist2packages, filter_item_if_exists, try_expand_by_regex
 from cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
                   CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
@@ -15,16 +12,6 @@ class CveAPI:
     """ Main /cves API class. """
     def __init__(self, cache):
         self.cache = cache
-
-    def find_cves_by_regex(self, regex):
-        """Returns list of CVEs matching a provided regex."""
-        if not regex.startswith('^'):
-            regex = '^' + regex
-
-        if not regex.endswith('$'):
-            regex = regex + '$'
-
-        return [label for label in self.cache.cve_detail if re.match(regex, label)]
 
     def _filter_redhat_only(self, cves_to_process):
         return [cve for cve in cves_to_process if self.cache.cve_detail.get(cve)
@@ -60,6 +47,11 @@ class CveAPI:
 
         return filtered_cves_to_process
 
+    def try_expand_by_regex(self, cves: list) -> list:
+        """Expand list with a POSIX regex if possible"""
+        out_cves = try_expand_by_regex(cves, self.cache.cve_detail)
+        return out_cves
+
     def process_list(self, api_version, data): # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
@@ -84,9 +76,7 @@ class CveAPI:
             return answer
 
         cves_to_process = list(filter(None, cves_to_process))
-        if len(cves_to_process) == 1:
-            # treat single-label like a regex, get all matching names
-            cves_to_process = self.find_cves_by_regex(cves_to_process[0])
+        cves_to_process = self.try_expand_by_regex(cves_to_process)
 
         filters = [(filter_item_if_exists, [self.cache.cve_detail])]
         if rh_only:

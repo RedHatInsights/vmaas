@@ -3,6 +3,7 @@ Set of functions and procedures shared between different modules.
 """
 
 import math
+import re
 from datetime import datetime
 from dateutil import parser as dateutil_parser
 import rpm
@@ -102,6 +103,7 @@ def filter_item_if_exists(list_to_process, item_details):
             filtered_list_to_process.append(item)
     return filtered_list_to_process
 
+
 def filter_package_list(package_list, latest_only=False):
     """
     Filter packages with latest NEVRA
@@ -120,3 +122,24 @@ def filter_package_list(package_list, latest_only=False):
                 continue
         latest_pkgs[(name, arch)] = (epoch, ver, rel, pkg)
     return [val[3] for val in latest_pkgs.values()]
+
+
+def find_by_regex(regex: str, labeled_data: dict) -> list:
+    """Returns list of matching labels for provided regex."""
+    if not regex.startswith('^'):
+        regex = '^' + regex
+
+    if not regex.endswith('$'):
+        regex = regex + '$'
+
+    matching_data = [label for label in labeled_data if re.match(regex, label)]
+    return matching_data
+
+
+def try_expand_by_regex(input_labels: list, labeled_data: dict) -> list:
+    """Treat single-label like a regex, get all matching names"""
+    if len(input_labels) == 1:
+        output_labels = find_by_regex(regex=input_labels[0], labeled_data=labeled_data)
+        if len(output_labels) > 0:
+            return output_labels
+    return input_labels
