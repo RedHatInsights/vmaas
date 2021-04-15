@@ -7,8 +7,9 @@ from natsort import natsorted  # pylint: disable=E0401
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY
 from common.dateutil import parse_datetime
-from common.webapp_utils import format_datetime, none2empty
+from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex
 from common.rpm import join_rpm_name
+
 
 class PkgtreeAPI:
     """ Main /packages API class."""
@@ -70,7 +71,8 @@ class PkgtreeAPI:
                 })
         return natsorted(repos, key=lambda repo_dict: repo_dict['label'])
 
-    def _get_first_published_from_erratas(self, erratas):  # pylint: disable=R0201
+    @staticmethod
+    def _get_first_published_from_erratas(erratas):  # pylint: disable=R0201
         # 'first_published' is the 'issued' date of the oldest errata.
         first_published = None
         for ert in erratas:
@@ -78,6 +80,11 @@ class PkgtreeAPI:
             if first_published is None or issued < first_published:
                 first_published = issued
         return format_datetime(first_published)
+
+    def try_expand_by_regex(self, names: list) -> list:
+        """Expand list with a POSIX regex if possible"""
+        out_names = try_expand_by_regex(names, self.cache.packagename2id)
+        return out_names
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
@@ -94,6 +101,9 @@ class PkgtreeAPI:
         pkgnamelist = {}
         if not names:
             return pkgnamelist
+
+        if api_version >= 3:
+            names = self.try_expand_by_regex(names)
 
         for name in names:
             pkgtree_list = pkgnamelist.setdefault(name, [])

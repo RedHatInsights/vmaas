@@ -73,6 +73,18 @@ class TestPkgtreeAPI(TestBase):
         """Setup PkgtreeAPI object."""
         self.pkg_api = PkgtreeAPI(self.cache)
 
+    def test_wrong_regex(self):
+        """Test wrong errata regex."""
+        with pytest.raises(Exception) as context:
+            self.pkg_api.try_expand_by_regex(["*"])
+        assert "nothing to repeat" in str(context.value)
+
+    def test_regex(self):
+        """Test correct errata regex."""
+        assert self.pkg_api.try_expand_by_regex([PKG]) == [PKG]
+        assert self.pkg_api.try_expand_by_regex(PKGS) == PKGS
+        assert self.pkg_api.try_expand_by_regex(["kernel-r.*"]) == [PKG]
+
     def test_schema(self):
         """Test pkgtree api response schema of valid input."""
         response = self.pkg_api.process_list(1, PKG_JSON)
