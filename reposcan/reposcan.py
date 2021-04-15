@@ -54,6 +54,7 @@ DEFAULT_CHUNK_SIZE = "1048576"
 
 REPOLIST_DIR = '/tmp/repolist_git'
 REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
+REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
 
@@ -335,8 +336,10 @@ class GitRepoListHandler(RepolistImportHandler):
         # Should we just use replacement or add a url handling library, which
         # would be used replace the username in the provided URL ?
         git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
+        git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
 
-        git.Git('/').clone(git_url, REPOLIST_DIR)
+        git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
+
         if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + REPOLIST_PATH):
             LOGGER.error("Downloading repolist failed: Directory was not created")
 
