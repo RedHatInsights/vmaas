@@ -34,13 +34,13 @@ class TestRepoAPI(TestBase):
 
     def test_regex(self):
         """Test correct repos regex."""
-        assert self.repo.find_repos_by_regex("rhel-7-server-rpms") == ["rhel-7-server-rpms"]
-        assert "rhel-7-server-rpms" in self.repo.find_repos_by_regex("rhel-[7].*")
+        assert self.repo.try_expand_by_regex(["rhel-7-server-rpms"]) == ["rhel-7-server-rpms"]
+        assert "rhel-7-server-rpms" in self.repo.try_expand_by_regex(["rhel-[7].*"])
 
     def test_wrong_regex(self):
         """Test wrong repos regex."""
         with pytest.raises(Exception) as context:
-            self.repo.find_repos_by_regex("*")
+            self.repo.try_expand_by_regex(["*"])
         assert "nothing to repeat" in str(context.value)
 
     def test_empty_repository_list(self):

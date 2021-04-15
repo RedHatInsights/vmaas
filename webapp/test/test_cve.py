@@ -62,13 +62,13 @@ class TestCveAPI(TestBase):
 
     def test_regex(self):
         """Test finding CVEs by correct regex."""
-        assert self.cve.find_cves_by_regex(CVE_NAME) == [CVE_NAME]
-        assert self.cve.find_cves_by_regex("CVE-2014-.*") == [CVE_NAME]
+        assert self.cve.try_expand_by_regex([CVE_NAME]) == [CVE_NAME]
+        assert self.cve.try_expand_by_regex(["CVE-2014-.*"]) == [CVE_NAME]
 
     def test_wrong_regex(self):
         """Test CVE API with wrong regex."""
         with pytest.raises(Exception) as context:
-            self.cve.find_cves_by_regex("*")
+            _ = self.cve.try_expand_by_regex(["*"])
         assert "nothing to repeat" in str(context.value)
 
     def test_empty_cve_list(self):
