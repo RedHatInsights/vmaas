@@ -25,8 +25,10 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           login-server: quay.io
-      - name: Build and run VMaaS
-        run: PIPENV_CHECK=0 docker-compose up --build -d
+      - name: Build VMaaS
+        run: PIPENV_CHECK=0 docker-compose build --build-arg OVAL_FEED_BASE_URL="https://raw.githubusercontent.com/psegedy/vmaas-data/master/oval/"
+      - name: Run VMaaS
+        run: PIPENV_CHECK=0 docker-compose up -d
       - name: Wait for VMaaS to run
         run: |
           set +e
