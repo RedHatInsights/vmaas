@@ -287,6 +287,8 @@ objects:
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
           value: ${CLOWDER_ENABLED}
+        - name: OVAL_FEED_BASE_URL
+          value: ${OVAL_FEED_BASE_URL}
 
     database:
       name: vmaas
@@ -439,3 +441,6 @@ parameters:
 - name: MANIFEST_BRANCH
   description: Git branch for manifests
   value: master
+- name: OVAL_FEED_BASE_URL
+  description: OVAL feed url
+  value: "https://www.redhat.com/security/data/oval/v2/"
