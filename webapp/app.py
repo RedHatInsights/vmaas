@@ -324,6 +324,15 @@ class PkgtreeHandlerGet(BaseHandler):
         return await cls.handle_request(cls.pkgtree_api, 1, 'package_name_list', package_name, **kwargs)
 
 
+class PkgtreeHandlerV3Get(BaseHandler):
+    """Handler for processing /pkgtree GET requests."""
+
+    @classmethod
+    async def get(cls, package_name=None, **kwargs):
+        """Get package NEVRAs tree for a single package name."""
+        return await cls.handle_request(cls.pkgtree_api, 3, 'package_name_list', package_name, **kwargs)
+
+
 class PkgtreeHandlerPost(BaseHandler):
     """ /pkgtree API handler """
 
@@ -331,6 +340,15 @@ class PkgtreeHandlerPost(BaseHandler):
     async def post(cls, **kwargs):
         """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
         return await cls.handle_request(cls.pkgtree_api, 1, **kwargs)
+
+
+class PkgtreeHandlerV3Post(BaseHandler):
+    """ /pkgtree API handler """
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
+        return await cls.handle_request(cls.pkgtree_api, 3, **kwargs)
 
 
 class VulnerabilitiesHandlerGet(BaseHandler):

@@ -247,7 +247,7 @@ paths:
   /pkgtree:
     post:
       description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names OR one POSIX regular expression.
-      operationId: app.PkgtreeHandlerPost.post
+      operationId: app.PkgtreeHandlerV3Post.post
       requestBody:
         content:
           application/json:
@@ -266,7 +266,7 @@ paths:
   '/pkgtree/{package_name}':
     get:
       description: Get package NEVRAs tree for a single package name.
-      operationId: app.PkgtreeHandlerGet.get
+      operationId: app.PkgtreeHandlerV3Get.get
       parameters:
         - name: package_name
           description: Package name
@@ -923,6 +923,7 @@ components:
           enum: [ true, false ]
           description: Include content from "third party" repositories into the response, disabled by default.
           default: false
+        <<: *req_paging
       required:
         - package_name_list
     PkgtreeResponse:
@@ -935,6 +936,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/PkgTreeItem'
+        <<: *resp_paging
 
     PkgTreeItem:
       type: object
