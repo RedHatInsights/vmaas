@@ -7,7 +7,7 @@ from natsort import natsorted  # pylint: disable=E0401
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY
 from common.dateutil import parse_datetime
-from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex
+from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex, paginate
 from common.rpm import join_rpm_name
 
 
@@ -81,10 +81,12 @@ class PkgtreeAPI:
                 first_published = issued
         return format_datetime(first_published)
 
-    def try_expand_by_regex(self, names: list) -> list:
+    def try_expand_by_regex(self, api_version: int, names: list) -> list:
         """Expand list with a POSIX regex if possible"""
-        out_names = try_expand_by_regex(names, self.cache.packagename2id)
-        return out_names
+        if api_version >= 3:
+            out_names = try_expand_by_regex(names, self.cache.packagename2id)
+            return out_names
+        return names
 
     def _get_pkg_item(self, pkg_id: int) -> dict:
         pkg_nevra = self._build_nevra(pkg_id)
@@ -118,6 +120,13 @@ class PkgtreeAPI:
             package_name_list[name] = pkgtree_list
         return package_name_list
 
+    @staticmethod
+    def _use_pagination(api_version: int, names: list, page: int, page_size: int):
+        if api_version >= 3:
+            names_page, pagination_response = paginate(names, page, page_size)
+            return names_page, pagination_response
+        return names, dict()
+
     def process_list(self, api_version: int, data: dict):  # pylint: disable=unused-argument
         """
         Returns list of NEVRAs for given packge name.
@@ -129,19 +138,16 @@ class PkgtreeAPI:
 
         # Date and time of last data change in the VMaaS DB
         last_change = format_datetime(self.cache.dbchange['last_change'])
+        page = data.get("page", None)
+        page_size = data.get("page_size", None)
 
         names = data.get('package_name_list', None)
         if not names:
             return dict()
 
-        if api_version >= 3:
-            names = self.try_expand_by_regex(names)
-
+        names = self.try_expand_by_regex(api_version, names)
+        names, response = self._use_pagination(api_version, names, page, page_size)
         package_name_list = self._build_package_name_list(names)
-
-        response = {
-            'package_name_list': package_name_list,
-            'last_change': last_change,
-        }
-
+        response['package_name_list'] = package_name_list
+        response['last_change'] = last_change
         return response

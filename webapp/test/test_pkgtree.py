@@ -15,7 +15,7 @@ PKGS = ['kernel', 'kernel-rt']
 PKG_JSON = {"package_name_list": [PKG]}
 PKGS_JSON = {"package_name_list": PKGS}
 
-RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995',
+RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_size': 1, 'pages': 1,
                 'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
                                                                  'name': 'RHEA-2011:0895'}],
                                                      'first_published': '2011-06-23T00:00:00',
@@ -46,7 +46,7 @@ RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995',
 
 
 RESPONSE_PKGS = {
-    'last_change': '2019-03-07T09:17:23.799995',
+    'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_size': 2, 'pages': 1,
     'package_name_list': {'kernel': [{'errata': [],
                                       'first_published': '',
                                       'nevra': 'kernel-4.18.0-80.el8.x86_64',
@@ -76,18 +76,18 @@ class TestPkgtreeAPI(TestBase):
     def test_wrong_regex(self):
         """Test wrong errata regex."""
         with pytest.raises(Exception) as context:
-            self.pkg_api.try_expand_by_regex(["*"])
+            self.pkg_api.try_expand_by_regex(3, ["*"])
         assert "nothing to repeat" in str(context.value)
 
     def test_regex(self):
         """Test correct errata regex."""
-        assert self.pkg_api.try_expand_by_regex([PKG]) == [PKG]
-        assert self.pkg_api.try_expand_by_regex(PKGS) == PKGS
-        assert self.pkg_api.try_expand_by_regex(["kernel-r.*"]) == [PKG]
+        assert self.pkg_api.try_expand_by_regex(3, [PKG]) == [PKG]
+        assert self.pkg_api.try_expand_by_regex(3, PKGS) == PKGS
+        assert self.pkg_api.try_expand_by_regex(3, ["kernel-r.*"]) == [PKG]
 
     def test_schema(self):
         """Test pkgtree api response schema of valid input."""
-        response = self.pkg_api.process_list(1, PKG_JSON)
+        response = self.pkg_api.process_list(3, PKG_JSON)
         schemas.pkgtree_top_schema.validate(response)
         schemas.pkgtree_list_schema.validate(response["package_name_list"][PKG])
         assert len(response["package_name_list"].keys()) == 1  # One package name is expected
@@ -95,7 +95,7 @@ class TestPkgtreeAPI(TestBase):
 
     def test_schema_multiple_pkgnames(self):
         """Test pkgtree api response schema of valid input with multiple package names."""
-        response = self.pkg_api.process_list(1, PKGS_JSON)
+        response = self.pkg_api.process_list(3, PKGS_JSON)
         schemas.pkgtree_top_schema.validate(response)
         assert len(response["package_name_list"].keys()) == 2  # Two package names are expected
         for pkg in PKGS:
@@ -122,12 +122,12 @@ class TestPkgtreeAPI(TestBase):
 
     def test_pkgname_one_item(self):
         """Test pkgtree api with one package name."""
-        response = self.pkg_api.process_list(1, PKG_JSON)
+        response = self.pkg_api.process_list(3, PKG_JSON)
         assert response == RESPONSE_PKG
 
     def test_pkgname_multiple_items(self):
         """Test pkgtree api with several package names."""
-        response = self.pkg_api.process_list(1, PKGS_JSON)
+        response = self.pkg_api.process_list(3, PKGS_JSON)
         assert response == RESPONSE_PKGS
 
     def test_pkgname_empty_list(self):
