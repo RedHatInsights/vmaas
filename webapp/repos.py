@@ -2,10 +2,8 @@
 Module to handle /repos API calls.
 """
 
-import re
-
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION, REPO_THIRD_PARTY
-from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists
+from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists, try_expand_by_regex
 
 
 class RepoAPI:
@@ -14,28 +12,17 @@ class RepoAPI:
     def __init__(self, cache):
         self.cache = cache
 
-    def find_repos_by_regex(self, repo_regex):
-        """
-        Returns list of repositories (content_set labels) matching a provided regex
-
-        :param repo_regex: string containing a POSIX regular expression
-
-        :returns: list of repository-labels matching the provided regex
-        """
-        if not repo_regex.startswith('^'):
-            repo_regex = '^' + repo_regex
-
-        if not repo_regex.endswith('$'):
-            repo_regex = repo_regex + '$'
-
-        return [label for label in self.cache.repolabel2ids if re.match(repo_regex, label)]
-
     @staticmethod
     def _modified_since(repo_detail, modified_since_dt):
         if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
                 repo_detail[REPO_REVISION]) > modified_since_dt):
             return True
         return False
+
+    def try_expand_by_regex(self, repos: list) -> list:
+        """Expand list with a POSIX regex if possible"""
+        out_repos = try_expand_by_regex(repos, self.cache.repolabel2ids)
+        return out_repos
 
     def _filter_modified_since(self, repos_to_process, modified_since_dt):
         """Filter repositories by modified since"""
@@ -91,9 +78,7 @@ class RepoAPI:
 
         filters.append((self._filter_third_party, [want_third_party]))
 
-        if len(repos) == 1:
-            # treat single-label like a regex, get all matching names
-            repos = self.find_repos_by_regex(repos[0])
+        repos = self.try_expand_by_regex(repos)
 
         repos = list(set(repos))
 

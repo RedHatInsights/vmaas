@@ -54,13 +54,13 @@ class TestErrataAPI(TestBase):
     def test_wrong_regex(self):
         """Test wrong errata regex."""
         with pytest.raises(Exception) as context:
-            self.errata_api.find_errata_by_regex("*")
+            self.errata_api.try_expand_by_regex(["*"])
         assert "nothing to repeat" in str(context.value)
 
     def test_regex(self):
         """Test correct errata regex."""
-        assert self.errata_api.find_errata_by_regex(ERRATA_NAME) == [ERRATA_NAME]
-        assert self.errata_api.find_errata_by_regex("RHBA-2015:0.*") == [ERRATA_NAME]
+        assert self.errata_api.try_expand_by_regex([ERRATA_NAME]) == [ERRATA_NAME]
+        assert self.errata_api.try_expand_by_regex(["RHBA-2015:0.*"]) == [ERRATA_NAME]
 
     def test_empty_errata_list(self):
         """Test errata API with empty 'errata_list'."""
