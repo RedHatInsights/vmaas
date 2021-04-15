@@ -37,13 +37,12 @@ jobs:
             curl http://localhost:8080/api/v1/monitoring/health
             resp=$?
           done
-      - name: Sync VMaaS repolist
-        run: ./scripts/setup_db.sh conf/repolist.json
       - name: Run VMaaS integration tests
         run: |
           docker run --name iqe --network host \
             -e IQE_TESTS_LOCAL_CONF_PATH=/iqe_settings ${{ secrets.IQE_TESTS_IMAGE }} \
-            iqe tests plugin vulnerability -k 'not reconnect' -m vmaas --long-running --html=report.html --self-contained-html
+            -e ENV_FOR_DYNACONF=smoke \
+            iqe tests plugin vmaas -k 'not reconnect' --long-running --html=report.html --self-contained-html
       - run: docker-compose logs > logs
         if: always()
       - run: docker cp iqe:/iqe_venv/report.html .
