@@ -41,6 +41,9 @@ _pkgs_list = {
 _pkgtree_top = {
     "package_name_list": {str: list},
     "last_change": str,
+    "page": int,
+    "page_size": int,
+    "pages": int,
 }
 
 _pkgtree_list = [{
