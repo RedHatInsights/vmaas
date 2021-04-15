@@ -86,48 +86,61 @@ class PkgtreeAPI:
         out_names = try_expand_by_regex(names, self.cache.packagename2id)
         return out_names
 
-    def process_list(self, api_version, data):  # pylint: disable=unused-argument
+    def _get_pkg_item(self, pkg_id: int) -> dict:
+        pkg_nevra = self._build_nevra(pkg_id)
+        errata = self._get_erratas(pkg_id)
+        repositories = self._get_repositories(pkg_id)
+        # Skip content with no repos and no erratas (Should skip third party content)
+        first_published = self._get_first_published_from_erratas(errata)
+        pkg_item = {
+            "nevra": pkg_nevra,
+            "first_published": none2empty(first_published),
+            "repositories": none2empty(repositories),
+            "errata": none2empty(errata),
+        }
+        return pkg_item
+
+    def _get_name_packages(self, name: str) -> list:
+        pkgtree_list = []
+        if name in self.cache.packagename2id:
+            name_id = self.cache.packagename2id[name]
+            pkg_ids = self._get_packages(name_id)
+            for pkg_id in pkg_ids:
+                pkg_item = self._get_pkg_item(pkg_id)
+                pkgtree_list.append(pkg_item)
+        pkgtree_list = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
+        return pkgtree_list
+
+    def _build_package_name_list(self, names: list) -> dict:
+        package_name_list = dict()
+        for name in names:
+            pkgtree_list = self._get_name_packages(name)
+            package_name_list[name] = pkgtree_list
+        return package_name_list
+
+    def process_list(self, api_version: int, data: dict):  # pylint: disable=unused-argument
         """
         Returns list of NEVRAs for given packge name.
 
         :param data: json request parsed into data structure
-
+        :param api_version: API version (1, 2, 3).
         :returns: json response with list of NEVRAs
         """
+
         # Date and time of last data change in the VMaaS DB
         last_change = format_datetime(self.cache.dbchange['last_change'])
 
         names = data.get('package_name_list', None)
-        pkgnamelist = {}
         if not names:
-            return pkgnamelist
+            return dict()
 
         if api_version >= 3:
             names = self.try_expand_by_regex(names)
 
-        for name in names:
-            pkgtree_list = pkgnamelist.setdefault(name, [])
-            if name in self.cache.packagename2id:
-                name_id = self.cache.packagename2id[name]
-                pkg_ids = self._get_packages(name_id)
-                for pkg_id in pkg_ids:
-                    pkg_nevra = self._build_nevra(pkg_id)
-                    errata = self._get_erratas(pkg_id)
-                    repositories = self._get_repositories(pkg_id)
-                    # Skip content with no repos and no erratas (Should skip third party content)
-                    first_published = self._get_first_published_from_erratas(errata)
-                    pkgtree_list.append(
-                        {
-                            "nevra": pkg_nevra,
-                            "first_published": none2empty(first_published),
-                            "repositories": none2empty(repositories),
-                            "errata": none2empty(errata),
-                        }
-                    )
-            pkgnamelist[name] = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
+        package_name_list = self._build_package_name_list(names)
 
         response = {
-            'package_name_list': pkgnamelist,
+            'package_name_list': package_name_list,
             'last_change': last_change,
         }
 
