@@ -246,7 +246,7 @@ paths:
 
   /pkgtree:
     post:
-      description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names.
+      description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names OR one POSIX regular expression.
       operationId: app.PkgtreeHandlerPost.post
       requestBody:
         content:
