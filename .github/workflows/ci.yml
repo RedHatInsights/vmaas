@@ -25,15 +25,12 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           login-server: quay.io
+      - name: Patch reposcan.env with OVAL_FEED_BASE_URL
+        run: echo "OVAL_FEED_BASE_URL=https://raw.githubusercontent.com/psegedy/vmaas-data/master/oval/" >> conf/reposcan.env
       - name: Build VMaaS
         run: PIPENV_CHECK=0 docker-compose build
       - name: Run VMaaS
         run: PIPENV_CHECK=0 docker-compose up -d
-      - name: Run reposcan with OVAL_FEED_BASE_URL
-        run: |
-          docker stop vmaas-reposcan
-          docker rm vmaas-reposcan
-          PIPENV_CHECK=0 docker-compose run --rm -d -e OVAL_FEED_BASE_URL="https://raw.githubusercontent.com/psegedy/vmaas-data/master/oval/" --name vmaas-reposcan vmaas_reposcan
       - name: Wait for VMaaS to run
         run: |
           set +e
