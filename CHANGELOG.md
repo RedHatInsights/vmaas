@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.10.0 (2021-04-16)
+### Feature
+* **webapp:** Added pagination to /pkgtree (api_version=3) ([`568497d`](https://github.com/RedHatInsights/vmaas/commit/568497df7f29fa139c0544a863c525a613110ba4))
+
 ## v2.9.0 (2021-04-15)
 ### Feature
 * **reposcan:** Add support for different git repolist branches ([`d7f8446`](https://github.com/RedHatInsights/vmaas/commit/d7f8446b35ad08ded908bd95d9e718ea1991b33a))
