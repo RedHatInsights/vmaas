@@ -40,8 +40,8 @@ jobs:
       - name: Run VMaaS integration tests
         run: |
           docker run --name iqe --network host \
-            -e IQE_TESTS_LOCAL_CONF_PATH=/iqe_settings ${{ secrets.IQE_TESTS_IMAGE }} \
-            -e ENV_FOR_DYNACONF=smoke \
+            -e IQE_TESTS_LOCAL_CONF_PATH=/iqe_settings -e ENV_FOR_DYNACONF=smoke \
+            ${{ secrets.IQE_TESTS_IMAGE }} \
             iqe tests plugin vmaas -k 'not reconnect' --long-running --html=report.html --self-contained-html
       - run: docker-compose logs > logs
         if: always()
