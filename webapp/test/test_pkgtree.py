@@ -12,8 +12,8 @@ from pkgtree import PkgtreeAPI
 
 PKG = 'kernel-rt'
 PKGS = ['kernel', 'kernel-rt']
-PKG_JSON = {"package_name_list": [PKG]}
-PKGS_JSON = {"package_name_list": PKGS}
+PKG_JSON = {"package_name_list": [PKG], "return_summary": True, "return_description": True}
+PKGS_JSON = {"package_name_list": PKGS, "return_summary": True, "return_description": True}
 
 RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_size': 1, 'pages': 1,
                 'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
