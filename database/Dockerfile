@@ -1,13 +1,7 @@
 # Dockerfile uses postgresql 12 latest image
 # with applied vmaas database schema
 FROM registry.redhat.io/rhscl/postgresql-12-rhel7
-
-ADD /scripts/generate_rpm_list.sh /generate_rpm_list.sh
-# make sure (redhat|centos|fedora)-release is always included in the manifest
-RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/base_rpm_list.txt
-
 # all environment variables are defined in conf/*.env
-
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
 ENV POSTGRESQL_DATABASE 'vmaas'
@@ -17,12 +11,3 @@ ENV POSTGRESQL_READER_PASSWORD 'vmaas_reader_pwd'
 ADD /database/vmaas_db_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
 ADD /database/vmaas_user_create_postgresql.sql ${CONTAINER_SCRIPTS_PATH}/start/
 ADD /database/init_schema.sh ${CONTAINER_SCRIPTS_PATH}/start/
-
-RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
-ENV MANIFEST_PATH=/opt/app-root/manifest.txt
-ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-database\/"
-ADD /scripts/generate_manifest.sh /generate_manifest.sh
-ADD /scripts/push_manifest.sh /push_manifest.sh
-ADD /common/*.py /opt/app-root/src/common/
-RUN /generate_manifest.sh $MANIFEST_PATH $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
-    echo 'MANIFEST:' && cat $MANIFEST_PATH
