@@ -5,7 +5,7 @@ Module to handle /pkgtree API calls.
 from natsort import natsorted  # pylint: disable=E0401
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
-    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY
+    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY, PKG_SUMMARY_ID, PKG_DESC_ID
 from common.dateutil import parse_datetime
 from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex, paginate
 from common.rpm import join_rpm_name
@@ -26,8 +26,8 @@ class PkgtreeAPI:
                 pkg_ids.add(pkg_id)
         return pkg_ids
 
-    def _build_nevra(self, pkg_id):
-        name_id, evr_id, arch_id, _, _, _ = self.cache.package_details[pkg_id]
+    def _build_nevra(self, pkg_val):
+        name_id, evr_id, arch_id, _, _, _ = pkg_val
         name = self.cache.id2packagename[name_id]
         epoch, ver, rel = self.cache.id2evr[evr_id]
         arch = self.cache.id2arch[arch_id]
@@ -88,8 +88,21 @@ class PkgtreeAPI:
             return out_names
         return names
 
-    def _get_pkg_item(self, pkg_id: int) -> dict:
-        pkg_nevra = self._build_nevra(pkg_id)
+    def _get_cached_string(self, pkg_detail, field_id: int) -> str:
+        str_id = pkg_detail[field_id]
+        cached_str = self.cache.strings.get(str_id, None)
+        return cached_str
+
+    def _get_another_metadata(self, api_version: int, pkg_detail) -> dict:
+        resp = {}
+        if api_version >= 3:
+            resp["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
+            resp["description"] = self._get_cached_string(pkg_detail, PKG_DESC_ID)
+        return resp
+
+    def _get_pkg_item(self, api_version: int, pkg_id: int) -> dict:
+        pkg_detail = self.cache.package_details[pkg_id]
+        pkg_nevra = self._build_nevra(pkg_detail)
         errata = self._get_erratas(pkg_id)
         repositories = self._get_repositories(pkg_id)
         # Skip content with no repos and no erratas (Should skip third party content)
@@ -100,23 +113,25 @@ class PkgtreeAPI:
             "repositories": none2empty(repositories),
             "errata": none2empty(errata),
         }
+        sum_and_des = self._get_another_metadata(api_version, pkg_detail)
+        pkg_item.update(sum_and_des)
         return pkg_item
 
-    def _get_name_packages(self, name: str) -> list:
+    def _get_name_packages(self, api_version: int, name: str) -> list:
         pkgtree_list = []
         if name in self.cache.packagename2id:
             name_id = self.cache.packagename2id[name]
             pkg_ids = self._get_packages(name_id)
             for pkg_id in pkg_ids:
-                pkg_item = self._get_pkg_item(pkg_id)
+                pkg_item = self._get_pkg_item(api_version, pkg_id)
                 pkgtree_list.append(pkg_item)
         pkgtree_list = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
         return pkgtree_list
 
-    def _build_package_name_list(self, names: list) -> dict:
+    def _build_package_name_list(self, api_version: int, names: list) -> dict:
         package_name_list = dict()
         for name in names:
-            pkgtree_list = self._get_name_packages(name)
+            pkgtree_list = self._get_name_packages(api_version, name)
             package_name_list[name] = pkgtree_list
         return package_name_list
 
@@ -147,7 +162,7 @@ class PkgtreeAPI:
 
         names = self.try_expand_by_regex(api_version, names)
         names, response = self._use_pagination(api_version, names, page, page_size)
-        package_name_list = self._build_package_name_list(names)
+        package_name_list = self._build_package_name_list(api_version, names)
         response['package_name_list'] = package_name_list
         response['last_change'] = last_change
         return response

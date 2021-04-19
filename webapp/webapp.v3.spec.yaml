@@ -944,6 +944,12 @@ components:
         nevra:
           type: string
           example: kernel-rt-4.18.0-147.rt24.93.el8.x86_64
+        summary:
+          type: string
+          example: My package summary
+        description:
+          type: string
+          example: My package description
         first_published:
           type: string
           example: '2020-01-13T17:31:41+00:00'
