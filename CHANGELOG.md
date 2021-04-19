@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.11.0 (2021-04-19)
+### Feature
+* **webapp:** Added summary and description info to /pkgtree response v3 ([`909d7c3`](https://github.com/RedHatInsights/vmaas/commit/909d7c36368e003c616f21acff8df34204928929))
+
 ## v2.10.0 (2021-04-16)
 ### Feature
 * **webapp:** Added pagination to /pkgtree (api_version=3) ([`568497d`](https://github.com/RedHatInsights/vmaas/commit/568497df7f29fa139c0544a863c525a613110ba4))
