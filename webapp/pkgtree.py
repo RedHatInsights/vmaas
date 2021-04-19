@@ -93,45 +93,44 @@ class PkgtreeAPI:
         cached_str = self.cache.strings.get(str_id, None)
         return cached_str
 
-    def _get_another_metadata(self, api_version: int, pkg_detail) -> dict:
-        resp = {}
-        if api_version >= 3:
-            resp["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
-            resp["description"] = self._get_cached_string(pkg_detail, PKG_DESC_ID)
-        return resp
-
-    def _get_pkg_item(self, api_version: int, pkg_id: int) -> dict:
+    def _get_pkg_item(self, api_version: int, pkg_id: int, opts: dict) -> dict:
         pkg_detail = self.cache.package_details[pkg_id]
         pkg_nevra = self._build_nevra(pkg_detail)
-        errata = self._get_erratas(pkg_id)
-        repositories = self._get_repositories(pkg_id)
         # Skip content with no repos and no erratas (Should skip third party content)
-        first_published = self._get_first_published_from_erratas(errata)
         pkg_item = {
             "nevra": pkg_nevra,
-            "first_published": none2empty(first_published),
-            "repositories": none2empty(repositories),
-            "errata": none2empty(errata),
         }
-        sum_and_des = self._get_another_metadata(api_version, pkg_detail)
-        pkg_item.update(sum_and_des)
+        if opts["return_repositories"]:
+            repositories = self._get_repositories(pkg_id)
+            pkg_item["repositories"] = none2empty(repositories)
+        if opts["return_errata"]:
+            errata = self._get_erratas(pkg_id)
+            pkg_item["errata"] = none2empty(errata)
+            first_published = self._get_first_published_from_erratas(errata)
+            pkg_item["first_published"] = none2empty(first_published)
+
+        if api_version >= 3:
+            if opts["return_summary"]:
+                pkg_item["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
+            if opts["return_description"]:
+                pkg_item["description"] = self._get_cached_string(pkg_detail, PKG_DESC_ID)
         return pkg_item
 
-    def _get_name_packages(self, api_version: int, name: str) -> list:
+    def _get_name_packages(self, api_version: int, name: str, opts: dict) -> list:
         pkgtree_list = []
         if name in self.cache.packagename2id:
             name_id = self.cache.packagename2id[name]
             pkg_ids = self._get_packages(name_id)
             for pkg_id in pkg_ids:
-                pkg_item = self._get_pkg_item(api_version, pkg_id)
+                pkg_item = self._get_pkg_item(api_version, pkg_id, opts)
                 pkgtree_list.append(pkg_item)
         pkgtree_list = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
         return pkgtree_list
 
-    def _build_package_name_list(self, api_version: int, names: list) -> dict:
+    def _build_package_name_list(self, api_version: int, names: list, opts: dict) -> dict:
         package_name_list = dict()
         for name in names:
-            pkgtree_list = self._get_name_packages(api_version, name)
+            pkgtree_list = self._get_name_packages(api_version, name, opts)
             package_name_list[name] = pkgtree_list
         return package_name_list
 
@@ -155,6 +154,12 @@ class PkgtreeAPI:
         last_change = format_datetime(self.cache.dbchange['last_change'])
         page = data.get("page", None)
         page_size = data.get("page_size", None)
+        opts = dict(
+            return_repositories=data.get("return_repositories", True),
+            return_errata=data.get("return_errata", True),
+            return_summary=data.get("return_summary", False),
+            return_description=data.get("return_description", False)
+        )
 
         names = data.get('package_name_list', None)
         if not names:
@@ -162,7 +167,7 @@ class PkgtreeAPI:
 
         names = self.try_expand_by_regex(api_version, names)
         names, response = self._use_pagination(api_version, names, page, page_size)
-        package_name_list = self._build_package_name_list(api_version, names)
+        package_name_list = self._build_package_name_list(api_version, names, opts)
         response['package_name_list'] = package_name_list
         response['last_change'] = last_change
         return response
