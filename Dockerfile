@@ -29,11 +29,13 @@ RUN pip3 install --upgrade pipenv && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 39462 ; fi
 
 RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
-ENV MANIFEST_PREFIX="mgmt_services:VERSION:vmaas-app\/"
-ENV MANIFEST_PYTHON=python3
+ENV MANIFEST_PREFIX="services-vmaas\/app"
+ENV APP_BASE_IMAGE="OCI_ubi-minimal registry.access.redhat.com/ubi8"
+ADD /scripts/get_app_version.sh   /get_app_version.sh
+ADD /common/*.py                  /vmaas/common/
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
-ADD /scripts/push_manifest.sh /push_manifest.sh
-RUN /generate_manifest.sh manifest.txt $MANIFEST_PREFIX /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt $MANIFEST_PYTHON && \
+ADD /scripts/push_manifest.sh     /push_manifest.sh
+RUN /generate_manifest.sh manifest.txt "$MANIFEST_PREFIX" "$APP_BASE_IMAGE" /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
     echo 'MANIFEST:' && cat manifest.txt
 
 RUN install -m 1777 -d /data && \
@@ -44,7 +46,6 @@ USER vmaas
 ADD wait-for-services.sh        /vmaas/
 ADD wait_for_services.py        /vmaas/
 ADD entrypoint.sh               /vmaas/
-ADD /common/*.py                /vmaas/common/
 ADD /common/*.py                /vmaas/webapp/common/
 ADD /common/*.py                /vmaas/reposcan/common/
 ADD /common/*.py                /vmaas/websocket/common/
