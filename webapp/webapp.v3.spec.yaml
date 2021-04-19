@@ -923,6 +923,26 @@ components:
           enum: [ true, false ]
           description: Include content from "third party" repositories into the response, disabled by default.
           default: false
+        return_repositories:
+          type: boolean
+          enum: [ true, false ]
+          description: Include nevra repositories info into the response.
+          default: true
+        return_errata:
+          type: boolean
+          enum: [ true, false ]
+          description: Include nevra errata info into the response.
+          default: true
+        return_summary:
+          type: boolean
+          enum: [ true, false ]
+          description: Include nevra summary info into the response.
+          default: false
+        return_description:
+          type: boolean
+          enum: [ true, false ]
+          description: Include nevra description info into the response.
+          default: false
         <<: *req_paging
       required:
         - package_name_list
