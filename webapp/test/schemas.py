@@ -48,6 +48,8 @@ _pkgtree_top = {
 
 _pkgtree_list = [{
     "nevra": str,
+    "summary": str,
+    "description": str,
     "first_published": str,
     "repositories": [{
         "label": str,

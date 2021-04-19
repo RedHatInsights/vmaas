@@ -276,24 +276,24 @@ package_details:
   - 332222
   - 310
   - 7
-  - 0
-  - 0
+  - 1
+  - 5
   - 0
   # kernel-rt-4.18.0-80.rt9.138.el8.x86_64
   8320: !!python/tuple # name_id, evr_id, arch_id
   - 332222
   - 320
   - 7
-  - 0
-  - 0
+  - 1
+  - 5
   - 0
   # kernel-4.18.0-80.el8.x86_64
   8410:
   - 32222
   - 410
   - 7
-  - 0
-  - 0
+  - 1
+  - 5
   - 0
 packagename2id:
   my-pkg: 2222
