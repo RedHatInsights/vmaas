@@ -918,6 +918,10 @@ components:
             type: string
             example: kernel-rt
           minItems: 1
+        modified_since:
+          type: string
+          example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         third_party:
           type: boolean
           enum: [ true, false ]
@@ -1016,6 +1020,10 @@ components:
                 type: string
                 example: 'RHSA-2019:2730'
               issued:
+                type: string
+                example: '2019-11-19T09:41:05+00:00'
+                format: date-time
+              updated:
                 type: string
                 example: '2019-11-19T09:41:05+00:00'
                 format: date-time
