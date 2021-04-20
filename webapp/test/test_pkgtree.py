@@ -135,11 +135,11 @@ class TestPkgtreeAPI(TestBase):
         assert response == RESPONSE_PKG
 
     def test_pkgname_modified_since(self):
-        """Test pkgtree api with one package name."""
-        req = PKG_JSON.copy()
+        """Test pkgtree api 'modified_since' param set."""
+        req = PKGS_JSON.copy()
         req["modified_since"] = '2015-04-05T01:23:45+00:00'
         response = self.pkg_api.process_list(3, req)
-        exp = deepcopy(RESPONSE_PKG)
+        exp = deepcopy(RESPONSE_PKGS)
         exp["package_name_list"]["kernel-rt"].pop(0)
         assert response == exp
 
