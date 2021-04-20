@@ -6,6 +6,7 @@ from test import schemas
 from test import tools
 from test.conftest import TestBase
 
+from copy import deepcopy
 import pytest
 
 from pkgtree import PkgtreeAPI
@@ -15,10 +16,11 @@ PKGS = ['kernel', 'kernel-rt']
 PKG_JSON = {"package_name_list": [PKG], "return_summary": True, "return_description": True}
 PKGS_JSON = {"package_name_list": PKGS, "return_summary": True, "return_description": True}
 
-RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_size': 1, 'pages': 1,
-                'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00',
+RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995+00:00', 'page': 1, 'page_size': 1, 'pages': 1,
+                'package_name_list': {'kernel-rt': [{'errata': [{'issued': '2011-06-23T00:00:00+00:00',
+                                                                 'updated': '2011-06-23T00:00:00+00:00',
                                                                  'name': 'RHEA-2011:0895'}],
-                                                     'first_published': '2011-06-23T00:00:00',
+                                                     'first_published': '2011-06-23T00:00:00+00:00',
                                                      'summary': 'Testing package summary...',
                                                      'description': 'Testing package description...',
                                                      'nevra': 'kernel-rt-2.6.33.9-rt31.66.el6rt.x86_64',
@@ -32,9 +34,10 @@ RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_si
                                                                        'releasever': '8.1',
                                                                        'revision': '2020-01-03T05:24:17+00:00'}]},
                                                     {'errata': [{'cve_list': ['CVE-2018-10126'],
-                                                                 'issued': '2019-06-14T18:22:02',
+                                                                 'issued': '2019-06-14T18:22:02+00:00',
+                                                                 'updated': '2019-05-14T18:22:02+00:00',
                                                                  'name': 'RHSA-2019:1175'}],
-                                                     'first_published': '2019-06-14T18:22:02',
+                                                     'first_published': '2019-06-14T18:22:02+00:00',
                                                      'summary': 'Testing package summary...',
                                                      'description': 'Testing package description...',
                                                      'nevra': 'kernel-rt-4.18.0-80.rt9.138.el8.x86_64',
@@ -50,7 +53,7 @@ RESPONSE_PKG = {'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_si
 
 
 RESPONSE_PKGS = {
-    'last_change': '2019-03-07T09:17:23.799995', 'page': 1, 'page_size': 2, 'pages': 1,
+    'last_change': '2019-03-07T09:17:23.799995+00:00', 'page': 1, 'page_size': 2, 'pages': 1,
     'package_name_list': {'kernel': [{'errata': [],
                                       'first_published': '',
                                       'summary': 'Testing package summary...',
@@ -130,6 +133,15 @@ class TestPkgtreeAPI(TestBase):
         """Test pkgtree api with one package name."""
         response = self.pkg_api.process_list(3, PKG_JSON)
         assert response == RESPONSE_PKG
+
+    def test_pkgname_modified_since(self):
+        """Test pkgtree api with one package name."""
+        req = PKG_JSON.copy()
+        req["modified_since"] = '2015-04-05T01:23:45+00:00'
+        response = self.pkg_api.process_list(3, req)
+        exp = deepcopy(RESPONSE_PKG)
+        exp["package_name_list"]["kernel-rt"].pop(0)
+        assert response == exp
 
     def test_pkgname_multiple_items(self):
         """Test pkgtree api with several package names."""
