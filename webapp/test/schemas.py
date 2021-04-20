@@ -63,6 +63,7 @@ _pkgtree_list = [{
     "errata": [{
         "name": str,
         "issued": str,
+        "updated": str,
         Optional("cve_list"): [str],
     }],
 }]

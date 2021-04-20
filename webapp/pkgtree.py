@@ -2,12 +2,14 @@
 Module to handle /pkgtree API calls.
 """
 
+import datetime
 from natsort import natsorted  # pylint: disable=E0401
 
 from cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
-    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY, PKG_SUMMARY_ID, PKG_DESC_ID
-from common.dateutil import parse_datetime
-from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex, paginate
+    REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY, ERRATA_UPDATED, \
+    PKG_SUMMARY_ID, PKG_DESC_ID
+from common.dateutil import parse_datetime as parse_dt
+from common.webapp_utils import format_datetime, none2empty, try_expand_by_regex, paginate, parse_datetime
 from common.rpm import join_rpm_name
 
 
@@ -26,32 +28,48 @@ class PkgtreeAPI:
                 pkg_ids.add(pkg_id)
         return pkg_ids
 
-    def _build_nevra(self, pkg_val):
-        name_id, evr_id, arch_id, _, _, _ = pkg_val
+    def _build_nevra(self, pkg_detail: tuple):
+        name_id, evr_id, arch_id, _, _, _ = pkg_detail
         name = self.cache.id2packagename[name_id]
         epoch, ver, rel = self.cache.id2evr[evr_id]
         arch = self.cache.id2arch[arch_id]
         return join_rpm_name(name, epoch, ver, rel, arch)
 
-    def _get_erratas(self, pkg_id):
+    @staticmethod
+    def _update_modified_found(modified_found_prev: bool, modified_since: datetime.datetime,
+                               updated_ts: datetime.datetime) -> bool:
+        if modified_found_prev:
+            return True
+        if modified_since is None or updated_ts is None:
+            return False
+        if updated_ts >= modified_since:
+            return True
+        return False
+
+    def _get_erratas(self, api_version: int, pkg_id: int, modified_since: datetime.datetime,
+                     third_party: bool) -> tuple:
         erratas = []
+        modified_found = False
         if pkg_id in self.cache.pkgid2errataids:
             errata_ids = self.cache.pkgid2errataids[pkg_id]
             for err_id in errata_ids:
                 name = self.cache.errataid2name[err_id]
                 detail = self.cache.errata_detail[name]
-                issued = detail[ERRATA_ISSUED]
-                cves = detail[ERRATA_CVE]
-                # Skip third party errata
-                if detail[ERRATA_THIRD_PARTY]:
+                if detail[ERRATA_THIRD_PARTY] and not third_party:
                     continue
-                errata = {
-                    'name': name,
-                    'issued': none2empty(format_datetime(issued))}
+                issued = detail[ERRATA_ISSUED]
+                errata = {'name': name,
+                          'issued': none2empty(format_datetime(issued))}
+                if api_version >= 3:
+                    updated_ts = detail[ERRATA_UPDATED]
+                    errata['updated'] = none2empty(format_datetime(updated_ts))
+                    modified_found = self._update_modified_found(modified_found, modified_since, updated_ts)
+                cves = detail[ERRATA_CVE]
                 if cves:
                     errata['cve_list'] = natsorted(cves)
                 erratas.append(errata)
-        return natsorted(erratas, key=lambda err_dict: err_dict['name'])
+        erratas = natsorted(erratas, key=lambda err_dict: err_dict['name'])
+        return erratas, modified_found
 
     def _get_repositories(self, pkg_id):
         # FIXME Add support for modules and streams.
@@ -76,7 +94,7 @@ class PkgtreeAPI:
         # 'first_published' is the 'issued' date of the oldest errata.
         first_published = None
         for ert in erratas:
-            issued = parse_datetime(ert['issued'])
+            issued = parse_dt(ert['issued'])
             if first_published is None or issued < first_published:
                 first_published = issued
         return format_datetime(first_published)
@@ -88,49 +106,87 @@ class PkgtreeAPI:
             return out_names
         return names
 
-    def _get_cached_string(self, pkg_detail, field_id: int) -> str:
+    def _get_cached_string(self, pkg_detail: tuple, field_id: int) -> str:
         str_id = pkg_detail[field_id]
         cached_str = self.cache.strings.get(str_id, None)
         return cached_str
 
-    def _get_pkg_item(self, api_version: int, pkg_id: int, opts: dict) -> dict:
+    @staticmethod
+    def _exclude_not_modified(modified: bool, modified_since: datetime.datetime) -> bool:
+        if modified_since is None:
+            return False
+        if not modified:
+            return True
+        return False
+
+    def _update_repositories(self, pkg_id: int, opts: dict) -> dict:
+        if opts["return_repositories"]:
+            repositories = self._get_repositories(pkg_id)
+            return dict(repositories=none2empty(repositories))
+        return dict()
+
+    def _update_errata(self, api_version: int, pkg_id: int, opts: dict, third_party: bool) -> tuple:
+        """Add errata-related data, skip based on modified_since if needed"""
+        data = dict()
+        if opts["return_errata"] or opts["modified_since"] is not None:
+            errata, modified = self._get_erratas(api_version, pkg_id, opts["modified_since"], third_party)
+            if self._exclude_not_modified(modified, opts["modified_since"]):
+                return None, True
+            if opts["return_errata"]:
+                data["errata"] = none2empty(errata)
+                first_published = self._get_first_published_from_erratas(errata)
+                data["first_published"] = none2empty(first_published)
+        return data, False
+
+    def _update_summary_desc(self, api_version: int, pkg_detail: tuple, opts: dict) -> dict:
+        data = dict()
+        if api_version >= 3:
+            if opts["return_summary"]:
+                data["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
+            if opts["return_description"]:
+                data["description"] = self._get_cached_string(pkg_detail, PKG_DESC_ID)
+        return data
+
+    def _get_pkg_item(self, api_version: int, pkg_id: int, opts: dict, third_party: bool) -> dict:
         pkg_detail = self.cache.package_details[pkg_id]
         pkg_nevra = self._build_nevra(pkg_detail)
         # Skip content with no repos and no erratas (Should skip third party content)
         pkg_item = {
             "nevra": pkg_nevra,
         }
-        if opts["return_repositories"]:
-            repositories = self._get_repositories(pkg_id)
-            pkg_item["repositories"] = none2empty(repositories)
-        if opts["return_errata"]:
-            errata = self._get_erratas(pkg_id)
-            pkg_item["errata"] = none2empty(errata)
-            first_published = self._get_first_published_from_erratas(errata)
-            pkg_item["first_published"] = none2empty(first_published)
-
-        if api_version >= 3:
-            if opts["return_summary"]:
-                pkg_item["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
-            if opts["return_description"]:
-                pkg_item["description"] = self._get_cached_string(pkg_detail, PKG_DESC_ID)
+        pkg_item.update(self._update_repositories(pkg_id, opts))
+        errata_update, modified_since_skip = self._update_errata(api_version, pkg_id, opts, third_party)
+        if modified_since_skip:
+            return None
+        pkg_item.update(errata_update)
+        summary_desc_update = self._update_summary_desc(api_version, pkg_detail, opts)
+        pkg_item.update(summary_desc_update)
         return pkg_item
 
-    def _get_name_packages(self, api_version: int, name: str, opts: dict) -> list:
+    def _get_name_packages(self, api_version: int, name: str, opts: dict, third_party: bool) -> list:
         pkgtree_list = []
         if name in self.cache.packagename2id:
             name_id = self.cache.packagename2id[name]
             pkg_ids = self._get_packages(name_id)
             for pkg_id in pkg_ids:
-                pkg_item = self._get_pkg_item(api_version, pkg_id, opts)
-                pkgtree_list.append(pkg_item)
+                pkg_item = self._get_pkg_item(api_version, pkg_id, opts, third_party)
+                if pkg_item is not None:
+                    pkgtree_list.append(pkg_item)
         pkgtree_list = natsorted(pkgtree_list, key=lambda nevra_list: nevra_list['nevra'])
         return pkgtree_list
 
+    @staticmethod
+    def _get_third_party(api_version: int, opts: dict) -> bool:
+        """Third party is disabled by default, allowed only for API v3"""
+        if api_version >= 3 and opts["third_party"]:
+            return True
+        return False
+
     def _build_package_name_list(self, api_version: int, names: list, opts: dict) -> dict:
         package_name_list = dict()
+        third_party = self._get_third_party(api_version, opts)
         for name in names:
-            pkgtree_list = self._get_name_packages(api_version, name, opts)
+            pkgtree_list = self._get_name_packages(api_version, name, opts, third_party)
             package_name_list[name] = pkgtree_list
         return package_name_list
 
@@ -150,15 +206,15 @@ class PkgtreeAPI:
         :returns: json response with list of NEVRAs
         """
 
-        # Date and time of last data change in the VMaaS DB
-        last_change = format_datetime(self.cache.dbchange['last_change'])
         page = data.get("page", None)
         page_size = data.get("page_size", None)
         opts = dict(
+            modified_since=parse_datetime(data.get("modified_since", None)),
             return_repositories=data.get("return_repositories", True),
             return_errata=data.get("return_errata", True),
             return_summary=data.get("return_summary", False),
-            return_description=data.get("return_description", False)
+            return_description=data.get("return_description", False),
+            third_party=data.get("third_party", False),
         )
 
         names = data.get('package_name_list', None)
@@ -169,5 +225,6 @@ class PkgtreeAPI:
         names, response = self._use_pagination(api_version, names, page, page_size)
         package_name_list = self._build_package_name_list(api_version, names, opts)
         response['package_name_list'] = package_name_list
-        response['last_change'] = last_change
+        # Date and time of last data change in the VMaaS DB
+        response['last_change'] = format_datetime(self.cache.dbchange['last_change'])
         return response
