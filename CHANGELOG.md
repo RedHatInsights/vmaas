@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.13.0 (2021-04-20)
+### Feature
+* **webapp:** Add "modified_since" support to /pkgtree v3 ([`922c84b`](https://github.com/RedHatInsights/vmaas/commit/922c84bab2dc2af861f1d6cba362dc6dc58cc887))
+
 ## v2.12.0 (2021-04-20)
 ### Feature
 * **webapp:** Add new /pkgtree endpoint options ([`5811f2f`](https://github.com/RedHatInsights/vmaas/commit/5811f2f6da52c8fbf192ce01944b230bb3a1d2bb))
