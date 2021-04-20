@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.12.0 (2021-04-20)
+### Feature
+* **webapp:** Add new /pkgtree endpoint options ([`5811f2f`](https://github.com/RedHatInsights/vmaas/commit/5811f2f6da52c8fbf192ce01944b230bb3a1d2bb))
+
 ## v2.11.0 (2021-04-19)
 ### Feature
 * **webapp:** Added summary and description info to /pkgtree response v3 ([`909d7c3`](https://github.com/RedHatInsights/vmaas/commit/909d7c36368e003c616f21acff8df34204928929))
