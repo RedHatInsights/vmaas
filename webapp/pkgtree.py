@@ -112,7 +112,9 @@ class PkgtreeAPI:
         return cached_str
 
     @staticmethod
-    def _exclude_not_modified(modified: bool, modified_since: datetime.datetime) -> bool:
+    def _exclude_not_modified(modified: bool, modified_since: datetime.datetime, n_erratas: int) -> bool:
+        if n_erratas == 0:
+            return False
         if modified_since is None:
             return False
         if not modified:
@@ -130,7 +132,7 @@ class PkgtreeAPI:
         data = dict()
         if opts["return_errata"] or opts["modified_since"] is not None:
             errata, modified = self._get_erratas(api_version, pkg_id, opts["modified_since"], third_party)
-            if self._exclude_not_modified(modified, opts["modified_since"]):
+            if self._exclude_not_modified(modified, opts["modified_since"], len(errata)):
                 return None, True
             if opts["return_errata"]:
                 data["errata"] = none2empty(errata)
