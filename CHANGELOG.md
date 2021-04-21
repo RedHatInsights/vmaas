@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.13.1 (2021-04-21)
+### Fix
+* **webapp:** Include packages without errata ([`4b4e409`](https://github.com/RedHatInsights/vmaas/commit/4b4e409769dd14864f8275f51118beda159fa4d8))
+
 ## v2.13.0 (2021-04-20)
 ### Feature
 * **webapp:** Add "modified_since" support to /pkgtree v3 ([`922c84b`](https://github.com/RedHatInsights/vmaas/commit/922c84bab2dc2af861f1d6cba362dc6dc58cc887))
