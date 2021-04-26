@@ -1,5 +1,23 @@
 [{
   "products": {
+    "Extra Packages for Enterprise Linux (EPEL)": {
+      "content_sets": {
+        "epel": {
+          "name": "Extra Packages for Enterprise Linux (RPMs)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Everything/$basearch",
+          "basearch": ["x86_64"],
+          "releasever": ["8"],
+          "third_party": true
+        },
+        "epel-modular": {
+          "name": "Extra Packages for Enterprise Linux Modular 8 - $basearch",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Modular/$basearch",
+          "basearch": ["x86_64"],
+          "releasever": ["8"],
+          "third_party": true
+        }
+      }
+    },
     "Red Hat Enterprise Linux Server": {
       "redhat_eng_product_id": 69,
       "content_sets": {
