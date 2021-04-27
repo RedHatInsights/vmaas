@@ -115,6 +115,8 @@ class RepositoryStore:
                 cur.execute("""delete from pkg_errata pe where pe.errata_id in %s""", (tuple(updates_to_delete),))
                 cur.execute("""delete from errata_cve ec where ec.errata_id in %s""", (tuple(updates_to_delete),))
                 cur.execute("""delete from errata_refs er where er.errata_id in %s""", (tuple(updates_to_delete),))
+                cur.execute("""delete from oval_definition_errata ode where ode.errata_id in %s""",
+                            (tuple(updates_to_delete),))
                 cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
             self.conn.commit()
         except Exception:  #pylint: disable=broad-except
@@ -151,6 +153,7 @@ class RepositoryStore:
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from repo where id = %s", (repo_id,))
+            cur.execute("delete from cpe_content_set where content_set_id = %s", (content_set_id,))
             cur.execute("delete from content_set where id = %s", (content_set_id,))
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
