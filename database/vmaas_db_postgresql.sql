@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 4);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 5);
 
 -- -----------------------------------------------------
 -- evr type
@@ -359,6 +359,7 @@ CREATE TABLE IF NOT EXISTS package (
 
 CREATE INDEX ON package(name_id);
 CREATE INDEX ON package(evr_id);
+CREATE INDEX ON package(source_package_id);
 
 
 -- -----------------------------------------------------
@@ -834,6 +835,7 @@ WHERE module_stream_id IS NOT NULL;
 
 CREATE INDEX ON pkg_errata(errata_id);
 CREATE INDEX ON pkg_errata(module_stream_id);
+CREATE INDEX ON pkg_errata(pkg_id);
 
 CREATE TABLE IF NOT EXISTS db_upgrade_log (
   id SERIAL,
@@ -1183,6 +1185,8 @@ CREATE TABLE IF NOT EXISTS oval_definition_errata (
     FOREIGN KEY (errata_id)
     REFERENCES errata (id)
 )TABLESPACE pg_default;
+
+CREATE INDEX ON oval_definition_errata(errata_id);
 
 
 -- -----------------------------------------------------
