@@ -290,6 +290,7 @@ class RepolistImportHandler(SyncHandler):
         try:
             products = kwargs.get("products", None)
             repos = kwargs.get("repos", None)
+            git_sync = kwargs.get("git_sync", False)
             init_logging()
             init_db()
 
@@ -299,11 +300,17 @@ class RepolistImportHandler(SyncHandler):
 
             if repos:
                 repository_controller = RepositoryController()
+                repos_in_db = repository_controller.repo_store.list_repositories()
                 # Sync repos from input
                 for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
                     repository_controller.add_repository(repo_url, content_set, basearch, releasever,
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
+                    repos_in_db.pop((content_set, basearch, releasever))
+                if git_sync:  # Warn about extra repos in DB when syncing main repolist from git
+                    for content_set, basearch, releasever in repos_in_db:
+                        LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
+                                       filter(None, (content_set, basearch, releasever))))
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
@@ -351,7 +358,7 @@ class GitRepoListHandler(RepolistImportHandler):
         if not products and not repos:
             LOGGER.warning("Input json is not valid")
             return "ERROR"
-        return RepolistImportHandler.run_task(products=products, repos=repos)
+        return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
 
     @classmethod
     def put(cls, **kwargs):
