@@ -82,13 +82,13 @@ class TestUpdatesAPI(TestBase):
 
     def test_process_input_pkg(self):
         """Test filtering out unknown (or without updates) package names."""
-        pkgs, update_list = self.updates_api._process_input_packages(UPDATES_JSON)
+        pkgs, update_list = self.updates_api.process_input_packages(UPDATES_JSON)
         assert pkgs == {'my-pkg-1.1.0-1.el8.i686': {'parsed_nevra': ('my-pkg', '0', '1.1.0', '1.el8', 'i686')}}
         assert update_list == {'my-pkg-1.1.0-1.el8.i686': {}}
 
     def test_process_input_non_exist(self):
         """Test filtering out unknown non existing package."""
-        pkgs, update_list = self.updates_api._process_input_packages(UPDATES_JSON_NON_EXIST)
+        pkgs, update_list = self.updates_api.process_input_packages(UPDATES_JSON_NON_EXIST)
         assert pkgs == {}
         assert update_list == {'non-exist': {}}
 
