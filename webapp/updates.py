@@ -82,7 +82,7 @@ class UpdatesAPI:
         modules_list = data.get('modules_list', None)
         return modules_list, module_ids
 
-    def _process_input_packages(self, data: dict) -> (dict, dict):
+    def process_input_packages(self, data: dict) -> (dict, dict):
         """Parse input NEVRAs and filter out unknown (or without updates) package names."""
         latest_only = data.get("latest_only", False)
         packages_to_process = filter_package_list(data.get('package_list', None), latest_only)
@@ -309,7 +309,7 @@ class UpdatesAPI:
                   {'package': <p_name>, 'erratum': <e_name>, 'repository': <r_label>}
         """
         # Return empty update list in case of empty input package list
-        packages_to_process, update_list = self._process_input_packages(data)
+        packages_to_process, update_list = self.process_input_packages(data)
         response = {'update_list': update_list}
         if len(packages_to_process) == 0:
             return response

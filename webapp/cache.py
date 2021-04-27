@@ -120,6 +120,16 @@ class Cache:
         self.src_pkg_id2pkg_ids = {}
         self.strings = {}
         self.src_pkg_name_id2cs_ids = {}
+        self.cpe_id2ovaldefinition_ids = {}
+        self.packagename_id2definition_ids = {}
+        self.ovaldefinition_detail = {}
+        self.ovaldefinition_id2cves = {}
+        self.ovalcriteria_id2type = {}
+        self.ovalcriteria_id2depcriteria_ids = {}
+        self.ovalcriteria_id2deptest_ids = {}
+        self.ovaltest_detail = {}
+        self.ovaltest_id2states = {}
+        self.ovalstate_id2arches = {}
 
     async def reload_async(self):
         """Update data and reload dictionaries asynchronously."""
@@ -214,6 +224,26 @@ class Cache:
                         self.src_pkg_id2pkg_ids[int(key)] = data[item]
                     elif relation == "strings":
                         self.strings[int(key)] = data[item]
+                    elif relation == "cpe_id2ovaldefinition_ids":
+                        self.cpe_id2ovaldefinition_ids[int(key)] = data[item]
+                    elif relation == "packagename_id2definition_ids":
+                        self.packagename_id2definition_ids[int(key)] = data[item]
+                    elif relation == "ovaldefinition_detail":
+                        self.ovaldefinition_detail[int(key)] = data[item]
+                    elif relation == "ovaldefinition_id2cves":
+                        self.ovaldefinition_id2cves[int(key)] = data[item]
+                    elif relation == "ovalcriteria_id2type":
+                        self.ovalcriteria_id2type[int(key)] = data[item]
+                    elif relation == "ovalcriteria_id2depcriteria_ids":
+                        self.ovalcriteria_id2depcriteria_ids[int(key)] = data[item]
+                    elif relation == "ovalcriteria_id2deptest_ids":
+                        self.ovalcriteria_id2deptest_ids[int(key)] = data[item]
+                    elif relation == "ovaltest_detail":
+                        self.ovaltest_detail[int(key)] = data[item]
+                    elif relation == "ovaltest_id2states":
+                        self.ovaltest_id2states[int(key)] = data[item]
+                    elif relation == "ovalstate_id2arches":
+                        self.ovalstate_id2arches[int(key)] = data[item]
                     else:
                         raise KeyError("Unknown relation in data: %s" % relation)
 
