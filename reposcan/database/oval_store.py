@@ -7,6 +7,7 @@ from common.dateutil import format_datetime
 from common.rpm import parse_rpm_name
 from database.object_store import ObjectStore
 from database.cpe_store import CpeStore
+from database.package_store import PackageStore
 
 
 class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
@@ -20,9 +21,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         super().__init__()
         self.cpe_store = CpeStore()
-        self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
-        self.arch_map = self._prepare_table_map(cols=["name"], table="arch")
-        self.evr_map = self._prepare_table_map(cols=["epoch", "version", "release"], table="evr")
+        self.package_store = PackageStore()
         self.evr_operation_map = self._prepare_table_map(cols=["name"], table="oval_operation_evr")
         self.cve_map = self._prepare_table_map(cols=["name"], table="cve")
         self.errata_map = self._prepare_table_map(cols=["name"], table="errata")
@@ -141,7 +140,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         """Check if object is in DB, return None if it's up to date and row to import otherwise."""
         if item["version"] <= self.oval_object_version_map.get(item["id"], -1):
             return None
-        name_id = self.package_name_map.get(item["name"])
+        name_id = self.package_store.package_name_map.get(item["name"])
         if not name_id:
             self.logger.warning("Package name not found: %s", item["name"])
             return None
@@ -158,6 +157,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                    on conflict (oval_id) do update set
                    package_name_id = EXCLUDED.package_name_id, version = EXCLUDED.version
                    returning id, oval_id, version"""
+        # Populate missing package names
+        self.package_store.populate_dep_table("package_name", {obj["name"] for obj in objects},
+                                              self.package_store.package_name_map)
         self._populate_data("objects", objects, self._object_import_check, query, self._object_refresh_maps)
         self._populate_associations("file", "objects", "file_id", "rpminfo_object_id", "oval_file_rpminfo_object",
                                     oval_file_id, objects, self.oval_object_map)
@@ -168,10 +170,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             return None
         evr_id = evr_operation_id = None
         if item['evr'] is not None:
-            # FIXME: as an input to common.rpm.parse_rpm_name, we don't have function to parse evr only
-            fake_nevra = f"pn-{item['evr']}.noarch"
-            _, epoch, version, release, _ = parse_rpm_name(fake_nevra)
-            evr_id = self.evr_map.get((epoch, version, release))
+            epoch, version, release = item['evr']
+            evr_id = self.package_store.evr_map.get((epoch, version, release))
             if not evr_id:
                 self.logger.warning("EVR not found: %s, %s, %s", epoch, version, release)
                 return None
@@ -194,6 +194,15 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                    evr_id = EXCLUDED.evr_id, evr_operation_id = EXCLUDED.evr_operation_id,
                    version = EXCLUDED.version
                    returning id, oval_id, version"""
+        # Parse EVR first
+        for state in states:
+            if state['evr'] is not None:
+                # FIXME: as an input to common.rpm.parse_rpm_name, we don't have function to parse evr only
+                fake_nevra = f"pn-{state['evr']}.noarch"
+                _, epoch, version, release, _ = parse_rpm_name(fake_nevra)
+                state['evr'] = (epoch, version, release)
+        # Populate missing EVRs
+        self.package_store.populate_evrs({state['evr'] for state in states if state['evr'] is not None})
         self._populate_data("states", states, self._state_import_check, query, self._state_refresh_maps)
         self._populate_associations("file", "states", "file_id", "rpminfo_state_id", "oval_file_rpminfo_state",
                                     oval_file_id, states, self.oval_state_map)
@@ -208,7 +217,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                     archs.extend([{"id": arch} for arch in state["arch"].split("|")])
                 self._populate_associations("state", "archs", "rpminfo_state_id", "arch_id",
                                             "oval_rpminfo_state_arch", self.oval_state_map[state["id"]],
-                                            archs, self.arch_map)
+                                            archs, self.package_store.arch_map)
 
     def _test_import_check(self, item):
         """Check if test is in DB, return None if it's up to date and row to import otherwise."""
