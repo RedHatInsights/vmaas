@@ -6,6 +6,7 @@ from psycopg2.extras import execute_values
 from common.dateutil import format_datetime
 from common.rpm import parse_rpm_name
 from database.object_store import ObjectStore
+from database.cpe_store import CpeStore
 
 
 class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
@@ -18,13 +19,13 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
         super().__init__()
+        self.cpe_store = CpeStore()
         self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
         self.arch_map = self._prepare_table_map(cols=["name"], table="arch")
         self.evr_map = self._prepare_table_map(cols=["epoch", "version", "release"], table="evr")
         self.evr_operation_map = self._prepare_table_map(cols=["name"], table="oval_operation_evr")
         self.cve_map = self._prepare_table_map(cols=["name"], table="cve")
         self.errata_map = self._prepare_table_map(cols=["name"], table="errata")
-        self.cpe_map = self._prepare_table_map(cols=["label"], table="cpe")
         self.oval_check_map = self._prepare_table_map(cols=["name"], table="oval_check_rpminfo")
         self.oval_check_existence_map = self._prepare_table_map(cols=["name"], table="oval_check_existence_rpminfo")
         self.oval_object_map = self._prepare_table_map(cols=["oval_id"], table="oval_rpminfo_object")
@@ -313,6 +314,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 cves = [{"id": cve} for cve in definition["cves"]]
                 advisories = [{"id": advisory} for advisory in definition["advisories"]]
                 cpes = [{"id": cpe} for cpe in definition["cpes"]]
+                # Store missing CPEs (they are often substrings of CPEs already in DB)
+                self.cpe_store.populate_cpes({cpe: None for cpe in definition["cpes"]
+                                              if cpe not in self.cpe_store.cpe_label_to_id})
                 tests = []
                 criteria = definition["criteria"]
                 criteria_stack = []
@@ -336,7 +340,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 self._populate_associations("definition", "advisories", "definition_id", "errata_id",
                                             "oval_definition_errata", definition_id, advisories, self.errata_map)
                 self._populate_associations("definition", "cpes", "definition_id", "cpe_id",
-                                            "oval_definition_cpe", definition_id, cpes, self.cpe_map)
+                                            "oval_definition_cpe", definition_id, cpes, self.cpe_store.cpe_label_to_id)
                 self._populate_associations("definition", "tests", "definition_id", "rpminfo_test_id",
                                             "oval_definition_test", definition_id, tests, self.oval_test_map,
                                             missing_ok=True)  # Don't log unsupported test types (rpmverifyfile etc.)
