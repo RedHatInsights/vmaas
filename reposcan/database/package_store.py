@@ -19,7 +19,7 @@ class PackageStore(ObjectStore):
         self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
         self.package_map = self._prepare_table_map(cols=["name_id", "evr_id", "arch_id"], table="package")
 
-    def _populate_dep_table(self, table, unique_items, table_map):
+    def populate_dep_table(self, table, unique_items, table_map):
         """Populate dependency table with column 'name'."""
         self.logger.debug("Unique %s's in repository: %d", table, len(unique_items))
         to_import = []
@@ -42,7 +42,8 @@ class PackageStore(ObjectStore):
             finally:
                 cur.close()
 
-    def _populate_evrs(self, unique_evrs):
+    def populate_evrs(self, unique_evrs):
+        """Populate evr table."""
         self.logger.debug("Unique EVRs in repository: %d", len(unique_evrs))
         to_import = []
         for epoch, version, release in unique_evrs:
@@ -77,9 +78,9 @@ class PackageStore(ObjectStore):
             unique_evrs.add((pkg["epoch"], pkg["ver"], pkg["rel"]))
             unique_names.add(pkg["name"])
 
-        self._populate_dep_table("arch", unique_archs, self.arch_map)
-        self._populate_dep_table("package_name", unique_names, self.package_name_map)
-        self._populate_evrs(unique_evrs)
+        self.populate_dep_table("arch", unique_archs, self.arch_map)
+        self.populate_dep_table("package_name", unique_names, self.package_name_map)
+        self.populate_evrs(unique_evrs)
 
     def _get_source_package_id(self, pkg):
         source_package_id = None
