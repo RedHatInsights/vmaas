@@ -24,6 +24,13 @@ class CpeStore:
         self.cpe_label_to_id = {}
         self.cpe_label_to_name = {}
 
+        cur = self.conn.cursor()
+        cur.execute("select id, label, name from cpe")
+        for cpe_id, label, name in cur.fetchall():
+            self.cpe_label_to_id[label] = cpe_id
+            self.cpe_label_to_name[label] = name
+        cur.close()
+
     def _save_lastmodified(self, lastmodified, key):
         lastmodified = format_datetime(lastmodified)
         cur = self.conn.cursor()
@@ -36,20 +43,17 @@ class CpeStore:
         cur.close()
         self.conn.commit()
 
-    def _populate_cpes(self, cpes):  # pylint: disable=too-many-branches
+    def populate_cpes(self, cpes):  # pylint: disable=too-many-branches
+        """
+        Insert or update CPE items.
+        """
         to_import = []
         to_update = []
-        cur = self.conn.cursor()
-        cur.execute("select id, label, name from cpe")
-        for cpe_id, label, name in cur.fetchall():
-            self.cpe_label_to_id[label] = cpe_id
-            self.cpe_label_to_name[label] = name
-        cur.close()
 
         for label, name in cpes.items():
             if label not in self.cpe_label_to_name:
                 to_import.append((label, name))
-            elif self.cpe_label_to_name[label] != name:
+            elif self.cpe_label_to_name[label] != name and name is not None:
                 to_update.append((label, name))
 
         self.logger.debug("CPEs in DB: %s", len(self.cpe_label_to_id))
@@ -101,7 +105,7 @@ class CpeStore:
             for cpe_label in repo_mapping["data"][content_set_label]["cpes"]:
                 if cpe_label not in self.cpe_label_to_id:
                     unknown_cpes[cpe_label] = None
-        self._populate_cpes(unknown_cpes)
+        self.populate_cpes(unknown_cpes)
 
         cur = self.conn.cursor()
         cur.execute("select label, id from content_set")
@@ -183,7 +187,7 @@ class CpeStore:
         self._save_lastmodified(cpe_dict.lastmodified, CpeStore.CPE_DICT_UPDATED_KEY)
         self._save_lastmodified(datetime.now(timezone.utc), CpeStore.CPE_REPO_MAP_UPDATED_KEY)
         self.logger.info("Syncing CPE dictionary.")
-        self._populate_cpes(cpe_dict.cpes)  # Import missing CPEs and lookup all IDs
+        self.populate_cpes(cpe_dict.cpes)  # Import missing CPEs and lookup all IDs
         self.logger.info("Syncing CPE repository mapping.")
         self._populate_repo_mappings(repo_mapping)
         self.logger.debug("Syncing CPE metadata finished.")
