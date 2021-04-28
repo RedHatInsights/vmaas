@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v2.14.0 (2021-04-28)
+### Feature
+* **reposcan:** Warn about extra repos in DB when syncing main repolist from git ([`5c5693d`](https://github.com/RedHatInsights/vmaas/commit/5c5693df8afc88d9bca0acb6924853ad754b78bc))
+
+### Fix
+* **reposcan:** Sync missing package names and EVRs ([`5079858`](https://github.com/RedHatInsights/vmaas/commit/507985819d9b6940debdf5b33080b32762743cbb))
+* **reposcan:** Sync CPE substrings from OVAL files ([`605d020`](https://github.com/RedHatInsights/vmaas/commit/605d020a28a8bbaf67f043e24507d87e8739af11))
+
 ## v2.13.2 (2021-04-28)
 ### Fix
 * **reposcan:** Optimize content deletion speed ([`b5fee66`](https://github.com/RedHatInsights/vmaas/commit/b5fee6630ec249bd89ee4b82da0edb875902edb6))
