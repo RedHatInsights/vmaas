@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.13.2 (2021-04-28)
+### Fix
+* **reposcan:** Optimize content deletion speed ([`b5fee66`](https://github.com/RedHatInsights/vmaas/commit/b5fee6630ec249bd89ee4b82da0edb875902edb6))
+* **reposcan:** Delete from new dependent tables ([`ebcb5cb`](https://github.com/RedHatInsights/vmaas/commit/ebcb5cb83f58dd0342c9c12dc8ce745e5829c0f0))
+
 ## v2.13.1 (2021-04-21)
 ### Fix
 * **webapp:** Include packages without errata ([`4b4e409`](https://github.com/RedHatInsights/vmaas/commit/4b4e409769dd14864f8275f51118beda159fa4d8))
