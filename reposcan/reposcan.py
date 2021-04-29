@@ -306,7 +306,7 @@ class RepolistImportHandler(SyncHandler):
                     repository_controller.add_repository(repo_url, content_set, basearch, releasever,
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
-                    repos_in_db.pop((content_set, basearch, releasever))
+                    repos_in_db.pop((content_set, basearch, releasever), None)
                 if git_sync:  # Warn about extra repos in DB when syncing main repolist from git
                     for content_set, basearch, releasever in repos_in_db:
                         LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
