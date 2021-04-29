@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.14.1 (2021-04-29)
+### Fix
+* **reposcan:** Fix KeyError when importing new repos ([`9303d34`](https://github.com/RedHatInsights/vmaas/commit/9303d347c364757e2af715321c53fb6415939c45))
+
 ## v2.14.0 (2021-04-28)
 ### Feature
 * **reposcan:** Warn about extra repos in DB when syncing main repolist from git ([`5c5693d`](https://github.com/RedHatInsights/vmaas/commit/5c5693df8afc88d9bca0acb6924853ad754b78bc))
