@@ -245,7 +245,7 @@ class Cache:
                     elif relation == "ovalstate_id2arches":
                         self.ovalstate_id2arches[int(key)] = data[item]
                     else:
-                        raise KeyError("Unknown relation in data: %s" % relation)
+                        LOGGER.warning("Unknown relation in data: %s", relation)
 
         except dbm.error as err:
             # file does not exist or has wrong type
