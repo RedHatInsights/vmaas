@@ -230,15 +230,12 @@ class DataDump:
                                  join product p on p.id = cs.product_id
                                  """)
             repolabel2ids = {}
-            productid2repoids = {}
             for oid, label, name, url, basearch, releasever, product, product_id, revision, third_party in cursor:
                 dump["repo_detail:%s" % oid] = (label, name, url, basearch,
                                                 releasever, product, product_id,
                                                 format_datetime(revision), third_party)
                 repolabel2ids.setdefault("repolabel2ids:%s" % label, []).append(oid)
-                productid2repoids.setdefault("productid2repoids:%s" % product_id, []).append(oid)
             dump.update(repolabel2ids)
-            dump.update(productid2repoids)
 
         if self.package_ids:
             # Select package ID to repo IDs mapping
