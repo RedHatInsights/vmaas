@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.15.1 (2021-05-04)
+### Fix
+* **webapp:** Add more as_long_arr casts ([`17d5137`](https://github.com/RedHatInsights/vmaas/commit/17d513726b333445bcbfb012d1c6b0cd913cc100))
+* **webapp:** Productid2repoids is not used ([`9483f9d`](https://github.com/RedHatInsights/vmaas/commit/9483f9dc18f113491b1371f472733f0a7c745691))
+
 ## v2.15.0 (2021-05-04)
 ### Feature
 * **webapp:** Evaluate OVAL ([`06db2b1`](https://github.com/RedHatInsights/vmaas/commit/06db2b17148e10e3828a065401b57e3baf9800f9))
