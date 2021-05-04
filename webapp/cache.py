@@ -107,7 +107,6 @@ class Cache:
         self.nevra2pkgid = {}
         self.repo_detail = {}
         self.repolabel2ids = {}
-        self.productid2repoids = {}
         self.pkgid2repoids = {}
         self.errataid2name = {}
         self.pkgid2errataids = {}
@@ -198,8 +197,6 @@ class Cache:
                         self.repo_detail[int(key)] = data[item]
                     elif relation == "repolabel2ids":
                         self.repolabel2ids[key] = data[item]
-                    elif relation == "productid2repoids":
-                        self.productid2repoids[int(key)] = data[item]
                     elif relation == "pkgid2repoids":
                         self.pkgid2repoids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "errataid2name":
