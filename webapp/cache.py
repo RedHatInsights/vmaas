@@ -160,9 +160,9 @@ class Cache:
                     elif relation == "id2packagename":
                         self.id2packagename[int(key)] = data[item]
                     elif relation == "src_pkg_name_id2cs_ids":
-                        self.src_pkg_name_id2cs_ids[int(key)] = data[item]
+                        self.src_pkg_name_id2cs_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "content_set_id2pkg_name_ids":
-                        self.content_set_id2pkg_name_ids[int(key)] = data[item]
+                        self.content_set_id2pkg_name_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "content_set_id2label":
                         self.content_set_id2label[int(key)] = data[item]
                     elif relation == "label2content_set_id":
@@ -172,7 +172,7 @@ class Cache:
                     elif relation == "label2cpe_id":
                         self.label2cpe_id[key] = data[item]
                     elif relation == "content_set_id2cpe_ids":
-                        self.content_set_id2cpe_ids[int(key)] = data[item]
+                        self.content_set_id2cpe_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "updates":
                         self.updates[int(key)] = data[item]
                     elif relation == "updates_index":
@@ -196,7 +196,7 @@ class Cache:
                     elif relation == "repo_detail":
                         self.repo_detail[int(key)] = data[item]
                     elif relation == "repolabel2ids":
-                        self.repolabel2ids[key] = data[item]
+                        self.repolabel2ids[key] = as_long_arr(list(data[item]))
                     elif relation == "pkgid2repoids":
                         self.pkgid2repoids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "errataid2name":
@@ -204,7 +204,7 @@ class Cache:
                     elif relation == "pkgid2errataids":
                         self.pkgid2errataids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "errataid2repoids":
-                        self.errataid2repoids[int(key)] = data[item]
+                        self.errataid2repoids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "cve_detail":
                         self.cve_detail[key] = data[item]
                     elif relation == "dbchange":
@@ -218,13 +218,13 @@ class Cache:
                         name, stream_name = key.split(":", 1)
                         self.modulename2id[(name, stream_name)] = data[item]
                     elif relation == "src_pkg_id2pkg_ids":
-                        self.src_pkg_id2pkg_ids[int(key)] = data[item]
+                        self.src_pkg_id2pkg_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "strings":
                         self.strings[int(key)] = data[item]
                     elif relation == "cpe_id2ovaldefinition_ids":
-                        self.cpe_id2ovaldefinition_ids[int(key)] = data[item]
+                        self.cpe_id2ovaldefinition_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "packagename_id2definition_ids":
-                        self.packagename_id2definition_ids[int(key)] = data[item]
+                        self.packagename_id2definition_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "ovaldefinition_detail":
                         self.ovaldefinition_detail[int(key)] = data[item]
                     elif relation == "ovaldefinition_id2cves":
@@ -232,9 +232,9 @@ class Cache:
                     elif relation == "ovalcriteria_id2type":
                         self.ovalcriteria_id2type[int(key)] = data[item]
                     elif relation == "ovalcriteria_id2depcriteria_ids":
-                        self.ovalcriteria_id2depcriteria_ids[int(key)] = data[item]
+                        self.ovalcriteria_id2depcriteria_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "ovalcriteria_id2deptest_ids":
-                        self.ovalcriteria_id2deptest_ids[int(key)] = data[item]
+                        self.ovalcriteria_id2deptest_ids[int(key)] = as_long_arr(list(data[item]))
                     elif relation == "ovaltest_detail":
                         self.ovaltest_detail[int(key)] = data[item]
                     elif relation == "ovaltest_id2states":
