@@ -353,9 +353,6 @@ pkgid2repoids:
   - 2
   8320:
   - 2
-productid2repoids:
-  1: !!set
-    1: null
 repo_detail:
   1: !!python/tuple
   - rhel-7-server-rpms
