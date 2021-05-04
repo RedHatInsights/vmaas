@@ -58,6 +58,7 @@ class DataDump:
                 self._dump_errata(dump)
                 self._dump_cves(dump)
                 self._dump_modules(dump)
+                self._dump_oval(dump)
                 self._dump_dbchange(dump)
                 dump["dbchange:exported"] = timestamp
         except Exception:  # pylint: disable=broad-except
@@ -477,6 +478,94 @@ class DataDump:
             for name, stream_name, stream_id in cursor:
                 modulename2id.setdefault("modulename2id:%s:%s" % (name, stream_name), set()).add(stream_id)
             dump.update(modulename2id)
+
+    def _dump_oval(self, dump):
+        """Select OVAL information"""
+        with self._named_cursor() as cursor:
+            cursor.execute("""select cpe_id, definition_id from oval_definition_cpe""")
+            cpe_id2ovaldefinition_ids = {}
+            for cpe_id, oval_definition_id in cursor:
+                cpe_id2ovaldefinition_ids.setdefault(
+                    "cpe_id2ovaldefinition_ids:%s" % cpe_id, []).append(oval_definition_id)
+            dump.update(cpe_id2ovaldefinition_ids)
+
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select distinct d.id, o.package_name_id
+                              from oval_definition d join
+                                   oval_definition_test dt on d.id = dt.definition_id join
+                                   oval_rpminfo_test t on dt.rpminfo_test_id = t.id join
+                                   oval_rpminfo_object o on t.rpminfo_object_id = o.id""")
+            packagename_id2definition_ids = {}
+            for oval_definition_id, package_name_id in cursor:
+                packagename_id2definition_ids.setdefault(
+                    "packagename_id2definition_ids:%s" % package_name_id, []).append(oval_definition_id)
+            dump.update(packagename_id2definition_ids)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select d.id, d.definition_type_id, d.criteria_id
+                              from oval_definition d""")
+            for oval_definition_id, oval_definition_type_id, oval_definition_criteria_id in cursor:
+                dump["ovaldefinition_detail:%s" % oval_definition_id] = \
+                    (oval_definition_type_id, oval_definition_criteria_id)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select dc.definition_id, cve.name
+                              from oval_definition_cve dc join
+                                   cve on dc.cve_id = cve.id""")
+            ovaldefinition_id2cves = {}
+            for oval_definition_id, cve_name in cursor:
+                ovaldefinition_id2cves.setdefault(
+                    "ovaldefinition_id2cves:%s" % oval_definition_id, []).append(cve_name)
+            dump.update(ovaldefinition_id2cves)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select c.id, c.operator_id
+                              from oval_criteria c""")
+            for oval_criteria_id, type_id in cursor:
+                dump["ovalcriteria_id2type:%s" % oval_criteria_id] = type_id
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select parent_criteria_id, dep_criteria_id, dep_test_id
+                              from oval_criteria_dependency""")
+            ovalcriteria_id2depcriteria_ids = {}
+            ovalcriteria_id2deptest_ids = {}
+            for parent_criteria_id, dep_criteria_id, dep_test_id in cursor:
+                if dep_test_id is None:
+                    ovalcriteria_id2depcriteria_ids.setdefault(
+                        "ovalcriteria_id2depcriteria_ids:%s" % parent_criteria_id, []).append(dep_criteria_id)
+                else:
+                    ovalcriteria_id2deptest_ids.setdefault(
+                        "ovalcriteria_id2deptest_ids:%s" % parent_criteria_id, []).append(dep_test_id)
+            dump.update(ovalcriteria_id2depcriteria_ids)
+            dump.update(ovalcriteria_id2deptest_ids)
+
+        with self._named_cursor() as cursor:
+            # Ignoring oval_check_rpminfo table as it cointains only one row currently used by all tests
+            cursor.execute("""select t.id, o.package_name_id, t.check_existence_id
+                              from oval_rpminfo_test t join
+                                   oval_rpminfo_object o on t.rpminfo_object_id = o.id""")
+            for oval_test_id, package_name_id, check_existence_id in cursor:
+                dump["ovaltest_detail:%s" % oval_test_id] = (package_name_id, check_existence_id)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select ts.rpminfo_test_id, s.id, s.evr_id, s.evr_operation_id
+                              from oval_rpminfo_test_state ts join
+                                   oval_rpminfo_state s on ts.rpminfo_state_id = s.id
+                              where s.evr_id is not null
+                                and s.evr_operation_id is not null""")
+            ovaltest_id2states = {}
+            for oval_test_id, oval_state_id, evr_id, oval_operation_evr_id in cursor:
+                ovaltest_id2states.setdefault("ovaltest_id2states:%s" % oval_test_id, []).append(
+                    (oval_state_id, evr_id, oval_operation_evr_id))
+            dump.update(ovaltest_id2states)
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select rpminfo_state_id, arch_id from oval_rpminfo_state_arch""")
+            ovalstate_id2arches = {}
+            for oval_state_id, arch_id in cursor:
+                ovalstate_id2arches.setdefault("ovalstate_id2arches:%s" % oval_state_id, set()).add(arch_id)
+            dump.update(ovalstate_id2arches)
 
     def _dump_dbchange(self, dump):
         """Select db change details"""
