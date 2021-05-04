@@ -40,4 +40,4 @@ werkzeug = "==1.0.1"
 yarl = "==1.6.2"
 
 [requires]
-python_version = "3.6"
+python_version = "3"
