@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v2.15.0 (2021-05-04)
+### Feature
+* **webapp:** Evaluate OVAL ([`06db2b1`](https://github.com/RedHatInsights/vmaas/commit/06db2b17148e10e3828a065401b57e3baf9800f9))
+* **reposcan:** Export OVAL data ([`49b1ec4`](https://github.com/RedHatInsights/vmaas/commit/49b1ec461b8a37d82e2c4fc7edb3b0a714e48cf7))
+
+### Fix
+* **webapp:** Warn but don't crash ([`8f4c0c2`](https://github.com/RedHatInsights/vmaas/commit/8f4c0c294fd877a3e4ec26dac6b92f07db8a1079))
+
 ## v2.14.1 (2021-04-29)
 ### Fix
 * **reposcan:** Fix KeyError when importing new repos ([`9303d34`](https://github.com/RedHatInsights/vmaas/commit/9303d347c364757e2af715321c53fb6415939c45))
