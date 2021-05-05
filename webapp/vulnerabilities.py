@@ -135,7 +135,7 @@ class VulnerabilitiesAPI:
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """Return list of potential security issues"""
-        evaluate_oval = data.get("oval", True)
+        evaluate_oval = data.get("oval", False)
         evaluate_oval_only = data.get("oval_only", False)
         cve_list = set()
         unpatched_cve_list = set()
