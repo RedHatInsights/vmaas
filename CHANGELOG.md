@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.15.2 (2021-05-05)
+### Fix
+* **webapp:** Default to false until it's well tested, apps can request it anyway using param ([`646b3f6`](https://github.com/RedHatInsights/vmaas/commit/646b3f683a2e5eafd33a2750e0895aa8c4f153bd))
+
 ## v2.15.1 (2021-05-04)
 ### Fix
 * **webapp:** Add more as_long_arr casts ([`17d5137`](https://github.com/RedHatInsights/vmaas/commit/17d513726b333445bcbfb012d1c6b0cd913cc100))
