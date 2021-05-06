@@ -317,36 +317,43 @@ components:
         content_sets:
           type: object
           additionalProperties:
-            type: object
-            properties:
-              name:
-                type: string
-                example: Red Hat Enterprise Linux 6 Server (RPMs)
-              baseurl:
-                oneOf:
-                  - type: string
-                    example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
-                  - type: array
-                    items:
-                      type: string
-                      example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
-              basearch:
-                type: array
+            oneOf:
+              - $ref: '#/components/schemas/ContentItem'
+              - type: array
                 items:
-                  type: string
-                  example: x86_64
-              releasever:
-                type: array
-                items:
-                  type: string
-                  example: 6Server
-            required:
-            - name
-            - baseurl
-            - basearch
-            - releasever
+                  $ref: '#/components/schemas/ContentItem'
+
       required:
       - content_sets
+    ContentItem:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Red Hat Enterprise Linux 6 Server (RPMs)
+        baseurl:
+          oneOf:
+            - type: string
+              example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+            - type: array
+              items:
+                type: string
+                example: https://cdn/content/dist/rhel/server/6/$releasever/$basearch/os/
+        basearch:
+          type: array
+          items:
+            type: string
+            example: x86_64
+        releasever:
+          type: array
+          items:
+            type: string
+            example: 6Server
+      required:
+        - name
+        - baseurl
+        - basearch
+        - releasever
     AddRepoItem:
       type: object
       properties:
@@ -380,7 +387,7 @@ components:
     ErrataObj:
       type: object
       properties:
-        name: { type: string, example: RHSA-2010:0842 }
+        name: { type: string, example: 'RHSA-2010:0842' }
         issued: { type: string, example: '2010-11-10T00:00:00+00:00', format: date-time }
         cve_list:
           type: array
