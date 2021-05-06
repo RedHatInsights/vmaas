@@ -351,7 +351,9 @@ components:
       type: object
       properties:
         entitlement_cert:
-          $ref: '#/components/schemas/CertItem'
+          oneOf:
+            - $ref: '#/components/schemas/CertItem'
+            - type: boolean
         products:
           type: object
           additionalProperties:
@@ -380,7 +382,7 @@ components:
     ErrataObj:
       type: object
       properties:
-        name: { type: string, example: RHSA-2010:0842 }
+        name: { type: string, example: 'RHSA-2010:0842' }
         issued: { type: string, example: '2010-11-10T00:00:00+00:00', format: date-time }
         cve_list:
           type: array
