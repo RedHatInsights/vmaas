@@ -358,7 +358,9 @@ components:
       type: object
       properties:
         entitlement_cert:
-          $ref: '#/components/schemas/CertItem'
+          oneOf:
+            - $ref: '#/components/schemas/CertItem'
+            - type: boolean
         products:
           type: object
           additionalProperties:
