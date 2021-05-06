@@ -209,7 +209,7 @@ class SyncHandler:
     def finish_task(cls, task_result):
         """Mark current task as finished."""
         if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler) \
-            and "ERROR" not in task_result:
+                and "ERROR" not in task_result:
             # Notify webapps to update their cache
             ReposcanWebsocket.report_version()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
@@ -262,11 +262,16 @@ class RepolistImportHandler(SyncHandler):
         seen = set()
         for repo_group in data:
             # Entitlement cert is optional, use default if not specified in input JSON
-            if "entitlement_cert" in repo_group:
+            if "entitlement_cert" in repo_group and isinstance(repo_group['entitlement_cert'], dict):
                 cert_name = repo_group["entitlement_cert"]["name"]
                 ca_cert = repo_group["entitlement_cert"]["ca_cert"]
                 cert = repo_group["entitlement_cert"]["cert"]
                 key = repo_group["entitlement_cert"]["key"]
+                # Disable any kind of certificate
+            elif "entitlement_cert" in repo_group and isinstance(repo_group['entitlement_cert'], bool) \
+                    and repo_group["entitlement_cert"] is False:
+                cert_name, ca_cert, cert, key = None, None, None, None
+
             elif DEFAULT_CA_CERT or DEFAULT_CERT:
                 cert_name = DEFAULT_CERT_NAME
                 ca_cert = DEFAULT_CA_CERT
@@ -315,7 +320,7 @@ class RepolistImportHandler(SyncHandler):
                 if git_sync:  # Warn about extra repos in DB when syncing main repolist from git
                     for content_set, basearch, releasever in repos_in_db:
                         LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
-                                       filter(None, (content_set, basearch, releasever))))
+                            filter(None, (content_set, basearch, releasever))))
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
@@ -869,7 +874,6 @@ def create_app(specs):
                                                      WEBSOCKET_RECONNECT_INTERVAL * 1000)
     ws_handler.reconnect_callback.start()
 
-
     app = connexion.App(__name__, options={
         'swagger_ui': True,
         'openapi_spec_path': '/openapi.json'
@@ -884,7 +888,6 @@ def create_app(specs):
                     base_path=route,
                     arguments={"vmaas_version": VMAAS_VERSION}
                     )
-
 
     @app.app.route('/metrics', methods=['GET'])
     def metrics():  # pylint: disable=unused-variable
