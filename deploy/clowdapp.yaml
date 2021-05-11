@@ -147,8 +147,7 @@ objects:
           requests: {cpu: 200m, memory: 1Gi}
         volumes:
         - name: vmaas-reposcan-tmp
-          persistentVolumeClaim:
-            claimName: vmaas-reposcan-tmp
+          emptyDir: {}
         - name: vmaas-dump-data
           persistentVolumeClaim:
             claimName: vmaas-dump-data
@@ -315,7 +314,7 @@ objects:
   apiVersion: v1
   data:
     BATCH_MAX_SIZE: '500'
-    BATCH_MAX_FILESIZE: '14_000_000_000'
+    BATCH_MAX_FILESIZE: '5_000_000_000'
     CHUNK_SIZE: '1048576'
     LOGGING_LEVEL_APP: INFO
     LOGGING_LEVEL_LIBS: WARNING
@@ -356,19 +355,6 @@ objects:
     labels:
       app: vmaas
     name: vmaas-database-conf-database-connection-admin-env
-
-- kind: PersistentVolumeClaim
-  apiVersion: v1
-  metadata:
-    labels:
-      app: vmaas
-    name: vmaas-reposcan-tmp
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 15Gi
 
 - kind: PersistentVolumeClaim
   apiVersion: v1
