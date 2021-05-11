@@ -44,7 +44,6 @@ services:
       - 8081:8081
       - 8730:8730
     volumes:
-      - vmaas-reposcan-tmp:/tmp
       - vmaas-dump-data:/data:z
     depends_on:
       - vmaas_websocket
@@ -119,6 +118,5 @@ services:
 volumes:
   vmaas-db-data:
   vmaas-dump-data:
-  vmaas-reposcan-tmp:
   prometheus-data:
   grafana-data:
