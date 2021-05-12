@@ -16,7 +16,16 @@ from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
+OLD_DUMP = '/data/vmaas.dbm'
 LOGGER = get_logger(__name__)
+
+
+def fetch_latest_dump():
+    """Read the symlink, to know what is latest dump."""
+    try:
+        return os.readlink(DUMP).split("-", 1)[1]
+    except FileNotFoundError:
+        return None
 
 
 class DataDump:
@@ -29,14 +38,6 @@ class DataDump:
         self.package_ids = []
         self.errata_ids = []
         self.keep_copies = int(os.getenv('KEEP_COPIES', DEFAULT_KEEP_COPIES))
-
-    @staticmethod
-    def fetch_latest_dump():
-        """Read the symlink, to know what is latest dump."""
-        try:
-            return os.readlink(DUMP).split("-", 1)[1]
-        except FileNotFoundError:
-            return None
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
@@ -1137,19 +1138,19 @@ class SqliteDump:
             dump.execute("insert into dbchange values (?, ?, ?, ?, ?)", row + (timestamp,))
 
 
-def main(filename):
+def main():
     """ Main loop."""
     init_logging()
     init_db()
     db_instance = DatabaseHandler.get_connection()
     timestamp = format_datetime(now())
 
-    data = SqliteDump(db_instance, filename)
+    data = SqliteDump(db_instance, DUMP)
     data.dump(timestamp)
 
-    data2 = DataDump(db_instance, filename + "m")
+    data2 = DataDump(db_instance, OLD_DUMP)
     data2.dump(timestamp)
 
 
 if __name__ == '__main__':
-    main(DUMP)
+    main()
