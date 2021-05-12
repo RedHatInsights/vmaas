@@ -283,14 +283,42 @@ class Cache:
             name = row[1]
             item = row[2:]
             self.cve_detail[name] = item
+        
+        for row in data.execute("select * from oval_definition_cpe"):
+            self.cpe_id2ovaldefinition_ids.setdefault(row[0], []).append(row[1])
+        
+        for row in data.execute("select * from packagename_oval_definition"):
+            self.packagename_id2definition_ids.setdefault(row[0], []).append(row[1])
+        
+        for row in data.execute("select * from oval_definition_detail"):
+            self.ovaldefinition_detail[row[0]] = (row[1], row[2])
+        
+        for row in data.execute("select * from oval_definition_cve"):
+            self.ovaldefinition_id2cves.setdefault(row[0], []).append(row[1])
+        
+        for row in data.execute("select * from oval_criteria_type"):
+            self.ovalcriteria_id2type[row[0]] = row[1]
+        
+        for row in data.execute("select * from oval_criteria_dependency"):
+            if row[2] is None:
+                self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], []).append(row[1])
+            else:
+                self.ovalcriteria_id2deptest_ids.setdefault(row[0], []).append(row[2])
+        
+        for row in data.execute("select * from oval_test_detail"):
+            self.ovaltest_detail[row[0]] = (row[1], row[2])
+        
+        for row in data.execute("select * from oval_test_state"):
+            self.ovaltest_id2states.setdefault(row[0], []).append((row[1], row[2], row[3]))
+        
+        for row in data.execute("select * from oval_state_arch"):
+            self.ovalstate_id2arches.setdefault(row[0], []).append(row[1])
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 
         for row in data.execute("select %s from dbchange" % ','.join(names)):
             for (i, v) in enumerate(row):
                 self.dbchange[names[i]] = v
-
-        LOGGER.info("Loaded cache")
 
     def load_sqlite(self, filename):
         """Load data from sqlite file into dictionaries."""
@@ -299,6 +327,7 @@ class Cache:
         try:
             with sqlite3.connect(filename) as data:
                 self._load_sqlite(data)
+            LOGGER.info("Loaded dump version: %s", self.dbchange.get('exported', 'unknown'))
         except sqlite3.Error as err:
             # file does not exist or has wrong type
             LOGGER.warning("Failed to load data %s: %s", filename, err)
