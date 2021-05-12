@@ -129,6 +129,50 @@ class Cache:
         self.ovaltest_detail = {}
         self.ovaltest_id2states = {}
         self.ovalstate_id2arches = {}
+    
+    def debug(self):
+        """Clear dictionaries and load new data."""
+        LOGGER.info("packagename2id: %s", len(self.packagename2id))
+        LOGGER.info("content_set_id2pkg_name_ids: %s, %s", len(self.content_set_id2pkg_name_ids), sum([len(x) for x in self.content_set_id2pkg_name_ids.values()]))
+        LOGGER.info("content_set_id2label: %s", len(self.content_set_id2label))
+        LOGGER.info("cpe_id2label: %s", len(self.cpe_id2label))
+        LOGGER.info("label2cpe_id: %s", len(self.label2cpe_id))
+        LOGGER.info("content_set_id2cpe_ids: %s, %s", len(self.content_set_id2cpe_ids), sum([len(x) for x in self.content_set_id2cpe_ids.values()]))
+        LOGGER.info("label2content_set_id: %s", len(self.label2content_set_id))
+        LOGGER.info("id2packagename: %s", len(self.id2packagename))
+        LOGGER.info("updates: %s, %s", len(self.updates), sum([len(x) for x in self.updates.values()]))
+        LOGGER.info("updates_index: %s", len(self.updates_index))
+        LOGGER.info("evr2id: %s", len(self.evr2id))
+        LOGGER.info("id2evr: %s", len(self.id2evr))
+        LOGGER.info("arch2id: %s", len(self.arch2id))
+        LOGGER.info("id2arch: %s", len(self.id2arch))
+        LOGGER.info("arch_compat: %s", len(self.arch_compat))
+        LOGGER.info("package_details: %s", len(self.package_details))
+        LOGGER.info("nevra2pkgid: %s", len(self.nevra2pkgid))
+        LOGGER.info("repo_detail: %s", len(self.repo_detail))
+        LOGGER.info("repolabel2ids: %s, %s", len(self.repolabel2ids), sum([len(x) for x in self.repolabel2ids.values()]))
+        LOGGER.info("pkgid2repoids: %s, %s", len(self.pkgid2repoids), sum([len(x) for x in self.pkgid2repoids.values()]))
+        LOGGER.info("errataid2name: %s", len(self.errataid2name))
+        LOGGER.info("pkgid2errataids: %s, %s", len(self.pkgid2errataids), sum([len(x) for x in self.pkgid2errataids.values()]))
+        LOGGER.info("errataid2repoids: %s, %s", len(self.errataid2repoids), sum([len(x) for x in self.errataid2repoids.values()]))
+        LOGGER.info("cve_detail: %s", len(self.cve_detail))
+        LOGGER.info("pkgerrata2module: %s", len(self.pkgerrata2module))
+        LOGGER.info("modulename2id: %s", len(self.modulename2id))
+        LOGGER.info("dbchange: %s", len(self.dbchange))
+        LOGGER.info("errata_detail: %s", len(self.errata_detail))
+        LOGGER.info("src_pkg_id2pkg_ids: %s, %s", len(self.src_pkg_id2pkg_ids), sum([len(x) for x in self.src_pkg_id2pkg_ids.values()]))
+        LOGGER.info("strings: %s", len(self.strings))
+        LOGGER.info("src_pkg_name_id2cs_ids: %s, %s", len(self.src_pkg_name_id2cs_ids), sum([len(x) for x in self.src_pkg_name_id2cs_ids.values()]))
+        LOGGER.info("cpe_id2ovaldefinition_ids: %s, %s", len(self.cpe_id2ovaldefinition_ids), sum([len(x) for x in self.cpe_id2ovaldefinition_ids.values()]))
+        LOGGER.info("packagename_id2definition_ids: %s, %s", len(self.packagename_id2definition_ids), sum([len(x) for x in self.packagename_id2definition_ids.values()]))
+        LOGGER.info("ovaldefinition_detail: %s", len(self.ovaldefinition_detail))
+        LOGGER.info("ovaldefinition_id2cves: %s, %s", len(self.ovaldefinition_id2cves), sum([len(x) for x in self.ovaldefinition_id2cves.values()]))
+        LOGGER.info("ovalcriteria_id2type: %s", len(self.ovalcriteria_id2type))
+        LOGGER.info("ovalcriteria_id2depcriteria_ids: %s, %s", len(self.ovalcriteria_id2depcriteria_ids), sum([len(x) for x in self.ovalcriteria_id2depcriteria_ids.values()]))
+        LOGGER.info("ovalcriteria_id2deptest_ids: %s, %s", len(self.ovalcriteria_id2deptest_ids), sum([len(x) for x in self.ovalcriteria_id2deptest_ids.values()]))
+        LOGGER.info("ovaltest_detail: %s", len(self.ovaltest_detail))
+        LOGGER.info("ovaltest_id2states: %s, %s", len(self.ovaltest_id2states), sum([len(x) for x in self.ovaltest_id2states.values()]))
+        LOGGER.info("ovalstate_id2arches: %s, %s", len(self.ovalstate_id2arches), sum([len(x) for x in self.ovalstate_id2arches.values()]))
 
     async def reload_async(self):
         """Update data and reload dictionaries asynchronously."""
@@ -140,6 +184,7 @@ class Cache:
         if self.download():
             self.clear()
             self.load(self.filename)
+            self.debug()
 
     @staticmethod
     def download():
