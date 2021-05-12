@@ -211,7 +211,6 @@ class Cache:
             repo = row[1:]
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], []).append(id)
-            self.productid2repoids.setdefault(repo[-2], []).append(id)
 
         for row in data.execute("select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
