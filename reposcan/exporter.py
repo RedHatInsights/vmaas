@@ -722,11 +722,7 @@ class SqliteDump:
         with self._named_cursor() as cursor:
             cursor.execute("""select distinct pn.id, pn.name
                                 from package_name pn inner join
-                                     package p on pn.id = p.name_id inner join
-                                     pkg_errata pe on p.id = pe.pkg_id inner join
-                                     errata e on pe.errata_id = e.id inner join
-                                     errata_type et on e.errata_type_id = et.id left join
-                                     errata_cve ec on e.id = ec.errata_id
+                                     package p on pn.id = p.name_id
                             """)
             for name_id, pkg_name in cursor:
                 dump.execute("insert into packagename values (?, ?)", (name_id, pkg_name))
