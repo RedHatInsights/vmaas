@@ -200,7 +200,7 @@ class Cache:
             self.arch2id[arch] = int(id)
 
         for (src, dst) in data.execute('select from_arch_id, to_arch_id from arch_compat'):
-            self.arch_compat[int(src)] = int(dst)
+            self.arch_compat.setdefault(src, set()).add(int(dst))
 
         for (id, string) in data.execute('select id, string from string'):
             self.strings[int(id)] = string
@@ -214,18 +214,18 @@ class Cache:
             self.id2packagename[int(id)] = str(name)
 
         for (cs_id, name_id) in data.execute("select content_set_id, pkg_name_id from content_set_pkg_name"):
-            self.content_set_id2pkg_name_ids.setdefault(cs_id, []).append(name_id)
+            self.content_set_id2pkg_name_ids.setdefault(cs_id, array.array('q')).append(name_id)
 
         for (cs_id, src_name_id) in data.execute(
                 "select content_set_id, src_pkg_name_id from content_set_src_pkg_name"):
-            self.src_pkg_name_id2cs_ids.setdefault(src_name_id, []).append(cs_id)
+            self.src_pkg_name_id2cs_ids.setdefault(src_name_id, array.array('q')).append(cs_id)
 
         for (cpe_id, label) in data.execute("select id, label from cpe"):
             self.cpe_id2label[cpe_id] = label
             self.label2cpe_id[label] = cpe_id
 
         for (cpe_id, cs_id) in data.execute("select cpe_id, content_set_id from cpe_content_set"):
-            self.content_set_id2cpe_ids.setdefault(cs_id, []).append(cpe_id)
+            self.content_set_id2cpe_ids.setdefault(cs_id, array.array('q')).append(cpe_id)
 
         for (name_id, pkg_id) in data.execute(
                 'select name_id, package_id from updates order by name_id, package_id, package_order'):
@@ -245,17 +245,19 @@ class Cache:
 
         for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in data.execute(
                 'select * from package_detail'):
-            self.package_details[id] = (name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id)
+            detail = array.array('q')
+            detail.fromlist([name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0])
+            self.package_details[id] = detail
             self.nevra2pkgid[(name_id, evr_id, arch_id)] = id
 
             if src_pkg_id:
-                self.src_pkg_id2pkg_ids.setdefault(src_pkg_id, []).append(id)
+                self.src_pkg_id2pkg_ids.setdefault(src_pkg_id, array.array('q')).append(id)
 
         for row in data.execute("select * from repo_detail"):
             id = row[0]
             repo = row[1:]
             self.repo_detail[id] = repo
-            self.repolabel2ids.setdefault(repo[0], []).append(id)
+            self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
 
         for row in data.execute("select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
@@ -268,16 +270,16 @@ class Cache:
             self.errataid2name[id] = name
 
         for row in data.execute("select errata_id, repo_id from errata_repo"):
-            self.errataid2repoids.setdefault(row[0], []).append(row[1])
+            self.errataid2repoids.setdefault(row[0], array.array('q')).append(row[1])
 
         for row in data.execute("select pkg_id, errata_id from pkg_errata "):
-            self.pkgid2errataids.setdefault(row[0], []).append(row[1])
+            self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
 
         for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
             self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
 
         for row in data.execute("select module, stream, stream_id from module_stream"):
-            self.modulename2id[(row[0], row[1])] = row[2]
+            self.modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
 
         for row in data.execute("select * from cve_detail"):
             name = row[1]
@@ -285,10 +287,10 @@ class Cache:
             self.cve_detail[name] = item
         
         for row in data.execute("select * from oval_definition_cpe"):
-            self.cpe_id2ovaldefinition_ids.setdefault(row[0], []).append(row[1])
+            self.cpe_id2ovaldefinition_ids.setdefault(row[0], array.array('q')).append(row[1])
         
         for row in data.execute("select * from packagename_oval_definition"):
-            self.packagename_id2definition_ids.setdefault(row[0], []).append(row[1])
+            self.packagename_id2definition_ids.setdefault(row[0], array.array('q')).append(row[1])
         
         for row in data.execute("select * from oval_definition_detail"):
             self.ovaldefinition_detail[row[0]] = (row[1], row[2])
@@ -301,9 +303,9 @@ class Cache:
         
         for row in data.execute("select * from oval_criteria_dependency"):
             if row[2] is None:
-                self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], []).append(row[1])
+                self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], array.array('q')).append(row[1])
             else:
-                self.ovalcriteria_id2deptest_ids.setdefault(row[0], []).append(row[2])
+                self.ovalcriteria_id2deptest_ids.setdefault(row[0], array.array('q')).append(row[2])
         
         for row in data.execute("select * from oval_test_detail"):
             self.ovaltest_detail[row[0]] = (row[1], row[2])
@@ -312,7 +314,7 @@ class Cache:
             self.ovaltest_id2states.setdefault(row[0], []).append((row[1], row[2], row[3]))
         
         for row in data.execute("select * from oval_state_arch"):
-            self.ovalstate_id2arches.setdefault(row[0], []).append(row[1])
+            self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 
