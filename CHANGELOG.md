@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.17.0 (2021-05-12)
+### Feature
+* **reposcan:** Allow repolists to opt_out of default certificates ([`dc00b21`](https://github.com/RedHatInsights/vmaas/commit/dc00b215c1b4d4283f87f9b63a02fa26fcc27aa1))
+
 ## v2.16.0 (2021-05-12)
 ### Feature
 * **reposcan:** Accept lists for content set data ([`24be17e`](https://github.com/RedHatInsights/vmaas/commit/24be17ec2ae0ef344eca161556c617cefa95669b))
