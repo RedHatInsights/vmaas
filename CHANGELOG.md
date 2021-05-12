@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.16.0 (2021-05-12)
+### Feature
+* **reposcan:** Accept lists for content set data ([`24be17e`](https://github.com/RedHatInsights/vmaas/commit/24be17ec2ae0ef344eca161556c617cefa95669b))
+
 ## v2.15.2 (2021-05-05)
 ### Fix
 * **webapp:** Default to false until it's well tested, apps can request it anyway using param ([`646b3f6`](https://github.com/RedHatInsights/vmaas/commit/646b3f683a2e5eafd33a2750e0895aa8c4f153bd))
