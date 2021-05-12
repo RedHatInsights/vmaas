@@ -15,7 +15,7 @@ from common.fileutil import remove_file_if_exists
 from database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"
-DUMP = './data/vmaas.db'
+DUMP = '/data/vmaas.db'
 LOGGER = get_logger(__name__)
 
 
