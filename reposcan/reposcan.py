@@ -30,8 +30,7 @@ from database.database_handler import DatabaseHandler
 from database.database_handler import init_db
 from database.product_store import ProductStore
 from dbchange import DbChangeAPI
-from exporter import DataDump
-from exporter import DUMP
+from exporter import fetch_latest_dump
 from exporter import main as export_data
 from mnm import ADMIN_REQUESTS
 from mnm import FAILED_AUTH
@@ -166,7 +165,7 @@ class DumpVersionHandler():
     @classmethod
     def get(cls, **kwargs):
         """Get the latest version."""
-        return DataDump.fetch_latest_dump()
+        return fetch_latest_dump()
 
 
 class SyncHandler:
@@ -454,7 +453,7 @@ class ExporterHandler(SyncHandler):
     def run_task(*args, **kwargs):
         """Function to start exporting disk dump."""
         try:
-            export_data(DUMP)
+            export_data()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
@@ -784,7 +783,7 @@ class ReposcanWebsocket():
     @classmethod
     def report_version(cls):
         """Report current dump version"""
-        cls.websocket.write_message(f"version {DataDump.fetch_latest_dump()}")
+        cls.websocket.write_message(f"version {fetch_latest_dump()}")
 
     @classmethod
     def _websocket_connect_status(cls, future):
