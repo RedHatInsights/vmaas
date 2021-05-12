@@ -72,7 +72,7 @@ class Config(BaseConfig, metaclass=Singleton):
                 self.reposcan_port = endpoint.port
         for endpoint in cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
-                self.remote_dump = f"rsync://{endpoint.hostname}:{endpoint.port}/data/vmaas.dbm"
+                self.remote_dump = f"rsync://{endpoint.hostname}:{endpoint.port}/data/vmaas.db"
             elif "websocket" in endpoint.hostname:
                 self.websocket_url = f"ws://{endpoint.hostname}:{endpoint.port}"
                 self.websocket_host = endpoint.hostname
@@ -102,4 +102,4 @@ class Config(BaseConfig, metaclass=Singleton):
         self.reposcan_host = os.getenv("REPOSCAN_HOST", "localhost")
         self.reposcan_port = int(os.getenv("REPOSCAN_PORT", "8081"))
         self.webapp_port = "8080"
-        self.remote_dump = f"rsync://{self.reposcan_host}:8730/data/vmaas.dbm"
+        self.remote_dump = f"rsync://{self.reposcan_host}:8730/data/vmaas.db"

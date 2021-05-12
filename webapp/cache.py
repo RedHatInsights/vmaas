@@ -12,7 +12,7 @@ from common.config import Config
 from common.logging_utils import get_logger
 
 CFG = Config()
-DUMP = '/data/vmaas.dbm'
+DUMP = '/data/vmaas.db'
 REMOTE_DUMP = CFG.remote_dump
 
 # repo_detail indexes
@@ -184,7 +184,7 @@ class Cache:
         """Update data and reload dictionaries."""
         if self.download():
             self.clear()
-            self.load(self.filename)
+            self.load_sqlite(self.filename)
             self.debug()
 
     @staticmethod
