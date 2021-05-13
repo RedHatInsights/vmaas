@@ -3,6 +3,7 @@ Module to handle /repos API calls.
 """
 
 from cache import REPO_NAME, REPO_URL, REPO_BASEARCH, REPO_RELEASEVER, REPO_PRODUCT, REPO_REVISION, REPO_THIRD_PARTY
+from common.dateutil import format_datetime
 from common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists, try_expand_by_regex
 
 
@@ -14,8 +15,8 @@ class RepoAPI:
 
     @staticmethod
     def _modified_since(repo_detail, modified_since_dt):
-        if not modified_since_dt or (repo_detail[REPO_REVISION] != 'None' and parse_datetime(
-                repo_detail[REPO_REVISION]) > modified_since_dt):
+        if not modified_since_dt or (repo_detail[REPO_REVISION] is not None and \
+                repo_detail[REPO_REVISION] > modified_since_dt):
             return True
         return False
 
@@ -102,7 +103,7 @@ class RepoAPI:
                         "basearch": none2empty(repo_detail[REPO_BASEARCH]),
                         "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
                         "product": repo_detail[REPO_PRODUCT],
-                        "revision": repo_detail[REPO_REVISION],
+                        "revision": format_datetime(repo_detail[REPO_REVISION]),
                         "cpes": [self.cache.cpe_id2label[cpe_id]
                                  for cpe_id in self.cache.content_set_id2cpe_ids.get(cs_id, [])],
                         "third_party": repo_detail[REPO_THIRD_PARTY]
