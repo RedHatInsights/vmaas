@@ -827,7 +827,6 @@ class SqliteDump:
         """Select repo mappings"""
         dump.execute("""create table if not exists repo_detail (
                                 id integer primary key,
-                                content_set_id int not null,
                                 label text,
                                 name text,
                                 url text,
@@ -835,12 +834,12 @@ class SqliteDump:
                                 releasever text,
                                 product text,
                                 product_id integer,
-                                revision datetime
+                                revision datetime,
+                                third_party integer
                                )""")
         # Select repo detail mapping
         with self._named_cursor() as cursor:
             cursor.execute("""select r.id,
-                                      cs.id,
                                       cs.label,
                                       cs.name as repo_name,
                                       r.url,
@@ -848,18 +847,21 @@ class SqliteDump:
                                       r.releasever,
                                       p.name as product_name,
                                       p.id as product_id,
-                                      r.revision
+                                      r.revision,
+                                      cs.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
                                  join product p on p.id = cs.product_id
                                  """)
-            for oid, cs_id, label, name, url, basearch, releasever, product, product_id, revision in cursor:
+            for oid, label, name, url, basearch, releasever, \
+                    product, product_id, revision, third_party in cursor:
                 dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                             (oid, cs_id, label, name, url, basearch,
+                             (oid, label, name, url, basearch,
                               releasever, product, product_id,
                               # Use NULLs in export
-                              format_datetime(revision) if revision is not None else None))
+                              format_datetime(revision) if revision is not None else None,
+                              1 if third_party else 0),)
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,
@@ -890,7 +892,8 @@ class SqliteDump:
                                 solution text,
                                 issued datetime,
                                 updated datetime,
-                                url text
+                                url text,
+                                third_party integer
                                )""")
         with self._named_cursor() as cursor:
             cursor.execute("""select distinct e.id
@@ -913,8 +916,8 @@ class SqliteDump:
                                 ) without rowid""")
         dump.execute("""create table if not exists errata_cve (
                                 errata_id integer,
-                                cve_id integer,
-                                primary key(errata_id, cve_id)
+                                cve text,
+                                primary key(errata_id, cve)
                                ) without rowid""")
         dump.execute("""create table if not exists errata_refs (
                                 errata_id integer,
@@ -927,6 +930,7 @@ class SqliteDump:
         dump.execute("""create table if not exists errata_module (
                                 errata_id integer,
                                 module_name text,
+                                module_stream_id integer,
                                 module_stream text,
                                 module_version text,
                                 module_context text
@@ -979,16 +983,18 @@ class SqliteDump:
             # Select errata ID to module mapping
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct p.errata_id, module.name,
-                                  m.stream_name, m.version, m.context
+                                  m.id, m.stream_name, m.version, m.context
                                   FROM module_stream m
                                   LEFT JOIN module on m.module_id = module.id
                                   LEFT JOIN pkg_errata p ON module_stream_id = m.id
                                   LEFT JOIN package_name on p.pkg_id = package_name.id
                                   WHERE p.module_stream_id IS NOT NULL
                                   AND p.errata_id in %s""", [tuple(self.errata_ids)])
-                for errata_id, module_name, module_stream_name, module_version, module_context in cursor:
-                    dump.execute("insert into errata_module values (?, ?, ?, ?, ?)",
-                                 (errata_id, module_name, module_stream_name, module_version, module_context))
+                for errata_id, module_name, module_stream_id, module_stream_name, \
+                        module_version, module_context in cursor:
+                    dump.execute("insert into errata_module values (?, ?, ?, ?, ?, ?)",
+                                 (errata_id, module_name, module_stream_id, module_stream_name,
+                                  module_version, module_context))
             # Select module to package ID mapping
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct errata_id, module_stream_id, pkg_id
@@ -1003,20 +1009,28 @@ class SqliteDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated
+                                         description, solution, issued, updated, 
+                                         true = ANY (
+                                            SELECT cs.third_party
+                                            FROM errata_repo er
+                                            JOIN repo r ON er.repo_id = r.id
+                                            JOIN content_set cs ON cs.id = r.content_set_id
+                                            WHERE er.errata_id = errata.id
+                                         ) AS third_party
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated in cursor:
+                    description, solution, issued, updated, third_party in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
-                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                  (errata_id, e_name,
                                   synopsis, summary, e_type,
                                   e_severity, description,
-                                  solution, issued, updated, url)
+                                  solution, issued, updated, url,
+                                  1 if third_party else 0)
                                  )
 
     def _dump_cves(self, dump):

@@ -255,28 +255,72 @@ class Cache:
 
         for row in data.execute("select * from repo_detail"):
             id = row[0]
-            repo = row[1:]
+            repo = (row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], bool(row[9]))
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
 
         for row in data.execute("select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
+        
+        errataid2cves = {}
+        for row in data.execute("select errata_id, cve from errata_cve"):
+            errataid2cves.setdefault(row[0], []).append(row[1])
+        
+        errataid2pkgid = {}
+        for row in data.execute("select pkg_id, errata_id from pkg_errata "):
+            self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
+            errataid2pkgid.setdefault(row[1], array.array('q')).append(row[0])
+
+        errataid2bzs = {}
+        for row in data.execute("select errata_id, bugzilla from errata_bugzilla"):
+            errataid2bzs.setdefault(row[0], []).append(row[1])
+        
+        errataid2refs = {}
+        for row in data.execute("select errata_id, ref from errata_refs"):
+            errataid2refs.setdefault(row[0], []).append(row[1])
+
+        errataidmodulestream2pkgid = {}
+        for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
+            self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
+            errataidmodulestream2pkgid.setdefault((row[1], row[2]), array.array('q')).append(row[0])
+
+        errataid2modules = {}
+        for row in data.execute("""select errata_id, module_name, module_stream_id, module_stream,
+                                   module_version, module_context from errata_module"""):
+            errataid2modules.setdefault(row[0], []).append({
+                "module_name": row[1],
+                "module_stream": row[3],
+                "module_version": row[4],
+                "module_context": row[5],
+                "package_list": errataidmodulestream2pkgid.get((row[0], row[2]), array.array('q')),
+                "source_package_list": []  # populated in API
+            })
 
         for row in data.execute("select * from errata_detail"):
             id = row[0]
             name = row[1]
-            errata = row[2:]
+            errata = (
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6],
+                row[7],
+                row[8],
+                row[9],
+                errataid2cves.get(id, []),
+                errataid2pkgid.get(id, array.array('q')),
+                errataid2bzs.get(id, []),
+                errataid2refs.get(id, []),
+                errataid2modules.get(id, []),
+                row[10],
+                bool(row[11])
+            )
             self.errata_detail[name] = errata
             self.errataid2name[id] = name
 
         for row in data.execute("select errata_id, repo_id from errata_repo"):
             self.errataid2repoids.setdefault(row[0], array.array('q')).append(row[1])
-
-        for row in data.execute("select pkg_id, errata_id from pkg_errata "):
-            self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
-
-        for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
-            self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
 
         for row in data.execute("select module, stream, stream_id from module_stream"):
             self.modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
