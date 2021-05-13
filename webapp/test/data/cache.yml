@@ -362,7 +362,7 @@ repo_detail:
   - 7Server
   - Red Hat Enterprise Linux Server
   - 1
-  - '2018-04-10T09:02:26+00:00'
+  - 2018-04-10 09:02:26+00:00
   - false
   2: !!python/tuple
   - rhel-8-for-x86_64-rt-rpms
@@ -372,7 +372,7 @@ repo_detail:
   - '8.1'
   - null
   - null
-  - '2020-01-03T05:24:17+00:00'
+  - 2020-01-03 05:24:17+00:00
   - false
   3: !!python/tuple
   - rhel-8-for-x86_64-nfv-rpms
@@ -382,7 +382,7 @@ repo_detail:
   - '8.0'
   - null
   - null
-  - '2019-09-20T06:25:14+00:00'
+  - 2019-09-20 06:25:14+00:00
   - false
   4: !!python/tuple
   - rhel-8-for-x86_64-nfv-rpms
@@ -392,7 +392,7 @@ repo_detail:
   - '8.1'
   - null
   - null
-  - '2020-01-03T05:24:24+00:00'
+  - 2020-01-03 05:24:24+00:00
   - false
   5: !!python/tuple
   - rhel-8-for-x86_64-rt-rpms
@@ -402,7 +402,7 @@ repo_detail:
   - '8.0'
   - null
   - null
-  - '2019-09-20T06:25:12+00:00'
+  - 2019-09-20 06:25:12+00:00
   - false
   6: !!python/tuple
   - third-party-repo1
@@ -412,7 +412,7 @@ repo_detail:
   - '8.0'
   - null
   - null
-  - '2019-09-20T06:25:12+00:00'
+  - 2019-09-20 06:25:12+00:00
   - true
 repolabel2ids:
   rhel-7-server-rpms:

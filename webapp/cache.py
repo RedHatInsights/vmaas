@@ -9,6 +9,7 @@ import shelve
 import sqlite3
 
 from common.config import Config
+from common.dateutil import parse_datetime
 from common.logging_utils import get_logger
 
 CFG = Config()
@@ -147,7 +148,7 @@ class Cache:
         """Download new version of data."""
         return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
 
-    # pylint: disable=too-many-branches,redefined-builtin,broad-except,invalid-name
+    # pylint: disable=too-many-branches,redefined-builtin,broad-except,invalid-name,too-many-statements
     def _load_sqlite(self, data):
 
         for (id, arch) in data.execute('select id, arch from arch'):
@@ -183,11 +184,11 @@ class Cache:
             self.content_set_id2cpe_ids.setdefault(cs_id, array.array('q')).append(cpe_id)
 
         for (name_id, pkg_id) in data.execute(
-                'select name_id, package_id from updates order by name_id, package_id, package_order'):
+                'select name_id, package_id from updates order by name_id, package_order'):
             self.updates.setdefault(int(name_id), []).append(int(pkg_id))
 
         for (name_id, evr_id, order) in data.execute(
-                'select name_id, evr_id, package_order from updates_index order by package_order'):
+                'select name_id, evr_id, package_order from updates_index order by name_id, package_order'):
             name_id = int(name_id)
             evr_id = int(evr_id)
             order = int(order)
@@ -210,64 +211,129 @@ class Cache:
 
         for row in data.execute("select * from repo_detail"):
             id = row[0]
-            repo = row[1:]
+            repo = (row[1], row[2], row[3], row[4], row[5], row[6], row[7],
+                    parse_datetime(row[8]), bool(row[9]))
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
 
         for row in data.execute("select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
 
+        errataid2cves = {}
+        cve2eid = {}
+        for row in data.execute("select errata_id, cve from errata_cve"):
+            errataid2cves.setdefault(row[0], []).append(row[1])
+            cve2eid.setdefault(row[1], array.array('q')).append(row[0])
+
+        errataid2pkgid = {}
+        for row in data.execute("select pkg_id, errata_id from pkg_errata "):
+            self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
+            errataid2pkgid.setdefault(row[1], array.array('q')).append(row[0])
+
+        errataid2bzs = {}
+        for row in data.execute("select errata_id, bugzilla from errata_bugzilla"):
+            errataid2bzs.setdefault(row[0], []).append(row[1])
+
+        errataid2refs = {}
+        for row in data.execute("select errata_id, ref from errata_refs"):
+            errataid2refs.setdefault(row[0], []).append(row[1])
+
+        errataidmodulestream2pkgid = {}
+        for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
+            self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
+            errataidmodulestream2pkgid.setdefault((row[1], row[2]), array.array('q')).append(row[0])
+
+        errataid2modules = {}
+        for row in data.execute("""select errata_id, module_name, module_stream_id, module_stream,
+                                   module_version, module_context from errata_module"""):
+            if row[0] not in errataid2modules:
+                errataid2modules[row[0]] = {}
+            if (row[1], row[3], row[4], row[5]) not in errataid2modules[row[0]]:
+                errataid2modules[row[0]][(row[1], row[3], row[4], row[5])] = {
+                    "module_name": row[1],
+                    "module_stream": row[3],
+                    "module_version": row[4],
+                    "module_context": row[5],
+                    "package_list": errataidmodulestream2pkgid.get((row[0], row[2]), array.array('q')),
+                    "source_package_list": []  # populated in API
+                }
+            else:
+                # Add packages from module with same name but different architecture, etc.
+                errataid2modules[row[0]][(row[1], row[3], row[4], row[5])]["package_list"].extend(
+                    errataidmodulestream2pkgid.get((row[0], row[2]), array.array('q'))
+                )
+
         for row in data.execute("select * from errata_detail"):
             id = row[0]
             name = row[1]
-            errata = row[2:]
+            errata = (
+                row[2], row[3], row[4], row[5], row[6], row[7],
+                parse_datetime(row[8]), parse_datetime(row[9]),
+                errataid2cves.get(id, []),
+                errataid2pkgid.get(id, array.array('q')),
+                errataid2bzs.get(id, []),
+                errataid2refs.get(id, []),
+                list(errataid2modules.get(id, {}).values()),
+                row[10], bool(row[11])
+            )
             self.errata_detail[name] = errata
             self.errataid2name[id] = name
 
         for row in data.execute("select errata_id, repo_id from errata_repo"):
             self.errataid2repoids.setdefault(row[0], array.array('q')).append(row[1])
 
-        for row in data.execute("select pkg_id, errata_id from pkg_errata "):
-            self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
-
-        for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
-            self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
-
         for row in data.execute("select module, stream, stream_id from module_stream"):
             self.modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
 
+        cveid2cwe = {}
+        for row in data.execute("select cve_id, cwe from cve_cwe"):
+            cveid2cwe.setdefault(row[0], []).append(row[1])
+
+        cveid2pid = {}
+        for row in data.execute("select cve_id, pkg_id from cve_pkg"):
+            cveid2pid.setdefault(row[0], array.array('q')).append(row[1])
+
         for row in data.execute("select * from cve_detail"):
+            id = row[0]
             name = row[1]
-            item = row[2:]
+            item = (
+                row[2], row[3], row[4], row[5], row[6],
+                parse_datetime(row[7]), parse_datetime(row[8]),
+                row[9], row[10],
+                cveid2cwe.get(id, []),
+                cveid2pid.get(id, array.array('q')),
+                cve2eid.get(name, array.array('q')),
+                row[11], row[12], row[13]
+            )
             self.cve_detail[name] = item
-        
+
         for row in data.execute("select * from oval_definition_cpe"):
             self.cpe_id2ovaldefinition_ids.setdefault(row[0], array.array('q')).append(row[1])
-        
+
         for row in data.execute("select * from packagename_oval_definition"):
             self.packagename_id2definition_ids.setdefault(row[0], array.array('q')).append(row[1])
-        
+
         for row in data.execute("select * from oval_definition_detail"):
             self.ovaldefinition_detail[row[0]] = (row[1], row[2])
-        
+
         for row in data.execute("select * from oval_definition_cve"):
             self.ovaldefinition_id2cves.setdefault(row[0], []).append(row[1])
-        
+
         for row in data.execute("select * from oval_criteria_type"):
             self.ovalcriteria_id2type[row[0]] = row[1]
-        
+
         for row in data.execute("select * from oval_criteria_dependency"):
             if row[2] is None:
                 self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], array.array('q')).append(row[1])
             else:
                 self.ovalcriteria_id2deptest_ids.setdefault(row[0], array.array('q')).append(row[2])
-        
+
         for row in data.execute("select * from oval_test_detail"):
             self.ovaltest_detail[row[0]] = (row[1], row[2])
-        
+
         for row in data.execute("select * from oval_test_state"):
             self.ovaltest_id2states.setdefault(row[0], []).append((row[1], row[2], row[3]))
-        
+
         for row in data.execute("select * from oval_state_arch"):
             self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
 

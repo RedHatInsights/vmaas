@@ -827,7 +827,6 @@ class SqliteDump:
         """Select repo mappings"""
         dump.execute("""create table if not exists repo_detail (
                                 id integer primary key,
-                                content_set_id int not null,
                                 label text,
                                 name text,
                                 url text,
@@ -835,12 +834,12 @@ class SqliteDump:
                                 releasever text,
                                 product text,
                                 product_id integer,
-                                revision datetime
+                                revision text,
+                                third_party integer
                                )""")
         # Select repo detail mapping
         with self._named_cursor() as cursor:
             cursor.execute("""select r.id,
-                                      cs.id,
                                       cs.label,
                                       cs.name as repo_name,
                                       r.url,
@@ -848,18 +847,21 @@ class SqliteDump:
                                       r.releasever,
                                       p.name as product_name,
                                       p.id as product_id,
-                                      r.revision
+                                      r.revision,
+                                      cs.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
                                  join product p on p.id = cs.product_id
                                  """)
-            for oid, cs_id, label, name, url, basearch, releasever, product, product_id, revision in cursor:
+            for oid, label, name, url, basearch, releasever, \
+                    product, product_id, revision, third_party in cursor:
                 dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                             (oid, cs_id, label, name, url, basearch,
+                             (oid, label, name, url, basearch,
                               releasever, product, product_id,
                               # Use NULLs in export
-                              format_datetime(revision) if revision is not None else None))
+                              format_datetime(revision) if revision is not None else None,
+                              1 if third_party else 0),)
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,
@@ -888,9 +890,10 @@ class SqliteDump:
                                 severity text,
                                 description text,
                                 solution text,
-                                issued datetime,
-                                updated datetime,
-                                url text
+                                issued text,
+                                updated text,
+                                url text,
+                                third_party integer
                                )""")
         with self._named_cursor() as cursor:
             cursor.execute("""select distinct e.id
@@ -913,8 +916,8 @@ class SqliteDump:
                                 ) without rowid""")
         dump.execute("""create table if not exists errata_cve (
                                 errata_id integer,
-                                cve_id integer,
-                                primary key(errata_id, cve_id)
+                                cve text,
+                                primary key(errata_id, cve)
                                ) without rowid""")
         dump.execute("""create table if not exists errata_refs (
                                 errata_id integer,
@@ -927,8 +930,9 @@ class SqliteDump:
         dump.execute("""create table if not exists errata_module (
                                 errata_id integer,
                                 module_name text,
+                                module_stream_id integer,
                                 module_stream text,
-                                module_version text,
+                                module_version integer,
                                 module_context text
                                )""")
         dump.execute("""create table if not exists errata_modulepkg (
@@ -958,7 +962,7 @@ class SqliteDump:
 
             # Select errata detail for errata API
             with self._named_cursor() as cursor:
-                cursor.execute("""SELECT errata_cve.errata_id, cve.id
+                cursor.execute("""SELECT errata_cve.errata_id, cve.name
                                     FROM cve
                                     JOIN errata_cve ON cve_id = cve.id
                                    WHERE errata_id in %s
@@ -979,16 +983,18 @@ class SqliteDump:
             # Select errata ID to module mapping
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct p.errata_id, module.name,
-                                  m.stream_name, m.version, m.context
+                                  m.id, m.stream_name, m.version, m.context
                                   FROM module_stream m
                                   LEFT JOIN module on m.module_id = module.id
                                   LEFT JOIN pkg_errata p ON module_stream_id = m.id
                                   LEFT JOIN package_name on p.pkg_id = package_name.id
                                   WHERE p.module_stream_id IS NOT NULL
                                   AND p.errata_id in %s""", [tuple(self.errata_ids)])
-                for errata_id, module_name, module_stream_name, module_version, module_context in cursor:
-                    dump.execute("insert into errata_module values (?, ?, ?, ?, ?)",
-                                 (errata_id, module_name, module_stream_name, module_version, module_context))
+                for errata_id, module_name, module_stream_id, module_stream_name, \
+                        module_version, module_context in cursor:
+                    dump.execute("insert into errata_module values (?, ?, ?, ?, ?, ?)",
+                                 (errata_id, module_name, module_stream_id, module_stream_name,
+                                  module_version, module_context))
             # Select module to package ID mapping
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT distinct errata_id, module_stream_id, pkg_id
@@ -1003,20 +1009,29 @@ class SqliteDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated
+                                         description, solution, issued, updated, 
+                                         true = ANY (
+                                            SELECT cs.third_party
+                                            FROM errata_repo er
+                                            JOIN repo r ON er.repo_id = r.id
+                                            JOIN content_set cs ON cs.id = r.content_set_id
+                                            WHERE er.errata_id = errata.id
+                                         ) AS third_party
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated in cursor:
+                    description, solution, issued, updated, third_party in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
-                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                 (errata_id, e_name,
-                                  synopsis, summary, e_type,
-                                  e_severity, description,
-                                  solution, issued, updated, url)
+                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                 (errata_id, e_name, synopsis, summary, e_type,
+                                  e_severity, description, solution,
+                                  format_datetime(issued) if issued is not None else None,
+                                  format_datetime(updated) if updated is not None else None,
+                                  url,
+                                  1 if third_party else 0)
                                  )
 
     def _dump_cves(self, dump):
@@ -1037,8 +1052,8 @@ class SqliteDump:
                                 cvss3_score float,
                                 cvss3_metrics text,
                                 impact text,
-                                published_date datetime,
-                                modified_date datetime,
+                                published_date text,
+                                modified_date text,
                                 iava text,
                                 description text,
                                 cvss2_score float,
@@ -1093,10 +1108,10 @@ class SqliteDump:
                 cvss3_score = (float(cvss3_score) if cvss3_score is not None else None)
                 cvss2_score = (float(cvss2_score) if cvss2_score is not None else None)
                 dump.execute("insert into cve_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                             (cve_id, name,
-                              redhat_url, secondary_url, cvss3_score, cvss3_metrics,
-                              impact, published_date, modified_date, iava, description,
-                              cvss2_score, cvss2_metrics, source)
+                             (cve_id, name, redhat_url, secondary_url, cvss3_score, cvss3_metrics, impact,
+                              format_datetime(published_date) if published_date is not None else None,
+                              format_datetime(modified_date) if modified_date is not None else None,
+                              iava, description, cvss2_score, cvss2_metrics, source)
                              )
 
     def _dump_modules(self, dump):
@@ -1237,11 +1252,11 @@ class SqliteDump:
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
         dump.execute("""create table if not exists dbchange (
-                                errata_changes datetime,
-                                cve_changes datetime,
-                                repository_changes datetime,
-                                last_change datetime,
-                                exported datetime
+                                errata_changes text,
+                                cve_changes text,
+                                repository_changes text,
+                                last_change text,
+                                exported text
                                )""")
         with self._named_cursor() as cursor:
             cursor.execute("""select errata_changes,
@@ -1250,7 +1265,13 @@ class SqliteDump:
                                      last_change
                                 from dbchange""")
             row = cursor.fetchone()
-            dump.execute("insert into dbchange values (?, ?, ?, ?, ?)", row + (timestamp,))
+            dump.execute("insert into dbchange values (?, ?, ?, ?, ?)", (
+                format_datetime(row[0]) if row[0] is not None else None,
+                format_datetime(row[1]) if row[1] is not None else None,
+                format_datetime(row[2]) if row[2] is not None else None,
+                format_datetime(row[3]) if row[3] is not None else None,
+                timestamp
+            ))
 
 
 def main():
