@@ -954,6 +954,10 @@ components:
       properties:
         last_change:
           example: '2020-04-16 20:07:58.500192+00'
+        modified_since:
+          type: string
+          example: '2018-04-05T01:23:45+02:00'
+          format: date-time
         package_name_list:
           type: object
           additionalProperties:
