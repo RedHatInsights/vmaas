@@ -21,6 +21,7 @@ async def server(aiohttp_server):
                       DEFAULT_PATH_API + "/v2": "webapp.v2.spec.yaml",
                       DEFAULT_PATH_API + "/v3": "webapp.v3.spec.yaml"})
     BaseHandler.db_cache = yaml_cache.load_test_cache()
+    BaseHandler.data_ready = True
     load_cache_to_apis()
     return await aiohttp_server(app.app)
 

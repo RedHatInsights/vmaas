@@ -72,6 +72,7 @@ class BaseHandler:
     patches_api = None
     dbchange_api = None
     refreshing = False
+    data_ready = False
 
     @classmethod
     async def get_post_data(cls, request):
@@ -86,6 +87,9 @@ class BaseHandler:
         # If refreshing cache, return 503 so apps can detect this state
         if cls.refreshing:
             return web.json_response("Data refresh in progress, please try again later.", status=503)
+
+        if not cls.data_ready:
+            return web.json_response("Data not available, please try again later.", status=503)
 
         request = kwargs.get('request', None)
         if request is None:
@@ -143,7 +147,7 @@ class ReadyHandler(BaseHandler):
     @classmethod
     async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get app status(whether the app is ready to serve requests)"""
-        return web.Response(status=503 if cls.refreshing else 200)
+        return web.Response(status=503 if cls.refreshing or not cls.data_ready else 200)
 
 
 class VersionHandler:
@@ -454,9 +458,12 @@ class Websocket:
         if not BaseHandler.refreshing:
             LOGGER.info("Starting cached data refresh.")
             BaseHandler.refreshing = True
+            BaseHandler.data_ready = False
             await self._send_msg("status-refreshing")
             await BaseHandler.db_cache.reload_async()
             await self.report_version()
+            if BaseHandler.db_cache.dbchange.get('exported'):  # check if timestamp is set in cache
+                BaseHandler.data_ready = True
             await self._send_msg("status-ready")
             BaseHandler.refreshing = False
             LOGGER.info("Cached data refreshed.")
@@ -480,6 +487,8 @@ class Websocket:
                 await self._send_msg("subscribe-webapp")
                 # Report version before status, so websocket doesn't send us the refresh message
                 await self.report_version()
+                if BaseHandler.db_cache.dbchange.get('exported'):  # check if timestamp is set in cache
+                    BaseHandler.data_ready = True
                 await self._send_msg("status-ready")
 
                 # check if webapp missed dump
