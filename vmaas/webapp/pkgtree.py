@@ -210,8 +210,9 @@ class PkgtreeAPI:
 
         page = data.get("page", None)
         page_size = data.get("page_size", None)
+        modified_since = data.get("modified_since", None)
         opts = dict(
-            modified_since=parse_datetime(data.get("modified_since", None)),
+            modified_since=parse_datetime(modified_since),
             return_repositories=data.get("return_repositories", True),
             return_errata=data.get("return_errata", True),
             return_summary=data.get("return_summary", False),
@@ -229,4 +230,6 @@ class PkgtreeAPI:
         response['package_name_list'] = package_name_list
         # Date and time of last data change in the VMaaS DB
         response['last_change'] = format_datetime(self.cache.dbchange['last_change'])
+        if modified_since:
+            response["modified_since"] = modified_since
         return response
