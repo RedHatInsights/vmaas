@@ -3,11 +3,11 @@ Unit test classes for exporter module.
 """
 # pylint: disable=no-self-use
 
-import shelve
-
 import time
+import sqlite3
+
 from common.dateutil import parse_datetime
-from exporter import DataDump
+from exporter import SqliteDump
 
 TEST_DUMP_FILE = "/tmp/dump.output"
 
@@ -17,10 +17,9 @@ class TestExporter:
 
     def test_dump(self, exporter_db_conn):
         """Test database dump."""
-
-        ddump = DataDump(exporter_db_conn, TEST_DUMP_FILE)
-        ddump.dump(time.time())
-        with shelve.open(TEST_DUMP_FILE) as dbdump:
+        sqlite_dump = SqliteDump(exporter_db_conn, TEST_DUMP_FILE)
+        sqlite_dump.dump(time.time())
+        with sqlite3.connect(TEST_DUMP_FILE) as dbdump:
             # from IPython import embed; embed()
 
             self.check_predefined_content(dbdump)
@@ -40,140 +39,202 @@ class TestExporter:
                      "ppc64le", "pSeries", "iSeries", "x86_64", "ppc64iseries",
                      "ppc64pseries", "ia32e", "amd64", "aarch64", "armv7hnl",
                      "armv7hl", "armv7l", "armv6hl", "armv6l", "armv5tel"]
+        id2arch = {}
+        arch2id = {}
+        for (id, arch) in dbdump.execute('select id, arch from arch'):
+            id2arch[id] = arch
+            arch2id[arch] = id
+
         for arch in arch_list:
-            archkey = "arch2id:%s" % arch
-            assert archkey in dbdump
-            idkey = "id2arch:%d" % dbdump[archkey]
-            assert idkey in dbdump
-            assert dbdump[idkey] == arch
+            assert arch in arch2id
+            assert arch2id[arch] in id2arch
+            assert id2arch[arch2id[arch]] == arch
 
     def check_packagename(self, dbdump):
         """Check packagename dump."""
-        assert "packagename2id:pkg-sec-errata1" in dbdump
-        assert dbdump["packagename2id:pkg-sec-errata1"] == 101
-        assert "id2packagename:101" in dbdump
-        assert dbdump["id2packagename:101"] == "pkg-sec-errata1"
-        assert "packagename2id:pkg-no-sec-errata2" in dbdump
-        assert "id2packagename:102" in dbdump
-        assert "packagename2id:pkg-errata-cve3" in dbdump
-        assert dbdump["packagename2id:pkg-errata-cve3"] == 103
-        assert "id2packagename:103" in dbdump
-        assert dbdump["id2packagename:103"] == "pkg-errata-cve3"
-        assert "packagename2id:pkg-sec-errata4" in dbdump
-        assert dbdump["packagename2id:pkg-sec-errata4"] == 104
-        assert "id2packagename:104" in dbdump
-        assert dbdump["id2packagename:104"] == "pkg-sec-errata4"
+        id2packagename = {}
+        packagename2id = {}
+        for (id, packagename) in dbdump.execute('select id, packagename from packagename'):
+            id2packagename[id] = packagename
+            packagename2id[packagename] = id
+
+        assert "pkg-sec-errata1" in packagename2id
+        assert packagename2id["pkg-sec-errata1"] == 101
+        assert 101 in id2packagename
+        assert id2packagename[101] == "pkg-sec-errata1"
+        assert "pkg-no-sec-errata2" in packagename2id
+        assert 102 in id2packagename
+        assert "pkg-errata-cve3" in packagename2id
+        assert packagename2id["pkg-errata-cve3"] == 103
+        assert 103 in id2packagename
+        assert id2packagename[103] == "pkg-errata-cve3"
+        assert "pkg-sec-errata4" in packagename2id
+        assert packagename2id["pkg-sec-errata4"] == 104
+        assert 104 in id2packagename
+        assert id2packagename[104] == "pkg-sec-errata4"
 
     def check_updates(self, dbdump):
         """Check updates in dump."""
-        assert "updates:101" in dbdump
-        updates1 = dbdump["updates:101"]
+        updates = {}
+        for (name_id, pkg_id) in dbdump.execute(
+                'select name_id, package_id from updates order by name_id, package_order'):
+            updates.setdefault(int(name_id), []).append(int(pkg_id))
+
+        assert 101 in updates
+        updates1 = updates[101]
         assert updates1 == [301, 302, 303]
 
-        assert "updates:102" in dbdump
+        assert 102 in updates
 
-        assert "updates:103" in dbdump
-        updates3 = dbdump["updates:103"]
+        assert 103 in updates
+        updates3 = updates[103]
         assert updates3 == [305, 306]
 
     def check_evr(self, dbdump):
         """Check evr in dump."""
-        assert "evr2id:1:1:1" in dbdump
-        assert dbdump["evr2id:1:1:1"] == 201
-        assert "evr2id:1:1:2" in dbdump
-        assert dbdump["evr2id:1:1:2"] == 202
-        assert "evr2id:1:1:2" in dbdump
-        assert dbdump["evr2id:1:1:3"] == 203
-        assert "evr2id:2:2:2" in dbdump
-        assert dbdump["evr2id:2:2:2"] == 204
-        assert "evr2id:3:3:3" in dbdump
-        assert dbdump["evr2id:3:3:3"] == 205
-        assert "evr2id:4:4:4" in dbdump
-        assert dbdump["evr2id:4:4:4"] == 206
+        id2evr = {}
+        evr2id = {}
+        for (id, epoch, ver, rel) in dbdump.execute('select id, epoch, version, release from evr'):
+            evr = (str(epoch), str(ver), str(rel))
+            id2evr[int(id)] = evr
+            evr2id[evr] = int(id)
 
-        assert "id2evr:201" in dbdump
-        assert dbdump["id2evr:201"] == ("1", "1", "1")
+        assert ("1", "1", "1") in evr2id
+        assert evr2id[("1", "1", "1")] == 201
+        assert ("1", "1", "2") in evr2id
+        assert evr2id[("1", "1", "2")] == 202
+        assert ("1", "1", "3") in evr2id
+        assert evr2id[("1", "1", "3")] == 203
+        assert ("2", "2", "2") in evr2id
+        assert evr2id[("2", "2", "2")] == 204
+        assert ("3", "3", "3") in evr2id
+        assert evr2id[("3", "3", "3")] == 205
+        assert ("4", "4", "4") in evr2id
+        assert evr2id[("4", "4", "4")] == 206
+
+        assert 201 in id2evr
+        assert id2evr[201] == ("1", "1", "1")
 
     def check_package_details(self, dbdump):
         """Check package details in dump."""
-        assert "package_details:301" in dbdump
-        item = dbdump["package_details:301"]
+        package_details = {}
+        strings = {}
+        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in dbdump.execute(
+                'select * from package_detail'):
+            detail = (name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0)
+            package_details[id] = detail
+        for (id, string) in dbdump.execute('select id, string from string'):
+            strings[int(id)] = string
+
+        assert 301 in package_details
+        item = package_details[301]
         assert item[0] == 101
         assert item[1] == 201
         assert item[2] == 1
-        assert dbdump["strings:%s" % item[3]] == "summary1"
-        assert dbdump["strings:%s" % item[4]] == "description1"
+        assert strings[item[3]] == "summary1"
+        assert strings[item[4]] == "description1"
         assert not item[5]
 
     def check_repo(self, dbdump):
         """Check repo data in dump."""
-        assert "repo_detail:801" in dbdump
-        assert dbdump["repo_detail:801"][0] == "content set 1"
-        assert dbdump["repo_detail:801"][1] == "content-set-name-1"
-        assert dbdump["repo_detail:801"][2] == "https://www.repourl.com/repo1"
-        assert dbdump["repo_detail:801"][3] == "noarch"
-        assert dbdump["repo_detail:801"][4] == "1"
-        assert dbdump["repo_detail:801"][5] == "product1"
-        assert dbdump["repo_detail:801"][6] == 501
-        assert parse_datetime(dbdump["repo_detail:801"][7]) == parse_datetime("2019-08-01T01:00:00-05:00")
-        #assert dbdump["repo_detail:801"] == ("content set 1", "content-set-name-1",
-        #                                   "https://www.repourl.com/repo1", "noarch", "1",
-        #                                   "product1", 501, "2019-08-01T01:00:00-05:00")
-        assert "repolabel2ids:content set 1" in dbdump
-        assert dbdump["repolabel2ids:content set 1"] == [801]
+        repo_detail = {}
+        repolabel2ids = {}
+        pkgid2repoids = {}
+        for row in dbdump.execute("select * from repo_detail"):
+            id = row[0]
+            repo = (row[1], row[2], row[3], row[4], row[5], row[6], row[7],
+                    parse_datetime(row[8]), bool(row[9]))
+            repo_detail[id] = repo
+            repolabel2ids.setdefault(repo[0], []).append(id)
+        for row in dbdump.execute("select pkg_id, repo_id from pkg_repo"):
+            pkgid2repoids.setdefault(row[0], []).append(row[1])
 
-        assert "pkgid2repoids:301" in dbdump
-        assert "pkgid2repoids:302" in dbdump
-        assert "pkgid2repoids:303" in dbdump
-        assert "pkgid2repoids:304" in dbdump
-        assert "pkgid2repoids:305" in dbdump
-        assert "pkgid2repoids:306" in dbdump
-        repo_list = dbdump["pkgid2repoids:306"]
+        assert 801 in repo_detail
+        assert repo_detail[801][0] == "content set 1"
+        assert repo_detail[801][1] == "content-set-name-1"
+        assert repo_detail[801][2] == "https://www.repourl.com/repo1"
+        assert repo_detail[801][3] == "noarch"
+        assert repo_detail[801][4] == "1"
+        assert repo_detail[801][5] == "product1"
+        assert repo_detail[801][6] == 501
+        assert parse_datetime(repo_detail[801][7]) == parse_datetime("2019-08-01T01:00:00-05:00")
+
+        assert "content set 1" in repolabel2ids
+        assert repolabel2ids["content set 1"] == [801]
+
+        assert 301 in pkgid2repoids
+        assert 302 in pkgid2repoids
+        assert 303 in pkgid2repoids
+        assert 304 in pkgid2repoids
+        assert 305 in pkgid2repoids
+        assert 306 in pkgid2repoids
+        repo_list = pkgid2repoids[306]
         assert 801 in repo_list
         assert 802 in repo_list
-        assert "pkgid2repoids:307" in dbdump
+        assert 307 in pkgid2repoids
 
     def check_errata(self, dbdump):
         """Check errata in dump."""
-        assert "errataid2name:401" in dbdump
-        assert dbdump["errataid2name:401"] == "errata1"
-        assert "errataid2name:402" in dbdump
-        assert "errataid2name:403" in dbdump
-        assert dbdump["errataid2name:403"] == "errata3"
+        errataid2name = {}
+        pkgid2errataids = {}
+        errataid2repoids = {}
+        for row in dbdump.execute("select * from errata_detail"):
+            errataid2name[row[0]] = row[1]
+        for row in dbdump.execute("select pkg_id, errata_id from pkg_errata "):
+            pkgid2errataids.setdefault(row[0], []).append(row[1])
+        for row in dbdump.execute("select errata_id, repo_id from errata_repo"):
+            errataid2repoids.setdefault(row[0], []).append(row[1])
 
-        assert "pkgid2errataids:301" in dbdump
-        assert 401 in dbdump["pkgid2errataids:301"]
-        assert 403 in dbdump["pkgid2errataids:301"]
-        assert "pkgid2errataids:302" in dbdump
-        assert 401 in dbdump["pkgid2errataids:302"]
-        assert "pkgid2errataids:303" not in dbdump
+        assert 401 in errataid2name
+        assert errataid2name[401] == "errata1"
+        assert 402 in errataid2name
+        assert 403 in errataid2name
+        assert errataid2name[403] == "errata3"
 
-        assert "errataid2repoids:401" in dbdump
-        assert 801 in dbdump["errataid2repoids:401"]
-        assert 802 in dbdump["errataid2repoids:401"]
-        assert "errataid2repoids:402" in dbdump
-        assert "errataid2repoids:403" in dbdump
-        assert 801 in dbdump["errataid2repoids:403"]
+        assert 301 in pkgid2errataids
+        assert 401 in pkgid2errataids[301]
+        assert 403 in pkgid2errataids[301]
+        assert 302 in pkgid2errataids
+        assert 401 in pkgid2errataids[302]
+        assert 303 not in pkgid2errataids
+
+        assert 401 in errataid2repoids
+        assert 801 in errataid2repoids[401]
+        assert 802 in errataid2repoids[401]
+        assert 402 in errataid2repoids
+        assert 403 in errataid2repoids
+        assert 801 in errataid2repoids[403]
 
     def check_modules(self, dbdump):
         """Check modules in dump."""
-        assert "pkgerrata2module:301:401" in dbdump
-        assert 1101 in dbdump["pkgerrata2module:301:401"]
-        assert "pkgerrata2module:302:401" in dbdump
-        assert 1103 in dbdump["pkgerrata2module:302:401"]
-        assert "pkgerrata2module:307:401" in dbdump
-        assert 1102 in dbdump["pkgerrata2module:307:401"]
+        pkgerrata2module = {}
+        modulename2id = {}
+        for row in dbdump.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
+            pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
+        for row in dbdump.execute("select module, stream, stream_id from module_stream"):
+            modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
 
-        assert "modulename2id:module1:stream1" in dbdump
-        assert 1101 in dbdump["modulename2id:module1:stream1"]
-        assert 1103 in dbdump["modulename2id:module1:stream1"]
-        assert "modulename2id:module2:stream2" in dbdump
-        assert 1102 in dbdump["modulename2id:module2:stream2"]
+        assert (301, 401) in pkgerrata2module
+        assert 1101 in pkgerrata2module[(301, 401)]
+        assert (302, 401) in pkgerrata2module
+        assert 1103 in pkgerrata2module[(302, 401)]
+        assert (307, 401) in pkgerrata2module
+        assert 1102 in pkgerrata2module[(307, 401)]
+
+        assert ("module1", "stream1") in modulename2id
+        assert 1101 in modulename2id[("module1", "stream1")]
+        assert 1103 in modulename2id[("module1", "stream1")]
+        assert ("module2", "stream2") in modulename2id
+        assert 1102 in modulename2id[("module2", "stream2")]
 
     def check_src_pkg_id(self, dbdump):
         """Check source package to binary packages
         mapping in dump."""
-        assert len(dbdump["src_pkg_id2pkg_ids:301"]) == 3
-        assert set(dbdump["src_pkg_id2pkg_ids:301"]) == {303, 304, 305}
-        assert len(dbdump["src_pkg_id2pkg_ids:302"]) == 2
-        assert set(dbdump["src_pkg_id2pkg_ids:302"]) == {306, 307}
+        src_pkg_id2pkg_ids = {}
+        for (id, _, _, _, _, _, src_pkg_id) in dbdump.execute('select * from package_detail'):
+            if src_pkg_id:
+                src_pkg_id2pkg_ids.setdefault(src_pkg_id, []).append(id)
+        assert len(src_pkg_id2pkg_ids[301]) == 3
+        assert set(src_pkg_id2pkg_ids[301]) == {303, 304, 305}
+        assert len(src_pkg_id2pkg_ids[302]) == 2
+        assert set(src_pkg_id2pkg_ids[302]) == {306, 307}
