@@ -8,11 +8,9 @@ import time
 
 from requests import request
 
-from common.config import Config
-from common.logging_utils import get_logger
-from common.logging_utils import init_logging
-from reposcan.database.database_handler import DatabaseHandler
-from reposcan.database.database_handler import init_db
+from vmaas.common.config import Config
+from vmaas.common.logging_utils import get_logger, init_logging
+from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 
 LOGGER = get_logger(__file__)
 

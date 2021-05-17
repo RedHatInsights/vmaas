@@ -4,18 +4,18 @@ cd $(dirname $0)
 
 if [[ ! -z $1 ]]; then
     if [[ "$1" == "webapp" ]]; then
-        cd webapp
+        cd vmaas/webapp
         [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="python3 -m main"
-        exec python3 ../wait_for_services.py $cmd
+        exec python3 ../../wait_for_services.py $cmd
     elif [[ "$1" == "reposcan" ]]; then
         rsync --daemon --verbose --port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8730)")
-        cd reposcan
-        exec python3 ../wait_for_services.py python3 -m main
+        cd vmaas/reposcan
+        exec python3 ../../wait_for_services.py python3 -m main
     elif [[ "$1" == "websocket" ]]; then
-        cd websocket
+        cd vmaas/websocket
         exec python3 -m websocket
     elif [[ "$1" == "webapp-utils" ]]; then
-        cd webapp_utils
+        cd vmaas/webapp_utils
         exec gunicorn -c gunicorn_conf.py -w ${GUNICORN_WORKERS:-4} --bind=0.0.0.0:8083 app
     elif [[ "$1" == "sleep" ]]; then
         # "developer" mode
