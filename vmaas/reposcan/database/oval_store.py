@@ -36,6 +36,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.oval_test_map = self._prepare_table_map(cols=["oval_id"], table="oval_rpminfo_test")
         self.oval_test_version_map = self._prepare_table_map(cols=["oval_id"], table="oval_rpminfo_test",
                                                              to_col="version")
+        self.oval_module_test_map = self._prepare_table_map(cols=["oval_id"], table="oval_module_test")
+        self.oval_module_test_version_map = self._prepare_table_map(cols=["oval_id"], table="oval_module_test",
+                                                                    to_col="version")
         self.oval_definition_map = self._prepare_table_map(cols=["oval_id"], table="oval_definition")
         self.oval_definition_version_map = self._prepare_table_map(cols=["oval_id"], table="oval_definition",
                                                                    to_col="version")
@@ -260,6 +263,29 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                                             "oval_rpminfo_test_state", self.oval_test_map[test["id"]],
                                             states, self.oval_state_map)
 
+    def _module_test_import_check(self, item):
+        """Check if module test is in DB, return None if it's up to date and row to import otherwise."""
+        if item["version"] <= self.oval_module_test_version_map.get(item["id"], -1):
+            return None
+        return item["id"], item["module_stream"], item["version"]
+
+    def _module_test_refresh_maps(self, cur):
+        """Add imported data to caches."""
+        for test_id, oval_id, version in cur.fetchall():
+            self.oval_module_test_map[oval_id] = test_id
+            self.oval_module_test_version_map[oval_id] = version
+
+    def _populate_module_tests(self, oval_file_id, module_tests):
+        query = """insert into oval_module_test
+                   (oval_id, module_stream, version) values %s
+                   on conflict (oval_id) do update set
+                   module_stream = EXCLUDED.module_stream, version = EXCLUDED.version
+                   returning id, oval_id, version"""
+        self._populate_data("module-tests", module_tests, self._module_test_import_check, query,
+                            self._module_test_refresh_maps)
+        self._populate_associations("file", "module-tests", "file_id", "module_test_id", "oval_file_module_test",
+                                    oval_file_id, module_tests, self.oval_module_test_map)
+
     def _populate_definition_criteria(self, cur, criteria):
         operator_id = self.oval_criteria_operator_map.get(criteria["operator"])
         if not operator_id:
@@ -270,15 +296,19 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         dependencies_to_import = []
         for test in criteria["criterions"]:
             test_id = self.oval_test_map.get(test)
+            module_test_id = self.oval_module_test_map.get(test)
             if test_id:  # Unsuported test type may not be imported (rpmverifyfile etc.)
-                dependencies_to_import.append((criteria_id, None, test_id))  # dep_criteria_id is null
+                dependencies_to_import.append((criteria_id, None, test_id, None))
+            if module_test_id:
+                dependencies_to_import.append((criteria_id, None, None, module_test_id))
+
         for child_criteria in criteria["criteria"]:
             child_criteria_id = self._populate_definition_criteria(cur, child_criteria)  # Recursion
-            dependencies_to_import.append((criteria_id, child_criteria_id, None))  # test_id is null
+            dependencies_to_import.append((criteria_id, child_criteria_id, None, None))
         # Import dependencies
         if dependencies_to_import:
             execute_values(cur, """insert into oval_criteria_dependency
-                                   (parent_criteria_id, dep_criteria_id, dep_test_id)
+                                   (parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id)
                                    values %s""", dependencies_to_import, page_size=len(dependencies_to_import))
         return criteria_id
 
@@ -360,4 +390,5 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self._populate_objects(oval_file_id, oval_file.objects)
         self._populate_states(oval_file_id, oval_file.states)
         self._populate_tests(oval_file_id, oval_file.tests)
+        self._populate_module_tests(oval_file_id, oval_file.module_tests)
         self._populate_definitions(oval_file_id, oval_file.definitions)
