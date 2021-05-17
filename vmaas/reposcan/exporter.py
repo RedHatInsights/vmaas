@@ -643,14 +643,15 @@ class SqliteDump:
         dump.execute("""create table if not exists oval_criteria_dependency (
                                 parent_criteria_id integer,
                                 dep_criteria_id integer,
-                                dep_test_id integer
+                                dep_test_id integer,
+                                dep_module_test_id integer
                                )""")
         with self._named_cursor() as cursor:
-            cursor.execute("""select parent_criteria_id, dep_criteria_id, dep_test_id
+            cursor.execute("""select parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id
                               from oval_criteria_dependency""")
-            for parent_criteria_id, dep_criteria_id, dep_test_id in cursor:
-                dump.execute("insert into oval_criteria_dependency values (?, ?, ?)",
-                (parent_criteria_id, dep_criteria_id, dep_test_id))
+            for parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id in cursor:
+                dump.execute("insert into oval_criteria_dependency values (?, ?, ?, ?)",
+                (parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id))
 
         # oval_test_detail
         dump.execute("""create table if not exists oval_test_detail (
@@ -693,6 +694,18 @@ class SqliteDump:
             cursor.execute("""select rpminfo_state_id, arch_id from oval_rpminfo_state_arch""")
             for oval_state_id, arch_id in cursor:
                 dump.execute("insert into oval_state_arch values (?, ?)", (oval_state_id, arch_id))
+
+        # oval_module_test_detail
+        dump.execute("""create table if not exists oval_module_test_detail (
+                                id integer primary key,
+                                module_stream text
+                               )""")
+        with self._named_cursor() as cursor:
+            cursor.execute("""select t.id, t.module_stream
+                              from oval_module_test t""")
+            for oval_module_test_id, module_stream in cursor:
+                dump.execute("insert into oval_module_test_detail values (?, ?)",
+                             (oval_module_test_id, module_stream))
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""

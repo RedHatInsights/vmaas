@@ -57,6 +57,9 @@ class VulnerabilitiesAPI:
         #            oval_state_id, evr_id, oval_operation_evr, matched)
         return matched
 
+    def _evaluate_module_test(self, module_test_id, modules_list):
+        return self.db_cache.ovalmoduletest_detail[module_test_id] in modules_list
+
     def _evaluate_test(self, test_id, nevra):
         package_name_id, epoch, ver, rel, arch = nevra
         candidate_package_name_id, check_existence = self.db_cache.ovaltest_detail[test_id]
@@ -81,21 +84,31 @@ class VulnerabilitiesAPI:
         #            test_id, package_name_id, candidate_package_name_id, check_existence, matched)
         return matched
 
-    def _evaluate_criteria(self, criteria_id, nevra):
+    def _evaluate_criteria(self, criteria_id, nevra, modules_list):
+        # pylint: disable=too-many-branches
+        module_test_deps = self.db_cache.ovalcriteria_id2depmoduletest_ids.get(criteria_id, [])
         test_deps = self.db_cache.ovalcriteria_id2deptest_ids.get(criteria_id, [])
         criteria_deps = self.db_cache.ovalcriteria_id2depcriteria_ids.get(criteria_id, [])
 
         criteria_type = self.db_cache.ovalcriteria_id2type[criteria_id]
         if criteria_type == OVAL_CRITERIA_OPERATOR_AND:
-            required_matches = len(test_deps) + len(criteria_deps)
+            required_matches = len(module_test_deps) + len(test_deps) + len(criteria_deps)
             must_match = True
         elif criteria_type == OVAL_CRITERIA_OPERATOR_OR:
-            required_matches = min(1, (len(test_deps) + len(criteria_deps)))
+            required_matches = min(1, (len(module_test_deps) + len(test_deps) + len(criteria_deps)))
             must_match = False
         else:
             raise ValueError("Unsupported operator: %s" % criteria_type)
 
         matches = 0
+
+        for module_test_id in module_test_deps:
+            if matches >= required_matches:
+                break
+            if self._evaluate_module_test(module_test_id, modules_list):
+                matches += 1
+            elif must_match:  # AND
+                break
 
         for test_id in test_deps:
             if matches >= required_matches:
@@ -108,7 +121,7 @@ class VulnerabilitiesAPI:
         for dep_criteria_id in criteria_deps:
             if matches >= required_matches:
                 break
-            if self._evaluate_criteria(dep_criteria_id, nevra):
+            if self._evaluate_criteria(dep_criteria_id, nevra, modules_list):
                 matches += 1
             elif must_match:  # AND
                 break
@@ -152,6 +165,7 @@ class VulnerabilitiesAPI:
         if evaluate_oval:
             # TODO: re-factor, double parsing input packages
             packages_to_process, _ = self.updates_api.process_input_packages(data)
+            modules_list = {f"{x['module_name']}:{x['module_stream']}" for x in data.get('modules_list', [])}
 
             # Get CPEs for affected repos/content sets
             # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
@@ -176,7 +190,8 @@ class VulnerabilitiesAPI:
                        ):
                         continue
 
-                    if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch)):  # Vulnerable
+                    if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
+                        # Vulnerable
                         #LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
                         if definition_type == OVAL_DEFINITION_TYPE_PATCH:
                             cve_list.update(cves)
