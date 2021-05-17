@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 5);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 6);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1083,6 +1083,34 @@ CREATE INDEX ON oval_file_rpminfo_test (rpminfo_test_id);
 
 
 -- -----------------------------------------------------
+-- Table vmaas.oval_module_test
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS oval_module_test (
+  id SERIAL,
+  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  module_stream TEXT NOT NULL, CHECK (NOT empty(module_stream)),
+  version INT NOT NULL,
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.oval_file_module_test
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS oval_file_module_test (
+  file_id INT NOT NULL,
+  module_test_id INT NOT NULL,
+  UNIQUE (file_id, module_test_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id),
+  CONSTRAINT module_test_id
+    FOREIGN KEY (module_test_id)
+    REFERENCES oval_module_test (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
 -- Table vmaas.oval_criteria
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_criteria (
@@ -1099,11 +1127,13 @@ CREATE TABLE IF NOT EXISTS oval_criteria (
 -- Table vmaas.oval_criteria_dependency
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_criteria_dependency (
-  id SERIAL,
   parent_criteria_id INT NOT NULL,
   dep_criteria_id INT,
   dep_test_id INT,
-  CONSTRAINT dep_criteria_id_dep_test_id CHECK((dep_criteria_id IS NOT NULL AND dep_test_id IS NULL) OR (dep_criteria_id IS NULL AND dep_test_id IS NOT NULL)),
+  dep_module_test_id INT,
+  CONSTRAINT dep_criteria_id_dep_test_id CHECK((dep_criteria_id IS NOT NULL AND dep_test_id IS NULL AND dep_module_test_id IS NULL) OR
+                                               (dep_criteria_id IS NULL AND dep_test_id IS NOT NULL AND dep_module_test_id IS NULL) OR
+                                               (dep_criteria_id IS NULL AND dep_test_id IS NULL AND dep_module_test_id IS NOT NULL)),
   CONSTRAINT parent_criteria_id
     FOREIGN KEY (parent_criteria_id)
     REFERENCES oval_criteria (id),
@@ -1113,11 +1143,17 @@ CREATE TABLE IF NOT EXISTS oval_criteria_dependency (
   CONSTRAINT dep_test_id
     FOREIGN KEY (dep_test_id)
     REFERENCES oval_rpminfo_test (id),
-  PRIMARY KEY (id)
+  CONSTRAINT dep_module_test_id
+    FOREIGN KEY (dep_module_test_id)
+    REFERENCES oval_module_test (id)
 )TABLESPACE pg_default;
 
-CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_1 ON oval_criteria_dependency (parent_criteria_id, dep_criteria_id) WHERE dep_criteria_id IS NOT NULL AND dep_test_id IS NULL;
-CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_2 ON oval_criteria_dependency (parent_criteria_id, dep_test_id) WHERE dep_criteria_id IS NULL AND dep_test_id IS NOT NULL;
+CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_1 ON oval_criteria_dependency (parent_criteria_id, dep_criteria_id)
+    WHERE dep_criteria_id IS NOT NULL AND dep_test_id IS NULL AND dep_module_test_id IS NULL;
+CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_2 ON oval_criteria_dependency (parent_criteria_id, dep_test_id)
+    WHERE dep_criteria_id IS NULL AND dep_test_id IS NOT NULL AND dep_module_test_id IS NULL;
+CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_3 ON oval_criteria_dependency (parent_criteria_id, dep_module_test_id)
+    WHERE dep_criteria_id IS NULL AND dep_test_id IS NULL AND dep_module_test_id IS NOT NULL;
 
 
 -- -----------------------------------------------------
