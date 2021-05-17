@@ -80,7 +80,7 @@ def as_long_arr(data):
 class Cache:
     """ Cache class. """
 
-    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes,invalid-name
     def __init__(self, filename=DUMP):
         self.filename = filename
         self.clear()
@@ -126,9 +126,11 @@ class Cache:
         self.ovalcriteria_id2type = {}
         self.ovalcriteria_id2depcriteria_ids = {}
         self.ovalcriteria_id2deptest_ids = {}
+        self.ovalcriteria_id2depmoduletest_ids = {}
         self.ovaltest_detail = {}
         self.ovaltest_id2states = {}
         self.ovalstate_id2arches = {}
+        self.ovalmoduletest_detail = {}
 
     async def reload_async(self):
         """Update data and reload dictionaries asynchronously."""
@@ -321,10 +323,12 @@ class Cache:
             self.ovalcriteria_id2type[row[0]] = row[1]
 
         for row in data.execute("select * from oval_criteria_dependency"):
-            if row[2] is None:
+            if row[2] is None and row[3] is None:
                 self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], array.array('q')).append(row[1])
-            else:
+            elif row[1] is None and row[3] is None:
                 self.ovalcriteria_id2deptest_ids.setdefault(row[0], array.array('q')).append(row[2])
+            else:
+                self.ovalcriteria_id2depmoduletest_ids.setdefault(row[0], array.array('q')).append(row[3])
 
         for row in data.execute("select * from oval_test_detail"):
             self.ovaltest_detail[row[0]] = (row[1], row[2])
@@ -334,6 +338,9 @@ class Cache:
 
         for row in data.execute("select * from oval_state_arch"):
             self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
+
+        for row in data.execute("select * from oval_module_test_detail"):
+            self.ovalmoduletest_detail[row[0]] = row[1]
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 
