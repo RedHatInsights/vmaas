@@ -18,7 +18,7 @@ services:
     command: >
       bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
                          && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
-                         && ./run_tests.sh reposcan \
-                         && ./run_tests.sh webapp \
-                         && ./run_tests.sh websocket \
+                         && ./run_tests.sh vmaas/reposcan \
+                         && ./run_tests.sh vmaas/webapp \
+                         && ./run_tests.sh vmaas/websocket \
                          && bash <(curl -s https://codecov.io/bash)"

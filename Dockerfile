@@ -7,7 +7,7 @@ RUN /generate_rpm_list.sh | grep -v -E "^(redhat|centos|fedora)-release" > /tmp/
 ARG PG_REPO=https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-8-x86_64/
 ARG PG_RPM=postgresql12-12.2-2PGDG.rhel8.x86_64.rpm
 ARG PG_LIBS_RPM=postgresql12-libs-12.2-2PGDG.rhel8.x86_64.rpm
-ADD /reposcan/RPM-GPG-KEY-PGDG /etc/pki/rpm-gpg/
+ADD /vmaas/reposcan/RPM-GPG-KEY-PGDG /etc/pki/rpm-gpg/
 RUN microdnf install python3 python3-rpm which rsync git shadow-utils diffutils systemd libicu $([ ! -z $QE_BUILD ] && echo 'procps-ng python3-coverage tar') && microdnf clean all && \
     curl -o /tmp/${PG_RPM} ${PG_REPO}${PG_RPM} && \
     curl -o /tmp/${PG_LIBS_RPM} ${PG_REPO}${PG_LIBS_RPM} && \
@@ -32,9 +32,10 @@ RUN /generate_rpm_list.sh > /tmp/final_rpm_list.txt
 ENV MANIFEST_PREFIX="services-vmaas\/app"
 ENV APP_BASE_IMAGE="OCI_ubi-minimal registry.access.redhat.com/ubi8"
 ADD /scripts/get_app_version.sh   /get_app_version.sh
-ADD /common/*.py                  /vmaas/common/
 ADD /scripts/generate_manifest.sh /generate_manifest.sh
 ADD /scripts/push_manifest.sh     /push_manifest.sh
+ADD /vmaas/common/*.py            /vmaas/common/
+ADD /vmaas/reposcan/rsyncd.conf   /etc/
 RUN /generate_manifest.sh manifest.txt "$MANIFEST_PREFIX" "$APP_BASE_IMAGE" /tmp/base_rpm_list.txt /tmp/final_rpm_list.txt && \
     echo 'MANIFEST:' && cat manifest.txt
 
@@ -43,31 +44,11 @@ RUN install -m 1777 -d /data && \
 
 USER vmaas
 
-ADD wait-for-services.sh        /vmaas/
-ADD wait_for_services.py        /vmaas/
-ADD entrypoint.sh               /vmaas/
-ADD /common/*.py                /vmaas/webapp/common/
-ADD /common/*.py                /vmaas/reposcan/common/
-ADD /common/*.py                /vmaas/websocket/common/
-ADD /common/*.py                /vmaas/webapp_utils/common/
-ADD /webapp/*.spec.yaml         /vmaas/webapp/
-ADD /webapp/*.py                /vmaas/webapp/
-ADD /reposcan/*.spec.yaml       /vmaas/reposcan/
-ADD /reposcan/*.py              /vmaas/reposcan/
-ADD /reposcan/database/*.py     /vmaas/reposcan/database/
-ADD /reposcan/download/*.py     /vmaas/reposcan/download/
-ADD /reposcan/redhatcpe/*.py    /vmaas/reposcan/redhatcpe/
-ADD /reposcan/redhatcve/*.py    /vmaas/reposcan/redhatcve/
-ADD /reposcan/redhatoval/*.py   /vmaas/reposcan/redhatoval/
-ADD /reposcan/repodata/*.py     /vmaas/reposcan/repodata/
-ADD /reposcan/rsyncd.conf       /etc/
-ADD /database/*.sql             /vmaas/reposcan/
-ADD /database/upgrade/*.sh      /vmaas/reposcan/
-ADD /database/upgrade_scripts/* /vmaas/reposcan/database/upgrade_scripts/
-ADD /websocket/*.py             /vmaas/websocket/
-ADD /webapp_utils/*.py          /vmaas/webapp_utils/
-ADD /webapp_utils/*.yml         /vmaas/webapp_utils/
-ADD /webapp_utils/database/*.py /vmaas/webapp_utils/database/
+ADD .                           /vmaas/
+ADD /database/*.sql             /vmaas/vmaas/reposcan/
+ADD /database/upgrade/*.sh      /vmaas/vmaas/reposcan/
+ADD /database/upgrade_scripts/* /vmaas/vmaas/reposcan/database/upgrade_scripts/
 
+ENV PYTHONPATH=/vmaas
 
 ENV COVERAGE_FILE='/tmp/.coverage'

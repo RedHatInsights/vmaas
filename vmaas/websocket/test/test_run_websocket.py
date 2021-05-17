@@ -1,0 +1,8 @@
+"""Websocket initialization test."""
+
+from vmaas.websocket import websocket as ws  # pylint: disable=no-name-in-module
+
+
+def test_run_app():
+    """Test websocket init process."""
+    ws.create_app()
