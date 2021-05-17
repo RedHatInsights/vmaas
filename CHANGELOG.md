@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.18.1 (2021-05-17)
+### Fix
+* **reposcan:** Fix path to wait script and replace it with python version ([`8d40e09`](https://github.com/RedHatInsights/vmaas/commit/8d40e097d31632f0eb505b8de960ede448376117))
+
 ## v2.18.0 (2021-05-14)
 ### Feature
 * **webapp:** Return HTTP 503 when no dump is loaded ([`5b7002a`](https://github.com/RedHatInsights/vmaas/commit/5b7002a968c1a12ca7a51c58b9fe1a3e7020468a))
