@@ -16,5 +16,5 @@ if [[ "$RETVAL" == "0" && "$EXISTING_TABLES" == "0" ]]; then
     echo "ALTER USER vmaas_writer WITH PASSWORD '${POSTGRESQL_WRITER_PASSWORD:-vmaas_writer_pwd}'" | psql_exec -
     echo "ALTER USER vmaas_reader WITH PASSWORD '${POSTGRESQL_READER_PASSWORD:-vmaas_reader_pwd}'" | psql_exec -
 else
-    exec ../wait-for-services.sh python3 -m database.upgrade
+    exec python3 ../../wait_for_services.py python3 -m database.upgrade
 fi
