@@ -13,35 +13,39 @@ NS = {"default": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
 
 DEFAULT_CHECK_EXISTENCE = "at_least_one_exists"
 
-UNSUPPORTED_TESTS = [
+UNSUPPORTED_TESTS = {
     "{%s}rpmverifyfile_test" % NS['red-def'],
-    "{%s}textfilecontent54_test" % NS['ind-def'],
     "{%s}uname_test" % NS['unix-def'],
-]
+}
 
-UNSUPPORTED_TEST_CHILDS = []
+UNSUPPORTED_TEST_CHILDS = {}
 
-UNSUPPORTED_OBJECTS = [
+UNSUPPORTED_TEST_COMMENTS = {
+    "kernel"
+}
+
+UNSUPPORTED_OBJECTS = {
     "{%s}rpmverifyfile_object" % NS['red-def'],
     "{%s}textfilecontent54_object" % NS['ind-def'],
     "{%s}uname_object" % NS['unix-def'],
-]
+}
 
-UNSUPPORTED_OBJECT_CHILDS = []
+UNSUPPORTED_OBJECT_CHILDS = {}
 
-UNSUPPORTED_STATES = [
+UNSUPPORTED_STATES = {
     "{%s}rpmverifyfile_state" % NS['red-def'],
     "{%s}textfilecontent54_state" % NS['ind-def'],
     "{%s}uname_state" % NS['unix-def'],
-]
+}
 
-UNSUPPORTED_STATE_CHILDS = [
+UNSUPPORTED_STATE_CHILDS = {
     "{%s}signature_keyid" % NS['red-def'],
-]
+}
 
 
 class OvalDefinitions:
     """Class parsing OVAL definitions file."""
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, oval_id, updated, url, local_path):
         self.logger = get_logger(__name__)
         self.oval_id = oval_id
@@ -52,6 +56,7 @@ class OvalDefinitions:
 
         self.definitions = []
         self.tests = []
+        self.module_tests = []
         self.objects = []
         self.states = []
 
@@ -111,6 +116,7 @@ class OvalDefinitions:
                 self.logger.warning("Unknown definition: %s", definition.tag)
 
     def _parse_tests(self):
+        # pylint: disable=too-many-branches
         for test in self._xfind("default:tests"):  # <tests>
             if test.tag == "{%s}rpminfo_test" % NS['red-def']:  # <red-def:rpminfo_test>
                 obj = None
@@ -130,6 +136,19 @@ class OvalDefinitions:
                                    "check": test.get("check"),
                                    "check_existence": test.get("check_existence", DEFAULT_CHECK_EXISTENCE),
                                    "version": int(test.get("version"))})
+            elif test.tag == "{%s}textfilecontent54_test" % NS['ind-def']:  # <ind-def:textfilecontent54_test>
+                # Can't use <ind-def:textfilecontent54_test>, parse required module from comment,
+                # not optimal, but better than parsing <ind-def:textfilecontent54_state> regex
+                comment = test.get("comment", "")
+                parts = comment.split()
+                if parts and parts[0] == "Module" and parts[-1] == "enabled":
+                    self.module_tests.append({"id": test.get("id"),
+                                              "module_stream": parts[1],
+                                              "version": int(test.get("version"))})
+                elif comment.startswith(tuple(UNSUPPORTED_TEST_COMMENTS)):  # Not supported, skip
+                    pass
+                else:
+                    self.logger.warning("Unknown <ind-def:textfilecontent54_test> comment: %s", test.get("comment"))
             elif test.tag in UNSUPPORTED_TESTS:  # Not supported, skip
                 pass
             else:  # Other unparsed tags
