@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.19.0 (2021-05-19)
+### Feature
+* **webapp:** Filter modules_list in OVAL evaluation ([`ab8011f`](https://github.com/RedHatInsights/vmaas/commit/ab8011f443a16299aab4f11aaa20f132bd32bb35))
+* **reposcan:** Import OVAL module streams ([`0408efc`](https://github.com/RedHatInsights/vmaas/commit/0408efcec808297f09226c648eddb3f11f95279e))
+
 ## v2.18.1 (2021-05-17)
 ### Fix
 * **reposcan:** Fix path to wait script and replace it with python version ([`8d40e09`](https://github.com/RedHatInsights/vmaas/commit/8d40e097d31632f0eb505b8de960ede448376117))
