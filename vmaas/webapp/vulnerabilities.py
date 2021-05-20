@@ -181,7 +181,7 @@ class VulnerabilitiesAPI:
                 #LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
                 for definition_id in definition_ids:
                     definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
-                    cves = self.db_cache.ovaldefinition_id2cves[definition_id]
+                    cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
                     if (
                             (definition_type == OVAL_DEFINITION_TYPE_PATCH
                              and not [cve for cve in cves if cve not in cve_list])
