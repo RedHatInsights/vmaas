@@ -1,6 +1,7 @@
 """
 Module to handle /vulnerabilities API calls.
 """
+import re
 
 from vmaas.webapp.cache import ERRATA_CVE
 
@@ -26,7 +27,8 @@ class VulnerabilitiesAPI:
 
     @staticmethod
     def _get_num_tuple(text):
-        return tuple(int(part) if part.isdigit() else part for part in text.split("."))
+        return tuple((int(part),) if part.isdigit() else (0, part) for part
+                     in list(filter(lambda x: x and x != ".", re.split(r"(\d+)", text))))
 
     def _evaluate_state(self, state, epoch, ver, rel, arch):
         oval_state_id, evr_id, oval_operation_evr = state
