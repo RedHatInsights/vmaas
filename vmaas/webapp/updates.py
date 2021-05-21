@@ -4,7 +4,7 @@ Module to handle /updates API calls.
 import rpm
 from vmaas.webapp. cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE, PKG_EVR_ID, ERRATA_THIRD_PARTY
-from vmaas.common.webapp_utils import none2empty, filter_package_list
+from vmaas.common.webapp_utils import none2empty, filter_package_list, format_datetime
 from vmaas.common.rpm import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
@@ -310,7 +310,8 @@ class UpdatesAPI:
         """
         # Return empty update list in case of empty input package list
         packages_to_process, update_list = self.process_input_packages(data)
-        response = {'update_list': update_list}
+        response = {'update_list': update_list,
+                    'last_change': format_datetime(self.db_cache.dbchange['last_change'])}
         if len(packages_to_process) == 0:
             return response
 

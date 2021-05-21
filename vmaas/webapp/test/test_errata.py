@@ -103,7 +103,6 @@ class TestErrataAPI(TestBase):
         modified_from_resp = parse_datetime(response['errata_list'][ERRATA_NAME]['updated'])
         modified_since = parse_datetime(DATE_SINCE)
         assert modified_from_resp >= modified_since
-        assert DATE_SINCE == response['modified_since']
 
     def test_modified_in_future(self):
         """Test CVE API with 'modified_since' property in future."""
