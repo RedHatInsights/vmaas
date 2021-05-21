@@ -570,6 +570,9 @@ components:
         basearch:
           type: string
           example: x86_64
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
 
     CvesRequest:
       type: object
@@ -666,10 +669,9 @@ components:
                 items:
                   type: string
                   example: nss-devel-3.16.1-9.el6_5.src
-        modified_since:
+        last_change:
           type: string
-          example: '2018-04-05T01:23:45+02:00'
-          format: date-time
+          example: '2020-04-16 20:07:58.500192+00'
         <<: *resp_paging
 
     ReposRequest:
@@ -732,6 +734,9 @@ components:
                     example: cpe:/a:redhat
                 third_party:
                   type: boolean
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
         <<: *resp_paging
 
     ErrataRequest:
@@ -837,10 +842,6 @@ components:
                 example: security
               third_party:
                 type: boolean
-        modified_since:
-          type: string
-          example: '2018-04-05T01:23:45+02:00'
-          format: date-time
         type:
           type: array
           items:
@@ -852,6 +853,9 @@ components:
             type: string
             enum: [Low, Moderate, Important, Critical, null]
             nullable: true
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
         <<: *resp_paging
 
     PackagesRequest:
@@ -870,6 +874,7 @@ components:
           default: false
       required:
         - package_list
+
     PackagesResponse:
       properties:
         package_list:
@@ -908,6 +913,9 @@ components:
                     releasever:
                       type: string
                       example: '6.9'
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
 
     PkgtreeRequest:
       type: object
@@ -953,6 +961,7 @@ components:
     PkgtreeResponse:
       properties:
         last_change:
+          type: string
           example: '2020-04-16 20:07:58.500192+00'
         package_name_list:
           type: object
@@ -1059,6 +1068,7 @@ components:
             exported:
               type: string
               example: '2018-04-16 20:07:59.235962+00'
+
     VulnerabilitiesRequest:
       type: object
       properties:
@@ -1105,6 +1115,7 @@ components:
           default: false
       required:
         - package_list
+
     VulnerabilitiesResponse:
       properties:
         cve_list:
@@ -1117,6 +1128,9 @@ components:
           items:
             type: string
             example: CVE-2017-15089
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
       required:
         - cve_list
         - unpatched_cve_list
@@ -1161,6 +1175,7 @@ components:
           default: false
       required:
         - package_list
+
     PatchesResponse:
       properties:
         errata_list:
@@ -1168,6 +1183,9 @@ components:
           items:
             type: string
             example: RHSA-2018:0151
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
 
     SRPMPkgNamesRequest:
       type: object
@@ -1192,8 +1210,6 @@ components:
 
     SRPMPkgNamesResponse:
         properties:
-          last_change:
-            example: '2020-04-16 20:07:58.500192+00'
           srpm_name_list:
             type: object
             additionalProperties:
@@ -1203,7 +1219,10 @@ components:
                 items:
                   type: string
                   example: 'openssl-libs'
-
+          last_change:
+            type: string
+            example: '2020-04-16 20:07:58.500192+00'
+                  
     RPMPkgNamesRequest:
       type: object
       properties:
@@ -1228,6 +1247,7 @@ components:
     RPMPkgNamesResponse:
       properties:
         last_change:
+          type: string
           example: '2020-04-16 20:07:58.500192+00'
         rpm_name_list:
           type: object

@@ -3,6 +3,7 @@ Module to handle /vulnerabilities API calls.
 """
 
 from vmaas.webapp.cache import ERRATA_CVE
+from vmaas.common.webapp_utils import format_datetime
 
 OVAL_OPERATION_EVR_EQUALS = 1
 OVAL_OPERATION_EVR_LESS_THAN = 2
@@ -200,4 +201,6 @@ class VulnerabilitiesAPI:
                         else:
                             raise ValueError("Unsupported definition type: %s" % definition_type)
 
-        return {'cve_list': list(cve_list), 'unpatched_cve_list': list(unpatched_cve_list)}
+        return {'cve_list': list(cve_list),
+                'unpatched_cve_list': list(unpatched_cve_list),
+                'last_change': format_datetime(self.db_cache.dbchange['last_change'])}

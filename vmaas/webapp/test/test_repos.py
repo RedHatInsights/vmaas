@@ -17,7 +17,8 @@ REPO_JSON_MODIFIED_SINCE = {
 REPO_JSON_EMPTY_LIST = {"repository_list": [""]}
 REPO_JSON_NON_EXIST = {"repository_list": ["non-existent-repo"]}
 
-EMPTY_RESPONSE = {"repository_list": {}, "page": 1, "page_size": 0, "pages": 0}
+EMPTY_RESPONSE = {"repository_list": {}, "page": 1, "page_size": 0, "pages": 0,
+                  "last_change": "2019-03-07T09:17:23.799995+00:00"}
 
 
 class TestRepoAPI(TestBase):

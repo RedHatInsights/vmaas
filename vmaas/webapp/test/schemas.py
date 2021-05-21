@@ -26,9 +26,11 @@ _cves = {
     "page": int,
     "page_size": int,
     "pages": int,
+    "last_change": str,
 }
 
-_pkgs_top = {"package_list": {str: dict}}
+_pkgs_top = {"package_list": {str: dict},
+             "last_change": str,}
 
 _pkgs_list = {
     "summary": str,
@@ -88,6 +90,7 @@ _repos = {
     "page": int,
     "page_size": int,
     "pages": int,
+    "last_change": str,
 }
 
 _errata = {
@@ -115,18 +118,21 @@ _errata = {
     "page": int,
     "page_size": int,
     "pages": int,
+    "last_change": str,
 }
 
-_updates_top = {"update_list": {str: dict}}
-_updates_top_repolist = {"repository_list": [str], "update_list": {str: dict}}
-_updates_top_basearch = {"basearch": str, "update_list": {str: dict}}
-_updates_top_releasever = {"releasever": str, "update_list": {str: dict}}
+_updates_top = {"update_list": {str: dict},
+                "last_change": str,}
+_updates_top_repolist = {"repository_list": [str], "update_list": {str: dict}, "last_change": str,}
+_updates_top_basearch = {"basearch": str, "update_list": {str: dict}, "last_change": str,}
+_updates_top_releasever = {"releasever": str, "update_list": {str: dict}, "last_change": str,}
 _updates_top_all = {
     "repository_list": [str],
     "releasever": str,
     "basearch": str,
     "update_list": {str: dict},
-    "modules_list": [dict]
+    "modules_list": [dict],
+    "last_change": str,
 }
 
 _updates_package = {
@@ -145,11 +151,13 @@ _updates_package_v2 = {
 
 _vulnerabilities_response = {
     'cve_list': [str],
-    'unpatched_cve_list': [str]
+    'unpatched_cve_list': [str],
+    'last_change': str,
 }
 
 _patches_response = {
-    'errata_list': [str]
+    'errata_list': [str],
+    'last_change': str,
 }
 
 _pkg_names_srpm_resp = {
@@ -169,7 +177,6 @@ pkgs_top_schema = Schema(_pkgs_top)
 pkgs_list_schema = Schema(_pkgs_list)
 pkgtree_top_schema = Schema(_pkgtree_top)
 pkgtree_list_schema = Schema(_pkgtree_list)
-updates_top_schema = Schema(_updates_top)
 updates_top_schema = Schema(_updates_top)
 updates_top_repolist_schema = Schema(_updates_top_repolist)
 updates_top_basearch_schema = Schema(_updates_top_basearch)
