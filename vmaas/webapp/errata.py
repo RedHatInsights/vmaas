@@ -103,11 +103,11 @@ class ErrataAPI:
         errata_type = data.get("type", None)
         severity = data.get("severity", [])
 
-        response = {"errata_list": {}}
+        response = {"errata_list": {},
+                    "last_change": format_datetime(self.cache.dbchange["last_change"])}
         filters = [(filter_item_if_exists, [self.cache.errata_detail]),
                    (self._filter_third_party, [third_party])]
         if modified_since:
-            response["modified_since"] = modified_since
             # if we have information about modified/published dates and receive "modified_since" in request,
             # compare the dates
             filters.append((self._filter_modified_since, [modified_since_dt]))

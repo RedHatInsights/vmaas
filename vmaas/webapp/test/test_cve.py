@@ -22,7 +22,8 @@ CVE_JSON_PUBLISHED = {"cve_list": [CVE_NAME], "published_since": DATE_SINCE}
 CVE_JSON_EMPTY_CVE = {"cve_list": [""]}
 CVE_JSON_NON_EXIST = {"cve_list": ["CVE-9999-9999"]}
 
-EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 0, "pages": 0}
+EMPTY_RESPONSE = {"cve_list": {}, "page": 1, "page_size": 0, "pages": 0,
+                  "last_change": "2019-03-07T09:17:23.799995+00:00"}
 CORRECT_RESPONSE = {
     "cvss2_score": "5.100",
     "impact": "Moderate",
@@ -93,7 +94,6 @@ class TestCveAPI(TestBase):
         modified_from_resp = parse_datetime(response['cve_list'][CVE_NAME]['modified_date'])
         modified_since = parse_datetime(DATE_SINCE)
         assert modified_from_resp >= modified_since
-        assert DATE_SINCE == response['modified_since']
 
     def test_modified_in_future(self):
         """Test CVE API with 'modified_since' property in future."""

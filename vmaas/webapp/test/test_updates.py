@@ -35,7 +35,8 @@ UPDATES_RESPONSE_2 = {
     'repository_list': ['rhel-7-server-rpms'],
     'releasever': '7Server',
     'basearch': 'x86_64',
-    'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}]}
+    'modules_list': [{'module_name': 'my-pkg', 'module_stream': '1'}],
+    'last_change': '2019-03-07T09:17:23.799995+00:00'}
 
 UPDATES_RESPONSE_1 = deepcopy(UPDATES_RESPONSE_2)
 UPDATES_RESPONSE_1['update_list'][PKG]['summary'] = 'Testing package summary...'
@@ -65,8 +66,8 @@ UPDATES_JSON_NON_EXIST = {"package_list": ["non-exist"]}
 UPDATES_JSON_EMPTY = {}
 UPDATES_JSON_EMPTY_LIST = {"package_list": [""]}
 
-EMPTY_RESPONSE = {"update_list": {"": {}}}
-NON_EXIST_RESPONSE = {"update_list": {"non-exist": {}}}
+EMPTY_RESPONSE = {"update_list": {"": {}}, "last_change": "2019-03-07T09:17:23.799995+00:00"}
+NON_EXIST_RESPONSE = {"update_list": {"non-exist": {}}, "last_change": "2019-03-07T09:17:23.799995+00:00"}
 
 
 class TestUpdatesAPI(TestBase):

@@ -120,11 +120,10 @@ class RepoAPI:
 
         response = {
             'repository_list': repolist,
+            'last_change': format_datetime(self.cache.dbchange['last_change'])
         }
 
         pagination_response['page_size'] = actual_page_size
         response.update(pagination_response)
-        if modified_since:
-            response["modified_since"] = modified_since
 
         return response

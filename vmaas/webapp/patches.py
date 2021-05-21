@@ -2,6 +2,8 @@
 Module to handle /patches API calls.
 """
 
+from vmaas.common.webapp_utils import format_datetime
+
 
 class PatchesAPI:
     """Main /patches API class"""
@@ -18,4 +20,5 @@ class PatchesAPI:
         for package in updates['update_list']:
             for update in updates['update_list'][package].get('available_updates', []):
                 errata_list.add(update['erratum'])
-        return {'errata_list': list(errata_list)}
+        return {'errata_list': list(errata_list),
+                'last_change': format_datetime(self.db_cache.dbchange['last_change'])}
