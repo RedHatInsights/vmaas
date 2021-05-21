@@ -120,8 +120,5 @@ class CveAPI:
             }
         response = {"cve_list": cve_list}
         response.update(pagination_response)
-        if modified_since:
-            response["modified_since"] = modified_since
-        if published_since:
-            response["published_since"] = published_since
+        response['last_change'] = format_datetime(self.cache.dbchange['last_change'])
         return response

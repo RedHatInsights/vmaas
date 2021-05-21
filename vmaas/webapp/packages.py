@@ -81,7 +81,8 @@ class PackagesAPI:
                 del packagelist[pkg]
 
         response = {
-            'package_list': packagelist
+            'package_list': packagelist,
+            'last_change': utils.format_datetime(self.cache.dbchange['last_change'])
         }
 
         return response
