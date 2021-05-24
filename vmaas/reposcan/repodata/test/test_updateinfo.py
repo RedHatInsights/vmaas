@@ -32,7 +32,8 @@ class TestUpdateInfoMD(unittest.TestCase):
 
     def _test_update(self, update):
         intended_fields = ["from", "status", "type", "version", "id", "title", "issued", "rights", "release",
-                           "summary", "description", "references", "pkglist", "updated", "severity", "solution"]
+                           "summary", "description", "references", "pkglist", "updated", "severity", "solution",
+                           "reboot"]
         actual_fields = update.keys()
         for field in intended_fields:
             self.assertTrue(field in actual_fields)

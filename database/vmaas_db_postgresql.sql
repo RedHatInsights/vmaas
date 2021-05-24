@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 9);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 10);
 
 -- -----------------------------------------------------
 -- evr type
@@ -529,6 +529,7 @@ CREATE TABLE IF NOT EXISTS errata (
   solution TEXT, CHECK (NOT empty(solution)),
   issued TIMESTAMP WITH TIME ZONE NOT NULL,
   updated TIMESTAMP WITH TIME ZONE NOT NULL,
+  requires_reboot BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (id),
   CONSTRAINT severity_id
     FOREIGN KEY (severity_id)
