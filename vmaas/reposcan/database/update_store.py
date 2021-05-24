@@ -92,40 +92,33 @@ class UpdateStore(ObjectStore):
         cur = self.conn.cursor()
         update_map = {}
         try:
+            errata = []
+            for update in updates:
+                erratum = (
+                    update["id"], update["title"],
+                    errata_severity_map[update["severity"]] if update["severity"] in errata_severity_map else None,
+                    errata_type_map[str(update["type"])],
+                    update["summary"], update["description"],
+                    update["issued"], update["updated"],
+                    update["solution"], update["reboot"]
+                )
+                errata.append(erratum)
+            execute_values(cur, """
+                insert into errata (name, synopsis, severity_id,
+                               errata_type_id, summary, description, issued, updated,
+                               solution, requires_reboot) values %s
+                               on conflict (name) do update set requires_reboot = excluded.requires_reboot
+            """, errata)
+
             names = set()
             for update in updates:
-                names.add((update["id"],))
-            if names:
-                execute_values(cur,
-                               """select id, name from errata
-                                  inner join (values %s) t(name)
-                                  using (name)
-                               """, list(names), page_size=len(names))
-                for row in cur.fetchall():
+                names.add(update["id"])
+
+            cur.execute("""select id, name from errata where name in %s""", (tuple(names),))
+            for row in cur.fetchall():
+                if row[1] in names:
                     update_map[row[1]] = row[0]
-                    # Remove to not insert this update
-                    names.remove((row[1],))
-            self.logger.debug("Updates already in DB: %d", len(update_map))
-            self.logger.debug("Updates to import: %d", len(names))
-            if names:
-                import_data = []
-                for update in updates:
-                    if (update["id"],) in names:
-                        import_data.append(
-                            (update["id"], update["title"],
-                             errata_severity_map[update["severity"]] if update["severity"] in errata_severity_map
-                             else None,
-                             errata_type_map[str(update["type"])],
-                             update["summary"], update["description"],
-                             update["issued"], update["updated"],
-                             update["solution"]))
-                execute_values(cur,
-                               """insert into errata (name, synopsis, severity_id,
-                               errata_type_id, summary, description, issued, updated,
-                               solution) values %s returning id, name""",
-                               import_data, page_size=len(import_data))
-                for row in cur.fetchall():
-                    update_map[row[1]] = row[0]
+            self.logger.debug("Updates loaded from DB: %d", len(update_map))
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure inserting into errata.")

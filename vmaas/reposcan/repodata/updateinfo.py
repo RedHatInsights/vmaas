@@ -1,9 +1,10 @@
 """
 Module containing class for UpdateInfo XML metadata.
 """
-# pylint: disable=too-many-nested-blocks
+# pylint: disable=too-many-nested-blocks, too-many-branches
 # I really don't want to do that but, the way how updateinfo XML is done it's unfortuntately needed
 from datetime import datetime
+from distutils.util import strtobool
 import re
 import xml.etree.ElementTree as eT
 
@@ -33,6 +34,8 @@ class UpdateInfoMD:
                 update["type"] = elem.get("type")
                 update["id"] = text_strip(elem.find("id"))
                 update["title"] = text_strip(elem.find("title"))
+                # Is the false here good choice ? Shouldn't the default be true ?
+                update["reboot"] = False
 
                 # Optional fields
                 text_elements = ["summary", "rights", "description", "release", "solution", "severity"]
@@ -63,6 +66,9 @@ class UpdateInfoMD:
                     for collection in pkglist.findall("collection"):
                         module = collection.find("module")
                         for pkg in collection.findall("package"):
+                            if strtobool(pkg.get("reboot_suggested", 'False')):
+                                update["reboot"] = True
+
                             rec = self._process_package(pkg, module)
                             if rec not in update["pkglist"]:
                                 update["pkglist"].append(rec)
