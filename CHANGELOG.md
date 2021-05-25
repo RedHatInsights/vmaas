@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.19.1 (2021-05-25)
+### Fix
+* **webapp:** Comparison between srt and int, enhance split the string to int/str parts ([`315fee8`](https://github.com/RedHatInsights/vmaas/commit/315fee89628156b83956ddf71df928896d34ee89))
+* **webapp:** If CVE is not in DB from cvemap, it's not connected with definition ([`d244df0`](https://github.com/RedHatInsights/vmaas/commit/d244df04e69c0b839f8674de9fc638890a0bb92c))
+
 ## v2.19.0 (2021-05-19)
 ### Feature
 * **webapp:** Filter modules_list in OVAL evaluation ([`ab8011f`](https://github.com/RedHatInsights/vmaas/commit/ab8011f443a16299aab4f11aaa20f132bd32bb35))
