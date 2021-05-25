@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.19.2 (2021-05-25)
+### Fix
+* **webapp:** Add "modified_since" to /v3/pkgtree response ([`aee93a6`](https://github.com/RedHatInsights/vmaas/commit/aee93a6a20d1bee6a9f4af45d07e1ae6d399c79a))
+
 ## v2.19.1 (2021-05-25)
 ### Fix
 * **webapp:** Comparison between srt and int, enhance split the string to int/str parts ([`315fee8`](https://github.com/RedHatInsights/vmaas/commit/315fee89628156b83956ddf71df928896d34ee89))
