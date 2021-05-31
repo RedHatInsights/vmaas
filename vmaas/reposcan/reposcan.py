@@ -353,17 +353,25 @@ class GitRepoListHandler(RepolistImportHandler):
 
         git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
 
-        if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + REPOLIST_PATH):
-            LOGGER.error("Downloading repolist failed: Directory was not created")
+        paths = REPOLIST_PATH.split(',')
+        products, repos = [], []
 
-        with open(REPOLIST_DIR + '/' + REPOLIST_PATH, 'r') as json_file:
-            data = json.load(json_file)
-        assert data
+        for path in paths:
+            # Trim the spaces so we can have nicely formatted comma lists
+            path = path.strip()
+            if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + path):
+                LOGGER.error("Downloading repolist failed: Directory was not created")
 
-        products, repos = RepolistImportHandler.parse_repolist_json(data)
-        if not products and not repos:
-            LOGGER.warning("Input json is not valid")
-            return "ERROR"
+            with open(REPOLIST_DIR + '/' + path, 'r') as json_file:
+                data = json.load(json_file)
+            assert data
+            item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
+            if not item_products and not item_repos:
+                LOGGER.warning("Input json is not valid")
+                return "ERROR"
+            products += item_products
+            repos += item_repos
+
         return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
 
     @classmethod
