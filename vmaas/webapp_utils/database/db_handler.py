@@ -29,7 +29,8 @@ class DatabasePoolHandler:
             self.db_pool = pool.ThreadedConnectionPool(1, size,
                                                        dbname=cfg.db_name, user=cfg.db_user,
                                                        password=cfg.db_pass,
-                                                       host=cfg.db_host, port=cfg.db_port)
+                                                       host=cfg.db_host, port=cfg.db_port,
+                                                       sslmode=cfg.db_ssl_mode, sslrootcert=cfg.db_ssl_root_cert_path)
 
     def get_connection(self):
         """ Gets one connection from pool. """

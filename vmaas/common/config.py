@@ -54,6 +54,8 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_pass = getattr(cfg.database, "password", "")
         self.db_host = getattr(cfg.database, "hostname", "")
         self.db_port = getattr(cfg.database, "port", "")
+        self.db_ssl_mode = getattr(cfg.database, "sslMode", "")
+        self.db_ssl_root_cert_path = getattr(cfg.database, "rdsCa", "")
         self.db_available = bool(self.db_name)
 
         self.cw_aws_access_key_id = cfg.logging.cloudwatch.accessKeyId
@@ -90,6 +92,8 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_pass = os.getenv("POSTGRESQL_PASSWORD", "vmaas_writer_pwd")
         self.db_host = os.getenv("POSTGRESQL_HOST", "database")
         self.db_port = int(os.getenv("POSTGRESQL_PORT", "5432"))
+        self.db_ssl_mode = os.getenv("POSTGRESQL_SSL_MODE", "prefer")
+        self.db_ssl_root_cert_path = os.getenv("POSTGRESQL_SSL_ROOT_CERT_PATH", "/opt/rds-ca/rds-cacert")
 
         self.cw_aws_access_key_id = os.environ.get("CW_AWS_ACCESS_KEY_ID")
         self.cw_aws_secret_access_key = os.environ.get("CW_AWS_SECRET_ACCESS_KEY")
