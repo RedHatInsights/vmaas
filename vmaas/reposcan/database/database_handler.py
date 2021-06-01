@@ -29,6 +29,8 @@ class DatabaseHandler:
     db_pass = None
     db_host = None
     db_port = None
+    db_sslmode = None
+    db_sslrootcert = None
     connection = None
 
     @classmethod
@@ -36,7 +38,8 @@ class DatabaseHandler:
         """Get database connection. Create new connection if doesn't exist."""
         if cls.connection is None:
             cls.connection = psycopg2.connect(
-                database=cls.db_name, user=cls.db_user, password=cls.db_pass, host=cls.db_host, port=cls.db_port)
+                dbname=cls.db_name, user=cls.db_user, password=cls.db_pass, host=cls.db_host, port=cls.db_port,
+                sslmode=cls.db_sslmode, sslrootcert=cls.db_sslrootcert)
         return cls.connection
 
     @classmethod
@@ -62,3 +65,5 @@ def init_db():
     DatabaseHandler.db_pass = os.getenv('POSTGRESQL_PASSWORD', cfg.db_pass)
     DatabaseHandler.db_host = os.getenv("POSTGRESQL_HOST", cfg.db_host)
     DatabaseHandler.db_port = int(os.getenv("POSTGRESQL_PORT", cfg.db_port))
+    DatabaseHandler.db_sslmode = os.getenv("POSTGRESQL_SSL_MODE", cfg.db_ssl_mode)
+    DatabaseHandler.db_sslrootcert = os.getenv("POSTGRESQL_SSL_ROOT_CERT_PATH", cfg.db_ssl_root_cert_path)
