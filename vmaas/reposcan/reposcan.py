@@ -347,8 +347,8 @@ class GitRepoListHandler(RepolistImportHandler):
         if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + REPOLIST_PATH):
             LOGGER.error("Downloading repolist failed: Directory was not created")
 
-        json_file = open(REPOLIST_DIR + '/' + REPOLIST_PATH, 'r')
-        data = json.load(json_file)
+        with open(REPOLIST_DIR + '/' + REPOLIST_PATH, 'r') as json_file:
+            data = json.load(json_file)
         assert data
 
         products, repos = RepolistImportHandler.parse_repolist_json(data)
