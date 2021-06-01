@@ -40,9 +40,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         self.pkgrepomodules = {}
         self.pkgtree_indent = int(os.getenv('PKGTREE_INDENT', DEFAULT_PKGTREE_INDENT))
         self.pkgtree_keep_copies = int(os.getenv('PKGTREE_KEEP_COPIES', DEFAULT_KEEP_COPIES))
-
-        if self.pkgtree_indent > 2:
-            self.pkgtree_indent = 2
+        self.pkgtree_indent = min(self.pkgtree_indent, 2)
 
     def _named_cursor(self):
         return NamedCursor(self.db_instance)
