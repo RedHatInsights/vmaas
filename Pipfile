@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 coverage = ">=4.5.3"
-podman = ">=1.4.4"
 pur = ">=5.2.2"
 pytest = ">=5.0.1"
 pylint = ">=2.3.1"
