@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.20.0 (2021-06-02)
+### Feature
+* Set PostgreSQL SSL mode ([`b5a555f`](https://github.com/RedHatInsights/vmaas/commit/b5a555f983e32dcb33be29a1a01f3f9b5e5cb32a))
+
 ## v2.19.2 (2021-05-25)
 ### Fix
 * **webapp:** Add "modified_since" to /v3/pkgtree response ([`aee93a6`](https://github.com/RedHatInsights/vmaas/commit/aee93a6a20d1bee6a9f4af45d07e1ae6d399c79a))
