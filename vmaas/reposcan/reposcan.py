@@ -11,6 +11,7 @@ import shutil
 import signal
 from contextlib import contextmanager
 from multiprocessing.pool import Pool
+from functools import reduce
 
 import connexion
 import git
@@ -18,6 +19,7 @@ from flask import make_response, request, send_file
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
+from psycopg2 import DatabaseError
 
 from vmaas.common.config import Config
 from vmaas.common.constants import VMAAS_VERSION
@@ -54,6 +56,8 @@ DEFAULT_KEY = os.getenv("DEFAULT_KEY", "")
 
 DEFAULT_PATH_API = "/api"
 DEFAULT_PATH = "/api/vmaas"
+
+CACHE_DUMP_RETRY_SECONDS = int(os.getenv("CACHE_DUMP_RETRY_SECONDS", "300"))
 
 
 class TaskStatusResponse(dict):
@@ -181,10 +185,11 @@ class SyncHandler:
     @classmethod
     def run_task_and_export(cls, *args, **kwargs):
         """Run sync task of current class and export."""
-        result = cls.run_task(*args, **kwargs)
+        result = []
+        result.append(cls.run_task(*args, **kwargs))
         if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler):
-            ExporterHandler.run_task()
-            PkgTreeHandler.run_task()
+            result.append(ExporterHandler.run_task())
+            result.append(PkgTreeHandler.run_task())
         return result
 
     @staticmethod
@@ -195,12 +200,14 @@ class SyncHandler:
     @classmethod
     def finish_task(cls, task_result):
         """Mark current task as finished."""
+        is_err = reduce(lambda was, msg: was if was else "ERROR" in msg, task_result, False)
         if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler) \
-                and "ERROR" not in task_result:
+                and not is_err:
             # Notify webapps to update their cache
             ReposcanWebsocket.report_version()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
+        return is_err
 
 
 class RepolistImportHandler(SyncHandler):
@@ -313,6 +320,8 @@ class RepolistImportHandler(SyncHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -456,6 +465,8 @@ class ExporterHandler(SyncHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -483,6 +494,8 @@ class PkgTreeHandler(SyncHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -543,6 +556,8 @@ class RepoSyncHandler(SyncHandler):
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -574,6 +589,8 @@ class CvemapSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             FAILED_IMPORT_CVE.inc()
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -605,6 +622,8 @@ class CpeSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             FAILED_IMPORT_CPE.inc()
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -636,6 +655,8 @@ class OvalSyncHandler(SyncHandler):
             LOGGER.exception(msg)
             FAILED_IMPORT_OVAL.inc()
             DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
@@ -666,6 +687,26 @@ class AllSyncHandler(SyncHandler):
                                        CvemapSyncHandler.run_task(),
                                        CpeSyncHandler.run_task(),
                                        OvalSyncHandler.run_task())
+
+
+class PeriodicSync(AllSyncHandler):
+    """Handler for Periodic Sync"""
+
+    attempt_retry = None
+
+    @classmethod
+    def finish_task(cls, task_result):
+        """Retry the sync later if failed, otherwise behave normally."""
+        super().finish_task(task_result)
+        is_err = reduce(lambda was, msg: was if was else "DB_ERROR" in msg, task_result, False)
+        if is_err:
+            ioloop = IOLoop.instance()
+            if cls.attempt_retry:
+                ioloop.remove_timeout(cls.attempt_retry)
+                cls.attempt_retry = None
+            LOGGER.info("Repeating sync in %ss", CACHE_DUMP_RETRY_SECONDS)
+            cls.attempt_retry = ioloop.call_later(CACHE_DUMP_RETRY_SECONDS,
+                                                  AllSyncHandler.start_task)
 
 
 class CleanTmpHandler(SyncHandler):
@@ -816,7 +857,7 @@ def periodic_sync():
     """Function running both repo and CVE sync."""
 
     LOGGER.info("Periodic sync started.")
-    AllSyncHandler.start_task()
+    PeriodicSync.start_task()
 
 
 @contextmanager
