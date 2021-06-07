@@ -54,7 +54,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_pass = getattr(cfg.database, "password", "")
         self.db_host = getattr(cfg.database, "hostname", "")
         self.db_port = getattr(cfg.database, "port", "")
-        self.db_ssl_mode = getattr(cfg.database, "sslMode", "")
+        self.db_ssl_mode = getattr(cfg.database, "sslMode", None)
         self.db_ssl_root_cert_path = getattr(cfg.database, "rdsCa", "")
         self.db_available = bool(self.db_name)
 
