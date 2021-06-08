@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.20.1 (2021-06-08)
+### Fix
+* **webapp:** Revert: add "modified_since" to /v3/pkgtree response" ([`ae15ba0`](https://github.com/RedHatInsights/vmaas/commit/ae15ba02709fca396a6b678fdfdb84f4d0b35ade))
+
 ## v2.20.0 (2021-06-02)
 ### Feature
 * Set PostgreSQL SSL mode ([`b5a555f`](https://github.com/RedHatInsights/vmaas/commit/b5a555f983e32dcb33be29a1a01f3f9b5e5cb32a))
