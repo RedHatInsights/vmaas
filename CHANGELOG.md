@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.20.2 (2021-06-09)
+### Fix
+* Bump app_common_python to get sslMode ([`b76eb7f`](https://github.com/RedHatInsights/vmaas/commit/b76eb7f8c70b245da94f5007825b034ec6d4daa5))
+* Default ssl mode can't be empty string ([`17a366e`](https://github.com/RedHatInsights/vmaas/commit/17a366e40246c9a9106e06824a4abcccc6cff5f7))
+
 ## v2.20.1 (2021-06-08)
 ### Fix
 * **webapp:** Revert: add "modified_since" to /v3/pkgtree response" ([`ae15ba0`](https://github.com/RedHatInsights/vmaas/commit/ae15ba02709fca396a6b678fdfdb84f4d0b35ade))
