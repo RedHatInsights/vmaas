@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 6);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 7);
 
 -- -----------------------------------------------------
 -- evr type
@@ -944,10 +944,12 @@ CREATE TABLE IF NOT EXISTS oval_file (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_rpminfo_object (
   id SERIAL,
-  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  file_id INT NOT NULL,
+  oval_id TEXT NOT NULL, CHECK (NOT empty(oval_id)),
   package_name_id INT NOT NULL,
   version INT NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (file_id, oval_id),
   CONSTRAINT package_name_id
     FOREIGN KEY (package_name_id)
     REFERENCES package_name (id)
@@ -955,33 +957,17 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_object (
 
 
 -- -----------------------------------------------------
--- Table vmaas.oval_file_rpminfo_object
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS oval_file_rpminfo_object (
-  file_id INT NOT NULL,
-  rpminfo_object_id INT NOT NULL,
-  UNIQUE (file_id, rpminfo_object_id),
-  CONSTRAINT file_id
-    FOREIGN KEY (file_id)
-    REFERENCES oval_file (id),
-  CONSTRAINT rpminfo_object_id
-    FOREIGN KEY (rpminfo_object_id)
-    REFERENCES oval_rpminfo_object (id)
-)TABLESPACE pg_default;
-
-CREATE INDEX ON oval_file_rpminfo_object (rpminfo_object_id);
-
-
--- -----------------------------------------------------
 -- Table vmaas.oval_rpminfo_state
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_rpminfo_state (
   id SERIAL,
-  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  file_id INT NOT NULL,
+  oval_id TEXT NOT NULL, CHECK (NOT empty(oval_id)),
   evr_id INT,
   evr_operation_id INT,
   version INT NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (file_id, oval_id),
   CONSTRAINT evr_id
     FOREIGN KEY (evr_id)
     REFERENCES evr (id),
@@ -1008,34 +994,18 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_state_arch (
 
 
 -- -----------------------------------------------------
--- Table vmaas.oval_file_rpminfo_state
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS oval_file_rpminfo_state (
-  file_id INT NOT NULL,
-  rpminfo_state_id INT NOT NULL,
-  UNIQUE (file_id, rpminfo_state_id),
-  CONSTRAINT file_id
-    FOREIGN KEY (file_id)
-    REFERENCES oval_file (id),
-  CONSTRAINT rpminfo_state_id
-    FOREIGN KEY (rpminfo_state_id)
-    REFERENCES oval_rpminfo_state (id)
-)TABLESPACE pg_default;
-
-CREATE INDEX ON oval_file_rpminfo_state (rpminfo_state_id);
-
-
--- -----------------------------------------------------
 -- Table vmaas.oval_rpminfo_test
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_rpminfo_test (
   id SERIAL,
-  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  file_id INT NOT NULL,
+  oval_id TEXT NOT NULL, CHECK (NOT empty(oval_id)),
   rpminfo_object_id INT NOT NULL,
   check_id INT NOT NULL,
   check_existence_id INT NOT NULL,
   version INT NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (file_id, oval_id),
   CONSTRAINT rpminfo_object_id
     FOREIGN KEY (rpminfo_object_id)
     REFERENCES oval_rpminfo_object (id),
@@ -1065,48 +1035,16 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test_state (
 
 
 -- -----------------------------------------------------
--- Table vmaas.oval_file_rpminfo_test
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS oval_file_rpminfo_test (
-  file_id INT NOT NULL,
-  rpminfo_test_id INT NOT NULL,
-  UNIQUE (file_id, rpminfo_test_id),
-  CONSTRAINT file_id
-    FOREIGN KEY (file_id)
-    REFERENCES oval_file (id),
-  CONSTRAINT rpminfo_test_id
-    FOREIGN KEY (rpminfo_test_id)
-    REFERENCES oval_rpminfo_test (id)
-)TABLESPACE pg_default;
-
-CREATE INDEX ON oval_file_rpminfo_test (rpminfo_test_id);
-
-
--- -----------------------------------------------------
 -- Table vmaas.oval_module_test
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_module_test (
   id SERIAL,
-  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  file_id INT NOT NULL,
+  oval_id TEXT NOT NULL, CHECK (NOT empty(oval_id)),
   module_stream TEXT NOT NULL, CHECK (NOT empty(module_stream)),
   version INT NOT NULL,
-  PRIMARY KEY (id)
-)TABLESPACE pg_default;
-
-
--- -----------------------------------------------------
--- Table vmaas.oval_file_module_test
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS oval_file_module_test (
-  file_id INT NOT NULL,
-  module_test_id INT NOT NULL,
-  UNIQUE (file_id, module_test_id),
-  CONSTRAINT file_id
-    FOREIGN KEY (file_id)
-    REFERENCES oval_file (id),
-  CONSTRAINT module_test_id
-    FOREIGN KEY (module_test_id)
-    REFERENCES oval_module_test (id)
+  PRIMARY KEY (id),
+  UNIQUE (file_id, oval_id)
 )TABLESPACE pg_default;
 
 
@@ -1161,11 +1099,13 @@ CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_3 ON oval_criteria_dependenc
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS oval_definition (
   id SERIAL,
-  oval_id TEXT UNIQUE NOT NULL, CHECK (NOT empty(oval_id)),
+  file_id INT NOT NULL,
+  oval_id TEXT NOT NULL, CHECK (NOT empty(oval_id)),
   definition_type_id INT NOT NULL,
   criteria_id INT,
   version INT NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE (file_id, oval_id),
   CONSTRAINT definition_type_id
     FOREIGN KEY (definition_type_id)
     REFERENCES oval_definition_type (id),
@@ -1239,24 +1179,6 @@ CREATE TABLE IF NOT EXISTS oval_definition_cpe (
     FOREIGN KEY (cpe_id)
     REFERENCES cpe (id)
 )TABLESPACE pg_default;
-
-
--- -----------------------------------------------------
--- Table vmaas.oval_file_definition
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS oval_file_definition (
-  file_id INT NOT NULL,
-  definition_id INT NOT NULL,
-  UNIQUE (file_id, definition_id),
-  CONSTRAINT file_id
-    FOREIGN KEY (file_id)
-    REFERENCES oval_file (id),
-  CONSTRAINT definition_id
-    FOREIGN KEY (definition_id)
-    REFERENCES oval_definition (id)
-)TABLESPACE pg_default;
-
-CREATE INDEX ON oval_file_definition (definition_id);
 
 
 -- -----------------------------------------------------
