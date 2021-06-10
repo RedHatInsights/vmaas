@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.21.0 (2021-06-10)
+### Feature
+* **reposcan:** Retry periodic cache dump later if it failed ([`0694e3a`](https://github.com/RedHatInsights/vmaas/commit/0694e3a9f6c15164eeeedd4ce8b918704224681d))
+
 ## v2.20.2 (2021-06-09)
 ### Fix
 * Bump app_common_python to get sslMode ([`b76eb7f`](https://github.com/RedHatInsights/vmaas/commit/b76eb7f8c70b245da94f5007825b034ec6d4daa5))
