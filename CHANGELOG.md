@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.22.0 (2021-06-17)
+### Feature
+* **reposcan:** Accept multiple repolists for git sync ([`f85f4a0`](https://github.com/RedHatInsights/vmaas/commit/f85f4a01b206063b1221de8853b5ce92aa6b30d0))
+
 ## v2.21.0 (2021-06-10)
 ### Feature
 * **reposcan:** Retry periodic cache dump later if it failed ([`0694e3a`](https://github.com/RedHatInsights/vmaas/commit/0694e3a9f6c15164eeeedd4ce8b918704224681d))
