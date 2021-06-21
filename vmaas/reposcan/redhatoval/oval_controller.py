@@ -87,7 +87,7 @@ class OvalController:
             self.clean()
             return
 
-        db_oval_definitions = self.oval_store.list_oval_definitions()
+        db_oval_definitions = self.oval_store.list_oval_files()
         batches = BatchList()
         up_to_date = 0
 

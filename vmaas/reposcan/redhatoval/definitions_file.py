@@ -82,7 +82,7 @@ class OvalDefinitions:
         return criteria_obj
 
     def _parse_definitions(self):
-        # pylint: disable=too-many-nested-blocks
+        # pylint: disable=too-many-nested-blocks, too-many-branches
         for definition in self._xfind("default:definitions"):  # <definitions>
             if definition.tag == "{%s}definition" % NS['default']:  # <definition>
                 cves = []
@@ -105,12 +105,26 @@ class OvalDefinitions:
                             for child in affected_cpe_list.findall("default:cpe", NS):
                                 cpes.append(text_strip(child))
                 criteria = self._parse_criteria(definition.find("default:criteria", NS))  # <criteria> 0..1
+
+                # Parse tests
+                tests = []
+                crit = criteria
+                criteria_stack = []
+                while crit is not None:
+                    tests.extend(crit["criterions"])
+                    criteria_stack.extend(crit["criteria"])
+                    if criteria_stack:
+                        crit = criteria_stack.pop()
+                    else:
+                        crit = None
+
                 self.definitions.append({"id": definition.get("id"),
                                          "type": definition.get("class"),
                                          "cves": cves,
                                          "advisories": advisories,
                                          "cpes": cpes,
                                          "criteria": criteria,
+                                         "tests": tests,
                                          "version": int(definition.get("version"))})
             else:  # Other unparsed tags
                 self.logger.warning("Unknown definition: %s", definition.tag)
