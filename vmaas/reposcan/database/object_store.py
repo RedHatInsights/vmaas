@@ -42,19 +42,25 @@ class ObjectStore:
         cur.close()
         return modules_in_repo
 
-    def _prepare_table_map(self, cols, table, to_col="id"):
-        """Create map from table map[columns] -> id."""
+    def _prepare_table_map(self, cols, table, to_cols=None):
+        """Create map from table map[columns] -> or(column, tuple(columns))."""
+        if not to_cols:
+            to_cols = ["id"]
+        cols_len = len(cols)
+        to_cols_len = len(to_cols)
         table_map = {}
         cur = self.conn.cursor()
-        if len(cols) == 1:
-            sql = "select %s, %s from %s" % (to_col, cols[0], table)
-            cur.execute(sql)
-            for row in cur.fetchall():
-                table_map[row[1]] = row[0]  # column value is a key
-        else:
-            sql = "select %s, %s from %s" % (to_col, ",".join(cols), table)
-            cur.execute(sql)
-            for row in cur.fetchall():
-                table_map[tuple(row[1:])] = row[0]  # tuple of columns values is a key
+        sql = "select %s, %s from %s" % (", ".join(cols), ", ".join(to_cols), table)
+        cur.execute(sql)
+        for row in cur.fetchall():
+            if cols_len == 1:
+                key = row[0]
+            else:
+                key = tuple(row[:cols_len])
+            if to_cols_len == 1:
+                value = row[-1]
+            else:
+                value = tuple(row[cols_len:])
+            table_map[key] = value
         self.conn.commit()
         return table_map
