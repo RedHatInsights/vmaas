@@ -52,6 +52,8 @@ class ProductStore:
                 if cs_label not in label_to_id:
                     # label, name, product_id, third_party
                     cs_detail = products[product]["content_sets"][cs_label]
+                    if isinstance(cs_detail, list):
+                        cs_detail = cs_detail[0]
                     missing_content_sets.append(
                         (
                             cs_label, cs_detail["name"],
