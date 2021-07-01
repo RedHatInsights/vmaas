@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.3 (2021-07-01)
+### Fix
+* **reposcan:** Remove parenthesis from returning statement ([`7e54a90`](https://github.com/RedHatInsights/vmaas/commit/7e54a904eeefc11473251ab1c3fc4f614019c8a3))
+
 ## v2.23.2 (2021-07-01)
 ### Fix
 * **database:** Set ON_ERROR_STOP=on to have non-zero RC when error occurs, also don't rely on stderr ([`1046e97`](https://github.com/RedHatInsights/vmaas/commit/1046e976680670245eb40ce5f10ed946003b1de7))
