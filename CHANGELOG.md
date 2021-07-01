@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.2 (2021-07-01)
+### Fix
+* **database:** Set ON_ERROR_STOP=on to have non-zero RC when error occurs, also don't rely on stderr ([`1046e97`](https://github.com/RedHatInsights/vmaas/commit/1046e976680670245eb40ce5f10ed946003b1de7))
+
 ## v2.23.1 (2021-07-01)
 ### Fix
 * **database:** Apply migration file as single transaction ([`c64d11f`](https://github.com/RedHatInsights/vmaas/commit/c64d11f7b14411834657a29710ce1d0083976374))
