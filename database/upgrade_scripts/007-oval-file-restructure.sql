@@ -1,28 +1,22 @@
-DELETE FROM oval_file_definition;
-DELETE FROM oval_definition_cpe;
-DELETE FROM oval_definition_errata;
-DELETE FROM oval_definition_cve;
-DELETE FROM oval_definition_test;
-DELETE FROM oval_definition;
--- many FK constraint checks, disable
-ALTER TABLE oval_criteria_dependency DISABLE TRIGGER all;
-ALTER TABLE oval_criteria DISABLE TRIGGER all;
-DELETE FROM oval_criteria_dependency;
-DELETE FROM oval_criteria;
-ALTER TABLE oval_criteria_dependency ENABLE TRIGGER all;
-ALTER TABLE oval_criteria ENABLE TRIGGER all;
--- enabled
-DELETE FROM oval_file_rpminfo_test;
-DELETE FROM oval_rpminfo_test_state;
-DELETE FROM oval_rpminfo_test;
-DELETE FROM oval_file_rpminfo_state;
-DELETE FROM oval_rpminfo_state_arch;
-DELETE FROM oval_rpminfo_state;
-DELETE FROM oval_file_rpminfo_object;
-DELETE FROM oval_rpminfo_object;
-DELETE FROM oval_file_module_test;
-DELETE FROM oval_module_test;
-DELETE FROM oval_file;
+TRUNCATE TABLE oval_file_definition;
+TRUNCATE TABLE oval_definition_cpe;
+TRUNCATE TABLE oval_definition_errata;
+TRUNCATE TABLE oval_definition_cve;
+TRUNCATE TABLE oval_definition_test;
+TRUNCATE TABLE oval_definition CASCADE;
+TRUNCATE TABLE oval_criteria_dependency;
+TRUNCATE TABLE oval_criteria CASCADE;
+TRUNCATE TABLE oval_file_rpminfo_test;
+TRUNCATE TABLE oval_rpminfo_test_state;
+TRUNCATE TABLE oval_rpminfo_test CASCADE;
+TRUNCATE TABLE oval_file_rpminfo_state;
+TRUNCATE TABLE oval_rpminfo_state_arch;
+TRUNCATE TABLE oval_rpminfo_state CASCADE;
+TRUNCATE TABLE oval_file_rpminfo_object;
+TRUNCATE TABLE oval_rpminfo_object CASCADE;
+TRUNCATE TABLE oval_file_module_test;
+TRUNCATE TABLE oval_module_test CASCADE;
+TRUNCATE TABLE oval_file CASCADE;
 
 ALTER TABLE oval_rpminfo_object ADD COLUMN file_id INT NOT NULL;
 ALTER TABLE oval_rpminfo_state ADD COLUMN file_id INT NOT NULL;
