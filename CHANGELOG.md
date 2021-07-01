@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.1 (2021-07-01)
+### Fix
+* **database:** Apply migration file as single transaction ([`c64d11f`](https://github.com/RedHatInsights/vmaas/commit/c64d11f7b14411834657a29710ce1d0083976374))
+
 ## v2.23.0 (2021-07-01)
 ### Feature
 * **database:** Bump database to rhel8/centos8 ([`8fc0b23`](https://github.com/RedHatInsights/vmaas/commit/8fc0b23953cb5a97f8accbca057e14f6dd223fd0))
