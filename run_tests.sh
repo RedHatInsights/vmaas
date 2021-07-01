@@ -5,7 +5,7 @@ rc=0
 # Check database Dockerfile consistency
 dockerfile=database/Dockerfile
 sed \
-    -e "s/docker.io\/centos\/postgresql-12-centos7/registry.redhat.io\/rhscl\/postgresql-12-rhel7/" \
+    -e "s/docker.io\/centos\/postgresql-12-centos8/registry.redhat.io\/rhel8\/postgresql-12/" \
     "$dockerfile".centos | diff "$dockerfile" -
 diff_rc=$?
 if [ $diff_rc -gt 0 ]; then

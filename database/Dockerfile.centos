@@ -1,6 +1,6 @@
 # Dockerfile uses postgresql 12 latest image
 # with applied vmaas database schema
-FROM docker.io/centos/postgresql-12-centos7
+FROM docker.io/centos/postgresql-12-centos8
 # all environment variables are defined in conf/*.env
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
