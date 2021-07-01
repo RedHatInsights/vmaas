@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.22.1 (2021-07-01)
+### Fix
+* **reposcan:** Detect changes in oval files better ([`c69017a`](https://github.com/RedHatInsights/vmaas/commit/c69017a17f14a2ebdf7e3342bf1cab0d05eba906))
+* **reposcan:** Sync OVAL data into updated schema ([`8a39630`](https://github.com/RedHatInsights/vmaas/commit/8a39630b6d6c5e5bc4e4da655157c4a3c7a91622))
+* **database:** Re-structure OVAL-file associations ([`c3e2d6b`](https://github.com/RedHatInsights/vmaas/commit/c3e2d6b8374c5d91b91d1f616c840abc82fd9110))
+
 ## v2.22.0 (2021-06-17)
 ### Feature
 * **reposcan:** Accept multiple repolists for git sync ([`f85f4a0`](https://github.com/RedHatInsights/vmaas/commit/f85f4a01b206063b1221de8853b5ce92aa6b30d0))
