@@ -1,6 +1,6 @@
 # Dockerfile uses postgresql 12 latest image
 # with applied vmaas database schema
-FROM registry.redhat.io/rhscl/postgresql-12-rhel7
+FROM registry.redhat.io/rhel8/postgresql-12
 # all environment variables are defined in conf/*.env
 ENV POSTGRESQL_USER 'vmaas_admin'
 ENV POSTGRESQL_PASSWORD 'vmaas_admin_pwd'
