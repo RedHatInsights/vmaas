@@ -4,8 +4,14 @@ DELETE FROM oval_definition_errata;
 DELETE FROM oval_definition_cve;
 DELETE FROM oval_definition_test;
 DELETE FROM oval_definition;
+-- many FK constraint checks, disable
+ALTER TABLE oval_criteria_dependency DISABLE TRIGGER all;
+ALTER TABLE oval_criteria DISABLE TRIGGER all;
 DELETE FROM oval_criteria_dependency;
 DELETE FROM oval_criteria;
+ALTER TABLE oval_criteria_dependency ENABLE TRIGGER all;
+ALTER TABLE oval_criteria ENABLE TRIGGER all;
+-- enabled
 DELETE FROM oval_file_rpminfo_test;
 DELETE FROM oval_rpminfo_test_state;
 DELETE FROM oval_rpminfo_test;
