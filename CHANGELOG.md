@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.0 (2021-07-01)
+### Feature
+* **database:** Bump database to rhel8/centos8 ([`8fc0b23`](https://github.com/RedHatInsights/vmaas/commit/8fc0b23953cb5a97f8accbca057e14f6dd223fd0))
+
 ## v2.22.1 (2021-07-01)
 ### Fix
 * **reposcan:** Detect changes in oval files better ([`c69017a`](https://github.com/RedHatInsights/vmaas/commit/c69017a17f14a2ebdf7e3342bf1cab0d05eba906))
