@@ -149,14 +149,15 @@ class DatabaseUpgrade:
                                '-U', DatabaseHandler.db_user,
                                '-d', DatabaseHandler.db_name,
                                '-f', self.scripts_dir + script_file,
-                               '--single-transaction'],
+                               '--single-transaction',
+                               '-v', 'ON_ERROR_STOP=on'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               universal_newlines=True,
                               env=psql_env,
                               check=True)
 
-        if psql.returncode != 0 or psql.stderr:
+        if psql.returncode != 0:
             status = 'failed'
             failure = True
             LOGGER.error('upgrade failure')
