@@ -96,7 +96,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             cur = self.conn.cursor()
             if to_insert:
                 execute_values(cur, f"""insert into {table_name} ({', '.join(cols)}) values %s
-                                        returning (id, {', '.join(cols)})""",
+                                        returning id, {', '.join(cols)}""",
                                to_insert, page_size=len(to_insert))
                 refresh_maps_func(cur)
             if to_update:
