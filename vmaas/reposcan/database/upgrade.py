@@ -154,8 +154,7 @@ class DatabaseUpgrade:
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               universal_newlines=True,
-                              env=psql_env,
-                              check=True)
+                              env=psql_env)
 
         if psql.returncode != 0:
             status = 'failed'
