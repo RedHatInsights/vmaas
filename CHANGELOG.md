@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.5 (2021-07-12)
+### Fix
+* **reposcan:** Products being a list instead of dict in reposcan ([`cfba1fd`](https://github.com/RedHatInsights/vmaas/commit/cfba1fd69cd94af0a2c08aa458075f904e3b6bc3))
+
 ## v2.23.4 (2021-07-12)
 ### Fix
 * Check=True throws subprocess.CalledProcessError in case of non-zero return code ([`cf4cee5`](https://github.com/RedHatInsights/vmaas/commit/cf4cee5e5bf164c9774e9c4ac64feb03b13b3284))
