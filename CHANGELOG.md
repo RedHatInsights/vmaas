@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.4 (2021-07-12)
+### Fix
+* Check=True throws subprocess.CalledProcessError in case of non-zero return code ([`cf4cee5`](https://github.com/RedHatInsights/vmaas/commit/cf4cee5e5bf164c9774e9c4ac64feb03b13b3284))
+
 ## v2.23.3 (2021-07-01)
 ### Fix
 * **reposcan:** Remove parenthesis from returning statement ([`7e54a90`](https://github.com/RedHatInsights/vmaas/commit/7e54a904eeefc11473251ab1c3fc4f614019c8a3))
