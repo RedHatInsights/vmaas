@@ -354,7 +354,7 @@ class GitRepoListHandler(RepolistImportHandler):
         git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
 
         paths = REPOLIST_PATH.split(',')
-        products, repos = [], []
+        products, repos = dict(), []
 
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
@@ -369,7 +369,7 @@ class GitRepoListHandler(RepolistImportHandler):
             if not item_products and not item_repos:
                 LOGGER.warning("Input json is not valid")
                 return "ERROR"
-            products += item_products
+            products.update(item_products)
             repos += item_repos
 
         return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
