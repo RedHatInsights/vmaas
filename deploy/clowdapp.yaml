@@ -49,51 +49,18 @@ objects:
           - /vmaas/entrypoint.sh
           - webapp
         env:
-        - name: HOTCACHE_ENABLED
-          valueFrom:
-            configMapKeyRef:
-              key: HOTCACHE_ENABLED
-              name: vmaas-webapp-conf-webapp-env
-        - name: HOTCACHE_LEVELS
-          valueFrom:
-            configMapKeyRef:
-              key: HOTCACHE_LEVELS
-              name: vmaas-webapp-conf-webapp-env
-        - name: HOTCACHE_PRUNING
-          valueFrom:
-            configMapKeyRef:
-              key: HOTCACHE_PRUNING
-              name: vmaas-webapp-conf-webapp-env
         - name: LOGGING_LEVEL_APP
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_LEVEL_APP
-              name: vmaas-webapp-conf-webapp-env
+          value: ${LOGGING_LEVEL_APP}
         - name: LOGGING_LEVEL_LIBS
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_LEVEL_LIBS
-              name: vmaas-webapp-conf-webapp-env
+          value: ${LOGGING_LEVEL_LIBS}
         - name: LOGGING_TYPE
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_TYPE
-              name: vmaas-webapp-conf-webapp-env
+          value: ${LOGGING_TYPE}
         - name: MAX_VMAAS_SERVERS
-          valueFrom:
-            configMapKeyRef:
-              key: MAX_VMAAS_SERVERS
-              name: vmaas-webapp-conf-webapp-env
+          value: ${MAX_VMAAS_SERVERS}
         - name: GZIP_RESPONSE_ENABLE
-          valueFrom:
-            configMapKeyRef:
-              key: GZIP_RESPONSE_ENABLE
-              name: vmaas-webapp-conf-webapp-env
+          value: ${GZIP_RESPONSE_ENABLE}
         - name: GZIP_COMPRESS_LEVEL
-          valueFrom:
-            configMapKeyRef:
-              key: GZIP_COMPRESS_LEVEL
-              name: vmaas-webapp-conf-webapp-env
+          value: ${GZIP_COMPRESS_LEVEL}
         - name: CW_ENABLED
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
@@ -158,95 +125,44 @@ objects:
           name: vmaas-dump-data
         env:
         - name: BATCH_MAX_SIZE
-          valueFrom:
-            configMapKeyRef:
-              key: BATCH_MAX_SIZE
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${BATCH_MAX_SIZE}
         - name: BATCH_MAX_FILESIZE
-          valueFrom:
-            configMapKeyRef:
-              key: BATCH_MAX_FILESIZE
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${BATCH_MAX_FILESIZE}
         - name: CHUNK_SIZE
-          valueFrom:
-            configMapKeyRef:
-              key: CHUNK_SIZE
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${CHUNK_SIZE}
         - name: LOGGING_LEVEL_APP
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_LEVEL_APP
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${LOGGING_LEVEL_APP}
         - name: LOGGING_LEVEL_LIBS
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_LEVEL_LIBS
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${LOGGING_LEVEL_LIBS}
         - name: LOGGING_TYPE
-          valueFrom:
-            configMapKeyRef:
-              key: LOGGING_TYPE
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${LOGGING_TYPE}
         - name: PKGTREE_INDENT
-          valueFrom:
-            configMapKeyRef:
-              key: PKGTREE_INDENT
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${PKGTREE_INDENT}
         - name: PKGTREE_KEEP_COPIES
-          valueFrom:
-            configMapKeyRef:
-              key: PKGTREE_KEEP_COPIES
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${PKGTREE_KEEP_COPIES}
         - name: REPOSCAN_SYNC_INTERVAL_MINUTES
-          valueFrom:
-            configMapKeyRef:
-              key: REPOSCAN_SYNC_INTERVAL_MINUTES
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${REPOSCAN_SYNC_INTERVAL_MINUTES}
         - name: RETRY_COUNT
-          valueFrom:
-            configMapKeyRef:
-              key: RETRY_COUNT
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${RETRY_COUNT}
         - name: THREADS
-          valueFrom:
-            configMapKeyRef:
-              key: THREADS
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${THREADS}
         - name: YEAR_SINCE
-          valueFrom:
-            configMapKeyRef:
-              key: YEAR_SINCE
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${YEAR_SINCE}
         - name: KEEP_COPIES
-          valueFrom:
-            configMapKeyRef:
-              key: KEEP_COPIES
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${KEEP_COPIES}
         - name: REPOLIST_GIT
-          valueFrom:
-            configMapKeyRef:
-              key: REPOLIST_GIT
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${REPOLIST_GIT}
         - name: REPOLIST_PATH
-          valueFrom:
-            configMapKeyRef:
-              key: REPOLIST_PATH
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${REPOLIST_GIT_PATH}
         - name: REPOLIST_GIT_TOKEN
           valueFrom:
             secretKeyRef:
               key: GIT_TOKEN
               name: github-vulnerability-bot
         - name: GIT_COMMITTER_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: GIT_COMMITTER_NAME
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${GIT_COMMITTER_NAME}
         - name: GIT_COMMITTER_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: GIT_COMMITTER_EMAIL
-              name: vmaas-reposcan-conf-reposcan-env
+          value: ${GIT_COMMITTER_EMAIL}
         - name: DEFAULT_CA_CERT
           valueFrom:
             secretKeyRef:
@@ -263,25 +179,13 @@ objects:
               key: DEFAULT_KEY
               name: cdn-certificate
         - name: POSTGRESQL_WRITER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRESQL_WRITER_PASSWORD
-              name: vmaas-database-conf-database-connection-admin-env
+          value: ${POSTGRESQL_WRITER_PASSWORD}
         - name: POSTGRESQL_READER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRESQL_READER_PASSWORD
-              name: vmaas-database-conf-database-connection-admin-env
+          value: ${POSTGRESQL_READER_PASSWORD}
         - name: POSTGRESQL_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRESQL_PASSWORD
-              name: vmaas-reposcan-conf-database-connection-writer-env
+          value: ${POSTGRESQL_PASSWORD}
         - name: POSTGRESQL_USER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRESQL_USER
-              name: vmaas-reposcan-conf-database-connection-writer-env
+          value: ${POSTGRESQL_USER}
         - name: CW_ENABLED
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
@@ -292,69 +196,6 @@ objects:
     database:
       name: vmaas
       version: 12
-
-- kind: ConfigMap
-  apiVersion: v1
-  data:
-    HOTCACHE_ENABLED: 'YES'
-    HOTCACHE_LEVELS: '11'
-    HOTCACHE_PRUNING: '1024'
-    LOGGING_LEVEL_APP: INFO
-    LOGGING_LEVEL_LIBS: WARNING
-    LOGGING_TYPE: OPENSHIFT
-    MAX_VMAAS_SERVERS: '1'
-    GZIP_RESPONSE_ENABLE: "on"
-    GZIP_COMPRESS_LEVEL: "5"
-  metadata:
-    labels:
-      app: vmaas
-    name: vmaas-webapp-conf-webapp-env
-
-- kind: ConfigMap
-  apiVersion: v1
-  data:
-    BATCH_MAX_SIZE: '500'
-    BATCH_MAX_FILESIZE: '5_000_000_000'
-    CHUNK_SIZE: '1048576'
-    LOGGING_LEVEL_APP: INFO
-    LOGGING_LEVEL_LIBS: WARNING
-    LOGGING_TYPE: OPENSHIFT
-    PKGTREE_INDENT: '0'
-    PKGTREE_KEEP_COPIES: '2'
-    REPOSCAN_SYNC_INTERVAL_MINUTES: '360'
-    REPOLIST_GIT: 'https://github.com/RedHatInsights/vmaas-assets.git'
-    REPOLIST_PATH: 'repolist.json'
-    GIT_COMMITTER_NAME: 'vmaas'
-    GIT_COMMITTER_EMAIL: 'vmaas@localhost'
-    RETRY_COUNT: '3'
-    THREADS: '8'
-    YEAR_SINCE: '2002'
-    KEEP_COPIES: '3'
-  metadata:
-    labels:
-      app: vmaas
-    name: vmaas-reposcan-conf-reposcan-env
-
-- kind: ConfigMap
-  apiVersion: v1
-  data:
-    POSTGRESQL_PASSWORD: vmaas_writer_pwd
-    POSTGRESQL_USER: vmaas_writer
-  metadata:
-    labels:
-      app: vmaas
-    name: vmaas-reposcan-conf-database-connection-writer-env
-
-- kind: ConfigMap
-  apiVersion: v1
-  data:
-    POSTGRESQL_READER_PASSWORD: vmaas_reader_pwd
-    POSTGRESQL_WRITER_PASSWORD: vmaas_writer_pwd
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: vmaas
-    name: vmaas-database-conf-database-connection-admin-env
 
 - kind: PersistentVolumeClaim
   apiVersion: v1
@@ -430,3 +271,84 @@ parameters:
 - name: OVAL_FEED_BASE_URL
   description: OVAL feed url
   value: "https://www.redhat.com/security/data/oval/v2/"
+- name: LOGGING_LEVEL_APP
+  description: Logging level in app code
+  value: INFO
+- name: LOGGING_LEVEL_LIBS
+  description: Logging level in libs code
+  value: WARNING
+- name: LOGGING_TYPE
+  description: Type of logging in webapp
+  value: OPENSHIFT
+- name: MAX_VMAAS_SERVERS
+  description: Maximum servers count of webapp
+  value: '1'
+- name: REPOSCAN_HOST
+  description: Hostname of VMaaS reposcan
+  value: "vmaas-reposcan"
+- name: WEBSOCKET_HOST
+  description: Hostname of VMaaS websocket
+  value: "vmaas-websocket"
+- name: GZIP_RESPONSE_ENABLE
+  description: Sets GZIP compression in responses
+  value: "on"
+- name: GZIP_COMPRESS_LEVEL
+  description: Level of GZIP compression in responses
+  value: "5"
+- name: BATCH_MAX_SIZE
+  description: Max size of batch in reposcan
+  value: '500' 
+- name: BATCH_MAX_FILESIZE
+  description: Max filesize of batch in reposcan
+  value: '5_000_000_000'
+- name: CHUNK_SIZE
+  description: File unpacker chunk size in reposcan
+  value: '1048576'
+- name: PKGTREE_INDENT
+  description: Indent of pkgtree
+  value: '0'
+- name: PKGTREE_KEEP_COPIES
+  description: Number of pkgtree copies kept
+  value: '2'
+- name: REPOSCAN_SYNC_INTERVAL_MINUTES
+  description: Reposcan periodic sync interval
+  value: '360'
+- name: REPOLIST_GIT
+  description: Location of VMaaS assets git
+  value: 'https://github.com/RedHatInsights/vmaas-assets.git'
+- name: REPOLIST_GIT_PATH
+  description: Path/comma separated paths, denoting repolist files in the git repo
+  value: "repolist.json"
+- name: GIT_COMMITTER_NAME
+  description: Commiter name in assets repo
+  value: 'vmaas'
+- name: GIT_COMMITTER_EMAIL
+  description: Commiter email in assets repo
+  value: 'vmaas@localhost'
+- name: RETRY_COUNT
+  description: Retry count of downloader
+  value: '3'
+- name: THREADS
+  description: Count of downloader threads
+  value: '8'
+- name: YEAR_SINCE
+  description: Year since
+  value: '2002'
+- name: WEBSOCKET_HOST
+  description: Hostname of VMaaS websocket
+  value: "vmaas-websocket"
+- name: KEEP_COPIES
+  description: Number of cache copies kept
+  value: '3'
+- name: POSTGRESQL_WRITER_PASSWORD
+  description: Database writer account password
+  value: vmaas_writer_pwd
+- name: POSTGRESQL_READER_PASSWORD
+  description: Database reader account password
+  value: vmaas_reader_pwd
+- name: POSTGRESQL_USER
+  description: Database user account name
+  value: vmaas_writer
+- name: POSTGRESQL_PASSWORD
+  description: Database user password
+  value: vmaas_writer_pwd
