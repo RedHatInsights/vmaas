@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 import json
+from distutils.util import strtobool
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
@@ -17,6 +18,8 @@ from vmaas.reposcan.mnm import FAILED_IMPORT_OVAL
 from vmaas.reposcan.redhatoval.definitions_file import OvalDefinitions
 
 OVAL_FEED_BASE_URL = os.getenv("OVAL_FEED_BASE_URL", "https://www.redhat.com/security/data/oval/v2/")
+OVAL_WITH_UNPATCHED_FILTER = strtobool(os.getenv("OVAL_WITH_UNPATCHED_FILTER", "TRUE"))
+OVAL_LABEL_FILTER = os.getenv("OVAL_LABEL_FILTER", "RHEL5").split(",")  # comma-separated keywords to filter out
 
 
 class OvalController:
@@ -70,6 +73,19 @@ class OvalController:
             oval_file.local_path = self.unpacker.get_unpacked_file_path(oval_file.local_path)
         self.unpacker.run()
 
+    @staticmethod
+    def _skip_oval_definition_file(definition_file, feed_oval_files):
+        for keyword in OVAL_LABEL_FILTER:
+            if keyword in definition_file:
+                return True
+        if OVAL_WITH_UNPATCHED_FILTER:
+            file_name_parts = definition_file.split(".oval.xml")
+            file_name_parts[0] += "-including-unpatched"
+            unpatched_file_name = ".oval.xml".join(file_name_parts)
+            if unpatched_file_name in feed_oval_files:
+                return True
+        return False
+
     def clean(self):
         """Clean downloaded files for given batch."""
         if self.tmp_directory:
@@ -87,15 +103,18 @@ class OvalController:
             self.clean()
             return
 
-        db_oval_definitions = self.oval_store.list_oval_files()
+        db_oval_files = self.oval_store.list_oval_files()
         batches = BatchList()
         up_to_date = 0
 
         # Filter out all not updated OVAL definition files
         with open(self.feed_path, 'r') as feed_file:
             feed = json.load(feed_file)
-        for entry in feed["feed"]["entry"]:
-            db_timestamp = db_oval_definitions.get(entry['id'])
+        feed_oval_files = {entry["id"]: entry for entry in feed["feed"]["entry"]}
+        for entry in feed_oval_files.values():
+            if self._skip_oval_definition_file(entry['id'], feed_oval_files):
+                continue
+            db_timestamp = db_oval_files.get(entry['id'])
             feed_timestamp = parse_datetime(entry["updated"])
             if not db_timestamp or feed_timestamp > db_timestamp:
                 local_path = os.path.join(self.tmp_directory, entry["content"]["src"].replace(OVAL_FEED_BASE_URL, ""))
@@ -104,12 +123,17 @@ class OvalController:
                 batches.add_item(oval_definitions_file)
             else:
                 up_to_date += 1
+            db_oval_files.pop(entry["id"], None)
         feed_updated = parse_datetime(feed["feed"]["updated"])
 
         self.logger.info("%d OVAL definition files are up to date.", up_to_date)
         total_oval_files = batches.get_total_items()
         completed_oval_files = 0
         self.logger.info("%d OVAL definition files need to be synced.", total_oval_files)
+
+        for oval_definition_file in db_oval_files:
+            self.logger.warning("OVAL definition file is filtered or obsolete and should be removed manually: %s",
+                                oval_definition_file)
 
         try:
             for batch in batches:
