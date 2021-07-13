@@ -18,8 +18,7 @@ objects:
           enabled: false
         private:
           enabled: true
-        metrics:
-          enabled: false
+        metrics: {}
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         command:
@@ -41,8 +40,7 @@ objects:
           enabled: true
         private:
           enabled: false
-        metrics:
-          enabled: true
+        metrics: {}
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         command:
@@ -80,8 +78,7 @@ objects:
           enabled: true
         private:
           enabled: true
-        metrics:
-          enabled: true
+        metrics: {}
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         initContainers:
@@ -283,12 +280,6 @@ parameters:
 - name: MAX_VMAAS_SERVERS
   description: Maximum servers count of webapp
   value: '1'
-- name: REPOSCAN_HOST
-  description: Hostname of VMaaS reposcan
-  value: "vmaas-reposcan"
-- name: WEBSOCKET_HOST
-  description: Hostname of VMaaS websocket
-  value: "vmaas-websocket"
 - name: GZIP_RESPONSE_ENABLE
   description: Sets GZIP compression in responses
   value: "on"
@@ -334,9 +325,6 @@ parameters:
 - name: YEAR_SINCE
   description: Year since
   value: '2002'
-- name: WEBSOCKET_HOST
-  description: Hostname of VMaaS websocket
-  value: "vmaas-websocket"
 - name: KEEP_COPIES
   description: Number of cache copies kept
   value: '3'
