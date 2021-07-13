@@ -115,13 +115,12 @@ def init_logging(num_servers=1):
     """Setup root logger handler."""
     logger = logging.getLogger()
     log_type = os.getenv('LOGGING_TYPE', "OPENSHIFT")
-    if log_type == "OPENSHIFT":
-        log_fmt = "%(name)s: [%(levelname)s] %(message)s"
-    else:
+    log_fmt = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
+    if log_type != "OPENSHIFT":
         uuid = os.uname().nodename
         if num_servers > 1:
             uuid += ":%d" % os.getpid()
-        log_fmt = uuid + " %(asctime)s %(name)s: [%(levelname)s] %(message)s"
+        log_fmt = "%s %s" % (uuid, log_fmt)
     level = os.getenv('LOGGING_LEVEL_LIBS', "WARNING")
     logger.setLevel(getattr(logging, level, logging.WARNING))
     if not logger.handlers:
