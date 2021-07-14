@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 7);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 8);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1092,6 +1092,8 @@ CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_2 ON oval_criteria_dependenc
     WHERE dep_criteria_id IS NULL AND dep_test_id IS NOT NULL AND dep_module_test_id IS NULL;
 CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_3 ON oval_criteria_dependency (parent_criteria_id, dep_module_test_id)
     WHERE dep_criteria_id IS NULL AND dep_test_id IS NULL AND dep_module_test_id IS NOT NULL;
+
+CREATE INDEX ON oval_criteria_dependency(parent_criteria_id);
 
 
 -- -----------------------------------------------------
