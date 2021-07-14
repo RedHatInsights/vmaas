@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.23.6 (2021-07-14)
+### Fix
+* **reposcan:** Fix slow re-syncs due to missing index ([`e9c9499`](https://github.com/RedHatInsights/vmaas/commit/e9c9499970d15a5c5e99be756982ad566724eff4))
+
 ## v2.23.5 (2021-07-12)
 ### Fix
 * **reposcan:** Products being a list instead of dict in reposcan ([`cfba1fd`](https://github.com/RedHatInsights/vmaas/commit/cfba1fd69cd94af0a2c08aa458075f904e3b6bc3))
