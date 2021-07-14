@@ -98,7 +98,7 @@ objects:
               valueFrom:
                 secretKeyRef:
                   key: GIT_TOKEN
-                  name: github-vulnerability-bot
+                  name: github-vmaas-bot
             - name: CLOWDER_ENABLED
               value: ${CLOWDER_ENABLED}
             - name: CW_ENABLED
@@ -155,7 +155,7 @@ objects:
           valueFrom:
             secretKeyRef:
               key: GIT_TOKEN
-              name: github-vulnerability-bot
+              name: github-vmaas-bot
         - name: GIT_COMMITTER_NAME
           value: ${GIT_COMMITTER_NAME}
         - name: GIT_COMMITTER_EMAIL
@@ -218,6 +218,14 @@ objects:
     namespace: test
   type: Opaque
 
+- apiVersion: v1
+  data:
+    GIT_TOKEN: ""
+  kind: Secret
+  metadata:
+    name: github-vmaas-bot
+    namespace: test
+  type: Opaque
 
 parameters:
 - name: MEMORY_LIMIT
