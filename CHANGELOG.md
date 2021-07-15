@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.24.0 (2021-07-15)
+### Feature
+* **reposcan:** Support filtering OVAL files ([`29d555c`](https://github.com/RedHatInsights/vmaas/commit/29d555c7c67939e3e37eb3840935bc590b426450))
+
 ## v2.23.6 (2021-07-14)
 ### Fix
 * **reposcan:** Fix slow re-syncs due to missing index ([`e9c9499`](https://github.com/RedHatInsights/vmaas/commit/e9c9499970d15a5c5e99be756982ad566724eff4))
