@@ -193,6 +193,8 @@ objects:
     database:
       name: vmaas
       version: 12
+    testing:
+      iqePlugin: vmaas
 
 - kind: PersistentVolumeClaim
   apiVersion: v1
