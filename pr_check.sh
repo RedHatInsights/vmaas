@@ -8,6 +8,7 @@ COMPONENT_NAME="vmaas"  # name of app-sre "resourceTemplate" in deploy.yaml for 
 IMAGE="quay.io/cloudservices/vmaas-app"  
 COMPONENTS="vmaas"
 COMPONENTS_W_RESOURCES="vmaas"
+CACHE_FROM_LATEST_IMAGE="true"
 
 IQE_PLUGINS="vmaas"
 IQE_MARKER_EXPRESSION=""
