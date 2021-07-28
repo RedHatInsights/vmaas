@@ -55,7 +55,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_host = getattr(cfg.database, "hostname", "")
         self.db_port = getattr(cfg.database, "port", "")
         self.db_ssl_mode = getattr(cfg.database, "sslMode", None)
-        self.db_ssl_root_cert_path = getattr(cfg.database, "rdsCa", "")
+        self.db_ssl_root_cert_path = cfg.rds_ca() if cfg.database.rdsCa else ""
         self.db_available = bool(self.db_name)
 
         self.cw_aws_access_key_id = cfg.logging.cloudwatch.accessKeyId
