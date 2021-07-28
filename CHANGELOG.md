@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.24.1 (2021-07-28)
+### Fix
+* **clowder:** Use rds ca path ([`9f8a568`](https://github.com/RedHatInsights/vmaas/commit/9f8a5684d3dc02641d59926f31e1f4d975ecc274))
+
 ## v2.24.0 (2021-07-15)
 ### Feature
 * **reposcan:** Support filtering OVAL files ([`29d555c`](https://github.com/RedHatInsights/vmaas/commit/29d555c7c67939e3e37eb3840935bc590b426450))
