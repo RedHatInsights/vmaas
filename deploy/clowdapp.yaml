@@ -86,11 +86,7 @@ objects:
             - sh
             - -c
             - >-
-              cd vmaas/reposcan && exec python3 ../../wait_for_services.py python3 -m database.upgrade &&
-              if [ "${MANIFEST_PUSH}" == "TRUE" ]; then
-              /push_manifest.sh
-              RedHatInsights/manifests ${MANIFEST_BRANCH} /vmaas/manifest.txt
-              vmaas/vmaas-app.txt; fi
+              cd vmaas/reposcan && exec python3 ../../wait_for_services.py python3 -m database.upgrade
             env:
             - name: DB_UPGRADE_SCRIPTS_DIR
               value: /vmaas/vmaas/reposcan/database/upgrade_scripts/
