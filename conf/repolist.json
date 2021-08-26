@@ -32,6 +32,12 @@
           "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/appstream/os/",
           "basearch": ["x86_64"],
           "releasever": ["8.1"]
+        },
+        "rhel-8-for-x86_64-baseos-rpms": {
+          "name": "Red Hat Enterprise Linux 8 for x86_64 - BaseOs (RPMs)",
+          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/baseos/os/",
+          "basearch": ["x86_64"],
+          "releasever": ["8"]
         }
       }
     },
