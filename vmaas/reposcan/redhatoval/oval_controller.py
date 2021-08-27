@@ -5,6 +5,7 @@ import os
 import shutil
 import tempfile
 import json
+import re
 from distutils.util import strtobool
 
 from vmaas.common.batch_list import BatchList
@@ -86,6 +87,27 @@ class OvalController:
                 return True
         return False
 
+    def _find_oval_file_by_regex(self, oval_id_regex):
+        if not oval_id_regex.startswith('^'):
+            oval_id_regex = '^' + oval_id_regex
+
+        if not oval_id_regex.endswith('$'):
+            oval_id_regex = oval_id_regex + '$'
+
+        return [oval_id for oval_id in self.oval_store.oval_file_map
+                if re.match(oval_id_regex, oval_id)]
+
+    def delete_oval_file(self, oval_id_in):
+        """
+        Deletes oval file from DB.
+        """
+        oval_ids = set()
+        for oval_id in oval_id_in:
+            oval_ids.update(self._find_oval_file_by_regex(oval_id))
+        for oval_id in oval_ids:
+            self.logger.info("Deleting OVAL file: %s", oval_id)
+            self.oval_store.delete_oval_file(oval_id)
+
     def clean(self):
         """Clean downloaded files for given batch."""
         if self.tmp_directory:
@@ -103,7 +125,7 @@ class OvalController:
             self.clean()
             return
 
-        db_oval_files = self.oval_store.list_oval_files()
+        db_oval_files = self.oval_store.oval_file_map.copy()
         batches = BatchList()
         up_to_date = 0
 
@@ -116,7 +138,7 @@ class OvalController:
                 continue
             db_timestamp = db_oval_files.get(entry['id'])
             feed_timestamp = parse_datetime(entry["updated"])
-            if not db_timestamp or feed_timestamp > db_timestamp:
+            if not db_timestamp or feed_timestamp > db_timestamp[1]:
                 local_path = os.path.join(self.tmp_directory, entry["content"]["src"].replace(OVAL_FEED_BASE_URL, ""))
                 oval_definitions_file = OvalDefinitions(entry["id"], feed_timestamp,
                                                         entry["content"]["src"], local_path)

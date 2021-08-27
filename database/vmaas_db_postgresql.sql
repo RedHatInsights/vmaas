@@ -1026,6 +1026,7 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test (
     REFERENCES oval_check_existence_rpminfo (id)
 )TABLESPACE pg_default;
 
+CREATE INDEX ON oval_rpminfo_test(rpminfo_object_id); -- deletion performance
 
 -- -----------------------------------------------------
 -- Table vmaas.oval_rpminfo_test_state
@@ -1041,6 +1042,8 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test_state (
     FOREIGN KEY (rpminfo_state_id)
     REFERENCES oval_rpminfo_state (id)
 )TABLESPACE pg_default;
+
+CREATE INDEX ON oval_rpminfo_test_state(rpminfo_state_id); -- deletion performance
 
 
 -- -----------------------------------------------------
@@ -1106,6 +1109,8 @@ CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_3 ON oval_criteria_dependenc
     WHERE dep_criteria_id IS NULL AND dep_test_id IS NULL AND dep_module_test_id IS NOT NULL;
 
 CREATE INDEX ON oval_criteria_dependency(parent_criteria_id);
+CREATE INDEX ON oval_criteria_dependency(dep_test_id); -- deletion performance
+CREATE INDEX ON oval_criteria_dependency(dep_module_test_id); -- deletion performance
 
 
 -- -----------------------------------------------------
@@ -1147,6 +1152,7 @@ CREATE TABLE IF NOT EXISTS oval_definition_test (
     REFERENCES oval_rpminfo_test (id)
 )TABLESPACE pg_default;
 
+CREATE INDEX ON oval_definition_test(rpminfo_test_id); -- deletion performance
 
 -- -----------------------------------------------------
 -- Table vmaas.oval_definition_cve
