@@ -452,6 +452,36 @@ class RepoDeleteHandler(SyncHandler):
         return "OK"
 
 
+class OvalDeleteHandler(SyncHandler):
+    """Handler for OVAL item API."""
+
+    task_type = "Delete OVAL files"
+
+    @classmethod
+    def delete(cls, oval_id, **kwargs):  # pylint: disable=arguments-differ
+        """Delete OVAL file."""
+        status_code, status_msg = cls.start_task(oval_id=oval_id)
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start deleting OVAL files."""
+        try:
+            oval_id = kwargs.get("oval_id", None)
+            init_logging()
+            init_db()
+            oval_controller = OvalController()
+            oval_controller.delete_oval_file(oval_id)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
 class ExporterHandler(SyncHandler):
     """Handler for Export API."""
 

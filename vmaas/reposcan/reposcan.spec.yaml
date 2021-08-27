@@ -108,6 +108,26 @@ paths:
       tags:
         - Repos
 
+  /oval/file:
+    delete:
+      summary: Delete OVAL file from the DB, can be a list or regexp
+      operationId: vmaas.reposcan.reposcan.OvalDeleteHandler.delete
+      <<: *secured
+      parameters:
+        - name: oval_id
+          description: OVAL file label or label list or POSIX regular expression pattern
+          required: true
+          in: query
+          x-example: oval:/RHEL5/amq-clients-1.oval.xml.bz2 OR oval:/RHEL5/.*
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        <<: *repo_responses
+      tags:
+        - Oval
+
   /sync:
     put:
       summary: Sync repositories from git, CVE map and CPE metadata

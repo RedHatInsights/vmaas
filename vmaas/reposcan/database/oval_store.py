@@ -25,6 +25,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.evr_operation_map = self._prepare_table_map(cols=["name"], table="oval_operation_evr")
         self.cve_map = self._prepare_table_map(cols=["name"], table="cve")
         self.errata_map = self._prepare_table_map(cols=["name"], table="errata")
+        self.oval_file_map = self._prepare_table_map(cols=["oval_id"], to_cols=["id", "updated"], table="oval_file")
         self.oval_check_map = self._prepare_table_map(cols=["name"], table="oval_check_rpminfo")
         self.oval_check_existence_map = self._prepare_table_map(cols=["name"], table="oval_check_existence_rpminfo")
         self.oval_object_map = self._prepare_table_map(cols=["file_id", "oval_id"],
@@ -47,12 +48,6 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.oval_definition_type_map = self._prepare_table_map(cols=["name"], table="oval_definition_type")
         self.oval_criteria_operator_map = self._prepare_table_map(cols=["name"], table="oval_criteria_operator")
 
-    def list_oval_files(self):
-        """List oval files and their timestamps stored in DB. Dictionary with oval id as key is returned."""
-        cur = self.conn.cursor()
-        cur.execute("""select oval_id, updated from oval_file""")
-        return dict(cur.fetchall())
-
     def save_lastmodified(self, lastmodified):
         """Store OVAL file timestamp."""
         lastmodified = format_datetime(lastmodified)
@@ -65,6 +60,50 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                         (self.OVAL_FEED_UPDATED_KEY, lastmodified))
         cur.close()
         self.conn.commit()
+
+    def delete_oval_file(self, oval_id):
+        """
+        Deletes oval file from DB.
+        """
+        db_id = self.oval_file_map[oval_id][0]
+        cur = self.conn.cursor()
+        try:
+            cur.execute("""delete from oval_criteria_dependency
+                           where dep_test_id in (select id from oval_rpminfo_test where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_criteria_dependency
+                           where dep_module_test_id in (select id from oval_module_test where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_rpminfo_test_state
+                           where rpminfo_test_id in (select id from oval_rpminfo_test where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_definition_test
+                           where rpminfo_test_id in (select id from oval_rpminfo_test where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_definition_cve
+                           where definition_id in (select id from oval_definition where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_definition_errata
+                           where definition_id in (select id from oval_definition where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_definition_cpe
+                           where definition_id in (select id from oval_definition where file_id = %s)""",
+                        (db_id,))
+            cur.execute("""delete from oval_rpminfo_state_arch
+                           where rpminfo_state_id in (select id from oval_rpminfo_state where file_id = %s)""",
+                        (db_id,))
+            cur.execute("delete from oval_definition where file_id = %s", (db_id,))
+            cur.execute("delete from oval_rpminfo_test where file_id = %s", (db_id,))
+            cur.execute("delete from oval_module_test where file_id = %s", (db_id,))
+            cur.execute("delete from oval_rpminfo_state where file_id = %s", (db_id,))
+            cur.execute("delete from oval_rpminfo_object where file_id = %s", (db_id,))
+            cur.execute("delete from oval_file where id = %s", (db_id,))
+            self.conn.commit()
+        except Exception:  # pylint: disable=broad-except
+            self.logger.exception("Failed to delete oval file.")
+            self.conn.rollback()
+        finally:
+            cur.close()
 
     def _save_oval_file_updated(self, oval_id, updated):
         cur = self.conn.cursor()
