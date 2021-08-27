@@ -185,6 +185,8 @@ objects:
           value: ${CLOWDER_ENABLED}
         - name: OVAL_FEED_BASE_URL
           value: ${OVAL_FEED_BASE_URL}
+        - name: OVAL_LABEL_FILTER
+          value: ${OVAL_LABEL_FILTER}
 
     database:
       name: vmaas
@@ -265,6 +267,9 @@ parameters:
 - name: OVAL_FEED_BASE_URL
   description: OVAL feed url
   value: "https://www.redhat.com/security/data/oval/v2/"
+- name: OVAL_LABEL_FILTER
+  description: Comma-separated keywords to filter out
+  value: RHEL5,rhel-7-alt
 - name: LOGGING_LEVEL_APP
   description: Logging level in app code
   value: INFO
