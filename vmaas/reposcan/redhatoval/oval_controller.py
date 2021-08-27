@@ -20,7 +20,8 @@ from vmaas.reposcan.redhatoval.definitions_file import OvalDefinitions
 
 OVAL_FEED_BASE_URL = os.getenv("OVAL_FEED_BASE_URL", "https://www.redhat.com/security/data/oval/v2/")
 OVAL_WITH_UNPATCHED_FILTER = strtobool(os.getenv("OVAL_WITH_UNPATCHED_FILTER", "TRUE"))
-OVAL_LABEL_FILTER = os.getenv("OVAL_LABEL_FILTER", "RHEL5").split(",")  # comma-separated keywords to filter out
+# comma-separated keywords to filter out
+OVAL_LABEL_FILTER = os.getenv("OVAL_LABEL_FILTER", "RHEL5,rhel-7-alt").split(",")
 
 
 class OvalController:
