@@ -153,10 +153,7 @@ class OvalController:
         total_oval_files = batches.get_total_items()
         completed_oval_files = 0
         self.logger.info("%d OVAL definition files need to be synced.", total_oval_files)
-
-        for oval_definition_file in db_oval_files:
-            self.logger.warning("OVAL definition file is filtered or obsolete and should be removed manually: %s",
-                                oval_definition_file)
+        self.logger.info("%d OVAL definition files need to be deleted.", len(db_oval_files))
 
         try:
             for batch in batches:
@@ -175,6 +172,7 @@ class OvalController:
                         self.oval_store.store(oval_definitions_file)
                     finally:
                         oval_definitions_file.unload_metadata()
+            self.delete_oval_file(list(db_oval_files))
             # Timestamp of main feed file
             self.oval_store.save_lastmodified(feed_updated)
         finally:
