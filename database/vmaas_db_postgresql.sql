@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 8);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 9);
 
 -- -----------------------------------------------------
 -- evr type
@@ -950,6 +950,9 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_object (
   version INT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (file_id, oval_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id),
   CONSTRAINT package_name_id
     FOREIGN KEY (package_name_id)
     REFERENCES package_name (id)
@@ -968,6 +971,9 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_state (
   version INT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (file_id, oval_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id),
   CONSTRAINT evr_id
     FOREIGN KEY (evr_id)
     REFERENCES evr (id),
@@ -1006,6 +1012,9 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test (
   version INT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (file_id, oval_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id),
   CONSTRAINT rpminfo_object_id
     FOREIGN KEY (rpminfo_object_id)
     REFERENCES oval_rpminfo_object (id),
@@ -1044,7 +1053,10 @@ CREATE TABLE IF NOT EXISTS oval_module_test (
   module_stream TEXT NOT NULL, CHECK (NOT empty(module_stream)),
   version INT NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE (file_id, oval_id)
+  UNIQUE (file_id, oval_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id)
 )TABLESPACE pg_default;
 
 
@@ -1108,6 +1120,9 @@ CREATE TABLE IF NOT EXISTS oval_definition (
   version INT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE (file_id, oval_id),
+  CONSTRAINT file_id
+    FOREIGN KEY (file_id)
+    REFERENCES oval_file (id),
   CONSTRAINT definition_type_id
     FOREIGN KEY (definition_type_id)
     REFERENCES oval_definition_type (id),
