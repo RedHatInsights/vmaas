@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.25.0 (2021-09-01)
+### Feature
+* Implement requires_reboot flag for advisories ([`4a58f6d`](https://github.com/RedHatInsights/vmaas/commit/4a58f6d2d6c76b289d3b1e22aca2fcd0a377679e))
+* **reposcan:** Automatically delete filtered/obsolete OVAL streams ([`bd977e2`](https://github.com/RedHatInsights/vmaas/commit/bd977e210c33a955ef23d0ab8bb7cf5e56533498))
+* **reposcan:** Support deleting OVAL files ([`a499029`](https://github.com/RedHatInsights/vmaas/commit/a49902903fbe075f68aa16dbae3a8bb8c50a9b45))
+
+### Fix
+* **reposcan:** Disable rhel-7-alt OVAL stream ([`2ea9987`](https://github.com/RedHatInsights/vmaas/commit/2ea99875f6038b7fad13fc66e07a2aadf9f45e18))
+* **database:** Add missing file_id foreign key ([`a6a23a9`](https://github.com/RedHatInsights/vmaas/commit/a6a23a95feb45a9560fd580ad84f095b6b1a6019))
+
 ## v2.24.1 (2021-07-28)
 ### Fix
 * **clowder:** Use rds ca path ([`9f8a568`](https://github.com/RedHatInsights/vmaas/commit/9f8a5684d3dc02641d59926f31e1f4d975ecc274))
