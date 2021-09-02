@@ -842,6 +842,8 @@ components:
                 example: security
               third_party:
                 type: boolean
+              requires_reboot:
+                type: boolean
         type:
           type: array
           items:
