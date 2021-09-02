@@ -118,19 +118,21 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.conn.commit()
         return db_id_row[0]
 
-    def _populate_data(self, entity, file_id, data, item_check_func, table_name, cols, refresh_maps_func):
+    def _populate_data(self, entity, file_id, data, item_check_func, table_name, cols, refresh_maps_func,
+                       items_to_delete_func):
         """Generic method to populate table with OVAL entity (objects, states, tests, etc.)."""
         to_insert = []
         to_update = []
-        # Append only here, not delete rows, same item may be referenced from multiple files
         for item in data:
             to_insert_row, to_update_row = item_check_func(file_id, item)
             if to_insert_row:
                 to_insert.append(to_insert_row)
             if to_update_row:
                 to_update.append(to_update_row)
+        to_delete = items_to_delete_func(file_id, {item["id"] for item in data})
         self.logger.debug("OVAL %s to insert: %d", entity, len(to_insert))
         self.logger.debug("OVAL %s to update: %d", entity, len(to_update))
+        self.logger.debug("OVAL %s to delete: %d", entity, len(to_delete))
         try:
             cur = self.conn.cursor()
             if to_insert:
@@ -147,9 +149,14 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                                 """,
                                to_update, page_size=len(to_update))
                 refresh_maps_func(cur)
+            if to_delete:
+                cur.execute(f"""delete from {table_name} where file_id = %s and oval_id in %s
+                                returning id, {', '.join(cols)}
+                             """, (file_id, tuple(to_delete)))
+                refresh_maps_func(cur)
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
-            self.logger.exception("Failure while inserting or updating %s data: ", entity)
+            self.logger.exception("Failure while inserting, updating or deleting %s data: ", entity)
             self.conn.rollback()
         finally:
             cur.close()
@@ -219,13 +226,19 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         for obj_id, file_id, oval_id, name_id, version in cur.fetchall():
             self.oval_object_map[(file_id, oval_id)] = (obj_id, name_id, version)
 
+    def _objects_to_delete(self, file_id, latest_data):
+        """Get list of oval_ids which are in DB but not in latest file."""
+        return [oval_id for (f_id, oval_id) in self.oval_object_map
+                if f_id == file_id and oval_id not in latest_data]
+
     def _populate_objects(self, oval_file_id, objects):
         # Populate missing package names
         self.package_store.populate_dep_table("package_name", {obj["name"] for obj in objects},
                                               self.package_store.package_name_map)
         # Insert/update data
         self._populate_data("objects", oval_file_id, objects, self._object_import_check, "oval_rpminfo_object",
-                            ["file_id", "oval_id", "package_name_id", "version"], self._object_refresh_maps)
+                            ["file_id", "oval_id", "package_name_id", "version"], self._object_refresh_maps,
+                            self._objects_to_delete)
 
     def _state_import_check(self, file_id, item):
         """Check if state is in DB to insert/update."""
@@ -256,6 +269,11 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         for state_id, file_id, oval_id, evr_id, evr_operation_id, version in cur.fetchall():
             self.oval_state_map[(file_id, oval_id)] = (state_id, evr_id, evr_operation_id, version)
 
+    def _states_to_delete(self, file_id, latest_data):
+        """Get list of oval_ids which are in DB but not in latest file."""
+        return [oval_id for (f_id, oval_id) in self.oval_state_map
+                if f_id == file_id and oval_id not in latest_data]
+
     def _populate_states(self, oval_file_id, states):
         # Parse EVR first
         for state in states:
@@ -268,7 +286,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.package_store.populate_evrs({state['evr'] for state in states if state['evr'] is not None})
         # Insert/update data
         self._populate_data("states", oval_file_id, states, self._state_import_check, "oval_rpminfo_state",
-                            ["file_id", "oval_id", "evr_id", "evr_operation_id", "version"], self._state_refresh_maps)
+                            ["file_id", "oval_id", "evr_id", "evr_operation_id", "version"], self._state_refresh_maps,
+                            self._states_to_delete)
         for state in states:
             if state["arch_operation"] is not None and state["arch_operation"] not in self.SUPPORTED_ARCH_OPERATIONS:
                 self.logger.warning("Unsupported arch operation: %s", state["arch_operation"])
@@ -315,11 +334,16 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             self.oval_test_map[(file_id, oval_id)] = (test_id, rpminfo_object_id, check_id,
                                                       check_existence_id, version)
 
+    def _tests_to_delete(self, file_id, latest_data):
+        """Get list of oval_ids which are in DB but not in latest file."""
+        return [oval_id for (f_id, oval_id) in self.oval_test_map
+                if f_id == file_id and oval_id not in latest_data]
+
     def _populate_tests(self, oval_file_id, tests):
         # Insert/update data
         self._populate_data("tests", oval_file_id, tests, self._test_import_check, "oval_rpminfo_test",
                             ["file_id", "oval_id", "rpminfo_object_id", "check_id", "check_existence_id", "version"],
-                            self._test_refresh_maps)
+                            self._test_refresh_maps, self._tests_to_delete)
         for test in tests:
             if (oval_file_id, test["id"]) in self.oval_test_map:  # Make sure test is imported
                 states = [{"id": state} for state in test["states"]]
@@ -345,11 +369,16 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         for test_id, file_id, oval_id, module_stream, version in cur.fetchall():
             self.oval_module_test_map[(file_id, oval_id)] = (test_id, module_stream, version)
 
+    def _module_tests_to_delete(self, file_id, latest_data):
+        """Get list of oval_ids which are in DB but not in latest file."""
+        return [oval_id for (f_id, oval_id) in self.oval_module_test_map
+                if f_id == file_id and oval_id not in latest_data]
+
     def _populate_module_tests(self, oval_file_id, module_tests):
         # Insert/update data
         self._populate_data("module-tests", oval_file_id, module_tests, self._module_test_import_check,
                             "oval_module_test", ["file_id", "oval_id", "module_stream", "version"],
-                            self._module_test_refresh_maps)
+                            self._module_test_refresh_maps, self._module_tests_to_delete)
 
     def _populate_definition_criteria(self, cur, file_id, criteria, current_criteria_id):
         # pylint: disable=too-many-branches, too-many-statements
@@ -467,11 +496,16 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             self.oval_definition_map[(file_id, oval_id)] = (definition_id, definition_type_id,
                                                             criteria_id, version)
 
+    def _definitions_to_delete(self, file_id, latest_data):
+        """Get list of oval_ids which are in DB but not in latest file."""
+        return [oval_id for (f_id, oval_id) in self.oval_definition_map
+                if f_id == file_id and oval_id not in latest_data]
+
     def _populate_definitions(self, oval_file_id, definitions):
         # Insert/update data
         self._populate_data("definitions", oval_file_id, definitions, self._definition_import_check,
                             "oval_definition", ["file_id", "oval_id", "definition_type_id", "criteria_id", "version"],
-                            self._definition_refresh_maps)
+                            self._definition_refresh_maps, self._definitions_to_delete)
         for definition in definitions:
             if (oval_file_id, definition["id"]) in self.oval_definition_map:  # Make sure definition is imported
                 cves = [{"id": cve} for cve in definition["cves"]]
