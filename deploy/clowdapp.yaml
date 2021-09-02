@@ -279,7 +279,7 @@ objects:
 parameters:
 - name: MEMORY_LIMIT
   description: Maximum memory limit for pod
-  value: '4Gi'
+  value: '2Gi'
 - name: REPLICAS_WEBAPP
   description: Number of pods for webapp
   # value: "{{ 8 if env == 'prod' else 1 }}"
