@@ -7,7 +7,7 @@ from vmaas.common.webapp_utils import format_datetime, parse_datetime, none2empt
 from vmaas.webapp.cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
     ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
     ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
-    ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY
+    ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY, ERRATA_REQUIRES_REBOOT
 
 
 class ErrataAPI:
@@ -160,7 +160,8 @@ class ErrataAPI:
                 "reference_list": errata_detail[ERRATA_REFERENCE],
                 "modules_list": errata_detail[ERRATA_MODULE],
                 "url": none2empty(errata_detail[ERRATA_URL]),
-                "third_party": errata_detail[ERRATA_THIRD_PARTY]
+                "third_party": errata_detail[ERRATA_THIRD_PARTY],
+                "requires_reboot": errata_detail[ERRATA_REQUIRES_REBOOT]
             }
         response["errata_list"] = errata_list
         response.update(pagination_response)

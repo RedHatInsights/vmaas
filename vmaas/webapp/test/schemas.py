@@ -111,7 +111,8 @@ _errata = {
             "source_package_list": [str],
             "type": str,
             "modules_list": [dict],
-            "third_party": bool
+            "third_party": bool,
+            "requires_reboot": bool
         }
     },
     Optional("modified_since"): str,
