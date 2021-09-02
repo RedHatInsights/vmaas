@@ -12,6 +12,7 @@ import signal
 from contextlib import contextmanager
 from multiprocessing.pool import Pool
 from functools import reduce
+from distutils.util import strtobool
 
 import connexion
 import git
@@ -58,6 +59,13 @@ DEFAULT_PATH_API = "/api"
 DEFAULT_PATH = "/api/vmaas"
 
 CACHE_DUMP_RETRY_SECONDS = int(os.getenv("CACHE_DUMP_RETRY_SECONDS", "300"))
+
+# Allow to optionally disable some parts of sync (e.g. to speed up testing)
+SYNC_GIT_REPO_LIST = strtobool(os.getenv("SYNC_GIT_REPO_LIST", "yes"))
+SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
+SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
+SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
+SYNC_OVAL = strtobool(os.getenv("SYNC_OVAL", "yes"))
 
 
 class TaskStatusResponse(dict):
@@ -701,14 +709,21 @@ class OvalSyncHandler(SyncHandler):
         return "OK"
 
 
+def all_sync_handlers() -> list:
+    """Return all sync-handlers selected using env vars."""
+    handlers = []
+    handlers.extend([GitRepoListHandler] if SYNC_GIT_REPO_LIST else [])
+    handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])
+    handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])
+    handlers.extend([CpeSyncHandler] if SYNC_CPE else [])
+    handlers.extend([OvalSyncHandler] if SYNC_OVAL else [])
+    return handlers
+
+
 class AllSyncHandler(SyncHandler):
     """Handler for repo + CVE sync API."""
 
-    task_type = "%s + %s + %s + %s + %s" % (GitRepoListHandler.task_type,
-                                            RepoSyncHandler.task_type,
-                                            CvemapSyncHandler.task_type,
-                                            CpeSyncHandler.task_type,
-                                            OvalSyncHandler.task_type)
+    task_type = " + ".join([h.task_type for h in all_sync_handlers()])
 
     @classmethod
     def put(cls, **kwargs):
@@ -720,11 +735,8 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        return "%s, %s, %s, %s, %s" % (GitRepoListHandler.run_task(),
-                                       RepoSyncHandler.run_task(),
-                                       CvemapSyncHandler.run_task(),
-                                       CpeSyncHandler.run_task(),
-                                       OvalSyncHandler.run_task())
+        tasks = ", ".join([h.run_task() for h in all_sync_handlers()])
+        return tasks
 
 
 class PeriodicSync(AllSyncHandler):
