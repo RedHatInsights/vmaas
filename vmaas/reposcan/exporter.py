@@ -338,7 +338,8 @@ class SqliteDump:
                                 issued text,
                                 updated text,
                                 url text,
-                                third_party integer
+                                third_party integer,
+                                requires_reboot boolean
                                )""")
         with self._named_cursor() as cursor:
             cursor.execute("""select distinct e.id
@@ -454,29 +455,28 @@ class SqliteDump:
             with self._named_cursor() as cursor:
                 cursor.execute("""SELECT errata.id, errata.name, synopsis, summary,
                                          errata_type.name, errata_severity.name,
-                                         description, solution, issued, updated, 
+                                         description, solution, issued, updated,
                                          true = ANY (
                                             SELECT cs.third_party
                                             FROM errata_repo er
                                             JOIN repo r ON er.repo_id = r.id
                                             JOIN content_set cs ON cs.id = r.content_set_id
                                             WHERE er.errata_id = errata.id
-                                         ) AS third_party
+                                         ) AS third_party, requires_reboot
                                     FROM errata
                                     JOIN errata_type ON errata_type_id = errata_type.id
                                     LEFT JOIN errata_severity ON severity_id = errata_severity.id
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated, third_party in cursor:
+                    description, solution, issued, updated, third_party, requires_reboot in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
-                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                  (errata_id, e_name, synopsis, summary, e_type,
                                   e_severity, description, solution,
                                   format_datetime(issued) if issued is not None else None,
                                   format_datetime(updated) if updated is not None else None,
-                                  url,
-                                  1 if third_party else 0)
+                                  url, 1 if third_party else 0, requires_reboot)
                                  )
 
     def _dump_cves(self, dump):
