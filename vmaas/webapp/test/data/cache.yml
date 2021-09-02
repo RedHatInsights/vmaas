@@ -58,7 +58,8 @@ errata_detail:
       source_package_list:
         - kernel-2.6.32-696.23.1.el6.src
   - https://access.redhat.com/errata/RHBA-2015:0364
-  - false
+  - false  # third_party
+  - true   # requires_reboot
   RHEA-2011:0895: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -74,7 +75,8 @@ errata_detail:
   - null
   - null
   - null
-  - false
+  - false # third_party
+  - true  # requires_reboot
   RHSA-2019:1174: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -93,7 +95,8 @@ errata_detail:
   - null
   - null
   - null
-  - false
+  - false # third_party
+  - true  # requires_reboot
   RHSA-2019:1175: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -109,7 +112,8 @@ errata_detail:
   - null
   - null
   - null
-  - false
+  - false  # third_party
+  - false  # requires_reboot
   RHSA-2222:1234: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -125,7 +129,8 @@ errata_detail:
   - null
   - null
   - null
-  - true
+  - true  # third_party
+  - false # requires_reboot
 errataid2name:
   111: RHEA-2011:0895
   444: RHBA-2015:0364
