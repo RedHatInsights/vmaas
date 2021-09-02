@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 10);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 11);
 
 -- -----------------------------------------------------
 -- evr type
@@ -805,6 +805,23 @@ CREATE TABLE IF NOT EXISTS module_profile_pkg (
     REFERENCES module_profile (id),
   CONSTRAINT module_profile_pkg_ids_uq
     UNIQUE (package_name_id, profile_id)
+) TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.module_stream_dep
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS module_stream_require (
+  module_stream_id INT NOT NULL,
+  require_id INT NOT NULL,
+  CONSTRAINT module_stream_id
+    FOREIGN KEY (module_stream_id)
+    REFERENCES module_stream (id),
+  CONSTRAINT require_id
+    FOREIGN KEY (require_id)
+    REFERENCES module_stream (id),
+  CONSTRAINT module_stream_dep_uq
+    UNIQUE (module_stream_id, require_id)
 ) TABLESPACE pg_default;
 
 
