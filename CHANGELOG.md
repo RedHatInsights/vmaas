@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.26.0 (2021-09-03)
+### Feature
+* **reposcan:** Auto delete old oval items ([`38322bf`](https://github.com/RedHatInsights/vmaas/commit/38322bf6cd48585387d8e25d51f4bf5c7d669988))
+
 ## v2.25.0 (2021-09-01)
 ### Feature
 * Implement requires_reboot flag for advisories ([`4a58f6d`](https://github.com/RedHatInsights/vmaas/commit/4a58f6d2d6c76b289d3b1e22aca2fcd0a377679e))
