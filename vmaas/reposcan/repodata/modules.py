@@ -37,6 +37,8 @@ class ModuleMD:
                     new_stream['artifacts'] = data.get('artifacts').get('rpms', [])
                 new_stream['default_stream'] = False
                 module_dict[name][stream].append(new_stream)
+                if 'dependencies' in data and 'requires' in data['dependencies'][0]:
+                    new_stream['requires'] = data['dependencies'][0]['requires']
             elif parsed['document'] == 'modulemd-defaults':
                 default_list.append(parsed)
         self._parse_modulemd_defaults(module_dict, default_list)

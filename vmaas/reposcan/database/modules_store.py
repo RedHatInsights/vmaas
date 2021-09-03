@@ -90,6 +90,42 @@ class ModulesStore(ObjectStore):
         finally:
             cur.close()
 
+    @staticmethod
+    def _module_stream_requires(module):
+        requires = set()
+        if 'requires' in module:
+            for req_mod, req_streams in module['requires'].items():
+                for req_stream in req_streams:
+                    requires.add((req_mod, str(req_stream)))
+        return requires
+
+    def _populate_stream_requires(self, modules):
+        cur = self.conn.cursor()
+        try:
+            stream_map = {}
+            for module in modules:
+                stream_map[(module['name'], module['stream'])] = module['stream_id']
+
+            stream_requires = set()
+            for module in modules:
+                for req in self._module_stream_requires(module):
+                    req_id = stream_map.get(req)
+                    if req_id:
+                        stream_requires.add((module['stream_id'], req_id))
+            if stream_requires:
+                execute_values(cur,
+                               """insert into module_stream_require (module_stream_id, require_id)
+                                  values %s on conflict (module_stream_id, require_id) do nothing""",
+                               list(stream_requires), page_size=len(stream_requires))
+            self.conn.commit()
+            return modules
+        except Exception: # pylint: disable=broad-except
+            self.logger.exception("Failure when inserting into module_stream.")
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
+
     def _populate_rpm_artifacts(self, modules, repo_id):
         cur = self.conn.cursor()
         try: # pylint: disable=too-many-nested-blocks
@@ -133,6 +169,7 @@ class ModulesStore(ObjectStore):
             module['default_stream'] = False
             modules = self._populate_modules(repo_id, [module])
             modules = self._populate_streams(modules)
+            modules = self._populate_stream_requires(modules)
             return modules[0]
         except Exception: # pylint: disable=broad-except
             # exception already logged.
@@ -146,6 +183,7 @@ class ModulesStore(ObjectStore):
         try:
             modules = self._populate_modules(repo_id, modules)
             modules = self._populate_streams(modules)
+            modules = self._populate_stream_requires(modules)
             self._populate_rpm_artifacts(modules, repo_id)
         except Exception: # pylint: disable=broad-except
             # exception already logged.
