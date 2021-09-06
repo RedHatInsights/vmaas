@@ -10,6 +10,7 @@ from vmaas.webapp.updates import UpdatesAPI
 
 PKG = "my-pkg-1.1.0-1.el8.i686"
 PKG_UNKNOWN = "my-pkg-1.1.1-1.el8.i686"
+PKG_NONE_ARCH = "my-pkg-1.1.1-1.el8.(none)"
 UPDATES_JSON = {
     "package_list": [PKG],
     "repository_list": ["rhel-7-server-rpms"],
@@ -17,6 +18,11 @@ UPDATES_JSON = {
     "basearch": "x86_64",
     "modules_list": [{'module_name': 'my-pkg', 'module_stream': '1'}]
 }
+
+UPDATES_JSON_3_OPT = UPDATES_JSON.copy()
+UPDATES_JSON_3_OPT['third_party'] = True
+UPDATES_JSON_3_OPT['optimistic_updates'] = True
+
 UPDATES_JSON_UNKNOWN = UPDATES_JSON.copy()
 UPDATES_JSON_UNKNOWN['package_list'] = [PKG_UNKNOWN]
 
@@ -95,14 +101,14 @@ class TestUpdatesAPI(TestBase):
     def test_schema_v1(self):
         """Test schema of updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
-        updates = self.updates_api.process_list(1, UPDATES_JSON.copy())
+        updates = self.updates_api.process_list(1, UPDATES_JSON_3_OPT.copy())
         assert schemas.updates_top_all_schema.validate(updates)
         assert schemas.updates_package_schema.validate(updates["update_list"][PKG])
 
     def test_schema_v2(self):
         """Test schema of updates api v2."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
-        updates = self.updates_api.process_list(2, UPDATES_JSON.copy())
+        updates = self.updates_api.process_list(2, UPDATES_JSON_3_OPT.copy())
         assert schemas.updates_top_all_schema.validate(updates)
         assert schemas.updates_package_schema_v2.validate(updates["update_list"][PKG])
 
@@ -127,14 +133,30 @@ class TestUpdatesAPI(TestBase):
     def test_process_list_v1(self):
         """Test looking for package updates api v1."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
-        updates = self.updates_api.process_list(1, UPDATES_JSON.copy())
+        updates = self.updates_api.process_list(1, UPDATES_JSON_3_OPT.copy())
         assert updates == UPDATES_RESPONSE_1
 
     def test_process_list_v2(self):
         """Test looking for package updates api v2."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
-        updates = self.updates_api.process_list(2, UPDATES_JSON.copy())
+        updates = self.updates_api.process_list(2, UPDATES_JSON_3_OPT.copy())
         assert updates == UPDATES_RESPONSE_2
+
+    def test_process_list_v3(self):
+        """Test looking for package updates api v3."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.updates_api.process_list(3, UPDATES_JSON_3_OPT.copy())
+        assert updates == UPDATES_RESPONSE_2
+
+    def test_process_none_arch(self):
+        """Test pkg with arch (none)."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates_json_none = UPDATES_JSON_3_OPT.copy()
+        updates_json_none['package_list'] = [PKG, PKG_NONE_ARCH]
+        updates = self.updates_api.process_list(3, updates_json_none)
+        assert len(updates['update_list']) == 2
+        assert len(updates['update_list'][PKG]['available_updates']) == 1
+        assert len(updates['update_list'][PKG_NONE_ARCH]['available_updates']) == 0
 
     def test_process_list_v2_unknown(self):
         """Test looking for unknown EVRA updates, disabled optimistic_updates."""
