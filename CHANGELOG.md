@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.26.1 (2021-09-06)
+### Fix
+* **webapp:** Fix /updates test for arch "(none)" ([`c24be27`](https://github.com/RedHatInsights/vmaas/commit/c24be272d61c2e385efbfd9da176c70ae58434bd))
+
 ## v2.26.0 (2021-09-03)
 ### Feature
 * **reposcan:** Auto delete old oval items ([`38322bf`](https://github.com/RedHatInsights/vmaas/commit/38322bf6cd48585387d8e25d51f4bf5c7d669988))
