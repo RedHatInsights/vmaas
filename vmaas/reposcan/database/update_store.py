@@ -303,8 +303,8 @@ class UpdateStore(ObjectStore):
 
             # Disassociate rest of update IDs
             to_disassociate = []
-            for update_id in update_to_cves:
-                for cve_id in update_to_cves[update_id]:
+            for update_id, update_dict in update_to_cves.items():
+                for cve_id in update_dict:
                     to_disassociate.append((update_id, cve_id))
 
             self.logger.debug("New update-CVE associations: %d", len(to_associate))

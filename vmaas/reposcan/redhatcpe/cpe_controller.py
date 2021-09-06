@@ -47,7 +47,7 @@ class CpeController:
 
     def _load(self):
         cpe_dict = CpeDict(self._cpe_dict_path())
-        with open(self._repo_mapping_path(), 'r') as repo_mapping_file:
+        with open(self._repo_mapping_path(), 'r', encoding='utf8') as repo_mapping_file:
             repo_mapping = json.load(repo_mapping_file)
         return cpe_dict, repo_mapping
 

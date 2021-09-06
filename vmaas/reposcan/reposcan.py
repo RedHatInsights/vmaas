@@ -362,7 +362,7 @@ class GitRepoListHandler(RepolistImportHandler):
         git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
 
         paths = REPOLIST_PATH.split(',')
-        products, repos = dict(), []
+        products, repos = {}, []
 
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
@@ -370,7 +370,7 @@ class GitRepoListHandler(RepolistImportHandler):
             if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + path):
                 LOGGER.error("Downloading repolist failed: Directory was not created")
 
-            with open(REPOLIST_DIR + '/' + path, 'r') as json_file:
+            with open(REPOLIST_DIR + '/' + path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
             assert data
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
@@ -785,7 +785,7 @@ class CleanTmpHandler(SyncHandler):
                         os.unlink(full_path)
                     LOGGER.info("Deleted file or directory: %s", full_path)
                 except Exception as err:  # pylint: disable=broad-except
-                    LOGGER.warning("Unable to delete file or directory: %s", full_path)
+                    LOGGER.warning("Unable to delete file or directory: %s (%s)", full_path, err)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)

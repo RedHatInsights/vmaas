@@ -139,8 +139,8 @@ class CpeStore:
                     to_import.append((cpe_id, cs_id))
 
         # Delete all remaining pairs
-        for cs_id in current_associations:
-            for cpe_id in current_associations[cs_id]:
+        for cs_id, cs_val in current_associations.items():
+            for cpe_id in cs_val:
                 to_delete.append((cpe_id, cs_id))
 
         self.logger.debug("CPE-CS pairs to import: %s", len(to_import))

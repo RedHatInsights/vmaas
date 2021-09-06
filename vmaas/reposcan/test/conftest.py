@@ -22,11 +22,11 @@ def exporter_db_conn():
         """Init DB with data."""
         conn = psycopg2.connect(**postgresql.dsn())
         cursor = conn.cursor()
-        with open("../../database/vmaas_user_create_postgresql.sql", "r") as psql_user:
+        with open("../../database/vmaas_user_create_postgresql.sql", "r", encoding='utf8') as psql_user:
             cursor.execute(psql_user.read())
-        with open("../../database/vmaas_db_postgresql.sql", "r") as vmaas_db:
+        with open("../../database/vmaas_db_postgresql.sql", "r", encoding='utf8') as vmaas_db:
             cursor.execute(vmaas_db.read())
-        with open("test_data/exporter/exporter_test_data.sql", "r") as test_data:
+        with open("test_data/exporter/exporter_test_data.sql", "r", encoding='utf8') as test_data:
             cursor.execute(test_data.read())
         cursor.close()
         conn.commit()

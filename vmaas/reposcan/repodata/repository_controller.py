@@ -220,14 +220,14 @@ class RepositoryController:
                                                "key": repository.key}
         if certs:
             self.certs_tmp_directory = tempfile.mkdtemp(prefix="certs-")
-            for cert_name in certs:
+            for cert_name, cert_dict in certs.items():
                 self.certs_files[cert_name] = {}
                 for cert_type in ["ca_cert", "cert", "key"]:
                     # Cert is not None
-                    if certs[cert_name][cert_type]:
+                    if cert_dict[cert_type]:
                         cert_path = os.path.join(self.certs_tmp_directory, "%s.%s" % (cert_name, cert_type))
-                        with open(cert_path, "w") as cert_file:
-                            cert_file.write(certs[cert_name][cert_type])
+                        with open(cert_path, "w", encoding='utf8') as cert_file:
+                            cert_file.write(cert_dict[cert_type])
                         self.certs_files[cert_name][cert_type] = cert_path
                     else:
                         self.certs_files[cert_name][cert_type] = None

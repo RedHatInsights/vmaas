@@ -3,10 +3,10 @@
 
 import re
 
+from vmaas.common import rpm
 from vmaas.webapp.test.conftest import TestBase
 
 import vmaas.common.webapp_utils as utils
-import vmaas.common.rpm as rpm
 
 
 class TestUtils(TestBase):

@@ -11,7 +11,7 @@ class ModuleMD:
         module_dict = {}
         default_list = []
 
-        with open(filename, 'r') as fdesc:
+        with open(filename, 'r', encoding='utf8') as fdesc:
             content = fdesc.read()
         groups = content.replace('...', '').split('---')[1:]  # get rid of modulemd separators
         for chunk in groups:
@@ -40,9 +40,9 @@ class ModuleMD:
             elif parsed['document'] == 'modulemd-defaults':
                 default_list.append(parsed)
         self._parse_modulemd_defaults(module_dict, default_list)
-        for name in module_dict:
-            for stream in module_dict[name]:
-                self.modules.extend(module_dict[name][stream])
+        for mod in module_dict.values():
+            for stream in mod:
+                self.modules.extend(mod[stream])
 
     @staticmethod
     def _parse_modulemd_defaults(module_dict, default_list):

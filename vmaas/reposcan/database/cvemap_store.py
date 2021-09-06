@@ -147,11 +147,11 @@ class CvemapStore(CveStoreCommon):
             db_id = a_db_row[0]
             if db_name in cve_data:
                 cve_data[db_name]["id"] = db_id
-                for a_key in cols:
+                for a_key, a_val in cols.items():
                     if not a_key in cve_data[db_name]:
                         cve_data[db_name][a_key] = None
                     if not cve_data[db_name][a_key]:
-                        cve_data[db_name][a_key] = a_db_row[cols[a_key]]
+                        cve_data[db_name][a_key] = a_db_row[a_val]
             else:
                 to_delete.append((db_id,))
 

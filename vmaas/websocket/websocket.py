@@ -49,7 +49,7 @@ class NotificationHandler(WebSocketHandler):
         if total_count != updated_count:
 
             # Outdated, but currently not updating webapps
-            updatable = [conn for conn in cls.connections if cls.connections[conn][1] == "webapp"
+            updatable = [conn for conn, val in cls.connections.items() if val[1] == "webapp"
                          and cls.webapp_export_timestamps.get(conn) != cls.last_dump_version
                          and cls.webapp_statuses.get(conn) == "ready"]
 

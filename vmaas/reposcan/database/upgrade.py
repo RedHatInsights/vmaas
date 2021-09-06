@@ -64,10 +64,12 @@ class DatabaseUpgrade:
             self._get_db_lock(conn)
             LOGGER.info("Empty database, initializing...")
             with conn.cursor() as cur:
-                cur.execute(open(USER_CREATE_SQL_PATH, "r").read())
-                cur.execute(open(DB_CREATE_SQL_PATH, "r").read())
-                cur.execute(f"ALTER USER vmaas_writer WITH PASSWORD '{cfg.postgresql_writer_password}'")
-                cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_writer_password}'")
+                with open(USER_CREATE_SQL_PATH, "r", encoding='utf8') as f_user, \
+                        open(DB_CREATE_SQL_PATH, "r", encoding='utf8') as f_db:
+                    cur.execute(f_user.read())
+                    cur.execute(f_db.read())
+                    cur.execute(f"ALTER USER vmaas_writer WITH PASSWORD '{cfg.postgresql_writer_password}'")
+                    cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_writer_password}'")
 
             conn.commit()
         finally:
