@@ -172,6 +172,9 @@ class UpdatesAPI:
 
     def _get_pkg_updates(self, update_pkg_id: int, arch_id: int, security_only: bool, module_ids: set,
                          available_repo_ids: set, valid_releasevers: set, third_party: bool) -> list:
+        if arch_id is None:
+            return []
+
         # Filter out packages without errata
         if update_pkg_id not in self.db_cache.pkgid2errataids:
             return []
