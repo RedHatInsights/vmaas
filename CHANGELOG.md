@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.27.0 (2021-09-06)
+### Feature
+* **webapp:** Added 'requires_reboot' to api docs (v3) ([`32440f2`](https://github.com/RedHatInsights/vmaas/commit/32440f2be2bc98fed7486e6dc1f0383923e2cb15))
+* **webapp:** Added 'requires_reboot' to webapp ([`f222500`](https://github.com/RedHatInsights/vmaas/commit/f2225000eef4c7a632649ae87695de451d91f6eb))
+* **reposcan:** Added 'requires_reboot' to dump exporter ([`309f35e`](https://github.com/RedHatInsights/vmaas/commit/309f35e2d3f6c097c432cac7429dbff4cf905dca))
+* **reposcan:** Added option to disable some sync parts (git, cve, oval...) ([`f38da8e`](https://github.com/RedHatInsights/vmaas/commit/f38da8e14de4143bde3fd310f75166a79f8bc1aa))
+
 ## v2.26.1 (2021-09-06)
 ### Fix
 * **webapp:** Fix /updates test for arch "(none)" ([`c24be27`](https://github.com/RedHatInsights/vmaas/commit/c24be272d61c2e385efbfd9da176c70ae58434bd))
