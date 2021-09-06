@@ -36,9 +36,9 @@ class TestUpdateInfoMD(unittest.TestCase):
                            "reboot"]
         actual_fields = update.keys()
         for field in intended_fields:
-            self.assertTrue(field in actual_fields)
+            self.assertTrue(field in actual_fields, field)
         for field in actual_fields:
-            self.assertTrue(field in intended_fields)
+            self.assertTrue(field in intended_fields, field)
 
         self.assertIsInstance(update["references"], list)
         self.assertIsInstance(update["pkglist"], list)
@@ -49,8 +49,18 @@ class TestUpdateInfoMD(unittest.TestCase):
         for pkg_ref in update["pkglist"]:
             self._test_pkg_ref(pkg_ref)
 
+        self._test_reboot(update)
+
         # Check known update types
         self.assertTrue(update["type"] in KNOWN_UPDATE_TYPES)
+
+    def _test_reboot(self, update: dict):
+        """Check that advisories with <reboot_suggested> tag were parsed correctly"""
+        self.assertIsInstance(update['reboot'], bool)
+        if update['id'] in ['FEDORA-2017-63f9b40927', 'FEDORA-2017-14fbbab6e0', 'FEDORA-2017-82315d72d0']:
+            self.assertTrue(update['reboot'], '%s - reboot' % update['id'])
+        else:
+            self.assertFalse(update['reboot'], '%s - reboot' % update['id'])
 
     def test_invalid_file(self):
         """Test case when file doesn't exist or is invalid."""

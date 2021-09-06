@@ -34,8 +34,7 @@ class UpdateInfoMD:
                 update["type"] = elem.get("type")
                 update["id"] = text_strip(elem.find("id"))
                 update["title"] = text_strip(elem.find("title"))
-                # Is the false here good choice ? Shouldn't the default be true ?
-                update["reboot"] = False
+                update["reboot"] = self._parse_reboot_suggested(elem)
 
                 # Optional fields
                 text_elements = ["summary", "rights", "description", "release", "solution", "severity"]
@@ -66,9 +65,6 @@ class UpdateInfoMD:
                     for collection in pkglist.findall("collection"):
                         module = collection.find("module")
                         for pkg in collection.findall("package"):
-                            if strtobool(pkg.get("reboot_suggested", 'False')):
-                                update["reboot"] = True
-
                             rec = self._process_package(pkg, module)
                             if rec not in update["pkglist"]:
                                 update["pkglist"].append(rec)
@@ -76,6 +72,16 @@ class UpdateInfoMD:
                 self.updates.append(update)
                 # Clear the XML tree continuously
                 root.clear()
+
+    @staticmethod
+    def _parse_reboot_suggested(elem) -> bool:
+        """Try to parse bool from <reboot_suggested> tag. Return False by default."""
+        found = elem.find("reboot_suggested")
+        if found is None:
+            return False
+        parsed = text_strip(found)
+        parsed_bool = bool(strtobool(parsed))  # strtobool returns 1 or 0, we need bool type
+        return parsed_bool
 
     @staticmethod
     def _process_package(pkg, module):
