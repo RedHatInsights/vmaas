@@ -193,7 +193,7 @@ class Cache:
             name_id = int(name_id)
             evr_id = int(evr_id)
             order = int(order)
-            self.updates_index.setdefault(name_id, dict()).setdefault(evr_id, []).append(order)
+            self.updates_index.setdefault(name_id, {}).setdefault(evr_id, []).append(order)
 
         for (id, epoch, ver, rel) in data.execute('select id, epoch, version, release from evr'):
             evr = (str(epoch), str(ver), str(rel))

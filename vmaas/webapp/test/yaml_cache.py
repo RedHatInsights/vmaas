@@ -21,7 +21,7 @@ class YamlCache(Cache):
 
     def load_yaml(self):
         """Load cache from YAML file."""
-        with open(self.filename, "r") as stream:
+        with open(self.filename, "r", encoding='utf8') as stream:
             try:
                 # FIXME: workaround using UnsafeLoader because https://github.com/yaml/pyyaml/issues/380
                 data = yaml.load(stream, Loader=yaml.UnsafeLoader)
@@ -37,7 +37,7 @@ class YamlCache(Cache):
         attrs = vars(self)
         del attrs["filename"]
 
-        with open(output, "w") as file:
+        with open(output, "w", encoding='utf8') as file:
             yaml.dump(attrs, file)
 
     #def dump_shelve(self, output):

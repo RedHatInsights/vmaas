@@ -125,11 +125,11 @@ class PkgtreeAPI:
         if opts["return_repositories"]:
             repositories = self._get_repositories(pkg_id)
             return dict(repositories=none2empty(repositories))
-        return dict()
+        return {}
 
     def _update_errata(self, api_version: int, pkg_id: int, opts: dict, third_party: bool) -> tuple:
         """Add errata-related data, skip based on modified_since if needed"""
-        data = dict()
+        data = {}
         if opts["return_errata"] or opts["modified_since"] is not None:
             errata, modified = self._get_erratas(api_version, pkg_id, opts["modified_since"], third_party)
             if self._exclude_not_modified(modified, opts["modified_since"], len(errata)):
@@ -141,7 +141,7 @@ class PkgtreeAPI:
         return data, False
 
     def _update_summary_desc(self, api_version: int, pkg_detail: tuple, opts: dict) -> dict:
-        data = dict()
+        data = {}
         if api_version >= 3:
             if opts["return_summary"]:
                 data["summary"] = self._get_cached_string(pkg_detail, PKG_SUMMARY_ID)
@@ -185,7 +185,7 @@ class PkgtreeAPI:
         return False
 
     def _build_package_name_list(self, api_version: int, names: list, opts: dict) -> dict:
-        package_name_list = dict()
+        package_name_list = {}
         third_party = self._get_third_party(api_version, opts)
         for name in names:
             pkgtree_list = self._get_name_packages(api_version, name, opts, third_party)
@@ -197,7 +197,7 @@ class PkgtreeAPI:
         if api_version >= 3:
             names_page, pagination_response = paginate(names, page, page_size)
             return names_page, pagination_response
-        return names, dict()
+        return names, {}
 
     def process_list(self, api_version: int, data: dict):  # pylint: disable=unused-argument
         """
@@ -221,7 +221,7 @@ class PkgtreeAPI:
 
         names = data.get('package_name_list', None)
         if not names:
-            return dict()
+            return {}
 
         names = self.try_expand_by_regex(api_version, names)
         names, response = self._use_pagination(api_version, names, page, page_size)

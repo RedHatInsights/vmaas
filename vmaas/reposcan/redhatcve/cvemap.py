@@ -18,7 +18,7 @@ class CvemapHead:
     """
     def __init__(self, filename):
         self.data = {}
-        with open(filename, 'r') as fde:
+        with open(filename, 'r', encoding='utf8') as fde:
             for line in fde.readlines():
                 key, val = line.strip().split(':', 1)
                 self.data[key] = val

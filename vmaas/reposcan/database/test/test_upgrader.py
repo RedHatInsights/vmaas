@@ -45,7 +45,7 @@ def _create_script(version, script_content):
     script_path = os.path.join(DB_UPDATES_FIXTURE_PATH, script_name)
     script_content = script_content.format(version)
 
-    with open(script_path, "w+") as new_script:
+    with open(script_path, "w+", encoding='utf8') as new_script:
         new_script.write(script_content)
     return script_path
 

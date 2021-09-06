@@ -20,9 +20,9 @@ def db_conn():
         """Init DB with data."""
         conn = psycopg2.connect(**postgresql.dsn())
         cursor = conn.cursor()
-        with open("../../database/vmaas_user_create_postgresql.sql", "r") as psql_user:
+        with open("../../database/vmaas_user_create_postgresql.sql", "r", encoding='utf8') as psql_user:
             cursor.execute(psql_user.read())
-        with open("../../database/vmaas_db_postgresql.sql", "r") as vmaas_db:
+        with open("../../database/vmaas_db_postgresql.sql", "r", encoding='utf8') as vmaas_db:
             cursor.execute(vmaas_db.read())
         cursor.close()
         conn.commit()

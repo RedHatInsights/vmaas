@@ -33,7 +33,7 @@ class CveStoreCommon:
         cwe_name_id = cursor.fetchall()
         cwe_name = [cwe[0] for cwe in cwe_name_id]
         cwe_list = []
-        cwe_link_map = dict()
+        cwe_link_map = {}
         for cve in cve_data.values():
             for cwe in cve["cwe_list"]:
                 cwe_list.append(cwe['cwe_name'])

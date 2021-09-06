@@ -131,7 +131,7 @@ class OvalController:
         up_to_date = 0
 
         # Filter out all not updated OVAL definition files
-        with open(self.feed_path, 'r') as feed_file:
+        with open(self.feed_path, 'r', encoding='utf8') as feed_file:
             feed = json.load(feed_file)
         feed_oval_files = {entry["id"]: entry for entry in feed["feed"]["entry"]}
         for entry in feed_oval_files.values():
