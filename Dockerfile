@@ -1,16 +1,9 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-ARG PG_REPO=https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-8-x86_64/
-ARG PG_RPM=postgresql12-12.2-2PGDG.rhel8.x86_64.rpm
-ARG PG_LIBS_RPM=postgresql12-libs-12.2-2PGDG.rhel8.x86_64.rpm
-ADD /vmaas/reposcan/RPM-GPG-KEY-PGDG /etc/pki/rpm-gpg/
-RUN microdnf install python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu && microdnf clean all && \
-    curl -o /tmp/${PG_RPM} ${PG_REPO}${PG_RPM} && \
-    curl -o /tmp/${PG_LIBS_RPM} ${PG_REPO}${PG_LIBS_RPM} && \
-    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG && \
-    rpm -K /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM} && \
-    rpm -ivh /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM} && \
-    rm /tmp/${PG_RPM} /tmp/${PG_LIBS_RPM}
+RUN rpm -Uvh https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    microdnf install --disablerepo=* --enablerepo=pgdg12 --enablerepo=ubi-8-* \
+             python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql12 && \
+             microdnf clean all
 
 WORKDIR /vmaas
 
