@@ -57,6 +57,7 @@
     <id>FEDORA-2017-63f9b40927</id>
     <title>perl-Math-Base85-0.4-1.fc27</title>
     <issued date="2017-11-11 13:29:22"/>
+    <reboot_suggested>True</reboot_suggested>
     <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
     <release>Fedora 27</release>
     <summary>perl-Math-Base85-0.4-1.fc27 bugfix update</summary>
@@ -86,6 +87,7 @@
     <id>FEDORA-2017-14fbbab6e0</id>
     <title>rubygem-jgrep-1.5.0-1.fc27</title>
     <issued date="2017-11-15 15:47:48"/>
+    <reboot_suggested>True</reboot_suggested>
     <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
     <release>Fedora 27</release>
     <summary>rubygem-jgrep-1.5.0-1.fc27 enhancement update</summary>
@@ -113,6 +115,7 @@
     <id>FEDORA-2017-82315d72d0</id>
     <title>jinput-2.0.7-11.20170607git.294629a.fc27</title>
     <issued date="2017-11-25 01:40:57"/>
+    <reboot_suggested>True</reboot_suggested>
     <rights>Copyright (C) 2015 Red Hat, Inc. and others.</rights>
     <release>Fedora 27</release>
     <summary>jinput-2.0.7-11.20170607git.294629a.fc27 bugfix update</summary>
