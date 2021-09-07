@@ -115,6 +115,7 @@ class Cache:
         self.cve_detail = {}
         self.pkgerrata2module = {}
         self.modulename2id = {}
+        self.modulerequire = {}
         self.dbchange = {}
         self.errata_detail = {}
         self.src_pkg_id2pkg_ids = {}
@@ -285,6 +286,9 @@ class Cache:
 
         for row in data.execute("select module, stream, stream_id from module_stream"):
             self.modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
+
+        for row in data.execute("select stream_id, require_id from module_stream_require"):
+            self.modulerequire.setdefault(row[0], set()).add(row[1])
 
         cveid2cwe = {}
         for row in data.execute("select cve_id, cwe from cve_cwe"):
