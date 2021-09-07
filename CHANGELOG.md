@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.27.2 (2021-09-07)
+### Fix
+* **test:** Fixing new pylint warnings ([`024e118`](https://github.com/RedHatInsights/vmaas/commit/024e1186e7534ff7f38a22fda2ee64e11e8bec43))
+* **test:** Fix pur deps to fix AttributeError: 'bool' object has no attribute 'lower' ([`1d73e3b`](https://github.com/RedHatInsights/vmaas/commit/1d73e3b92619afd15d7eb267cbcf869852c8cebe))
+
 ## v2.27.1 (2021-09-07)
 ### Fix
 * **reposcan:** Fixed advisory "reboot_suggested" value parsing ([`85c1ddd`](https://github.com/RedHatInsights/vmaas/commit/85c1ddda23531c9118a7000d711cabae99c47eef))
