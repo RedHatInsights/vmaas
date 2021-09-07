@@ -11,8 +11,7 @@ services:
 
   vmaas_websocket:
     volumes:
-      - ./websocket:/git
-      - ./common:/git/common
+      - ./:/git
     security_opt:
       - label=disable
     working_dir: /git
@@ -21,8 +20,7 @@ services:
 
   vmaas_reposcan:
     volumes:
-      - ./reposcan:/git
-      - ./common:/git/common
+      - ./:/git
     security_opt:
       - label=disable
     working_dir: /git
@@ -31,8 +29,7 @@ services:
 
   vmaas_webapp:
     volumes:
-      - ./webapp:/git
-      - ./common:/git/common
+      - ./:/git
     security_opt:
       - label=disable
     working_dir: /git
@@ -41,8 +38,7 @@ services:
 
   vmaas_webapp_utils:
     volumes:
-      - ./webapp_utils:/git
-      - ./common:/git/common
+      - ./:/git
     security_opt:
       - label=disable
     working_dir: /git
