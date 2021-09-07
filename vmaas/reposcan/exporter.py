@@ -576,6 +576,18 @@ class SqliteDump:
             for name, stream_name, stream_id in cursor:
                 dump.execute("insert into module_stream values (?, ?, ?)", (stream_id, name, stream_name))
 
+        dump.execute("""create table if not exists module_stream_require (
+                                stream_id integer,
+                                require_id integer
+                               )""")
+        with self._named_cursor() as cursor:
+            cursor.execute("""select module_stream_id,
+                                     require_id
+                                from module_stream_require
+                           """)
+            for stream_id, require_id in cursor:
+                dump.execute("insert into module_stream_require values (?, ?)", (stream_id, require_id))
+
     def _dump_oval(self, dump):
         """Select OVAL information"""
         # oval_definition_cpe
