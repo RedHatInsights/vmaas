@@ -79,8 +79,14 @@ class UpdatesAPI:
         for module in module_info:
             if module in self.db_cache.modulename2id:
                 module_ids.update(self.db_cache.modulename2id[module])
+        # filter out streams without satisfied requires
+        filtered_ids = set()
+        for stream_id in module_ids:
+            requires = self.db_cache.modulerequire.get(stream_id, set())
+            if requires.issubset(module_ids):
+                filtered_ids.add(stream_id)
         modules_list = data.get('modules_list', None)
-        return modules_list, module_ids
+        return modules_list, filtered_ids
 
     def process_input_packages(self, data: dict) -> (dict, dict):
         """Parse input NEVRAs and filter out unknown (or without updates) package names."""
