@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.27.1 (2021-09-07)
+### Fix
+* **reposcan:** Fixed advisory "reboot_suggested" value parsing ([`85c1ddd`](https://github.com/RedHatInsights/vmaas/commit/85c1ddda23531c9118a7000d711cabae99c47eef))
+
 ## v2.27.0 (2021-09-06)
 ### Feature
 * **webapp:** Added 'requires_reboot' to api docs (v3) ([`32440f2`](https://github.com/RedHatInsights/vmaas/commit/32440f2be2bc98fed7486e6dc1f0383923e2cb15))
