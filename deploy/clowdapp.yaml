@@ -258,6 +258,21 @@ objects:
       name: weblegacy
     selector:
       pod: vmaas-websocket-service
+# vmaas-reposcan:8081 to the clowderized one - vmaas-reposcan-service:9000
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: vmaas-reposcan
+    labels:
+      app: vmaas-reposcan
+  spec:
+    ports:
+    - port: 8081
+      protocol: TCP
+      targetPort: 8000
+      name: weblegacy
+    selector:
+      pod: vmaas-reposcan-service
 
 - apiVersion: route.openshift.io/v1
   kind: Route
