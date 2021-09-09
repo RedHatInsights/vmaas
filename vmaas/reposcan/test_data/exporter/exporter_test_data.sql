@@ -71,6 +71,9 @@ INSERT INTO module_stream (id, module_id, stream_name, version, context, is_defa
   (1102, 1002, 'stream2', 12, 'fun2', true),
   (1103, 1001, 'stream1', 13, 'fun3', false);
 
+INSERT INTO module_stream_require (module_stream_id, require_id) VALUES
+  (1102, 1103);
+
 INSERT INTO pkg_errata (pkg_id, errata_id, module_stream_id) VALUES
   (301, 401, 1101),
   (301, 403, null),
