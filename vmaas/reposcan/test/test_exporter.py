@@ -209,10 +209,13 @@ class TestExporter:
         """Check modules in dump."""
         pkgerrata2module = {}
         modulename2id = {}
+        modulerequire = []
         for row in dbdump.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
             pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
         for row in dbdump.execute("select module, stream, stream_id from module_stream"):
             modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
+        for row in dbdump.execute("select stream_id, require_id from module_stream_require"):
+            modulerequire.append(row)
 
         assert (301, 401) in pkgerrata2module
         assert 1101 in pkgerrata2module[(301, 401)]
@@ -220,6 +223,7 @@ class TestExporter:
         assert 1103 in pkgerrata2module[(302, 401)]
         assert (307, 401) in pkgerrata2module
         assert 1102 in pkgerrata2module[(307, 401)]
+        assert (1102, 1103) in modulerequire
 
         assert ("module1", "stream1") in modulename2id
         assert 1101 in modulename2id[("module1", "stream1")]
