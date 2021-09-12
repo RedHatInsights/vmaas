@@ -1,9 +1,16 @@
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-RUN rpm -Uvh https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+RUN rpm -Uvh "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm"
+RUN [ "$(uname -m)" == "aarch64" ] && echo "WORKAROUND: Disabling pgdg repo_gpgcheck" && \
+    sed -i 's/repo_gpgcheck = 1/repo_gpgcheck = 0/g' /etc/yum.repos.d/pgdg-redhat-all.repo || true
+RUN microdnf install --disablerepo=* --enablerepo=pgdg12 --enablerepo=ubi-8-* \
+        python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql12 && \
+        microdnf clean all
+# missing pg_config, gcc, python3-devel needed for psycopg on aarch64
+RUN [ "$(uname -m)" == "aarch64" ] && \
     microdnf install --disablerepo=* --enablerepo=pgdg12 --enablerepo=ubi-8-* \
-             python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql12 && \
-             microdnf clean all
+        libpq-devel gcc python3-devel && \
+    microdnf clean all || true
 
 WORKDIR /vmaas
 
