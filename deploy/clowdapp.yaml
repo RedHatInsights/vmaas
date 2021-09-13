@@ -321,12 +321,6 @@ parameters:
 - name: CW_ENABLED
   description: CloudWatch enabled
   value: 'FALSE'
-- name: MANIFEST_PUSH
-  description: Push manifest to git
-  value: 'FALSE'
-- name: MANIFEST_BRANCH
-  description: Git branch for manifests
-  value: master
 - name: OVAL_FEED_BASE_URL
   description: OVAL feed url
   value: "https://www.redhat.com/security/data/oval/v2/"
