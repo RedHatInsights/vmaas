@@ -148,6 +148,8 @@ class RepositoryStore:
                                     (tuple(module_stream_ids),))
                         cur.execute("delete from pkg_errata where module_stream_id in %s", (tuple(module_stream_ids),))
                         cur.execute("delete from module_profile where stream_id in %s", (tuple(module_stream_ids),))
+                        cur.execute("delete from module_stream_require where module_stream_id in %s",
+                                    (tuple(module_stream_ids),))
                     cur.execute("delete from module_stream where module_id in %s", (tuple(module_ids),))
                 cur.execute("delete from module where repo_id = %s", (repo_id,))
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
