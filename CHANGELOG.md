@@ -2,6 +2,21 @@
 
 <!--next-version-placeholder-->
 
+## v2.28.0 (2021-09-14)
+### Feature
+* Delete stream requires when stream is deleted ([`db18b59`](https://github.com/RedHatInsights/vmaas/commit/db18b59c88057cd7ba9462a3b17e2d2ff2c1a1bf))
+* Improve exporter test form module requires ([`dd79c7c`](https://github.com/RedHatInsights/vmaas/commit/dd79c7c3304167280fff939e67272f1df0784196))
+* Updated test for module loading ([`e98fca9`](https://github.com/RedHatInsights/vmaas/commit/e98fca94b3307884f10dd7e3c7feee27c9d9433f))
+* Fiter out module stream without satisfied requires ([`b0821bc`](https://github.com/RedHatInsights/vmaas/commit/b0821bc3982ded9111e1cb1d841703be0345fad9))
+* Read module requires into cache ([`3b4afc7`](https://github.com/RedHatInsights/vmaas/commit/3b4afc72cb875a3200529f1cc288f3f5befa1e7e))
+* Export module requires data ([`77b48c6`](https://github.com/RedHatInsights/vmaas/commit/77b48c61e4b8cb65a145a2d24e2db8c3d45fce47))
+* Store module requires during reposcan ([`8487e65`](https://github.com/RedHatInsights/vmaas/commit/8487e65d70f8d0ed1357177d734aab2b7af52e37))
+* Table to store module dependencies ([`24f3a25`](https://github.com/RedHatInsights/vmaas/commit/24f3a25a0f85edb8c5fc0164832302546e9711eb))
+
+### Fix
+* Silence pytest warnings ([`c71b03a`](https://github.com/RedHatInsights/vmaas/commit/c71b03ad08223bdff772dc895aeca3c70ed13431))
+* Update developer setup to single app layout ([`9810bc2`](https://github.com/RedHatInsights/vmaas/commit/9810bc2ea42165ed9cd1c4005dbd45a344e95db2))
+
 ## v2.27.2 (2021-09-07)
 ### Fix
 * **test:** Fixing new pylint warnings ([`024e118`](https://github.com/RedHatInsights/vmaas/commit/024e1186e7534ff7f38a22fda2ee64e11e8bec43))
