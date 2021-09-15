@@ -2,6 +2,7 @@
 Common VMaaS configuration.
 """
 import os
+from distutils.util import strtobool
 
 import app_common_python
 
@@ -28,6 +29,7 @@ class BaseConfig:
             "POSTGRESQL_READER_PASSWORD", "vmaas_reader_pwd"
         )
         self.pod_hostname = os.environ.get("HOSTNAME")
+        self.is_init_container = strtobool(os.environ.get("INIT_CONTAINER", "false"))
         self.web_port = None
         self.public_port = None
         self.private_port = None

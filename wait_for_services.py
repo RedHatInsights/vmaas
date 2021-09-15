@@ -44,7 +44,7 @@ def main():
         wait(DatabaseHandler.get_connection, service="PostgreSQL")
     else:
         LOGGER.info("Skipping PostgreSQL check")
-    if config.websocket_host and "vmaas-websocket" not in config.pod_hostname:
+    if config.websocket_host and "vmaas-websocket" not in config.pod_hostname and not config.is_init_container:
         wait(
             request,
             "GET",
