@@ -99,6 +99,8 @@ objects:
               value: ${CLOWDER_ENABLED}
             - name: CW_ENABLED
               value: ${{CW_ENABLED}}
+            - name: INIT_CONTAINER
+              value: "true"
         command:
         - /vmaas/entrypoint.sh
         - reposcan
