@@ -150,58 +150,68 @@ class Cache:
         """Download new version of data."""
         return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
 
+    @staticmethod
+    def _sqlite_execute(data, query):
+        try:
+            return data.execute(query)
+        except sqlite3.Error as err:
+            # file does not exist or has wrong type
+            LOGGER.error("Failed to load data %s: %s", query, err)
+            return []
+
     # pylint: disable=too-many-branches,redefined-builtin,broad-except,invalid-name,too-many-statements
     def _load_sqlite(self, data):
 
-        for (id, arch) in data.execute('select id, arch from arch'):
+        for (id, arch) in self._sqlite_execute(data, 'select id, arch from arch'):
             self.id2arch[int(id)] = arch
             self.arch2id[arch] = int(id)
 
-        for (src, dst) in data.execute('select from_arch_id, to_arch_id from arch_compat'):
+        for (src, dst) in self._sqlite_execute(data, 'select from_arch_id, to_arch_id from arch_compat'):
             self.arch_compat.setdefault(src, set()).add(int(dst))
 
-        for (id, string) in data.execute('select id, string from string'):
+        for (id, string) in self._sqlite_execute(data, 'select id, string from string'):
             self.strings[int(id)] = string
 
-        for (id, label) in data.execute('select id, label from content_set'):
+        for (id, label) in self._sqlite_execute(data, 'select id, label from content_set'):
             self.content_set_id2label[id] = label
             self.label2content_set_id[label] = id
 
-        for (id, name) in data.execute('select id, packagename from packagename'):
+        for (id, name) in self._sqlite_execute(data, 'select id, packagename from packagename'):
             self.packagename2id[str(name)] = int(id)
             self.id2packagename[int(id)] = str(name)
 
-        for (cs_id, name_id) in data.execute("select content_set_id, pkg_name_id from content_set_pkg_name"):
+        for (cs_id, name_id) in self._sqlite_execute(data,
+                "select content_set_id, pkg_name_id from content_set_pkg_name"):
             self.content_set_id2pkg_name_ids.setdefault(cs_id, array.array('q')).append(name_id)
 
-        for (cs_id, src_name_id) in data.execute(
+        for (cs_id, src_name_id) in self._sqlite_execute(data,
                 "select content_set_id, src_pkg_name_id from content_set_src_pkg_name"):
             self.src_pkg_name_id2cs_ids.setdefault(src_name_id, array.array('q')).append(cs_id)
 
-        for (cpe_id, label) in data.execute("select id, label from cpe"):
+        for (cpe_id, label) in self._sqlite_execute(data, "select id, label from cpe"):
             self.cpe_id2label[cpe_id] = label
             self.label2cpe_id[label] = cpe_id
 
-        for (cpe_id, cs_id) in data.execute("select cpe_id, content_set_id from cpe_content_set"):
+        for (cpe_id, cs_id) in self._sqlite_execute(data, "select cpe_id, content_set_id from cpe_content_set"):
             self.content_set_id2cpe_ids.setdefault(cs_id, array.array('q')).append(cpe_id)
 
-        for (name_id, pkg_id) in data.execute(
+        for (name_id, pkg_id) in self._sqlite_execute(data,
                 'select name_id, package_id from updates order by name_id, package_order'):
             self.updates.setdefault(int(name_id), []).append(int(pkg_id))
 
-        for (name_id, evr_id, order) in data.execute(
+        for (name_id, evr_id, order) in self._sqlite_execute(data,
                 'select name_id, evr_id, package_order from updates_index order by name_id, package_order'):
             name_id = int(name_id)
             evr_id = int(evr_id)
             order = int(order)
             self.updates_index.setdefault(name_id, {}).setdefault(evr_id, []).append(order)
 
-        for (id, epoch, ver, rel) in data.execute('select id, epoch, version, release from evr'):
+        for (id, epoch, ver, rel) in self._sqlite_execute(data, 'select id, epoch, version, release from evr'):
             evr = (str(epoch), str(ver), str(rel))
             self.id2evr[int(id)] = evr
             self.evr2id[evr] = int(id)
 
-        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in data.execute(
+        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in self._sqlite_execute(data,
                 'select * from package_detail'):
             detail = array.array('q')
             detail.fromlist([name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0])
@@ -211,43 +221,43 @@ class Cache:
             if src_pkg_id:
                 self.src_pkg_id2pkg_ids.setdefault(src_pkg_id, array.array('q')).append(id)
 
-        for row in data.execute("select * from repo_detail"):
+        for row in self._sqlite_execute(data, "select * from repo_detail"):
             id = row[0]
             repo = (row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                     parse_datetime(row[8]), bool(row[9]))
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
 
-        for row in data.execute("select pkg_id, repo_id from pkg_repo"):
+        for row in self._sqlite_execute(data, "select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
 
         errataid2cves = {}
         cve2eid = {}
-        for row in data.execute("select errata_id, cve from errata_cve"):
+        for row in self._sqlite_execute(data, "select errata_id, cve from errata_cve"):
             errataid2cves.setdefault(row[0], []).append(row[1])
             cve2eid.setdefault(row[1], array.array('q')).append(row[0])
 
         errataid2pkgid = {}
-        for row in data.execute("select pkg_id, errata_id from pkg_errata "):
+        for row in self._sqlite_execute(data, "select pkg_id, errata_id from pkg_errata "):
             self.pkgid2errataids.setdefault(row[0], array.array('q')).append(row[1])
             errataid2pkgid.setdefault(row[1], array.array('q')).append(row[0])
 
         errataid2bzs = {}
-        for row in data.execute("select errata_id, bugzilla from errata_bugzilla"):
+        for row in self._sqlite_execute(data, "select errata_id, bugzilla from errata_bugzilla"):
             errataid2bzs.setdefault(row[0], []).append(row[1])
 
         errataid2refs = {}
-        for row in data.execute("select errata_id, ref from errata_refs"):
+        for row in self._sqlite_execute(data, "select errata_id, ref from errata_refs"):
             errataid2refs.setdefault(row[0], []).append(row[1])
 
         errataidmodulestream2pkgid = {}
-        for row in data.execute("select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
+        for row in self._sqlite_execute(data, "select pkg_id, errata_id, module_stream_id from errata_modulepkg"):
             self.pkgerrata2module.setdefault((row[0], row[1]), set()).add(row[2])
             errataidmodulestream2pkgid.setdefault((row[1], row[2]), array.array('q')).append(row[0])
 
         errataid2modules = {}
-        for row in data.execute("""select errata_id, module_name, module_stream_id, module_stream,
-                                   module_version, module_context from errata_module"""):
+        for row in self._sqlite_execute(data, """select errata_id, module_name, module_stream_id, module_stream,
+                                                 module_version, module_context from errata_module"""):
             if row[0] not in errataid2modules:
                 errataid2modules[row[0]] = {}
             if (row[1], row[3], row[4], row[5]) not in errataid2modules[row[0]]:
@@ -265,7 +275,7 @@ class Cache:
                     errataidmodulestream2pkgid.get((row[0], row[2]), array.array('q'))
                 )
 
-        for row in data.execute("select * from errata_detail"):
+        for row in self._sqlite_execute(data, "select * from errata_detail"):
             id = row[0]
             name = row[1]
             errata = (
@@ -281,24 +291,24 @@ class Cache:
             self.errata_detail[name] = errata
             self.errataid2name[id] = name
 
-        for row in data.execute("select errata_id, repo_id from errata_repo"):
+        for row in self._sqlite_execute(data, "select errata_id, repo_id from errata_repo"):
             self.errataid2repoids.setdefault(row[0], array.array('q')).append(row[1])
 
-        for row in data.execute("select module, stream, stream_id from module_stream"):
+        for row in self._sqlite_execute(data, "select module, stream, stream_id from module_stream"):
             self.modulename2id.setdefault((row[0], row[1]), set()).add(row[2])
 
-        for row in data.execute("select stream_id, require_id from module_stream_require"):
+        for row in self._sqlite_execute(data, "select stream_id, require_id from module_stream_require"):
             self.modulerequire.setdefault(row[0], set()).add(row[1])
 
         cveid2cwe = {}
-        for row in data.execute("select cve_id, cwe from cve_cwe"):
+        for row in self._sqlite_execute(data, "select cve_id, cwe from cve_cwe"):
             cveid2cwe.setdefault(row[0], []).append(row[1])
 
         cveid2pid = {}
-        for row in data.execute("select cve_id, pkg_id from cve_pkg"):
+        for row in self._sqlite_execute(data, "select cve_id, pkg_id from cve_pkg"):
             cveid2pid.setdefault(row[0], array.array('q')).append(row[1])
 
-        for row in data.execute("select * from cve_detail"):
+        for row in self._sqlite_execute(data, "select * from cve_detail"):
             id = row[0]
             name = row[1]
             item = (
@@ -312,22 +322,22 @@ class Cache:
             )
             self.cve_detail[name] = item
 
-        for row in data.execute("select * from oval_definition_cpe"):
+        for row in self._sqlite_execute(data, "select * from oval_definition_cpe"):
             self.cpe_id2ovaldefinition_ids.setdefault(row[0], array.array('q')).append(row[1])
 
-        for row in data.execute("select * from packagename_oval_definition"):
+        for row in self._sqlite_execute(data, "select * from packagename_oval_definition"):
             self.packagename_id2definition_ids.setdefault(row[0], array.array('q')).append(row[1])
 
-        for row in data.execute("select * from oval_definition_detail"):
+        for row in self._sqlite_execute(data, "select * from oval_definition_detail"):
             self.ovaldefinition_detail[row[0]] = (row[1], row[2])
 
-        for row in data.execute("select * from oval_definition_cve"):
+        for row in self._sqlite_execute(data, "select * from oval_definition_cve"):
             self.ovaldefinition_id2cves.setdefault(row[0], []).append(row[1])
 
-        for row in data.execute("select * from oval_criteria_type"):
+        for row in self._sqlite_execute(data, "select * from oval_criteria_type"):
             self.ovalcriteria_id2type[row[0]] = row[1]
 
-        for row in data.execute("select * from oval_criteria_dependency"):
+        for row in self._sqlite_execute(data, "select * from oval_criteria_dependency"):
             if row[2] is None and row[3] is None:
                 self.ovalcriteria_id2depcriteria_ids.setdefault(row[0], array.array('q')).append(row[1])
             elif row[1] is None and row[3] is None:
@@ -335,21 +345,21 @@ class Cache:
             else:
                 self.ovalcriteria_id2depmoduletest_ids.setdefault(row[0], array.array('q')).append(row[3])
 
-        for row in data.execute("select * from oval_test_detail"):
+        for row in self._sqlite_execute(data, "select * from oval_test_detail"):
             self.ovaltest_detail[row[0]] = (row[1], row[2])
 
-        for row in data.execute("select * from oval_test_state"):
+        for row in self._sqlite_execute(data, "select * from oval_test_state"):
             self.ovaltest_id2states.setdefault(row[0], []).append((row[1], row[2], row[3]))
 
-        for row in data.execute("select * from oval_state_arch"):
+        for row in self._sqlite_execute(data, "select * from oval_state_arch"):
             self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
 
-        for row in data.execute("select * from oval_module_test_detail"):
+        for row in self._sqlite_execute(data, "select * from oval_module_test_detail"):
             self.ovalmoduletest_detail[row[0]] = row[1]
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 
-        for row in data.execute("select %s from dbchange" % ','.join(names)):
+        for row in self._sqlite_execute(data, "select %s from dbchange" % ','.join(names)):
             for (i, v) in enumerate(row):
                 self.dbchange[names[i]] = v
 
@@ -361,10 +371,6 @@ class Cache:
             with sqlite3.connect(filename) as data:
                 self._load_sqlite(data)
             LOGGER.info("Loaded dump version: %s", self.dbchange.get('exported', 'unknown'))
-        except sqlite3.Error as err:
-            # file does not exist or has wrong type
-            LOGGER.warning("Failed to load data %s: %s", filename, err)
-            return
         except Exception as err:
             LOGGER.warning("Failed to load data %s: %s", filename, err)
             return
