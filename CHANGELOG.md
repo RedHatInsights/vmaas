@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.28.1 (2021-09-17)
+### Fix
+* Set timeout for requests while waiting for services ([`ab4cb40`](https://github.com/RedHatInsights/vmaas/commit/ab4cb40b791df2e5f9558da664428574c1e9fad5))
+
 ## v2.28.0 (2021-09-14)
 ### Feature
 * Delete stream requires when stream is deleted ([`db18b59`](https://github.com/RedHatInsights/vmaas/commit/db18b59c88057cd7ba9462a3b17e2d2ff2c1a1bf))
