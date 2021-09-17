@@ -148,62 +148,81 @@ class VulnerabilitiesAPI:
                 candidate_definitions.update(self.db_cache.cpe_id2ovaldefinition_ids[cpe_id])
         return candidate_definitions
 
+    @staticmethod
+    def _serialize_dict(input_dict, extended=False):
+        return [{k: list(v) if isinstance(v, set) else v for k, v in cve.items()} for cve in input_dict.values()] \
+            if extended else list(input_dict.keys())
 
-    def process_list(self, api_version, data):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,too-many-branches,too-many-nested-blocks
+    def process_list(self, api_version, data):
         """Return list of potential security issues"""
         data["optimistic_updates"] = True  # find updates even if original package is not found in repo
-        evaluate_oval = data.get("oval", False)
-        evaluate_oval_only = data.get("oval_only", False)
-        cve_list = set()
-        unpatched_cve_list = set()
+        extended = data.get("extended", False)
+        cve_dict = {}
+        manually_fixable_cve_dict = {}
+        unpatched_cve_dict = {}
 
-        if not evaluate_oval_only:
-            updates = self.updates_api.process_list(2, data)
-            errata_list = set()
-            for package in updates['update_list']:
-                for update in updates['update_list'][package].get('available_updates', []):
-                    errata_list.add(update['erratum'])
-            for errata in errata_list:
-                cve_list.update(self.db_cache.errata_detail[errata][ERRATA_CVE])
+        # Repositories
+        updates = self.updates_api.process_list(2, data)
+        for package in updates['update_list']:
+            for update in updates['update_list'][package].get('available_updates', []):
+                for cve in self.db_cache.errata_detail[update['erratum']][ERRATA_CVE]:
+                    cve_dict.setdefault(cve, {})["cve"] = cve
+                    cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                    cve_dict[cve].setdefault("errata", set()).add(update['erratum'])
 
-        if evaluate_oval:
-            # TODO: re-factor, double parsing input packages
-            packages_to_process, _ = self.updates_api.process_input_packages(data)
-            modules_list = {f"{x['module_name']}:{x['module_stream']}" for x in data.get('modules_list', [])}
+        # OVAL
+        # TODO: re-factor, double parsing input packages
+        packages_to_process, _ = self.updates_api.process_input_packages(data)
+        modules_list = {f"{x['module_name']}:{x['module_stream']}" for x in data.get('modules_list', [])}
 
-            # Get CPEs for affected repos/content sets
-            # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
-            #       there needs to be better fallback at least to guess correctly RHEL version,
-            #       use old VMaaS repo guessing?
-            candidate_definitions = self._content_sets_to_definitions(data.get('repository_list', []))
+        # Get CPEs for affected repos/content sets
+        # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
+        #       there needs to be better fallback at least to guess correctly RHEL version,
+        #       use old VMaaS repo guessing?
+        candidate_definitions = self._content_sets_to_definitions(data.get('repository_list', []))
 
-            for package in packages_to_process.values():
-                name, epoch, ver, rel, arch = package["parsed_nevra"]
-                package_name_id = self.db_cache.packagename2id[name]
-                definition_ids = candidate_definitions.intersection(
-                    self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
-                #LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
-                for definition_id in definition_ids:
-                    definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
-                    cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
-                    if (
-                            (definition_type == OVAL_DEFINITION_TYPE_PATCH
-                             and not [cve for cve in cves if cve not in cve_list])
-                         or (definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY
-                             and not [cve for cve in cves if cve not in unpatched_cve_list])
-                       ):
-                        continue
+        for package, parsed_package in packages_to_process.items():
+            name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
+            package_name_id = self.db_cache.packagename2id[name]
+            definition_ids = candidate_definitions.intersection(
+                self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
+            #LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
+            for definition_id in definition_ids:
+                definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
+                cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
+                # Skip if all CVEs from definition were already found somewhere
+                if not [cve for cve in cves
+                        if cve not in cve_dict and
+                        cve not in manually_fixable_cve_dict and
+                        cve not in unpatched_cve_dict]:
+                    continue
 
-                    if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
-                        # Vulnerable
-                        #LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
-                        if definition_type == OVAL_DEFINITION_TYPE_PATCH:
-                            cve_list.update(cves)
-                        elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
-                            unpatched_cve_list.update(cves)
-                        else:
-                            raise ValueError("Unsupported definition type: %s" % definition_type)
+                if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
+                    # Vulnerable
+                    #LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
+                    if definition_type == OVAL_DEFINITION_TYPE_PATCH:
+                        for cve in cves:
+                            # Skip CVEs found in repos
+                            if cve in cve_dict:
+                                continue
+                            manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
+                            manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                            # no erratum directly mappable to CVE in OVAL
+                            manually_fixable_cve_dict[cve].setdefault("errata", set())
+                    elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
+                        for cve in cves:
+                            # Skip fixable CVEs (should never happen, just in case)
+                            if cve in cve_dict or cve in manually_fixable_cve_dict:
+                                continue
+                            unpatched_cve_dict.setdefault(cve, {})["cve"] = cve
+                            unpatched_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                            # no erratum for unpatched CVEs
+                            unpatched_cve_dict[cve].setdefault("errata", set())
+                    else:
+                        raise ValueError("Unsupported definition type: %s" % definition_type)
 
-        return {'cve_list': list(cve_list),
-                'unpatched_cve_list': list(unpatched_cve_list),
+        return {'cve_list': self._serialize_dict(cve_dict, extended=extended),
+                'manually_fixable_cve_list': self._serialize_dict(manually_fixable_cve_dict, extended=extended),
+                'unpatched_cve_list': self._serialize_dict(unpatched_cve_dict, extended=extended),
                 'last_change': format_datetime(self.db_cache.dbchange['last_change'])}

@@ -1104,10 +1104,7 @@ components:
         basearch:
           type: string
           example: x86_64
-        oval:
-          type: boolean
-          enum: [true, false]
-        oval_only:
+        extended:
           type: boolean
           enum: [true, false]
         third_party:
@@ -1121,20 +1118,17 @@ components:
     VulnerabilitiesResponse:
       properties:
         cve_list:
-          type: array
-          items:
-            type: string
-            example: CVE-2016-0800
+          $ref: '#/components/schemas/VulnerabilityList'
+        manually_fixable_cve_list:
+          $ref: '#/components/schemas/VulnerabilityList'
         unpatched_cve_list:
-          type: array
-          items:
-            type: string
-            example: CVE-2017-15089
+          $ref: '#/components/schemas/VulnerabilityList'
         last_change:
           type: string
           example: '2020-04-16 20:07:58.500192+00'
       required:
         - cve_list
+        - manually_fixable_cve_list
         - unpatched_cve_list
 
     PatchesRequest:
@@ -1258,3 +1252,29 @@ components:
             items:
               type: string
               example: 'rhel-7-desktop-rpms'
+
+    VulnerabilityList:
+      type: array
+      items:
+        oneOf:
+          - type: string
+            example: CVE-2017-15089
+          - type: object
+            properties:
+              cve:
+                type: string
+                example: CVE-2017-15089
+              affected_packages:
+                type: array
+                items:
+                  type: string
+                  example: libxml2-0:2.9.1-6.el7_2.3.x86_64
+              errata:
+                type: array
+                items:
+                  type: string
+                  example: RHSA-2018:0512
+            required:
+              - cve
+              - affected_packages
+              - errata
