@@ -20,12 +20,12 @@ def bye(signum, frame):
     sys.exit(f"Stopped,{signum} received.")
 
 
-def wait(func, *args, delay=1, service=""):
+def wait(func, *args, delay=1, service="", **kwargs):
     """Waits for success of `func`."""
     LOGGER.info("Checking if %s is up", service)
     while True:
         try:
-            result = func(*args)
+            result = func(*args, **kwargs)
             if result:
                 return
             LOGGER.info("%s is unavailable - sleeping", service)
@@ -49,7 +49,8 @@ def main():
             request,
             "GET",
             f"http://{config.websocket_host}:{config.websocket_port}/api/v1/monitoring/health",
-            service="Websocket server"
+            service="Websocket server",
+            timeout=1,
         )
     else:
         LOGGER.info("Skipping Websocket server check")
@@ -58,7 +59,8 @@ def main():
             request,
             "GET",
             f"http://{config.reposcan_host}:{config.reposcan_port}/api/v1/monitoring/health",
-            service="Reposcan API"
+            service="Reposcan API",
+            timeout=1,
         )
     else:
         LOGGER.info("Skipping Reposcan API check")
