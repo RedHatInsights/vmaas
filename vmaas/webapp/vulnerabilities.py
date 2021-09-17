@@ -151,6 +151,7 @@ class VulnerabilitiesAPI:
 
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """Return list of potential security issues"""
+        data["optimistic_updates"] = True  # find updates even if original package is not found in repo
         evaluate_oval = data.get("oval", False)
         evaluate_oval_only = data.get("oval_only", False)
         cve_list = set()
