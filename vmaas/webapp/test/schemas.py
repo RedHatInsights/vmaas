@@ -151,8 +151,9 @@ _updates_package_v2 = {
 }
 
 _vulnerabilities_response = {
-    'cve_list': [str],
-    'unpatched_cve_list': [str],
+    'cve_list': [Or(str, dict)],
+    "manually_fixable_cve_list": [Or(str, dict)],
+    'unpatched_cve_list': [Or(str, dict)],
     'last_change': str,
 }
 
