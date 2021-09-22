@@ -10,16 +10,105 @@ COMPONENTS="vmaas"
 COMPONENTS_W_RESOURCES="vmaas"
 CACHE_FROM_LATEST_IMAGE="true"
 
-IQE_PLUGINS="vmaas"
-IQE_MARKER_EXPRESSION=""
-IQE_FILTER_EXPRESSION=""
-IQE_CJI_TIMEOUT="30m"
+export IQE_PLUGINS="vmaas"
+export IQE_MARKER_EXPRESSION=""
+export IQE_FILTER_EXPRESSION=""
+export IQE_REQUIREMENTS_PRIORITY=""
+export IQE_TEST_IMPORTANCE=""
+export IQE_CJI_TIMEOUT="30m"
 
-# Install bonfire repo/initialize
-CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
-curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh && source .cicd_bootstrap.sh
 
-source $CICD_ROOT/build.sh
-#source $APP_ROOT/unit_test.sh  #Add unit tests here
-source $CICD_ROOT/deploy_ephemeral_env.sh
-source $CICD_ROOT/cji_smoke_test.sh
+# Heavily inspired by project-koku pr_check
+# https://github.com/project-koku/koku/blob/main/pr_check.sh
+ARTIFACTS_DIR="$WORKSPACE/artifacts"
+
+mkdir -p $ARTIFACTS_DIR
+exit_code=0
+task_arr=([1]="Build" [2]="Deploy" [3]="Smoke Tests")
+error_arr=([1]="The PR is labeled to not build the test image" \
+           [2]="The PR is labeled to not deploy to ephemeral" \
+           [3]="The PR is labeled to not run smoke tests")
+
+function check_for_labels() {
+    if [ -f $ARTIFACTS_DIR/github_labels.txt ]; then
+        egrep "$1" $ARTIFACTS_DIR/github_labels.txt &>/dev/null
+    fi
+}
+
+function process_requirements_labels() {
+    if [ -f $ARTIFACTS_DIR/github_labels.txt ]; then
+        requirements=$(egrep "^\"[A-Z]+-[A-Z-]*\"$" $ARTIFACTS_DIR/github_labels.txt)
+        if [ -n "$requirements" ]; then
+            IQE_REQUIREMENTS="{"
+            for req in $requirements; do
+                IQE_REQUIREMENTS="$IQE_REQUIREMENTS$requirement,"
+            done
+            # delete extra comma and add closing }
+            export IQE_REQUIREMENTS="${IQE_REQUIREMENTS:0:-1}}"
+        fi
+    fi
+}
+
+function build_image() {
+    source $CICD_ROOT/build.sh
+}
+
+function deploy_ephemeral() {
+    source $CICD_ROOT/deploy_ephemeral_env.sh
+}
+
+function run_smoke_tests() {
+    source $CICD_ROOT/cji_smoke_test.sh
+}
+
+function make_results_xml() {
+cat << EOF > $WORKSPACE/artifacts/junit-pr_check.xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite id="pr_check" name="PR Check" tests="1" failures="0">
+    <testcase id="pr_check.${task_arr[$exit_code]}" name="${task_arr[$exit_code]}">
+    </testcase>
+</testsuite>
+EOF
+}
+
+# Save PR labels into a file
+set -ex
+# GH_API_URL="${GITHUB_API_URL:-https://api.github.com/}"  # don't use app-sre github api mirror for now
+curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/search/issues\?q\=sha:$ghprbActualCommit | jq '.items[].labels[].name' > $ARTIFACTS_DIR/github_labels.txt
+
+if check_for_labels "skip-build"; then
+    echo "PR check skipped"
+    exit_code=1
+else
+    # Install bonfire repo/initialize
+    CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
+    curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh && source .cicd_bootstrap.sh
+    echo "creating PR image"
+    build_image
+fi
+
+if [[ $exit_code == 0 ]]; then
+    if check_for_labels "skip-deploy"; then
+        echo "deployment to ephemeral skipped"
+        exit_code=2
+    else
+        echo "deploying to ephemeral"
+        deploy_ephemeral
+        if check_for_labels "skip-tests"; then
+            echo "PR smoke tests skipped"
+            exit_code=3
+        else
+            echo "running PR smoke tests"
+            set +e
+            process_requirements_labels
+            set -e
+            run_smoke_tests
+        fi
+    fi
+fi
+
+if [[ $exit_code != 0 ]]
+then
+    echo "PR check failed"
+    make_results_xml
+fi
