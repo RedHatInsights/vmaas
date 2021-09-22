@@ -113,13 +113,13 @@ class PkgtreeAPI:
 
     @staticmethod
     def _exclude_not_modified(modified: bool, modified_since: datetime.datetime, n_erratas: int) -> bool:
-        if n_erratas == 0:
-            return False
-        if modified_since is None:
-            return False
-        if not modified:
+        if n_erratas == 0 and modified_since is not None:  # Skip packages without time info when "modified_since" used
             return True
-        return False
+        if modified_since is None:  # Include all packages when "modified_since" not used
+            return False
+        if not modified:  # Exclude not-modified packages ("modified_since" used)
+            return True
+        return False  # Include all packages by default
 
     def _update_repositories(self, pkg_id: int, opts: dict) -> dict:
         if opts["return_repositories"]:

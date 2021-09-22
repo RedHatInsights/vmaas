@@ -138,6 +138,7 @@ class TestPkgtreeAPI(TestBase):
         response = self.pkg_api.process_list(3, req)
         exp = deepcopy(RESPONSE_PKGS)
         exp["package_name_list"]["kernel-rt"].pop(0)
+        exp["package_name_list"]["kernel"] = []
         assert response == exp
 
     def test_pkgname_multiple_items(self):
