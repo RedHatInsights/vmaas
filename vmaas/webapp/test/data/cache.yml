@@ -196,6 +196,7 @@ id2packagename:
   2222: my-pkg
   32222: kernel
   332222: kernel-rt
+  4444: third-party-pkg
 modulename2id:
   ? !!python/tuple
   - my-pkg
@@ -209,10 +210,10 @@ modulename2id:
     22: null
 nevra2pkgid:
   ? !!python/tuple
-  - 2222
-  - 110
-  - 5
-  : 8110
+  - 2222 # package-name id
+  - 110  # evr id
+  - 5    # arch id
+  : 8110 # package id
   ? !!python/tuple
   - 2222
   - 110
@@ -233,6 +234,11 @@ nevra2pkgid:
   - 210
   - 5
   : 8210
+  ? !!python/tuple
+  - 4444
+  - 210
+  - 5
+  : 8500
 strings:
   1: Testing package summary...
   2: Testing package (1.1.0) description...
@@ -242,12 +248,12 @@ strings:
   6: Testing package (2.1.0) summary...
 package_details:
   8110: !!python/tuple
-  - 2222
-  - 110
-  - 5
-  - 1
-  - 2
-  - 81100
+  - 2222 # package-name id
+  - 110  # evr id
+  - 5    # arch id
+  - 1    # summary id
+  - 2    # description id
+  - 81100 # source package id
   81100: !!python/tuple
   - 2222
   - 110
@@ -300,10 +306,19 @@ package_details:
   - 1
   - 5
   - 0
+  # third-party-pkg-4.18.0-80.el8.x86_64
+  8500:
+  - 4444
+  - 410
+  - 7
+  - 1
+  - 5
+  - 0
 packagename2id:
   my-pkg: 2222
   kernel: 32222
   kernel-rt: 332222
+  third-party-pkg: 4444
 pkgerrata2module:
   ? !!python/tuple
   - 8110
@@ -358,6 +373,8 @@ pkgid2repoids:
   - 2
   8320:
   - 2
+  8500:
+  - 6
 repo_detail:
   1: !!python/tuple
   - rhel-7-server-rpms
@@ -466,4 +483,5 @@ content_set_id2pkg_name_ids:
     - 2222
   2:
     - 2222
-  3: []
+  3:
+    - 4444
