@@ -71,15 +71,14 @@ class PkgtreeAPI:
         erratas = natsorted(erratas, key=lambda err_dict: err_dict['name'])
         return erratas, modified_found
 
-    def _get_repositories(self, pkg_id):
+    def _get_repositories(self, pkg_id) -> tuple:
         # FIXME Add support for modules and streams.
         repos = []
+        third_party_flags = []
         if pkg_id in self.cache.pkgid2repoids:
             for repo_id in self.cache.pkgid2repoids[pkg_id]:
                 detail = self.cache.repo_detail[repo_id]
-                # Skip third party repos
-                if detail[REPO_THIRD_PARTY]:
-                    continue
+                third_party_flags.append(detail[REPO_THIRD_PARTY])
                 repos.append({
                     'label': detail[REPO_LABEL],
                     'name': detail[REPO_NAME],
@@ -87,7 +86,10 @@ class PkgtreeAPI:
                     'releasever': none2empty(detail[REPO_RELEASEVER]),
                     'revision': format_datetime(detail[REPO_REVISION])
                 })
-        return natsorted(repos, key=lambda repo_dict: repo_dict['label'])
+
+        # Check whether all found repositories are third-party
+        third_party_only = (len(third_party_flags) > 0) and (False not in third_party_flags)
+        return natsorted(repos, key=lambda repo_dict: repo_dict['label']), third_party_only
 
     @staticmethod
     def _get_first_published_from_erratas(erratas):  # pylint: disable=R0201
@@ -121,11 +123,12 @@ class PkgtreeAPI:
             return True
         return False  # Include all packages by default
 
-    def _update_repositories(self, pkg_id: int, opts: dict) -> dict:
+    def _update_repositories(self, pkg_id: int, opts: dict) -> tuple:
+        """Check whether all repos are 'third-party' to exclude package if third-party=True is set."""
         if opts["return_repositories"]:
-            repositories = self._get_repositories(pkg_id)
-            return dict(repositories=none2empty(repositories))
-        return {}
+            repositories, third_party_only = self._get_repositories(pkg_id)
+            return dict(repositories=none2empty(repositories)), third_party_only
+        return {}, False
 
     def _update_errata(self, api_version: int, pkg_id: int, opts: dict, third_party: bool) -> tuple:
         """Add errata-related data, skip based on modified_since if needed"""
@@ -156,7 +159,10 @@ class PkgtreeAPI:
         pkg_item = {
             "nevra": pkg_nevra,
         }
-        pkg_item.update(self._update_repositories(pkg_id, opts))
+        repositories, third_party_only = self._update_repositories(pkg_id, opts)
+        if not third_party and third_party_only:  # All repos are "third-party" and "third-party" not set, exclude pkg.
+            return None
+        pkg_item.update(repositories)
         errata_update, modified_since_skip = self._update_errata(api_version, pkg_id, opts, third_party)
         if modified_since_skip:
             return None

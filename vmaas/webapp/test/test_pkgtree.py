@@ -190,3 +190,20 @@ class TestPkgtreeAPI(TestBase):
         repos = [val['label'] for val in response['package_name_list'][PKG][-1]['repositories']]
         expected = ['rhel-8-for-x86_64-rt-rpms']
         assert repos == expected
+
+    def test_third_party_on(self):
+        """Test pkgtree with 'third_party' = True."""
+        req = PKGS_JSON.copy()
+        req["third_party"] = True
+        req["package_name_list"] = [".*"]
+        response = self.pkg_api.process_list(3, req)
+        assert len(response["package_name_list"]) == 4
+        assert len(response["package_name_list"]["third-party-pkg"]) == 1  # one package (third-party) found
+
+    def test_third_party_off(self):
+        """Test pkgtree with 'third_party' = False."""
+        req = PKGS_JSON.copy()
+        req["package_name_list"] = [".*"]
+        response = self.pkg_api.process_list(3, req)
+        assert len(response["package_name_list"]) == 4
+        assert response["package_name_list"]["third-party-pkg"] == []  # third-party package was excluded

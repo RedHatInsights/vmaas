@@ -29,7 +29,7 @@ class TestUtils(TestBase):
         """Test making NEVRA from package id."""
         pkgid_list = self.cache.package_details
         bin_nevras, src_nevras = utils.pkgidlist2packages(self.cache, pkgid_list)
-        assert len(bin_nevras) == 7
+        assert len(bin_nevras) == 8
         assert len(src_nevras) == 1
         for nevra in bin_nevras + src_nevras:
             assert self._is_nevra(nevra)
