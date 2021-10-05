@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.28.2 (2021-10-05)
+### Fix
+* **webapp:** Fix /pkgtree endpoint when "modified_since" used ([`0f1d73e`](https://github.com/RedHatInsights/vmaas/commit/0f1d73ed3542b94a4cfa35156e941a338e7a7f6d))
+
 ## v2.28.1 (2021-09-17)
 ### Fix
 * Set timeout for requests while waiting for services ([`ab4cb40`](https://github.com/RedHatInsights/vmaas/commit/ab4cb40b791df2e5f9558da664428574c1e9fad5))
