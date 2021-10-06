@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.28.3 (2021-10-06)
+### Fix
+* **webapp:** Fix /pkgtree third-party repos info and third-party flag ([`717d79c`](https://github.com/RedHatInsights/vmaas/commit/717d79c820ed3e7f6b021b58b9cac7501b07225e))
+
 ## v2.28.2 (2021-10-05)
 ### Fix
 * **webapp:** Fix /pkgtree endpoint when "modified_since" used ([`0f1d73e`](https://github.com/RedHatInsights/vmaas/commit/0f1d73ed3542b94a4cfa35156e941a338e7a7f6d))
