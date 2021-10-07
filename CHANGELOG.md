@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.30.0 (2021-10-07)
+### Feature
+* **webapp:** Enhance /vulnerabilities API ([`613125d`](https://github.com/RedHatInsights/vmaas/commit/613125d640769bcb9f556a161c52ce0261bd4597))
+
 ## v2.29.0 (2021-10-07)
 ### Feature
 * **webapp:** Enable optimistic updates for /vulnerabilities ([`d7c1fe0`](https://github.com/RedHatInsights/vmaas/commit/d7c1fe03ffff9089dd615e8b028b0ecab8eb309c))
