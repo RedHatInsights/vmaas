@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.28.4 (2021-10-07)
+### Fix
+* **webapp:** Load as many tables as possible even when dump is not up to date ([`751989b`](https://github.com/RedHatInsights/vmaas/commit/751989b6c9256575ac3071fae6bee93be9a4ae9b))
+
 ## v2.28.3 (2021-10-06)
 ### Fix
 * **webapp:** Fix /pkgtree third-party repos info and third-party flag ([`717d79c`](https://github.com/RedHatInsights/vmaas/commit/717d79c820ed3e7f6b021b58b9cac7501b07225e))
