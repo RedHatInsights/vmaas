@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.29.0 (2021-10-07)
+### Feature
+* **webapp:** Enable optimistic updates for /vulnerabilities ([`d7c1fe0`](https://github.com/RedHatInsights/vmaas/commit/d7c1fe03ffff9089dd615e8b028b0ecab8eb309c))
+
 ## v2.28.4 (2021-10-07)
 ### Fix
 * **webapp:** Load as many tables as possible even when dump is not up to date ([`751989b`](https://github.com/RedHatInsights/vmaas/commit/751989b6c9256575ac3071fae6bee93be9a4ae9b))
