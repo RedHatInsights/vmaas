@@ -180,8 +180,9 @@ class PackageStore(ObjectStore):
         """
         source_packages = self._get_source_packages(packages)
         self.logger.debug("Syncing %d packages.", len(packages))
-        self._populate_dependent_tables(source_packages + packages)
-        self._populate_packages(source_packages)
-        package_ids = self._populate_packages(packages)
-        self._associate_packages(package_ids, repo_id)
+        if packages:
+            self._populate_dependent_tables(source_packages + packages)
+            self._populate_packages(source_packages)
+            package_ids = self._populate_packages(packages)
+            self._associate_packages(package_ids, repo_id)
         self.logger.debug("Syncing packages finished.")

@@ -181,10 +181,11 @@ class ModulesStore(ObjectStore):
         # step.  Specifically _populate_modules and _populate_streams
         # could return modules with invalid/incomplete data.
         try:
-            modules = self._populate_modules(repo_id, modules)
-            modules = self._populate_streams(modules)
-            modules = self._populate_stream_requires(modules)
-            self._populate_rpm_artifacts(modules, repo_id)
+            if modules:
+                modules = self._populate_modules(repo_id, modules)
+                modules = self._populate_streams(modules)
+                modules = self._populate_stream_requires(modules)
+                self._populate_rpm_artifacts(modules, repo_id)
         except Exception: # pylint: disable=broad-except
             # exception already logged.
             pass
