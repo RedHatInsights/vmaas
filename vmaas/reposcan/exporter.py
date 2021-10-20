@@ -250,21 +250,22 @@ class SqliteDump:
                                 arch_id integer,
                                 summary_id integer,
                                 description_id integer,
-                                source_package_id integer
+                                source_package_id integer,
+                                modified timestamp
                                )""")
         if self.packagename_ids:
             with self._named_cursor() as cursor:
-                cursor.execute("""select id, name_id, evr_id, arch_id, summary, description, source_package_id
+                cursor.execute("""select id, name_id, evr_id, arch_id, summary, description, source_package_id, modified
                                     from package
                                    where name_id in %s
                                """, [tuple(self.packagename_ids)])
-                for pkg_id, name_id, evr_id, arch_id, summary, description, source_package_id in cursor:
+                for pkg_id, name_id, evr_id, arch_id, summary, description, source_package_id, modified in cursor:
                     sum_id = hash(summary)
                     desc_id = hash(description)
                     dump.execute("insert or ignore into string values (?, ?)", (sum_id, summary))
                     dump.execute("insert or ignore into string values (?, ?)", (desc_id, description))
-                    dump.execute("insert into package_detail values (?, ?, ?, ?, ?, ?, ?)",
-                                 (pkg_id, name_id, evr_id, arch_id, sum_id, desc_id, source_package_id))
+                    dump.execute("insert into package_detail values (?, ?, ?, ?, ?, ?, ?, ?)",
+                                 (pkg_id, name_id, evr_id, arch_id, sum_id, desc_id, source_package_id, modified))
 
                     self.package_ids.append(pkg_id)
 

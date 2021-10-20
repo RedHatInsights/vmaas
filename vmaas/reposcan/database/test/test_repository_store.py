@@ -1,6 +1,7 @@
 """Test storing repository in DB."""
 # pylint: disable=unused-argument, attribute-defined-outside-init, no-self-use
 
+import time
 import pytest
 
 from vmaas.reposcan.database.product_store import ProductStore
@@ -113,33 +114,34 @@ class TestRepositoryStore:
     def test_stored_packages(self, db_conn, repository):
         """Test all packages count in package table."""
         cur = db_conn.cursor()
-        cur.execute("select evr.epoch, evr.version, evr.release, pn.name, arch.name "
+        cur.execute("select evr.epoch, evr.version, evr.release, pn.name, arch.name, to_char(modified, 'YYYY-MM-DD') "
                     "from package "
                     "join package_name pn on package.name_id = pn.id "
                     "join evr on package.evr_id = evr.id "
                     "join arch on package.arch_id = arch.id "
                     "order by evr.evr, pn.name, arch.name")
         rows = cur.fetchall()
+        date_now = time.strftime('%Y-%m-%d')
         assert len(rows) == 18  # 18 packages expected from primary.xml/primary.db
         # check correct packages order (mainly sorting according to evr)
-        assert rows[0] == ('0', '0.0.20', '5.fc27', '3Depict', 'src')
-        assert rows[1] == ('0', '0.0.20', '5.fc27', '3Depict', 'x86_64')
-        assert rows[2] == ('0', '0.57', '1.fc27', 'BackupPC-XS', 'src')
-        assert rows[3] == ('0', '0.57', '1.fc27', 'BackupPC-XS', 'x86_64')
-        assert rows[4] == ('0', '1.3.7.8', '1.fc27', '389-ds-base', 'src')
-        assert rows[5] == ('0', '1.3.7.8', '1.fc27', '389-ds-base', 'x86_64')
-        assert rows[6] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-devel', 'i686')
-        assert rows[7] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-devel', 'x86_64')
-        assert rows[8] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-libs', 'i686')
-        assert rows[9] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-libs', 'x86_64')
-        assert rows[10] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-snmp', 'x86_64')
-        assert rows[11] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'i686')
-        assert rows[12] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'src')
-        assert rows[13] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'x86_64')
-        assert rows[14] == ('0', '2.5.2', '9.fc27', 'Agda', 'src')
-        assert rows[15] == ('0', '2.5.2', '9.fc27', 'Agda', 'x86_64')
-        assert rows[16] == ('0', '4.1.5', '1.fc27', 'BackupPC', 'src')
-        assert rows[17] == ('0', '4.1.5', '1.fc27', 'BackupPC', 'x86_64')
+        assert rows[0] == ('0', '0.0.20', '5.fc27', '3Depict', 'src', date_now)
+        assert rows[1] == ('0', '0.0.20', '5.fc27', '3Depict', 'x86_64', date_now)
+        assert rows[2] == ('0', '0.57', '1.fc27', 'BackupPC-XS', 'src', date_now)
+        assert rows[3] == ('0', '0.57', '1.fc27', 'BackupPC-XS', 'x86_64', date_now)
+        assert rows[4] == ('0', '1.3.7.8', '1.fc27', '389-ds-base', 'src', date_now)
+        assert rows[5] == ('0', '1.3.7.8', '1.fc27', '389-ds-base', 'x86_64', date_now)
+        assert rows[6] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-devel', 'i686', date_now)
+        assert rows[7] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-devel', 'x86_64', date_now)
+        assert rows[8] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-libs', 'i686', date_now)
+        assert rows[9] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-libs', 'x86_64', date_now)
+        assert rows[10] == ('0', '1.3.7.8', '1.fc27', '389-ds-base-snmp', 'x86_64', date_now)
+        assert rows[11] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'i686', date_now)
+        assert rows[12] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'src', date_now)
+        assert rows[13] == ('0', '1.3.10', '7.fc27', 'CGSI-gSOAP', 'x86_64', date_now)
+        assert rows[14] == ('0', '2.5.2', '9.fc27', 'Agda', 'src', date_now)
+        assert rows[15] == ('0', '2.5.2', '9.fc27', 'Agda', 'x86_64', date_now)
+        assert rows[16] == ('0', '4.1.5', '1.fc27', 'BackupPC', 'src', date_now)
+        assert rows[17] == ('0', '4.1.5', '1.fc27', 'BackupPC', 'x86_64', date_now)
 
     @pytest.mark.parametrize("repository", REPOSITORIES, ids=[r[0] for r in REPOSITORIES])
     def test_rpm_pkgs_count(self, db_conn, repository):
