@@ -119,9 +119,9 @@ class TestExporter:
         """Check package details in dump."""
         package_details = {}
         strings = {}
-        for (pkg_id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in dbdump.execute(
+        for (pkg_id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id, modified) in dbdump.execute(
                 'select * from package_detail'):
-            detail = (name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0)
+            detail = (name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0, modified)
             package_details[pkg_id] = detail
         for (str_id, string) in dbdump.execute('select id, string from string'):
             strings[int(str_id)] = string
@@ -134,6 +134,7 @@ class TestExporter:
         assert strings[item[3]] == "summary1"
         assert strings[item[4]] == "description1"
         assert not item[5]
+        assert item[6][0:10] == time.strftime('%Y-%m-%d')
 
     def check_repo(self, dbdump):
         """Check repo data in dump."""
@@ -235,7 +236,7 @@ class TestExporter:
         """Check source package to binary packages
         mapping in dump."""
         src_pkg_id2pkg_ids = {}
-        for (pkg_id, _, _, _, _, _, src_pkg_id) in dbdump.execute('select * from package_detail'):
+        for (pkg_id, _, _, _, _, _, src_pkg_id, _) in dbdump.execute('select * from package_detail'):
             if src_pkg_id:
                 src_pkg_id2pkg_ids.setdefault(src_pkg_id, []).append(pkg_id)
         assert len(src_pkg_id2pkg_ids[301]) == 3
