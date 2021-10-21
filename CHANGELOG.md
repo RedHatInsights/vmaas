@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.31.0 (2021-10-21)
+### Feature
+* **webapp:** Exclude modified from cache for now ([`c4de51c`](https://github.com/RedHatInsights/vmaas/commit/c4de51cd07e844e4e9770940afc5b77f4551fd4d))
+* **reposcan:** Updated package_store test, dump exporter and its tests ([`5debe20`](https://github.com/RedHatInsights/vmaas/commit/5debe20a723e7ed063b21e0a7cf36ac7a4b7e7a5))
+* **reposcan:** SQL updates - added package.modified timestamp column ([`08d2b6a`](https://github.com/RedHatInsights/vmaas/commit/08d2b6a877afe2644383c5e6bae8cace179c97dd))
+
 ## v2.30.0 (2021-10-07)
 ### Feature
 * **webapp:** Enhance /vulnerabilities API ([`613125d`](https://github.com/RedHatInsights/vmaas/commit/613125d640769bcb9f556a161c52ce0261bd4597))
