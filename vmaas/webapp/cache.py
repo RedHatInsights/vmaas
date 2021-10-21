@@ -211,7 +211,7 @@ class Cache:
             self.id2evr[int(id)] = evr
             self.evr2id[evr] = int(id)
 
-        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id) in self._sqlite_execute(data,
+        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id, _) in self._sqlite_execute(data,
                 'select * from package_detail'):
             detail = array.array('q')
             detail.fromlist([name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0])
