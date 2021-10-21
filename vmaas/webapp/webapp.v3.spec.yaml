@@ -844,6 +844,11 @@ components:
                 type: boolean
               requires_reboot:
                 type: boolean
+              release_versions:
+                type: array
+                items:
+                  type: string
+                  example: '8.1'
         type:
           type: array
           items:

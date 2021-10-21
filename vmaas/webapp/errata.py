@@ -7,7 +7,8 @@ from vmaas.common.webapp_utils import format_datetime, parse_datetime, none2empt
 from vmaas.webapp.cache import ERRATA_SYNOPSIS, ERRATA_SUMMARY, ERRATA_TYPE, \
     ERRATA_SEVERITY, ERRATA_DESCRIPTION, ERRATA_SOLUTION, \
     ERRATA_ISSUED, ERRATA_UPDATED, ERRATA_CVE, ERRATA_PKGIDS, \
-    ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY, ERRATA_REQUIRES_REBOOT
+    ERRATA_BUGZILLA, ERRATA_REFERENCE, ERRATA_MODULE, ERRATA_URL, ERRATA_THIRD_PARTY, ERRATA_REQUIRES_REBOOT, \
+    ERRATA_ID, REPO_RELEASEVER
 
 
 class ErrataAPI:
@@ -81,6 +82,11 @@ class ErrataAPI:
             ret = severity
         return ret
 
+    def _errata_releasevers(self, errata_id):
+        releasevers = list(set(self.cache.repo_detail[rid][REPO_RELEASEVER]
+                               for rid in self.cache.errataid2repoids.get(errata_id, [])))
+        return list(releasevers)
+
     def try_expand_by_regex(self, erratas: list) -> list:
         """Expand list with a POSIX regex if possible"""
         out_erratas = try_expand_by_regex(erratas, self.cache.errata_detail)
@@ -135,6 +141,7 @@ class ErrataAPI:
                 continue
 
             bin_pkg_list, src_pkg_list = pkgidlist2packages(self.cache, errata_detail[ERRATA_PKGIDS])
+            releasevers = self._errata_releasevers(errata_detail[ERRATA_ID])
 
             if errata_detail[ERRATA_MODULE]:
                 for index, module_update in enumerate(errata_detail[ERRATA_MODULE]):
@@ -161,7 +168,8 @@ class ErrataAPI:
                 "modules_list": errata_detail[ERRATA_MODULE],
                 "url": none2empty(errata_detail[ERRATA_URL]),
                 "third_party": errata_detail[ERRATA_THIRD_PARTY],
-                "requires_reboot": errata_detail[ERRATA_REQUIRES_REBOOT]
+                "requires_reboot": errata_detail[ERRATA_REQUIRES_REBOOT],
+                "release_versions": releasevers,
             }
         response["errata_list"] = errata_list
         response.update(pagination_response)
