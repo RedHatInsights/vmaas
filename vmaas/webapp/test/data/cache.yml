@@ -60,6 +60,7 @@ errata_detail:
   - https://access.redhat.com/errata/RHBA-2015:0364
   - false  # third_party
   - true   # requires_reboot
+  - 444    # id
   RHEA-2011:0895: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -77,6 +78,7 @@ errata_detail:
   - null
   - false # third_party
   - true  # requires_reboot
+  - 111    # id
   RHSA-2019:1174: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -97,6 +99,7 @@ errata_detail:
   - null
   - false # third_party
   - true  # requires_reboot
+  - 555    # id
   RHSA-2019:1175: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -114,6 +117,7 @@ errata_detail:
   - null
   - false  # third_party
   - false  # requires_reboot
+  - 556    # id
   RHSA-2222:1234: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -131,6 +135,7 @@ errata_detail:
   - null
   - true  # third_party
   - false # requires_reboot
+  - 123    # id
 errataid2name:
   111: RHEA-2011:0895
   444: RHBA-2015:0364
