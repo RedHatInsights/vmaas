@@ -112,7 +112,8 @@ _errata = {
             "type": str,
             "modules_list": [dict],
             "third_party": bool,
-            "requires_reboot": bool
+            "requires_reboot": bool,
+            "release_versions": [str],
         }
     },
     Optional("modified_since"): str,

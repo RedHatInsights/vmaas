@@ -117,3 +117,11 @@ class TestErrataAPI(TestBase):
         errata["errata_list"] = ["RHSA-W/O:MODIFIED"]
         response = self.errata_api.process_list(api_version="v1", data=errata)
         assert tools.match(EMPTY_RESPONSE, response) is True
+
+    def test_errata_releasever(self):
+        """Test errata API response."""
+        response = self.errata_api.process_list(api_version="v3", data=ERRATA_JSON)
+        assert ERRATA_NAME in response["errata_list"]
+        relvers = response["errata_list"][ERRATA_NAME]["release_versions"]
+        assert len(relvers) == 1
+        assert relvers[0] == '7Server'
