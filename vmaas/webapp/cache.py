@@ -67,6 +67,7 @@ ERRATA_MODULE = 12
 ERRATA_URL = 13
 ERRATA_THIRD_PARTY = 14
 ERRATA_REQUIRES_REBOOT = 15
+ERRATA_ID = 16
 
 LOGGER = get_logger(__name__)
 
@@ -286,7 +287,8 @@ class Cache:
                 errataid2bzs.get(id, []),
                 errataid2refs.get(id, []),
                 list(errataid2modules.get(id, {}).values()),
-                row[10], bool(row[11]), bool(row[12])
+                row[10], bool(row[11]), bool(row[12]),
+                id,
             )
             self.errata_detail[name] = errata
             self.errataid2name[id] = name
