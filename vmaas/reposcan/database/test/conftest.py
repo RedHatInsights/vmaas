@@ -48,8 +48,8 @@ def create_pg(vmaas_user=VMAAS_USER, vmaas_pg=VMAAS_PG):
             cursor.execute("GRANT ALL ON SCHEMA public TO public")
 
         with conn.cursor() as cursor:
-            cursor.execute(vmaas_user.read_text())
-            cursor.execute(vmaas_pg.read_text())
+            cursor.execute(vmaas_user.read_text(encoding="utf-8"))
+            cursor.execute(vmaas_pg.read_text(encoding="utf-8"))
 
         conn.commit()
         conn.close()
