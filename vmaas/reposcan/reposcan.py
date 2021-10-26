@@ -125,7 +125,7 @@ class HealthHandler():
     @classmethod
     def get(cls, **kwargs):
         """Get API status."""
-        return True, 200
+        return "Ok", 200
 
 
 class VersionHandler():

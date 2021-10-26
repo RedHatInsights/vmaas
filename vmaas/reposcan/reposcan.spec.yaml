@@ -33,8 +33,8 @@ paths:
           content:
             text/plain:
               schema:
-                type: boolean
-                enum: [true, false]
+                type: string
+                example: Ok
       tags: [ Metadata ]
 
   /version:
