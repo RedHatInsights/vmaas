@@ -509,7 +509,8 @@ class Websocket:
             async with self.websocket_lock:
                 self.websocket = None
 
-    async def fetch_latest_dump(self, session):
+    @staticmethod
+    async def fetch_latest_dump(session):
         """Method fetches latest dump from reposcan"""
         async with session.get("http://%s:%s/%s" % (REPOSCAN_HOST, REPOSCAN_PORT, LATEST_DUMP_ENDPOINT)) as resp:
             return await resp.text()
