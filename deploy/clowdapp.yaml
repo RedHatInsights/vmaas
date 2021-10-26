@@ -30,8 +30,12 @@ objects:
         - name: CLOWDER_ENABLED
           value: ${CLOWDER_ENABLED}
         resources:
-          limits: {cpu: 100m, memory: 100Mi}
-          requests: {cpu: 100m, memory: 100Mi}
+          limits:
+            cpu: ${CPU_LIMIT_WEBSOCKET}
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
 
     - name: webapp-service
       minReplicas: ${{REPLICAS_WEBAPP}}
@@ -65,7 +69,7 @@ objects:
           value: ${CLOWDER_ENABLED}
         resources:
           limits:
-            cpu: '1'
+            cpu: ${CPU_LIMIT_WEBAPP}
             memory: ${MEMORY_LIMIT}
           requests:
             cpu: 500m
@@ -105,8 +109,12 @@ objects:
         - /vmaas/entrypoint.sh
         - reposcan
         resources:
-          limits: {cpu: '1', memory: 2Gi}
-          requests: {cpu: 200m, memory: 1Gi}
+          limits:
+            cpu: ${CPU_LIMIT_REPOSCAN}
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 1Gi
         volumes:
         - name: vmaas-reposcan-tmp
           emptyDir: {}
@@ -294,6 +302,15 @@ objects:
     wildcardPolicy: None
 
 parameters:
+- name: CPU_LIMIT_WEBSOCKET
+  description: Maximum CPU limit for pods
+  value: '100m'
+- name: CPU_LIMIT_WEBAPP
+  description: Maximum CPU limit for pods
+  value: '1000m'
+- name: CPU_LIMIT_REPOSCAN
+  description: Maximum CPU limit for pods
+  value: '1000m'
 - name: MEMORY_LIMIT
   description: Maximum memory limit for pod
   value: '2Gi'
