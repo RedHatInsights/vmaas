@@ -173,6 +173,21 @@ _pkg_names_rpm_resp = {
     'rpm_name_list': {str: [str]}
 }
 
+_pkglist = {
+    "package_list": [{
+        "nevra": str,
+        "summary": str,
+        "description": str,
+        Optional("modified"): str
+    }],
+    Optional("modified_since"): str,
+    "page": int,
+    "page_size": int,
+    "pages": int,
+    "total": int,
+    "last_change": str,
+}
+
 errata_schema = Schema(_errata)
 repos_schema = Schema(_repos)
 cves_schema = Schema(_cves)
@@ -191,3 +206,4 @@ vulnerabilities_schema = Schema(_vulnerabilities_response)
 patches_schema = Schema(_patches_response)
 pkg_names_srpm_schema = Schema(_pkg_names_srpm_resp)
 pkg_names_rpm_schema = Schema(_pkg_names_rpm_resp)
+pkglist_list_schema = Schema(_pkglist)
