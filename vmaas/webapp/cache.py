@@ -7,7 +7,7 @@ import os
 import sqlite3
 
 from vmaas.common.config import Config
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 from vmaas.common.logging_utils import get_logger
 
 CFG = Config()

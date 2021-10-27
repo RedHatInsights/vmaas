@@ -5,7 +5,7 @@ import rpm
 from vmaas.webapp. cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE, PKG_EVR_ID, ERRATA_THIRD_PARTY
 from vmaas.common.webapp_utils import none2empty, filter_package_list, format_datetime
-from vmaas.common.rpm import parse_rpm_name, join_rpm_name
+from vmaas.common.rpm_utils import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
 

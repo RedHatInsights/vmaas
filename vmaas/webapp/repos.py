@@ -11,7 +11,7 @@ from vmaas.webapp.cache import (
     REPO_REVISION,
     REPO_THIRD_PARTY
 )
-from vmaas.common.dateutil import format_datetime
+from vmaas.common.date_utils import format_datetime
 from vmaas.common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists, try_expand_by_regex
 
 
