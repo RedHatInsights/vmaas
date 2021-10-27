@@ -59,5 +59,7 @@ def test_cache(monkeypatch):
     for name, var in variables.items():
         if name == "filename":
             assert var == TEST_DUMP_FILE
+        elif name == "package_details_modified_index":
+            assert var == []
         else:
             assert var == {}
