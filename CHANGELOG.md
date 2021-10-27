@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.31.1 (2021-10-27)
+### Fix
+* **reposcan:** Fixed implicit json serialization warning ([`7cb9ca0`](https://github.com/RedHatInsights/vmaas/commit/7cb9ca0c807da85b941c374f10a3f0c88fafb0a7))
+* Updated lint related things ([`0ceacf8`](https://github.com/RedHatInsights/vmaas/commit/0ceacf839df8c687adb04c38e6b1dcd65a5c2290))
+* Update deps ([`3afb539`](https://github.com/RedHatInsights/vmaas/commit/3afb53966ca4567ba76fc8dd2eff84909f006685))
+
 ## v2.31.0 (2021-10-21)
 ### Feature
 * **webapp:** Exclude modified from cache for now ([`c4de51c`](https://github.com/RedHatInsights/vmaas/commit/c4de51cd07e844e4e9770940afc5b77f4551fd4d))
