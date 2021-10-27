@@ -26,6 +26,7 @@ class YamlCache(Cache):
 
         for key, val in data.items():
             setattr(self, key, val)
+        self.build_indexes()
         return self
 
     def dump(self, output):

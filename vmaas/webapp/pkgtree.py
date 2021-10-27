@@ -29,7 +29,7 @@ class PkgtreeAPI:
         return pkg_ids
 
     def _build_nevra(self, pkg_detail: tuple):
-        name_id, evr_id, arch_id, _, _, _ = pkg_detail
+        name_id, evr_id, arch_id, _, _, _, _ = pkg_detail
         name = self.cache.id2packagename[name_id]
         epoch, ver, rel = self.cache.id2evr[evr_id]
         arch = self.cache.id2arch[arch_id]

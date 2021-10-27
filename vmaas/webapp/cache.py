@@ -3,6 +3,7 @@ Module to cache data from file dump.
 """
 import array
 import asyncio
+import datetime
 import os
 import sqlite3
 
@@ -32,6 +33,7 @@ PKG_ARCH_ID = 2
 PKG_SUMMARY_ID = 3
 PKG_DESC_ID = 4
 PKG_SOURCE_PKG_ID = 5
+PKG_MODIFIED_ID = 6
 
 # cve detail indexes
 CVE_REDHAT_URL = 0
@@ -87,6 +89,7 @@ class Cache:
         self.filename = filename
         self.clear()
         self.reload()
+        self.build_indexes()
 
     def clear(self):
         """Clear dictionaries and load new data."""
@@ -106,6 +109,7 @@ class Cache:
         self.id2arch = {}
         self.arch_compat = {}
         self.package_details = {}
+        self.package_details_modified_index = []
         self.nevra2pkgid = {}
         self.repo_detail = {}
         self.repolabel2ids = {}
@@ -145,6 +149,13 @@ class Cache:
         if self.download():
             self.clear()
             self.load_sqlite(self.filename)
+
+    def build_indexes(self):
+        """Build additional indexes."""
+        LOGGER.info("Building 'package_detail.modified' index")
+        data = [id for id, _ in self.package_details.items()]
+        self.package_details_modified_index = sorted(data, key=lambda id: self.package_details[id][PKG_MODIFIED_ID])
+        LOGGER.info("Index 'package_detail.modified' done")
 
     @staticmethod
     def download():
@@ -212,10 +223,12 @@ class Cache:
             self.id2evr[int(id)] = evr
             self.evr2id[evr] = int(id)
 
-        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id, _) in self._sqlite_execute(data,
+        for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id, modified_str) in self._sqlite_execute(data,
                 'select * from package_detail'):
             detail = array.array('q')
-            detail.fromlist([name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0])
+            modified_dt = datetime.datetime.strptime(modified_str, '%Y-%m-%d %H:%M:%S.%f')
+            modified_int = int(modified_dt.timestamp())
+            detail.fromlist([name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id or 0, modified_int])
             self.package_details[id] = detail
             self.nevra2pkgid[(name_id, evr_id, arch_id)] = id
 
