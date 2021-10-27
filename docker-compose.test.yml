@@ -18,6 +18,7 @@ services:
     command: >
       bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
                          && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
+                         && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \
                          && ./run_tests.sh vmaas/webapp \
                          && ./run_tests.sh vmaas/websocket \

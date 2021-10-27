@@ -5,7 +5,7 @@ Module to handle /packages API calls.
 from vmaas.webapp.cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, \
     PKG_SOURCE_PKG_ID, REPO_THIRD_PARTY
 import vmaas.common.webapp_utils as utils
-from vmaas.common.rpm import parse_rpm_name
+from vmaas.common.rpm_utils import parse_rpm_name
 
 
 class PackagesAPI:

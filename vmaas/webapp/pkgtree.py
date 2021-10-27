@@ -8,9 +8,9 @@ from natsort import natsorted  # pylint: disable=E0401
 from vmaas.webapp.cache import PKG_NAME_ID, ERRATA_ISSUED, ERRATA_CVE, REPO_LABEL, REPO_NAME, \
     REPO_BASEARCH, REPO_RELEASEVER, REPO_REVISION, REPO_THIRD_PARTY, ERRATA_THIRD_PARTY, ERRATA_UPDATED, \
     PKG_SUMMARY_ID, PKG_DESC_ID
-from vmaas.common.dateutil import parse_datetime as parse_dt
+from vmaas.common.date_utils import parse_datetime as parse_dt
 from vmaas.common.webapp_utils import format_datetime, none2empty, try_expand_by_regex, paginate, parse_datetime
-from vmaas.common.rpm import join_rpm_name
+from vmaas.common.rpm_utils import join_rpm_name
 
 
 class PkgtreeAPI:

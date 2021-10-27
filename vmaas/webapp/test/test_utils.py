@@ -3,7 +3,7 @@
 
 import re
 
-from vmaas.common import rpm
+from vmaas.common import rpm_utils
 from vmaas.webapp.test.conftest import TestBase
 
 import vmaas.common.webapp_utils as utils
@@ -20,7 +20,7 @@ class TestUtils(TestBase):
 
     def test_join_pkgname(self):
         """Test joining package name"""
-        pkg_name = rpm.join_rpm_name("test", "2", "1.2", "4.el7", "x86_64")
+        pkg_name = rpm_utils.join_rpm_name("test", "2", "1.2", "4.el7", "x86_64")
         assert pkg_name == "test-2:1.2-4.el7.x86_64"
 
     # pylint: disable=unused-argument
@@ -37,7 +37,7 @@ class TestUtils(TestBase):
     def test_split_packagename(self):
         """Test splitting package name into N,E,V,R,A."""
         pkg_name = "bash-0:4.2.46-20.el7_2.x86_64.rpm"
-        name, epoch, version, release, arch = rpm.parse_rpm_name(pkg_name, default_epoch='0')
+        name, epoch, version, release, arch = rpm_utils.parse_rpm_name(pkg_name, default_epoch='0')
         assert name == "bash"
         assert epoch == "0"
         assert version == "4.2.46"
