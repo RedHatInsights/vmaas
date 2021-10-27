@@ -244,6 +244,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/PackagesResponse'
 
+  /pkglist:
+    post:
+      description: Get details about all packages..
+      operationId: vmaas.webapp.app.PkgListHandlerPost.post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PkgListRequest'
+
+      responses:
+        '200':
+          description: Return details about list of package NEVRAs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PkgListResponse'
+        <<: *format_resps
+
   /pkgtree:
     post:
       description: Get package NEVRAs trees for package names. "package_name_list" must be a list of package names OR one POSIX regular expression.
@@ -1283,3 +1302,49 @@ components:
               - cve
               - affected_packages
               - errata
+
+    PkgListRequest:
+      type: object
+      properties:
+        modified_since:
+          type: string
+          example: '2018-04-05T01:23:45+02:00'
+          format: date-time
+        return_modified:
+          type: boolean
+          enum: [true, false]
+          description: Include 'modified' package attribute into the response
+          default: false
+        <<: *req_paging
+
+    PkgListResponse:
+      properties:
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
+        package_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PkgListItem'
+        total:
+          type: number
+          description: Total number of packages to return.
+          example: 100
+        <<: *resp_paging
+
+    PkgListItem:
+      type: object
+      properties:
+        nevra:
+          type: string
+          example: kernel-rt-4.18.0-147.rt24.93.el8.x86_64
+        summary:
+          type: string
+          example: My package summary
+        description:
+          type: string
+          example: My package description
+        modified:
+          type: string
+          example: '2018-04-05T01:23:45+02:00'
+          format: date-time
