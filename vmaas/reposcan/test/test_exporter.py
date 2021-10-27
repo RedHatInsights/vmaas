@@ -6,7 +6,7 @@ Unit test classes for exporter module.
 import time
 import sqlite3
 
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 from vmaas.reposcan.exporter import SqliteDump
 
 TEST_DUMP_FILE = "/tmp/dump.output"

@@ -4,7 +4,7 @@ Module containing classes for fetching/importing packages from/into database.
 from psycopg2.extras import execute_values
 
 from vmaas.reposcan.database.object_store import ObjectStore
-from vmaas.common import rpm
+from vmaas.common import rpm_utils
 
 
 class PackageStore(ObjectStore):
@@ -49,7 +49,7 @@ class PackageStore(ObjectStore):
         for epoch, version, release in unique_evrs:
             if (epoch, version, release) not in self.evr_map:
                 to_import.append((epoch, version, release, epoch,
-                                  rpm.rpmver2sqlarray(version), rpm.rpmver2sqlarray(release)))
+                                  rpm_utils.rpmver2sqlarray(version), rpm_utils.rpmver2sqlarray(release)))
 
         self.logger.debug("EVRs to import: %d", len(to_import))
         if to_import:
@@ -85,7 +85,7 @@ class PackageStore(ObjectStore):
     def _get_source_package_id(self, pkg):
         source_package_id = None
         if pkg["srpm"]:
-            name, epoch, ver, rel, arch = rpm.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
+            name, epoch, ver, rel, arch = rpm_utils.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
                                                              raise_exception=True)
             name_id = self.package_name_map[name]
             evr_id = self.evr_map[(epoch, ver, rel)]
@@ -166,7 +166,7 @@ class PackageStore(ObjectStore):
         unique_source_packages = set()
         for pkg in packages:
             if pkg["srpm"]:
-                unique_source_packages.add(rpm.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
+                unique_source_packages.add(rpm_utils.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
                                                               raise_exception=True))
         source_packages = []
         for name, epoch, ver, rel, arch in unique_source_packages:

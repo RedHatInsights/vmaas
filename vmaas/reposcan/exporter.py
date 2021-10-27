@@ -10,7 +10,7 @@ import os
 import sqlite3
 
 from vmaas.common.logging_utils import get_logger, init_logging
-from vmaas.common.dateutil import format_datetime, now
+from vmaas.common.date_utils import format_datetime, now
 from vmaas.common.fileutil import remove_file_if_exists
 from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCursor, init_db
 

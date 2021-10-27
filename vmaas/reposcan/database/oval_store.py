@@ -3,8 +3,8 @@ Module containing classes for fetching/importing OVAL data from/into database.
 """
 from psycopg2.extras import execute_values
 
-from vmaas.common.dateutil import format_datetime
-from vmaas.common.rpm import parse_rpm_name
+from vmaas.common.date_utils import format_datetime
+from vmaas.common.rpm_utils import parse_rpm_name
 from vmaas.reposcan.database.object_store import ObjectStore
 from vmaas.reposcan.database.cpe_store import CpeStore
 from vmaas.reposcan.database.package_store import PackageStore

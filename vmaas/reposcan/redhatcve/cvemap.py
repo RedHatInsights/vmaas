@@ -5,7 +5,7 @@ Parse informations from CVE map response.
 import xml.etree.ElementTree as eT
 import re
 
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 from vmaas.common.string import text_strip
 
 NS = 'http://www.w3.org/XML/1998/namespace'

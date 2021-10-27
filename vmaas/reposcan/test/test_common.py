@@ -7,7 +7,7 @@ import math
 
 import pytest
 
-from vmaas.common import string, dateutil
+from vmaas.common import string, date_utils
 from vmaas.common.batch_list import BatchList, BATCH_MAX_SIZE, BATCH_MAX_FILESIZE
 
 DATETIME_OBJ = datetime.now()
@@ -45,22 +45,22 @@ class TestDateutil:
 
     def test_parse_none(self):
         """Test parsing date = None."""
-        assert dateutil.parse_datetime(None) is None
+        assert date_utils.parse_datetime(None) is None
 
     def test_parse_string(self):
         """Test parsing datetime from string."""
-        assert isinstance(dateutil.parse_datetime("2018-10-24 15:27:40.058353"), datetime)
+        assert isinstance(date_utils.parse_datetime("2018-10-24 15:27:40.058353"), datetime)
 
     @pytest.mark.parametrize("date_param", DATES, ids=[d[0] for d in DATES])
     def test_datetime_to_iso(self, date_param):
         """Test formatting datetime to ISO format."""
-        date = dateutil.format_datetime(date_param[1])
+        date = date_utils.format_datetime(date_param[1])
         assert isinstance(date, str)
         assert RE_ISO.match(date) is not None
 
     def test_tz_awareness(self):
         """Test if datetime is tz aware."""
-        date = dateutil.now()
+        date = date_utils.now()
         assert date.tzinfo is not None
         assert date.tzinfo.utcoffset(date) is not None
 

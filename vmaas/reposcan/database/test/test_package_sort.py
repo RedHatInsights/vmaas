@@ -5,7 +5,7 @@ https://github.com/rpm-software-management/rpm/blob/c7e711bba58374f03347c795a567
 """
 import re
 
-from vmaas.common import rpm
+from vmaas.common import rpm_utils
 
 
 def test_rpmver_1_numbers(db_conn):
@@ -142,7 +142,7 @@ def _typed_sql_array(ver: str) -> str:
     Example '1a' -> 'ARRAY[(1,null)::evr_array_item,(0,'a')::evr_array_item'
     """
 
-    res = rpm.rpmver2sqlarray(ver)
+    res = rpm_utils.rpmver2sqlarray(ver)
     res = re.sub(r"([A-Za-z]+)", r"'\1'", res)
     res = res.replace("{", "ARRAY[")
     res = res.replace("}", "]")

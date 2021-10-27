@@ -6,7 +6,7 @@ import os
 import shutil
 import tempfile
 
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.cvemap_store import CvemapStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES

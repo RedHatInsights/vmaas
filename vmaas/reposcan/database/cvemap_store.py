@@ -5,7 +5,7 @@ from psycopg2.extras import execute_values
 
 from vmaas.reposcan.database.cve_common import CveStoreCommon
 from vmaas.reposcan.mnm import FAILED_IMPORT_CVE, FAILED_UPDATE_CVE
-from vmaas.common.dateutil import format_datetime
+from vmaas.common.date_utils import format_datetime
 
 
 class CvemapStore(CveStoreCommon):

@@ -9,9 +9,9 @@ import os
 import json
 import gzip
 from vmaas.common.logging_utils import get_logger, init_logging
-from vmaas.common.dateutil import format_datetime, now
+from vmaas.common.date_utils import format_datetime, now
 from vmaas.common.fileutil import remove_file_if_exists
-from vmaas.common.rpm import join_rpm_name
+from vmaas.common.rpm_utils import join_rpm_name
 from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCursor, init_db
 
 DEFAULT_KEEP_COPIES = "2"

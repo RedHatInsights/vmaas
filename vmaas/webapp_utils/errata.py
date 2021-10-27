@@ -6,7 +6,7 @@ import psycopg2
 from vmaas.webapp_utils.base import Request
 import vmaas.webapp_utils.database.db_handler as DB
 from vmaas.common.logging_utils import get_logger, init_logging
-from vmaas.common.rpm import join_rpm_name
+from vmaas.common.rpm_utils import join_rpm_name
 from vmaas.webapp_utils.pagination import paginate
 
 POOL_SIZE = 10

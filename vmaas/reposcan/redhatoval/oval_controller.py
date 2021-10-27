@@ -10,7 +10,7 @@ from distutils.util import strtobool
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 
 from vmaas.reposcan.database.oval_store import OvalStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
