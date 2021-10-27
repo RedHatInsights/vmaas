@@ -24,6 +24,7 @@ from vmaas.webapp.cve import CveAPI
 from vmaas.webapp.dbchange import DBChange
 from vmaas.webapp.errata import ErrataAPI
 from vmaas.webapp.packages import PackagesAPI
+from vmaas.webapp.pkglist import PkgListAPI
 from vmaas.webapp.patches import PatchesAPI
 from vmaas.webapp.pkgtree import PkgtreeAPI
 from vmaas.webapp.probes import REQUEST_COUNTS
@@ -67,6 +68,7 @@ class BaseHandler:
     cve_api = None
     errata_api = None
     packages_api = None
+    pkglist_api = None
     pkgtree_api = None
     vulnerabilities_api = None
     patches_api = None
@@ -319,6 +321,15 @@ class PackagesHandlerPost(BaseHandler):
         return await cls.handle_request(cls.packages_api, 1, **kwargs)
 
 
+class PkgListHandlerPost(BaseHandler):
+    """ /pkglist API handler """
+
+    @classmethod
+    async def post(cls, **kwargs):
+        """Get details about all packages."""
+        return await cls.handle_request(cls.pkglist_api, 1, **kwargs)
+
+
 class PkgtreeHandlerGet(BaseHandler):
     """Handler for processing /pkgtree GET requests."""
 
@@ -539,6 +550,7 @@ def load_cache_to_apis():
     BaseHandler.cve_api = CveAPI(BaseHandler.db_cache)
     BaseHandler.errata_api = ErrataAPI(BaseHandler.db_cache)
     BaseHandler.packages_api = PackagesAPI(BaseHandler.db_cache)
+    BaseHandler.pkglist_api = PkgListAPI(BaseHandler.db_cache)
     BaseHandler.pkgtree_api = PkgtreeAPI(BaseHandler.db_cache)
     BaseHandler.vulnerabilities_api = VulnerabilitiesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
     BaseHandler.patches_api = PatchesAPI(BaseHandler.db_cache, BaseHandler.updates_api)
