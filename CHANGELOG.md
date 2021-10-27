@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.31.2 (2021-10-27)
+### Fix
+* **reposcan:** Skip populating empty repo data ([`b7a11b3`](https://github.com/RedHatInsights/vmaas/commit/b7a11b380dd4491d9b24eda4fb3c84af073c1ece))
+
 ## v2.31.1 (2021-10-27)
 ### Fix
 * **reposcan:** Fixed implicit json serialization warning ([`7cb9ca0`](https://github.com/RedHatInsights/vmaas/commit/7cb9ca0c807da85b941c374f10a3f0c88fafb0a7))
