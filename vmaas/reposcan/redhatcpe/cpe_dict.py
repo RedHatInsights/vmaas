@@ -4,7 +4,7 @@ Parse informations from CPE dict XML.
 
 import xml.etree.ElementTree as eT
 
-from vmaas.common.dateutil import parse_datetime
+from vmaas.common.date_utils import parse_datetime
 from vmaas.common.string import text_strip
 
 NS = {'cpe': 'http://cpe.mitre.org/dictionary/2.0'}

@@ -5,7 +5,7 @@ Module containing classes for fetching/importing modules from/into database.
 from psycopg2.extras import execute_values
 
 from vmaas.reposcan.database.object_store import ObjectStore
-from vmaas.common import rpm
+from vmaas.common import rpm_utils
 
 
 class ModulesStore(ObjectStore):
@@ -134,7 +134,7 @@ class ModulesStore(ObjectStore):
             for module in modules:
                 if 'artifacts' in module:
                     for artifact in module['artifacts']:
-                        split_pkg_name = rpm.parse_rpm_name(artifact, default_epoch='0',
+                        split_pkg_name = rpm_utils.parse_rpm_name(artifact, default_epoch='0',
                                                             raise_exception=True)
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))

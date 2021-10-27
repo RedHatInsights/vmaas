@@ -6,7 +6,7 @@ from psycopg2.extras import execute_values
 
 from vmaas.reposcan.database.database_handler import DatabaseHandler
 from vmaas.reposcan.mnm import FAILED_IMPORT_CPE, FAILED_UPDATE_CPE
-from vmaas.common.dateutil import format_datetime
+from vmaas.common.date_utils import format_datetime
 from vmaas.common.logging_utils import get_logger
 
 

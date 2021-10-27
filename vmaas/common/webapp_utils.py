@@ -5,13 +5,16 @@ Set of functions and procedures shared between different modules.
 import math
 import re
 from datetime import datetime
-from dateutil import parser as dateutil_parser
+
 import rpm
-from vmaas.common.rpm import join_rpm_name, parse_rpm_name
+from dateutil import parser as dateutil_parser
+
+from vmaas.common.rpm_utils import join_rpm_name, parse_rpm_name
 
 PKG_NAME_ID = 0
 PKG_EVR_ID = 1
 PKG_ARCH_ID = 2
+
 
 def pkg_detail2nevra(cache, pkg_detail):
     """Create package object from pkg_detail using cache object."""

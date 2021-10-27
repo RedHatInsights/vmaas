@@ -22,7 +22,7 @@ class OneLineExceptionFormatter(logging.Formatter):
     (insures one entry-per-log for some logging environments that divide on newline)
     """
 
-    # pylint: disable=arguments-differ
+    # pylint: disable=arguments-differ, arguments-renamed
     def formatException(self, exc_info):
         """
         Make sure exception-tracebacks end up on a single line.

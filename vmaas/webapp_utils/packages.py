@@ -4,7 +4,7 @@ Module for API /packages.
 from vmaas.webapp_utils.base import Request
 import vmaas.webapp_utils.database.db_handler as DB
 from vmaas.common.logging_utils import init_logging, get_logger
-from vmaas.common.rpm import parse_rpm_name, join_rpm_name
+from vmaas.common.rpm_utils import parse_rpm_name, join_rpm_name
 
 POOL_SIZE = 10
 
