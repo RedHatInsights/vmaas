@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 12);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 13);
 
 -- -----------------------------------------------------
 -- evr type
@@ -341,7 +341,7 @@ CREATE TABLE IF NOT EXISTS package (
   summary TEXT NULL, CHECK (NOT empty(summary)),
   description TEXT NULL, CHECK (NOT empty(description)),
   source_package_id INT NULL,
-  modified TIMESTAMP NOT NULL DEFAULT now(),
+  modified TIMESTAMP NOT NULL DEFAULT (now() at time zone 'utc'),
   UNIQUE (name_id, evr_id, arch_id),
   PRIMARY KEY (id),
   CONSTRAINT name_id
