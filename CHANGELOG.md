@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.0 (2021-11-02)
+### Feature
+* **webapp:** Update api spec with /pkglist endpoint ([`0b4aa64`](https://github.com/RedHatInsights/vmaas/commit/0b4aa645d2eb74022366fe7c325cde9b8cb02cd7))
+* **webapp:** Add new /pkglist endpoint ([`a542839`](https://github.com/RedHatInsights/vmaas/commit/a542839164d4251bbc03355f99e7634e4ec29f82))
+* **webapp:** Add "package_detail.modified" attribute and modified index to cache ([`50b1e4d`](https://github.com/RedHatInsights/vmaas/commit/50b1e4d642af0aa1add880de19e43be7f97ef863))
+* Added common/algorithms.py module with find_index method ([`1431ee2`](https://github.com/RedHatInsights/vmaas/commit/1431ee24bad99a38531fd048d5b22df0e4cc70fa))
+
+### Fix
+* Upgrade db, use utc default timezon for "modified" pkg attribute ([`0c96b78`](https://github.com/RedHatInsights/vmaas/commit/0c96b7870b677dd63b3fe3030a47f8c4745867c7))
+
 ## v2.31.2 (2021-10-27)
 ### Fix
 * **reposcan:** Skip populating empty repo data ([`b7a11b3`](https://github.com/RedHatInsights/vmaas/commit/b7a11b380dd4491d9b24eda4fb3c84af073c1ece))
