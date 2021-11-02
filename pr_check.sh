@@ -39,12 +39,18 @@ function process_requirements_labels() {
     if [ -f $LABELS_DIR/github_labels.txt ]; then
         requirements=$(egrep "^\"[A-Z]+-[A-Z-]*\"$" $LABELS_DIR/github_labels.txt)
         if [ -n "$requirements" ]; then
-            IQE_REQUIREMENTS="{"
+            requirements=$(echo "$requirements" | sed -e 's/"//g')
+            lines=$(echo "$requirements" | wc -l | xargs)
+            if [[ "$lines" == "1" ]]; then
+                export IQE_REQUIREMENTS="$requirements"
+                return
+            fi
+            IQE_REQUIREMENTS=""
             for req in $requirements; do
-                IQE_REQUIREMENTS="$IQE_REQUIREMENTS$requirement,"
+                IQE_REQUIREMENTS="$IQE_REQUIREMENTS$req,"
             done
-            # delete extra comma and add closing }
-            export IQE_REQUIREMENTS="${IQE_REQUIREMENTS:0:-1}}"
+            # delete extra comma
+            export IQE_REQUIREMENTS="${IQE_REQUIREMENTS%?}"
         fi
     fi
 }
