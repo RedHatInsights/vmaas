@@ -16,9 +16,17 @@ cat <<EOF > $workdir$dockerfile
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 RUN microdnf install python3 && microdnf clean all
 RUN pip3 install --upgrade pip && pip3 install --upgrade pipenv
+RUN [ "\$(uname -m)" == "aarch64" ] && \\
+    rpm -Uvh "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-\$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm" && \\
+    microdnf install --disablerepo=* --enablerepo=pgdg12 --enablerepo=ubi-8-* \\
+        libpq-devel && \\
+    microdnf clean all || true
 EOF
 
-$cmd build -t pipenv-locker -f $dockerfile $workdir
+current_dir=$(pwd)
+cd $workdir
+$cmd build -t pipenv-locker -f $dockerfile .
+cd $current_dir
 $cmd run --rm -d --name pipenv-locker-container pipenv-locker sleep infinity
 $cmd cp Pipfile pipenv-locker-container:/tmp/
 $cmd exec pipenv-locker-container bash -c "cd tmp && pipenv lock"
