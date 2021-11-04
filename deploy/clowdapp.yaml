@@ -73,7 +73,7 @@ objects:
             memory: ${MEMORY_LIMIT}
           requests:
             cpu: 500m
-            memory: 2Gi
+            memory: ${MEMORY_LIMIT}
 
     - name: reposcan-service
       minReplicas: ${{REPLICAS_REPOSCAN}}
