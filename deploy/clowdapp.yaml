@@ -32,10 +32,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBSOCKET}
-            memory: 100Mi
+            memory: ${MEMORY_LIMIT_WEBSOCKET}
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: ${CPU_LIMIT_WEBSOCKET}
+            memory: ${MEMORY_LIMIT_WEBSOCKET}
 
     - name: webapp-service
       minReplicas: ${{REPLICAS_WEBAPP}}
@@ -70,10 +70,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT}
+            memory: ${MEMORY_LIMIT_WEBAPP}
           requests:
-            cpu: 500m
-            memory: 2Gi
+            cpu: ${CPU_LIMIT_WEBAPP}
+            memory: ${MEMORY_LIMIT_WEBAPP}
 
     - name: reposcan-service
       minReplicas: ${{REPLICAS_REPOSCAN}}
@@ -111,10 +111,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_REPOSCAN}
-            memory: 2Gi
+            memory: ${MEMORY_LIMIT_REPOSCAN}
           requests:
-            cpu: 200m
-            memory: 1Gi
+            cpu: ${CPU_LIMIT_REPOSCAN}
+            memory: ${MEMORY_LIMIT_REPOSCAN}
         volumes:
         - name: vmaas-reposcan-tmp
           emptyDir: {}
@@ -311,7 +311,13 @@ parameters:
 - name: CPU_LIMIT_REPOSCAN
   description: Maximum CPU limit for pods
   value: '1000m'
-- name: MEMORY_LIMIT
+- name: MEMORY_LIMIT_WEBSOCKET
+  description: Maximum memory limit for pod
+  value: '100Mi'
+- name: MEMORY_LIMIT_WEBAPP
+  description: Maximum memory limit for pod
+  value: '2Gi'
+- name: MEMORY_LIMIT_REPOSCAN
   description: Maximum memory limit for pod
   value: '2Gi'
 - name: REPLICAS_WEBAPP
