@@ -75,6 +75,26 @@ objects:
           requests:
             cpu: 500m
             memory: ${MEMORY_LIMIT}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 120
+          timeoutSeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 120
+          timeoutSeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          failureThreshold: 5
 
     - name: reposcan-service
       minReplicas: ${{REPLICAS_REPOSCAN}}
