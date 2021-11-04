@@ -89,7 +89,6 @@ class Cache:
         self.filename = filename
         self.clear()
         self.reload()
-        self.build_indexes()
 
     def clear(self):
         """Clear dictionaries and load new data."""
@@ -149,11 +148,13 @@ class Cache:
         if self.download():
             self.clear()
             self.load_sqlite(self.filename)
+            self.build_indexes()
 
     def build_indexes(self):
         """Build additional indexes."""
         LOGGER.info("Building 'package_detail.modified' index")
         data = [id for id, _ in self.package_details.items()]
+        # pylint: disable=attribute-defined-outside-init
         self.package_details_modified_index = sorted(data, key=lambda id: self.package_details[id][PKG_MODIFIED_ID])
         LOGGER.info("Index 'package_detail.modified' done")
 
