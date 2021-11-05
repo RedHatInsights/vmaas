@@ -78,7 +78,8 @@ class PackagesAPI:
 
             # If the package is third party, then remove it from result
             if not want_third_party and is_third_party:
-                del packagelist[pkg]
+                packagelist[pkg] = {}
+                return packagelist
 
         response = {
             'package_list': packagelist,
