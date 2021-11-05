@@ -197,6 +197,8 @@ objects:
           value: ${OVAL_FEED_BASE_URL}
         - name: OVAL_LABEL_FILTER
           value: ${OVAL_LABEL_FILTER}
+        - name: REDHAT_CVEMAP_URL
+          value: ${REDHAT_CVEMAP_URL}
 
     database:
       name: vmaas
@@ -418,3 +420,5 @@ parameters:
 - name: POSTGRESQL_PASSWORD
   description: Database user password
   value: vmaas_writer_pwd
+- name: REDHAT_CVEMAP_URL
+  value: https://www.redhat.com/security/data/metrics/cvemap.xml
