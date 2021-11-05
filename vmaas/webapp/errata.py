@@ -83,9 +83,11 @@ class ErrataAPI:
         return ret
 
     def _errata_releasevers(self, errata_id):
-        releasevers = list(set(self.cache.repo_detail[rid][REPO_RELEASEVER]
-                               for rid in self.cache.errataid2repoids.get(errata_id, [])))
-        return list(releasevers)
+        releasevers = set(self.cache.repo_detail[rid][REPO_RELEASEVER]
+                          for rid in self.cache.errataid2repoids.get(errata_id, []))
+        # remove empty items and convert to list
+        releasevers = [x for x in releasevers if x is not None and x != '']
+        return releasevers
 
     def try_expand_by_regex(self, erratas: list) -> list:
         """Expand list with a POSIX regex if possible"""
