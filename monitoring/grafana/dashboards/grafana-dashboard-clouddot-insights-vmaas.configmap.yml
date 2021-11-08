@@ -1065,7 +1065,7 @@ data:
             "options": [],
             "query": "prometheus",
             "refresh": 1,
-            "regex": "/devel-prometheus|crc-stg-01-prometheus|crcp01ue1-prometheus/",
+            "regex": "/devel-prometheus|crcs02ue1-prometheus|crcp01ue1-prometheus/",
             "skipUrlSync": false,
             "type": "datasource"
           },
