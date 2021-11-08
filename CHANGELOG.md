@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.1 (2021-11-08)
+### Fix
+* **webapp:** Remove empty release versions from list ([`77d7267`](https://github.com/RedHatInsights/vmaas/commit/77d72670271c71ddeaf3414c2b47eea7d430acfb))
+
 ## v2.32.0 (2021-11-02)
 ### Feature
 * **webapp:** Update api spec with /pkglist endpoint ([`0b4aa64`](https://github.com/RedHatInsights/vmaas/commit/0b4aa645d2eb74022366fe7c325cde9b8cb02cd7))
