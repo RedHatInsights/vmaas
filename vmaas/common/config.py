@@ -34,6 +34,7 @@ class BaseConfig:
         self.public_port = None
         self.private_port = None
         self.webapp_port = None
+        self.metrics_port = None
 
 
 # pylint: disable=too-many-instance-attributes
@@ -85,6 +86,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.web_port = cfg.webPort
         self.public_port = cfg.publicPort
         self.private_port = cfg.privatePort
+        self.metrics_port = cfg.metricsPort
 
     def legacy(self):
         """Configuration fro environment variables."""
@@ -109,3 +111,4 @@ class Config(BaseConfig, metaclass=Singleton):
         self.reposcan_port = int(os.getenv("REPOSCAN_PORT", "8081"))
         self.webapp_port = "8080"
         self.remote_dump = f"rsync://{self.reposcan_host}:8730/data/vmaas.db"
+        self.metrics_port = os.getenv("PROMETHEUS_PORT", "")

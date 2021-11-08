@@ -43,6 +43,7 @@ services:
     ports:
       - 8081:8081
       - 8730:8730
+      - 9082:9082
     volumes:
       - vmaas-dump-data:/data:z
     depends_on:
@@ -59,6 +60,7 @@ services:
       - ./conf/webapp.env
     ports:
       - 8080:8080
+      - 9081:9081
     depends_on:
       - vmaas_websocket
       - vmaas_reposcan

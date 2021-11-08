@@ -44,7 +44,8 @@ objects:
           enabled: true
         private:
           enabled: false
-        metrics: {}
+        metrics:
+          enabled: true
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         command:
@@ -82,7 +83,8 @@ objects:
           enabled: true
         private:
           enabled: true
-        metrics: {}
+        metrics:
+          enabled: true
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         initContainers:
