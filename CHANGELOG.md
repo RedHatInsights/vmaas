@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.2 (2021-11-08)
+### Fix
+* **webapp:** Rebuild index array on cache reload ([`9062a6e`](https://github.com/RedHatInsights/vmaas/commit/9062a6e033026e227e2bc075ce99d2d2d5ddf88b))
+
 ## v2.32.1 (2021-11-08)
 ### Fix
 * **webapp:** Remove empty release versions from list ([`77d7267`](https://github.com/RedHatInsights/vmaas/commit/77d72670271c71ddeaf3414c2b47eea7d430acfb))
