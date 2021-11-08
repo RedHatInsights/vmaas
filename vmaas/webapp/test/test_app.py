@@ -116,7 +116,7 @@ class TestWebappPosts(BaseCase):
         body = """{"package_list": ["my-pkg-1.1.0-1.el8.i686"]}"""
         resp = await self.fetch('/api/v1/packages', method='POST', data=body)
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
+        assert resp.body.find('"package_list": {"my-pkg-1.1.')
 
     async def test_pkgtree_post_1(self):
         """Test pkgtree post endpoint."""
@@ -190,19 +190,19 @@ class TestWebappGets(BaseCase):
         """Test packages get endpoint."""
         resp = await self.fetch('/api/v1/packages/my-pkg-1.1.0-1.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
+        assert resp.body.find('"package_list": {"my-pkg-1.1.')
 
     async def test_packages_get_2_tilda(self):
         """Test packages get endpoint."""
         resp = await self.fetch('/api/v1/packages/my-pkg-1.1.0-1~beta.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
+        assert resp.body.find('"package_list": {"my-pkg-1.1.')
 
     async def test_packages_get_3_caret(self):
         """Test packages get endpoint."""
         resp = await self.fetch('/api/v1/packages/my-pkg-1.1.0-1^.el8.i686', method='GET')
         assert HTTPStatus.OK == resp.status
-        assert resp.body[:30] == '{"package_list": {"my-pkg-1.1.'
+        assert resp.body.find('"package_list": {"my-pkg-1.1.')
 
     async def test_pkgtree_get_1(self):
         """Test pkgtree get endpoint."""

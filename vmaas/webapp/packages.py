@@ -42,8 +42,14 @@ class PackagesAPI:
         want_third_party = data.get('third_party', False)
 
         packagelist = {}
+
+        response = {
+            'last_change': utils.format_datetime(self.cache.dbchange['last_change'])
+        }
+
         if not packages:
-            return packagelist
+            response['package_list'] = packagelist
+            return response
 
         for pkg in packages:
             packagedata = packagelist.setdefault(pkg, {})
@@ -78,11 +84,8 @@ class PackagesAPI:
 
             # If the package is third party, then remove it from result
             if not want_third_party and is_third_party:
-                del packagelist[pkg]
+                packagelist[pkg] = {}
 
-        response = {
-            'package_list': packagelist,
-            'last_change': utils.format_datetime(self.cache.dbchange['last_change'])
-        }
 
+        response['package_list'] = packagelist
         return response
