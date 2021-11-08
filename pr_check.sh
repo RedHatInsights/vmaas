@@ -20,9 +20,9 @@ export IQE_CJI_TIMEOUT="30m"
 
 # Heavily inspired by project-koku pr_check
 # https://github.com/project-koku/koku/blob/main/pr_check.sh
-ARTIFACTS_DIR="$WORKSPACE/artifacts"
+LABELS_DIR="$WORKSPACE/github_labels"
 
-mkdir -p $ARTIFACTS_DIR
+mkdir -p $LABELS_DIR
 exit_code=0
 task_arr=([1]="Build" [2]="Deploy" [3]="Smoke Tests")
 error_arr=([1]="The PR is labeled to not build the test image" \
@@ -30,14 +30,14 @@ error_arr=([1]="The PR is labeled to not build the test image" \
            [3]="The PR is labeled to not run smoke tests")
 
 function check_for_labels() {
-    if [ -f $ARTIFACTS_DIR/github_labels.txt ]; then
-        egrep "$1" $ARTIFACTS_DIR/github_labels.txt &>/dev/null
+    if [ -f $LABELS_DIR/github_labels.txt ]; then
+        egrep "$1" $LABELS_DIR/github_labels.txt &>/dev/null
     fi
 }
 
 function process_requirements_labels() {
-    if [ -f $ARTIFACTS_DIR/github_labels.txt ]; then
-        requirements=$(egrep "^\"[A-Z]+-[A-Z-]*\"$" $ARTIFACTS_DIR/github_labels.txt)
+    if [ -f $LABELS_DIR/github_labels.txt ]; then
+        requirements=$(egrep "^\"[A-Z]+-[A-Z-]*\"$" $LABELS_DIR/github_labels.txt)
         if [ -n "$requirements" ]; then
             IQE_REQUIREMENTS="{"
             for req in $requirements; do
@@ -74,7 +74,7 @@ EOF
 # Save PR labels into a file
 set -ex
 # GH_API_URL="${GITHUB_API_URL:-https://api.github.com/}"  # don't use app-sre github api mirror for now
-curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/search/issues\?q\=sha:$ghprbActualCommit | jq '.items[].labels[].name' > $ARTIFACTS_DIR/github_labels.txt
+curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/search/issues\?q\=sha:$ghprbActualCommit | jq '.items[].labels[].name' > $LABELS_DIR/github_labels.txt
 
 if check_for_labels "skip-build"; then
     echo "PR check skipped"
@@ -106,6 +106,8 @@ if [[ $exit_code == 0 ]]; then
         fi
     fi
 fi
+
+cp $LABELS_DIR/github_labels.txt $ARTIFACTS_DIR/github_labels.txt
 
 if [[ $exit_code != 0 ]]
 then
