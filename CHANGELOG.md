@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.3 (2021-11-08)
+### Fix
+* **webapp:** Aiohttp 3.8.0 - don't create new event loop, fix websocket connection ([`2fb0494`](https://github.com/RedHatInsights/vmaas/commit/2fb0494d568fd4c17eb6be3995fee86b306eb3f9))
+
 ## v2.32.2 (2021-11-08)
 ### Fix
 * **webapp:** Rebuild index array on cache reload ([`9062a6e`](https://github.com/RedHatInsights/vmaas/commit/9062a6e033026e227e2bc075ce99d2d2d5ddf88b))
