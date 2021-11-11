@@ -2,11 +2,14 @@
 Module to handle /packages API calls.
 """
 
+import datetime
+
 from vmaas.webapp.cache import REPO_LABEL, REPO_NAME, REPO_BASEARCH, REPO_RELEASEVER, PKG_SUMMARY_ID, PKG_DESC_ID, \
-    PKG_SOURCE_PKG_ID, REPO_THIRD_PARTY
+    PKG_SOURCE_PKG_ID, REPO_THIRD_PARTY, PKG_MODIFIED_ID
 import vmaas.common.webapp_utils as utils
 from vmaas.common.rpm_utils import parse_rpm_name
 
+UTC = datetime.timezone.utc
 
 class PackagesAPI:
     """ Main /packages API class."""
@@ -70,6 +73,8 @@ class PackagesAPI:
                     packagedata['source_package'] = self._get_source_package(pkg_detail)
                     packagedata['repositories'] = []
                     packagedata['package_list'] = self._get_built_binary_packages(pkg_id)
+                    packagedata['last_updated'] = utils.format_datetime(
+                        datetime.datetime.fromtimestamp(self.cache.package_details[pkg_id][PKG_MODIFIED_ID], tz=UTC))
                     if pkg_id in self.cache.pkgid2repoids:
                         for repo_id in self.cache.pkgid2repoids[pkg_id]:
                             repodetail = self.cache.repo_detail[repo_id]

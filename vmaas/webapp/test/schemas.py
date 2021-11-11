@@ -38,6 +38,7 @@ _pkgs_list = {
     "source_package": Or(str, None),
     "package_list": list,
     "repositories": [{"label": str, "name": str, "basearch": str, "releasever": str}],
+    "last_updated": str,
 }
 
 _pkgtree_top = {
