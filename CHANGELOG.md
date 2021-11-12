@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.4 (2021-11-12)
+### Fix
+* **webapp:** Use common function for parsing evr ([`0724a04`](https://github.com/RedHatInsights/vmaas/commit/0724a04a8cb97cedef1ddeee26430816c43adbeb))
+
 ## v2.32.3 (2021-11-08)
 ### Fix
 * **webapp:** Aiohttp 3.8.0 - don't create new event loop, fix websocket connection ([`2fb0494`](https://github.com/RedHatInsights/vmaas/commit/2fb0494d568fd4c17eb6be3995fee86b306eb3f9))
