@@ -76,6 +76,10 @@ set -ex
 # GH_API_URL="${GITHUB_API_URL:-https://api.github.com/}"  # don't use app-sre github api mirror for now
 curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/search/issues\?q\=sha:$ghprbActualCommit | jq '.items[].labels[].name' > $LABELS_DIR/github_labels.txt
 
+if check_for_labels "keep-namespace"; then
+    export KEEP_NAMESPACE=TRUE
+fi
+
 if check_for_labels "skip-build"; then
     echo "PR check skipped"
     exit_code=1
