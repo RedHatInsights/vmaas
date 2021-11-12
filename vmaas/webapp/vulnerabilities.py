@@ -1,9 +1,9 @@
 """
 Module to handle /vulnerabilities API calls.
 """
-import re
 
 from vmaas.webapp.cache import ERRATA_CVE
+from vmaas.common.rpm_utils import rpmver2array
 from vmaas.common.webapp_utils import format_datetime
 
 OVAL_OPERATION_EVR_EQUALS = 1
@@ -26,11 +26,6 @@ class VulnerabilitiesAPI:
         self.db_cache = db_cache
         self.updates_api = updates_api
 
-    @staticmethod
-    def _get_num_tuple(text):
-        return tuple((int(part),) if part.isdigit() else (0, part) for part
-                     in list(filter(lambda x: x and x != ".", re.split(r"(\d+)", text))))
-
     def _evaluate_state(self, state, epoch, ver, rel, arch):
         oval_state_id, evr_id, oval_operation_evr = state
         matched = False
@@ -39,12 +34,12 @@ class VulnerabilitiesAPI:
         if oval_operation_evr == OVAL_OPERATION_EVR_EQUALS:
             matched = epoch == candidate_epoch and ver == candidate_ver and rel == candidate_rel
         elif oval_operation_evr == OVAL_OPERATION_EVR_LESS_THAN:
-            epoch = self._get_num_tuple(epoch)
-            candidate_epoch = self._get_num_tuple(candidate_epoch)
-            ver = self._get_num_tuple(ver)
-            candidate_ver = self._get_num_tuple(candidate_ver)
-            rel = self._get_num_tuple(rel)
-            candidate_rel = self._get_num_tuple(candidate_rel)
+            epoch = rpmver2array(epoch)
+            candidate_epoch = rpmver2array(candidate_epoch)
+            ver = rpmver2array(ver)
+            candidate_ver = rpmver2array(candidate_ver)
+            rel = rpmver2array(rel)
+            candidate_rel = rpmver2array(candidate_rel)
 
             matched = ((epoch < candidate_epoch) or
                        (epoch == candidate_epoch and ver < candidate_ver) or
