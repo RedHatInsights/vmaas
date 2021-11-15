@@ -20,7 +20,7 @@ ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
 ARG PIPENV_PYUP_API_KEY=""
-RUN pip3 install --upgrade pipenv && \
+RUN pip3 install --upgrade pipenv==2021.11.9 && \
     pipenv install --ignore-pipfile --deploy --system && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system ; fi
 

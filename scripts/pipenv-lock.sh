@@ -15,7 +15,7 @@ echo "Using: $cmd"
 cat <<EOF > $workdir$dockerfile
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 RUN microdnf install python3 && microdnf clean all
-RUN pip3 install --upgrade pip && pip3 install --upgrade pipenv
+RUN pip3 install --upgrade pip && pip3 install --upgrade pipenv==2021.11.9
 RUN [ "\$(uname -m)" == "aarch64" ] && \\
     rpm -Uvh "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-\$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm" && \\
     microdnf install --disablerepo=* --enablerepo=pgdg12 --enablerepo=ubi-8-* \\
