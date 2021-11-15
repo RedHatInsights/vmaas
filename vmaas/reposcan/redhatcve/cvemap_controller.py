@@ -6,7 +6,7 @@ import os
 import shutil
 import tempfile
 
-from vmaas.common.date_utils import parse_datetime
+from vmaas.common.date_utils import parse_datetime, now
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.cvemap_store import CvemapStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
@@ -46,17 +46,17 @@ class CvemapController:
 
     def _read_head(self, failed):
         """Reads downloaded meta files and checks for updates."""
+        header_path = self._tmp_head()
         if not failed:
-            header_path = self._tmp_head()
             header = CvemapHead(header_path)
-
             # already synced before?
             db_lastmodified = parse_datetime(self.cvemap_store.lastmodified())
-            # db_lastmodified = None
             self.lastmodified = parse_datetime(header.get_lastmodified())
+            # if header doesn't have last-modified
+            if self.lastmodified is None:
+                self.lastmodified = now()
             # synced for the first time or has newer revision
             if (db_lastmodified is None
-                    or self.lastmodified is None
                     or self.lastmodified > db_lastmodified):
                 self.updated = True
             else:
