@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.5 (2021-11-15)
+### Fix
+* **reposcan:** Do not store 'None' string if last-modified header is not available ([`55e908a`](https://github.com/RedHatInsights/vmaas/commit/55e908a44734848c67f03d8e1c39f16c675027b8))
+
 ## v2.32.4 (2021-11-12)
 ### Fix
 * **webapp:** Use common function for parsing evr ([`0724a04`](https://github.com/RedHatInsights/vmaas/commit/0724a04a8cb97cedef1ddeee26430816c43adbeb))
