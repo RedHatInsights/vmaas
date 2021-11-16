@@ -221,7 +221,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-reposcan\"}[$__range]))",
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-reposcan-service\"}[$__range]))",
               "format": "time_series",
               "groupBy": [
                 {
@@ -339,7 +339,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-webapp\"}[$__range]))",
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-webapp-service\"}[$__range]))",
               "format": "time_series",
               "groupBy": [
                 {
@@ -457,7 +457,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-websocket\"}[$__range]))",
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{container=\"vmaas-websocket-service\"}[$__range]))",
               "format": "time_series",
               "groupBy": [
                 {
