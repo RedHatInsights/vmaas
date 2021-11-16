@@ -151,9 +151,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 refresh_maps_func(cur)
             if to_delete:
                 cur.execute(f"""delete from {table_name} where file_id = %s and oval_id in %s
-                                returning id, {', '.join(cols)}
-                             """, (file_id, tuple(to_delete)))
-                refresh_maps_func(cur)
+                                returning file_id, oval_id""",
+                            (file_id, tuple(to_delete)))
+                refresh_maps_func(cur, delete=True)
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
             self.logger.exception("Failure while inserting, updating or deleting %s data: ", entity)
@@ -221,10 +221,14 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             to_insert_row = (file_id, item["id"], name_id, item["version"])
         return to_insert_row, to_update_row
 
-    def _object_refresh_maps(self, cur):
+    def _object_refresh_maps(self, cur, delete=False):
         """Add imported data to caches."""
-        for obj_id, file_id, oval_id, name_id, version in cur.fetchall():
-            self.oval_object_map[(file_id, oval_id)] = (obj_id, name_id, version)
+        if not delete:
+            for obj_id, file_id, oval_id, name_id, version in cur.fetchall():
+                self.oval_object_map[(file_id, oval_id)] = (obj_id, name_id, version)
+        else:
+            for file_id, oval_id in cur.fetchall():
+                del self.oval_object_map[(file_id, oval_id)]
 
     def _objects_to_delete(self, file_id, latest_data):
         """Get list of oval_ids which are in DB but not in latest file."""
@@ -264,10 +268,14 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             to_insert_row = (file_id, item["id"], evr_id, evr_operation_id, item["version"])
         return to_insert_row, to_update_row
 
-    def _state_refresh_maps(self, cur):
+    def _state_refresh_maps(self, cur, delete=False):
         """Add imported data to caches."""
-        for state_id, file_id, oval_id, evr_id, evr_operation_id, version in cur.fetchall():
-            self.oval_state_map[(file_id, oval_id)] = (state_id, evr_id, evr_operation_id, version)
+        if not delete:
+            for state_id, file_id, oval_id, evr_id, evr_operation_id, version in cur.fetchall():
+                self.oval_state_map[(file_id, oval_id)] = (state_id, evr_id, evr_operation_id, version)
+        else:
+            for file_id, oval_id in cur.fetchall():
+                del self.oval_state_map[(file_id, oval_id)]
 
     def _states_to_delete(self, file_id, latest_data):
         """Get list of oval_ids which are in DB but not in latest file."""
@@ -328,11 +336,15 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             to_insert_row = (file_id, item["id"], rpminfo_object_id, check_id, check_existence_id, item["version"])
         return to_insert_row, to_update_row
 
-    def _test_refresh_maps(self, cur):
+    def _test_refresh_maps(self, cur, delete=False):
         """Add imported data to caches."""
-        for test_id, file_id, oval_id, rpminfo_object_id, check_id, check_existence_id, version in cur.fetchall():
-            self.oval_test_map[(file_id, oval_id)] = (test_id, rpminfo_object_id, check_id,
-                                                      check_existence_id, version)
+        if not delete:
+            for test_id, file_id, oval_id, rpminfo_object_id, check_id, check_existence_id, version in cur.fetchall():
+                self.oval_test_map[(file_id, oval_id)] = (test_id, rpminfo_object_id, check_id,
+                                                          check_existence_id, version)
+        else:
+            for file_id, oval_id in cur.fetchall():
+                del self.oval_test_map[(file_id, oval_id)]
 
     def _tests_to_delete(self, file_id, latest_data):
         """Get list of oval_ids which are in DB but not in latest file."""
@@ -364,10 +376,14 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             to_insert_row = (file_id, item["id"], item["module_stream"], item["version"])
         return to_insert_row, to_update_row
 
-    def _module_test_refresh_maps(self, cur):
+    def _module_test_refresh_maps(self, cur, delete=False):
         """Add imported data to caches."""
-        for test_id, file_id, oval_id, module_stream, version in cur.fetchall():
-            self.oval_module_test_map[(file_id, oval_id)] = (test_id, module_stream, version)
+        if not delete:
+            for test_id, file_id, oval_id, module_stream, version in cur.fetchall():
+                self.oval_module_test_map[(file_id, oval_id)] = (test_id, module_stream, version)
+        else:
+            for file_id, oval_id in cur.fetchall():
+                del self.oval_module_test_map[(file_id, oval_id)]
 
     def _module_tests_to_delete(self, file_id, latest_data):
         """Get list of oval_ids which are in DB but not in latest file."""
@@ -490,11 +506,15 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             to_insert_row = (file_id, item["id"], definition_type, criteria_id, item["version"])
         return to_insert_row, to_update_row
 
-    def _definition_refresh_maps(self, cur):
+    def _definition_refresh_maps(self, cur, delete=False):
         """Add imported data to caches."""
-        for definition_id, file_id, oval_id, definition_type_id, criteria_id, version in cur.fetchall():
-            self.oval_definition_map[(file_id, oval_id)] = (definition_id, definition_type_id,
-                                                            criteria_id, version)
+        if not delete:
+            for definition_id, file_id, oval_id, definition_type_id, criteria_id, version in cur.fetchall():
+                self.oval_definition_map[(file_id, oval_id)] = (definition_id, definition_type_id,
+                                                                criteria_id, version)
+        else:
+            for file_id, oval_id in cur.fetchall():
+                del self.oval_definition_map[(file_id, oval_id)]
 
     def _definitions_to_delete(self, file_id, latest_data):
         """Get list of oval_ids which are in DB but not in latest file."""
