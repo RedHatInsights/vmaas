@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 13);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 14);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1011,7 +1011,8 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_state_arch (
   UNIQUE (rpminfo_state_id, arch_id),
   CONSTRAINT rpminfo_state_id
     FOREIGN KEY (rpminfo_state_id)
-    REFERENCES oval_rpminfo_state (id),
+    REFERENCES oval_rpminfo_state (id)
+    ON DELETE CASCADE,
   CONSTRAINT arch_id
     FOREIGN KEY (arch_id)
     REFERENCES arch (id)
@@ -1036,7 +1037,8 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test (
     REFERENCES oval_file (id),
   CONSTRAINT rpminfo_object_id
     FOREIGN KEY (rpminfo_object_id)
-    REFERENCES oval_rpminfo_object (id),
+    REFERENCES oval_rpminfo_object (id)
+    ON DELETE CASCADE,
   CONSTRAINT check_id
     FOREIGN KEY (check_id)
     REFERENCES oval_check_rpminfo (id),
@@ -1056,10 +1058,12 @@ CREATE TABLE IF NOT EXISTS oval_rpminfo_test_state (
   UNIQUE (rpminfo_test_id, rpminfo_state_id),
   CONSTRAINT rpminfo_test_id
     FOREIGN KEY (rpminfo_test_id)
-    REFERENCES oval_rpminfo_test (id),
+    REFERENCES oval_rpminfo_test (id)
+    ON DELETE CASCADE,
   CONSTRAINT rpminfo_state_id
     FOREIGN KEY (rpminfo_state_id)
     REFERENCES oval_rpminfo_state (id)
+    ON DELETE CASCADE
 )TABLESPACE pg_default;
 
 CREATE INDEX ON oval_rpminfo_test_state(rpminfo_state_id); -- deletion performance
@@ -1114,10 +1118,12 @@ CREATE TABLE IF NOT EXISTS oval_criteria_dependency (
     REFERENCES oval_criteria (id),
   CONSTRAINT dep_test_id
     FOREIGN KEY (dep_test_id)
-    REFERENCES oval_rpminfo_test (id),
+    REFERENCES oval_rpminfo_test (id)
+    ON DELETE CASCADE,
   CONSTRAINT dep_module_test_id
     FOREIGN KEY (dep_module_test_id)
     REFERENCES oval_module_test (id)
+    ON DELETE CASCADE
 )TABLESPACE pg_default;
 
 CREATE UNIQUE INDEX ocd_dep_criteria_id_dep_test_id_1 ON oval_criteria_dependency (parent_criteria_id, dep_criteria_id)
@@ -1165,10 +1171,12 @@ CREATE TABLE IF NOT EXISTS oval_definition_test (
   UNIQUE (definition_id, rpminfo_test_id),
   CONSTRAINT definition_id
     FOREIGN KEY (definition_id)
-    REFERENCES oval_definition (id),
+    REFERENCES oval_definition (id)
+    ON DELETE CASCADE,
   CONSTRAINT rpminfo_test_id
     FOREIGN KEY (rpminfo_test_id)
     REFERENCES oval_rpminfo_test (id)
+    ON DELETE CASCADE
 )TABLESPACE pg_default;
 
 CREATE INDEX ON oval_definition_test(rpminfo_test_id); -- deletion performance
@@ -1182,7 +1190,8 @@ CREATE TABLE IF NOT EXISTS oval_definition_cve (
   UNIQUE (definition_id, cve_id),
   CONSTRAINT definition_id
     FOREIGN KEY (definition_id)
-    REFERENCES oval_definition (id),
+    REFERENCES oval_definition (id)
+    ON DELETE CASCADE,
   CONSTRAINT cve_id
     FOREIGN KEY (cve_id)
     REFERENCES cve (id)
@@ -1198,7 +1207,8 @@ CREATE TABLE IF NOT EXISTS oval_definition_errata (
   UNIQUE (definition_id, errata_id),
   CONSTRAINT definition_id
     FOREIGN KEY (definition_id)
-    REFERENCES oval_definition (id),
+    REFERENCES oval_definition (id)
+    ON DELETE CASCADE,
   CONSTRAINT errata_id
     FOREIGN KEY (errata_id)
     REFERENCES errata (id)
@@ -1216,7 +1226,8 @@ CREATE TABLE IF NOT EXISTS oval_definition_cpe (
   UNIQUE (definition_id, cpe_id),
   CONSTRAINT definition_id
     FOREIGN KEY (definition_id)
-    REFERENCES oval_definition (id),
+    REFERENCES oval_definition (id)
+    ON DELETE CASCADE,
   CONSTRAINT cpe_id
     FOREIGN KEY (cpe_id)
     REFERENCES cpe (id)
