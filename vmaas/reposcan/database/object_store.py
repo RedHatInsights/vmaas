@@ -42,7 +42,7 @@ class ObjectStore:
         cur.close()
         return modules_in_repo
 
-    def _prepare_table_map(self, cols, table, to_cols=None):
+    def _prepare_table_map(self, cols, table, to_cols=None, where=None):
         """Create map from table map[columns] -> or(column, tuple(columns))."""
         if not to_cols:
             to_cols = ["id"]
@@ -51,6 +51,8 @@ class ObjectStore:
         table_map = {}
         cur = self.conn.cursor()
         sql = "select %s, %s from %s" % (", ".join(cols), ", ".join(to_cols), table)
+        if where:
+            sql = f"{sql} where {where}"
         cur.execute(sql)
         for row in cur.fetchall():
             if cols_len == 1:

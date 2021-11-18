@@ -28,23 +28,11 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         self.oval_file_map = self._prepare_table_map(cols=["oval_id"], to_cols=["id", "updated"], table="oval_file")
         self.oval_check_map = self._prepare_table_map(cols=["name"], table="oval_check_rpminfo")
         self.oval_check_existence_map = self._prepare_table_map(cols=["name"], table="oval_check_existence_rpminfo")
-        self.oval_object_map = self._prepare_table_map(cols=["file_id", "oval_id"],
-                                                       to_cols=["id", "package_name_id", "version"],
-                                                       table="oval_rpminfo_object")
-        self.oval_state_map = self._prepare_table_map(cols=["file_id", "oval_id"],
-                                                      to_cols=["id", "evr_id", "evr_operation_id", "version"],
-                                                      table="oval_rpminfo_state")
-        self.oval_test_map = self._prepare_table_map(cols=["file_id", "oval_id"],
-                                                     to_cols=["id", "rpminfo_object_id", "check_id",
-                                                              "check_existence_id", "version"],
-                                                     table="oval_rpminfo_test")
-        self.oval_module_test_map = self._prepare_table_map(cols=["file_id", "oval_id"],
-                                                            to_cols=["id", "module_stream", "version"],
-                                                            table="oval_module_test")
-        self.oval_definition_map = self._prepare_table_map(cols=["file_id", "oval_id"],
-                                                           to_cols=["id", "definition_type_id",
-                                                                    "criteria_id", "version"],
-                                                           table="oval_definition")
+        self.oval_object_map = {}
+        self.oval_state_map = {}
+        self.oval_test_map = {}
+        self.oval_module_test_map = {}
+        self.oval_definition_map = {}
         self.oval_definition_type_map = self._prepare_table_map(cols=["name"], table="oval_definition_type")
         self.oval_criteria_operator_map = self._prepare_table_map(cols=["name"], table="oval_criteria_operator")
 
@@ -236,6 +224,10 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 if f_id == file_id and oval_id not in latest_data]
 
     def _populate_objects(self, oval_file_id, objects):
+        self.oval_object_map = self._prepare_table_map(cols=["file_id", "oval_id"],
+                                                       to_cols=["id", "package_name_id", "version"],
+                                                       table="oval_rpminfo_object",
+                                                       where=f"file_id = {oval_file_id}")
         # Populate missing package names
         self.package_store.populate_dep_table("package_name", {obj["name"] for obj in objects},
                                               self.package_store.package_name_map)
@@ -283,6 +275,10 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 if f_id == file_id and oval_id not in latest_data]
 
     def _populate_states(self, oval_file_id, states):
+        self.oval_state_map = self._prepare_table_map(cols=["file_id", "oval_id"],
+                                                      to_cols=["id", "evr_id", "evr_operation_id", "version"],
+                                                      table="oval_rpminfo_state",
+                                                      where=f"file_id = {oval_file_id}")
         # Parse EVR first
         for state in states:
             if state['evr'] is not None:
@@ -352,6 +348,11 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 if f_id == file_id and oval_id not in latest_data]
 
     def _populate_tests(self, oval_file_id, tests):
+        self.oval_test_map = self._prepare_table_map(cols=["file_id", "oval_id"],
+                                                     to_cols=["id", "rpminfo_object_id", "check_id",
+                                                              "check_existence_id", "version"],
+                                                     table="oval_rpminfo_test",
+                                                     where=f"file_id = {oval_file_id}")
         # Insert/update data
         self._populate_data("tests", oval_file_id, tests, self._test_import_check, "oval_rpminfo_test",
                             ["file_id", "oval_id", "rpminfo_object_id", "check_id", "check_existence_id", "version"],
@@ -392,6 +393,10 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 if f_id == file_id and oval_id not in latest_data]
 
     def _populate_module_tests(self, oval_file_id, module_tests):
+        self.oval_module_test_map = self._prepare_table_map(cols=["file_id", "oval_id"],
+                                                            to_cols=["id", "module_stream", "version"],
+                                                            table="oval_module_test",
+                                                            where=f"file_id = {oval_file_id}")
         # Insert/update data
         self._populate_data("module-tests", oval_file_id, module_tests, self._module_test_import_check,
                             "oval_module_test", ["file_id", "oval_id", "module_stream", "version"],
@@ -524,6 +529,11 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 if f_id == file_id and oval_id not in latest_data]
 
     def _populate_definitions(self, oval_file_id, definitions):
+        self.oval_definition_map = self._prepare_table_map(cols=["file_id", "oval_id"],
+                                                           to_cols=["id", "definition_type_id",
+                                                                    "criteria_id", "version"],
+                                                           table="oval_definition",
+                                                           where=f"file_id = {oval_file_id}")
         # Insert/update data
         self._populate_data("definitions", oval_file_id, definitions, self._definition_import_check,
                             "oval_definition", ["file_id", "oval_id", "definition_type_id", "criteria_id", "version"],
