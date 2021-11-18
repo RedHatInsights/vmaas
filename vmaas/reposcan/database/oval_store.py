@@ -119,7 +119,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         return db_id_row[0]
 
     def _populate_data(self, entity, file_id, data, item_check_func, table_name, cols, refresh_maps_func,
-                       items_to_delete_func):
+                       items_to_delete_func, update_tmpl_str):
         """Generic method to populate table with OVAL entity (objects, states, tests, etc.)."""
         to_insert = []
         to_update = []
@@ -147,7 +147,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                                    where {table_name}.id = v.id
                                    returning {table_name}.id, {', '.join([f'{table_name}.{col}' for col in cols])}
                                 """,
-                               to_update, page_size=len(to_update))
+                               to_update, page_size=len(to_update), template=update_tmpl_str)
                 refresh_maps_func(cur)
             if to_delete:
                 cur.execute(f"""delete from {table_name} where file_id = %s and oval_id in %s
@@ -242,7 +242,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         # Insert/update data
         self._populate_data("objects", oval_file_id, objects, self._object_import_check, "oval_rpminfo_object",
                             ["file_id", "oval_id", "package_name_id", "version"], self._object_refresh_maps,
-                            self._objects_to_delete)
+                            self._objects_to_delete, "(%s::int, %s::int, %s, %s::int, %s::int)")
 
     def _state_import_check(self, file_id, item):
         """Check if state is in DB to insert/update."""
@@ -295,7 +295,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         # Insert/update data
         self._populate_data("states", oval_file_id, states, self._state_import_check, "oval_rpminfo_state",
                             ["file_id", "oval_id", "evr_id", "evr_operation_id", "version"], self._state_refresh_maps,
-                            self._states_to_delete)
+                            self._states_to_delete, "(%s::int, %s::int, %s, %s::int, %s::int, %s::int)")
         for state in states:
             if state["arch_operation"] is not None and state["arch_operation"] not in self.SUPPORTED_ARCH_OPERATIONS:
                 self.logger.warning("Unsupported arch operation: %s", state["arch_operation"])
@@ -355,7 +355,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         # Insert/update data
         self._populate_data("tests", oval_file_id, tests, self._test_import_check, "oval_rpminfo_test",
                             ["file_id", "oval_id", "rpminfo_object_id", "check_id", "check_existence_id", "version"],
-                            self._test_refresh_maps, self._tests_to_delete)
+                            self._test_refresh_maps, self._tests_to_delete,
+                            "(%s::int, %s::int, %s, %s::int, %s::int, %s::int, %s::int)")
         for test in tests:
             if (oval_file_id, test["id"]) in self.oval_test_map:  # Make sure test is imported
                 states = [{"id": state} for state in test["states"]]
@@ -394,7 +395,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         # Insert/update data
         self._populate_data("module-tests", oval_file_id, module_tests, self._module_test_import_check,
                             "oval_module_test", ["file_id", "oval_id", "module_stream", "version"],
-                            self._module_test_refresh_maps, self._module_tests_to_delete)
+                            self._module_test_refresh_maps, self._module_tests_to_delete,
+                            "(%s::int, %s::int, %s, %s, %s::int)")
 
     def _populate_definition_criteria(self, cur, file_id, criteria, current_criteria_id):
         # pylint: disable=too-many-branches, too-many-statements
@@ -525,7 +527,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
         # Insert/update data
         self._populate_data("definitions", oval_file_id, definitions, self._definition_import_check,
                             "oval_definition", ["file_id", "oval_id", "definition_type_id", "criteria_id", "version"],
-                            self._definition_refresh_maps, self._definitions_to_delete)
+                            self._definition_refresh_maps, self._definitions_to_delete,
+                            "(%s::int, %s::int, %s, %s::int, %s::int, %s::int)")
         for definition in definitions:
             if (oval_file_id, definition["id"]) in self.oval_definition_map:  # Make sure definition is imported
                 cves = [{"id": cve} for cve in definition["cves"]]
