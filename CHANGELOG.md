@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.6 (2021-11-19)
+### Fix
+* **reposcan:** Fetch actual data from db progressively ([`bbaf703`](https://github.com/RedHatInsights/vmaas/commit/bbaf7039ce048cd2b2c4aa13412ca4140c9a38c8))
+* **reposcan:** Add template strings to properly update ([`60bf563`](https://github.com/RedHatInsights/vmaas/commit/60bf563b93379c9d54566121b05f427c6a2058e0))
+* **reposcan:** Use cascade delete to properly delete ([`74b1c78`](https://github.com/RedHatInsights/vmaas/commit/74b1c784c24cb328cade9b7c260d429e3f273ccd))
+
 ## v2.32.5 (2021-11-15)
 ### Fix
 * **reposcan:** Do not store 'None' string if last-modified header is not available ([`55e908a`](https://github.com/RedHatInsights/vmaas/commit/55e908a44734848c67f03d8e1c39f16c675027b8))
