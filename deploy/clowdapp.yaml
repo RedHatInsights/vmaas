@@ -55,7 +55,7 @@ objects:
         - name: LOGGING_LEVEL_APP
           value: ${LOGGING_LEVEL_APP}
         - name: LOGGING_LEVEL_LIBS
-          value: ${LOGGING_LEVEL_LIBS}
+          value: ${WEBAPP_LOGGING_LEVEL_LIBS}
         - name: LOGGING_TYPE
           value: ${LOGGING_TYPE}
         - name: MAX_VMAAS_SERVERS
@@ -140,7 +140,7 @@ objects:
         - name: LOGGING_LEVEL_APP
           value: ${LOGGING_LEVEL_APP}
         - name: LOGGING_LEVEL_LIBS
-          value: ${LOGGING_LEVEL_LIBS}
+          value: ${REPOSCAN_LOGGING_LEVEL_LIBS}
         - name: LOGGING_TYPE
           value: ${LOGGING_TYPE}
         - name: PKGTREE_INDENT
@@ -355,9 +355,12 @@ parameters:
 - name: LOGGING_LEVEL_APP
   description: Logging level in app code
   value: INFO
-- name: LOGGING_LEVEL_LIBS
+- name: REPOSCAN_LOGGING_LEVEL_LIBS
   description: Logging level in libs code
   value: WARNING
+- name: WEBAPP_LOGGING_LEVEL_LIBS
+  description: Logging level in libs code
+  value: INFO
 - name: LOGGING_TYPE
   description: Type of logging in webapp
   value: OPENSHIFT
