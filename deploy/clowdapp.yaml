@@ -290,23 +290,6 @@ objects:
     selector:
       pod: vmaas-reposcan-service
 
-# workaround with appProtocol tcp (clowder hardcodes http) - for istio
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: vmaas-reposcan-service-rsync-workaround
-    labels:
-      app: vmaas-reposcan
-  spec:
-    ports:
-    - name: private
-      protocol: TCP
-      appProtocol: tcp
-      port: 10000
-      targetPort: 10000
-    selector:
-      pod: vmaas-reposcan-service
-
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:

@@ -77,10 +77,7 @@ class Config(BaseConfig, metaclass=Singleton):
                 self.reposcan_port = endpoint.port
         for endpoint in cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
-                # workaround with appProtocol tcp (clowder hardcodes http) - for istio
-                hostname = endpoint.hostname.split(".", maxsplit=1)
-                hostname[0] = "vmaas-reposcan-service-rsync-workaround"
-                self.remote_dump = f"rsync://{'.'.join(hostname)}:10000/data/vmaas.db"
+                self.remote_dump = f"rsync://{endpoint.hostname}:{endpoint.port}/data/vmaas.db"
             elif "websocket" in endpoint.hostname:
                 self.websocket_url = f"ws://{endpoint.hostname}:{endpoint.port}"
                 self.websocket_host = endpoint.hostname
