@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.7 (2021-11-24)
+### Fix
+* **webapp:** Workaround with appProtocol tcp (clowder hardcodes http) - for istio ([`c5341d7`](https://github.com/RedHatInsights/vmaas/commit/c5341d7cbf3e65cac4abe21bfebd37ebeec61ffe))
+
 ## v2.32.6 (2021-11-19)
 ### Fix
 * **reposcan:** Fetch actual data from db progressively ([`bbaf703`](https://github.com/RedHatInsights/vmaas/commit/bbaf7039ce048cd2b2c4aa13412ca4140c9a38c8))
