@@ -70,7 +70,7 @@ class NotificationHandler(WebSocketHandler):
 
         # We have all webapps up to date, but advertised version is outdated
         if cls.last_dump_version != cls.last_advertised_version and cls.webapps_count() == cls.webapps_ready_count() \
-                and cls.webapps_count() > 0:
+                and cls.webapps_count() > 0 and str(cls.last_dump_version) != "None":
             LOGGER.info("Advertising dump version %s to listeners", cls.last_dump_version)
             cls.last_advertised_version = cls.last_dump_version
             cls.send_message("listener", "webapps-refreshed")
