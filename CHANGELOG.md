@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.8 (2021-11-25)
+### Fix
+* **websocket:** Do not advertise None vmaas cache version ([`a971fe0`](https://github.com/RedHatInsights/vmaas/commit/a971fe0559c1b55b0a531cbcc29d3c0a6d044cd4))
+
 ## v2.32.7 (2021-11-24)
 ### Fix
 * **webapp:** Workaround with appProtocol tcp (clowder hardcodes http) - for istio ([`c5341d7`](https://github.com/RedHatInsights/vmaas/commit/c5341d7cbf3e65cac4abe21bfebd37ebeec61ffe))
