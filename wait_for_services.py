@@ -6,6 +6,7 @@ import signal
 import sys
 import time
 
+from psycopg2 import OperationalError
 from requests import request
 
 from vmaas.common.config import Config
@@ -29,6 +30,14 @@ def wait(func, *args, delay=1, service="", **kwargs):
             if result:
                 return
             LOGGER.info("%s is unavailable - sleeping", service)
+            time.sleep(delay)
+        except OperationalError as err:
+            LOGGER.info(
+                "%s is unavailable, pgerror: %s, pgcode: %s - sleeping",
+                service,
+                err.pgerror,
+                err.pgcode
+            )
             time.sleep(delay)
         except:  # noqa pylint: disable=bare-except
             LOGGER.info("%s is unavailable - sleeping", service)
