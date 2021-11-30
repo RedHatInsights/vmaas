@@ -35,23 +35,39 @@ function check_for_labels() {
     fi
 }
 
+function _process_requirements_labels() {
+    # $1 env var to export
+    # $@ labels to process
+    env_var_name=$1; shift;
+    labels=$@
+    if [ -n "$labels" ]; then
+        labels=$(echo "$labels" | sed -e 's/"//g')
+        # contents of labels is different in different shells
+        # it can be one of
+        #   labels="REQ1\nREQ2"
+        #   labels="REQ1 REQ2"
+        lines=$(echo "$labels" | wc -l | xargs)
+        words=$(echo "$labels" | wc -w | xargs)
+        if [[ "$lines" == "1" ]] && [[ "$words" == "1" ]]; then
+            export "$env_var_name=$labels"
+            return
+        fi
+        processed=""
+        for req in $labels; do
+            processed="$processed$req,"
+        done
+        # delete extra comma
+        processed="${processed%?}"
+        export "$env_var_name=$processed"
+    fi
+}
+
 function process_requirements_labels() {
     if [ -f $LABELS_DIR/github_labels.txt ]; then
         requirements=$(egrep "^\"[A-Z]+-[A-Z-]*\"$" $LABELS_DIR/github_labels.txt)
-        if [ -n "$requirements" ]; then
-            requirements=$(echo "$requirements" | sed -e 's/"//g')
-            lines=$(echo "$requirements" | wc -l | xargs)
-            if [[ "$lines" == "1" ]]; then
-                export IQE_REQUIREMENTS="$requirements"
-                return
-            fi
-            IQE_REQUIREMENTS=""
-            for req in $requirements; do
-                IQE_REQUIREMENTS="$IQE_REQUIREMENTS$req,"
-            done
-            # delete extra comma
-            export IQE_REQUIREMENTS="${IQE_REQUIREMENTS%?}"
-        fi
+        requirements_priority=$(egrep "^\"(critical|high|medium|low)-requirements\"$" $LABELS_DIR/github_labels.txt | sed -e 's/-requirements//g')
+        _process_requirements_labels IQE_REQUIREMENTS $requirements
+        _process_requirements_labels IQE_REQUIREMENTS_PRIORITY $requirements_priority
     fi
 }
 
