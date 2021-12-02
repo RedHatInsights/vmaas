@@ -87,6 +87,7 @@ objects:
           enabled: true
         private:
           enabled: true
+          appProtocol: tcp
         metrics:
           enabled: true
       podSpec:
