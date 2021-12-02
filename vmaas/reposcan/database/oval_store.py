@@ -8,6 +8,7 @@ from vmaas.common.rpm_utils import parse_rpm_name
 from vmaas.reposcan.database.object_store import ObjectStore
 from vmaas.reposcan.database.cpe_store import CpeStore
 from vmaas.reposcan.database.package_store import PackageStore
+from vmaas.reposcan.mnm import OVAL_FAILED_IMPORT, OVAL_FAILED_UPDATE, OVAL_FAILED_DELETE
 
 
 class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
@@ -88,6 +89,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             cur.execute("delete from oval_file where id = %s", (db_id,))
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
+            OVAL_FAILED_DELETE.inc()
             self.logger.exception("Failed to delete oval file.")
             self.conn.rollback()
         finally:
@@ -144,6 +146,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 refresh_maps_func(cur, delete=True)
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
+            OVAL_FAILED_IMPORT.inc()
+            OVAL_FAILED_UPDATE.inc()
+            OVAL_FAILED_DELETE.inc()
             self.logger.exception("Failure while inserting, updating or deleting %s data: ", entity)
             self.conn.rollback()
         finally:
@@ -187,6 +192,8 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                             (ent_one_id, tuple(associated_with_entity_one),))
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
+            OVAL_FAILED_IMPORT.inc()
+            OVAL_FAILED_DELETE.inc()
             self.logger.exception("Failure while (dis)associating OVAL %s with %s %s: ",
                                   entity_many, entity_one, ent_one_id)
             self.conn.rollback()
@@ -502,6 +509,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             criteria_id = self._populate_definition_criteria(cur, file_id, item["criteria"], criteria_id)
             self.conn.commit()
         except Exception: # pylint: disable=broad-except
+            OVAL_FAILED_IMPORT.inc()
+            OVAL_FAILED_UPDATE.inc()
+            OVAL_FAILED_DELETE.inc()
             self.logger.exception("Failure while inserting criteria: ")
             self.conn.rollback()
         if current_version:

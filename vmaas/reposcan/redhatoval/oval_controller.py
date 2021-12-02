@@ -15,7 +15,7 @@ from vmaas.common.date_utils import parse_datetime
 from vmaas.reposcan.database.oval_store import OvalStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import FileUnpacker
-from vmaas.reposcan.mnm import FAILED_IMPORT_OVAL
+from vmaas.reposcan.mnm import OVAL_FAILED_DOWNLOAD, OVAL_DELETED_STREAMS
 from vmaas.reposcan.redhatoval.definitions_file import OvalDefinitions
 
 OVAL_FEED_BASE_URL = os.getenv("OVAL_FEED_BASE_URL", "https://www.redhat.com/security/data/oval/v2/")
@@ -106,6 +106,7 @@ class OvalController:
         for oval_id in oval_id_in:
             oval_ids.update(self._find_oval_file_by_regex(oval_id))
         for oval_id in oval_ids:
+            OVAL_DELETED_STREAMS.inc()
             self.logger.info("Deleting OVAL file: %s", oval_id)
             self.oval_store.delete_oval_file(oval_id)
 
@@ -121,7 +122,7 @@ class OvalController:
         failed = self._download_feed()
         if failed:
             for path in failed:
-                FAILED_IMPORT_OVAL.inc()
+                OVAL_FAILED_DOWNLOAD.inc()
                 self.logger.warning("OVAL feed failed to download, %s (HTTP CODE %d).", path, failed[path])
             self.clean()
             return
@@ -160,6 +161,7 @@ class OvalController:
                 self.logger.info("Syncing a batch of %d OVAL definition files", len(batch))
                 failed = self._download_definitions(batch)
                 if failed:
+                    OVAL_FAILED_DOWNLOAD.inc(len(failed))
                     self.logger.warning("%d OVAL definition files failed to download.", len(failed))
                     batch = [oval_file for oval_file in batch if oval_file.local_path not in failed]
                 self._unpack_definitions(batch)
