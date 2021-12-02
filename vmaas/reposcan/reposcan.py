@@ -29,7 +29,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
-from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, FAILED_IMPORT_OVAL,\
+from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
     FAILED_IMPORT_REPO, FAILED_WEBSOCK
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
@@ -699,7 +699,7 @@ class OvalSyncHandler(SyncHandler):
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
             LOGGER.exception(msg)
-            FAILED_IMPORT_OVAL.inc()
+            OVAL_FAILED_IMPORT.inc()
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
                 return "DB_ERROR"
