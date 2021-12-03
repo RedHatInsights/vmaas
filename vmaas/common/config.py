@@ -36,6 +36,8 @@ class BaseConfig:
         self.webapp_port = None
         self.metrics_port = None
 
+        self.oval_unfixed_eval_enabled = strtobool(os.getenv("OVAL_UNFIXED_EVAL_ENABLED", "FALSE"))
+
 
 # pylint: disable=too-many-instance-attributes
 class Config(BaseConfig, metaclass=Singleton):

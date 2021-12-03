@@ -2,7 +2,7 @@
 Module to handle /vulnerabilities API calls.
 """
 
-from vmaas.webapp.cache import ERRATA_CVE
+from vmaas.webapp.cache import ERRATA_CVE, CFG
 from vmaas.common.rpm_utils import rpmver2array
 from vmaas.common.webapp_utils import format_datetime
 
@@ -185,6 +185,9 @@ class VulnerabilitiesAPI:
             #LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
             for definition_id in definition_ids:
                 definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
+                # Skip if unfixed CVE feature flag is disabled
+                if definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY and not CFG.oval_unfixed_eval_enabled:
+                    continue
                 cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
                 # Skip if all CVEs from definition were already found somewhere
                 if not [cve for cve in cves
