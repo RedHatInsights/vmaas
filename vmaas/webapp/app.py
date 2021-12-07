@@ -634,14 +634,20 @@ def create_app(specs):
         # hence it's added here in the create_app step
         return web.Response(text=generate_latest().decode('utf-8'))
 
+    def dummy_200(request, **kwargs):  # pylint: disable=unused-argument
+        """Dummy endpoint returning 200"""
+        return web.Response()
+
     async def on_prepare(request, response):  # pylint: disable=unused-argument
         """Hook for preparing new responses"""
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS, POST'
 
     app.app.on_response_prepare.append(on_prepare)
     app.app.router.add_get("/metrics", metrics)
     app.app.router.add_get("/healthz", HealthHandler.get)
+    app.app.router.add_route("OPTIONS", "/api/v3/cves", dummy_200)
 
     for route, spec in specs.items():
         app.add_api(spec, resolver=connexion.RestyResolver('app'),
