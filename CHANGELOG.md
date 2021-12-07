@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.9 (2021-12-07)
+### Fix
+* **webapp:** Allow CORS pre-flight check for /cves API ([`3a7c489`](https://github.com/RedHatInsights/vmaas/commit/3a7c489f5e8f72883522e1237d94611f7917bd1c))
+
 ## v2.32.8 (2021-11-25)
 ### Fix
 * **websocket:** Do not advertise None vmaas cache version ([`a971fe0`](https://github.com/RedHatInsights/vmaas/commit/a971fe0559c1b55b0a531cbcc29d3c0a6d044cd4))
