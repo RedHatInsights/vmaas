@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.10 (2021-12-08)
+### Performance
+* **webapp:** Don't evaluate unfixed CVEs by default now ([`3bec6c8`](https://github.com/RedHatInsights/vmaas/commit/3bec6c8c936b41592c34751a61acb617399f4582))
+
 ## v2.32.9 (2021-12-07)
 ### Fix
 * **webapp:** Allow CORS pre-flight check for /cves API ([`3a7c489`](https://github.com/RedHatInsights/vmaas/commit/3a7c489f5e8f72883522e1237d94611f7917bd1c))
