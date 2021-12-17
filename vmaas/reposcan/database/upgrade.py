@@ -9,15 +9,11 @@ import psycopg2
 
 from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger, init_logging
+from vmaas.common.paths import DB_UPGRADES_PATH, USER_CREATE_SQL_PATH, DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 
 LOGGER = get_logger(__name__)
-
 SCHEMA_VER_NAME = 'schema_version'
-
-DB_UPGRADES_PATH = "./database/upgrade_scripts"
-USER_CREATE_SQL_PATH = "/vmaas/vmaas/reposcan/vmaas_user_create_postgresql.sql"
-DB_CREATE_SQL_PATH = "/vmaas/vmaas/reposcan/vmaas_db_postgresql.sql"
 
 
 class DatabaseUpgrade:
@@ -44,8 +40,7 @@ class DatabaseUpgrade:
         self.init_schema()
 
         # get upgrade sql scripts directory
-        self.scripts_dir = os.getenv('DB_UPGRADE_SCRIPTS_DIR',
-                                     DB_UPGRADES_PATH)
+        self.scripts_dir = os.getenv('DB_UPGRADE_SCRIPTS_DIR', str(DB_UPGRADES_PATH))
         if not self.scripts_dir.endswith('/'):
             self.scripts_dir += '/'
 
