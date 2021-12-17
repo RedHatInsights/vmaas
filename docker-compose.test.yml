@@ -1,12 +1,30 @@
-version: '3'
-
+version: '3.4'
 services:
-  test:
+  vmaas_database:
+    container_name: vmaas-database
+    hostname: vmaas-database
     build:
       context: .
-      dockerfile: Dockerfile.test
+      dockerfile: ./database/Dockerfile.centos
+    image: vmaas/database:latest
+    restart: unless-stopped
+    shm_size: '256mb'
+    env_file:
+      - ./conf/database-connection-admin.env
+    ports:
+      - 5432:5432
+
+  test:
+    container_name: vmaas-webapp
+    hostname: vmaas-webapp
+    build:
+      context: .
+      dockerfile: Dockerfile
       args:
-          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
+        VAR_RPMS: "findutils"
+        VAR_PIPENV_INSTALL_OPT: "--dev"
+        PIPENV_CHECK: "${PIPENV_CHECK:-1}"
+    image: vmaas/app:latest
     environment:
       CI: "${CI:-false}"
       GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
@@ -15,6 +33,15 @@ services:
       GITHUB_SHA: "${GITHUB_SHA:-}"
       GITHUB_REPOSITORY: "${GITHUB_REPOSITORY:-}"
       GITHUB_RUN_ID: "${GITHUB_RUN_ID:-}"
+    env_file:
+      - ./conf/test.env
+    depends_on:
+      - vmaas_database
+    volumes:
+      - ./:/vmaas
+    user: root
+    security_opt:
+      - label=disable
     command: >
       bash -c "cd /vmaas && ./scripts/check_deps_versions.sh \
                          && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
