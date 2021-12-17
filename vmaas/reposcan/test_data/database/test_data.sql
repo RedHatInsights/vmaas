@@ -1,3 +1,21 @@
+DELETE FROM errata_cve;
+DELETE FROM cve;
+DELETE FROM pkg_errata;
+DELETE FROM module_stream_require;
+DELETE FROM module_stream;
+DELETE FROM module;
+DELETE FROM errata_repo;
+DELETE FROM pkg_repo;
+DELETE FROM repo;
+DELETE FROM certificate;
+DELETE FROM content_set;
+DELETE FROM product;
+DELETE FROM errata;
+DELETE FROM errata_type;
+DELETE FROM package;
+DELETE FROM evr;
+DELETE FROM package_name;
+
 INSERT INTO package_name (id, name) VALUES
   (101, 'pkg-sec-errata1'),
   (102, 'pkg-no-sec-errata2'),
