@@ -9,7 +9,7 @@ from vmaas.reposcan.repodata.repository_controller import RepositoryController
 
 from vmaas.reposcan.database import product_store
 from vmaas.reposcan.download.downloader import DownloadItem, FileDownloadThread
-from vmaas.reposcan.conftest import reset_db
+from vmaas.reposcan.conftest import reset_db, write_testing_data
 from vmaas.reposcan.database.database_handler import DatabaseHandler
 
 
@@ -68,17 +68,25 @@ def test_phase_1(db_conn, caplog, monkeypatch):
 
 
 def test_phase_2(db_conn, monkeypatch):
-    """Test add cves and delete content set."""
+    """Test delete content set."""
 
     DatabaseHandler.connection = db_conn
+    reset_db(db_conn)
+    write_testing_data(db_conn)
     monkeypatch.setattr(FileDownloadThread, '_download', download_mock)
 
     # Test delete content_set
     rep_con = RepositoryController()
-    rep_con.delete_content_set("content_set_1")
 
+    _assert_rows_in_table(db_conn, 'content_set', 2)
+    _assert_rows_in_table(db_conn, 'package', 7)
+    _assert_rows_in_table(db_conn, 'repo', 2)
+
+    rep_con.delete_content_set("content set 2")
+
+    _assert_rows_in_table(db_conn, 'content_set', 1)
     _assert_rows_in_table(db_conn, 'package', 6)
-    _assert_rows_in_table(db_conn, 'errata_refs', 0)
+    _assert_rows_in_table(db_conn, 'repo', 1)
 
 
 def _assert_rows_in_table(db_conn, table, n_expected):
