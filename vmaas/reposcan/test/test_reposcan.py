@@ -4,6 +4,7 @@ import os
 
 from http import HTTPStatus
 from vmaas.reposcan.test.test_case import FlaskTestCase
+from vmaas.reposcan.reposcan import PKGTREE_FILE
 
 
 class TestReposcanApp(FlaskTestCase):
@@ -113,6 +114,7 @@ class TestReposcanApp(FlaskTestCase):
 
     def test_pkgtree(self):
         """Test pkgtree endpoint."""
+        os.system('rm -f %s' % PKGTREE_FILE)  # Remove pkgtree file if exists
         resp = self.fetch('/api/v1/pkgtree', method='GET')
         self.assertEqual(HTTPStatus.NOT_FOUND, resp.status)
         assert resp.data == b"\"Package Tree file not found.  Has it been generated?\"\n"

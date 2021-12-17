@@ -8,16 +8,18 @@ import sqlite3
 
 from vmaas.common.date_utils import parse_datetime
 from vmaas.reposcan.exporter import SqliteDump
+from vmaas.reposcan.conftest import write_testing_data
 
-TEST_DUMP_FILE = "/tmp/dump.output"
+TEST_DUMP_FILE = "./dump.output"
 
 
 class TestExporter:
     """Test Exporter class."""
 
-    def test_dump(self, exporter_db_conn):
+    def test_dump(self, db_conn):
         """Test database dump."""
-        sqlite_dump = SqliteDump(exporter_db_conn, TEST_DUMP_FILE)
+        write_testing_data(db_conn)
+        sqlite_dump = SqliteDump(db_conn, TEST_DUMP_FILE)
         sqlite_dump.dump(time.time())
         with sqlite3.connect(TEST_DUMP_FILE) as dbdump:
             # from IPython import embed; embed()

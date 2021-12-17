@@ -4,12 +4,13 @@ Unit test classes for repository controller module.
 
 import os
 import shutil
-import pytest
 
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
 
 from vmaas.reposcan.database import product_store
 from vmaas.reposcan.download.downloader import DownloadItem, FileDownloadThread
+from vmaas.reposcan.conftest import reset_db
+from vmaas.reposcan.database.database_handler import DatabaseHandler
 
 
 def download_mock(self, download_item: DownloadItem):
@@ -26,9 +27,13 @@ def download_mock(self, download_item: DownloadItem):
     download_item.status_code = 200
 
 
-@pytest.mark.first
 def test_phase_1(db_conn, caplog, monkeypatch):
     """Test add product and repo."""
+
+    DatabaseHandler.connection = db_conn
+    reset_db(db_conn)
+
+    # write_testing_data(db_conn)
     basearch = 'x86_64'
     releasever = '7Server'
     base_url = 'http://localhost:8888/%s/%s' % (releasever, basearch)
@@ -55,41 +60,30 @@ def test_phase_1(db_conn, caplog, monkeypatch):
     for file in ["repomd.xml", "updateinfo.xml.gz", "primary_db.sqlite.gz"]:
         assert f"File {file} mock-downloaded." in caplog.messages
 
-    with db_conn.cursor() as cur:
-        cur.execute("""select * from content_set""")
-        rows = cur.fetchall()
-        assert len(rows) == 1
-
-        cur.execute("""select * from repo""")
-        rows = cur.fetchall()
-        assert len(rows) == 1
-
-        cur.execute("""select * from package""")
-        rows = cur.fetchall()
-        assert len(rows) == 18
-
-        cur.execute("""select * from errata_refs""")
-        rows = cur.fetchall()
-        assert len(rows) == 5
-
-        cur.execute("""select * from cve""")
-        rows = cur.fetchall()
-        assert len(rows) == 2
+    _assert_rows_in_table(db_conn, 'content_set', 1)
+    _assert_rows_in_table(db_conn, 'repo', 1)
+    _assert_rows_in_table(db_conn, 'package', 18)
+    _assert_rows_in_table(db_conn, 'errata_refs', 5)
+    _assert_rows_in_table(db_conn, 'cve', 2)
 
 
 def test_phase_2(db_conn, monkeypatch):
     """Test add cves and delete content set."""
+
+    DatabaseHandler.connection = db_conn
     monkeypatch.setattr(FileDownloadThread, '_download', download_mock)
 
     # Test delete content_set
     rep_con = RepositoryController()
     rep_con.delete_content_set("content_set_1")
 
-    with db_conn.cursor() as cur:
-        cur.execute("""select * from package""")
-        rows = cur.fetchall()
-        assert len(rows) == 6
+    _assert_rows_in_table(db_conn, 'package', 6)
+    _assert_rows_in_table(db_conn, 'errata_refs', 0)
 
-        cur.execute("""select * from errata_refs""")
+
+def _assert_rows_in_table(db_conn, table, n_expected):
+    """Check expected rows in given database table."""
+    with db_conn.cursor() as cur:
+        cur.execute("""select * from %s""" % table)
         rows = cur.fetchall()
-        assert not rows
+        assert len(rows) == n_expected
