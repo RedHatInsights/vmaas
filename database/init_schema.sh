@@ -7,6 +7,7 @@ if $PG_INITIALIZED ; then
     psql -c "ALTER USER vmaas_reader WITH PASSWORD '${POSTGRESQL_READER_PASSWORD}'" -d ${POSTGRESQL_DATABASE}
     # Need to make sure admin role has createrole attribute
     psql -c "ALTER USER ${POSTGRESQL_USER} WITH CREATEROLE" -d ${POSTGRESQL_DATABASE}
+    psql -c "ALTER USER ${POSTGRESQL_USER} WITH SUPERUSER"
 else
     echo "Schema initialization skipped."
 fi
