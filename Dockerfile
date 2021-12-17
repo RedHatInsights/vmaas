@@ -8,9 +8,10 @@ RUN FULL_RHEL=$(microdnf repolist --enabled | grep rhel-8) ; \
         sed -i 's/^\(enabled.*\)/\1\npriority=200/;' /etc/yum.repos.d/CentOS*.repo ; \
     fi
 
+ARG VAR_RPMS=""
 RUN microdnf module enable postgresql:12 && \
     microdnf install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql && \
+        python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql $VAR_RPMS && \
     microdnf clean all
 
 WORKDIR /vmaas
@@ -21,8 +22,9 @@ ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG PIPENV_CHECK=1
 ARG PIPENV_PYUP_API_KEY=""
+ARG VAR_PIPENV_INSTALL_OPT=""
 RUN pip3 install --upgrade pipenv==2021.11.9 && \
-    pipenv install --ignore-pipfile --deploy --system && \
+    pipenv install --ignore-pipfile --deploy --system $VAR_PIPENV_INSTALL_OPT && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system ; fi
 
 ADD /vmaas/reposcan/rsyncd.conf   /etc/
