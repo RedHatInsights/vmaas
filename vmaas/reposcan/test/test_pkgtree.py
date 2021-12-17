@@ -7,6 +7,7 @@ import gzip
 import json
 
 from vmaas.reposcan.pkgtree import JsonPkgTree
+from vmaas.reposcan.conftest import write_testing_data
 
 TEST_DUMP_FILE = "/tmp/dump.output"
 
@@ -14,9 +15,10 @@ TEST_DUMP_FILE = "/tmp/dump.output"
 class TestPkgtree:
     """Test Exporter class."""
 
-    def test_dump(self, exporter_db_conn):
+    def test_dump(self, db_conn):
         """Test pkgtree dump."""
-        ddump = JsonPkgTree(exporter_db_conn, TEST_DUMP_FILE)
+        write_testing_data(db_conn)
+        ddump = JsonPkgTree(db_conn, TEST_DUMP_FILE)
         ddump.dump()
         with gzip.open(TEST_DUMP_FILE) as dumpfile:
             pkgtree = json.load(dumpfile)
