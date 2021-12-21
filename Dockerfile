@@ -37,13 +37,11 @@ USER vmaas
 ADD entrypoint.sh               /vmaas/
 ADD wait_for_services.py        /vmaas/
 ADD conf                        /vmaas/conf
+ADD /database                   /vmaas/database
 ADD /vmaas/webapp_utils         /vmaas/vmaas/webapp_utils/
 ADD /vmaas/websocket            /vmaas/vmaas/websocket/
-ADD /database/upgrade/*.sh      /vmaas/vmaas/reposcan/
-ADD /database/upgrade_scripts/* /vmaas/vmaas/reposcan/database/upgrade_scripts/
 ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common
-ADD /database/*.sql             /vmaas/vmaas/reposcan/
 
 ENV PYTHONPATH=/vmaas
