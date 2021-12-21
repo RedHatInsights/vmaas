@@ -99,8 +99,6 @@ objects:
             - >-
               cd vmaas/reposcan && exec python3 ../../wait_for_services.py python3 -m database.upgrade
             env:
-            - name: DB_UPGRADE_SCRIPTS_DIR
-              value: /vmaas/vmaas/reposcan/database/upgrade_scripts/
             - name: GIT_TOKEN
               valueFrom:
                 secretKeyRef:
