@@ -3,15 +3,13 @@ version: '3'
 services:
   vmaas_database:
     container_name: vmaas-database
-    hostname: vmaas-database
-    build:
-        context: .
-        dockerfile: ./database/Dockerfile.centos
-    image: vmaas/database:latest
+    image: docker.io/library/postgres:12
     restart: unless-stopped
     shm_size: '256mb'
-    env_file:
-      - ./conf/database-connection-admin.env
+    environment:
+      POSTGRES_DB: vmaas
+      POSTGRES_USER: vmaas_admin
+      POSTGRES_PASSWORD: vmaas_admin_pwd
     ports:
       - 5432:5432
     volumes:
@@ -50,6 +48,19 @@ services:
       - vmaas_websocket
       - vmaas_database
 
+  vmaas_reposcan_db_init:
+    command: >
+         python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade
+    container_name: vmaas-reposcan-db-init
+    hostname: vmaas-reposcan-db-init
+    image: vmaas/app:latest
+    env_file:
+      - ./conf/database-connection-admin.env
+      - ./conf/reposcan.env
+    depends_on:
+      - vmaas_websocket
+      - vmaas_database
+
   vmaas_webapp:
     command: /vmaas/entrypoint.sh webapp
     container_name: vmaas-webapp
@@ -65,7 +76,6 @@ services:
       - vmaas_websocket
       - vmaas_reposcan
 
-    
   vmaas_webapp_utils:
     command: /vmaas/entrypoint.sh webapp-utils
     container_name: vmaas-webapp-utils
