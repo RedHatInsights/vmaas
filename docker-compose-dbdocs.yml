@@ -3,16 +3,17 @@ version: '3'
 services:
   vmaas_database:
     container_name: vmaas-database
-    build:
-        context: .
-        dockerfile: ./database/Dockerfile.centos
-    image: vmaas/database:latest
+    image: docker.io/library/postgres:12
     restart: unless-stopped
-    env_file:
-      - ./conf/database-connection-admin.env
+    environment:
+      POSTGRES_DB: vmaas
+      POSTGRES_USER: vmaas_admin
+      POSTGRES_PASSWORD: vmaas_admin_pwd
     ports:
       - 5432:5432
-    
+    volumes:
+      - vmaas-db-data:/var/lib/pgsql/data
+
   schema_spy:
     container_name: schema-spy
     privileged: true
