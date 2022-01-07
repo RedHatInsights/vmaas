@@ -16,7 +16,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 LOGGER = get_logger(__file__)
 
 
-def bye(signum, frame):
+def bye(signum, _):
     """Handle signal"""
     sys.exit(f"Stopped,{signum} received.")
 

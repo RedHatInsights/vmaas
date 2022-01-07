@@ -35,7 +35,6 @@ RUN install -m 1777 -d /data && \
 USER vmaas
 
 ADD entrypoint.sh               /vmaas/
-ADD wait_for_services.py        /vmaas/
 ADD conf                        /vmaas/conf
 ADD /database                   /vmaas/database
 ADD /vmaas/webapp_utils         /vmaas/vmaas/webapp_utils/

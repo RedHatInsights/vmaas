@@ -6,11 +6,11 @@ if [[ ! -z $1 ]]; then
     if [[ "$1" == "webapp" ]]; then
         cd vmaas/webapp
         [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="python3 -m main"
-        exec python3 ../../wait_for_services.py $cmd
+        exec python3 -m vmaas.common.wait_for_services $cmd
     elif [[ "$1" == "reposcan" ]]; then
         rsync --daemon --verbose --port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8730)")
         cd vmaas/reposcan
-        exec python3 ../../wait_for_services.py python3 -m main
+        exec python3 -m vmaas.common.wait_for_services python3 -m main
     elif [[ "$1" == "websocket" ]]; then
         cd vmaas/websocket
         exec python3 -m websocket
