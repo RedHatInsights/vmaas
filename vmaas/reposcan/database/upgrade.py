@@ -64,7 +64,7 @@ class DatabaseUpgrade:
                     cur.execute(f_user.read())
                     cur.execute(f_db.read())
                     cur.execute(f"ALTER USER vmaas_writer WITH PASSWORD '{cfg.postgresql_writer_password}'")
-                    cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_writer_password}'")
+                    cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_reader_password}'")
 
             conn.commit()
         finally:
