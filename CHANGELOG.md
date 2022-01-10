@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.32.11 (2022-01-10)
+### Fix
+* **reposcan:** Fix vmaas_reader password setting ([`3ac9888`](https://github.com/RedHatInsights/vmaas/commit/3ac98880b8b97cb2d933f78918c370ee37095abf))
+
 ## v2.32.10 (2021-12-08)
 ### Performance
 * **webapp:** Don't evaluate unfixed CVEs by default now ([`3bec6c8`](https://github.com/RedHatInsights/vmaas/commit/3bec6c8c936b41592c34751a61acb617399f4582))
