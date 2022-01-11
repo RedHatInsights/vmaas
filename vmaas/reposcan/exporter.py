@@ -159,6 +159,20 @@ class SqliteDump:
             for cpe_id, content_set_id in cursor:
                 dump.execute("insert into cpe_content_set values(?, ?)", (cpe_id, content_set_id))
 
+        dump.execute("""
+            create table if not exists cpe_repo(
+                cpe_id integer not null,
+                repo_id integer not null,
+                primary key (cpe_id, repo_id)
+            )""")
+
+        with self._named_cursor() as cursor:
+            cursor.execute("""select cpe_id, repo_id
+                                   from cpe_repo
+                               """)
+            for cpe_id, repo_id in cursor:
+                dump.execute("insert into cpe_repo values(?, ?)", (cpe_id, repo_id))
+
     def _dump_packagename(self, dump):
         """Select all package names (only for package names with ever received sec. update)"""
         dump.execute("""create table if not exists packagename (
