@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 14);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 15);
 
 -- -----------------------------------------------------
 -- evr type
@@ -405,27 +405,6 @@ CREATE TABLE IF NOT EXISTS content_set (
 
 
 -- -----------------------------------------------------
--- Table vmaas.cpe_content_set
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS cpe_content_set (
-  cpe_id INT NOT NULL,
-  content_set_id INT NOT NULL,
-  UNIQUE (cpe_id, content_set_id),
-  CONSTRAINT cpe_id
-    FOREIGN KEY (cpe_id)
-    REFERENCES cpe (id),
-  CONSTRAINT content_set_id
-    FOREIGN KEY (content_set_id)
-    REFERENCES content_set (id)
-)TABLESPACE pg_default;
-CREATE TRIGGER cpe_changed AFTER INSERT OR UPDATE OR DELETE ON cpe_content_set
-  FOR EACH STATEMENT
-  EXECUTE PROCEDURE cpes_changed();
-
-CREATE INDEX ON cpe_content_set(content_set_id);
-
-
--- -----------------------------------------------------
 -- Table vmaas.certificate
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS certificate (
@@ -490,6 +469,48 @@ CREATE TRIGGER pkg_repo_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_repo
   EXECUTE PROCEDURE repos_changed();
 
 CREATE INDEX ON pkg_repo(repo_id);
+
+
+-- -----------------------------------------------------
+-- Table vmaas.cpe_content_set
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cpe_content_set (
+  cpe_id INT NOT NULL,
+  content_set_id INT NOT NULL,
+  UNIQUE (cpe_id, content_set_id),
+  CONSTRAINT cpe_id
+    FOREIGN KEY (cpe_id)
+    REFERENCES cpe (id),
+  CONSTRAINT content_set_id
+    FOREIGN KEY (content_set_id)
+    REFERENCES content_set (id)
+)TABLESPACE pg_default;
+CREATE TRIGGER cpe_changed AFTER INSERT OR UPDATE OR DELETE ON cpe_content_set
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cpes_changed();
+
+CREATE INDEX ON cpe_content_set(content_set_id);
+
+
+-- -----------------------------------------------------
+-- Table vmaas.cpe_repo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cpe_repo (
+  cpe_id INT NOT NULL,
+  repo_id INT NOT NULL,
+  UNIQUE (cpe_id, repo_id),
+  CONSTRAINT cpe_id
+    FOREIGN KEY (cpe_id)
+    REFERENCES cpe (id),
+  CONSTRAINT repo_id
+    FOREIGN KEY (repo_id)
+    REFERENCES repo (id)
+)TABLESPACE pg_default;
+CREATE TRIGGER cpe_changed AFTER INSERT OR UPDATE OR DELETE ON cpe_repo
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE cpes_changed();
+
+CREATE INDEX ON cpe_repo(repo_id);
 
 
 -- -----------------------------------------------------
