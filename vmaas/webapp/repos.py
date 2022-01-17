@@ -104,6 +104,10 @@ class RepoAPI:
             for repo_id in self.cache.repolabel2ids.get(label, []):
                 repo_detail = self.cache.repo_detail[repo_id]
                 if not modified_since_dt or self._modified_since(repo_detail, modified_since_dt):
+                    if repo_id in self.cache.repo_id2cpe_ids:
+                        cpe_ids = self.cache.repo_id2cpe_ids[repo_id]
+                    else:
+                        cpe_ids = self.cache.content_set_id2cpe_ids.get(cs_id, [])
                     repolist.setdefault(label, []).append({
                         "label": label,
                         "name": repo_detail[REPO_NAME],
@@ -112,8 +116,7 @@ class RepoAPI:
                         "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
                         "product": repo_detail[REPO_PRODUCT],
                         "revision": format_datetime(repo_detail[REPO_REVISION]),
-                        "cpes": [self.cache.cpe_id2label[cpe_id]
-                                 for cpe_id in self.cache.content_set_id2cpe_ids.get(cs_id, [])],
+                        "cpes": [self.cache.cpe_id2label[cpe_id] for cpe_id in cpe_ids],
                         "third_party": repo_detail[REPO_THIRD_PARTY]
                     })
             actual_page_size += len(repolist[label])
