@@ -98,6 +98,7 @@ class Cache:
         self.cpe_id2label = {}
         self.label2cpe_id = {}
         self.content_set_id2cpe_ids = {}
+        self.repo_id2cpe_ids = {}
         self.label2content_set_id = {}
         self.id2packagename = {}
         self.updates = {}
@@ -207,6 +208,9 @@ class Cache:
 
         for (cpe_id, cs_id) in self._sqlite_execute(data, "select cpe_id, content_set_id from cpe_content_set"):
             self.content_set_id2cpe_ids.setdefault(cs_id, array.array('q')).append(cpe_id)
+
+        for (cpe_id, repo_id) in self._sqlite_execute(data, "select cpe_id, repo_id from cpe_repo"):
+            self.repo_id2cpe_ids.setdefault(repo_id, array.array('q')).append(cpe_id)
 
         for (name_id, pkg_id) in self._sqlite_execute(data,
                 'select name_id, package_id from updates order by name_id, package_order'):

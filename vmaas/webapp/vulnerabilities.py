@@ -2,7 +2,7 @@
 Module to handle /vulnerabilities API calls.
 """
 
-from vmaas.webapp.cache import ERRATA_CVE, CFG
+from vmaas.webapp.cache import ERRATA_CVE, CFG, REPO_BASEARCH, REPO_RELEASEVER
 from vmaas.common.rpm_utils import rpmver2array
 from vmaas.common.webapp_utils import format_datetime
 
@@ -128,15 +128,33 @@ class VulnerabilitiesAPI:
         #            matches >= required_matches)
         return matches >= required_matches
 
-    def _content_sets_to_definitions(self, content_set_list):
+    def _repos_to_definitions(self, content_set_list, basearch, releasever):  # pylint: disable=too-many-branches
         # TODO: some CPEs are not matching because they are substrings/subtrees
-        content_set_ids = {self.db_cache.label2content_set_id[label]
-                           for label in content_set_list
-                           if label in self.db_cache.label2content_set_id}
+        repo_ids = set()
+        content_set_ids = set()
+        # Try to identify repos (CS+basearch+releasever) or at least CS
+        for label in content_set_list:
+            if basearch or releasever:
+                for repo_id in self.db_cache.repolabel2ids.get(label, []):
+                    if basearch and self.db_cache.repo_detail[repo_id][REPO_BASEARCH] != basearch:
+                        continue
+                    if releasever and self.db_cache.repo_detail[repo_id][REPO_RELEASEVER] != releasever:
+                        continue
+                    repo_ids.add(repo_id)
+            if label in self.db_cache.label2content_set_id:
+                content_set_ids.add(self.db_cache.label2content_set_id[label])
+
         cpe_ids = set()
-        for content_set_id in content_set_ids:
-            if content_set_id in self.db_cache.content_set_id2cpe_ids:
-                cpe_ids.update(self.db_cache.content_set_id2cpe_ids[content_set_id])
+        if repo_ids:  # Check CPE-Repo mapping first
+            for repo_id in repo_ids:
+                if repo_id in self.db_cache.repo_id2cpe_ids:
+                    cpe_ids.update(self.db_cache.repo_id2cpe_ids[repo_id])
+
+        if not cpe_ids:  # No CPE-Repo mapping? Use CPE-CS mapping
+            for content_set_id in content_set_ids:
+                if content_set_id in self.db_cache.content_set_id2cpe_ids:
+                    cpe_ids.update(self.db_cache.content_set_id2cpe_ids[content_set_id])
+
         candidate_definitions = set()
         for cpe_id in cpe_ids:
             if cpe_id in self.db_cache.cpe_id2ovaldefinition_ids:
@@ -175,7 +193,9 @@ class VulnerabilitiesAPI:
         # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
         #       there needs to be better fallback at least to guess correctly RHEL version,
         #       use old VMaaS repo guessing?
-        candidate_definitions = self._content_sets_to_definitions(data.get('repository_list', []))
+        candidate_definitions = self._repos_to_definitions(data.get('repository_list', []),
+                                                           data.get('basearch'),
+                                                           data.get('releasever'))
 
         for package, parsed_package in packages_to_process.items():
             name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
