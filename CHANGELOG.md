@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.33.0 (2022-01-18)
+### Feature
+* **webapp:** Use CPE-repository mapping if available ([`9e06241`](https://github.com/RedHatInsights/vmaas/commit/9e06241f5b3ac8fb28672154739a7a3afc71380d))
+* **reposcan:** Link CPEs with specific repos, not only content sets ([`428bfad`](https://github.com/RedHatInsights/vmaas/commit/428bfad8e974ae0b0107d7fd557fb842f9b333aa))
+
 ## v2.32.11 (2022-01-10)
 ### Fix
 * **reposcan:** Fix vmaas_reader password setting ([`3ac9888`](https://github.com/RedHatInsights/vmaas/commit/3ac98880b8b97cb2d933f78918c370ee37095abf))
