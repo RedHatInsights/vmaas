@@ -244,53 +244,6 @@ objects:
     namespace: test
   type: Opaque
 
-# proxy requests for old service for smooth transition
-# vmaas-webapp:8080 to the clowderized one - vmaas-webapp-service:8000
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: vmaas-webapp
-    labels:
-      app: vmaas-webapp
-  spec:
-    ports:
-    - port: 8080
-      protocol: TCP
-      targetPort: 8000
-      name: weblegacy
-    selector:
-      pod: vmaas-webapp-service
-# vmaas-websocket:8081 to the clowderized one - vmaas-websocket-service:9000
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: vmaas-websocket
-    labels:
-      app: vmaas-websocket
-  spec:
-    ports:
-    - port: 8082
-      protocol: TCP
-      targetPort: 9000
-      name: weblegacy
-    selector:
-      pod: vmaas-websocket-service
-# vmaas-reposcan:8081 to the clowderized one - vmaas-reposcan-service:9000
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: vmaas-reposcan
-    labels:
-      app: vmaas-reposcan
-  spec:
-    ports:
-    - port: 8081
-      protocol: TCP
-      targetPort: 8000
-      name: weblegacy
-    selector:
-      pod: vmaas-reposcan-service
-
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
