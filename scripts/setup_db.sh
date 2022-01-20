@@ -12,7 +12,7 @@ Optional parameters:
 "
 
 CHECK_PACKAGE="bash-4.2.45-5.el7_0.4.x86_64"
-TURNPIKE_MOCK=$(readlink -f $(find . -name turnpike-mock))
+TURNPIKE_MOCK=$(greadlink -f $(find . -name turnpike-mock))
 
 wait_and_run() {
   count=60
