@@ -77,8 +77,6 @@ objects:
           requests:
             cpu: 500m
             memory: ${MEMORY_LIMIT}
-        readinessProbe: {}
-        livenessProbe: {}
 
     - name: reposcan-service
       minReplicas: ${{REPLICAS_REPOSCAN}}
