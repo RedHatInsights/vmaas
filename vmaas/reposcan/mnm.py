@@ -2,7 +2,7 @@
 Measurement aNd Monitoring - prometheus probes used by reposcan subsystem
 """
 
-from prometheus_client import Counter
+from prometheus_client import Counter, Gauge
 
 ADMIN_REQUESTS = Counter('vmaas_reposcan_admin_invocations', 'Number of calls on admin API')
 FAILED_AUTH = Counter('vmaas_reposcan_failed_auth_attempts', '# of failed authentication attempts')
@@ -29,3 +29,5 @@ OVAL_DELETED_STREAMS = Counter('vmaas_reposcan_oval_deleted_streams', '# of dele
 OVAL_FAILED_IMPORT = Counter('vmaas_reposcan_failed_oval_import', '# of failed oval-import attempts')
 OVAL_FAILED_UPDATE = Counter('vmaas_reposcan_failed_oval_update', '# of failed oval-update attempts')
 OVAL_FAILED_DELETE = Counter('vmaas_reposcan_failed_oval_delete', '# of failed oval-delete attempts')
+
+REPOS_TO_CLEANUP = Gauge('vmaas_reposcan_repos_cleanup', '# of repos to cleanup from DB')

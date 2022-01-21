@@ -31,7 +31,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
-    FAILED_IMPORT_REPO, FAILED_WEBSOCK
+    FAILED_IMPORT_REPO, FAILED_WEBSOCK, REPOS_TO_CLEANUP
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
@@ -324,6 +324,7 @@ class RepolistImportHandler(SyncHandler):
                     for content_set, basearch, releasever in repos_in_db:
                         LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
                             filter(None, (content_set, basearch, releasever))))
+                    REPOS_TO_CLEANUP.set(len(repos_in_db))
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % err.__hash__()
