@@ -249,6 +249,14 @@ class RepositoryController:
             self.repo_store.delete_content_set(content_set_label)
         self.repo_store.cleanup_unused_data()
 
+    def delete_repos(self, repos):
+        """Deletes repos (cs+basearch+releasever) from DB."""
+        for content_set, basearch, releasever in repos:
+            self.logger.info("Deleting repository: %s", ", ".join(
+                filter(None, (content_set, basearch, releasever))))
+            self.repo_store.delete_content_set(content_set, basearch=basearch, releasever=releasever)
+        self.repo_store.cleanup_unused_data()
+
     def import_repositories(self):
         """Create or update repository records in the DB."""
         self.logger.info("Importing %d repositories.", len(self.repositories))

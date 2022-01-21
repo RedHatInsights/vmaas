@@ -125,16 +125,28 @@ class RepositoryStore:
         finally:
             cur.close()
 
-    def delete_content_set(self, content_set_label):
+    def delete_content_set(self, content_set_label, basearch=None, releasever=None):
         """
         Deletes repositories and their content from DB.
         """
         content_set_id = self.content_set_to_db_id[content_set_label]
         cur = self.conn.cursor()
         try:
-            cur.execute("""select id from repo where content_set_id = %s""", (content_set_id,))
-            repo_ids = cur.fetchall()
-            for repo_id in repo_ids:
+            query = "select id from repo where content_set_id = %s"
+            query_args = [content_set_id]
+            cur.execute(query, tuple(query_args))
+            all_cs_repo_ids = cur.fetchall()
+
+            if basearch:
+                query += " and basearch_id = (select id from arch where name = %s)"
+                query_args.append(basearch)
+            if releasever:
+                query += " and releasever = %s"
+                query_args.append(releasever)
+            cur.execute(query, tuple(query_args))
+            to_delete_repo_ids = cur.fetchall()
+
+            for repo_id in to_delete_repo_ids:
                 cur.execute("select id from module where repo_id = %s", (repo_id,))
                 module_ids = cur.fetchall()
                 if module_ids:
@@ -154,9 +166,11 @@ class RepositoryStore:
                 cur.execute("delete from module where repo_id = %s", (repo_id,))
                 cur.execute("delete from pkg_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from errata_repo where repo_id = %s", (repo_id,))
+                cur.execute("delete from cpe_repo where repo_id = %s", (repo_id,))
                 cur.execute("delete from repo where id = %s", (repo_id,))
-            cur.execute("delete from cpe_content_set where content_set_id = %s", (content_set_id,))
-            cur.execute("delete from content_set where id = %s", (content_set_id,))
+            if len(all_cs_repo_ids) == len(to_delete_repo_ids):
+                cur.execute("delete from cpe_content_set where content_set_id = %s", (content_set_id,))
+                cur.execute("delete from content_set where id = %s", (content_set_id,))
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failed to delete content set.")

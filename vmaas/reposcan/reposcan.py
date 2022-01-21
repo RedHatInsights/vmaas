@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=too-many-lines
 """
 Main entrypoint of reposcan tool. It provides and API and allows to sync specified repositories
 into specified PostgreSQL database.
@@ -341,16 +342,9 @@ class GitRepoListHandler(RepolistImportHandler):
     task_type = "Import repositories from git"
 
     @staticmethod
-    def run_task(*args, **kwargs):
-        """Start importing from git"""
-
-        init_logging()
-
-        if not REPOLIST_GIT_TOKEN:
-            LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
-            return "SKIPPED"
-
-        LOGGER.info("Downloading repolist.json from git %s", REPOLIST_GIT)
+    def fetch_git_repolists():
+        """Download and parse repolists from configured git repo"""
+        LOGGER.info("Downloading repolists from git %s", REPOLIST_GIT)
         shutil.rmtree(REPOLIST_DIR, True)
         os.makedirs(REPOLIST_DIR, exist_ok=True)
 
@@ -369,6 +363,7 @@ class GitRepoListHandler(RepolistImportHandler):
             path = path.strip()
             if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + path):
                 LOGGER.error("Downloading repolist failed: Directory was not created")
+                return None, None
 
             with open(REPOLIST_DIR + '/' + path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
@@ -376,15 +371,75 @@ class GitRepoListHandler(RepolistImportHandler):
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
             if not item_products and not item_repos:
                 LOGGER.warning("Input json is not valid")
-                return "ERROR"
+                return None, None
             products.update(item_products)
             repos += item_repos
+        return products, repos
 
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Start importing from git"""
+        init_logging()
+        if not REPOLIST_GIT_TOKEN:
+            LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
+            return "SKIPPED"
+        products, repos = GitRepoListHandler.fetch_git_repolists()
+        if products is None or repos is None:
+            return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
 
     @classmethod
     def put(cls, **kwargs):
         """Add repositories listed in request to the DB"""
+        try:
+            status_code, status_msg = cls.start_task()
+            return status_msg, status_code
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            FAILED_IMPORT_REPO.inc()
+            return TaskStartResponse(msg, success=False), 400
+
+
+class GitRepoListCleanupHandler(SyncHandler):
+    """Handler for deleting repos from DB if repos are not in repolist"""
+    task_type = "Cleanup repositories from DB"
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Start importing from git"""
+        try:
+            init_logging()
+            init_db()
+
+            if not REPOLIST_GIT_TOKEN:
+                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
+                return "SKIPPED"
+
+            _, repos = GitRepoListHandler.fetch_git_repolists()
+            if not repos:
+                return "ERROR"
+
+            repository_controller = RepositoryController()
+            repos_in_db = repository_controller.repo_store.list_repositories()
+            for _, content_set, basearch, releasever, _, _, _, _ in repos:
+                repos_in_db.pop((content_set, basearch, releasever), None)
+            repository_controller.delete_repos(repos_in_db)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % err.__hash__()
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+    @classmethod
+    def delete(cls, **kwargs):
+        """Cleanup repositories from DB"""
         try:
             status_code, status_msg = cls.start_task()
             return status_msg, status_code
