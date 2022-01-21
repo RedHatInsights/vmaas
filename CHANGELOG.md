@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.33.1 (2022-01-21)
+### Fix
+* **webapp:** Remove null probes in clowaddp.yaml ([`5e38b8d`](https://github.com/RedHatInsights/vmaas/commit/5e38b8dd703fc453285c0d7b36dcc9ff2ee0da19))
+
 ## v2.33.0 (2022-01-18)
 ### Feature
 * **webapp:** Use CPE-repository mapping if available ([`9e06241`](https://github.com/RedHatInsights/vmaas/commit/9e06241f5b3ac8fb28672154739a7a3afc71380d))
