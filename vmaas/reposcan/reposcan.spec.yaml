@@ -90,6 +90,18 @@ paths:
       tags:
         - Repos
 
+  /repos/git/cleanup:
+    delete:
+      summary: Delete repositories from the DB if they are not in current repolist
+      operationId: vmaas.reposcan.reposcan.GitRepoListCleanupHandler.delete
+      <<: *secured
+      responses:
+        <<: *repo_responses
+        <<: *running_resp
+        <<: *auth_resps
+      tags:
+        - Repos
+
   /repos/{repo}:
     delete:
       summary: Delete repo from the DB
