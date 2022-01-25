@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.0 (2022-01-25)
+### Feature
+* **reposcan:** Delete all repos removed from list ([`e9ec3a8`](https://github.com/RedHatInsights/vmaas/commit/e9ec3a81bb08595a8d3d17168c0b1b26ca5aacfc))
+
 ## v2.33.1 (2022-01-21)
 ### Fix
 * **webapp:** Remove null probes in clowaddp.yaml ([`5e38b8d`](https://github.com/RedHatInsights/vmaas/commit/5e38b8dd703fc453285c0d7b36dcc9ff2ee0da19))
