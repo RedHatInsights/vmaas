@@ -20,6 +20,8 @@ export IQE_CJI_TIMEOUT="30m"
 
 # Heavily inspired by project-koku pr_check
 # https://github.com/project-koku/koku/blob/main/pr_check.sh
+export ARTIFACTS_DIR="$WORKSPACE/artifacts"
+mkdir -p $ARTIFACTS_DIR
 LABELS_DIR="$WORKSPACE/github_labels"
 
 mkdir -p $LABELS_DIR
