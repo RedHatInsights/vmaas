@@ -125,7 +125,7 @@ class RepositoryStore:
         finally:
             cur.close()
 
-    def delete_content_set(self, content_set_label, basearch=None, releasever=None):
+    def delete_content_set(self, content_set_label, whole_content_set=False, basearch=None, releasever=None):
         """
         Deletes repositories and their content from DB.
         """
@@ -140,9 +140,13 @@ class RepositoryStore:
             if basearch:
                 query += " and basearch_id = (select id from arch where name = %s)"
                 query_args.append(basearch)
+            elif not whole_content_set:
+                query += " and basearch_id is null"
             if releasever:
                 query += " and releasever = %s"
                 query_args.append(releasever)
+            elif not whole_content_set:
+                query += " and releasever is null"
             cur.execute(query, tuple(query_args))
             to_delete_repo_ids = cur.fetchall()
 

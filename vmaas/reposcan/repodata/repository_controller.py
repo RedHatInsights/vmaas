@@ -246,7 +246,7 @@ class RepositoryController:
         """Deletes content sets described by given regex from DB."""
         for content_set_label in self._find_content_sets_by_regex(content_set_regex):
             self.logger.info("Deleting content set: %s", content_set_label)
-            self.repo_store.delete_content_set(content_set_label)
+            self.repo_store.delete_content_set(content_set_label, whole_content_set=True)
         self.repo_store.cleanup_unused_data()
 
     def delete_repos(self, repos):
