@@ -3,8 +3,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal
 # install postgresql from centos if not building on RHSM system
 RUN FULL_RHEL=$(microdnf repolist --enabled | grep rhel-8) ; \
     if [ -z "$FULL_RHEL" ] ; then \
-        rpm -Uvh http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/centos-linux-repos-8-3.el8.noarch.rpm \
-                 http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm && \
+        rpm -Uvh http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-4.el8.noarch.rpm \
+                 http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-4.el8.noarch.rpm && \
         sed -i 's/^\(enabled.*\)/\1\npriority=200/;' /etc/yum.repos.d/CentOS*.repo ; \
     fi
 
