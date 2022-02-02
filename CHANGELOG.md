@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.1 (2022-02-02)
+### Fix
+* **reposcan:** Allow redirects ([`dc433c8`](https://github.com/RedHatInsights/vmaas/commit/dc433c861551b34aec2a2713118fd12c2fefebc7))
+
 ## v2.34.0 (2022-01-25)
 ### Feature
 * **reposcan:** Delete all repos removed from list ([`e9ec3a8`](https://github.com/RedHatInsights/vmaas/commit/e9ec3a81bb08595a8d3d17168c0b1b26ca5aacfc))
