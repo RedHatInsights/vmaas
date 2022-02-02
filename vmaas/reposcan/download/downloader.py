@@ -65,7 +65,7 @@ class FileDownloadThread(Thread):
             else:
                 cert = None
 
-            req_args = {'url': download_item.source_url, 'verify': verify, 'cert': cert, 'stream': True}
+            req_args = {'url': download_item.source_url, 'verify': verify, 'cert': cert, 'stream': True, 'allow_redirects': True}
             if self.headers_only:
                 with self.session.head(**req_args) as response:
                     headers = ["%s:%s" % (key, value)
