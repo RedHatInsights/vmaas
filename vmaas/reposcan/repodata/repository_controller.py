@@ -8,6 +8,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 import re
 import sqlite3
+from operator import attrgetter
 
 from OpenSSL import crypto
 
@@ -50,7 +51,7 @@ class RepositoryController:
     def _download_repomds(self):
         download_items = []
         certs_tmp_dict = {}
-        for repository in self.repositories:
+        for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
@@ -105,7 +106,7 @@ class RepositoryController:
         """
         # Fetch current list of repositories from DB
         db_repositories = self.repo_store.list_repositories()
-        for repository in self.repositories:
+        for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             repomd = RepoMD(repomd_path)
             # Was repository already synced before?
@@ -214,7 +215,7 @@ class RepositoryController:
 
     def _write_certificate_cache(self):
         certs = {}
-        for repository in self.repositories:
+        for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             if repository.cert_name:
                 certs[repository.cert_name] = {"ca_cert": repository.ca_cert, "cert": repository.cert,
                                                "key": repository.key}
@@ -261,7 +262,7 @@ class RepositoryController:
         """Create or update repository records in the DB."""
         self.logger.info("Importing %d repositories.", len(self.repositories))
         failures = 0
-        for repository in self.repositories:
+        for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             try:
                 self.repo_store.import_repository(repository)
             except Exception:  # pylint: disable=broad-except
@@ -281,7 +282,8 @@ class RepositoryController:
         failed = self._download_repomds()
         if failed:
             FAILED_REPOMD.inc(len(failed))
-            failed_repos = [repo for repo in self.repositories if self._repo_download_failed(repo, failed)]
+            failed_repos = [repo for repo in sorted(self.repositories, key=attrgetter("repo_url"))
+                            if self._repo_download_failed(repo, failed)]
             self.logger.warning("%d repomd.xml files failed to download.", len(failed))
             self.clean_repodata(failed_repos)
 
@@ -298,7 +300,7 @@ class RepositoryController:
             except RepoMDTypeNotFound:
                 return 0
 
-        for repository in self.repositories:
+        for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             if repository.repomd:
 
                 repo_size = md_size(repository.repomd, 'primary_db')
