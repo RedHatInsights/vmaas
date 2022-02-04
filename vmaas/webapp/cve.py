@@ -6,6 +6,7 @@ from vmaas.common.webapp_utils import format_datetime, parse_datetime, none2empt
 from vmaas.webapp.cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
                   CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
                   CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
+from vmaas.webapp.vulnerabilities import OVAL_DEFINITION_TYPE_PATCH
 
 
 class CveAPI:
@@ -18,8 +19,19 @@ class CveAPI:
                 and self.cache.cve_detail.get(cve)[CVE_SOURCE] == 'Red Hat']
 
     def _filter_errata_only(self, cves_to_process):
-        return [cve for cve in cves_to_process if self.cache.cve_detail.get(cve)
-                and self.cache.cve_detail.get(cve)[CVE_EID]]
+        oval_patch_cves = set()
+        for oval_definition_id, oval_definition_detail in self.cache.ovaldefinition_detail.items():
+            if oval_definition_detail[0] == OVAL_DEFINITION_TYPE_PATCH:
+                oval_patch_cves.update(self.cache.ovaldefinition_id2cves.get(oval_definition_id, []))
+
+        filtered_cves_to_process = []
+        for cve in cves_to_process:
+            if self.cache.cve_detail.get(cve):
+                if self.cache.cve_detail.get(cve)[CVE_EID]:
+                    filtered_cves_to_process.append(cve)
+                elif cve in oval_patch_cves:
+                    filtered_cves_to_process.append(cve)
+        return filtered_cves_to_process
 
     def _filter_modified_since(self, cves_to_process, modified_since_dt):
         filtered_cves_to_process = []
