@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.2 (2022-02-07)
+### Fix
+* **webapp:** In errata_associated CVE list include also CVEs found only in OVAL files (missing in repodata due to error) ([`4b0157e`](https://github.com/RedHatInsights/vmaas/commit/4b0157ef9994931d16549659efae80339c8c02cd))
+* **reposcan:** Don't delete whole CS when want to delete only repo with null basearch and releasever ([`862c2cb`](https://github.com/RedHatInsights/vmaas/commit/862c2cb67a7a2fd74eed1f86a60d40ff0bb8681d))
+
 ## v2.34.1 (2022-02-02)
 ### Fix
 * **reposcan:** Allow redirects ([`dc433c8`](https://github.com/RedHatInsights/vmaas/commit/dc433c861551b34aec2a2713118fd12c2fefebc7))
