@@ -202,6 +202,11 @@ objects:
           value: ${OVAL_LABEL_FILTER}
         - name: REDHAT_CVEMAP_URL
           value: ${REDHAT_CVEMAP_URL}
+        - name: SLACK_WEBHOOK
+          valueFrom:
+            secretKeyRef:
+              key: slack_webhook
+              name: vulnerability-slack
 
     database:
       name: vmaas
@@ -240,6 +245,15 @@ objects:
   metadata:
     name: github-vmaas-bot
     namespace: test
+  type: Opaque
+
+- apiVersion: v1
+  data:
+    slack_webhook: ""
+  kind: Secret
+  metadata:
+    name: vulnerability-slack
+    namespace: test  # namespace is overwritten by bonfire
   type: Opaque
 
 - apiVersion: route.openshift.io/v1
