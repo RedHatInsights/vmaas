@@ -207,6 +207,8 @@ objects:
             secretKeyRef:
               key: slack_webhook
               name: vulnerability-slack
+        - name: VMAAS_ENV
+          value: ${VMAAS_ENV}
 
     database:
       name: vmaas
@@ -397,3 +399,6 @@ parameters:
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
 - name: OVAL_UNFIXED_EVAL_ENABLED
   value: "FALSE"
+- name: VMAAS_ENV
+  description: Environment VMaaS is running in
+  value: PROD
