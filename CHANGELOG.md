@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.3 (2022-02-14)
+### Fix
+* **reposcan:** EUS repos are mapped to CPEs of incorrect EUS version ([`f9fc5da`](https://github.com/RedHatInsights/vmaas/commit/f9fc5da8b88011bf80637c30131e66598ac2a40e))
+
 ## v2.34.2 (2022-02-07)
 ### Fix
 * **webapp:** In errata_associated CVE list include also CVEs found only in OVAL files (missing in repodata due to error) ([`4b0157e`](https://github.com/RedHatInsights/vmaas/commit/4b0157ef9994931d16549659efae80339c8c02cd))
