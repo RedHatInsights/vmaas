@@ -226,9 +226,9 @@ class CpeStore(ObjectStore):
                 continue
 
             for basearch, releasever, repo_id in repos:
-                if required_basearch and not required_basearch != basearch:
+                if required_basearch and required_basearch != basearch:
                     continue
-                if required_releasever and not required_releasever != releasever:
+                if required_releasever and required_releasever != releasever:
                     continue
 
                 # Find missing pairs to import and eliminate already existing
