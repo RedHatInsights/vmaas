@@ -43,7 +43,7 @@
           "name": "Red Hat Enterprise Linux 8 EUS for x86_64 - AppStream (RPMs)",
           "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/eus/rhel8/$releasever/$basearch/appstream/os/",
           "basearch": ["x86_64"],
-          "releasever": ["8.4"]
+          "releasever": ["8.1", "8.4"]
         },
         "rhel-8-for-x86_64-baseos-eus-rpms": {
           "name": "Red Hat Enterprise Linux 8 EUS for x86_64 - BaseOs (RPMs)",
