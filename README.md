@@ -118,7 +118,23 @@ Congratulations!
 ### Run tests
 You can run all tests from scratch just after cloning repo using command:
 ~~~bash
-sudo podman-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+sudo docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+~~~
+You can alternatively log in to webapp container and run selected tests separately
+~~~bash
+sudo docker-compose -f docker-compose.test-ia.yml up --build --abort-on-container-exit
+~~~
+In a new shell instance
+~~~bash
+docker exec -it vmaas-webapp bash
+~~~
+From within container go to desired module
+~~~bash
+cd vmaas/webapp
+~~~
+Then for example run tests from selected file and with stdout captured
+~~~bash
+pipenv run pytest -rP test/test_repos.py
 ~~~
 
 ### Developing / Debugging
