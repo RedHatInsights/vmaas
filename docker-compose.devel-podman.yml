@@ -8,9 +8,9 @@ services:
     container_name: vmaas-databasefix
     image: vmaas/database:latest
     volumes:
-      - vmaas-db-data:/var/lib/pgsql/data
+      - vmaas-db-data:/var/lib/postgresql/data
     user: root
-    command: chown -R postgres /var/lib/pgsql/data
+    command: chown -R postgres /var/lib/postgresql/data
   vmaas_reposcan:
     depends_on:
       - vmaas_podmanfix

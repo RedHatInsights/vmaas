@@ -12,7 +12,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - vmaas-db-data:/var/lib/pgsql/data
+      - vmaas-db-data:/var/lib/postgresql/data
 
   schema_spy:
     container_name: schema-spy
