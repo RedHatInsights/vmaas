@@ -13,7 +13,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - vmaas-db-data:/var/lib/pgsql/data
+      - vmaas-db-data:/var/lib/postgresql/data
 
   vmaas_websocket:
     command: /vmaas/entrypoint.sh websocket
