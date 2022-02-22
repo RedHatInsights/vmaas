@@ -1,16 +1,6 @@
 version: '3'
 
 services:
-  vmaas_database:
-    depends_on:
-      - vmaas_databasefix
-  vmaas_databasefix:
-    container_name: vmaas-databasefix
-    image: vmaas/database:latest
-    volumes:
-      - vmaas-db-data:/var/lib/postgresql/data
-    user: root
-    command: chown -R postgres /var/lib/postgresql/data
   vmaas_reposcan:
     depends_on:
       - vmaas_podmanfix
