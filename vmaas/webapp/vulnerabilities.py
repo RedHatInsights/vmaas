@@ -49,7 +49,7 @@ class VulnerabilitiesAPI:
 
         candidate_arches = self.db_cache.ovalstate_id2arches.get(oval_state_id, [])
         if candidate_arches:
-            if self.db_cache.arch2id.get(arch) is not None:
+            if arch in self.db_cache.arch2id:
                 matched = matched and self.db_cache.arch2id[arch] in candidate_arches
             else:
                 raise ValueError("Invalid arch name: %s" % arch)
