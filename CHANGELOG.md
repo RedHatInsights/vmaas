@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.4 (2022-02-22)
+### Fix
+* **local-deployment:** Official PostgreSQL container has different mount path ([`9fcc693`](https://github.com/RedHatInsights/vmaas/commit/9fcc69332f5bd91189e2918eb86fc1dc534bd331))
+
 ## v2.34.3 (2022-02-14)
 ### Fix
 * **reposcan:** EUS repos are mapped to CPEs of incorrect EUS version ([`f9fc5da`](https://github.com/RedHatInsights/vmaas/commit/f9fc5da8b88011bf80637c30131e66598ac2a40e))
