@@ -11,6 +11,16 @@ services:
     ports:
       - 5432:5432
 
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    environment:
+      REDIS_PASSWORD: vmaas_redis_pwd
+    ports:
+      - 6379:6379
+
   test:
     container_name: vmaas-webapp
     hostname: vmaas-webapp
@@ -34,6 +44,7 @@ services:
       - ./conf/test.env
     depends_on:
       - vmaas_database
+      - redis
     volumes:
       - ./:/vmaas
     user: root
