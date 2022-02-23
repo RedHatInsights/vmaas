@@ -524,6 +524,7 @@ components:
         latest_only:
           type: boolean
           enum: [true, false]
+          description: Filters out non latest versions of packages from request.
         third_party:
           type: boolean
           enum: [ true, false ]
