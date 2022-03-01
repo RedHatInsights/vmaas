@@ -44,4 +44,4 @@ class TestBatchList:
             self.batch_list.add_item(item)
 
         self.batch_list.clear()
-        assert self.batch_list.batches == []
+        assert len(self.batch_list.batches) == 0
