@@ -7,7 +7,6 @@ import tempfile
 from datetime import datetime
 from urllib.parse import urljoin
 import re
-import sqlite3
 from operator import attrgetter
 
 from OpenSSL import crypto
@@ -341,8 +340,8 @@ class RepositoryController:
                                 filter(None, (repository.content_set, repository.basearch, repository.releasever))),
                                              completed_repositories, total_repositories)
                             self.repo_store.store(repository)
-                        except sqlite3.Error:
-                            self.logger.warning("Syncing repository failed due to sqlite error: %s [%s/%s]", ", ".join(
+                        except Exception:  # pylint: disable=broad-except
+                            self.logger.warning("Syncing repository failed: %s [%s/%s]", ", ".join(
                                 filter(None, (repository.content_set, repository.basearch, repository.releasever))),
                                              completed_repositories, total_repositories)
                             self.logger.exception("Exception: ")
