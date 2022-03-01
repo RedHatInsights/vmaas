@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.5 (2022-03-01)
+### Fix
+* **reposcan:** Handle all other sync exceptions to not skip syncing valid repos ([`9d355da`](https://github.com/RedHatInsights/vmaas/commit/9d355da4f13585c3d9a50ff1220a0e252011cf83))
+
 ## v2.34.4 (2022-02-22)
 ### Fix
 * **local-deployment:** Official PostgreSQL container has different mount path ([`9fcc693`](https://github.com/RedHatInsights/vmaas/commit/9fcc69332f5bd91189e2918eb86fc1dc534bd331))
