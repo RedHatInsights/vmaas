@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.34.6 (2022-03-02)
+### Fix
+* **reposcan:** Fix lint in test_patchlist.py ([`b71de25`](https://github.com/RedHatInsights/vmaas/commit/b71de25e43286e5d39270b70af6844a4d2e42160))
+
 ## v2.34.5 (2022-03-01)
 ### Fix
 * **reposcan:** Handle all other sync exceptions to not skip syncing valid repos ([`9d355da`](https://github.com/RedHatInsights/vmaas/commit/9d355da4f13585c3d9a50ff1220a0e252011cf83))
