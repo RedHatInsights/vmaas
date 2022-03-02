@@ -32,6 +32,9 @@ UPDATES_JSON_UNKNOWN_OPT_UPD['optimistic_updates'] = True
 UPDATES_JSON_UNKNOWN_OPT_UPD_2 = UPDATES_JSON_UNKNOWN_OPT_UPD.copy()
 UPDATES_JSON_UNKNOWN_OPT_UPD_2["modules_list"] = [{'module_name': 'my-pkg', 'module_stream': '2'}]
 
+UPDATES_JSON_PREFIX = UPDATES_JSON_3_OPT.copy()
+UPDATES_JSON_PREFIX['repository_list'] = ["rhul-rhel-7-server-rpms"]
+
 UPDATES_RESPONSE_2 = {
     'update_list': {PKG:
                         {'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
@@ -146,6 +149,12 @@ class TestUpdatesAPI(TestBase):
         """Test looking for package updates api v3."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.updates_api.process_list(3, UPDATES_JSON_3_OPT.copy())
+        assert updates == UPDATES_RESPONSE_2
+
+    def test_process_list_prefix_v3(self):
+        """Test looking for package updates api v3 with prefixed repo names."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.updates_api.process_list(3, UPDATES_JSON_PREFIX.copy())
         assert updates == UPDATES_RESPONSE_2
 
     def test_process_none_arch(self):

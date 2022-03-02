@@ -147,3 +147,12 @@ def try_expand_by_regex(input_labels: list, labeled_data: dict) -> list:
         if len(output_labels) > 0:
             return output_labels
     return input_labels
+
+
+def strip_prefixes(repos: list, prefixes: list):
+    """Strips prefixes from repo names"""
+    for i, repo in enumerate(list(repos)):
+        for prefix in prefixes:
+            if repo.startswith(prefix):
+                repos[i] = repo[len(prefix):]
+                break

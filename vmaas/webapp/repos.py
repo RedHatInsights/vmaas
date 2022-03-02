@@ -2,6 +2,8 @@
 Module to handle /repos API calls.
 """
 
+import os
+
 from vmaas.webapp.cache import (
     REPO_NAME,
     REPO_URL,
@@ -12,7 +14,10 @@ from vmaas.webapp.cache import (
     REPO_THIRD_PARTY
 )
 from vmaas.common.date_utils import format_datetime
-from vmaas.common.webapp_utils import paginate, none2empty, parse_datetime, filter_item_if_exists, try_expand_by_regex
+from vmaas.common.webapp_utils import paginate, none2empty, parse_datetime, \
+                  filter_item_if_exists, try_expand_by_regex, strip_prefixes
+
+REPO_PREFIXES = os.getenv("REPO_NAME_PREFIXES", "").split(",")
 
 
 class RepoAPI:
@@ -69,6 +74,7 @@ class RepoAPI:
         :returns: json response with repository details
         """
         repos = data.get('repository_list', None)
+        strip_prefixes(repos, REPO_PREFIXES)
         modified_since = data.get('modified_since', None)
         modified_since_dt = parse_datetime(modified_since)
         page = data.get("page", None)
