@@ -16,6 +16,7 @@ REPO_JSON_MODIFIED_SINCE = {
 }
 REPO_JSON_EMPTY_LIST = {"repository_list": [""]}
 REPO_JSON_NON_EXIST = {"repository_list": ["non-existent-repo"]}
+REPO_JSON_WITH_PREFIX = {"repository_list": ["rhul-rhel-7-server-rpms"]}
 
 EMPTY_RESPONSE = {"repository_list": {}, "page": 1, "page_size": 0, "pages": 0,
                   "last_change": "2019-03-07T09:17:23.799995+00:00"}
@@ -91,3 +92,8 @@ class TestRepoAPI(TestBase):
         for label in response['repository_list']:
             page_size += len(response['repository_list'][label])
         assert response['page_size'] == page_size
+
+    def test_repo_with_prefix(self):
+        """Test repos with valid prefixes"""
+        response = self.repo.process_list(api_version="v1", data=REPO_JSON_WITH_PREFIX)
+        assert len(response["repository_list"]) == 1

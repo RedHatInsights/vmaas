@@ -3,8 +3,9 @@ Module to handle /vulnerabilities API calls.
 """
 
 from vmaas.webapp.cache import ERRATA_CVE, CFG, REPO_BASEARCH, REPO_RELEASEVER
+from vmaas.webapp.repos import REPO_PREFIXES
 from vmaas.common.rpm_utils import rpmver2array
-from vmaas.common.webapp_utils import format_datetime
+from vmaas.common.webapp_utils import format_datetime, strip_prefixes
 
 OVAL_OPERATION_EVR_EQUALS = 1
 OVAL_OPERATION_EVR_LESS_THAN = 2
@@ -169,6 +170,7 @@ class VulnerabilitiesAPI:
     # pylint: disable=unused-argument,too-many-branches,too-many-nested-blocks
     def process_list(self, api_version, data):
         """Return list of potential security issues"""
+        strip_prefixes(data, REPO_PREFIXES)
         data["optimistic_updates"] = True  # find updates even if original package is not found in repo
         extended = data.get("extended", False)
         cve_dict = {}

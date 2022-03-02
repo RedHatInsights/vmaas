@@ -2,9 +2,11 @@
 Module to handle /updates API calls.
 """
 import rpm
+
 from vmaas.webapp. cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
     ERRATA_CVE, ERRATA_TYPE, PKG_EVR_ID, ERRATA_THIRD_PARTY
-from vmaas.common.webapp_utils import none2empty, filter_package_list, format_datetime
+from vmaas.webapp.repos import REPO_PREFIXES
+from vmaas.common.webapp_utils import none2empty, filter_package_list, format_datetime, strip_prefixes
 from vmaas.common.rpm_utils import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
@@ -44,6 +46,7 @@ class UpdatesAPI:
     def _get_repository_list(self, data: dict) -> (list, list):
         repo_list = data.get('repository_list', None)
         if repo_list is not None:
+            strip_prefixes(repo_list, REPO_PREFIXES)
             repo_ids = []
             for label in repo_list:
                 repo_id = self.db_cache.repolabel2ids.get(label, None)

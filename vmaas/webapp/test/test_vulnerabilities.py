@@ -20,6 +20,9 @@ UPDATES_JSON_NON_EXIST = {"package_list": ["non-exist"]}
 UPDATES_JSON_EMPTY = {}
 UPDATES_JSON_EMPTY_LIST = {"package_list": [""]}
 
+UPDATES_JSON_PREFIX = UPDATES_JSON.copy()
+UPDATES_JSON_PREFIX['repository_list'] = ["rhul-rhel-7-server-rpms"]
+
 EMPTY_RESPONSE = {"cve_list": [], "manually_fixable_cve_list": [], "unpatched_cve_list": [],
                   "last_change": "2019-03-07T09:17:23.799995+00:00"}
 
@@ -38,6 +41,12 @@ class TestVulnerabilitiesAPI(TestBase):
         """Test schema of vulnerabilities api."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.vulnerabilities_api.process_list(1, UPDATES_JSON.copy())
+        assert schemas.vulnerabilities_schema.validate(updates)
+
+    def test_schema_with_repo_prefix(self):
+        """Test non-existing package vulnerabilities api."""
+        # NOTE: use copy of dict with json input, because process_list changes this dict
+        updates = self.vulnerabilities_api.process_list(1, UPDATES_JSON_PREFIX.copy())
         assert schemas.vulnerabilities_schema.validate(updates)
 
     def test_process_list(self):
