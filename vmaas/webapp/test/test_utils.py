@@ -77,4 +77,4 @@ class TestUtils(TestBase):
             "nonexistent-2": []
         }
         filtered_items = utils.filter_item_if_exists(repos, details)
-        assert filtered_items == []
+        assert len(filtered_items) == 0

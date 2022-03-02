@@ -95,7 +95,7 @@ class TestUpdatesAPI(TestBase):
     def test_process_input_non_exist(self):
         """Test filtering out unknown non existing package."""
         pkgs, update_list = self.updates_api.process_input_packages(UPDATES_JSON_NON_EXIST)
-        assert pkgs == {}
+        assert len(pkgs) == 0
         assert update_list == {'non-exist': {}}
 
     def test_schema_v1(self):
