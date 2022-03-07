@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.35.0 (2022-03-07)
+### Feature
+* **webapp:** Strip prefixes from repository names ([`bcd2572`](https://github.com/RedHatInsights/vmaas/commit/bcd2572de2b192a1b98a8e5b4de91ea7d74b2c87))
+
 ## v2.34.6 (2022-03-02)
 ### Fix
 * **reposcan:** Fix lint in test_patchlist.py ([`b71de25`](https://github.com/RedHatInsights/vmaas/commit/b71de25e43286e5d39270b70af6844a4d2e42160))
