@@ -402,3 +402,6 @@ parameters:
 - name: VMAAS_ENV
   description: Environment VMaaS is running in
   value: PROD
+- name: REPO_NAME_PREFIXES
+  description: Repo name prefixes to be stripped
+  value: "rhui-"
