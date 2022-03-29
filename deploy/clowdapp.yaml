@@ -70,6 +70,8 @@ objects:
           value: ${CLOWDER_ENABLED}
         - name: OVAL_UNFIXED_EVAL_ENABLED
           value: ${OVAL_UNFIXED_EVAL_ENABLED}
+        - name: REPO_NAME_PREFIXES
+          value: ${REPO_NAME_PREFIXES}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP}
