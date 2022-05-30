@@ -2,7 +2,7 @@
   "products": {
     "Extra Packages for Enterprise Linux (EPEL)": {
       "content_sets": {
-        "epel": {
+        "epel-8": {
           "name": "Extra Packages for Enterprise Linux (RPMs)",
           "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Everything/$basearch",
           "basearch": ["x86_64"],
