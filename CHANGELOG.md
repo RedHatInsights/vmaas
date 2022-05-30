@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.35.1 (2022-05-30)
+### Fix
+* Rename epel repo to epel-8 ([`7b13602`](https://github.com/RedHatInsights/vmaas/commit/7b1360265a1eeba3e35c419b40318d48546138e7))
+
 ## v2.35.0 (2022-03-07)
 ### Feature
 * **webapp:** Strip prefixes from repository names ([`bcd2572`](https://github.com/RedHatInsights/vmaas/commit/bcd2572de2b192a1b98a8e5b4de91ea7d74b2c87))
