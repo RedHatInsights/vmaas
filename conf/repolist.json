@@ -4,14 +4,14 @@
       "content_sets": {
         "epel-8": {
           "name": "Extra Packages for Enterprise Linux (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Everything/$basearch",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Everything/$basearch",
           "basearch": ["x86_64"],
           "releasever": ["8"],
           "third_party": true
         },
         "epel-modular": {
           "name": "Extra Packages for Enterprise Linux Modular 8 - $basearch",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Modular/$basearch",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/epel/$releasever/Modular/$basearch",
           "basearch": ["x86_64"],
           "releasever": ["8"],
           "third_party": true
@@ -23,31 +23,31 @@
       "content_sets": {
         "rhel-7-server-rpms": {
           "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/server/7/$releasever/$basearch/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/rhel/server/7/$releasever/$basearch/os/",
           "basearch": ["x86_64", "ppc64"],
           "releasever": ["7Server", "7.7"]
         },
         "rhel-8-for-x86_64-appstream-rpms": {
           "name": "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/appstream/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/appstream/os/",
           "basearch": ["x86_64"],
           "releasever": ["8", "8.1"]
         },
         "rhel-8-for-x86_64-baseos-rpms": {
           "name": "Red Hat Enterprise Linux 8 for x86_64 - BaseOs (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/baseos/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/rhel/$releasever/$basearch/baseos/os/",
           "basearch": ["x86_64"],
           "releasever": ["8"]
         },
         "rhel-8-for-x86_64-appstream-eus-rpms": {
           "name": "Red Hat Enterprise Linux 8 EUS for x86_64 - AppStream (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/eus/rhel8/$releasever/$basearch/appstream/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/eus/rhel8/$releasever/$basearch/appstream/os/",
           "basearch": ["x86_64"],
           "releasever": ["8.1", "8.4"]
         },
         "rhel-8-for-x86_64-baseos-eus-rpms": {
           "name": "Red Hat Enterprise Linux 8 EUS for x86_64 - BaseOs (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/eus/rhel8/$releasever/$basearch/baseos/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/eus/rhel8/$releasever/$basearch/baseos/os/",
           "basearch": ["x86_64"],
           "releasever": ["8.4"]
         }
@@ -57,7 +57,7 @@
       "content_sets": {
         "rhel-7-workstation-rpms": {
           "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/rhel/workstation/7/$releasever/$basearch/os/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/rhel/workstation/7/$releasever/$basearch/os/",
           "basearch": ["x86_64"],
           "releasever": ["7Workstation"]
         }
@@ -67,13 +67,13 @@
       "content_sets": {
         "vmaas-test-1": {
           "name": "VMaaS testing repo 1 - arch2noar update",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-1/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-1/",
           "basearch": ["x86_64"],
           "releasever": ["7"]
         },
         "vmaas-test-2": {
           "name": "VMaaS testing repo 2 - update in different repo",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-2/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-2/",
           "basearch": ["x86_64"],
           "releasever": ["7"]
         }
@@ -83,7 +83,7 @@
       "content_sets": {
         "vmaas-test-3": {
           "name": "VMaaS testing repo 3 - update in different repo - different product",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
           "basearch": ["x86_64"],
           "releasever": ["7"]
         }
@@ -93,7 +93,7 @@
       "content_sets": {
         "vmaas-test-4": {
           "name": "VMaaS testing repo 4 - empty basearch (same repo as vmaas-test-3)",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-3/",
           "basearch": [""],
           "releasever": ["6"]
         }
@@ -103,13 +103,13 @@
       "content_sets": {
         "vmaas-test-i386": {
           "name": "VMaaS testing i386 arch repo",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-i386/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-i386/",
           "basearch": ["i386"],
           "releasever": ["6"]
         },
         "vmaas-test-x86_64": {
           "name": "VMaaS testing x86_64 arch repo",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-x86_64/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/vmaas-test-arch-x86_64/",
           "basearch": ["x86_64"],
           "releasever": ["7"]
         }
@@ -119,7 +119,7 @@
       "content_sets": {
         "vmaas-test-rhel8-module": {
           "name": "VMaaS testing RHEL8 modularity repo",
-          "baseurl": "https://raw.githubusercontent.com/psegedy/vmaas-data/master/repodata-for-vmaas/module_repo/",
+          "baseurl": "https://raw.githubusercontent.com/RedHatInsights/vmaas-data/master/repodata-for-vmaas/module_repo/",
           "basearch": ["x86_64"],
           "releasever": ["8"]
         }
