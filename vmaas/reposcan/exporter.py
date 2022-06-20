@@ -68,11 +68,6 @@ class SqliteDump:
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump", exc_info=err)
             remove_file_if_exists(dump_filename)
-            # TODO: remove old dump format files, can be removed after it was executed once
-            old_data = sorted(glob.glob("/data/vmaas.dbm*"), reverse=True)
-            for fname in old_data:
-                LOGGER.info("Removing old format dump %s", fname)
-                remove_file_if_exists(fname)
         else:
             # relink to the latest file only if no db exceptions
             remove_file_if_exists(self.filename)
@@ -81,11 +76,6 @@ class SqliteDump:
             old_data = sorted(glob.glob("%s-*" % self.filename), reverse=True)
             for fname in old_data[self.keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
-                remove_file_if_exists(fname)
-            # TODO: remove old dump format files, can be removed after it was executed once
-            old_data = sorted(glob.glob("/data/vmaas.dbm*"), reverse=True)
-            for fname in old_data:
-                LOGGER.info("Removing old format dump %s", fname)
                 remove_file_if_exists(fname)
 
     def _dump_content_set_src_pkg_names(self, dump):
