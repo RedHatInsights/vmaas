@@ -15,6 +15,7 @@ from vmaas.common.rpm_utils import join_rpm_name
 
 class PkgtreeAPI:
     """ Main /packages API class."""
+
     def __init__(self, cache):
         self.cache = cache
 

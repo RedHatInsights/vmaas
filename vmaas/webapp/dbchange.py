@@ -7,6 +7,7 @@ from vmaas.common.webapp_utils import format_datetime
 
 class DBChange:
     """ Main /dbchange API class. """
+
     def __init__(self, cache):
         self.cache = cache
 

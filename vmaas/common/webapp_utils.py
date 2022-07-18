@@ -66,6 +66,8 @@ def none2empty(value):
 
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 5000
+
+
 def paginate(input_list, page, page_size, filters=None, sort_input=True):
     """Split input list into pages and return only requested page."""
     def _validate_num(num, default):
@@ -122,7 +124,7 @@ def filter_package_list(package_list, latest_only=False):
         name, epoch, ver, rel, arch = parse_rpm_name(pkg)
         if (name, arch) in latest_pkgs:
             latest = latest_pkgs[(name, arch)][0:3]
-            if rpm.labelCompare((epoch, ver, rel), latest) < 1: # pylint: disable=no-member
+            if rpm.labelCompare((epoch, ver, rel), latest) < 1:  # pylint: disable=no-member
                 continue
         latest_pkgs[(name, arch)] = (epoch, ver, rel, pkg)
     return [val[3] for val in latest_pkgs.values()]

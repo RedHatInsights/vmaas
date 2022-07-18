@@ -195,11 +195,11 @@ class Cache:
             self.id2packagename[int(id)] = str(name)
 
         for (cs_id, name_id) in self._sqlite_execute(data,
-                "select content_set_id, pkg_name_id from content_set_pkg_name"):
+                                                     "select content_set_id, pkg_name_id from content_set_pkg_name"):
             self.content_set_id2pkg_name_ids.setdefault(cs_id, array.array('q')).append(name_id)
 
         for (cs_id, src_name_id) in self._sqlite_execute(data,
-                "select content_set_id, src_pkg_name_id from content_set_src_pkg_name"):
+                                                         "select content_set_id, src_pkg_name_id from content_set_src_pkg_name"):
             self.src_pkg_name_id2cs_ids.setdefault(src_name_id, array.array('q')).append(cs_id)
 
         for (cpe_id, label) in self._sqlite_execute(data, "select id, label from cpe"):
@@ -213,11 +213,11 @@ class Cache:
             self.repo_id2cpe_ids.setdefault(repo_id, array.array('q')).append(cpe_id)
 
         for (name_id, pkg_id) in self._sqlite_execute(data,
-                'select name_id, package_id from updates order by name_id, package_order'):
+                                                      'select name_id, package_id from updates order by name_id, package_order'):
             self.updates.setdefault(int(name_id), []).append(int(pkg_id))
 
         for (name_id, evr_id, order) in self._sqlite_execute(data,
-                'select name_id, evr_id, package_order from updates_index order by name_id, package_order'):
+                                                             'select name_id, evr_id, package_order from updates_index order by name_id, package_order'):
             name_id = int(name_id)
             evr_id = int(evr_id)
             order = int(order)
@@ -229,7 +229,7 @@ class Cache:
             self.evr2id[evr] = int(id)
 
         for (id, name_id, evr_id, arch_id, sum_id, descr_id, src_pkg_id, modified_str) in self._sqlite_execute(data,
-                'select * from package_detail'):
+                                                                                                               'select * from package_detail'):
             detail = array.array('q')
             modified_dt = datetime.datetime.strptime(modified_str, '%Y-%m-%d %H:%M:%S.%f')
             modified_int = int(modified_dt.timestamp())

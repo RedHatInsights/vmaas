@@ -21,6 +21,7 @@ class CvemapController:
     """
     Controls import/sync of CVE map into the DB.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.downloader = FileDownloader()

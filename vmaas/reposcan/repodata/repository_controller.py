@@ -338,12 +338,12 @@ class RepositoryController:
                             repository.load_metadata()
                             self.logger.info("Syncing repository: %s [%s/%s]", ", ".join(
                                 filter(None, (repository.content_set, repository.basearch, repository.releasever))),
-                                             completed_repositories, total_repositories)
+                                completed_repositories, total_repositories)
                             self.repo_store.store(repository)
                         except Exception:  # pylint: disable=broad-except
                             self.logger.warning("Syncing repository failed: %s [%s/%s]", ", ".join(
                                 filter(None, (repository.content_set, repository.basearch, repository.releasever))),
-                                             completed_repositories, total_repositories)
+                                completed_repositories, total_repositories)
                             self.logger.exception("Exception: ")
                             FAILED_IMPORT_REPO.inc()
                         finally:

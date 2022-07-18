@@ -65,8 +65,8 @@ class TestReposcanApp(FlaskTestCase):
            },
            "entitlement_cert": {
               "name": "RHSM-CDN",
-              "ca_cert": "$RHSM-CDN-CA",  
-              "cert": "$RHSM-CDN-CERT",  
+              "ca_cert": "$RHSM-CDN-CA",
+              "cert": "$RHSM-CDN-CERT",
               "key": "$RHSM-CDN-KEY"
             }
         }]"""

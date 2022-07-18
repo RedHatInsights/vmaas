@@ -8,6 +8,7 @@ from vmaas.common.config import Config
 
 class DatabasePoolConnection:
     """ Wrapper for psycopg2 one connection pool from DatabasePoolHandler. """
+
     def __init__(self, conn):
         self.conn = conn
 

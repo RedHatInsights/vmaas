@@ -16,6 +16,7 @@ class RepoMDTypeNotFound(Exception):
 
 class RepoMD:
     """Class parsing Repo XML. Takes filename in the constructor."""
+
     def __init__(self, filename):
         tree = eT.parse(filename)
         root = tree.getroot()

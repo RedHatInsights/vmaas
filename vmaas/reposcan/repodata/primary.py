@@ -11,6 +11,7 @@ NS = {"primary": "http://linux.duke.edu/metadata/common", "rpm": "http://linux.d
 
 class PrimaryMD:
     """Class parsing Primary XML. Takes filename in the constructor."""
+
     def __init__(self, filename):
         self.package_count = 0
         self.packages = []

@@ -21,6 +21,7 @@ class CpeController:
     """
     Controls import/sync of CPE metadata into the DB.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.downloader = FileDownloader()

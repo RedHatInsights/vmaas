@@ -1,7 +1,6 @@
 """
 Module for /errata API endpoint
 """
-import psycopg2
 
 from vmaas.webapp_utils.base import Request
 import vmaas.webapp_utils.database.db_handler as DB
@@ -133,9 +132,9 @@ class ErrataAPI:
                 item[ERRATA_PKG_RELEASE],
                 item[ERRATA_PKG_ARCH]
             )
-            if package and not source and not package in package_list and not package[-4:] == ".src":
+            if package and not source and package not in package_list and not package[-4:] == ".src":
                 package_list.append(package)
-            elif package and source and not package in source_package_list and package[-4:] == ".src":
+            elif package and source and package not in source_package_list and package[-4:] == ".src":
                 source_package_list.append(package)
         if source:
             return source_package_list

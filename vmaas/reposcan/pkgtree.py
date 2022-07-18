@@ -21,8 +21,9 @@ DEFAULT_PKGTREE_INDENT = "0"
 LOGGER = get_logger(__name__)
 
 
-class JsonPkgTree: # pylint: disable=too-many-instance-attributes
+class JsonPkgTree:  # pylint: disable=too-many-instance-attributes
     """Class for creating package tree json file from database."""
+
     def __init__(self, db_instance, filename):
         self.db_instance = db_instance
         self.filename = filename
@@ -68,7 +69,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
             self._associate_modules()
             self._associate_repos()
             self._associate_errata()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to export pkgtree")
         else:
@@ -85,7 +86,6 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
             for fname in old_data[self.pkgtree_keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
                 remove_file_if_exists(fname)
-
 
     def _update_pkgtree_timestamp(self, timestamp):
         """ Updates the pkgtree_change column in db. """
@@ -141,8 +141,8 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
                                                    'name': name,
                                                    'arch': archname,
                                                    'releasever': releasever,
-                                                   'revision':format_datetime(revision)}
-                                         }
+                                                   'revision': format_datetime(revision)}
+                                          }
 
     def _load_cves(self):
         """Load CVE data"""
@@ -159,7 +159,7 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
                 self.erratadata[errata_id] = {'issued': issued,
                                               'data': {'name': name,
                                                        'issued': format_datetime(issued)}
-                                             }
+                                              }
 
     def _associate_cves_to_errata(self):
         """Associate CVEs to errata"""
@@ -189,8 +189,8 @@ class JsonPkgTree: # pylint: disable=too-many-instance-attributes
         (epoch, ver, rel) = self.evrid2evr[evr_id]
         package_nevra = join_rpm_name(self.pkgnameid2pkgname[name_id], epoch, ver, rel, self.archid2arch[arch_id])
         self.packagedata[pkg_id] = {'data': {'nevra': package_nevra,
-                                             'repositories':[]}
-                                   }
+                                             'repositories': []}
+                                    }
         self.datadict[name_id].append(self.packagedata[pkg_id]['data'])
 
     def _associate_repos(self):
@@ -261,6 +261,7 @@ def main(filename):
     db_instance = DatabaseHandler.get_connection()
     data = JsonPkgTree(db_instance, filename)
     data.dump()
+
 
 if __name__ == '__main__':
     main(PKGTREE_FILE)

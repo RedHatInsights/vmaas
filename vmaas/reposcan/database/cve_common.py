@@ -11,6 +11,7 @@ class CveStoreCommon:
     """
     Class interface for listing and storing CVEs in database.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()

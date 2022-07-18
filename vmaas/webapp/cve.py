@@ -2,15 +2,16 @@
 Module contains functions and CVE class for returning data from DB
 """
 from vmaas.common.webapp_utils import format_datetime, parse_datetime, none2empty, paginate, \
-                  pkgidlist2packages, filter_item_if_exists, try_expand_by_regex
+    pkgidlist2packages, filter_item_if_exists, try_expand_by_regex
 from vmaas.webapp.cache import CVE_REDHAT_URL, CVE_SECONDARY_URL, CVE_IMPACT, CVE_PUBLISHED_DATE, \
-                  CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
-                  CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
+    CVE_MODIFIED_DATE, CVE_CWE, CVE_CVSS3_SCORE, CVE_CVSS3_METRICS, \
+    CVE_DESCRIPTION, CVE_PID, CVE_EID, CVE_CVSS2_SCORE, CVE_CVSS2_METRICS, CVE_SOURCE
 from vmaas.webapp.vulnerabilities import OVAL_DEFINITION_TYPE_PATCH
 
 
 class CveAPI:
     """ Main /cves API class. """
+
     def __init__(self, cache):
         self.cache = cache
 
@@ -64,7 +65,7 @@ class CveAPI:
         out_cves = try_expand_by_regex(cves, self.cache.cve_detail)
         return out_cves
 
-    def process_list(self, api_version, data): # pylint: disable=unused-argument
+    def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         This method returns details for given set of CVEs.
 

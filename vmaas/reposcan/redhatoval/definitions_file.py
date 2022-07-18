@@ -46,6 +46,7 @@ UNSUPPORTED_STATE_CHILDS = {
 class OvalDefinitions:
     """Class parsing OVAL definitions file."""
     # pylint: disable=too-many-instance-attributes
+
     def __init__(self, oval_id, updated, url, local_path):
         self.logger = get_logger(__name__)
         self.oval_id = oval_id
@@ -219,7 +220,6 @@ class OvalDefinitions:
         self._parse_tests()
         self._parse_objects()
         self._parse_states()
-
 
     def unload_metadata(self):
         """Unset previously loaded metadata files from this object."""

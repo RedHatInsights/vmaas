@@ -43,4 +43,4 @@ class BatchList:
 
     def get_total_items(self):
         """Return total item count in all batches."""
-        return sum(len(l) for l in self.batches)
+        return sum(len(batch) for batch in self.batches)

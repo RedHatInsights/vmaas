@@ -10,6 +10,7 @@ from vmaas.common.config import Config
 
 class NamedCursor:
     """Wrapper class for named cursor."""
+
     def __init__(self, db_connection, name="default"):
         self.cursor = db_connection.cursor(name=name)
 

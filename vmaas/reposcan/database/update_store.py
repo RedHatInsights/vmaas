@@ -79,7 +79,7 @@ class UpdateStore(ObjectStore):
                 for row in cur.fetchall():
                     errata_types[row[1]] = row[0]
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure inserting into errata_type.")
             self.conn.rollback()
         finally:
@@ -169,7 +169,7 @@ class UpdateStore(ObjectStore):
                 cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
                             (tuple(to_disassociate),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing src package associations.")
             self.conn.rollback()
         finally:
@@ -205,7 +205,7 @@ class UpdateStore(ObjectStore):
                 cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
                             (tuple(to_disassociate),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing package associations.")
             self.conn.rollback()
         finally:
@@ -235,7 +235,7 @@ class UpdateStore(ObjectStore):
                 cur.execute("delete from errata_repo where repo_id = %s and errata_id in %s",
                             (repo_id, tuple(associated_with_repo),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure updating errata_repo data.")
             self.conn.rollback()
         finally:
@@ -270,14 +270,14 @@ class UpdateStore(ObjectStore):
                 for row in cur.fetchall():
                     cve_map[row[1]] = row[0]
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure inserting into cve.")
             self.conn.rollback()
         finally:
             cur.close()
         return cve_map
 
-    def _associate_cves(self, updates, update_map, cve_map): # pylint: disable=too-many-branches
+    def _associate_cves(self, updates, update_map, cve_map):  # pylint: disable=too-many-branches
         cur = self.conn.cursor()
         try:
             update_to_cves = {}
@@ -317,15 +317,15 @@ class UpdateStore(ObjectStore):
             if to_disassociate:
                 cur.execute("delete from errata_cve where (errata_id, cve_id) in %s", (tuple(to_disassociate),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure updating errata_cve data.")
             self.conn.rollback()
         finally:
             cur.close()
 
-    def _associate_refs(self, updates, update_map): # pylint: disable=too-many-branches
+    def _associate_refs(self, updates, update_map):  # pylint: disable=too-many-branches
         cur = self.conn.cursor()
-        try: # pylint: disable=too-many-nested-blocks
+        try:  # pylint: disable=too-many-nested-blocks
             refs_to_add = set()
             refs_to_remove = []
             existing_refs_count = 0
@@ -357,7 +357,7 @@ class UpdateStore(ObjectStore):
                 cur.execute("delete from errata_refs where (errata_id, type, name) in %s",
                             (tuple(refs_to_remove),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure updating errata_refs data.")
             self.conn.rollback()
         finally:

@@ -7,6 +7,7 @@ from vmaas.webapp.test import yaml_cache
 # pylint: disable=invalid-name
 pytest_plugins = 'aiohttp.pytest_plugin'
 
+
 @pytest.fixture(scope="session")
 def load_data_once():
     """Load test data only once for whole test case."""

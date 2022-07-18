@@ -26,6 +26,7 @@ class DownloadItem:
     Basic download structure storing source HTTP URL, target file path where to save downloaded file
     and result HTTP status code of the download operation.
     """
+
     def __init__(self, source_url=None, target_path=None, ca_cert=None, cert=None, key=None):
         self.source_url = source_url
         self.target_path = target_path
@@ -40,6 +41,7 @@ class FileDownloadThread(Thread):
     Single thread for downloading files. After it's created, it processes DownloadItem objects from queue shared
     between all threads. Thread will end when shared queue is empty.
     """
+
     def __init__(self, queue, logger, progress_logger, headers_only=False):
         Thread.__init__(self)
         self.queue = queue
@@ -121,6 +123,7 @@ class FileDownloader:
     of download threads is created. Downloader is waiting until download queue is empty and all child threads
     are finished.
     """
+
     def __init__(self):
         self.queue = Queue()
         self.logger = get_logger(__name__)

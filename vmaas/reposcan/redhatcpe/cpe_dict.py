@@ -12,6 +12,7 @@ NS = {'cpe': 'http://cpe.mitre.org/dictionary/2.0'}
 
 class CpeDict:
     """Class parsing CPE dict. Takes filename in the constructor."""
+
     def __init__(self, filename):
         self.lastmodified = None
         self.cpes = {}

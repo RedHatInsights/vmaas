@@ -37,10 +37,10 @@ UPDATES_JSON_PREFIX['repository_list'] = ["rhul-rhel-7-server-rpms"]
 
 UPDATES_RESPONSE_2 = {
     'update_list': {PKG:
-                        {'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
-                                                'erratum': 'RHBA-2015:0364',
-                                                'repository': 'rhel-7-server-rpms',
-                                                'basearch': 'x86_64', 'releasever': '7Server'}]}},
+                    {'available_updates': [{'package': 'my-pkg-1.2.0-1.el8.i686',
+                                            'erratum': 'RHBA-2015:0364',
+                                            'repository': 'rhel-7-server-rpms',
+                                            'basearch': 'x86_64', 'releasever': '7Server'}]}},
     'repository_list': ['rhel-7-server-rpms'],
     'releasever': '7Server',
     'basearch': 'x86_64',
@@ -57,16 +57,16 @@ UPDATES_RESPONSE_2_UNKNOWN_NONE = UPDATES_RESPONSE_2_UNKNOWN.copy()
 UPDATES_RESPONSE_2_UNKNOWN_NONE['update_list'] = {PKG_UNKNOWN: {}}
 UPDATES_RESPONSE_2_UNKNOWN_2 = deepcopy(UPDATES_RESPONSE_2_UNKNOWN)
 UPDATES_RESPONSE_2_UNKNOWN_2['update_list'] = {PKG_UNKNOWN:
-                                                   {'available_updates': [{'basearch': 'x86_64',
-                                                                           'erratum': 'RHBA-2015:0364',
-                                                                           'package': 'my-pkg-2.0.0-1.el8.i686',
-                                                                           'releasever': '7Server',
-                                                                           'repository': 'rhel-7-server-rpms'},
-                                                                          {'basearch': 'x86_64',
-                                                                           'erratum': 'RHBA-2015:0364',
-                                                                           'package': 'my-pkg-2.1.0-1.el8.i686',
-                                                                           'releasever': '7Server',
-                                                                           'repository': 'rhel-7-server-rpms'}]}}
+                                               {'available_updates': [{'basearch': 'x86_64',
+                                                                       'erratum': 'RHBA-2015:0364',
+                                                                       'package': 'my-pkg-2.0.0-1.el8.i686',
+                                                                       'releasever': '7Server',
+                                                                       'repository': 'rhel-7-server-rpms'},
+                                                                      {'basearch': 'x86_64',
+                                                                       'erratum': 'RHBA-2015:0364',
+                                                                       'package': 'my-pkg-2.1.0-1.el8.i686',
+                                                                       'releasever': '7Server',
+                                                                       'repository': 'rhel-7-server-rpms'}]}}
 UPDATES_RESPONSE_2_UNKNOWN_2["modules_list"] = [{'module_name': 'my-pkg', 'module_stream': '2'}]
 UPDATES_JSON_REPO = {"package_list": [PKG], "repository_list": ["rhel-6-server-rpms"]}
 UPDATES_JSON_RELEASE = {"package_list": [PKG], "releasever": "6Server"}
