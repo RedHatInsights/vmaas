@@ -13,6 +13,7 @@ DUMMY_DATA = open("test/db/dummy_data.sql", "r").read()
 class DummyDatabase():
     """ Class for the dummy database which creates vmaas database dummy copy,
         based on the schema sql files. """
+
     def __init__(self):
         self.database = testing.postgresql.Postgresql()
         conn = psycopg2.connect(**self.database.dsn())

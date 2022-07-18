@@ -42,7 +42,7 @@ class ModulesStore(ObjectStore):
             for module in modules:
                 module['module_id'] = module_map[(module['name'], arch_map[module['arch']],)]
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure putting new module for repo_id %s into db.", repo_id)
             self.conn.rollback()
             raise
@@ -83,7 +83,7 @@ class ModulesStore(ObjectStore):
                                                   module['version'], module['context'])]
             self.conn.commit()
             return modules
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure when inserting into module_stream.")
             self.conn.rollback()
             raise
@@ -119,7 +119,7 @@ class ModulesStore(ObjectStore):
                                list(stream_requires), page_size=len(stream_requires))
             self.conn.commit()
             return modules
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure when inserting into module_stream.")
             self.conn.rollback()
             raise
@@ -128,14 +128,14 @@ class ModulesStore(ObjectStore):
 
     def _populate_rpm_artifacts(self, modules, repo_id):
         cur = self.conn.cursor()
-        try: # pylint: disable=too-many-nested-blocks
+        try:  # pylint: disable=too-many-nested-blocks
             nevras_in_repo = self._get_nevras_in_repo(repo_id)
             to_associate = set()
             for module in modules:
                 if 'artifacts' in module:
                     for artifact in module['artifacts']:
                         split_pkg_name = rpm_utils.parse_rpm_name(artifact, default_epoch='0',
-                                                            raise_exception=True)
+                                                                  raise_exception=True)
                         if split_pkg_name in nevras_in_repo:
                             to_associate.add((nevras_in_repo[split_pkg_name], module['stream_id'],))
                         else:
@@ -154,7 +154,7 @@ class ModulesStore(ObjectStore):
                                   values %s""",
                                list(to_associate), page_size=len(to_associate))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure while populating rpm artifacts")
             self.conn.rollback()
         finally:
@@ -171,7 +171,7 @@ class ModulesStore(ObjectStore):
             modules = self._populate_streams(modules)
             modules = self._populate_stream_requires(modules)
             return modules[0]
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # exception already logged.
             return {}
 
@@ -186,6 +186,6 @@ class ModulesStore(ObjectStore):
                 modules = self._populate_streams(modules)
                 modules = self._populate_stream_requires(modules)
                 self._populate_rpm_artifacts(modules, repo_id)
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # exception already logged.
             pass

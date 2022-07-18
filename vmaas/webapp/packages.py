@@ -86,6 +86,5 @@ class PackagesAPI:
             if not want_third_party and is_third_party:
                 packagelist[pkg] = {}
 
-
         response['package_list'] = packagelist
         return response

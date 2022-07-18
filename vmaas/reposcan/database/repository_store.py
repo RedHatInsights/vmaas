@@ -12,6 +12,7 @@ class RepositoryStore:
     """
     Class providing interface for listing repositories stored in DB and storing repositories one by one.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()
@@ -119,7 +120,7 @@ class RepositoryStore:
                             (tuple(updates_to_delete),))
                 cur.execute("""delete from errata e where e.id in %s""", (tuple(updates_to_delete),))
             self.conn.commit()
-        except Exception:  #pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failed to clean up unused data.")
             self.conn.rollback()
         finally:
@@ -242,6 +243,6 @@ class RepositoryStore:
             self.package_store.store(repo_id, repository.list_packages())
             self.module_store.store(repo_id, repository.list_modules())
             self.update_store.store(repo_id, repository.list_updates())
-        except Exception:  #pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # exception already logged.
             pass

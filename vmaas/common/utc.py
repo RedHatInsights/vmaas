@@ -8,6 +8,7 @@ ZERO = timedelta(0)
 
 class UtcTz(tzinfo):
     """UTC"""
+
     def utcoffset(self, dt):
         return ZERO
 
@@ -16,5 +17,6 @@ class UtcTz(tzinfo):
 
     def dst(self, dt):
         return ZERO
+
 
 UTC = UtcTz()

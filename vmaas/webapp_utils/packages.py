@@ -25,6 +25,8 @@ BINARY_PACKAGES = 11
 LOGGER = get_logger(__name__)
 
 # pylint: disable=broad-except
+
+
 class Packages(Request):
     """ POST and GET to /v1/packages """
     @classmethod
@@ -51,9 +53,11 @@ class Packages(Request):
             return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return package, response
 
+
 class PackagesAPI:
     """ Class for handling packages API requests. """
     # pylint: disable=no-self-use
+
     def __init__(self, dsn=None):
         init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)
@@ -99,23 +103,23 @@ class PackagesAPI:
                                   cs.label, cs.name, a.name, r.releasever,
                                   pn3.name
                                   from package p
-                                  left join package_name pn on pn.id = p.name_id 
-                                  left join arch ap on p.arch_id = ap.id 
-                                  left join evr on p.evr_id = evr.id 
-                                  left join package p2 on p2.id = p.source_package_id 
+                                  left join package_name pn on pn.id = p.name_id
+                                  left join arch ap on p.arch_id = ap.id
+                                  left join evr on p.evr_id = evr.id
+                                  left join package p2 on p2.id = p.source_package_id
                                   left join package_name pn2 on p2.name_id = pn2.id
-                                  left join evr evr2 on p2.evr_id = evr2.id 
+                                  left join evr evr2 on p2.evr_id = evr2.id
                                   left join arch a2 on p2.arch_id = a2.id
-                                  left join pkg_repo pr on pr.pkg_id = p.id 
-                                  left join repo r on r.id = pr.repo_id 
-                                  left join content_set cs on cs.id = r.content_set_id 
+                                  left join pkg_repo pr on pr.pkg_id = p.id
+                                  left join repo r on r.id = pr.repo_id
+                                  left join content_set cs on cs.id = r.content_set_id
                                   left join arch a on a.id = r.basearch_id
                                   left join package p3 on p3.source_package_id = p.id
                                   left join package_name pn3 on p3.name_id = pn3.id
-                                  where pn.name = '%s' 
-                                  and ap.name = '%s' 
-                                  and evr.epoch = '%s' 
-                                  and evr.version = '%s' 
+                                  where pn.name = '%s'
+                                  and ap.name = '%s'
+                                  and evr.epoch = '%s'
+                                  and evr.version = '%s'
                                   and evr.release = '%s'
                                """ % (name, arch, epoch, version, release))
                 query = cursor.fetchall()
@@ -131,7 +135,7 @@ class PackagesAPI:
                                                                      item[SOURCE_PACKAGE_ARCH]),
                                      "repositories": self._build_repositories(query),
                                      "binary_package_list": self._build_binary_packages(query)
-                                    }
+                                     }
                 response["package_list"].update(pkgs)
         self.db_pool.return_connection(db_connection)
         return response

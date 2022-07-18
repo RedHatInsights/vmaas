@@ -30,7 +30,7 @@ _cves = {
 }
 
 _pkgs_top = {"package_list": {str: dict},
-             "last_change": str,}
+             "last_change": str, }
 
 _pkgs_list = {
     "summary": str,
@@ -124,10 +124,10 @@ _errata = {
 }
 
 _updates_top = {"update_list": {str: dict},
-                "last_change": str,}
-_updates_top_repolist = {"repository_list": [str], "update_list": {str: dict}, "last_change": str,}
-_updates_top_basearch = {"basearch": str, "update_list": {str: dict}, "last_change": str,}
-_updates_top_releasever = {"releasever": str, "update_list": {str: dict}, "last_change": str,}
+                "last_change": str, }
+_updates_top_repolist = {"repository_list": [str], "update_list": {str: dict}, "last_change": str, }
+_updates_top_basearch = {"basearch": str, "update_list": {str: dict}, "last_change": str, }
+_updates_top_releasever = {"releasever": str, "update_list": {str: dict}, "last_change": str, }
 _updates_top_all = {
     "repository_list": [str],
     "releasever": str,

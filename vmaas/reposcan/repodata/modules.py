@@ -6,6 +6,7 @@ import yaml
 
 class ModuleMD:
     """Class parsing modules.yaml, takes filename in the constructor"""
+
     def __init__(self, filename):
         self.modules = []
         module_dict = {}
@@ -20,9 +21,9 @@ class ModuleMD:
             if parsed['document'] == 'modulemd':
                 name = data['name']
                 stream = data['stream']
-                if not name in module_dict:
+                if name not in module_dict:
                     module_dict[name] = {}
-                if not stream in module_dict[name]:
+                if stream not in module_dict[name]:
                     module_dict[name][stream] = []
                 new_stream = {}
                 new_stream['name'] = name

@@ -6,6 +6,7 @@ import sqlite3
 
 class PrimaryDatabaseMD:
     """Class parsing Primary SQLite. Takes filename in the constructor."""
+
     def __init__(self, filename):
         self.packages = []
         conn = sqlite3.connect(filename)

@@ -55,7 +55,7 @@ class VulnerabilitiesAPI:
             else:
                 raise ValueError("Invalid arch name: %s" % arch)
 
-        #LOGGER.info("Evaluated state id=%s, candidate_evr_id=%s, operation=%s, matched=%s",
+        # LOGGER.info("Evaluated state id=%s, candidate_evr_id=%s, operation=%s, matched=%s",
         #            oval_state_id, evr_id, oval_operation_evr, matched)
         return matched
 
@@ -82,7 +82,7 @@ class VulnerabilitiesAPI:
         else:
             raise ValueError("Unsupported check_existence: %s" % check_existence)
 
-        #LOGGER.info("Evaluated test id=%s, package=%s, candidate_package=%s, check_existence=%s, matched=%s",
+        # LOGGER.info("Evaluated test id=%s, package=%s, candidate_package=%s, check_existence=%s, matched=%s",
         #            test_id, package_name_id, candidate_package_name_id, check_existence, matched)
         return matched
 
@@ -128,7 +128,7 @@ class VulnerabilitiesAPI:
             elif must_match:  # AND
                 break
 
-        #LOGGER.info("Evaluated criteria id=%s, type=%s, matched=%s", criteria_id, criteria_type,
+        # LOGGER.info("Evaluated criteria id=%s, type=%s, matched=%s", criteria_id, criteria_type,
         #            matches >= required_matches)
         return matches >= required_matches
 
@@ -207,7 +207,7 @@ class VulnerabilitiesAPI:
             package_name_id = self.db_cache.packagename2id[name]
             definition_ids = candidate_definitions.intersection(
                 self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
-            #LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
+            # LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
             for definition_id in definition_ids:
                 definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
                 # Skip if unfixed CVE feature flag is disabled
@@ -223,7 +223,7 @@ class VulnerabilitiesAPI:
 
                 if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
                     # Vulnerable
-                    #LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
+                    # LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
                     if definition_type == OVAL_DEFINITION_TYPE_PATCH:
                         for cve in cves:
                             # Skip CVEs found in repos

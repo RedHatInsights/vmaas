@@ -76,6 +76,7 @@ class ProgressLogger:
     """
     Class to log progress every N seconds.
     """
+
     def __init__(self, logger, total, log_interval=60):
         self.logger = logger
         self.log_interval = log_interval

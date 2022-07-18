@@ -17,19 +17,20 @@ PKG_MALFORMED_JSON = {"package_list": "package"}
 
 PKG_LEGIT = {"package_list": ["kernel-2.6.32-696.20.1.el6.x86_64"]}
 PKG_LEGIT_EXPECTED = \
-{"package_list": {
-    "kernel-2.6.32-696.20.1.el6.x86_64": {
-        "summary": "Kernel for basic OS functions.",
-        "description": "Kernel description",
-        "source_package": None,
-        "repositories": [{"label": "rhel-6-desktop-rpms", "name":"Red Hat Enterprise Linux 6 Desktop (RPMs)",
-                          "releasever": "696.20.1.el6", "arch": "x86_64"},
-                         {"label": "rhel-6-server-rpms", "name":"Red Hat Enterprise Linux 6 Server (RPMs)",
-                          "releasever": "696.20.1.el6", "arch": "x86_64"}],
-        "binary_package_list": []
+    {"package_list": {
+        "kernel-2.6.32-696.20.1.el6.x86_64": {
+            "summary": "Kernel for basic OS functions.",
+            "description": "Kernel description",
+            "source_package": None,
+            "repositories": [{"label": "rhel-6-desktop-rpms", "name": "Red Hat Enterprise Linux 6 Desktop (RPMs)",
+                              "releasever": "696.20.1.el6", "arch": "x86_64"},
+                             {"label": "rhel-6-server-rpms", "name": "Red Hat Enterprise Linux 6 Server (RPMs)",
+                              "releasever": "696.20.1.el6", "arch": "x86_64"}],
+            "binary_package_list": []
         }
     }
-}
+    }
+
 
 class TestPackagesAPI():
     """ Set of tests for the packages API. """

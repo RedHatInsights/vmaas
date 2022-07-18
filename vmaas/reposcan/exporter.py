@@ -484,7 +484,7 @@ class SqliteDump:
                                    WHERE errata.id in %s
                                """, [tuple(self.errata_ids)])
                 for errata_id, e_name, synopsis, summary, e_type, e_severity, \
-                    description, solution, issued, updated, third_party, requires_reboot in cursor:
+                        description, solution, issued, updated, third_party, requires_reboot in cursor:
                     url = "https://access.redhat.com/errata/%s" % e_name
                     dump.execute("insert into errata_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                  (errata_id, e_name, synopsis, summary, e_type,
@@ -562,9 +562,9 @@ class SqliteDump:
                            left join cve_impact on cve.impact_id = cve_impact.id
                            """)
             for cve_id, name, redhat_url, secondary_url, \
-                cvss3_score, cvss3_metrics, \
-                impact, published_date, modified_date, iava, description, \
-                cvss2_score, cvss2_metrics, source in cursor:
+                    cvss3_score, cvss3_metrics, \
+                    impact, published_date, modified_date, iava, description, \
+                    cvss2_score, cvss2_metrics, source in cursor:
                 cvss3_score = (float(cvss3_score) if cvss3_score is not None else None)
                 cvss2_score = (float(cvss2_score) if cvss2_score is not None else None)
                 dump.execute("insert into cve_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -678,7 +678,7 @@ class SqliteDump:
                               from oval_criteria_dependency""")
             for parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id in cursor:
                 dump.execute("insert into oval_criteria_dependency values (?, ?, ?, ?)",
-                (parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id))
+                             (parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id))
 
         # oval_test_detail
         dump.execute("""create table if not exists oval_test_detail (
@@ -710,7 +710,7 @@ class SqliteDump:
                                 and s.evr_operation_id is not null""")
             for oval_test_id, oval_state_id, evr_id, oval_operation_evr_id in cursor:
                 dump.execute("insert into oval_test_state values (?, ?, ?, ?)",
-                (oval_test_id, oval_state_id, evr_id, oval_operation_evr_id))
+                             (oval_test_id, oval_state_id, evr_id, oval_operation_evr_id))
 
         # oval_state_arch
         dump.execute("""create table if not exists oval_state_arch (

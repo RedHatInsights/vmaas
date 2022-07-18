@@ -19,6 +19,7 @@ class FileUnpacker:
     Files to unpack are collected and then all unpacked at once into their locations.
     Gz, Xz, Bz2 formats are supported.
     """
+
     def __init__(self):
         self.queue = []
         self.logger = get_logger(__name__)

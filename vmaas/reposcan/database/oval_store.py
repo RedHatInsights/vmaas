@@ -145,7 +145,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                             (file_id, tuple(to_delete)))
                 refresh_maps_func(cur, delete=True)
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             OVAL_FAILED_IMPORT.inc()
             OVAL_FAILED_UPDATE.inc()
             OVAL_FAILED_DELETE.inc()
@@ -165,7 +165,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             for row in cur.fetchall():
                 associated_with_entity_one.add(row[0])
             self.logger.debug("OVAL %s associated with %s %s: %d", entity_many, entity_one, ent_one_id,
-                             len(associated_with_entity_one))
+                              len(associated_with_entity_one))
             to_associate = []
             for item in ent_many_data:
                 checked_key = (file_id, item["id"]) if file_id else item["id"]
@@ -181,9 +181,9 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 else:
                     to_associate.append(item_id)
             self.logger.debug("New OVAL %s to associate with %s %s: %d", entity_many, entity_one, ent_one_id,
-                             len(to_associate))
+                              len(to_associate))
             self.logger.debug("OVAL %s to disassociate with %s %s: %d",
-                             entity_many, entity_one, ent_one_id, len(associated_with_entity_one))
+                              entity_many, entity_one, ent_one_id, len(associated_with_entity_one))
             if to_associate:
                 execute_values(cur, f"insert into {table_name} ({ent_one_id_col}, {ent_many_id_col}) values %s",
                                [(ent_one_id, item_id) for item_id in to_associate], page_size=len(to_associate))
@@ -191,7 +191,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
                 cur.execute(f"delete from {table_name} where {ent_one_id_col} = %s and {ent_many_id_col} in %s",
                             (ent_one_id, tuple(associated_with_entity_one),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             OVAL_FAILED_IMPORT.inc()
             OVAL_FAILED_DELETE.inc()
             self.logger.exception("Failure while (dis)associating OVAL %s with %s %s: ",
@@ -508,7 +508,7 @@ class OvalStore(ObjectStore):  # pylint: disable=too-many-instance-attributes
             cur = self.conn.cursor()
             criteria_id = self._populate_definition_criteria(cur, file_id, item["criteria"], criteria_id)
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             OVAL_FAILED_IMPORT.inc()
             OVAL_FAILED_UPDATE.inc()
             OVAL_FAILED_DELETE.inc()

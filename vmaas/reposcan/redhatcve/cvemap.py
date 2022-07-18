@@ -16,6 +16,7 @@ class CvemapHead:
     """
     Class for parsing CVE map headers.
     """
+
     def __init__(self, filename):
         self.data = {}
         with open(filename, 'r', encoding='utf8') as fde:
@@ -31,8 +32,10 @@ class CvemapHead:
         """Lastmodified time of CVE map."""
         return self.get_header('Last-Modified')
 
+
 class CvemapBody:
     """Class parsing CVE map. Takes filename in the constructor."""
+
     def __init__(self, filename, lastmodified):
         self.lastmodified = lastmodified
         self.cves = {}
@@ -65,6 +68,7 @@ class CvemapBody:
     @staticmethod
     def _cwe_list(cwe_text):
         cwe_names = CWE_RE.findall(cwe_text or '')
+
         def _link(name):
             return "http://cwe.mitre.org/data/definitions/%s.html" % name[4:]
         cwe_list = [dict(cwe_name=name, link=_link(name)) for name in cwe_names]

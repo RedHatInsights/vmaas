@@ -12,6 +12,7 @@ class PackageStore(ObjectStore):
     Class providing interface for storing packages and related info.
     All packages from repository are imported to the DB at once.
     """
+
     def __init__(self):
         super().__init__()
         self.arch_map = self._prepare_table_map(cols=["name"], table="arch")
@@ -36,7 +37,7 @@ class PackageStore(ObjectStore):
                 for row in cur.fetchall():
                     table_map[row[1]] = row[0]
                 self.conn.commit()
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while inserting into %s", table)
                 self.conn.rollback()
             finally:
@@ -63,7 +64,7 @@ class PackageStore(ObjectStore):
                 for evr_id, evr_epoch, evr_ver, evr_rel in cur.fetchall():
                     self.evr_map[(evr_epoch, evr_ver, evr_rel)] = evr_id
                 self.conn.commit()
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while inserting into evr table")
                 self.conn.rollback()
             finally:
@@ -86,7 +87,7 @@ class PackageStore(ObjectStore):
         source_package_id = None
         if pkg["srpm"]:
             name, epoch, ver, rel, arch = rpm_utils.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
-                                                             raise_exception=True)
+                                                                   raise_exception=True)
             name_id = self.package_name_map[name]
             evr_id = self.evr_map[(epoch, ver, rel)]
             arch_id = self.arch_map[arch]
@@ -124,7 +125,7 @@ class PackageStore(ObjectStore):
                     self.package_map[(name_id, evr_id, arch_id)] = pkg_id
                     package_ids.append(pkg_id)
                 self.conn.commit()
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while inserting into package table")
                 self.conn.rollback()
             finally:
@@ -155,7 +156,7 @@ class PackageStore(ObjectStore):
                 cur.execute("delete from pkg_repo where repo_id = %s and pkg_id in %s",
                             (repo_id, tuple(associated_with_repo),))
             self.conn.commit()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure while associating packages with repo_id %s", repo_id)
             self.conn.rollback()
         finally:
@@ -167,7 +168,7 @@ class PackageStore(ObjectStore):
         for pkg in packages:
             if pkg["srpm"]:
                 unique_source_packages.add(rpm_utils.parse_rpm_name(pkg["srpm"], default_epoch=pkg["epoch"],
-                                                              raise_exception=True))
+                                                                    raise_exception=True))
         source_packages = []
         for name, epoch, ver, rel, arch in unique_source_packages:
             source_packages.append(dict(name=name, epoch=epoch, ver=ver, rel=rel, arch=arch,

@@ -657,7 +657,6 @@ def create_app(specs):
                     pass_context_arg_name='request',
                     arguments={'vmaas_version': VMAAS_VERSION})
 
-
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
 

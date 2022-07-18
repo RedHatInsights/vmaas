@@ -28,16 +28,19 @@ def _fetch_version(conn):
         cursor.execute("SELECT version FROM db_version")
         return (cursor.fetchone())[0]
 
+
 def _fetch_version_logs(conn):
     """ Fetch all upgrade logs from db. """
     with conn.cursor() as cursor:
         cursor.execute("SELECT version, status, script, returncode FROM db_upgrade_log")
         return cursor.fetchall()
 
+
 def _fetch_upgrade_ver():
     files = os.listdir(DB_UPDATES_FIXTURE_PATH)
     latest = files[-1]
     return int(latest.split("-")[0])
+
 
 def _create_script(version, script_content):
     """ Create script with given version number and given script content. """
@@ -49,9 +52,11 @@ def _create_script(version, script_content):
         new_script.write(script_content)
     return script_path
 
+
 def _remove_script(script_name):
     """ Remove the test script. """
     os.remove(script_name)
+
 
 def _parse_dsn(dsn_string):
     """ Parsing of DSN string. """
@@ -74,6 +79,7 @@ def _parse_dsn(dsn_string):
             db_name = name_value[VALUE]
 
     return host, user, db_name, port
+
 
 class TestUpgrade:
     """ Test for the upgrades. """

@@ -377,7 +377,6 @@ class GitRepoListHandler(RepolistImportHandler):
             repos += item_repos
         return products, repos
 
-
     @staticmethod
     def run_task(*args, **kwargs):
         """Start importing from git"""
@@ -933,9 +932,10 @@ class ReposcanWebsocket():
     @classmethod
     def _websocket_connect_status(cls, future):
         """Check if connection attempt succeeded."""
+        # pylint: disable=bare-except
         try:
             result = future.result()
-        except:  # pylint: disable=bare-except
+        except:  # noqa: E722
             result = None
 
         cls.websocket = result

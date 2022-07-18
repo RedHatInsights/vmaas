@@ -42,8 +42,10 @@ class PackageRepositories(Request):
             return cls.format_exception(f"Unknown exception: {_}, include in bug report.", 500)
         return repositories, response
 
+
 class PackagesRepositoriesAPI:
     """ Class for handling packages to repositories requests. """
+
     def __init__(self, dsn=None):
         init_logging()
         self.db_pool = DB.DatabasePoolHandler(POOL_SIZE, dsn)

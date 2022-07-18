@@ -162,7 +162,7 @@ class UpdatesAPI:
         if not third_party and errata_detail[ERRATA_THIRD_PARTY]:
             return []
 
-        if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not \
+        if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
                 self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
             return []
         repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,

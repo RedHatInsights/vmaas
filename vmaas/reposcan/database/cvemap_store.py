@@ -83,7 +83,7 @@ class CvemapStore(CveStoreCommon):
                                   cvss2_score, cvss2_metrics)
                                   where cve.id = v.id """,
                                list(to_update), page_size=len(to_update), template=tmpl_str)
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while updating CVEs")
                 FAILED_UPDATE_CVE.inc()
                 self.conn.rollback()
@@ -148,7 +148,7 @@ class CvemapStore(CveStoreCommon):
             if db_name in cve_data:
                 cve_data[db_name]["id"] = db_id
                 for a_key, a_val in cols.items():
-                    if not a_key in cve_data[db_name]:
+                    if a_key not in cve_data[db_name]:
                         cve_data[db_name][a_key] = None
                     if not cve_data[db_name][a_key]:
                         cve_data[db_name][a_key] = a_db_row[a_val]
@@ -160,10 +160,10 @@ class CvemapStore(CveStoreCommon):
         # now, deal with all items
         for name, values in cve_data.items():
             values["impact_id"] = cve_impact_map[values["impact"].capitalize()] \
-                        if values["impact"] is not None else cve_impact_map["None"]
+                if values["impact"] is not None else cve_impact_map["None"]
             # make sure everyting has all the keys, even if val is empty
             for a_key in cols:
-                if not a_key in values:
+                if a_key not in values:
                     values[a_key] = None
 
             item = (name, values["description"], values["impact_id"], values["published_date"],

@@ -15,7 +15,7 @@ from vmaas.webapp.cache import (
 )
 from vmaas.common.date_utils import format_datetime
 from vmaas.common.webapp_utils import paginate, none2empty, parse_datetime, \
-                  filter_item_if_exists, try_expand_by_regex, strip_prefixes
+    filter_item_if_exists, try_expand_by_regex, strip_prefixes
 
 REPO_PREFIXES = os.getenv("REPO_NAME_PREFIXES", "").split(",")
 
@@ -28,8 +28,8 @@ class RepoAPI:
 
     @staticmethod
     def _modified_since(repo_detail, modified_since_dt):
-        if not modified_since_dt or (repo_detail[REPO_REVISION] is not None and \
-                repo_detail[REPO_REVISION] > modified_since_dt):
+        if not modified_since_dt or (repo_detail[REPO_REVISION] is not None and
+                                     repo_detail[REPO_REVISION] > modified_since_dt):
             return True
         return False
 

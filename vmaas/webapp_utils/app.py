@@ -24,7 +24,7 @@ def create_app(specs):
                           arguments={"vmaas_version": VMAAS_VERSION})
 
     @utils_app.app.after_request
-    def set_default_headers(response): # pylint: disable=unused-variable
+    def set_default_headers(response):  # pylint: disable=unused-variable
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Access-Control-Allow-Headers, \
             Authorization, X-Requested-With, x-rh-identity"
@@ -33,6 +33,7 @@ def create_app(specs):
         return response
 
     return utils_app
+
 
 application = create_app({DEFAULT_ROUTE: "webapp-utils.yml",  # pylint: disable=invalid-name
                           "": "webapp-utils-healthz.yml"})

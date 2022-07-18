@@ -11,6 +11,7 @@ class ProductStore:
     """
     Class providing interface for storing product info.
     """
+
     def __init__(self):
         self.logger = get_logger(__name__)
         self.conn = DatabaseHandler.get_connection()

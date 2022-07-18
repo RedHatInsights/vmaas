@@ -20,6 +20,7 @@ DATETIME_PATTERNS = {
 
 class UpdateInfoMD:
     """Class parsing UpdateInfo XML. Takes filename in the constructor."""
+
     def __init__(self, filename):
         self.updates = []
         root = None

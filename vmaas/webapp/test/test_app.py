@@ -228,7 +228,7 @@ class TestWebappGets(BaseCase):
         assert HTTPStatus.OK == resp.status
         assert resp.body == \
             '{"cve_list": [], "manually_fixable_cve_list": [], "unpatched_cve_list": [], ' \
-                '"last_change": "2019-03-07T09:17:23.799995+00:00"}'
+            '"last_change": "2019-03-07T09:17:23.799995+00:00"}'
 
     async def test_vuln_get_3_caret(self):
         """Test vulnerabilities get endpoint."""
@@ -236,13 +236,14 @@ class TestWebappGets(BaseCase):
         assert HTTPStatus.OK == resp.status
         assert resp.body == \
             '{"cve_list": [], "manually_fixable_cve_list": [], "unpatched_cve_list": [], ' \
-                '"last_change": "2019-03-07T09:17:23.799995+00:00"}'
+            '"last_change": "2019-03-07T09:17:23.799995+00:00"}'
 
     async def test_error_formatter(self):
         """Test error formater"""
         resp = await self.fetch('/api/v1/cves/*', method='GET')
         assert HTTPStatus.BAD_REQUEST == resp.status
         assert resp.body[24:] == '"detail": "error(\'nothing to repeat at position 1\',)", "status": 400}'
+
 
 @pytest.mark.usefixtures('client')
 class TestWebappSupportMethods(BaseCase):

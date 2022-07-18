@@ -10,6 +10,7 @@ class RPMParseException(Exception):
     SRPM name parsing exception.
     """
 
+
 # This will parse package names in the following formats:
 # 389-ds-base-1.3.7.8-1.fc27.src
 # perl-DBD-Pg-2:3.7.4-2.module+el8+2517+b1471f1c.x86_64
@@ -18,6 +19,7 @@ class RPMParseException(Exception):
 # present at all.
 NEVRA_RE = re.compile(
     r'((?P<e1>[0-9]+):)?(?P<pn>[^:]+)(?(e1)-|-((?P<e2>[0-9]+):)?)(?P<ver>[^-:]+)-(?P<rel>[^-:]+)\.(?P<arch>[a-z0-9_]+)')
+
 
 def parse_rpm_name(rpm_name, default_epoch=None, raise_exception=False):
     """
@@ -44,6 +46,7 @@ def parse_rpm_name(rpm_name, default_epoch=None, raise_exception=False):
     arch = match.group('arch')
     return name, epoch, version, release, arch
 
+
 def join_rpm_name(name, epoch, version, release, arch):
     """
     Build a package name from the separate NEVRA parts
@@ -51,11 +54,12 @@ def join_rpm_name(name, epoch, version, release, arch):
     if name and epoch and version and release and arch:
         try:
             epoch = ("%s:" % epoch) if int(epoch) else ''
-        except Exception as _: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             epoch = ''
         return "%s-%s%s-%s.%s" % (name, epoch, version, release, arch)
 
     return None
+
 
 def rpmver2array(rpm_version: str) -> list:
     """
