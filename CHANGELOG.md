@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.35.2 (2022-07-19)
+### Fix
+* Run flake8 in GH actions and fix flake8 issues ([`ca6d8c1`](https://github.com/RedHatInsights/vmaas/commit/ca6d8c1782a2122a028f247078ab35257c9ab7c9))
+
 ## v2.35.1 (2022-05-30)
 ### Fix
 * Rename epel repo to epel-8 ([`7b13602`](https://github.com/RedHatInsights/vmaas/commit/7b1360265a1eeba3e35c419b40318d48546138e7))
