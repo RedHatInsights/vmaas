@@ -31,7 +31,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
-    FAILED_IMPORT_REPO, FAILED_WEBSOCK, REPOS_TO_CLEANUP
+    FAILED_IMPORT_REPO, FAILED_WEBSOCK, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
@@ -1027,7 +1027,7 @@ def create_app(specs):
     def metrics():  # pylint: disable=unused-variable
         # /metrics API shouldn't be visible in the API documentation,
         # hence it's added here in the create_app step
-        return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+        return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
     @app.app.after_request
     def set_headers(response):  # pylint: disable=unused-variable
