@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.35.3 (2022-10-07)
+### Fix
+* **reposcan:** Collect prometheus metrics from child processes ([`4c16942`](https://github.com/RedHatInsights/vmaas/commit/4c16942abe5817c5a479d46f14d0ec7805d15afd))
+
 ## v2.35.2 (2022-07-19)
 ### Fix
 * Run flake8 in GH actions and fix flake8 issues ([`ca6d8c1`](https://github.com/RedHatInsights/vmaas/commit/ca6d8c1782a2122a028f247078ab35257c9ab7c9))
