@@ -5,6 +5,7 @@ import array
 import asyncio
 import datetime
 import os
+from urllib.parse import urlparse
 import sqlite3
 
 from vmaas.common.config import Config
@@ -113,6 +114,7 @@ class Cache:
         self.nevra2pkgid = {}
         self.repo_detail = {}
         self.repolabel2ids = {}
+        self.repopath2ids = {}
         self.pkgid2repoids = {}
         self.errataid2name = {}
         self.pkgid2errataids = {}
@@ -242,10 +244,19 @@ class Cache:
 
         for row in self._sqlite_execute(data, "select * from repo_detail"):
             id = row[0]
-            repo = (row[1], row[2], row[3], row[4], row[5], row[6], row[7],
+            url = row[3]
+            repo = (row[1], row[2], url, row[4], row[5], row[6], row[7],
                     parse_datetime(row[8]), bool(row[9]))
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
+
+            if url:
+                try:
+                    repo_path = urlparse(url).path.rstrip('/')
+                except ValueError as err:
+                    LOGGER.warning("Malformend repository URL for repo %d: %s", id, err)
+                else:
+                    self.repopath2ids.setdefault(repo_path, array.array('q')).append(id)
 
         for row in self._sqlite_execute(data, "select pkg_id, repo_id from pkg_repo"):
             self.pkgid2repoids.setdefault(row[0], array.array('q')).append(row[1])
