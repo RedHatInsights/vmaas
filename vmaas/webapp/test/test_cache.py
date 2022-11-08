@@ -52,6 +52,7 @@ def test_load(cache):
     assert len(cache.pkgid2repoids) == 7
     assert len(cache.repo_detail) == 2
     assert len(cache.repolabel2ids) == 2
+    assert len(cache.repopath2ids) == 2
     assert len(cache.src_pkg_id2pkg_ids) == 2
     assert len(cache.updates) == 4
     assert len(cache.updates_index) == 4
@@ -64,7 +65,7 @@ def test_clear(cache):
     """Test cache clear method"""
     cache.clear()
     variables = vars(cache)
-    assert len(variables) == 47
+    assert len(variables) == 48
     for name, var in variables.items():
         if name == "filename":
             assert var == TEST_DUMP_FILE
@@ -72,3 +73,16 @@ def test_clear(cache):
             assert var == []
         else:
             assert var == {}
+
+
+def test_repopath2ids(cache):
+    """Test repopath2ids cache"""
+    assert len(cache.repopath2ids) == 2
+
+    assert cache.repopath2ids["/repo1"] is not None
+    assert len(cache.repopath2ids["/repo1"]) == 1
+    assert cache.repopath2ids["/repo1"][0] == 801
+
+    assert cache.repopath2ids["/repo2"] is not None
+    assert len(cache.repopath2ids["/repo2"]) == 1
+    assert cache.repopath2ids["/repo2"][0] == 802
