@@ -1,7 +1,10 @@
 """Cache test."""
+# pylint: disable=redefined-outer-name
 
 import os
 import sqlite3
+
+import pytest
 
 from vmaas.webapp.cache import Cache
 
@@ -9,7 +12,8 @@ TEST_DUMP_FILE = "/tmp/cache_test.db"
 TEST_SQL_SCRIPT = "test/data/cache-dump.sql"
 
 
-def create_test_db():
+@pytest.fixture(scope="session")
+def dump_file_db():
     """Create testing sqlite file."""
     if os.path.exists(TEST_DUMP_FILE):
         os.remove(TEST_DUMP_FILE)
@@ -18,14 +22,16 @@ def create_test_db():
             conn.cursor().executescript(sql_script.read())
 
 
-def test_cache(monkeypatch):
-    """Test cache load and clear method"""
-
+# pylint: disable=unused-argument
+@pytest.fixture()
+def cache(dump_file_db, monkeypatch):
+    """Fixture of cache instance."""
     monkeypatch.setattr(Cache, 'download', lambda _: True)
+    return Cache(TEST_DUMP_FILE)
 
-    create_test_db()
 
-    cache = Cache(TEST_DUMP_FILE)
+def test_load(cache):
+    """Test cache load method"""
     assert len(cache.arch2id) == 32
     assert len(cache.arch_compat) == 28
     assert len(cache.cve_detail) == 1
@@ -53,6 +59,9 @@ def test_cache(monkeypatch):
     assert len(cache.label2content_set_id) == 2
     assert len(cache.content_set_id2pkg_name_ids) == 2
 
+
+def test_clear(cache):
+    """Test cache clear method"""
     cache.clear()
     variables = vars(cache)
     assert len(variables) == 47
