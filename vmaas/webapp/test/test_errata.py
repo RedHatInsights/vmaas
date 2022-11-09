@@ -59,7 +59,7 @@ class TestErrataAPI(TestBase):
     def test_regex(self):
         """Test correct errata regex."""
         assert self.errata_api.try_expand_by_regex([ERRATA_NAME]) == [ERRATA_NAME]
-        assert self.errata_api.try_expand_by_regex(["RHBA-2015:0.*"]) == [ERRATA_NAME]
+        assert self.errata_api.try_expand_by_regex(["RHBA-2015:03.*"]) == [ERRATA_NAME]
 
     def test_empty_errata_list(self):
         """Test errata API with empty 'errata_list'."""
@@ -75,14 +75,14 @@ class TestErrataAPI(TestBase):
         """Test filtering with third party enabled"""
         data = {**ERRATA_JSON_ALL, "third_party": True}
         response = self.errata_api.process_list(api_version="v3", data=data)
-        assert len(response["errata_list"]) == 6
+        assert len(response["errata_list"]) == 7
 
     def test_non_third_party(self):
         """Test filtering with third-party content disabled"""
         data = {**ERRATA_JSON_ALL}
         data.pop("third_party", None)
         response = self.errata_api.process_list(api_version="v3", data=data)
-        assert len(response["errata_list"]) == 5
+        assert len(response["errata_list"]) == 6
 
     def test_errata_response(self):
         """Test errata API response."""

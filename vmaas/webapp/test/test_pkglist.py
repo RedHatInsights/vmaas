@@ -26,11 +26,11 @@ class TestPkgListAPI(TestBase):
     def test_fetch_all_packages(self):
         """Test response without 'modified_since' input argument."""
         response = self.pkglist_api.process_list(3, {})
-        assert len(response['package_list']) == 9
-        assert response['total'] == 9
+        assert len(response['package_list']) == 13
+        assert response['total'] == 13
         assert response['page'] == 1
         assert response['pages'] == 1
-        assert response['page_size'] == 9
+        assert response['page_size'] == 13
 
     def test_fetch_with_modified_since(self):
         """Test response with 'modified_since' input argument."""
@@ -50,9 +50,9 @@ class TestPkgListAPI(TestBase):
         """Test pagination usage."""
         response = self.pkglist_api.process_list(3, {'page_size': 4})
         assert len(response['package_list']) == 4
-        assert response['total'] == 9
+        assert response['total'] == 13
         assert response['page'] == 1
-        assert response['pages'] == 3
+        assert response['pages'] == 4
         assert response['page_size'] == 4
 
     def test_return_modified(self):

@@ -1,6 +1,8 @@
 """Unit tests for updates module."""
 # pylint: disable=protected-access
 # pylint: disable=unused-argument
+# pylint: disable=too-many-public-methods
+# pylint: disable=invalid-name
 from copy import deepcopy
 import pytest
 
@@ -157,6 +159,24 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(3, UPDATES_JSON_PREFIX.copy())
         assert updates == UPDATES_RESPONSE_2
 
+    def test_process_list_with_repo_paths_v3(self):
+        """Test looking for package updates api v3 with repository paths."""
+        pkg = "rhui-pkg-1.1.0-1.el7.x86_64"
+        data = {
+            "package_list": [pkg],
+            "repository_list": [],
+            "repository_paths": ["/content/dist/rhel/rhui/server/7/7Server/x86_64/os/"],
+            "releasever": "7Server",
+            "basearch": "x86_64",
+        }
+        updates = self.updates_api.process_list(3, data)
+        assert "update_list" in updates
+        assert len(updates['update_list']) == 1
+        assert pkg in updates["update_list"]
+        assert "available_updates" in updates["update_list"][pkg]
+        assert len(updates['update_list'][pkg]['available_updates']) == 1
+        assert updates['update_list'][pkg]['available_updates'][0]["erratum"] == "RHBA-2015:0777"
+
     def test_process_none_arch(self):
         """Test pkg with arch (none)."""
         # NOTE: use copy of dict with json input, because process_list changes this dict
@@ -236,13 +256,21 @@ class TestInternalUpdatesAPI(TestBase):
         """Test with 'releasever' only request."""
         repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_RELEASE)
         assert repositories_list is None
-        assert list(repo_ids) == [1, 2, 3, 4, 5, 6]
+        assert list(repo_ids) == [1, 2, 3, 4, 5, 6, 7, 8]
 
     def test_get_repository_list_5(self):
         """Test with 'basearch' only request."""
         repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_ARCH)
         assert repositories_list is None
-        assert list(repo_ids) == [1, 2, 3, 4, 5, 6]
+        assert list(repo_ids) == [1, 2, 3, 4, 5, 6, 7, 8]
+
+    def test_get_repository_paths(self):
+        """Test get repository paths and their corresponding ids."""
+        data = {'repository_paths': ['/content/dist/rhel/rhui/server/7/7Server/x86_64/os/']}
+        repository_paths, repo_ids = self.updates_api._get_repository_paths(data, [999])
+        assert repository_paths == ['/content/dist/rhel/rhui/server/7/7Server/x86_64/os/']
+        assert 7 in repo_ids, "repository not found by path"
+        assert 999 in repo_ids, "previously found repository not returned back"
 
     def test_get_releasever_1(self):
         """Test with complete request"""
