@@ -197,7 +197,7 @@ class TestPkgtreeAPI(TestBase):
         req["third_party"] = True
         req["package_name_list"] = [".*"]
         response = self.pkg_api.process_list(3, req)
-        assert len(response["package_name_list"]) == 4
+        assert len(response["package_name_list"]) == 5
         assert len(response["package_name_list"]["third-party-pkg"]) == 1  # one package (third-party) found
 
     def test_third_party_off(self):
@@ -205,5 +205,5 @@ class TestPkgtreeAPI(TestBase):
         req = PKGS_JSON.copy()
         req["package_name_list"] = [".*"]
         response = self.pkg_api.process_list(3, req)
-        assert len(response["package_name_list"]) == 4
+        assert len(response["package_name_list"]) == 5
         assert response["package_name_list"]["third-party-pkg"] == []  # third-party package was excluded

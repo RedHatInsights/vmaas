@@ -56,6 +56,18 @@ class UpdatesAPI:
             repo_ids = list(self.db_cache.repo_detail.keys())
         return repo_list, repo_ids
 
+    def _get_repository_paths(self, data: dict, repo_ids: list) -> (list, list):
+        repo_paths = data.get('repository_paths', None)
+        if repo_paths is not None:
+            for repo_path in repo_paths:
+                if not repo_path:
+                    continue
+
+                repo_id = self.db_cache.repopath2ids.get(repo_path.rstrip('/'), None)
+                if repo_id:
+                    repo_ids.extend(repo_id)
+        return repo_paths, repo_ids
+
     def _get_releasever(self, data: dict, repo_ids: list) -> (str, list):
         releasever = data.get('releasever', None)
         if releasever is not None:
@@ -329,6 +341,9 @@ class UpdatesAPI:
 
         repository_list, repo_ids = self._get_repository_list(data)
         response = insert_if_not_empty(response, 'repository_list', repository_list)
+
+        repository_paths, repo_ids = self._get_repository_paths(data, repo_ids)
+        response = insert_if_not_empty(response, 'repository_paths', repository_paths)
 
         releasever, repo_ids = self._get_releasever(data, repo_ids)
         response = insert_if_not_empty(response, 'releasever', releasever)

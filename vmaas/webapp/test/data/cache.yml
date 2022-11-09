@@ -61,6 +61,27 @@ errata_detail:
   - false  # third_party
   - true   # requires_reboot
   - 444    # id
+  RHBA-2015:0777: !!python/tuple
+  - Errata synopsis...
+  - Errata summary...
+  - bugfix
+  - None
+  - Errata description...
+  - Errata solution...
+  - 2015-03-05 00:00:00+00:00
+  - 2015-03-05 00:00:00+00:00
+  - []
+  - - 8720
+    - 87200
+  - - '1004102'
+    - '1004107'
+    - '1087507'
+  - []
+  - []
+  - https://access.redhat.com/errata/RHBA-2015:0364
+  - false  # third_party
+  - true   # requires_reboot
+  - 777    # id
   RHEA-2011:0895: !!python/tuple
   - Errata synopsis...
   - Errata summary...
@@ -142,9 +163,12 @@ errataid2name:
   555: RHSA-2019:1174
   556: RHSA-2019:1175
   123: RHSA-2222:1234
+  777: RHBA-2015:0777
 errataid2repoids:
   444: !!set
     1: null
+  777:
+    7: null
   556: !!set
     2: null
   123: !!set
@@ -185,6 +209,16 @@ evr2id:
   - 4.18.0
   - 80.el8
   : 410
+  ? &id008 !!python/tuple
+  - '0'
+  - 1.1.0
+  - 1.el7
+  : 710
+  ? &id009 !!python/tuple
+  - '0'
+  - 1.2.0
+  - 1.el7
+  : 720
 id2arch:
   5: i686
   6: src
@@ -197,11 +231,14 @@ id2evr:
   310: *id005
   320: *id006
   410: *id007
+  710: *id008
+  720: *id009
 id2packagename:
   2222: my-pkg
   32222: kernel
   332222: kernel-rt
   4444: third-party-pkg
+  33377: rhui-pkg
 modulename2id:
   ? !!python/tuple
   - my-pkg
@@ -244,6 +281,26 @@ nevra2pkgid:
   - 210
   - 5
   : 8500
+  ? !!python/tuple
+  - 33377 # package-name id
+  - 710   # evr id
+  - 7     # arch id
+  : 8710  # package id
+  ? !!python/tuple
+  - 33377 # package-name id
+  - 710   # evr id
+  - 6     # arch id
+  : 87100  # package id
+  ? !!python/tuple
+  - 33377 # package-name id
+  - 720   # evr id
+  - 7     # arch id
+  : 8720  # package id
+  ? !!python/tuple
+  - 33377 # package-name id
+  - 720   # evr id
+  - 6     # arch id
+  : 87200  # package id
 strings:
   1: Testing package summary...
   2: Testing package (1.1.0) description...
@@ -328,11 +385,44 @@ package_details:
   - 5
   - 0
   - 1602291723 # 2020-10-10 01:02:03+00:00
+  8710: !!python/tuple
+  - 33377 # package-name id
+  - 710  # evr id
+  - 7    # arch id
+  - 1    # summary id
+  - 2    # description id
+  - 87100 # source package id
+  - 1602378123 # 2020-10-11 01:02:03+00:00 - modified
+  87100: !!python/tuple
+  - 33377 # package-name id
+  - 710  # evr id
+  - 6    # arch id (src)
+  - 1    # summary id
+  - 2    # description id
+  - 0    # source package id
+  - 1602378123 # 2020-10-11 01:02:03+00:00 - modified
+  8720: !!python/tuple
+  - 33377 # package-name id
+  - 720  # evr id
+  - 7    # arch id
+  - 1    # summary id
+  - 2    # description id
+  - 87200 # source package id
+  - 1602378125 # 2020-10-11 01:02:05+00:00 - modified
+  87200: !!python/tuple
+  - 33377 # package-name id
+  - 720  # evr id
+  - 6    # arch id (src)
+  - 1    # summary id
+  - 2    # description id
+  - 0    # source package id
+  - 1602378125 # 2020-10-11 01:02:05+00:00 - modified
 packagename2id:
   my-pkg: 2222
   kernel: 32222
   kernel-rt: 332222
   third-party-pkg: 4444
+  rhui-pkg: 33377
 pkgerrata2module:
   ? !!python/tuple
   - 8110
@@ -374,6 +464,10 @@ pkgid2errataids:
     111: null
   8320: !!set
     556: null
+  8720: !!set
+    777: null
+  87200: !!set
+    777: null
 pkgid2repoids:
   8110:
   - 1
@@ -389,6 +483,10 @@ pkgid2repoids:
   - 2
   8500:
   - 6
+  8710:
+  - 7
+  8720:
+  - 7
 repo_detail:
   1: !!python/tuple
   - rhel-7-server-rpms
@@ -450,11 +548,36 @@ repo_detail:
   - null
   - 2019-09-20 06:25:12+00:00
   - true
+  7: !!python/tuple
+  - rhel-7-server-rhui-rpms
+  - RHEL 8 AppStream for RHUI
+  - https://rhui.redhat.com/content/dist/rhel/rhui/server/7/7Server/x86_64/os/
+  - x86_64
+  - '7Server'
+  - null
+  - null
+  - 2022-09-20 06:25:12+00:00
+  - false
+  8: !!python/tuple
+  - rhel-8-for-x86_64-appstream-rhui-rpms
+  - RHEL 8 AppStream for RHUI
+  - https://rhui.redhat.com/content/dist/rhel8/rhui/8/x86_64/appstream/os/
+  - x86_64
+  - '8.0'
+  - null
+  - null
+  - 2022-09-20 06:25:12+00:00
+  - false
 repolabel2ids:
   rhel-7-server-rpms:
   - 1
   third-party-repo1:
   - 6
+repopath2ids:
+  /content/dist/rhel8/rhui/8/x86_64/appstream/os:
+  - 8
+  /content/dist/rhel/rhui/server/7/7Server/x86_64/os:
+  - 7
 updates:
   2222:
   - 8110
@@ -464,6 +587,9 @@ updates:
   332222:
   - 8310
   - 8320
+  33377:
+  - 8710
+  - 8720
 updates_index:
   2222:
     110:
@@ -477,15 +603,25 @@ updates_index:
   332222:
     310:
     - 0
+  33377:
+    710:
+    - 0
+    720:
+    - 1
 src_pkg_id2pkg_ids:
   81100:
     - 8110
   83200:
     - 8320
+  87100:
+    - 8710
+  87200:
+    - 8720
 content_set_id2label:
   1: rhel-7-server-rpms
   2: my-content-set
   3: third-party-repo1
+  4: rhel-7-server-rhui-rpms
 label2content_set_id:
   rhel-7-server-rpms: 1
   my-content-set: 2
@@ -499,3 +635,6 @@ content_set_id2pkg_name_ids:
     - 2222
   3:
     - 4444
+  4:
+    - 8710
+    - 8720

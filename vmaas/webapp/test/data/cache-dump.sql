@@ -383,8 +383,8 @@ CREATE TABLE repo_detail (
                                 revision text,
                                 third_party integer
                                );
-INSERT INTO "repo_detail" VALUES(801,'content set 1','content-set-name-1','https://www.repourl.com/repo1','noarch','1','product1',501,'2019-08-01T06:00:00+00:00',0);
-INSERT INTO "repo_detail" VALUES(802,'content set 2','content-set-name-2','https://www.repourl.com/repo2','noarch','1','product2',502,'2019-08-02T06:00:00+00:00',0);
+INSERT INTO "repo_detail" VALUES(801,'content set 1','content-set-name-1','https://www.repourl.com/repo1/','noarch','1','product1',501,'2019-08-01T06:00:00+00:00',0);
+INSERT INTO "repo_detail" VALUES(802,'content set 2','content-set-name-2','https://www.repourl.com/repo2/','noarch','1','product2',502,'2019-08-02T06:00:00+00:00',0);
 CREATE TABLE string (
                                 id integer primary key,
                                 string text
