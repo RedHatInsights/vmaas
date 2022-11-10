@@ -53,7 +53,7 @@ class UpdatesAPI:
                 if repo_id:
                     repo_ids.extend(repo_id)
         else:
-            repo_ids = self.db_cache.repo_detail.keys()
+            repo_ids = list(self.db_cache.repo_detail.keys())
         return repo_list, repo_ids
 
     def _get_releasever(self, data: dict, repo_ids: list) -> (str, list):
