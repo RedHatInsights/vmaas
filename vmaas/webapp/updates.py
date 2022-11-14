@@ -45,6 +45,7 @@ class UpdatesAPI:
 
     def _get_repository_list(self, data: dict) -> (list, list):
         repo_list = data.get('repository_list', None)
+        repo_paths = data.get('repository_paths', None)
         if repo_list is not None:
             strip_prefixes(repo_list, REPO_PREFIXES)
             repo_ids = []
@@ -52,8 +53,10 @@ class UpdatesAPI:
                 repo_id = self.db_cache.repolabel2ids.get(label, None)
                 if repo_id:
                     repo_ids.extend(repo_id)
-        else:
+        elif repo_paths is None:
             repo_ids = list(self.db_cache.repo_detail.keys())
+        else:
+            repo_ids = []
         return repo_list, repo_ids
 
     def _get_repository_paths(self, data: dict, repo_ids: list) -> (list, list):

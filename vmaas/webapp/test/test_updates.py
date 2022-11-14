@@ -159,12 +159,13 @@ class TestUpdatesAPI(TestBase):
         updates = self.updates_api.process_list(3, UPDATES_JSON_PREFIX.copy())
         assert updates == UPDATES_RESPONSE_2
 
-    def test_process_list_with_repo_paths_v3(self):
+    @pytest.mark.parametrize("repository_list", [None, [], ["anything"]])
+    def test_process_list_with_repo_paths_v3(self, repository_list):
         """Test looking for package updates api v3 with repository paths."""
         pkg = "rhui-pkg-1.1.0-1.el7.x86_64"
         data = {
             "package_list": [pkg],
-            "repository_list": [],
+            "repository_list": repository_list,
             "repository_paths": ["/content/dist/rhel/rhui/server/7/7Server/x86_64/os/"],
             "releasever": "7Server",
             "basearch": "x86_64",
