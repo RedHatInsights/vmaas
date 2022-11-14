@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.35.4 (2022-11-14)
+### Fix
+* **tests:** Test env vars unqoted ([`4800058`](https://github.com/RedHatInsights/vmaas/commit/4800058fcbdfdae4d15049602d10905fcf9a62d4))
+* **tests:** Skip unrelated pipenv check ([`bfe0a7b`](https://github.com/RedHatInsights/vmaas/commit/bfe0a7ba750db0ba4e323e96fa362530e7dbee0b))
+
 ## v2.35.3 (2022-10-07)
 ### Fix
 * **reposcan:** Collect prometheus metrics from child processes ([`4c16942`](https://github.com/RedHatInsights/vmaas/commit/4c16942abe5817c5a479d46f14d0ec7805d15afd))
