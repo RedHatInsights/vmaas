@@ -11,7 +11,8 @@ RUN FULL_RHEL=$(microdnf repolist --enabled | grep rhel-8) ; \
 ARG VAR_RPMS=""
 RUN microdnf module enable postgresql:12 && \
     microdnf install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python3 python3-rpm which rsync git-core shadow-utils diffutils systemd libicu postgresql $VAR_RPMS && \
+        python3 python3-rpm which rsync rpm-devel git-core shadow-utils diffutils systemd libicu postgresql $VAR_RPMS \
+        go-toolset && \
     microdnf clean all
 
 WORKDIR /vmaas
@@ -31,6 +32,19 @@ ADD /vmaas/reposcan/rsyncd.conf   /etc/
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas
+RUN mkdir -p /vmaas/go/src/vmaas && chown -R vmaas:root /vmaas/go
+
+ENV PYTHONPATH=/vmaas
+ENV GOPATH=/vmaas/go \
+    PATH=$PATH:/vmaas/go/bin
+
+ADD /vmaas-go                   /vmaas/go/src/vmaas
+
+WORKDIR /vmaas/go/src/vmaas
+RUN go mod download
+RUN go build -v main.go
+
+WORKDIR /vmaas
 
 USER vmaas
 
@@ -42,5 +56,3 @@ ADD /vmaas/websocket            /vmaas/vmaas/websocket/
 ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common
-
-ENV PYTHONPATH=/vmaas
