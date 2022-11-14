@@ -1,0 +1,54 @@
+{
+    "database": {
+        "adminPassword": "vmaas_admin_pwd",
+        "adminUsername": "vmaas_admin",
+        "hostname": "vmaas_database",
+        "name": "vmaas",
+        "password": "vmaas_writer_pwd",
+        "port": 5432,
+        "sslMode": "disable",
+        "username": "vmaas_writer"
+    },
+    "endpoints": [
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_webapp",
+            "name": "webapp-service",
+            "port": 8080
+        },
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_reposcan",
+            "name": "reposcan-service",
+            "port": 8081
+        }
+    ],
+    "privateEndpoints": [
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_websocket",
+            "name": "websocket-service",
+            "port": 8082
+        },
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_reposcan",
+            "name": "reposcan-service",
+            "port": 8730
+        }
+    ],
+    "logging": {
+        "cloudwatch": {
+            "accessKeyId": "",
+            "logGroup": "",
+            "region": "",
+            "secretAccessKey": ""
+        },
+        "type": "null"
+    },
+    "metricsPath": "/metrics",
+    "metricsPort": 9088,
+    "privatePort": 8082,
+    "publicPort": 8000,
+    "webPort": 8000
+}
