@@ -75,8 +75,9 @@ class TestModularity(TestBase):
         updates = self.updates_api.process_list(2, self.gen_pkg_json(pkg, modules))
         assert updates
         available_updates = updates['update_list'][pkg]['available_updates']
-        assert len(available_updates) == len(expected_update_pkgs)
-        assert expected_update_pkgs == {rec['package'] for rec in available_updates}
+        package_updates = {rec['package'] for rec in available_updates}
+        assert len(package_updates) == len(expected_update_pkgs)
+        assert expected_update_pkgs == package_updates
 
     @pytest.mark.parametrize('test_data', NEW_OLD, ids=[x[0] for x in NEW_OLD])
     def test_new_pkg_old_module(self, test_data):
@@ -98,8 +99,9 @@ class TestModularity(TestBase):
         if mode == 'correct_stream_enabled':  # with correct stream enabled there should be no updates
             assert not available_updates
             return
-        assert len(available_updates) == len(expected_update_pkgs)
-        assert expected_update_pkgs == {rec['package'] for rec in available_updates}
+        package_updates = {rec['package'] for rec in available_updates}
+        assert len(package_updates) == len(expected_update_pkgs)
+        assert expected_update_pkgs == package_updates
 
     @pytest.mark.parametrize('test_data', NEW_MODULE, ids=[x[0] for x in NEW_MODULE])
     def test_old_pkg_new_module(self, test_data):
