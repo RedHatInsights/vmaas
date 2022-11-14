@@ -1119,6 +1119,11 @@ components:
           items:
             type: string
             example: rhel-6-server-rpms
+        repository_paths:
+          type: array
+          items:
+            type: string
+            example: /content/dist/rhel/rhui/server/7/7Server/x86_64/os/
         modules_list:
           type: array
           items:
