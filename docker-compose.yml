@@ -76,6 +76,22 @@ services:
       - vmaas_websocket
       - vmaas_reposcan
 
+  vmaas_webapp_go:
+    command: /vmaas/entrypoint.sh webapp-go
+    container_name: vmaas-webapp-go
+    hostname: vmaas-webapp-go
+    image: vmaas/app:latest
+    restart: unless-stopped
+    env_file:
+      - ./conf/webapp_go.env
+    ports:
+      - 8000:8000
+      - 9088:9088
+    depends_on:
+      - vmaas_websocket
+      - vmaas_reposcan
+      - vmaas_webapp # to proxy requests
+
   vmaas_webapp_utils:
     command: /vmaas/entrypoint.sh webapp-utils
     container_name: vmaas-webapp-utils
