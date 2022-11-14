@@ -66,3 +66,18 @@ class TestVulnerabilitiesAPI(TestBase):
         # NOTE: use copy of dict with json input, because process_list changes this dict
         updates = self.vulnerabilities_api.process_list(1, UPDATES_JSON_NON_EXIST.copy())
         assert updates == EMPTY_RESPONSE
+
+    # pylint: disable=invalid-name
+    def test_process_list_with_repo_paths(self):
+        """Test looking for package updates api v3 with repository paths."""
+        pkg = "rhui-pkg-1.1.0-1.el7.x86_64"
+        data = {
+            "package_list": [pkg],
+            "repository_list": [],
+            "repository_paths": ["/content/dist/rhel/rhui/server/7/7Server/x86_64/os/"],
+            "releasever": "7Server",
+            "basearch": "x86_64",
+        }
+        updates = self.vulnerabilities_api.process_list(3, data)
+        assert "cve_list" in updates
+        assert "CVE-2022-00777" in updates["cve_list"]
