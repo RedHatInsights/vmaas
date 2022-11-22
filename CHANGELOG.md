@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.36.0 (2022-11-22)
+### Feature
+* **webapp-go:** Build and deployment ([`5ab7743`](https://github.com/RedHatInsights/vmaas/commit/5ab7743bd8a3d289d0d4e14a5b9e5a1adf62c137))
+* **webapp-go:** Local config ([`b01edf3`](https://github.com/RedHatInsights/vmaas/commit/b01edf39917cc917771c54be8299311c7f11639b))
+* **webapp-go:** App handling updates and vulnerabilities ([`c7436c1`](https://github.com/RedHatInsights/vmaas/commit/c7436c1b2e54b5c204116a711c611e05ab5f3fb2))
+* **webapp-go:** Base and utils based on redhatinsights/patchman-engine ([`133b098`](https://github.com/RedHatInsights/vmaas/commit/133b098c1f124ff0d5d812a6772fe397259ad736))
+
 ## v2.35.4 (2022-11-14)
 ### Fix
 * **tests:** Test env vars unqoted ([`4800058`](https://github.com/RedHatInsights/vmaas/commit/4800058fcbdfdae4d15049602d10905fcf9a62d4))
