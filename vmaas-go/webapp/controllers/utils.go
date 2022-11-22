@@ -61,3 +61,8 @@ func LogAndRespNotAllowed(c *gin.Context, err error) {
 	utils.Log("err", err.Error()).Warn()
 	respStatusError(c, http.StatusMethodNotAllowed, err)
 }
+
+func LogAndRespUnavailable(c *gin.Context, err error) {
+	utils.Log("err", err.Error()).Warn()
+	respStatusError(c, http.StatusServiceUnavailable, err)
+}

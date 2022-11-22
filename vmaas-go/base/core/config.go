@@ -16,8 +16,13 @@ var (
 )
 
 func ConfigureApp() {
-	var err error
 	utils.ConfigureLogging()
+	// FIXME: add metrics
+	// metrics.Configure()
+}
+
+func ConfigureCache() {
+	var err error
 	VmaasAPI, err = vmaas.InitFromUrl(utils.Cfg.DumpRsyncAddress)
 	if err != nil {
 		utils.Log("err", err.Error()).Warn("Cache not available on app start")
@@ -27,8 +32,6 @@ func ConfigureApp() {
 		fmt.Sprintf("%s/api/v1/latestdump", utils.Cfg.ReposcanAddress),
 		nil, // not needed, cache initialized from rsync url
 	)
-	// FIXME: add metrics
-	// metrics.Configure()
 }
 
 func SetupTestEnvironment() {

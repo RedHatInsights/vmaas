@@ -28,6 +28,7 @@ var basepaths = []string{"/api/v3", "/api/vmaas/v3"}
 // @BasePath /api/vmaas/v3
 func Run() {
 	core.ConfigureApp()
+	go core.ConfigureCache()
 
 	port := utils.Cfg.PublicPort
 	utils.Log().Infof("Webapp starting at port %d", port)

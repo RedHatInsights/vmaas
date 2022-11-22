@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/redhatinsights/app-common-go v1.6.4
 	github.com/redhatinsights/platform-go-middlewares v0.20.0
-	github.com/redhatinsights/vmaas-lib v0.0.0-20221114175817-6b9b037c4fc5
+	github.com/redhatinsights/vmaas-lib v0.0.0-20221121180623-75c4cb5a4cf1
 	github.com/sirupsen/logrus v1.9.0
 )
 
