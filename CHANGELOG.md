@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.0 (2022-11-22)
+### Feature
+* **vulnerabilities:** Vulns by repository_paths ([`985ad04`](https://github.com/RedHatInsights/vmaas/commit/985ad04c243e9569b46327813f567cdb303dd087))
+* **updates:** Look up updates by repository paths ([`5ce94f0`](https://github.com/RedHatInsights/vmaas/commit/5ce94f082c29d9bb64025d65be2f39a12622c7b2))
+* **cache:** Repository id by path ([`47bc078`](https://github.com/RedHatInsights/vmaas/commit/47bc07893f90d352dd8cb2be2f974eba123ba70e))
+
+### Fix
+* **updates:** Repository_paths used alone ([`2cac2b4`](https://github.com/RedHatInsights/vmaas/commit/2cac2b4a28f00cba3f9d01f11e568e3327c4636a))
+
 ## v2.36.0 (2022-11-22)
 ### Feature
 * **webapp-go:** Build and deployment ([`5ab7743`](https://github.com/RedHatInsights/vmaas/commit/5ab7743bd8a3d289d0d4e14a5b9e5a1adf62c137))
