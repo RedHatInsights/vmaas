@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,8 +9,7 @@ import (
 )
 
 func UpdatesHandler(c *gin.Context) {
-	if core.VmaasAPI == nil {
-		LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
+	if !isCacheLoaded(c) {
 		return
 	}
 	pkg := c.Param("package")
