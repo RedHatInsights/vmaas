@@ -231,8 +231,6 @@ objects:
               name: vulnerability-slack
         - name: VMAAS_ENV
           value: ${VMAAS_ENV}
-        - name: PROMETHEUS_MULTIPROC_DIR
-          value: /tmp/prometheus_multiproc_dir
 
     database:
       name: vmaas

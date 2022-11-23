@@ -2,17 +2,7 @@
 Measurement aNd Monitoring - prometheus probes used by reposcan subsystem
 """
 
-import os
-
-from prometheus_client import Counter, Gauge, CollectorRegistry, multiprocess
-
-from vmaas.common.config import Config
-
-CFG = Config()
-
-os.makedirs(CFG.prometheus_multiproc_dir, exist_ok=True)
-REGISTRY = CollectorRegistry()
-multiprocess.MultiProcessCollector(REGISTRY)
+from prometheus_client import Counter, Gauge
 
 ADMIN_REQUESTS = Counter('vmaas_reposcan_admin_invocations', 'Number of calls on admin API')
 FAILED_AUTH = Counter('vmaas_reposcan_failed_auth_attempts', '# of failed authentication attempts')

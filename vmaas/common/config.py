@@ -18,7 +18,6 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-# pylint: disable=too-many-instance-attributes
 class BaseConfig:
     """Base configuration, same for clowder and non-clowder."""
 
@@ -38,7 +37,6 @@ class BaseConfig:
         self.metrics_port = None
 
         self.oval_unfixed_eval_enabled = strtobool(os.getenv("OVAL_UNFIXED_EVAL_ENABLED", "FALSE"))
-        self.prometheus_multiproc_dir = os.getenv("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc_dir")
 
 
 # pylint: disable=too-many-instance-attributes
