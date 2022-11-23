@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6]
+        python-version: [3.8]
     env:
       PIPENV_CHECK: "1"
       PGPORT: "5433"
