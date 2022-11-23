@@ -32,10 +32,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBSOCKET}
-            memory: 100Mi
+            memory: ${MEMORY_LIMIT_WEBSOCKET}
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: ${CPU_REQUEST_WEBSOCKET}
+            memory: ${MEMORY_REQUEST_WEBSOCKET}
 
     - name: webapp-go
       minReplicas: ${{REPLICAS_WEBAPP_GO}}
@@ -83,10 +83,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT}
+            memory: ${MEMORY_LIMIT_WEBAPP}
           requests:
-            cpu: 500m
-            memory: ${MEMORY_LIMIT}
+            cpu: ${CPU_REQUEST_WEBAPP}
+            memory: ${MEMORY_REQUEST_WEBAPP}
 
     - name: webapp-service
       minReplicas: ${{REPLICAS_WEBAPP}}
@@ -146,10 +146,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT}
+            memory: ${MEMORY_LIMIT_WEBAPP}
           requests:
-            cpu: 500m
-            memory: ${MEMORY_LIMIT}
+            cpu: ${CPU_REQUEST_WEBAPP}
+            memory: ${MEMORY_REQUEST_WEBAPP}
 
     - name: reposcan-service
       minReplicas: ${{REPLICAS_REPOSCAN}}
@@ -187,10 +187,10 @@ objects:
         resources:
           limits:
             cpu: ${CPU_LIMIT_REPOSCAN}
-            memory: 2Gi
+            memory: ${MEMORY_LIMIT_REPOSCAN}
           requests:
-            cpu: 200m
-            memory: 1Gi
+            cpu: ${CPU_REQUEST_REPOSCAN}
+            memory: ${MEMORY_REQUEST_REPOSCAN}
         volumes:
         - name: vmaas-reposcan-tmp
           emptyDir: {}
@@ -354,16 +354,40 @@ parameters:
 - name: GIN_MODE
   description: Gin webframework mode
   value: release
-- name: CPU_LIMIT_WEBSOCKET
-  description: Maximum CPU limit for pods
+- name: CPU_REQUEST_WEBSOCKET
+  description: CPU request for pod
   value: '100m'
+- name: CPU_LIMIT_WEBSOCKET
+  description: Maximum CPU limit for pod
+  value: '100m'
+- name: CPU_REQUEST_WEBAPP
+  description: CPU request for pod
+  value: '500m'
 - name: CPU_LIMIT_WEBAPP
-  description: Maximum CPU limit for pods
+  description: Maximum CPU limit for pod
   value: '1000m'
+- name: CPU_REQUEST_REPOSCAN
+  description: CPU request for pod
+  value: '200m'
 - name: CPU_LIMIT_REPOSCAN
-  description: Maximum CPU limit for pods
+  description: Maximum CPU limit for pod
   value: '1000m'
-- name: MEMORY_LIMIT
+- name: MEMORY_REQUEST_WEBSOCKET
+  description: Memory request for pod
+  value: '50Mi'
+- name: MEMORY_LIMIT_WEBSOCKET
+  description: Maximum memory limit for pod
+  value: '100Mi'
+- name: MEMORY_REQUEST_WEBAPP
+  description: Memory request for pod
+  value: '1Gi'
+- name: MEMORY_LIMIT_WEBAPP
+  description: Maximum memory limit for pod
+  value: '2Gi'
+- name: MEMORY_REQUEST_REPOSCAN
+  description: Memory request for pod
+  value: '1Gi'
+- name: MEMORY_LIMIT_REPOSCAN
   description: Maximum memory limit for pod
   value: '2Gi'
 - name: REPLICAS_WEBAPP
