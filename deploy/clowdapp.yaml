@@ -37,37 +37,6 @@ objects:
             cpu: 100m
             memory: 100Mi
 
-    - name: webapp-go
-      minReplicas: ${{REPLICAS_WEBAPP_GO}}
-      webServices:
-        public:
-          enabled: true
-        private:
-          enabled: false
-      podSpec:
-        image: ${IMAGE}:${IMAGE_TAG}
-        command:
-          - /vmaas/entrypoint.sh
-          - webapp-go
-        env:
-        - name: GIN_MODE
-          value: ${GIN_MODE}
-        - name: GOMAXPROCS
-          value: ${GOMAXPROCS_WEBAPP}
-        - name: LOG_LEVEL
-          value: ${LOGGING_LEVEL_APP}
-        - name: LOG_STYLE
-          value: ${LOG_STYLE}
-        - name: OVAL_UNFIXED_EVAL_ENABLED
-          value: ${OVAL_UNFIXED_EVAL_ENABLED}
-        resources:
-          limits:
-            cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT}
-          requests:
-            cpu: 500m
-            memory: ${MEMORY_LIMIT}
-
     - name: webapp-service
       minReplicas: ${{REPLICAS_WEBAPP}}
       webServices:
@@ -103,6 +72,26 @@ objects:
           value: ${OVAL_UNFIXED_EVAL_ENABLED}
         - name: REPO_NAME_PREFIXES
           value: ${REPO_NAME_PREFIXES}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          timeoutSeconds: 1
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 180
+          timeoutSeconds: 1
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP}
