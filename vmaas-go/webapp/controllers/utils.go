@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas-lib/vmaas"
+	"github.com/redhatinsights/vmaas/base/core"
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
@@ -31,6 +33,14 @@ func bindValidateJSON(c *gin.Context) (*vmaas.Request, error) {
 		}
 	}
 	return &request, nil
+}
+
+func isCacheLoaded(c *gin.Context) bool {
+	if core.VmaasAPI == nil || core.VmaasAPI.Cache == nil {
+		LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
+		return false
+	}
+	return true
 }
 
 func respStatusError(c *gin.Context, code int, err error) {

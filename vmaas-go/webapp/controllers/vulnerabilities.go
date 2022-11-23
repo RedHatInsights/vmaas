@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,8 +9,7 @@ import (
 )
 
 func VulnerabilitiesHandler(c *gin.Context) {
-	if core.VmaasAPI == nil {
-		LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
+	if !isCacheLoaded(c) {
 		return
 	}
 	pkg := c.Param("package")
@@ -26,8 +24,7 @@ func VulnerabilitiesHandler(c *gin.Context) {
 }
 
 func VulnerabilitiesPostHandler(c *gin.Context) {
-	if core.VmaasAPI == nil {
-		LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
+	if !isCacheLoaded(c) {
 		return
 	}
 	request, err := bindValidateJSON(c)
