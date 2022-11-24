@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.2 (2022-11-24)
+### Fix
+* Define cpu/memory limit/requests separately ([`22a96d9`](https://github.com/RedHatInsights/vmaas/commit/22a96d96015a1d3a0d7ece3d317a3a333a35852d))
+
 ## v2.37.1 (2022-11-23)
 ### Fix
 * **probes:** Define custom probes ([`7a5c438`](https://github.com/RedHatInsights/vmaas/commit/7a5c4384f4f5e811cfb263817d9ec328869a4179))
