@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.3 (2022-11-25)
+### Fix
+* **vmaas-go:** Return 503 during cache reload ([`6913cc9`](https://github.com/RedHatInsights/vmaas/commit/6913cc9b7a734db169c063c3d9bbe68d0a44d412))
+
 ## v2.37.2 (2022-11-24)
 ### Fix
 * Define cpu/memory limit/requests separately ([`22a96d9`](https://github.com/RedHatInsights/vmaas/commit/22a96d96015a1d3a0d7ece3d317a3a333a35852d))
