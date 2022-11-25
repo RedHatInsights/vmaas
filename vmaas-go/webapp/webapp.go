@@ -6,9 +6,11 @@ import (
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"github.com/redhatinsights/vmaas/base"
 	"github.com/redhatinsights/vmaas/base/core"
 	"github.com/redhatinsights/vmaas/base/utils"
+	"github.com/redhatinsights/vmaas/webapp/controllers"
 	"github.com/redhatinsights/vmaas/webapp/middlewares"
 	"github.com/redhatinsights/vmaas/webapp/routes"
 )
@@ -64,12 +66,14 @@ func vmaasProxy(c *gin.Context) {
 	c.Request.URL.Host = utils.Cfg.OGWebappHost
 	res, err := http.DefaultClient.Do(c.Request)
 	if err != nil {
-		utils.Log("err", err.Error()).Error("error making http request")
+		controllers.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
+		return
 	}
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		utils.Log("err", err.Error()).Error("could not read response body")
+		controllers.LogAndRespFailedDependency(c, errors.Wrap(err, "could not read response body"))
+		return
 	}
 	c.Data(res.StatusCode, res.Header.Get("Content-Type"), resBody)
 }
