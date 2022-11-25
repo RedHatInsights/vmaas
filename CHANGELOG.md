@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.4 (2022-11-25)
+### Fix
+* **vmaas-go:** Don't proxy request when error is present ([`6c86060`](https://github.com/RedHatInsights/vmaas/commit/6c86060465d95830b866e405bcdb5b5aa719a93e))
+
 ## v2.37.3 (2022-11-25)
 ### Fix
 * **vmaas-go:** Return 503 during cache reload ([`6913cc9`](https://github.com/RedHatInsights/vmaas/commit/6913cc9b7a734db169c063c3d9bbe68d0a44d412))
