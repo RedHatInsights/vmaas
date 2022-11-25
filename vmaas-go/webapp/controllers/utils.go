@@ -76,3 +76,8 @@ func LogAndRespUnavailable(c *gin.Context, err error) {
 	utils.Log("err", err.Error()).Warn()
 	respStatusError(c, http.StatusServiceUnavailable, err)
 }
+
+func LogAndRespFailedDependency(c *gin.Context, err error) {
+	utils.Log("err", err.Error()).Error() // log more descriptive error, possibly showing internal urls
+	respStatusError(c, http.StatusFailedDependency, errors.New("couldn't proxy request to vmaas-webapp-service"))
+}
