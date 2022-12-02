@@ -3,20 +3,12 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas-lib/vmaas"
 	"github.com/redhatinsights/vmaas/base/core"
 	"github.com/redhatinsights/vmaas/base/utils"
 )
-
-var errorTitles = map[int]string{
-	http.StatusInternalServerError: "Internal Server Error",
-	http.StatusBadRequest:          "Bad Request",
-	http.StatusNotFound:            "Not Found",
-	http.StatusMethodNotAllowed:    "Method Not Allowed",
-}
 
 func bindValidateJSON(c *gin.Context) (*vmaas.Request, error) {
 	request := vmaas.Request{}
@@ -37,47 +29,8 @@ func bindValidateJSON(c *gin.Context) (*vmaas.Request, error) {
 
 func isCacheLoaded(c *gin.Context) bool {
 	if core.VmaasAPI == nil || core.VmaasAPI.Cache == nil {
-		LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
+		utils.LogAndRespUnavailable(c, errors.New("data not available, please try again later"))
 		return false
 	}
 	return true
-}
-
-func respStatusError(c *gin.Context, code int, err error) {
-	c.AbortWithStatusJSON(code, utils.ErrorResponse{
-		Type:   "about:blank",
-		Title:  errorTitles[code],
-		Detail: err.Error(),
-		Status: code,
-	})
-}
-
-func LogAndRespError(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Error()
-	respStatusError(c, http.StatusInternalServerError, err)
-}
-
-func LogAndRespBadRequest(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Warn()
-	respStatusError(c, http.StatusBadRequest, err)
-}
-
-func LogAndRespNotFound(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Warn()
-	respStatusError(c, http.StatusNotFound, err)
-}
-
-func LogAndRespNotAllowed(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Warn()
-	respStatusError(c, http.StatusMethodNotAllowed, err)
-}
-
-func LogAndRespUnavailable(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Warn()
-	respStatusError(c, http.StatusServiceUnavailable, err)
-}
-
-func LogAndRespFailedDependency(c *gin.Context, err error) {
-	utils.Log("err", err.Error()).Error() // log more descriptive error, possibly showing internal urls
-	respStatusError(c, http.StatusFailedDependency, errors.New("couldn't proxy request to vmaas-webapp-service"))
 }

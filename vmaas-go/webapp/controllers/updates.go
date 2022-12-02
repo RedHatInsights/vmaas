@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas-lib/vmaas"
 	"github.com/redhatinsights/vmaas/base/core"
+	"github.com/redhatinsights/vmaas/base/utils"
 )
 
 func UpdatesHandler(c *gin.Context) {
@@ -17,7 +18,7 @@ func UpdatesHandler(c *gin.Context) {
 
 	updates, err := core.VmaasAPI.Updates(&request)
 	if err != nil {
-		LogAndRespError(c, err)
+		utils.LogAndRespError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, updates)
@@ -26,13 +27,13 @@ func UpdatesHandler(c *gin.Context) {
 func UpdatesPostHandler(c *gin.Context) {
 	request, err := bindValidateJSON(c)
 	if err != nil {
-		LogAndRespBadRequest(c, err)
+		utils.LogAndRespBadRequest(c, err)
 		return
 	}
 
 	updates, err := core.VmaasAPI.Updates(request)
 	if err != nil {
-		LogAndRespError(c, err)
+		utils.LogAndRespError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, updates)
