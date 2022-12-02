@@ -10,7 +10,6 @@ import (
 	"github.com/redhatinsights/vmaas/base"
 	"github.com/redhatinsights/vmaas/base/core"
 	"github.com/redhatinsights/vmaas/base/utils"
-	"github.com/redhatinsights/vmaas/webapp/controllers"
 	"github.com/redhatinsights/vmaas/webapp/middlewares"
 	"github.com/redhatinsights/vmaas/webapp/routes"
 )
@@ -38,6 +37,7 @@ func Run() {
 	app := gin.New()
 
 	// middlewares
+	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
 	app.HandleMethodNotAllowed = true
@@ -51,7 +51,6 @@ func Run() {
 	}
 
 	go base.TryExposeOnMetricsPort(app)
-
 	err := utils.RunServer(base.Context, app, port)
 	if err != nil {
 		utils.Log("err", err.Error()).Fatal("server listening failed")
@@ -66,13 +65,13 @@ func vmaasProxy(c *gin.Context) {
 	c.Request.URL.Host = utils.Cfg.OGWebappHost
 	res, err := http.DefaultClient.Do(c.Request)
 	if err != nil {
-		controllers.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
+		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
 		return
 	}
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		controllers.LogAndRespFailedDependency(c, errors.Wrap(err, "could not read response body"))
+		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "could not read response body"))
 		return
 	}
 	c.Data(res.StatusCode, res.Header.Get("Content-Type"), resBody)

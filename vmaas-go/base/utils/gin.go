@@ -21,6 +21,13 @@ type ErrorResponse struct {
 	Status int    `json:"status"`
 }
 
+var errorTitles = map[int]string{
+	http.StatusInternalServerError: "Internal Server Error",
+	http.StatusBadRequest:          "Bad Request",
+	http.StatusNotFound:            "Not Found",
+	http.StatusMethodNotAllowed:    "Method Not Allowed",
+}
+
 func LoadParamInt(c *gin.Context, param string, defaultValue int, query bool) (int, error) {
 	var valueStr string
 	if query {
@@ -86,4 +93,43 @@ func RunServer(ctx context.Context, handler http.Handler, port int) error {
 		return errors.Wrap(err, "server listening failed")
 	}
 	return nil
+}
+
+func respStatusError(c *gin.Context, code int, err error) {
+	c.AbortWithStatusJSON(code, ErrorResponse{
+		Type:   "about:blank",
+		Title:  errorTitles[code],
+		Detail: err.Error(),
+		Status: code,
+	})
+}
+
+func LogAndRespError(c *gin.Context, err error) {
+	Log("err", err.Error()).Error()
+	respStatusError(c, http.StatusInternalServerError, err)
+}
+
+func LogAndRespBadRequest(c *gin.Context, err error) {
+	Log("err", err.Error()).Warn()
+	respStatusError(c, http.StatusBadRequest, err)
+}
+
+func LogAndRespNotFound(c *gin.Context, err error) {
+	Log("err", err.Error()).Warn()
+	respStatusError(c, http.StatusNotFound, err)
+}
+
+func LogAndRespNotAllowed(c *gin.Context, err error) {
+	Log("err", err.Error()).Warn()
+	respStatusError(c, http.StatusMethodNotAllowed, err)
+}
+
+func LogAndRespUnavailable(c *gin.Context, err error) {
+	Log("err", err.Error()).Warn()
+	respStatusError(c, http.StatusServiceUnavailable, err)
+}
+
+func LogAndRespFailedDependency(c *gin.Context, err error) {
+	Log("err", err.Error()).Error() // log more descriptive error, possibly showing internal urls
+	respStatusError(c, http.StatusFailedDependency, errors.New("couldn't proxy request to vmaas-webapp-service"))
 }
