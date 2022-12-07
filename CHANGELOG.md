@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.5 (2022-12-07)
+### Fix
+* **vmaas-go:** Recover from panic and respond 500 ([`09be0db`](https://github.com/RedHatInsights/vmaas/commit/09be0db507bf35ad9a32241beb9ae47e820858eb))
+
 ## v2.37.4 (2022-11-25)
 ### Fix
 * **vmaas-go:** Don't proxy request when error is present ([`6c86060`](https://github.com/RedHatInsights/vmaas/commit/6c86060465d95830b866e405bcdb5b5aa719a93e))
