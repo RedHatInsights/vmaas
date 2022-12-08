@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.6 (2022-12-08)
+### Fix
+* **vmaas-go:** Add metrics ([`daf67c0`](https://github.com/RedHatInsights/vmaas/commit/daf67c0c6731b7bcb17f2d3952b50faa9776b8df))
+
 ## v2.37.5 (2022-12-07)
 ### Fix
 * **vmaas-go:** Recover from panic and respond 500 ([`09be0db`](https://github.com/RedHatInsights/vmaas/commit/09be0db507bf35ad9a32241beb9ae47e820858eb))
