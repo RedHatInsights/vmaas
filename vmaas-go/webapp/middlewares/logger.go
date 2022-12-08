@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,7 @@ func RequestResponseLogger() gin.HandlerFunc {
 			utils.Log(fields...).Error("request")
 		}
 
-		// FIXME: prometheus
-		// utils.ObserveSecondsSince(tStart, requestDurations.WithLabelValues(c.Request.Method+c.Request.URL.String()))
+		utils.ObserveSecondsSince(tStart, requestTime.WithLabelValues(c.Request.Method, c.FullPath()))
+		requestCount.WithLabelValues(c.Request.Method, c.FullPath(), strconv.Itoa(c.Writer.Status())).Inc()
 	}
 }

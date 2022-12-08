@@ -40,6 +40,7 @@ func Run() {
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
+	middlewares.Prometheus().Use(app)
 	app.HandleMethodNotAllowed = true
 
 	// routes
