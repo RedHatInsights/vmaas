@@ -325,10 +325,8 @@ github.com/redhatinsights/app-common-go v1.6.4 h1:L6xhROlGEXN4zvw51whl+ZxtMN1fcs
 github.com/redhatinsights/app-common-go v1.6.4/go.mod h1:6gzRyg8ZyejwMCksukeAhh2ZXOB3uHSmBsbP06fG2PQ=
 github.com/redhatinsights/platform-go-middlewares v0.20.0 h1:qwK9ArGYRlORsZ56PXXLJrGvzTsMe3bk2lR+WN5aIjM=
 github.com/redhatinsights/platform-go-middlewares v0.20.0/go.mod h1:i5gVDZJ/quCQhs5AW5CwkRPXlz1HfDBvyNtXHnlXZfM=
-github.com/redhatinsights/vmaas-lib v0.2.0 h1:OfeBWGfhozBxzal9g0PAMfFzt3bFx3H6YE1a7WEkc50=
-github.com/redhatinsights/vmaas-lib v0.2.0/go.mod h1:Qq3Owvb0zbki8IuNBWyHRm5deJcgC3KTekkY+rhF18g=
-github.com/redhatinsights/vmaas-lib v0.2.1 h1:89YEYNrWS3AKDS6s//9er5OjNgxXjiFD3QJZV6PzdcA=
-github.com/redhatinsights/vmaas-lib v0.2.1/go.mod h1:Qq3Owvb0zbki8IuNBWyHRm5deJcgC3KTekkY+rhF18g=
+github.com/redhatinsights/vmaas-lib v0.2.2 h1:bEyVk75/ajiu8MM2+czDFImQgLgjByZLTwB8ae/SnD0=
+github.com/redhatinsights/vmaas-lib v0.2.2/go.mod h1:Qq3Owvb0zbki8IuNBWyHRm5deJcgC3KTekkY+rhF18g=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
