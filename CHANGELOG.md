@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.8 (2022-12-12)
+### Fix
+* **vmaas-go:** Updates when releasever in repo is empty ([`80c86c0`](https://github.com/RedHatInsights/vmaas/commit/80c86c0fa5e41a4b8a3e6333a2b7328812f5818d))
+
 ## v2.37.7 (2022-12-08)
 ### Fix
 * **vmaas-go:** Bump vmaas-lib version to fix arch compatibility ([`ecbd93a`](https://github.com/RedHatInsights/vmaas/commit/ecbd93a022662f0d79e1bf4edfe0cb2868cb231f))
