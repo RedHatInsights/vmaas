@@ -17,8 +17,6 @@ var (
 
 func ConfigureApp() {
 	utils.ConfigureLogging()
-	// FIXME: add metrics
-	// metrics.Configure()
 }
 
 func ConfigureCache() {

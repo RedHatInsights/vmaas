@@ -5,13 +5,14 @@ go 1.17
 require (
 	github.com/aws/aws-sdk-go v1.44.155
 	github.com/gin-contrib/gzip v0.0.6
+	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/joho/godotenv v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/redhatinsights/app-common-go v1.6.4
 	github.com/redhatinsights/platform-go-middlewares v0.20.0
-	github.com/redhatinsights/vmaas-lib v0.2.2
+	github.com/redhatinsights/vmaas-lib v0.2.3
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.1
 	github.com/zsais/go-gin-prometheus v0.1.0
