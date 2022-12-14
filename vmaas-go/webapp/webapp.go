@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/gzip"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/redhatinsights/vmaas/base"
@@ -35,6 +36,9 @@ func Run() {
 	utils.Log().Infof("Webapp starting at port %d", port)
 	// create web app
 	app := gin.New()
+	if utils.Cfg.EnableProfiler {
+		pprof.Register(app)
+	}
 
 	// middlewares
 	app.Use(middlewares.Recovery())
@@ -69,6 +73,7 @@ func vmaasProxy(c *gin.Context) {
 		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
 		return
 	}
+	defer res.Body.Close()
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {

@@ -60,6 +60,10 @@ objects:
           value: ${LOG_STYLE}
         - name: OVAL_UNFIXED_EVAL_ENABLED
           value: ${OVAL_UNFIXED_EVAL_ENABLED}
+        - name: CACHE_REFRESH_INTERVAL
+          value: ${CACHE_REFRESH_INTERVAL}
+        - name: ENABLE_PROFILER
+          values: ${ENABLE_PROFILER}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -519,3 +523,5 @@ parameters:
 - name: CACHE_REFRESH_INTERVAL
   description: Interval for checking if newer cache exists, in seconds
   value: '60'
+- name: ENABLE_PROFILER
+  value: "FALSE"

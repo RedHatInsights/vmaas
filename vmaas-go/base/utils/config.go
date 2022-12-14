@@ -45,6 +45,7 @@ type Config struct {
 	LogLevel             string
 	LogStyle             string
 	CacheRefreshInterval time.Duration
+	EnableProfiler       bool
 }
 
 func init() {
@@ -121,4 +122,5 @@ func initEnv() {
 	Cfg.LogStyle = os.Getenv("LOG_STYLE")
 	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 5*60) // 5 min default
 	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
+	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
 }
