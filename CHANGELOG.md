@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.9 (2022-12-15)
+### Fix
+* **vmaas-go:** Optimizations ([`8d2639c`](https://github.com/RedHatInsights/vmaas/commit/8d2639cda988217648216d6aff5421a92fdd1131))
+
 ## v2.37.8 (2022-12-12)
 ### Fix
 * **vmaas-go:** Updates when releasever in repo is empty ([`80c86c0`](https://github.com/RedHatInsights/vmaas/commit/80c86c0fa5e41a4b8a3e6333a2b7328812f5818d))
