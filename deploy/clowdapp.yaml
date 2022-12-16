@@ -54,6 +54,8 @@ objects:
           value: ${GIN_MODE}
         - name: GOMAXPROCS
           value: ${GOMAXPROCS_WEBAPP}
+        - name: GOGC
+          value: ${GOGC}
         - name: LOG_LEVEL
           value: ${LOGGING_LEVEL_APP}
         - name: LOG_STYLE
@@ -358,6 +360,9 @@ parameters:
 - name: GIN_MODE
   description: Gin webframework mode
   value: release
+- name: GOGC
+  description: Golang garbage collector, run GC when heap increases by ${GOGC}%
+  value: "50"
 - name: CPU_REQUEST_WEBSOCKET
   description: CPU request for pod
   value: '100m'
