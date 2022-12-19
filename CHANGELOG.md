@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.10 (2022-12-19)
+### Fix
+* **vmaas-go:** Update vmaas-lib and set GC ([`6572ef5`](https://github.com/RedHatInsights/vmaas/commit/6572ef513ae21f909cdbc0109f54c57d85b2306c))
+
 ## v2.37.9 (2022-12-15)
 ### Fix
 * **vmaas-go:** Optimizations ([`8d2639c`](https://github.com/RedHatInsights/vmaas/commit/8d2639cda988217648216d6aff5421a92fdd1131))
