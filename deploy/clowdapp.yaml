@@ -362,7 +362,7 @@ parameters:
   value: release
 - name: GOGC
   description: Golang garbage collector, run GC when heap increases by ${GOGC}%
-  value: "50"
+  value: "25"
 - name: CPU_REQUEST_WEBSOCKET
   description: CPU request for pod
   value: '100m'
