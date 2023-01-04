@@ -56,7 +56,6 @@ class Packages(Request):
 
 class PackagesAPI:
     """ Class for handling packages API requests. """
-    # pylint: disable=no-self-use
 
     def __init__(self, dsn=None):
         init_logging()

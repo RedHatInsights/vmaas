@@ -109,7 +109,7 @@ class TestPkgtreeAPI(TestBase):
             assert len(response["package_name_list"][pkg]) >= 1  # At least one NEVRA for a package name is expected
 
     # FIXME Add support for modules and streams to pkgtree and cache.yml test data.
-    @pytest.mark.xfail  # pylint: disable=R0201
+    @pytest.mark.xfail
     def test_schema_rhel8_modularity(self):
         """Test pkgtree api response with rhel8 modularity respositories."""
         # For rhel8 modularity the only difference is that the rhel-8 nevras contain repositories
@@ -206,4 +206,4 @@ class TestPkgtreeAPI(TestBase):
         req["package_name_list"] = [".*"]
         response = self.pkg_api.process_list(3, req)
         assert len(response["package_name_list"]) == 5
-        assert response["package_name_list"]["third-party-pkg"] == []  # third-party package was excluded
+        assert not response["package_name_list"]["third-party-pkg"]  # third-party package was excluded

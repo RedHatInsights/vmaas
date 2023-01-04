@@ -1,7 +1,6 @@
 """
 Unit test classes for pkgtree module.
 """
-# pylint: disable=no-self-use
 
 import gzip
 import json
@@ -22,7 +21,6 @@ class TestPkgtree:
         ddump.dump()
         with gzip.open(TEST_DUMP_FILE) as dumpfile:
             pkgtree = json.load(dumpfile)
-            # from IPython import embed; embed()
 
             self.check_timestamp(pkgtree)
             self.check_packages(pkgtree)

@@ -35,7 +35,7 @@ class FlaskTestCase:
     """Base class for vulnerability engine manager test cases"""
 
     @pytest.fixture
-    def app(self):  # pylint: disable=no-self-use
+    def app(self):
         """Fixture for the application"""
         connexion_app = reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
                                              reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",

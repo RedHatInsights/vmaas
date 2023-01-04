@@ -1,7 +1,6 @@
 """
 Unit test classes for repomd module.
 """
-# pylint: disable=no-self-use
 from datetime import datetime
 from xml.etree.ElementTree import ParseError
 import pytest

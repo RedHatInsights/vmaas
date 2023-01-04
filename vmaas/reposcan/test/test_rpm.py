@@ -1,7 +1,6 @@
 """
 Unit test classes for srpm module.
 """
-# pylint: disable=no-self-use
 import pytest
 from vmaas.common import rpm_utils
 

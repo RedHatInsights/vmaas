@@ -1,7 +1,6 @@
 """
 Unit test classes for updateinfo module.
 """
-# pylint: disable=no-self-use
 from xml.etree.ElementTree import ParseError
 import pytest
 from vmaas.reposcan.repodata.updateinfo import UpdateInfoMD

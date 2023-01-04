@@ -1,7 +1,6 @@
 """
 Unit test classes for exporter module.
 """
-# pylint: disable=no-self-use
 
 import time
 import sqlite3

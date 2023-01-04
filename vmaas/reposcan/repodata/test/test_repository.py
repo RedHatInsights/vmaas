@@ -1,7 +1,6 @@
 """
 Unit test classes for repository module.
 """
-# pylint: disable=no-self-use
 from vmaas.reposcan.repodata.primary import PrimaryMD
 from vmaas.reposcan.repodata.primary_db import PrimaryDatabaseMD
 from vmaas.reposcan.repodata.updateinfo import UpdateInfoMD
@@ -69,7 +68,7 @@ class TestRepository:
     def test_load_metadata(self):
         """Test package and update methods."""
         repo = Repository(repo_url="", content_set="", basearch="", releasever="")
-        assert repo.md_files == {}
+        assert not repo.md_files
         assert repo.primary is None
         assert repo.updateinfo is None
         assert repo.modules is None

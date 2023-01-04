@@ -1,5 +1,5 @@
 """Test storing repository in DB."""
-# pylint: disable=unused-argument, attribute-defined-outside-init, no-self-use
+# pylint: disable=unused-argument, attribute-defined-outside-init
 
 import time
 import pytest
