@@ -59,5 +59,8 @@ def prepare_msg_for_slack(cert_name, header, expire_tuple=None):
 def send_slack_notification(msg: dict):
     """If SLACK_WEBHOOK is set, sends notification to Slack"""
     if SLACK_WEBHOOK:
-        requests.post(SLACK_WEBHOOK, json=format_message(msg),
-                      headers={'Content-type': 'application/json'})
+        requests.post(
+            SLACK_WEBHOOK, json=format_message(msg),
+            headers={'Content-type': 'application/json'},
+            timeout=5,
+        )
