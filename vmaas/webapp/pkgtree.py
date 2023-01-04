@@ -93,7 +93,7 @@ class PkgtreeAPI:
         return natsorted(repos, key=lambda repo_dict: repo_dict['label']), third_party_only
 
     @staticmethod
-    def _get_first_published_from_erratas(erratas):  # pylint: disable=R0201
+    def _get_first_published_from_erratas(erratas):
         # 'first_published' is the 'issued' date of the oldest errata.
         first_published = None
         for ert in erratas:

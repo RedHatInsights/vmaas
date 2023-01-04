@@ -1,5 +1,5 @@
 """Unit tests of common module."""
-# pylint: disable=attribute-defined-outside-init, unused-argument, no-self-use
+# pylint: disable=attribute-defined-outside-init, unused-argument
 
 from datetime import datetime
 import re

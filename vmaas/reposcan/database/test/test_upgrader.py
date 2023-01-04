@@ -1,7 +1,7 @@
 """
 Tests for database upgrade, which are made from reposcan.
 """
-# pylint: disable=no-self-use, import-outside-toplevel, unused-argument,
+# pylint: disable=import-outside-toplevel, unused-argument,
 import os
 import shutil
 import psycopg2

@@ -100,7 +100,7 @@ class TestUpdatesAPI(TestBase):
     def test_process_input_non_exist(self):
         """Test filtering out unknown non existing package."""
         pkgs, update_list = self.updates_api.process_input_packages(UPDATES_JSON_NON_EXIST)
-        assert pkgs == {}
+        assert not pkgs
         assert update_list == {'non-exist': {}}
 
     def test_schema_v1(self):
@@ -251,7 +251,7 @@ class TestInternalUpdatesAPI(TestBase):
         """Test with 'repository_list' only request."""
         repositories_list, repo_ids = self.updates_api._get_repository_list(UPDATES_JSON_REPO)
         assert repositories_list == ['rhel-6-server-rpms']
-        assert repo_ids == []
+        assert not repo_ids
 
     def test_get_repository_list_4(self):
         """Test with 'releasever' only request."""
@@ -285,7 +285,7 @@ class TestInternalUpdatesAPI(TestBase):
         repo_ids_in = [1, 2, 3, 4, 5]
         releasever, repo_ids = self.updates_api._get_releasever(UPDATES_JSON_RELEASE, repo_ids_in)
         assert releasever == '6Server'
-        assert repo_ids == []
+        assert not repo_ids
 
     def test_get_releasever_3(self):
         """Test with 'basearch' only request."""

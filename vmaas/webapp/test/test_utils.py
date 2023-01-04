@@ -1,5 +1,4 @@
 """Unit tests for utils module."""
-# pylint: disable=no-self-use
 
 import re
 
@@ -77,4 +76,4 @@ class TestUtils(TestBase):
             "nonexistent-2": []
         }
         filtered_items = utils.filter_item_if_exists(repos, details)
-        assert filtered_items == []
+        assert not filtered_items

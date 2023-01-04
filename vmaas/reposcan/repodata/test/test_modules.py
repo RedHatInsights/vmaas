@@ -1,7 +1,6 @@
 """
 Unit test classes for modules module.
 """
-# pylint: disable=no-self-use
 from vmaas.reposcan.repodata.modules import ModuleMD
 
 

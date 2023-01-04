@@ -119,7 +119,7 @@ class BaseHandler:
             res = repr(ex)
             code = 400
         except Exception as err:  # pylint: disable=broad-except
-            err_id = err.__hash__()
+            err_id = hash(err)
             res = 'Internal server error <%s>: please include this error id in bug report.' % err_id
             code = 500
             LOGGER.exception(res)

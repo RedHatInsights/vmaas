@@ -1,7 +1,6 @@
 """
 Unit test classes for primary_db module.
 """
-# pylint: disable=no-self-use
 from sqlite3 import OperationalError
 import pytest
 from vmaas.reposcan.repodata.primary_db import PrimaryDatabaseMD

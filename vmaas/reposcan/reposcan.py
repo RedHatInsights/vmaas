@@ -327,7 +327,7 @@ class RepolistImportHandler(SyncHandler):
                     REPOS_TO_CLEANUP.set(len(repos_in_db))
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
@@ -396,7 +396,7 @@ class GitRepoListHandler(RepolistImportHandler):
             status_code, status_msg = cls.start_task()
             return status_msg, status_code
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             FAILED_IMPORT_REPO.inc()
             return TaskStartResponse(msg, success=False), 400
@@ -427,7 +427,7 @@ class GitRepoListCleanupHandler(SyncHandler):
                 repos_in_db.pop((content_set, basearch, releasever), None)
             repository_controller.delete_repos(repos_in_db)
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
@@ -444,7 +444,7 @@ class GitRepoListCleanupHandler(SyncHandler):
             status_code, status_msg = cls.start_task()
             return status_msg, status_code
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             FAILED_IMPORT_REPO.inc()
             return TaskStartResponse(msg, success=False), 400
@@ -479,7 +479,7 @@ class RepoListHandler(RepolistImportHandler):
             status_code, status_msg = cls.start_task(products=products, repos=repos)
             return status_msg, status_code
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             FAILED_IMPORT_REPO.inc()
             return TaskStartResponse(msg, success=False), 400
@@ -506,7 +506,7 @@ class RepoDeleteHandler(SyncHandler):
             repository_controller = RepositoryController()
             repository_controller.delete_content_set(repo)
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
@@ -536,7 +536,7 @@ class OvalDeleteHandler(SyncHandler):
             oval_controller = OvalController()
             oval_controller.delete_oval_file(oval_id)
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             return "ERROR"
@@ -563,7 +563,7 @@ class ExporterHandler(SyncHandler):
         try:
             export_data()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
@@ -592,7 +592,7 @@ class PkgTreeHandler(SyncHandler):
         try:
             export_pkgtree(PKGTREE_FILE)
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
@@ -654,7 +654,7 @@ class RepoSyncHandler(SyncHandler):
             repository_controller.add_db_repositories()
             repository_controller.store()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
@@ -686,7 +686,7 @@ class CvemapSyncHandler(SyncHandler):
             controller = CvemapController()
             controller.store()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             FAILED_IMPORT_CVE.inc()
             DatabaseHandler.rollback()
@@ -719,7 +719,7 @@ class CpeSyncHandler(SyncHandler):
             controller = CpeController()
             controller.store()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             FAILED_IMPORT_CPE.inc()
             DatabaseHandler.rollback()
@@ -752,7 +752,7 @@ class OvalSyncHandler(SyncHandler):
             controller = OvalController()
             controller.store()
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             OVAL_FAILED_IMPORT.inc()
             DatabaseHandler.rollback()
@@ -842,7 +842,7 @@ class CleanTmpHandler(SyncHandler):
                 except Exception as err:  # pylint: disable=broad-except
                     LOGGER.warning("Unable to delete file or directory: %s (%s)", full_path, err)
         except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % err.__hash__()
+            msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             return "ERROR"
         return "OK"
