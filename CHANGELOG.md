@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.37.11 (2023-01-05)
+### Fix
+* **vmaas-go:** Cache reload, adjust GOGC ([`3ab6317`](https://github.com/RedHatInsights/vmaas/commit/3ab6317ef2c2f5547729f78553adf897fa9d46f3))
+
 ## v2.37.10 (2022-12-19)
 ### Fix
 * **vmaas-go:** Update vmaas-lib and set GC ([`6572ef5`](https://github.com/RedHatInsights/vmaas/commit/6572ef513ae21f909cdbc0109f54c57d85b2306c))
