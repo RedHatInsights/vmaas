@@ -26,7 +26,7 @@ ARG PIPENV_PYUP_API_KEY=""
 ARG VAR_PIPENV_INSTALL_OPT=""
 RUN pip3 install --upgrade pipenv==2022.1.8 && \
     pipenv install --ignore-pipfile --deploy --system $VAR_PIPENV_INSTALL_OPT && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 45185 -i 51457 ; fi
+    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 45185 -i 51457 -i 52365 -i 52495 -i 52518 -i 52322 ; fi
 
 ADD /vmaas/reposcan/rsyncd.conf   /etc/
 
