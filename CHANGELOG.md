@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.38.0 (2023-01-09)
+### Feature
+* Use ubi9, python3.9, go1.18 ([`c3e3b60`](https://github.com/RedHatInsights/vmaas/commit/c3e3b602fc8c6731bed14550cde967c5287cb495))
+
 ## v2.37.11 (2023-01-05)
 ### Fix
 * **vmaas-go:** Cache reload, adjust GOGC ([`3ab6317`](https://github.com/RedHatInsights/vmaas/commit/3ab6317ef2c2f5547729f78553adf897fa9d46f3))
