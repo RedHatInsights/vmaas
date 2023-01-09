@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.38.1 (2023-01-09)
+### Fix
+* **vmaas-go:** Incorrect cve-errata mapping ([`56094cf`](https://github.com/RedHatInsights/vmaas/commit/56094cffee0ffaff4b4e7218af51a03b69f9f2d6))
+
 ## v2.38.0 (2023-01-09)
 ### Feature
 * Use ubi9, python3.9, go1.18 ([`c3e3b60`](https://github.com/RedHatInsights/vmaas/commit/c3e3b602fc8c6731bed14550cde967c5287cb495))
