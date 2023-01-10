@@ -10,7 +10,7 @@ from distutils.util import strtobool  # pylint: disable=import-error, no-name-in
 from threading import Lock
 
 import watchtower
-from boto3.session import Session
+from boto3 import client
 from botocore.exceptions import ClientError
 
 from vmaas.common.config import Config
@@ -53,7 +53,8 @@ def setup_cw_logging(main_logger):
         logger.info('CloudWatch logging disabled due to missing access key')
         return
 
-    session = Session(
+    boto3_client = client(
+        "logs",
         aws_access_key_id=key_id,
         aws_secret_access_key=secret,
         region_name=cfg.cw_aws_region
@@ -61,7 +62,7 @@ def setup_cw_logging(main_logger):
 
     try:
         handler = watchtower.CloudWatchLogHandler(
-            boto3_session=session,
+            boto3_client=boto3_client,
             log_group=cfg.cw_aws_log_group,
             stream_name=os.environ.get('HOSTNAME', 'vmaas')
         )
