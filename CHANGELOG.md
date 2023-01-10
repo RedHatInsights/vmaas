@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.38.2 (2023-01-10)
+### Fix
+* Watchtower params ([`02ccf10`](https://github.com/RedHatInsights/vmaas/commit/02ccf1026592dfc42b1a0b763fcfb9667d0e04cb))
+
 ## v2.38.1 (2023-01-09)
 ### Fix
 * **vmaas-go:** Incorrect cve-errata mapping ([`56094cf`](https://github.com/RedHatInsights/vmaas/commit/56094cffee0ffaff4b4e7218af51a03b69f9f2d6))
