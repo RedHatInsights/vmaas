@@ -65,7 +65,9 @@ objects:
         - name: CACHE_REFRESH_INTERVAL
           value: ${CACHE_REFRESH_INTERVAL}
         - name: ENABLE_PROFILER
-          values: ${ENABLE_PROFILER}
+          value: ${ENABLE_PROFILER}
+        - name: VMAAS_LIB_MAX_GOROUTINES
+          value: ${VMAAS_LIB_MAX_GOROUTINES}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -530,3 +532,5 @@ parameters:
   value: '60'
 - name: ENABLE_PROFILER
   value: "FALSE"
+- name: VMAAS_LIB_MAX_GOROUTINES
+  value: "20"
