@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.39.0 (2023-01-13)
+### Feature
+* **vmaas-go:** Use goroutines ([`6859dca`](https://github.com/RedHatInsights/vmaas/commit/6859dca4da5863c528d68494cdd07de3e4e8f639))
+
 ## v2.38.2 (2023-01-10)
 ### Fix
 * Watchtower params ([`02ccf10`](https://github.com/RedHatInsights/vmaas/commit/02ccf1026592dfc42b1a0b763fcfb9667d0e04cb))
