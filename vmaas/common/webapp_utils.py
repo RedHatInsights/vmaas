@@ -122,6 +122,10 @@ def filter_package_list(package_list, latest_only=False):
     latest_pkgs = {}
     for pkg in package_list:
         name, epoch, ver, rel, arch = parse_rpm_name(pkg)
+        if not any((name, epoch, ver, rel, arch)):
+            # parse error - store `pkg` in `name` for consistency
+            # labelCompare would raise exception for such package
+            name = pkg
         if (name, arch) in latest_pkgs:
             latest = latest_pkgs[(name, arch)][0:3]
             if rpm.labelCompare((epoch, ver, rel), latest) < 1:  # pylint: disable=no-member
