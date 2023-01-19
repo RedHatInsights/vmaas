@@ -134,6 +134,9 @@ class VulnerabilitiesAPI:
 
     def _repos_to_definitions(self, content_set_list, basearch, releasever):  # pylint: disable=too-many-branches
         # TODO: some CPEs are not matching because they are substrings/subtrees
+        if content_set_list is None:
+            return set()
+
         repo_ids = set()
         content_set_ids = set()
         # Try to identify repos (CS+basearch+releasever) or at least CS
@@ -198,52 +201,52 @@ class VulnerabilitiesAPI:
         # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
         #       there needs to be better fallback at least to guess correctly RHEL version,
         #       use old VMaaS repo guessing?
-        candidate_definitions = self._repos_to_definitions(data.get('repository_list', []),
+        candidate_definitions = self._repos_to_definitions(data.get('repository_list'),
                                                            data.get('basearch'),
                                                            data.get('releasever'))
+        if candidate_definitions:
+            for package, parsed_package in packages_to_process.items():
+                name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
+                package_name_id = self.db_cache.packagename2id[name]
+                definition_ids = candidate_definitions.intersection(
+                    self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
+                # LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
+                for definition_id in definition_ids:
+                    definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
+                    # Skip if unfixed CVE feature flag is disabled
+                    if definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY and not CFG.oval_unfixed_eval_enabled:
+                        continue
+                    cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
+                    # Skip if all CVEs from definition were already found somewhere
+                    if not [cve for cve in cves
+                            if cve not in cve_dict and
+                            cve not in manually_fixable_cve_dict and
+                            cve not in unpatched_cve_dict]:
+                        continue
 
-        for package, parsed_package in packages_to_process.items():
-            name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
-            package_name_id = self.db_cache.packagename2id[name]
-            definition_ids = candidate_definitions.intersection(
-                self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
-            # LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
-            for definition_id in definition_ids:
-                definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
-                # Skip if unfixed CVE feature flag is disabled
-                if definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY and not CFG.oval_unfixed_eval_enabled:
-                    continue
-                cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
-                # Skip if all CVEs from definition were already found somewhere
-                if not [cve for cve in cves
-                        if cve not in cve_dict and
-                        cve not in manually_fixable_cve_dict and
-                        cve not in unpatched_cve_dict]:
-                    continue
-
-                if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
-                    # Vulnerable
-                    # LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
-                    if definition_type == OVAL_DEFINITION_TYPE_PATCH:
-                        for cve in cves:
-                            # Skip CVEs found in repos
-                            if cve in cve_dict:
-                                continue
-                            manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
-                            manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                            # no erratum directly mappable to CVE in OVAL
-                            manually_fixable_cve_dict[cve].setdefault("errata", set())
-                    elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
-                        for cve in cves:
-                            # Skip fixable CVEs (should never happen, just in case)
-                            if cve in cve_dict or cve in manually_fixable_cve_dict:
-                                continue
-                            unpatched_cve_dict.setdefault(cve, {})["cve"] = cve
-                            unpatched_cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                            # no erratum for unpatched CVEs
-                            unpatched_cve_dict[cve].setdefault("errata", set())
-                    else:
-                        raise ValueError("Unsupported definition type: %s" % definition_type)
+                    if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
+                        # Vulnerable
+                        # LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
+                        if definition_type == OVAL_DEFINITION_TYPE_PATCH:
+                            for cve in cves:
+                                # Skip CVEs found in repos
+                                if cve in cve_dict:
+                                    continue
+                                manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
+                                manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                                # no erratum directly mappable to CVE in OVAL
+                                manually_fixable_cve_dict[cve].setdefault("errata", set())
+                        elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
+                            for cve in cves:
+                                # Skip fixable CVEs (should never happen, just in case)
+                                if cve in cve_dict or cve in manually_fixable_cve_dict:
+                                    continue
+                                unpatched_cve_dict.setdefault(cve, {})["cve"] = cve
+                                unpatched_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                                # no erratum for unpatched CVEs
+                                unpatched_cve_dict[cve].setdefault("errata", set())
+                        else:
+                            raise ValueError("Unsupported definition type: %s" % definition_type)
 
         return {'cve_list': self._serialize_dict(cve_dict, extended=extended),
                 'manually_fixable_cve_list': self._serialize_dict(manually_fixable_cve_dict, extended=extended),
