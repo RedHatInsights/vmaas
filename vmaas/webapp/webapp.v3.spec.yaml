@@ -495,6 +495,7 @@ components:
           minItems: 1
         repository_list:
           type: array
+          nullable: true
           items:
             type: string
             example: rhel-6-server-rpms
@@ -1116,6 +1117,7 @@ components:
             example: kernel-2.6.32-696.20.1.el6.x86_64
         repository_list:
           type: array
+          nullable: true
           items:
             type: string
             example: rhel-6-server-rpms
@@ -1181,6 +1183,7 @@ components:
             example: kernel-2.6.32-696.20.1.el6.x86_64
         repository_list:
           type: array
+          nullable: true
           items:
             type: string
             example: rhel-6-server-rpms
