@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.39.1 (2023-01-20)
+### Fix
+* Allow null repository_list ([`0dc8546`](https://github.com/RedHatInsights/vmaas/commit/0dc8546191054bec26832c2338829226789406f4))
+
 ## v2.39.0 (2023-01-13)
 ### Feature
 * **vmaas-go:** Use goroutines ([`6859dca`](https://github.com/RedHatInsights/vmaas/commit/6859dca4da5863c528d68494cdd07de3e4e8f639))
