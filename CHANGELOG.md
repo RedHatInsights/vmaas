@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.39.2 (2023-01-23)
+### Fix
+* Inconsistent response for invalid packages ([`cdf3f48`](https://github.com/RedHatInsights/vmaas/commit/cdf3f488174c9a10ae65e1cc6b0c18fdc33475a8))
+
 ## v2.39.1 (2023-01-20)
 ### Fix
 * Allow null repository_list ([`0dc8546`](https://github.com/RedHatInsights/vmaas/commit/0dc8546191054bec26832c2338829226789406f4))
