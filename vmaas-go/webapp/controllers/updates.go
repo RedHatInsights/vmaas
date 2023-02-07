@@ -25,6 +25,9 @@ func UpdatesHandler(c *gin.Context) {
 }
 
 func UpdatesPostHandler(c *gin.Context) {
+	if !isCacheLoaded(c) {
+		return
+	}
 	request, err := bindValidateJSON(c)
 	if err != nil {
 		utils.LogAndRespBadRequest(c, err)
