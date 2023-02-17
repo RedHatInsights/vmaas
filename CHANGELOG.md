@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.39.3 (2023-02-17)
+### Fix
+* **vmaas-go:** Incorrect json field for third_party updates ([`eb39dba`](https://github.com/RedHatInsights/vmaas/commit/eb39dba5f82f97135085b4ca11af637f37e7daef))
+* **vmaas-go:** Return errata: [] instead of null ([`23908a8`](https://github.com/RedHatInsights/vmaas/commit/23908a8f96282377c3751ae8ff8acb34b0875572))
+* **vmaas-go:** Panic during refresh ([`5d2f900`](https://github.com/RedHatInsights/vmaas/commit/5d2f9001de52e89af17e698c14c0ec8a7dc53312))
+
 ## v2.39.2 (2023-01-23)
 ### Fix
 * Inconsistent response for invalid packages ([`cdf3f48`](https://github.com/RedHatInsights/vmaas/commit/cdf3f488174c9a10ae65e1cc6b0c18fdc33475a8))
