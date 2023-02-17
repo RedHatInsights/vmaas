@@ -13,8 +13,8 @@ fi
 echo "Using: $cmd"
 
 cat <<EOF > $workdir$dockerfile
-FROM registry.access.redhat.com/ubi9/ubi-minimal
-RUN microdnf -y install python3 python3-pip && microdnf clean all
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+RUN microdnf install python39 python39-pip && microdnf clean all
 RUN pip3 install --upgrade pip && pip3 install --upgrade pipenv==2022.12.19
 RUN [ "\$(uname -m)" == "aarch64" ] && \\
     rpm -Uvh "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-\$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm" && \\
