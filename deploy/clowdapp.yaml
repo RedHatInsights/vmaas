@@ -223,10 +223,6 @@ objects:
           value: ${REPOSCAN_LOGGING_LEVEL_LIBS}
         - name: LOGGING_TYPE
           value: ${LOGGING_TYPE}
-        - name: PKGTREE_INDENT
-          value: ${PKGTREE_INDENT}
-        - name: PKGTREE_KEEP_COPIES
-          value: ${PKGTREE_KEEP_COPIES}
         - name: REPOSCAN_SYNC_INTERVAL_MINUTES
           value: ${REPOSCAN_SYNC_INTERVAL_MINUTES}
         - name: RETRY_COUNT
@@ -472,12 +468,6 @@ parameters:
 - name: CHUNK_SIZE
   description: File unpacker chunk size in reposcan
   value: '1048576'
-- name: PKGTREE_INDENT
-  description: Indent of pkgtree
-  value: '0'
-- name: PKGTREE_KEEP_COPIES
-  description: Number of pkgtree copies kept
-  value: '2'
 - name: REPOSCAN_SYNC_INTERVAL_MINUTES
   description: Reposcan periodic sync interval
   value: '360'
