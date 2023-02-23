@@ -225,28 +225,6 @@ paths:
       tags:
         - Export
 
-  /pkgtree:
-    get:
-      summary: Download the package tree.
-      operationId: vmaas.reposcan.reposcan.PkgTreeDownloadHandler.get
-      <<: *secured
-      responses:
-        200:
-          description: The package tree
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PkgTreeDownloadResponse"
-        404:
-          description: Package tree not found
-          content:
-            text/plain:
-              schema: { type: string, example: "Pkgtree file not found - has it been generated ?" }
-
-        <<: *auth_resps
-      tags:
-        - PkgTree
-
   /task/status:
     get:
       summary: Get status of currently running background task
@@ -417,54 +395,6 @@ components:
       properties:
         success: { type: boolean, enum: [true, false] }
         msg: { type: string, example: 'Repo sync has started' }
-
-    ErrataObj:
-      type: object
-      properties:
-        name: { type: string, example: 'RHSA-2010:0842' }
-        issued: { type: string, example: '2010-11-10T00:00:00+00:00', format: date-time }
-        cve_list:
-          type: array
-          items: { type: string, example: CVE-2010-3437}
-
-    PkgObj:
-      type: object
-      properties:
-        nevra:
-          type: string
-          example: kernel-2.6.32-71.el6.x86_64
-        first_published:
-          type: string
-          example: '2010-11-10T00:00:00+00:00'
-          format: date-time
-        repositories:
-          type: object
-          properties:
-            label:
-              type: string
-              example: rhel-6-workstation-rpms
-            name:
-              type: string
-              example: Red Hat Enterprise Linux 6 Workstation (RPMs)
-            arch:
-              type: string
-              example: x86_64
-            releasever:
-              type: string
-              example: 6Workstation
-            revision:
-              type: string
-              example: '2018-08-20T15:11:29+00:00'
-              format: date-time
-        errata:
-          $ref: '#/components/schemas/ErrataObj'
-
-    PkgTreeDownloadResponse:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/PkgObj'
 
     DbChangeResponse:
       type: object

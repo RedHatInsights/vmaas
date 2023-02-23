@@ -4,7 +4,6 @@ import os
 
 from http import HTTPStatus
 from vmaas.reposcan.test.test_case import FlaskTestCase
-from vmaas.reposcan.reposcan import PKGTREE_FILE
 
 
 class TestReposcanApp(FlaskTestCase):
@@ -102,22 +101,10 @@ class TestReposcanApp(FlaskTestCase):
         resp = self.fetch('/api/v1/sync/cvemap', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
 
-    def test_export_pkgtree(self):
-        """Test export_pkgtree endpoint."""
-        resp = self.fetch('/api/v1/export/pkgtree', method='PUT', data="{}")
-        self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
-
     def test_export_dump(self):
         """Test export_dump endpoint."""
         resp = self.fetch('/api/v1/export/dump', method='PUT', data="{}")
         self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
-
-    def test_pkgtree(self):
-        """Test pkgtree endpoint."""
-        os.system('rm -f %s' % PKGTREE_FILE)  # Remove pkgtree file if exists
-        resp = self.fetch('/api/v1/pkgtree', method='GET')
-        self.assertEqual(HTTPStatus.NOT_FOUND, resp.status)
-        assert resp.data == b"\"Package Tree file not found.  Has it been generated?\"\n"
 
     def test_task_cancel(self):
         """Test cancel task."""

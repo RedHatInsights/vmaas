@@ -17,7 +17,7 @@ from distutils.util import strtobool
 
 import connexion
 import git
-from flask import make_response, request, send_file
+from flask import request
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
@@ -601,24 +601,6 @@ class PkgTreeHandler(SyncHandler):
         finally:
             DatabaseHandler.close_connection()
         return "OK"
-
-
-class PkgTreeDownloadHandler():
-    """Handler class to download package tree to the caller."""
-
-    @classmethod
-    def get(cls, **kwargs):
-        """Download the package tree."""
-
-        try:
-            response = make_response(send_file(PKGTREE_FILE))
-            response.headers["Content-Type"] = "application/json"
-            response.headers["Content-Encoding"] = "gzip"
-            response.direct_passthrough = True
-            return response
-
-        except FileNotFoundError:
-            return 'Package Tree file not found.  Has it been generated?', 404
 
 
 class DbChangeHandler():
