@@ -32,7 +32,7 @@ type Config struct {
 	// endpoints
 	ReposcanAddress  string
 	WebsocketAddress string
-	OGWebappHost     string
+	OGWebappAddress  string
 
 	// cloudwatch
 	CloudWatchAccessKeyID     string
@@ -46,6 +46,9 @@ type Config struct {
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
 }
+
+type Endpoint clowder.DependencyEndpoint
+type PrivateEndpoint clowder.PrivateDependencyEndpoint
 
 func init() {
 	if !clowder.IsClowderEnabled() {
@@ -88,9 +91,9 @@ func initEndpoints() {
 		if e.App == "vmaas" {
 			switch {
 			case strings.Contains(e.Name, "reposcan"):
-				Cfg.ReposcanAddress = fmt.Sprintf("http://%s:%d", e.Hostname, e.Port)
+				Cfg.ReposcanAddress = (*Endpoint)(&e).BuildUrl("http")
 			case strings.Contains(e.Name, "webapp") && !strings.Contains(e.Name, "go"):
-				Cfg.OGWebappHost = fmt.Sprintf("%s:%d", e.Hostname, e.Port)
+				Cfg.OGWebappAddress = (*Endpoint)(&e).BuildUrl("http")
 			}
 		}
 	}
@@ -120,4 +123,22 @@ func initEnv() {
 	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 5*60) // 5 min default
 	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
+}
+
+func (e *Endpoint) BuildUrl(scheme string) string {
+	return buildUrl(scheme, e.Hostname, e.Port, e.TlsPort)
+}
+
+func (e *PrivateEndpoint) BuildUrl(scheme string) string {
+	return buildUrl(scheme, e.Hostname, e.Port, e.TlsPort)
+}
+
+func buildUrl(scheme, host string, port int, tlsPort *int) string {
+	if clowder.LoadedConfig.TlsCAPath != nil {
+		scheme += "s"
+		if tlsPort != nil {
+			port = *tlsPort
+		}
+	}
+	return fmt.Sprintf("%s://%s:%d", scheme, host, port)
 }

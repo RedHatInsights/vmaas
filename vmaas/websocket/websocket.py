@@ -176,9 +176,8 @@ def create_app():
     for sig in signals:
         signal.signal(sig, terminate)
 
-    port = cfg.private_port or cfg.websocket_port
-    LOGGER.info("Websocket is listening on port %s", port)
-    app.listen(port)
+    LOGGER.info("Websocket is listening on port %s", cfg.private_port)
+    app.listen(cfg.private_port)
 
 
 def main():

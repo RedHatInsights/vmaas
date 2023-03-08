@@ -3,6 +3,7 @@ package webapp
 import (
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
@@ -65,9 +66,13 @@ func Run() {
 }
 
 func vmaasProxy(c *gin.Context) {
+	u, err := url.Parse(utils.Cfg.OGWebappAddress)
+	if err != nil {
+		panic(err)
+	}
 	c.Request.RequestURI = ""
-	c.Request.URL.Scheme = "http"
-	c.Request.URL.Host = utils.Cfg.OGWebappHost
+	c.Request.URL.Scheme = u.Scheme
+	c.Request.URL.Host = u.Host
 	res, err := http.DefaultClient.Do(c.Request)
 	if err != nil {
 		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
