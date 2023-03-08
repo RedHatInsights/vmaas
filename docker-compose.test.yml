@@ -31,6 +31,7 @@ services:
       GITHUB_REPOSITORY: "${GITHUB_REPOSITORY:-}"
       GITHUB_RUN_ID: "${GITHUB_RUN_ID:-}"
     env_file:
+      - ./conf/common.env
       - ./conf/test.env
     depends_on:
       - vmaas_database

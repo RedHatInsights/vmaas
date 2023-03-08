@@ -23,7 +23,6 @@ if __name__ == '__main__':
                               DEFAULT_PATH_API + "/v3": "webapp.v3.spec.yaml"})
     init_websocket()
     cfg = Config()
-    port = cfg.web_port or cfg.webapp_port
 
     start_http_server(int(cfg.metrics_port))
-    web.run_app(application.app, port=port, access_log_format="%s %r (%a) %Tfs", loop=asyncio.get_event_loop())
+    web.run_app(application.app, port=cfg.public_port, access_log_format="%s %r (%a) %Tfs", loop=asyncio.get_event_loop())

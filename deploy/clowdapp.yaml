@@ -68,6 +68,8 @@ objects:
           value: ${ENABLE_PROFILER}
         - name: VMAAS_LIB_MAX_GOROUTINES
           value: ${VMAAS_LIB_MAX_GOROUTINES}
+        - name: SSL_CERT_DIR
+          value: ${SSL_CERT_DIR}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -527,3 +529,5 @@ parameters:
   value: "20"
 - name: IS_FEDRAMP
   value: "FALSE"
+- name: SSL_CERT_DIR
+  value: "/etc/ssl/certs:/etc/pki/tls/certs:/system/etc/security/cacerts:/cdapp/certs"

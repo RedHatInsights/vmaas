@@ -45,8 +45,6 @@ CFG = Config()
 WEBSOCKET_RECONNECT_INTERVAL = 60
 WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
 
-REPOSCAN_HOST = CFG.reposcan_host
-REPOSCAN_PORT = CFG.reposcan_port
 GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
 GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
 LATEST_DUMP_ENDPOINT = "api/v1/latestdump"
@@ -490,7 +488,7 @@ class Websocket:
     async def websocket_session(self, session):
         """Main loop for handling websocket connection"""
         try:
-            async with session.ws_connect(url=self.websocket_url) as socket:
+            async with session.ws_connect(url=self.websocket_url, ssl=CFG.tls_ca_path) as socket:
                 LOGGER.info("Connected to: %s", self.websocket_url)
                 async with self.websocket_lock:
                     self.websocket = socket
@@ -523,7 +521,7 @@ class Websocket:
     @staticmethod
     async def fetch_latest_dump(session):
         """Method fetches latest dump from reposcan"""
-        async with session.get("http://%s:%s/%s" % (REPOSCAN_HOST, REPOSCAN_PORT, LATEST_DUMP_ENDPOINT)) as resp:
+        async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=CFG.tls_ca_path) as resp:
             return await resp.text()
 
     async def report_version(self):

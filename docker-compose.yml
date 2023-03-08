@@ -26,8 +26,10 @@ services:
           PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/app:latest
     restart: unless-stopped
+    env_file:
+      - ./conf/common.env
     ports:
-      - 8082:8082
+      - 8082:9000
 
   vmaas_reposcan:
     command: /vmaas/entrypoint.sh reposcan
@@ -36,11 +38,12 @@ services:
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
+      - ./conf/common.env
       - ./conf/database-connection-writer.env
       - ./conf/reposcan.env
     ports:
-      - 8081:8081
-      - 9082:9082
+      - 8081:8000
+      - 9082:10000
     volumes:
       - vmaas-dump-data:/data:z
     depends_on:
@@ -54,6 +57,7 @@ services:
     hostname: vmaas-reposcan-db-init
     image: vmaas/app:latest
     env_file:
+      - ./conf/common.env
       - ./conf/database-connection-admin.env
       - ./conf/reposcan.env
     depends_on:
@@ -67,10 +71,11 @@ services:
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
+      - ./conf/common.env
       - ./conf/webapp.env
     ports:
-      - 8080:8080
-      - 9081:9081
+      - 8080:8000
+      - 9081:10000
     depends_on:
       - vmaas_websocket
       - vmaas_reposcan
@@ -82,10 +87,11 @@ services:
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
+      - ./conf/common.env
       - ./conf/webapp_go.env
     ports:
       - 8000:8000
-      - 9088:9088
+      - 9088:10000
     depends_on:
       - vmaas_websocket
       - vmaas_reposcan
@@ -98,10 +104,11 @@ services:
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
+      - ./conf/common.env
       - ./conf/webapp_utils.env
       - ./conf/database-connection-reader.env
     ports:
-      - 8083:8083
+      - 8083:8000
     depends_on:
       - vmaas_webapp
 

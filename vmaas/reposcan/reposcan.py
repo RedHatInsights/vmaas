@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import signal
+import ssl
 from contextlib import contextmanager
 from multiprocessing.pool import Pool
 from functools import reduce
@@ -21,6 +22,7 @@ from flask import make_response, request, send_file
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
+from tornado.httpclient import HTTPRequest
 from psycopg2 import DatabaseError
 
 from vmaas.common.config import Config
@@ -913,6 +915,10 @@ class ReposcanWebsocket():
     cfg = Config()
     websocket = None
     websocket_url = cfg.websocket_url
+    ssl_ctx = None
+    if cfg.tls_ca_path:
+        ssl_ctx = ssl.create_default_context(cafile=cfg.tls_ca_path)
+    http_request = HTTPRequest(url=websocket_url, ssl_options=ssl_ctx)
     reconnect_callback = None
 
     @staticmethod
@@ -926,7 +932,7 @@ class ReposcanWebsocket():
     def websocket_reconnect(cls):
         """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
         if cls.websocket is None:
-            websocket_connect(cls.websocket_url, on_message_callback=cls._read_websocket_message,
+            websocket_connect(cls.http_request, on_message_callback=cls._read_websocket_message,
                               callback=cls._websocket_connect_status)
 
     @classmethod

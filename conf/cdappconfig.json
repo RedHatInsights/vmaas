@@ -14,13 +14,13 @@
             "app": "vmaas",
             "hostname": "vmaas_webapp",
             "name": "webapp-service",
-            "port": 8080
+            "port": 8000
         },
         {
             "app": "vmaas",
             "hostname": "vmaas_reposcan",
             "name": "reposcan-service",
-            "port": 8081
+            "port": 8000
         }
     ],
     "privateEndpoints": [
@@ -28,7 +28,7 @@
             "app": "vmaas",
             "hostname": "vmaas_websocket",
             "name": "websocket-service",
-            "port": 8082
+            "port": 9000
         }
     ],
     "logging": {
@@ -41,8 +41,8 @@
         "type": "null"
     },
     "metricsPath": "/metrics",
-    "metricsPort": 9088,
-    "privatePort": 8082,
+    "metricsPort": 10000,
+    "privatePort": 9000,
     "publicPort": 8000,
     "webPort": 8000
 }

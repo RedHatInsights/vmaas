@@ -6,8 +6,8 @@ import signal
 import sys
 import time
 
+import requests
 from psycopg2 import OperationalError
-from requests import request
 
 from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger, init_logging
@@ -53,23 +53,26 @@ def main():
         wait(DatabaseHandler.get_connection, service="PostgreSQL")
     else:
         LOGGER.info("Skipping PostgreSQL check")
-    if config.websocket_host and "vmaas-websocket" not in config.pod_hostname and not config.is_init_container:
+    if (
+        not config.is_test and config.websocket_http_url and "vmaas-websocket" not in config.pod_hostname
+        and not config.is_init_container
+    ):
         wait(
-            request,
-            "GET",
-            f"http://{config.websocket_host}:{config.websocket_port}/api/v1/monitoring/health",
+            requests.get,
+            f"{config.websocket_http_url}/api/v1/monitoring/health",
             service="Websocket server",
             timeout=1,
+            verify=config.tls_ca_path,
         )
     else:
         LOGGER.info("Skipping Websocket server check")
-    if config.reposcan_host and "vmaas-reposcan" not in config.pod_hostname:
+    if not config.is_test and config.reposcan_url and "vmaas-reposcan" not in config.pod_hostname:
         wait(
-            request,
-            "GET",
-            f"http://{config.reposcan_host}:{config.reposcan_port}/api/v1/monitoring/health",
+            requests.get,
+            f"{config.reposcan_url}/api/v1/monitoring/health",
             service="Reposcan API",
             timeout=1,
+            verify=config.tls_ca_path
         )
     else:
         LOGGER.info("Skipping Reposcan API check")

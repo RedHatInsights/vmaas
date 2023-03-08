@@ -15,6 +15,6 @@ application = create_app({DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
 if __name__ == '__main__':
     cfg = Config()
     server = HTTPServer(WSGIContainer(application))
-    server.listen(cfg.public_port or cfg.reposcan_port)
+    server.listen(cfg.public_port)
     start_http_server(int(cfg.metrics_port))
     IOLoop.instance().start()
