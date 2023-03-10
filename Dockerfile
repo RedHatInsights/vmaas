@@ -47,6 +47,14 @@ RUN go build -v main.go
 
 WORKDIR /vmaas
 
+# Baked-in content for FedRAMP
+ARG STATIC_ASSETS=0
+RUN if [ "${STATIC_ASSETS}" == 1 ] ; then \
+        curl -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt https://password.corp.redhat.com/RH-IT-Root-CA.crt && \
+        update-ca-trust extract && \
+        git clone https://gitlab.cee.redhat.com/vmaas/vmaas-assets.git /vmaas/repolist_git ; \
+    fi
+
 USER vmaas
 
 ADD entrypoint.sh               /vmaas/
