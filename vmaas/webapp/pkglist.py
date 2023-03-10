@@ -63,9 +63,7 @@ class PkgListAPI:
 
         page = data.get("page", None)
         page_size = data.get("page_size", None)
-        opts = dict(
-            return_modified=data.get("return_modified", False),
-        )
+        opts = {"return_modified": data.get("return_modified", False)}
         modified_since = parse_datetime(data.get("modified_since", None))
         modified_since_int = self.modify_since_dt2int(modified_since)
         package_ids = self._get_package_ids(modified_since_int)

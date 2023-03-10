@@ -571,7 +571,7 @@ def create_app(specs):
         else:
             res = handler(request, **kwargs)
 
-        duration = (time.time() - start_time)
+        duration = time.time() - start_time
         # (0)  /(1) /(2) /(3)
         #     /api /v1  /updates
         const_path = '/'.join(request.path.split('/')[:4])

@@ -16,6 +16,10 @@ LOGGER = get_logger(__name__)
 SCHEMA_VER_NAME = 'schema_version'
 
 
+class UpgradeException(Exception):
+    """Exception during database """
+
+
 class DatabaseUpgrade:
     """ This class contains logic for upgrading the database.
     """
@@ -108,9 +112,11 @@ class DatabaseUpgrade:
                     try:
                         file_num = int(result[0])
                         if file_num in ver2file_map:
-                            raise Exception('Found two files with same file number',
-                                            ver2file_map[file_num],
-                                            name)
+                            raise UpgradeException(
+                                "Found two files with same file number",
+                                ver2file_map[file_num],
+                                name,
+                            )
                         LOGGER.debug('adding to list file version %d: %s', file_num, name)
                         ver2file_map[file_num] = {'ver': file_num, 'script': name}
                         if file_num > max_version:
@@ -131,7 +137,7 @@ class DatabaseUpgrade:
             else:
                 missing_upgrades.append(file_ver)
         if missing_upgrades:
-            raise Exception('Missing upgrade script versions %s' % missing_upgrades)
+            raise UpgradeException('Missing upgrade script versions %s' % missing_upgrades)
         return upgrades_to_apply
 
     def _apply_upgrade(self, version, script_file, conn):
@@ -171,9 +177,11 @@ class DatabaseUpgrade:
                                stdout=psql.stdout,
                                stderr=psql.stderr)
         if failure:
-            raise Exception('upgrade psql command failed with returncode %d' % psql.returncode,
-                            'stdout: %s' % psql.stdout,
-                            'stderr: %s' % psql.stderr)
+            raise UpgradeException(
+                "upgrade psql command failed with returncode %d" % psql.returncode,
+                "stdout: %s" % psql.stdout,
+                "stderr: %s" % psql.stderr,
+            )
 
     @staticmethod
     def _get_db_lock(conn):
@@ -197,7 +205,7 @@ class DatabaseUpgrade:
                             (SCHEMA_VER_NAME,))
                 result = cur.fetchone()
             if not result:
-                raise Exception("db_version table exists, but no row with name '%s'" % SCHEMA_VER_NAME)
+                raise UpgradeException("db_version table exists, but no row with name '%s'" % SCHEMA_VER_NAME)
             db_version = result[0]
         except psycopg2.ProgrammingError:
             db_version = 0
