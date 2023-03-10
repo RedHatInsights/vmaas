@@ -71,7 +71,7 @@ class CvemapBody:
 
         def _link(name):
             return "http://cwe.mitre.org/data/definitions/%s.html" % name[4:]
-        cwe_list = [dict(cwe_name=name, link=_link(name)) for name in cwe_names]
+        cwe_list = [{"cwe_name": name, "link": _link(name)} for name in cwe_names]
         return cwe_list
 
     @staticmethod

@@ -72,12 +72,12 @@ class TestRepository:
         assert repo.primary is None
         assert repo.updateinfo is None
         assert repo.modules is None
-        repo.md_files = dict(
-            primary_db=PRIMARY_SQLITE_PATH,
-            primary=PRIMARY_XML_PATH,
-            updateinfo=UPDATEINFO_XML_PATH,
-            modules=MODULES_YAML_PATH,
-        )
+        repo.md_files = {
+            "primary_db": PRIMARY_SQLITE_PATH,
+            "primary": PRIMARY_XML_PATH,
+            "updateinfo": UPDATEINFO_XML_PATH,
+            "modules": MODULES_YAML_PATH,
+        }
         repo.load_metadata()
         assert repo.primary is not None
         assert repo.updateinfo is not None

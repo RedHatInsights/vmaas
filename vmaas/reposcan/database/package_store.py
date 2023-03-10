@@ -171,8 +171,10 @@ class PackageStore(ObjectStore):
                                                                     raise_exception=True))
         source_packages = []
         for name, epoch, ver, rel, arch in unique_source_packages:
-            source_packages.append(dict(name=name, epoch=epoch, ver=ver, rel=rel, arch=arch,
-                                        srpm=None, summary=None, description=None))
+            source_packages.append({
+                "name": name, "epoch": epoch, "ver": ver, "rel": rel, "arch": arch,
+                "srpm": None, "summary": None, "description": None,
+            })
         return source_packages
 
     def store(self, repo_id, packages):

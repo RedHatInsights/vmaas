@@ -128,7 +128,7 @@ class PkgtreeAPI:
         """Check whether all repos are 'third-party' to exclude package if third-party=True is set."""
         if opts["return_repositories"]:
             repositories, third_party_only = self._get_repositories(pkg_id)
-            return dict(repositories=none2empty(repositories)), third_party_only
+            return {"repositories": none2empty(repositories)}, third_party_only
         return {}, False
 
     def _update_errata(self, api_version: int, pkg_id: int, opts: dict, third_party: bool) -> tuple:
@@ -217,14 +217,14 @@ class PkgtreeAPI:
 
         page = data.get("page", None)
         page_size = data.get("page_size", None)
-        opts = dict(
-            modified_since=parse_datetime(data.get("modified_since", None)),
-            return_repositories=data.get("return_repositories", True),
-            return_errata=data.get("return_errata", True),
-            return_summary=data.get("return_summary", False),
-            return_description=data.get("return_description", False),
-            third_party=data.get("third_party", False),
-        )
+        opts = {
+            "modified_since": parse_datetime(data.get("modified_since", None)),
+            "return_repositories": data.get("return_repositories", True),
+            "return_errata": data.get("return_errata", True),
+            "return_summary": data.get("return_summary", False),
+            "return_description": data.get("return_description", False),
+            "third_party": data.get("third_party", False),
+        }
 
         names = data.get('package_name_list', None)
         if not names:
