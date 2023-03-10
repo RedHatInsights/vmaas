@@ -43,6 +43,10 @@ KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
 DEFAULT_CHUNK_SIZE = "1048576"
 
+# FedRAMP deployment using only baked-in content, no git cloning in runtime
+IS_FEDRAMP = strtobool(os.getenv("IS_FEDRAMP", "FALSE"))
+REPOLIST_STATIC_DIR = '/vmaas/repolist_git'
+
 REPOLIST_DIR = '/tmp/repolist_git'
 REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
 REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
@@ -345,16 +349,21 @@ class GitRepoListHandler(RepolistImportHandler):
     @staticmethod
     def fetch_git_repolists():
         """Download and parse repolists from configured git repo"""
-        LOGGER.info("Downloading repolists from git %s", REPOLIST_GIT)
-        shutil.rmtree(REPOLIST_DIR, True)
-        os.makedirs(REPOLIST_DIR, exist_ok=True)
+        if IS_FEDRAMP:
+            LOGGER.info("FedRAMP env, using static repolists source: %s", REPOLIST_STATIC_DIR)
+            repolist_dir = REPOLIST_STATIC_DIR
+        else:
+            LOGGER.info("Downloading repolists from git %s", REPOLIST_GIT)
+            shutil.rmtree(REPOLIST_DIR, True)
+            os.makedirs(REPOLIST_DIR, exist_ok=True)
 
-        # Should we just use replacement or add a url handling library, which
-        # would be used replace the username in the provided URL ?
-        git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
-        git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
+            # Should we just use replacement or add a url handling library, which
+            # would be used replace the username in the provided URL ?
+            git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
+            git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
 
-        git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
+            git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
+            repolist_dir = REPOLIST_DIR
 
         paths = REPOLIST_PATH.split(',')
         products, repos = {}, []
@@ -362,11 +371,11 @@ class GitRepoListHandler(RepolistImportHandler):
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
             path = path.strip()
-            if not os.path.isdir(REPOLIST_DIR) or not os.path.isfile(REPOLIST_DIR + '/' + path):
+            if not os.path.isdir(repolist_dir) or not os.path.isfile(repolist_dir + '/' + path):
                 LOGGER.error("Downloading repolist failed: Directory was not created")
                 return None, None
 
-            with open(REPOLIST_DIR + '/' + path, 'r', encoding='utf8') as json_file:
+            with open(repolist_dir + '/' + path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
             assert data
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
@@ -381,7 +390,7 @@ class GitRepoListHandler(RepolistImportHandler):
     def run_task(*args, **kwargs):
         """Start importing from git"""
         init_logging()
-        if not REPOLIST_GIT_TOKEN:
+        if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
             LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
             return "SKIPPED"
         products, repos = GitRepoListHandler.fetch_git_repolists()
@@ -413,7 +422,7 @@ class GitRepoListCleanupHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not REPOLIST_GIT_TOKEN:
+            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
                 return "SKIPPED"
 
