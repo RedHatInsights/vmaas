@@ -110,6 +110,7 @@ class TestUpgrade:
 
         os.environ["POSTGRESQL_DATABASE"] = db_name
         os.environ["POSTGRESQL_USER"] = db_user
+        os.environ["POSTGRESQL_PASSWORD"] = "vmaas_admin_pwd"
         os.environ["POSTGRESQL_HOST"] = db_host
         os.environ["POSTGRESQL_PORT"] = db_port
 
@@ -142,6 +143,7 @@ class TestUpgrade:
 
         os.environ["POSTGRESQL_DATABASE"] = db_name
         os.environ["POSTGRESQL_USER"] = db_user
+        os.environ["POSTGRESQL_PASSWORD"] = "vmaas_admin_pwd"
         os.environ["POSTGRESQL_HOST"] = db_host
         os.environ["POSTGRESQL_PORT"] = db_port
 
@@ -183,6 +185,7 @@ class TestUpgrade:
 
         os.environ["POSTGRESQL_DATABASE"] = db_name
         os.environ["POSTGRESQL_USER"] = db_user
+        os.environ["POSTGRESQL_PASSWORD"] = "vmaas_admin_pwd"
         os.environ["POSTGRESQL_HOST"] = db_host
         os.environ["POSTGRESQL_PORT"] = db_port
 
