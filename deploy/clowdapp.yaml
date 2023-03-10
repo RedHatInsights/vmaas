@@ -292,6 +292,8 @@ objects:
           value: ${VMAAS_ENV}
         - name: PROMETHEUS_MULTIPROC_DIR
           value: /tmp/prometheus_multiproc_dir
+        - name: IS_FEDRAMP
+          value: ${IS_FEDRAMP}
 
     database:
       name: vmaas
@@ -534,3 +536,5 @@ parameters:
   value: "FALSE"
 - name: VMAAS_LIB_MAX_GOROUTINES
   value: "20"
+- name: IS_FEDRAMP
+  value: "FALSE"
