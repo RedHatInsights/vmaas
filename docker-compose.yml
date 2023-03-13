@@ -40,7 +40,6 @@ services:
       - ./conf/reposcan.env
     ports:
       - 8081:8081
-      - 8730:8730
       - 9082:9082
     volumes:
       - vmaas-dump-data:/data:z

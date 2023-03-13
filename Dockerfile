@@ -11,7 +11,7 @@ RUN FULL_RHEL=$(microdnf repolist --enabled | grep rhel-8) ; \
 ARG VAR_RPMS=""
 RUN microdnf module enable postgresql:12 && \
     microdnf install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python39 python39-pip python3-rpm which rsync rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
+        python39 python39-pip python3-rpm which rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
         $VAR_RPMS && \
         ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.9/site-packages/rpm && \
     microdnf clean all
@@ -28,8 +28,6 @@ ARG VAR_PIPENV_INSTALL_OPT=""
 RUN pip3 install --upgrade pip pipenv==2022.12.19 && \
     pipenv install --ignore-pipfile --deploy --system $VAR_PIPENV_INSTALL_OPT && \
     if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 53048 ; fi
-
-ADD /vmaas/reposcan/rsyncd.conf   /etc/
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas

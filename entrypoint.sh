@@ -11,7 +11,6 @@ if [[ ! -z $1 ]]; then
         cd go/src/vmaas
         exec ./main webapp
     elif [[ "$1" == "reposcan" ]]; then
-        rsync --daemon --verbose --port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8730)")
         cd vmaas/reposcan
         exec python3 -m vmaas.common.wait_for_services python3 -m main
     elif [[ "$1" == "websocket" ]]; then

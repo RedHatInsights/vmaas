@@ -32,7 +32,6 @@ type Config struct {
 	// endpoints
 	ReposcanAddress  string
 	WebsocketAddress string
-	DumpRsyncAddress string
 	OGWebappHost     string
 
 	// cloudwatch
@@ -98,8 +97,6 @@ func initEndpoints() {
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
 		if e.App == "vmaas" {
 			switch {
-			case strings.Contains(e.Name, "reposcan"):
-				Cfg.DumpRsyncAddress = fmt.Sprintf("rsync://%s:%d/data/vmaas.db", e.Hostname, e.Port)
 			case strings.Contains(e.Name, "websocket"):
 				Cfg.WebsocketAddress = fmt.Sprintf("ws://%s:%d", e.Name, e.Port)
 			}

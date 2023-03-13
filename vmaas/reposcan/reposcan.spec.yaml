@@ -282,6 +282,24 @@ paths:
       tags:
         - Metadata
   
+  /latestdumpdownload:
+    get:
+      summary: Download latest database dump
+      operationId: vmaas.reposcan.reposcan.DumpDownloadHandler.get
+      responses:
+        200:
+          description: Downloads latest dump
+          content:
+            application/octet-stream:
+              schema: {type: string, format: binary}
+        404:
+          description: Dump not found
+          content:
+            text/plain:
+              schema: { type: string, example: "Dump file not found - has it been generated ?" }
+      tags:
+        - DataDump
+
   /cleantmp:
     put:
       summary: Clean /tmp data
