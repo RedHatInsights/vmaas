@@ -17,7 +17,7 @@ from distutils.util import strtobool
 
 import connexion
 import git
-from flask import request
+from flask import make_response, request, send_file
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.websocket import websocket_connect
@@ -29,7 +29,7 @@ from vmaas.common.logging_utils import get_logger, init_logging
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
-from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
+from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, DUMP
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
     FAILED_IMPORT_REPO, FAILED_WEBSOCK, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
@@ -171,6 +171,20 @@ class DumpVersionHandler():
     def get(cls, **kwargs):
         """Get the latest version."""
         return fetch_latest_dump()
+
+
+class DumpDownloadHandler():
+    """Handler class to download dump to the caller."""
+
+    @classmethod
+    def get(cls, **kwargs):
+        """Download the dump."""
+        try:
+            response = make_response(send_file(DUMP))
+            response.direct_passthrough = True
+            return response
+        except FileNotFoundError:
+            return "Dump file not found.  Has it been generated?", 404
 
 
 class SyncHandler:

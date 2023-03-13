@@ -49,7 +49,7 @@ REPOSCAN_HOST = CFG.reposcan_host
 REPOSCAN_PORT = CFG.reposcan_port
 GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
 GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
-LATEST_DUMP_ENDPOINT = "/api/v1/latestdump"
+LATEST_DUMP_ENDPOINT = "api/v1/latestdump"
 
 LOGGER = get_logger(__name__)
 

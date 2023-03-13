@@ -4,9 +4,10 @@ Module to cache data from file dump.
 import array
 import asyncio
 import datetime
-import os
 from urllib.parse import urlparse
 import sqlite3
+
+import requests
 
 from vmaas.common.config import Config
 from vmaas.common.date_utils import parse_datetime
@@ -14,7 +15,8 @@ from vmaas.common.logging_utils import get_logger
 
 CFG = Config()
 DUMP = '/data/vmaas.db'
-REMOTE_DUMP = CFG.remote_dump
+DOWNLOAD_DUMP_ENDPOINT = "api/v1/latestdumpdownload"
+DEFAULT_CHUNK_SIZE = 1048576
 
 # repo_detail indexes
 REPO_LABEL = 0
@@ -164,7 +166,22 @@ class Cache:
     @staticmethod
     def download():
         """Download new version of data."""
-        return not os.system("rsync -a --copy-links --quiet %s %s" % (REMOTE_DUMP, DUMP))
+        try:
+            with open(DUMP, "wb") as file_handle:
+                # pylint: disable=missing-timeout
+                resp = requests.get("http://%s:%s/%s" % (CFG.reposcan_host, CFG.reposcan_port, DOWNLOAD_DUMP_ENDPOINT),
+                                    stream=True)
+                while True:
+                    chunk = resp.raw.read(DEFAULT_CHUNK_SIZE, decode_content=True)
+                    if chunk == b"":
+                        break
+                    file_handle.write(chunk)
+                if resp.status_code == 200:
+                    return True
+                LOGGER.error("Dump download returned HTTP code: %s", resp.status_code)
+        except requests.exceptions.RequestException:
+            LOGGER.exception("Dump download failed: ")
+        return False
 
     @staticmethod
     def _sqlite_execute(data, query):
