@@ -29,6 +29,12 @@
             "hostname": "vmaas_websocket",
             "name": "websocket-service",
             "port": 9000
+        },
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_reposcan",
+            "name": "reposcan-service",
+            "port": 9000
         }
     ],
     "logging": {

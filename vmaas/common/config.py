@@ -77,7 +77,9 @@ class Config(BaseConfig, metaclass=Singleton):
             if "reposcan" in endpoint.hostname:
                 self.reposcan_url = self._build_url(endpoint)
         for endpoint in self._cfg.privateEndpoints:
-            if "websocket" in endpoint.hostname:
+            if "reposcan" in endpoint.hostname:
+                self.remote_dump = f"{self._build_url(endpoint)}/vmaas.db"
+            elif "websocket" in endpoint.hostname:
                 self.websocket_url = self._build_url(endpoint, "ws")
                 self.websocket_http_url = self._build_url(endpoint)
 

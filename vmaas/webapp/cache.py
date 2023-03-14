@@ -15,7 +15,6 @@ from vmaas.common.logging_utils import get_logger
 
 CFG = Config()
 DUMP = '/data/vmaas.db'
-DOWNLOAD_DUMP_ENDPOINT = "api/v1/latestdumpdownload"
 DEFAULT_CHUNK_SIZE = 1048576
 
 # repo_detail indexes
@@ -168,9 +167,7 @@ class Cache:
         """Download new version of data."""
         try:
             with open(DUMP, "wb") as file_handle:
-                # pylint: disable=missing-timeout
-                resp = requests.get(f"{CFG.reposcan_url}/{DOWNLOAD_DUMP_ENDPOINT}",
-                                    stream=True, verify=CFG.tls_ca_path)
+                resp = requests.get(CFG.remote_dump, stream=True, verify=CFG.tls_ca_path)  # pylint: disable=missing-timeout
                 while True:
                     chunk = resp.raw.read(DEFAULT_CHUNK_SIZE, decode_content=True)
                     if chunk == b"":

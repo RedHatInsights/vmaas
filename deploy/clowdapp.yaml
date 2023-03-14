@@ -167,7 +167,7 @@ objects:
         public:
           enabled: true
         private:
-          enabled: false
+          enabled: true
         metrics:
           enabled: true
       podSpec:

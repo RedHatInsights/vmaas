@@ -12,6 +12,9 @@ if [[ ! -z $1 ]]; then
         exec ./main webapp
     elif [[ "$1" == "reposcan" ]]; then
         cd vmaas/reposcan
+        port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8083)")
+        cat nginx.conf.template | sed "s/_PORT_/$port/g" > /tmp/nginx.conf
+        nginx -c /tmp/nginx.conf
         exec python3 -m vmaas.common.wait_for_services python3 -m main
     elif [[ "$1" == "websocket" ]]; then
         cd vmaas/websocket

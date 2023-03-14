@@ -10,8 +10,9 @@ RUN FULL_RHEL=$(microdnf repolist --enabled | grep rhel-8) ; \
 
 ARG VAR_RPMS=""
 RUN microdnf module enable postgresql:12 && \
+    microdnf module enable nginx:1.20 && \
     microdnf install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python39 python39-pip python3-rpm which rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
+        python39 python39-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
         $VAR_RPMS && \
         ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.9/site-packages/rpm && \
     microdnf clean all
