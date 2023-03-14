@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.40.0 (2023-03-14)
+### Feature
+* **fedramp:** Use tls for outgoing connections and simplify config ([`e3e9e71`](https://github.com/RedHatInsights/vmaas/commit/e3e9e719bb97b4f904e45af14d6d8b5b5a7281fb))
+
+### Fix
+* **fedramp:** Set tls ca for dump download ([`7d27e62`](https://github.com/RedHatInsights/vmaas/commit/7d27e620206c54e5b4f10cce6ffc0f84effe1f42))
+
 ## v2.39.3 (2023-02-17)
 ### Fix
 * **vmaas-go:** Incorrect json field for third_party updates ([`eb39dba`](https://github.com/RedHatInsights/vmaas/commit/eb39dba5f82f97135085b4ca11af637f37e7daef))
