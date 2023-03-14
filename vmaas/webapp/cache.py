@@ -169,8 +169,8 @@ class Cache:
         try:
             with open(DUMP, "wb") as file_handle:
                 # pylint: disable=missing-timeout
-                resp = requests.get("http://%s:%s/%s" % (CFG.reposcan_host, CFG.reposcan_port, DOWNLOAD_DUMP_ENDPOINT),
-                                    stream=True)
+                resp = requests.get(f"{CFG.reposcan_url}/{DOWNLOAD_DUMP_ENDPOINT}",
+                                    stream=True, verify=CFG.tls_ca_path)
                 while True:
                     chunk = resp.raw.read(DEFAULT_CHUNK_SIZE, decode_content=True)
                     if chunk == b"":
