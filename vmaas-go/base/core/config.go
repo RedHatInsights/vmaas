@@ -21,14 +21,14 @@ func ConfigureApp() {
 
 func ConfigureCache() {
 	var err error
-	VmaasAPI, err = vmaas.InitFromURL(fmt.Sprintf("%s/api/v1/latestdumpdownload", utils.Cfg.ReposcanAddress))
+	VmaasAPI, err = vmaas.InitFromURL(utils.Cfg.DumpAddress)
 	if err != nil {
 		utils.Log("err", err.Error()).Warn("Cache not available on app start")
 	}
 	VmaasAPI.PeriodicCacheReload(
 		utils.Cfg.CacheRefreshInterval,
 		fmt.Sprintf("%s/api/v1/latestdump", utils.Cfg.ReposcanAddress),
-		nil, // not needed, cache initialized from API url
+		nil, // not needed, cache initialized from url
 	)
 }
 

@@ -43,6 +43,7 @@ services:
       - ./conf/reposcan.env
     ports:
       - 8081:8000
+      - 8083:9000
       - 9082:10000
     volumes:
       - vmaas-dump-data:/data:z
@@ -108,7 +109,7 @@ services:
       - ./conf/webapp_utils.env
       - ./conf/database-connection-reader.env
     ports:
-      - 8083:8000
+      - 8084:8000
     depends_on:
       - vmaas_webapp
 
