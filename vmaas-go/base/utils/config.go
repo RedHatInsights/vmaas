@@ -30,10 +30,9 @@ type Config struct {
 	MetricsPath string
 
 	// endpoints
-	ReposcanAddress  string
-	WebsocketAddress string
-	DumpAddress      string
-	OGWebappAddress  string
+	ReposcanAddress string
+	DumpAddress     string
+	OGWebappAddress string
 
 	// cloudwatch
 	CloudWatchAccessKeyID     string
@@ -99,13 +98,8 @@ func initEndpoints() {
 		}
 	}
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
-		if e.App == "vmaas" {
-			switch {
-			case strings.Contains(e.Name, "reposcan"):
-				Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildUrl("http"))
-			case strings.Contains(e.Name, "websocket"):
-				Cfg.WebsocketAddress = fmt.Sprintf("ws://%s:%d", e.Name, e.Port)
-			}
+		if e.App == "vmaas" && strings.Contains(e.Name, "reposcan") {
+			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildUrl("http"))
 		}
 	}
 }
