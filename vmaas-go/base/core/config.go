@@ -23,7 +23,7 @@ func ConfigureCache() {
 	var err error
 	VmaasAPI, err = vmaas.InitFromURL(utils.Cfg.DumpAddress)
 	if err != nil {
-		utils.Log("err", err.Error()).Warn("Cache not available on app start")
+		utils.LogWarn("err", err.Error(), "Cache not available on app start")
 	}
 	VmaasAPI.PeriodicCacheReload(
 		utils.Cfg.CacheRefreshInterval,

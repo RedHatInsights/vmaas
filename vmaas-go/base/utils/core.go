@@ -124,10 +124,10 @@ func TestLoadEnv(files ...string) {
 	}
 	err := godotenv.Overload(files...)
 
-	Log("files", files).Debug("Loading new env file")
-	Log("dbuser", Cfg.DBUser, "passwd", Cfg.DBPassword).Debug("Db auth info")
+	LogDebug("files", files, "Loading new env file")
+	LogDebug("dbuser", Cfg.DBUser, "passwd", Cfg.DBPassword, "Db auth info")
 	if err != nil {
-		Log().Panic("Could not load env file")
+		LogPanic("Could not load env file")
 	}
 }
 
@@ -136,7 +136,7 @@ func LogPanics(exitAfterLogging bool) {
 	if obj := recover(); obj != nil {
 		stack := string(debug.Stack())
 		stackLine := strings.ReplaceAll(stack, "\n", "|")
-		Log("err", obj, "stack", stackLine).Error("Panicked")
+		LogError("err", obj, "stack", stackLine, "Panicked")
 		FlushLogs()
 		if exitAfterLogging {
 			os.Exit(1)

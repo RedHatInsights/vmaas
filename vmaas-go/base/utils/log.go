@@ -19,19 +19,67 @@ func ConfigureLogging() {
 	trySetupCloudWatchLogging()
 }
 
-// implement Log function to enable additional log fields
-// usage: utils.Log("my_field_1", 1, "my_field_2", 4.3).Info("Testing logging")
-func Log(args ...interface{}) *log.Entry {
+func processArgs(args []interface{}) (log.Fields, interface{}) {
 	nArgs := len(args)
 	fields := log.Fields{}
-	if nArgs%2 != 0 {
-		log.Warningf("Unable to accept odd (%d) arguments count in utils.DebugLog method.", nArgs)
-	} else {
-		for i := 0; i < nArgs; i += 2 {
-			fields[args[i].(string)] = args[i+1]
-		}
+	for i := 1; i < nArgs; i += 2 {
+		fields[args[i-1].(string)] = args[i]
 	}
-	return log.WithFields(fields)
+	var msg interface{}
+	if nArgs%2 != 0 {
+		msg = args[nArgs-1]
+	} else {
+		msg = ""
+	}
+	return fields, msg
+}
+
+// implement LogXXXX functions to enable additional log fields
+// usage: utils.LogInfo("my_field_1", 1, "my_field_2", 4.3, "Testing logging")
+func logLevel(level log.Level, args ...interface{}) {
+	if !log.IsLevelEnabled(level) {
+		return
+	}
+	fields, msg := processArgs(args)
+
+	// using standard Log at Fatal or Panic level will not properly exit or panic
+	entry := log.WithFields(fields)
+	switch level {
+	case log.FatalLevel:
+		entry.Fatal(msg)
+	case log.PanicLevel:
+		entry.Panic(msg)
+	default:
+		entry.Log(level, msg)
+	}
+}
+
+func LogTrace(args ...interface{}) {
+	logLevel(log.TraceLevel, args...)
+}
+
+func LogDebug(args ...interface{}) {
+	logLevel(log.DebugLevel, args...)
+}
+
+func LogInfo(args ...interface{}) {
+	logLevel(log.InfoLevel, args...)
+}
+
+func LogWarn(args ...interface{}) {
+	logLevel(log.WarnLevel, args...)
+}
+
+func LogError(args ...interface{}) {
+	logLevel(log.ErrorLevel, args...)
+}
+
+func LogFatal(args ...interface{}) {
+	logLevel(log.FatalLevel, args...)
+}
+
+func LogPanic(args ...interface{}) {
+	logLevel(log.PanicLevel, args...)
 }
 
 // parse log.Level from string or fail
@@ -70,7 +118,7 @@ func LogProgress(msg string, duration time.Duration, total int64) (*time.Ticker,
 	go func() {
 		for range timer.C {
 			pct := count * 100 / total
-			Log("gorutineID", goID, "progress %", pct).Info(msg)
+			LogInfo("gorutineID", goID, "progress %", pct, msg)
 		}
 	}()
 	return timer, &count

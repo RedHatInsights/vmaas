@@ -1,6 +1,7 @@
 package webapp
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -34,7 +35,7 @@ func Run() {
 	go core.ConfigureCache()
 
 	port := utils.Cfg.PublicPort
-	utils.Log().Infof("Webapp starting at port %d", port)
+	utils.LogInfo(fmt.Sprintf("Webapp starting at port %d", port))
 	// create web app
 	app := gin.New()
 	if utils.Cfg.EnableProfiler {
@@ -59,10 +60,10 @@ func Run() {
 	go base.TryExposeOnMetricsPort(app)
 	err := utils.RunServer(base.Context, app, port)
 	if err != nil {
-		utils.Log("err", err.Error()).Fatal("server listening failed")
+		utils.LogFatal("err", err.Error(), "server listening failed")
 		panic(err)
 	}
-	utils.Log().Info("webapp completed")
+	utils.LogInfo("webapp completed")
 }
 
 func vmaasProxy(c *gin.Context) {

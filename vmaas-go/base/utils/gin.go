@@ -82,10 +82,10 @@ func RunServer(ctx context.Context, handler http.Handler, port int) error {
 		<-ctx.Done()
 		err := srv.Shutdown(context.Background())
 		if err != nil {
-			Log("err", err.Error()).Error("server shutting down failed")
+			LogError("err", err.Error(), "server shutting down failed")
 			return
 		}
-		Log().Info("server closed successfully")
+		LogInfo("server closed successfully")
 	}()
 
 	err := srv.ListenAndServe()
@@ -105,31 +105,31 @@ func respStatusError(c *gin.Context, code int, err error) {
 }
 
 func LogAndRespError(c *gin.Context, err error) {
-	Log("err", err.Error()).Error()
+	LogError("err", err.Error())
 	respStatusError(c, http.StatusInternalServerError, err)
 }
 
 func LogAndRespBadRequest(c *gin.Context, err error) {
-	Log("err", err.Error()).Warn()
+	LogWarn("err", err.Error())
 	respStatusError(c, http.StatusBadRequest, err)
 }
 
 func LogAndRespNotFound(c *gin.Context, err error) {
-	Log("err", err.Error()).Warn()
+	LogWarn("err", err.Error())
 	respStatusError(c, http.StatusNotFound, err)
 }
 
 func LogAndRespNotAllowed(c *gin.Context, err error) {
-	Log("err", err.Error()).Warn()
+	LogWarn("err", err.Error())
 	respStatusError(c, http.StatusMethodNotAllowed, err)
 }
 
 func LogAndRespUnavailable(c *gin.Context, err error) {
-	Log("err", err.Error()).Warn()
+	LogWarn("err", err.Error())
 	respStatusError(c, http.StatusServiceUnavailable, err)
 }
 
 func LogAndRespFailedDependency(c *gin.Context, err error) {
-	Log("err", err.Error()).Error() // log more descriptive error, possibly showing internal urls
+	LogError("err", err.Error()) // log more descriptive error, possibly showing internal urls
 	respStatusError(c, http.StatusFailedDependency, errors.New("couldn't proxy request to vmaas-webapp-service"))
 }

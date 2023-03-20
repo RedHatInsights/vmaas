@@ -32,9 +32,9 @@ func RequestResponseLogger() gin.HandlerFunc {
 		}
 
 		if c.Writer.Status() < http.StatusInternalServerError {
-			utils.Log(fields...).Info("request")
+			utils.LogInfo(append(fields, "request")...)
 		} else {
-			utils.Log(fields...).Error("request")
+			utils.LogError(append(fields, "request")...)
 		}
 
 		utils.ObserveSecondsSince(tStart, requestTime.WithLabelValues(c.Request.Method, c.FullPath()))
