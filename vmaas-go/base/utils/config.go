@@ -117,7 +117,7 @@ func initCloudwatch() {
 func initEnv() {
 	Cfg.LogLevel = Getenv("LOG_LEVEL", "INFO")
 	Cfg.LogStyle = os.Getenv("LOG_STYLE")
-	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 5*60) // 5 min default
+	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 60) // 1 min default
 	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
 }
