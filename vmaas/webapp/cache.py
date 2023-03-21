@@ -400,7 +400,7 @@ class Cache:
             self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
 
         for row in self._sqlite_execute(data, "select * from oval_module_test_detail"):
-            self.ovalmoduletest_detail[row[0]] = row[1]   
+            self.ovalmoduletest_detail[row[0]] = row[1]
 
         for row in self._sqlite_execute(data, "select * from oval_definition_errata"):
             self.ovaldefinition_id2errata_id[row[0]] = row[1]
