@@ -680,6 +680,17 @@ class SqliteDump:
                 dump.execute("insert into oval_criteria_dependency values (?, ?, ?, ?)",
                              (parent_criteria_id, dep_criteria_id, dep_test_id, dep_module_test_id))
 
+        # oval_definition_errata
+        dump.execute("""create table if not exists oval_definition_errata (
+                                definition_id integer,
+                                errata_id integer
+                               )""")
+        with self._named_cursor() as cursor:
+            cursor.execute("""select definition_id, errata_id
+                              from oval_definition_errata""")
+            for oval_definition_id, errata_id in cursor:
+                dump.execute("insert into oval_definition_errata values (?, ?)", (oval_definition_id, errata_id))
+
         # oval_test_detail
         dump.execute("""create table if not exists oval_test_detail (
                                 id integer primary key,
