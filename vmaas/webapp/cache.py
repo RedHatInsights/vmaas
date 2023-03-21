@@ -140,6 +140,7 @@ class Cache:
         self.ovaltest_id2states = {}
         self.ovalstate_id2arches = {}
         self.ovalmoduletest_detail = {}
+        self.ovaldefinition_id2errata_id = {}
 
     async def reload_async(self):
         """Update data and reload dictionaries asynchronously."""
@@ -399,7 +400,10 @@ class Cache:
             self.ovalstate_id2arches.setdefault(row[0], set()).add(row[1])
 
         for row in self._sqlite_execute(data, "select * from oval_module_test_detail"):
-            self.ovalmoduletest_detail[row[0]] = row[1]
+            self.ovalmoduletest_detail[row[0]] = row[1]   
+
+        for row in self._sqlite_execute(data, "select * from oval_definition_errata"):
+            self.ovaldefinition_id2errata_id[row[0]] = row[1]
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 
