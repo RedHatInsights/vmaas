@@ -403,7 +403,7 @@ class Cache:
             self.ovalmoduletest_detail[row[0]] = row[1]
 
         for row in self._sqlite_execute(data, "select * from oval_definition_errata"):
-            self.ovaldefinition_id2errata_id[row[0]] = row[1]
+            self.ovaldefinition_id2errata_id.setdefault(row[0], []).append(row[1])
 
         names = ["exported", "last_change", "repository_changes", "cve_changes", "errata_changes"]
 

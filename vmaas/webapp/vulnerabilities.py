@@ -234,13 +234,9 @@ class VulnerabilitiesAPI:
                                     continue
                                 manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
                                 manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                                # no erratum directly mappable to CVE in OVAL
-                                errata_id = self.db_cache.ovaldefinition_id2errata_id.get(definition_id, None)
-                                errata_name = self.db_cache.errataid2name.get(errata_id, None)
-                                if errata_name is not None:
-                                    manually_fixable_cve_dict[cve].setdefault("errata", set()).add(errata_name)
-                                else:
-                                    manually_fixable_cve_dict[cve].setdefault("errata", set())
+                                errata_ids = self.db_cache.ovaldefinition_id2errata_id.get(definition_id, [])
+                                errata_names = [res for e in errata_ids if (res := self.db_cache.errataid2name.get(e))]
+                                manually_fixable_cve_dict[cve].setdefault("errata", set()).update(errata_names)
                         elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
                             for cve in cves:
                                 # Skip fixable CVEs (should never happen, just in case)
