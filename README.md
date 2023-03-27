@@ -60,65 +60,10 @@ docker-compose start vmaas_database
 docker-compose stop vmaas_database
 ~~~
 
-## Initial Setup
-
-This "Initial Setup" section was put together as I set up on my Fedora 27 system.  Your mileage may vary.
-
-### Install docker and docker-compose
-~~~bash
-sudo dnf install docker docker-compose # install packages
-sudo systemctl start docker # Start docker.
-sudo docker run hello-world # Make sure it's working...
-~~~
-If you get output that says "Hello from Docker!" you've successfully
-installed Docker. Continue the set up...
-
-
-For OpenShift deployment install also following tools.
-~~~bash
-sudo dnf install origin-clients ansible
-~~~
-
-### Prepare Setup for Development
-- Start docker at boot.
-- Add docker group and your user to it. This will allow you to run
-docker as your user.
-~~~bash
-sudo systemctl enable docker
-sudo groupadd docker
-sudo usermod -aG docker $USER
-~~~
-
-Now, reboot the system to pick up the changes to the docker group.
-Then log back in and test running docker as your user.
-~~~bash
-docker run hello-world
-~~~
-Look for "Hello from Docker!" again.
-
-### First Run of VMaaS
-
-#### Free ports
-Make sure postgresql isn't running locally... we need port **5432**
-available. If anything is running on port **8080**, stop that, too.
-~~~bash
-sudo systemctl stop postgresql
-~~~
-
-#### Clone, build, run
-~~~bash
-git clone https://github.com/RedHatInsights/vmaas.git # clone repo
-cd vmaas
-docker-compose up --build # build images and start containers
-~~~
-Use `--build` switch every time you want to rebuild project before running.'
-
-Congratulations!
-
 ### Run tests
 You can run all tests from scratch just after cloning repo using command:
 ~~~bash
-sudo podman-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 ~~~
 
 ### Developing / Debugging
