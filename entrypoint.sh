@@ -16,9 +16,6 @@ if [[ ! -z $1 ]]; then
         cat nginx.conf.template | sed "s/_PORT_/$port/g" > /tmp/nginx.conf
         nginx -c /tmp/nginx.conf
         exec python3 -m vmaas.common.wait_for_services python3 -m main
-    elif [[ "$1" == "websocket" ]]; then
-        cd vmaas/websocket
-        exec python3 -m websocket
     elif [[ "$1" == "webapp-utils" ]]; then
         cd vmaas/webapp_utils
         exec gunicorn -c gunicorn_conf.py -w ${GUNICORN_WORKERS:-4} --bind=0.0.0.0:8083 app

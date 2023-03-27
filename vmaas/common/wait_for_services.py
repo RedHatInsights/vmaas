@@ -53,19 +53,6 @@ def main():
         wait(DatabaseHandler.get_connection, service="PostgreSQL")
     else:
         LOGGER.info("Skipping PostgreSQL check")
-    if (
-        not config.is_test and config.websocket_http_url and "vmaas-websocket" not in config.pod_hostname
-        and not config.is_init_container
-    ):
-        wait(
-            requests.get,
-            f"{config.websocket_http_url}/api/v1/monitoring/health",
-            service="Websocket server",
-            timeout=1,
-            verify=config.tls_ca_path,
-        )
-    else:
-        LOGGER.info("Skipping Websocket server check")
     if not config.is_test and config.reposcan_url and "vmaas-reposcan" not in config.pod_hostname:
         wait(
             requests.get,

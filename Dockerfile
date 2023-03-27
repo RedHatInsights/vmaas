@@ -60,7 +60,6 @@ ADD entrypoint.sh               /vmaas/
 ADD conf                        /vmaas/conf
 ADD /database                   /vmaas/database
 ADD /vmaas/webapp_utils         /vmaas/vmaas/webapp_utils/
-ADD /vmaas/websocket            /vmaas/vmaas/websocket/
 ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common

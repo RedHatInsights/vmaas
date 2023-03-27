@@ -15,22 +15,6 @@ services:
     volumes:
       - vmaas-db-data:/var/lib/postgresql/data
 
-  vmaas_websocket:
-    command: /vmaas/entrypoint.sh websocket
-    container_name: vmaas-websocket
-    hostname: vmaas-websocket
-    build:
-        context: .
-        dockerfile: ./Dockerfile
-        args:
-          PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/app:latest
-    restart: unless-stopped
-    env_file:
-      - ./conf/common.env
-    ports:
-      - 8082:9000
-
   vmaas_reposcan:
     command: /vmaas/entrypoint.sh reposcan
     container_name: vmaas-reposcan
@@ -48,7 +32,6 @@ services:
     volumes:
       - vmaas-dump-data:/data:z
     depends_on:
-      - vmaas_websocket
       - vmaas_database
 
   vmaas_reposcan_db_init:
@@ -62,7 +45,6 @@ services:
       - ./conf/database-connection-admin.env
       - ./conf/reposcan.env
     depends_on:
-      - vmaas_websocket
       - vmaas_database
 
   vmaas_webapp:
@@ -78,7 +60,6 @@ services:
       - 8080:8000
       - 9081:10000
     depends_on:
-      - vmaas_websocket
       - vmaas_reposcan
 
   vmaas_webapp_go:
@@ -94,7 +75,6 @@ services:
       - 8000:8000
       - 9088:10000
     depends_on:
-      - vmaas_websocket
       - vmaas_reposcan
       - vmaas_webapp # to proxy requests
 
