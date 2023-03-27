@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.41.0 (2023-03-27)
+### Feature
+* **webapp:** Use timer instead of websocket to refresh data ([`4e14fa7`](https://github.com/RedHatInsights/vmaas/commit/4e14fa7db8511b4a09238ea6ca2b487f9dcebc2a))
+
 ## v2.40.0 (2023-03-14)
 ### Feature
 * **fedramp:** Use tls for outgoing connections and simplify config ([`e3e9e71`](https://github.com/RedHatInsights/vmaas/commit/e3e9e719bb97b4f904e45af14d6d8b5b5a7281fb))
