@@ -69,3 +69,20 @@ docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 ### Developing / Debugging
 You can build and start your container in ["developer mode"](doc/developer_mode.md).
 You can tune metrics using Prometheus and Grafana dev containers, see [doc/metrics.md](doc/metrics.md).
+
+### Copy database from live OpenShift instance (requires valid credentials)
+~~~bash
+oc project vmaas-stage
+# Dump database
+oc exec -c vmaas-reposcan-service $(oc get pod -l pod=vmaas-reposcan-service --no-headers -o custom-columns=:metadata.name) -- bash -c 'PGPASSWORD=vmaas_writer_pwd pg_dump -h $(python3 -c "import app_common_python as a;print(a.LoadedConfig.database.hostname)") -U vmaas_writer vmaas | gzip > /data/pgdump.sql.gz'
+# Download database dump
+oc port-forward $(oc get pod -l pod=vmaas-reposcan-service --no-headers -o custom-columns=:metadata.name) 10000:10000
+curl http://localhost:10000/pgdump.sql.gz > /tmp/pgdump.sql.gz
+# Populate local database
+docker-compose up -d
+docker-compose exec vmaas_database psql -U vmaas_admin postgres -c "drop database vmaas"
+docker-compose exec vmaas_database psql -U vmaas_admin postgres -c "create database vmaas"
+cat /tmp/pgdump.sql.gz | gzip -d | docker-compose exec -T vmaas_database psql -U vmaas_admin vmaas
+# Generate new webapp sqlite dump
+./scripts/turnpike-mock curl -X PUT http://localhost:8081/api/v1/export/dump
+~~~
