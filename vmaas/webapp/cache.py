@@ -90,7 +90,6 @@ class Cache:
     def __init__(self, filename=DUMP):
         self.filename = filename
         self.clear()
-        self.reload()
 
     def clear(self):
         """Clear dictionaries and load new data."""

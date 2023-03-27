@@ -27,7 +27,9 @@ def dump_file_db():
 def cache(dump_file_db, monkeypatch):
     """Fixture of cache instance."""
     monkeypatch.setattr(Cache, 'download', lambda _: True)
-    return Cache(TEST_DUMP_FILE)
+    cache = Cache(TEST_DUMP_FILE)
+    cache.reload()
+    return cache
 
 
 def test_load(cache):
