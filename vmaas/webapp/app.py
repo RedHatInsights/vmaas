@@ -15,7 +15,6 @@ import connexion
 from aiohttp import ClientSession
 from aiohttp import hdrs
 from aiohttp import web
-from aiohttp import WSMsgType
 from aiohttp.client_exceptions import ClientConnectionError
 from prometheus_client import generate_latest
 from jsonschema.exceptions import ValidationError
@@ -42,8 +41,7 @@ from vmaas.common.logging_utils import get_logger
 # pylint: disable=too-many-lines
 CFG = Config()
 
-WEBSOCKET_RECONNECT_INTERVAL = 60
-WEBSOCKET_FAIL_RECONNECT_INTERVAL = 2
+REFRESH_CHECK_INTERVAL = 60
 
 GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
 GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
@@ -438,107 +436,49 @@ class RPMPkgNamesHandlerGet(BaseHandler):
         return await cls.handle_request(cls.rpm_pkg_names_api, 1, 'rpm_name_list', rpm, **kwargs)
 
 
-class Websocket:
-    """ main websocket handling class"""
+class RefreshTimer:
+    """ main refresh timer handling class"""
 
     def __init__(self):
-        self.websocket_url = CFG.websocket_url
-        self.websocket = None
-        self.websocket_lock = asyncio.Lock()
         self.task = None
 
     def stop(self):
-        """Stop vmaas application"""
-        if self.websocket is not None:
-            self.websocket.close()
-            self.websocket = None
-
+        """Stop timer task"""
         self.task.cancel()
         self.task = None
-
-    async def _send_msg(self, msg):
-        async with self.websocket_lock:
-            if self.websocket:
-                await self.websocket.send_str(msg)
-            else:
-                LOGGER.warning("Unable to send websocket message: %s.", msg)
 
     async def _refresh_cache(self):
         if not BaseHandler.refreshing:
             LOGGER.info("Starting cached data refresh.")
             BaseHandler.refreshing = True
             BaseHandler.data_ready = False
-            await self._send_msg("status-refreshing")
             await BaseHandler.db_cache.reload_async()
-            await self.report_version()
             if BaseHandler.db_cache.dbchange.get('exported'):  # check if timestamp is set in cache
                 BaseHandler.data_ready = True
-            await self._send_msg("status-ready")
             BaseHandler.refreshing = False
             LOGGER.info("Cached data refreshed.")
         else:
             LOGGER.warning("Cached data refresh already in progress.")
 
-    async def run_websocket(self):
-        """Infinite loop handling websocket connection"""
-        async with ClientSession() as session:
-            while True:
-                await self.websocket_session(session)
-
-    async def websocket_session(self, session):
-        """Main loop for handling websocket connection"""
-        try:
-            async with session.ws_connect(url=self.websocket_url, ssl=CFG.tls_ca_path) as socket:
-                LOGGER.info("Connected to: %s", self.websocket_url)
-                async with self.websocket_lock:
-                    self.websocket = socket
-                # subscribe for notifications
-                await self._send_msg("subscribe-webapp")
-                # Report version before status, so websocket doesn't send us the refresh message
-                await self.report_version()
-                if BaseHandler.db_cache.dbchange.get('exported'):  # check if timestamp is set in cache
-                    BaseHandler.data_ready = True
-                await self._send_msg("status-ready")
-
-                # check if webapp missed dump
-                latest_dump = await self.fetch_latest_dump(session)
+    async def run_timer(self):
+        """Infinite loop handling refresh timer"""
+        LOGGER.info("Refresh timer started.")
+        while True:
+            try:
+                latest_dump = await self.fetch_latest_dump()
                 if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
-                    LOGGER.info("Fetching missed dump: %s.", latest_dump)
-                    asyncio.get_event_loop().create_task(self._refresh_cache())
-                # handle websocket messages
-                await self.websocket_msg_handler()
-                async with self.websocket_lock:
-                    self.websocket = None
-                await asyncio.sleep(WEBSOCKET_RECONNECT_INTERVAL)
-        except ClientConnectionError:
-            LOGGER.info("Cannot connect to websocket: %s. Trying again.", self.websocket_url)
-            await asyncio.sleep(WEBSOCKET_FAIL_RECONNECT_INTERVAL)
-        finally:
-            # Reconnection sleep, then, the outer loop will begin again, reconnecting this client
-            async with self.websocket_lock:
-                self.websocket = None
+                    LOGGER.info("New dump found: %s.", latest_dump)
+                    await self._refresh_cache()
+            except ClientConnectionError:
+                LOGGER.exception("Unable to connect to reposcan API: ")
+            await asyncio.sleep(REFRESH_CHECK_INTERVAL)
 
     @staticmethod
-    async def fetch_latest_dump(session):
+    async def fetch_latest_dump():
         """Method fetches latest dump from reposcan"""
-        async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=CFG.tls_ca_path) as resp:
-            return await resp.text()
-
-    async def report_version(self):
-        """Report currently used dump version"""
-        await self._send_msg(f"version {BaseHandler.db_cache.dbchange.get('exported')}")
-
-    async def websocket_msg_handler(self):
-        """Handle active websocket connection, returning upon close"""
-        async for msg in self.websocket:
-            LOGGER.debug("Websocket message: %s, %s", msg.type, msg.data)
-            if msg.type in (WSMsgType.CLOSED, WSMsgType.ERROR):
-                return None
-
-            if msg.data == 'refresh-cache':
-                asyncio.get_event_loop().create_task(self._refresh_cache())
-            else:
-                LOGGER.warning("Unhandled websocket message %s", msg.data)
+        async with ClientSession() as session:
+            async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=CFG.tls_ca_path) as resp:
+                return await resp.text()
 
 
 def load_cache_to_apis():
@@ -661,18 +601,18 @@ def create_app(specs):
     return app
 
 
-def init_websocket():
-    """Init websocket conenction on main event loop"""
-    socket = Websocket()
+def init_refresh_timer():
+    """Init refresh timer on main event loop"""
+    refresh_timer = RefreshTimer()
 
     def terminate(*_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
-        asyncio.get_event_loop().call_soon(socket.stop)
+        asyncio.get_event_loop().call_soon(refresh_timer.stop)
 
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
     for sig in signals:
         signal.signal(sig, terminate)
 
-    # start websocket handling coroutine
-    socket.task = asyncio.get_event_loop().create_task(socket.run_websocket())
+    # start refresh timer handling coroutine
+    refresh_timer.task = asyncio.get_event_loop().create_task(refresh_timer.run_timer())

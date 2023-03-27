@@ -4,7 +4,7 @@ import asyncio
 from aiohttp import web
 from prometheus_client import start_http_server
 from vmaas.webapp.app import create_app, DEFAULT_PATH, DEFAULT_PATH_API
-from vmaas.webapp.app import init_websocket
+from vmaas.webapp.app import init_refresh_timer
 
 from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger
@@ -21,7 +21,7 @@ if __name__ == '__main__':
                               DEFAULT_PATH_API + "/v1": "webapp.v1.spec.yaml",
                               DEFAULT_PATH_API + "/v2": "webapp.v2.spec.yaml",
                               DEFAULT_PATH_API + "/v3": "webapp.v3.spec.yaml"})
-    init_websocket()
+    init_refresh_timer()
     cfg = Config()
 
     start_http_server(int(cfg.metrics_port))
