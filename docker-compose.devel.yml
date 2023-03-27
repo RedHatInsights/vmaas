@@ -9,15 +9,6 @@ services:
     working_dir: /git
     hostname: vmaas-database
 
-  vmaas_websocket:
-    volumes:
-      - ./:/git
-    security_opt:
-      - label=disable
-    working_dir: /git
-    command: /vmaas/entrypoint.sh sleep
-    hostname: vmaas-websocket
-
   vmaas_reposcan:
     volumes:
       - ./:/git

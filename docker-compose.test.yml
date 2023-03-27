@@ -47,5 +47,4 @@ services:
                          && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \
                          && ./run_tests.sh vmaas/webapp \
-                         && ./run_tests.sh vmaas/websocket \
                          && bash <(curl -s https://codecov.io/bash)"

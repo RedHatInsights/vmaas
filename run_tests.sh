@@ -28,11 +28,6 @@ pipenv run pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1
 
 rc=$(($rc+$?))
 
-if [ "$TESTDIR" == "websocket" ] && [ "$rc" -eq 5 ]; then
-    echo "Warning: No tests for $TESTDIR found, ignore for now"
-    rc=$(($rc - 5))
-fi
-
 # Run pylint
 find . -iname '*.py' | xargs pipenv run pylint --rcfile=../../pylintrc --output-format=colorized
 rc=$(($rc+$?))

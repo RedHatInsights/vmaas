@@ -11,32 +11,6 @@ objects:
   spec:
     envName: ${ENV_NAME}
     deployments:
-    - name: websocket-service
-      minReplicas: ${{REPLICAS_WEBSOCKET}}
-      webServices:
-        public:
-          enabled: false
-        private:
-          enabled: true
-        metrics: {}
-      podSpec:
-        image: ${IMAGE}:${IMAGE_TAG}
-        command:
-          - /vmaas/entrypoint.sh
-          - websocket
-        env:
-        - name: CW_ENABLED
-          value: ${{CW_ENABLED}}
-        - name: CLOWDER_ENABLED
-          value: ${CLOWDER_ENABLED}
-        resources:
-          limits:
-            cpu: ${CPU_LIMIT_WEBSOCKET}
-            memory: ${MEMORY_LIMIT_WEBSOCKET}
-          requests:
-            cpu: ${CPU_REQUEST_WEBSOCKET}
-            memory: ${MEMORY_REQUEST_WEBSOCKET}
-
     - name: webapp-go
       minReplicas: ${{REPLICAS_WEBAPP_GO}}
       webServices:
@@ -173,7 +147,7 @@ objects:
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         initContainers:
-          - command: 
+          - command:
             - sh
             - -c
             - >-
@@ -364,12 +338,6 @@ parameters:
 - name: GOGC
   description: Golang garbage collector, run GC when heap increases by ${GOGC}%
   value: "25"
-- name: CPU_REQUEST_WEBSOCKET
-  description: CPU request for pod
-  value: '100m'
-- name: CPU_LIMIT_WEBSOCKET
-  description: Maximum CPU limit for pod
-  value: '100m'
 - name: CPU_REQUEST_WEBAPP
   description: CPU request for pod
   value: '500m'
@@ -382,12 +350,6 @@ parameters:
 - name: CPU_LIMIT_REPOSCAN
   description: Maximum CPU limit for pod
   value: '1000m'
-- name: MEMORY_REQUEST_WEBSOCKET
-  description: Memory request for pod
-  value: '50Mi'
-- name: MEMORY_LIMIT_WEBSOCKET
-  description: Maximum memory limit for pod
-  value: '100Mi'
 - name: MEMORY_REQUEST_WEBAPP
   description: Memory request for pod
   value: '1Gi'
@@ -409,9 +371,6 @@ parameters:
   value: '1'
 - name: REPLICAS_REPOSCAN
   description: Number of pods for reposcan
-  value: '1'
-- name: REPLICAS_WEBSOCKET
-  description: Number of pods for webapp
   value: '1'
 - name: IMAGE_TAG
   description: Version of VMaaS
@@ -464,7 +423,7 @@ parameters:
   value: "5"
 - name: BATCH_MAX_SIZE
   description: Max size of batch in reposcan
-  value: '500' 
+  value: '500'
 - name: BATCH_MAX_FILESIZE
   description: Max filesize of batch in reposcan
   value: '5_000_000_000'

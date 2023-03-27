@@ -10,7 +10,6 @@ import json
 import os
 import shutil
 import signal
-import ssl
 from contextlib import contextmanager
 from multiprocessing.pool import Pool
 from functools import reduce
@@ -21,11 +20,8 @@ import git
 from flask import request
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.websocket import websocket_connect
-from tornado.httpclient import HTTPRequest
 from psycopg2 import DatabaseError
 
-from vmaas.common.config import Config
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger, init_logging
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
@@ -33,7 +29,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
-    FAILED_IMPORT_REPO, FAILED_WEBSOCK, REPOS_TO_CLEANUP, REGISTRY
+    FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
@@ -54,8 +50,6 @@ REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaa
 REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
-
-WEBSOCKET_RECONNECT_INTERVAL = 60
 
 DEFAULT_CERT_NAME = "DEFAULT"
 DEFAULT_CA_CERT = os.getenv("DEFAULT_CA_CERT", "")
@@ -216,10 +210,6 @@ class SyncHandler:
     def finish_task(cls, task_result):
         """Mark current task as finished."""
         is_err = reduce(lambda was, msg: was if was else "ERROR" in msg, task_result, False)
-        if cls not in (PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler) \
-                and not is_err:
-            # Notify webapps to update their cache
-            ReposcanWebsocket.report_version()
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
         return is_err
@@ -896,66 +886,6 @@ class SyncTask:
             cls.finish()
 
 
-class ReposcanWebsocket():
-    """Class defining API handlers."""
-    cfg = Config()
-    websocket = None
-    websocket_url = cfg.websocket_url
-    ssl_ctx = None
-    if cfg.tls_ca_path:
-        ssl_ctx = ssl.create_default_context(cafile=cfg.tls_ca_path)
-    http_request = HTTPRequest(url=websocket_url, ssl_options=ssl_ctx)
-    reconnect_callback = None
-
-    @staticmethod
-    def stop():
-        """Stop the application"""
-        if SyncTask.is_running():
-            SyncTask.cancel()
-        IOLoop.instance().stop()
-
-    @classmethod
-    def websocket_reconnect(cls):
-        """Try to connect to given WS URL, set message handler and callback to evaluate this connection attempt."""
-        if cls.websocket is None:
-            websocket_connect(cls.http_request, on_message_callback=cls._read_websocket_message,
-                              callback=cls._websocket_connect_status)
-
-    @classmethod
-    def report_version(cls):
-        """Report current dump version"""
-        cls.websocket.write_message(f"version {fetch_latest_dump()}")
-
-    @classmethod
-    def _websocket_connect_status(cls, future):
-        """Check if connection attempt succeeded."""
-        # pylint: disable=bare-except
-        try:
-            result = future.result()
-        except:  # noqa: E722
-            result = None
-
-        cls.websocket = result
-
-        if result is None:
-            # TODO: print the traceback as debug message when we use logging module instead of prints here
-            FAILED_WEBSOCK.inc()
-            LOGGER.warning("Unable to connect to: %s", cls.websocket_url)
-        else:
-            LOGGER.info("Connected to: %s", cls.websocket_url)
-            result.write_message("subscribe-reposcan")
-            cls.report_version()
-
-    @classmethod
-    def _read_websocket_message(cls, message):
-        """Read incoming websocket messages."""
-        if message is None:
-            FAILED_WEBSOCK.inc()
-            LOGGER.warning("Connection to %s closed: %s (%s)", cls.websocket_url,
-                           cls.websocket.close_reason, cls.websocket.close_code)
-            cls.websocket = None
-
-
 def periodic_sync():
     """Function running both repo and CVE sync."""
 
@@ -987,23 +917,14 @@ def create_app(specs):
     else:
         LOGGER.info("Periodic syncing disabled.")
 
-    ws_handler = ReposcanWebsocket()
-
     def terminate(*_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
-        # Kill asyncio ioloop
-        IOLoop.instance().add_callback_from_signal(ws_handler.stop)
         # Kill background pool
         SyncTask.cancel()
 
     for sig in KILL_SIGNALS:
         signal.signal(sig, terminate)
-
-    ws_handler.websocket_reconnect()
-    ws_handler.reconnect_callback = PeriodicCallback(ws_handler.websocket_reconnect,
-                                                     WEBSOCKET_RECONNECT_INTERVAL * 1000)
-    ws_handler.reconnect_callback.start()
 
     app = connexion.App(__name__, options={
         'swagger_ui': True,

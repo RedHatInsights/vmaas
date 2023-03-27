@@ -70,8 +70,6 @@ class Config(BaseConfig, metaclass=Singleton):
         self.cw_aws_log_group = self._cfg.logging.cloudwatch.logGroup
 
         self.tls_ca_path = self._cfg.tlsCAPath
-        self.websocket_url = ""
-        self.websocket_http_url = ""
         self.reposcan_url = ""
         for endpoint in self._cfg.endpoints:
             if "reposcan" in endpoint.hostname:
@@ -79,9 +77,6 @@ class Config(BaseConfig, metaclass=Singleton):
         for endpoint in self._cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
                 self.remote_dump = f"{self._build_url(endpoint)}/vmaas.db"
-            elif "websocket" in endpoint.hostname:
-                self.websocket_url = self._build_url(endpoint, "ws")
-                self.websocket_http_url = self._build_url(endpoint)
 
         self.public_port = self._cfg.publicPort
         self.private_port = self._cfg.privatePort
