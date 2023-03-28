@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.41.1 (2023-03-28)
+### Fix
+* Docker-compose build ([`25e44da`](https://github.com/RedHatInsights/vmaas/commit/25e44da7856cb52960dc492c0a14ffcbb1482ef2))
+* Handle exception when sending slack notification ([`7379d2a`](https://github.com/RedHatInsights/vmaas/commit/7379d2ae7a59dbf69373e0c6b3ffe9bb8f986201))
+
 ## v2.41.0 (2023-03-27)
 ### Feature
 * **webapp:** Use timer instead of websocket to refresh data ([`4e14fa7`](https://github.com/RedHatInsights/vmaas/commit/4e14fa7db8511b4a09238ea6ca2b487f9dcebc2a))
