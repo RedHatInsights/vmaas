@@ -19,6 +19,11 @@ services:
     command: /vmaas/entrypoint.sh reposcan
     container_name: vmaas-reposcan
     hostname: vmaas-reposcan
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        PIPENV_CHECK: "${PIPENV_CHECK:-1}"
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
