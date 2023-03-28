@@ -352,10 +352,10 @@ parameters:
   value: '1000m'
 - name: MEMORY_REQUEST_WEBAPP
   description: Memory request for pod
-  value: '1Gi'
+  value: '1536Mi'
 - name: MEMORY_LIMIT_WEBAPP
   description: Maximum memory limit for pod
-  value: '2Gi'
+  value: '3Gi'
 - name: MEMORY_REQUEST_REPOSCAN
   description: Memory request for pod
   value: '1Gi'
@@ -364,11 +364,10 @@ parameters:
   value: '2Gi'
 - name: REPLICAS_WEBAPP
   description: Number of pods for webapp
-  # value: "{{ 8 if env == 'prod' else 1 }}"
-  value: '1'
+  value: '2'
 - name: REPLICAS_WEBAPP_GO
   description: Number of pods for webapp-go
-  value: '1'
+  value: '2'
 - name: REPLICAS_REPOSCAN
   description: Number of pods for reposcan
   value: '1'
@@ -387,7 +386,7 @@ parameters:
   required: false
 - name: CW_ENABLED
   description: CloudWatch enabled
-  value: 'FALSE'
+  value: 'TRUE'
 - name: OVAL_FEED_BASE_URL
   description: OVAL feed url
   value: "https://www.redhat.com/security/data/oval/v2/"
@@ -438,7 +437,7 @@ parameters:
   value: 'https://github.com/RedHatInsights/vmaas-assets.git'
 - name: REPOLIST_GIT_PATH
   description: Path/comma separated paths, denoting repolist files in the git repo
-  value: "repolist.json"
+  value: "repolist.json, epel-repolist.json"
 - name: GIT_COMMITTER_NAME
   description: Commiter name in assets repo
   value: 'vmaas'
@@ -475,7 +474,7 @@ parameters:
   value: "FALSE"
 - name: VMAAS_ENV
   description: Environment VMaaS is running in
-  value: PROD
+  value: STAGE
 - name: REPO_NAME_PREFIXES
   description: Repo name prefixes to be stripped
   value: "rhui-"
