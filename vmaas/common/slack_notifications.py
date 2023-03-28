@@ -6,6 +6,10 @@ import os
 
 import requests
 
+from vmaas.common.logging_utils import get_logger
+
+LOGGER = get_logger(__file__)
+
 SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 VMAAS_ENV = os.getenv('VMAAS_ENV', 'dev')
 
@@ -59,8 +63,11 @@ def prepare_msg_for_slack(cert_name, header, expire_tuple=None):
 def send_slack_notification(msg: dict):
     """If SLACK_WEBHOOK is set, sends notification to Slack"""
     if SLACK_WEBHOOK:
-        requests.post(
-            SLACK_WEBHOOK, json=format_message(msg),
-            headers={'Content-type': 'application/json'},
-            timeout=5,
-        )
+        try:
+            requests.post(
+                SLACK_WEBHOOK, json=format_message(msg),
+                headers={'Content-type': 'application/json'},
+                timeout=5,
+            )
+        except requests.RequestException:
+            LOGGER.exception("Unable to send Slack notification: ")
