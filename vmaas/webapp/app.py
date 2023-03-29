@@ -471,6 +471,8 @@ class RefreshTimer:
                     await self._refresh_cache()
             except ClientConnectionError:
                 LOGGER.exception("Unable to connect to reposcan API: ")
+            except:  # noqa pylint: disable=bare-except
+                LOGGER.exception("Refresh timer error occured: ")
             await asyncio.sleep(REFRESH_CHECK_INTERVAL)
 
     @staticmethod
