@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.42.1 (2023-03-29)
+### Fix
+* **webapp:** SSL context usage ([`cb98723`](https://github.com/RedHatInsights/vmaas/commit/cb98723577148d9b65b85407576aeb46c704f405))
+
 ## v2.42.0 (2023-03-29)
 ### Feature
 * **webapp:** Support many erratas for manually fixable cve ([`54b7099`](https://github.com/RedHatInsights/vmaas/commit/54b709947f930cfaa3447df37107f9dfe4927479))
