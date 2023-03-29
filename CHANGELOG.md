@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.42.0 (2023-03-29)
+### Feature
+* **webapp:** Support many erratas for manually fixable cve ([`54b7099`](https://github.com/RedHatInsights/vmaas/commit/54b709947f930cfaa3447df37107f9dfe4927479))
+* **webapp:** Include errata for manually fixable cves ([`e811912`](https://github.com/RedHatInsights/vmaas/commit/e8119125b58ed36cec2b9a3423c80eb01534100e))
+* **reposcan:** Add oval_definition_errata to cache ([`9a16df6`](https://github.com/RedHatInsights/vmaas/commit/9a16df619d8cf7ac4a103b3da9fba85cf4c925ef))
+
 ## v2.41.1 (2023-03-28)
 ### Fix
 * Docker-compose build ([`25e44da`](https://github.com/RedHatInsights/vmaas/commit/25e44da7856cb52960dc492c0a14ffcbb1482ef2))
