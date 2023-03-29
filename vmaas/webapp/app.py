@@ -7,6 +7,7 @@ import gzip
 import os
 import signal
 import sre_constants
+import ssl
 import time
 from distutils.util import strtobool
 from json import loads
@@ -478,8 +479,9 @@ class RefreshTimer:
     @staticmethod
     async def fetch_latest_dump():
         """Method fetches latest dump from reposcan"""
+        ssl_ctx = ssl.create_default_context(cafile=CFG.tls_ca_path)
         async with ClientSession() as session:
-            async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=CFG.tls_ca_path) as resp:
+            async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=ssl_ctx) as resp:
                 return await resp.text()
 
 
