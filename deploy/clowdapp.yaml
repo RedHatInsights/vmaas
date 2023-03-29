@@ -367,7 +367,7 @@ parameters:
   value: '2'
 - name: REPLICAS_WEBAPP_GO
   description: Number of pods for webapp-go
-  value: '2'
+  value: '0'
 - name: REPLICAS_REPOSCAN
   description: Number of pods for reposcan
   value: '1'
