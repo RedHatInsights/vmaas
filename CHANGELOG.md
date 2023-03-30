@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.42.2 (2023-03-30)
+### Fix
+* **vmaas-go:** Bump to vmaas-lib with fixed locking ([`1f9d720`](https://github.com/RedHatInsights/vmaas/commit/1f9d7206debb181787ae05b7b36998d84013ab58))
+
 ## v2.42.1 (2023-03-29)
 ### Fix
 * **webapp:** SSL context usage ([`cb98723`](https://github.com/RedHatInsights/vmaas/commit/cb98723577148d9b65b85407576aeb46c704f405))
