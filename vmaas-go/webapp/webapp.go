@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -45,7 +44,6 @@ func Run() {
 	// middlewares
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
-	app.Use(gzip.Gzip(gzip.DefaultCompression))
 	middlewares.Prometheus().Use(app)
 	app.HandleMethodNotAllowed = true
 
@@ -86,5 +84,6 @@ func vmaasProxy(c *gin.Context) {
 		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "could not read response body"))
 		return
 	}
+	c.Header("Content-Encoding", res.Header.Get("Content-Encoding"))
 	c.Data(res.StatusCode, res.Header.Get("Content-Type"), resBody)
 }
