@@ -260,7 +260,7 @@ objects:
               key: slack_webhook
               name: vulnerability-slack
         - name: VMAAS_ENV
-          value: ${VMAAS_ENV}
+          value: ${ENV_NAME}
         - name: PROMETHEUS_MULTIPROC_DIR
           value: /tmp/prometheus_multiproc_dir
         - name: IS_FEDRAMP
@@ -472,9 +472,6 @@ parameters:
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
 - name: OVAL_UNFIXED_EVAL_ENABLED
   value: "FALSE"
-- name: VMAAS_ENV
-  description: Environment VMaaS is running in
-  value: STAGE
 - name: REPO_NAME_PREFIXES
   description: Repo name prefixes to be stripped
   value: "rhui-"
