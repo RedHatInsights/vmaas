@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.42.3 (2023-03-30)
+### Fix
+* **vmaas-go:** Don't gzip response from python vmaas ([`6322d12`](https://github.com/RedHatInsights/vmaas/commit/6322d1236f78a114ecb1777eaf2990f15ecc0cd8))
+
 ## v2.42.2 (2023-03-30)
 ### Fix
 * **vmaas-go:** Bump to vmaas-lib with fixed locking ([`1f9d720`](https://github.com/RedHatInsights/vmaas/commit/1f9d7206debb181787ae05b7b36998d84013ab58))
