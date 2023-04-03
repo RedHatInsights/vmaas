@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.42.4 (2023-04-03)
+### Fix
+* **vmaas-go:** Modules_list consistency with python ([`b136588`](https://github.com/RedHatInsights/vmaas/commit/b1365886e224e065a1162cca7cc08ac160346b52))
+
 ## v2.42.3 (2023-03-30)
 ### Fix
 * **vmaas-go:** Don't gzip response from python vmaas ([`6322d12`](https://github.com/RedHatInsights/vmaas/commit/6322d1236f78a114ecb1777eaf2990f15ecc0cd8))
