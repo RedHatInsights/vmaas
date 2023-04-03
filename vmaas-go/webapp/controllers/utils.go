@@ -17,11 +17,11 @@ func bindValidateJSON(c *gin.Context) (*vmaas.Request, error) {
 	}
 	// validate module name:stream
 	for i, m := range request.Modules {
-		if len(m.Module) == 0 {
-			return nil, fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
-		}
-		if len(m.Stream) == 0 {
+		if m.Module == nil {
 			return nil, fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
+		}
+		if m.Stream == nil {
+			return nil, fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
 		}
 	}
 	return &request, nil
