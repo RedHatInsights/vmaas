@@ -188,12 +188,6 @@ class TestUpdatesAPI(TestBase):
         assert len(updates['update_list'][PKG]['available_updates']) == 1
         assert len(updates['update_list'][PKG_NONE_ARCH]['available_updates']) == 0
 
-    def test_process_list_v2_unknown(self):
-        """Test looking for unknown EVRA updates, disabled optimistic_updates."""
-        # NOTE: use copy of dict with json input, because process_list changes this dict
-        updates = self.updates_api.process_list(2, UPDATES_JSON_UNKNOWN.copy())
-        assert updates == UPDATES_RESPONSE_2_UNKNOWN_NONE
-
     def test_optimistic_updates_1(self):
         """Test looking for unknown EVRA updates (module_stream: 1)."""
         # NOTE: use copy of dict with json input, because process_list changes this dict

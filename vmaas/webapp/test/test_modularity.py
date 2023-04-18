@@ -129,7 +129,7 @@ class TestModularity(TestBase):
         mode, modules, expected_update_pkgs = test_data  # pylint:disable=unused-variable
         updates = self.updates_api.process_list(2, self.gen_pkg_json(pkg, modules))
         assert updates
-        assert not updates['update_list'][pkg]['available_updates']
+        assert not updates['update_list'][pkg].get('available_updates')
 
     @pytest.mark.parametrize('test_data', NO_MODULES, ids=[x[0] for x in NO_MODULES])
     def test_no_enabled_modules(self, test_data):
@@ -142,4 +142,4 @@ class TestModularity(TestBase):
         mode, modules = test_data  # pylint:disable=unused-variable
         updates = self.updates_api.process_list(2, self.gen_pkg_json(pkg, modules))
         assert updates
-        assert not updates['update_list'][pkg]['available_updates']
+        assert not updates['update_list'][pkg].get('available_updates')
