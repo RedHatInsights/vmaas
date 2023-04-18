@@ -177,7 +177,6 @@ class VulnerabilitiesAPI:
     def process_list(self, api_version, data):
         """Return list of potential security issues"""
         strip_prefixes(data, REPO_PREFIXES)
-        data["optimistic_updates"] = True  # find updates even if original package is not found in repo
         extended = data.get("extended", False)
         cve_dict = {}
         manually_fixable_cve_dict = {}

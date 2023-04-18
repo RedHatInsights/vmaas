@@ -1,6 +1,8 @@
 """
 Module to handle /updates API calls.
 """
+from typing import List, Set
+
 import rpm
 
 from vmaas.webapp. cache import REPO_LABEL, REPO_BASEARCH, REPO_RELEASEVER, REPO_URL, PKG_SUMMARY_ID, PKG_DESC_ID, \
@@ -121,32 +123,19 @@ class UpdatesAPI:
                         filtered_packages_to_process[pkg] = {'parsed_nevra': (name, epoch, ver, rel, arch)}
         return filtered_packages_to_process, update_list
 
-    def _get_valid_releasevers(self, original_package_repo_ids: set) -> set:
-        valid_releasevers = set()
-        for original_package_repo_id in original_package_repo_ids:
-            valid_releasevers.add(self.db_cache.repo_detail[original_package_repo_id][REPO_RELEASEVER])
-        return valid_releasevers
+    def _repos_by_pkgs(self, pkg_ids: List[int], repo_ids: Set[int]) -> Set[int]:
+        res = set()
+        for pkg_id in pkg_ids:
+            res.update([x for x in self.db_cache.pkgid2repoids.get(pkg_id, []) if x in repo_ids])
+        return res
 
-    def _is_repo_valid(self, repo_id: int, valid_releasevers: set) -> bool:
-        if valid_releasevers is None:
-            return True
-        repo_detail = self.db_cache.repo_detail[repo_id]
-        if repo_detail[REPO_RELEASEVER] in valid_releasevers:
-            return True
-        return False
-
-    def _get_repositories(self, update_pkg_id: int, errata_ids: list,
-                          available_repo_ids: set, valid_releasevers: set) -> set:
+    def _get_repositories(self, errata_id: int, available_repo_ids: set) -> set:
         repo_ids = set()
         errata_repo_ids = set()
-        for errata_id in errata_ids:
-            errata_repo_ids.update(self.db_cache.errataid2repoids.get(errata_id, []))
+        errata_repo_ids.update(self.db_cache.errataid2repoids.get(errata_id, []))
 
-        res_repos = set(self.db_cache.pkgid2repoids.get(update_pkg_id, []))
-        res_repos.intersection_update(available_repo_ids, errata_repo_ids)
-
-        for repo_id in res_repos:
-            if self._is_repo_valid(repo_id, valid_releasevers):
+        for repo_id in available_repo_ids:
+            if repo_id in errata_repo_ids:
                 repo_ids.add(repo_id)
 
         return repo_ids
@@ -165,7 +154,7 @@ class UpdatesAPI:
         return result_str
 
     def _get_pkg_errata_updates(self, update_pkg_id: int, errata_id: int, module_ids: set, available_repo_ids: set,
-                                valid_releasevers: set, nevra: str, security_only: bool, third_party: bool) -> list:
+                                nevra: str, security_only: bool, third_party: bool) -> list:
         errata_name = self.db_cache.errataid2name[errata_id]
         errata_detail = self.db_cache.errata_detail[errata_name]
 
@@ -180,8 +169,7 @@ class UpdatesAPI:
         if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
                 self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
             return []
-        repo_ids = self._get_repositories(update_pkg_id, [errata_id], available_repo_ids,
-                                          valid_releasevers)
+        repo_ids = self._get_repositories(errata_id, available_repo_ids)
         pkg_errata_updates = []
         for repo_id in repo_ids:
             repo_details = self.db_cache.repo_detail[repo_id]
@@ -195,7 +183,7 @@ class UpdatesAPI:
         return pkg_errata_updates
 
     def _get_pkg_updates(self, update_pkg_id: int, arch_id: int, security_only: bool, module_ids: set,
-                         available_repo_ids: set, valid_releasevers: set, third_party: bool) -> list:
+                         available_repo_ids: set, third_party: bool) -> list:
         if arch_id is None:
             return []
 
@@ -214,7 +202,7 @@ class UpdatesAPI:
         pkg_updates = []
         for errata_id in errata_ids:
             pkg_errata_updates = self._get_pkg_errata_updates(update_pkg_id, errata_id, module_ids, available_repo_ids,
-                                                              valid_releasevers, nevra, security_only, third_party)
+                                                              nevra, security_only, third_party)
             pkg_updates.extend(pkg_errata_updates)
         return pkg_updates
 
@@ -243,12 +231,12 @@ class UpdatesAPI:
         return pkg_data
 
     def _get_nevra_updates(self, name_id: int, current_evr_ids: list, arch_id: int,
-                           api_version: int) -> (dict, list, list):
+                           api_version: int) -> (dict, list):
         pkg_data = {'available_updates': []}
         current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_ids, arch_id)
         # Package with given NEVRA not found in cache/DB
         if not current_nevra_pkg_id:
-            return pkg_data, [], None
+            return pkg_data, []
 
         # append metadata according to API version
         pkg_data = self._append_metadata(pkg_data, current_nevra_pkg_id, api_version)
@@ -256,38 +244,34 @@ class UpdatesAPI:
         # No updates found for given NEVRA
         last_version_pkg_id = self.db_cache.updates[name_id][-1]
         if last_version_pkg_id == current_nevra_pkg_id:
-            return pkg_data, [], None
+            return pkg_data, []
 
         # Get candidate package IDs
         update_pkg_ids = self.db_cache.updates[name_id][current_evr_ids[-1] + 1:]
-        # Get associated product IDs
-        valid_releasevers = self._get_pkg_releasevers(current_nevra_pkg_id)
-        return pkg_data, update_pkg_ids, valid_releasevers
+        return pkg_data, update_pkg_ids
 
     def _process_package_updates(self, api_version: int, pkg_dict: dict, available_repo_ids: set, module_ids: set,
-                                 security_only: bool, optimistic_updates: bool, third_party: bool) -> dict:
+                                 security_only: bool, third_party: bool) -> dict:
         name_id, current_evr_ids, arch_id = self._extract_nevra_ids(pkg_dict)
+        update_pkg_ids = []
         if current_evr_ids:
-            pkg_data, update_pkg_ids, valid_releasevers = self._get_nevra_updates(name_id, current_evr_ids, arch_id,
-                                                                                  api_version)
-        elif optimistic_updates:
+            pkg_data, update_pkg_ids = self._get_nevra_updates(name_id, current_evr_ids, arch_id, api_version)
+        if not update_pkg_ids:
+            # no nevra updates, try optimistic updates
             update_pkg_ids = self._get_optimistic_updates(name_id, pkg_dict)
             pkg_data = {'available_updates': []}
-            valid_releasevers = None
-        else:
+        if not update_pkg_ids:
+            # still no updates, return empty UpdateDetail
             return {}
+
+        # get repositories for update packages
+        filtered_repo_ids = self._repos_by_pkgs(update_pkg_ids, available_repo_ids)
 
         for update_pkg_id in update_pkg_ids:
             pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
-                                                available_repo_ids, valid_releasevers, third_party)
+                                                filtered_repo_ids, third_party)
             pkg_data['available_updates'].extend(pkg_updates)
         return pkg_data
-
-    def _get_pkg_releasevers(self, pkg_id: int) -> set:
-        original_package_repo_ids = set()
-        original_package_repo_ids.update(self.db_cache.pkgid2repoids.get(pkg_id, []))
-        valid_releasevers = self._get_valid_releasevers(original_package_repo_ids)
-        return valid_releasevers
 
     def _process_updates(
             self,
@@ -297,13 +281,12 @@ class UpdatesAPI:
             repo_ids: set,
             module_ids: set,
             security_only: bool,
-            optimistic_updates: bool,
             third_party: bool
     ) -> dict:
 
         for pkg, pkg_dict in packages.items():
             update_list[pkg] = self._process_package_updates(api_version, pkg_dict, repo_ids, module_ids,
-                                                             security_only, optimistic_updates, third_party)
+                                                             security_only, third_party)
         return update_list
 
     def _get_nevra_pkg_id(self, name_id: int, evr_indexes: list, arch_id: int) -> int:
@@ -362,8 +345,7 @@ class UpdatesAPI:
         security_only = get_security_only(api_version, data)
         third_party = data.get('third_party', False)
         # Process updated packages, errata and fill the response
-        optimistic_updates = data.get('optimistic_updates', False)
         update_list = self._process_updates(api_version, update_list, packages_to_process, available_repo_ids,
-                                            module_ids, security_only, optimistic_updates, third_party)
+                                            module_ids, security_only, third_party)
         response['update_list'] = update_list
         return response
