@@ -536,11 +536,6 @@ components:
           enum: [ true, false ]
           description: Include content from "third party" repositories into the response, disabled by default.
           default: false
-        optimistic_updates:
-          type: boolean
-          enum: [ true, false ]
-          description: Search for updates of unknown package EVRAs.
-          default: false
       required:
         - package_list
 
