@@ -66,11 +66,11 @@ objects:
           failureThreshold: 3
         resources:
           limits:
-            cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT_WEBAPP}
+            cpu: ${CPU_LIMIT_WEBAPP_GO}
+            memory: ${MEMORY_LIMIT_WEBAPP_GO}
           requests:
-            cpu: ${CPU_REQUEST_WEBAPP}
-            memory: ${MEMORY_REQUEST_WEBAPP}
+            cpu: ${CPU_REQUEST_WEBAPP_GO}
+            memory: ${MEMORY_REQUEST_WEBAPP_GO}
 
     - name: webapp-service
       minReplicas: ${{REPLICAS_WEBAPP}}
@@ -344,6 +344,12 @@ parameters:
 - name: CPU_LIMIT_WEBAPP
   description: Maximum CPU limit for pod
   value: '1000m'
+- name: CPU_REQUEST_WEBAPP_GO
+  description: CPU request for pod
+  value: '1'
+- name: CPU_LIMIT_WEBAPP_GO
+  description: Maximum CPU limit for pod
+  value: '2'
 - name: CPU_REQUEST_REPOSCAN
   description: CPU request for pod
   value: '200m'
@@ -354,6 +360,12 @@ parameters:
   description: Memory request for pod
   value: '1536Mi'
 - name: MEMORY_LIMIT_WEBAPP
+  description: Maximum memory limit for pod
+  value: '3Gi'
+- name: MEMORY_REQUEST_WEBAPP_GO
+  description: Memory request for pod
+  value: '1536Mi'
+- name: MEMORY_LIMIT_WEBAPP_GO
   description: Maximum memory limit for pod
   value: '3Gi'
 - name: MEMORY_REQUEST_REPOSCAN
@@ -413,7 +425,7 @@ parameters:
   value: '1'
 - name: GOMAXPROCS_WEBAPP
   description: Maximum threads for webapp-go
-  value: '8'
+  value: '2'
 - name: GZIP_RESPONSE_ENABLE
   description: Sets GZIP compression in responses
   value: "on"
