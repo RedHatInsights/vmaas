@@ -12,8 +12,8 @@ services:
       - 5432:5432
 
   test:
-    container_name: vmaas-webapp
-    hostname: vmaas-webapp
+    container_name: vmaas-test
+    hostname: vmaas-test
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,7 +21,7 @@ services:
         VAR_RPMS: "findutils"
         VAR_PIPENV_INSTALL_OPT: "--dev"
         PIPENV_CHECK: "${PIPENV_CHECK:-1}"
-    image: vmaas/app:latest
+    image: vmaas/test:latest
     environment:
       CI: "${CI:-false}"
       GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
