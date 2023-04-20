@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.43.0 (2023-04-20)
+### Feature
+* Always use optimistic updates, also for known packages ([`f0d4437`](https://github.com/RedHatInsights/vmaas/commit/f0d4437e1417a660fc3b354c4edfcd2f8be4a150))
+
 ## v2.42.4 (2023-04-03)
 ### Fix
 * **vmaas-go:** Modules_list consistency with python ([`b136588`](https://github.com/RedHatInsights/vmaas/commit/b1365886e224e065a1162cca7cc08ac160346b52))
