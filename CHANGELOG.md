@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.43.1 (2023-05-03)
+### Fix
+* **webapp-go:** Oval and modules fixes ([`1b7b69f`](https://github.com/RedHatInsights/vmaas/commit/1b7b69fe529125048e98679c6e8b1fe798fd2485))
+
 ## v2.43.0 (2023-04-20)
 ### Feature
 * Always use optimistic updates, also for known packages ([`f0d4437`](https://github.com/RedHatInsights/vmaas/commit/f0d4437e1417a660fc3b354c4edfcd2f8be4a150))
