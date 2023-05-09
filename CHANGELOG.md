@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.44.0 (2023-05-09)
+### Feature
+* **oval:** Unpatched cves take precedence ([`83e1d3b`](https://github.com/RedHatInsights/vmaas/commit/83e1d3bb9314d9282339eea02f8d28ab581ca916))
+
 ## v2.43.1 (2023-05-03)
 ### Fix
 * **webapp-go:** Oval and modules fixes ([`1b7b69f`](https://github.com/RedHatInsights/vmaas/commit/1b7b69fe529125048e98679c6e8b1fe798fd2485))
