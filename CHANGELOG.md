@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.45.0 (2023-05-10)
+### Feature
+* **oval:** Show package name, evra, cpe for unpatched cves ([`48f5c03`](https://github.com/RedHatInsights/vmaas/commit/48f5c03932a13d683522db3b6313b1b48360e103))
+
 ## v2.44.0 (2023-05-09)
 ### Feature
 * **oval:** Unpatched cves take precedence ([`83e1d3b`](https://github.com/RedHatInsights/vmaas/commit/83e1d3bb9314d9282339eea02f8d28ab581ca916))
