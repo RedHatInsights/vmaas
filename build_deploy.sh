@@ -4,6 +4,7 @@ set -exv
 
 IMAGE="quay.io/cloudservices/vmaas-app"
 IMAGE_TAG=$(git rev-parse --short=7 HEAD)
+SECURITY_COMPLIANCE_TAG="sc-$(date +%Y%m%d)"
 
 if [[ -z "$QUAY_USER" || -z "$QUAY_TOKEN" ]]; then
     echo "QUAY_USER and QUAY_TOKEN must be set"
@@ -23,5 +24,11 @@ podman login -u="$QUAY_USER" -p="$QUAY_TOKEN" quay.io
 podman login -u="$RH_REGISTRY_USER" -p="$RH_REGISTRY_TOKEN" registry.redhat.io
 podman build --build-arg STATIC_ASSETS=1 --pull=true -f Dockerfile -t "${IMAGE}:${IMAGE_TAG}" .
 podman push "${IMAGE}:${IMAGE_TAG}"
-podman tag "${IMAGE}:${IMAGE_TAG}" "${IMAGE}:latest"
-podman push "${IMAGE}:latest"
+
+if [[ $GIT_BRANCH == *"security-compliance"* ]]; then
+    podman tag "${IMAGE}:${IMAGE_TAG}" "${IMAGE}:${SECURITY_COMPLIANCE_TAG}"
+    podman push "${IMAGE}:${SECURITY_COMPLIANCE_TAG}"
+else
+    podman tag "${IMAGE}:${IMAGE_TAG}" "${IMAGE}:latest"
+    podman push "${IMAGE}:latest"
+fi
