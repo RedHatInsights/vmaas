@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.45.1 (2023-05-15)
+### Fix
+* **modules:** Package from module with disabled repo ([`aa79953`](https://github.com/RedHatInsights/vmaas/commit/aa79953c89441d1b6eedba9661957aacedaca2b6))
+
 ## v2.45.0 (2023-05-10)
 ### Feature
 * **oval:** Show package name, evra, cpe for unpatched cves ([`48f5c03`](https://github.com/RedHatInsights/vmaas/commit/48f5c03932a13d683522db3b6313b1b48360e103))
