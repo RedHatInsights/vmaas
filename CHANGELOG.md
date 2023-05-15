@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.45.2 (2023-05-15)
+### Fix
+* Use standardized compare func ([`12fa9b2`](https://github.com/RedHatInsights/vmaas/commit/12fa9b259ec2bc2d6488ff9d603e6567b3b11e6b))
+* Backport current package module detection to py ([`ed022a1`](https://github.com/RedHatInsights/vmaas/commit/ed022a127ea038752bfa07753512d6e9421e6ac9))
+* Backport changed order evaluation (unfixed, fixed) to py ([`7631038`](https://github.com/RedHatInsights/vmaas/commit/76310389503b44a1692c932ab36c109b0c8b58b1))
+
 ## v2.45.1 (2023-05-15)
 ### Fix
 * **modules:** Package from module with disabled repo ([`aa79953`](https://github.com/RedHatInsights/vmaas/commit/aa79953c89441d1b6eedba9661957aacedaca2b6))
