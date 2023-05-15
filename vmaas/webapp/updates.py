@@ -154,7 +154,8 @@ class UpdatesAPI:
         return result_str
 
     def _get_pkg_errata_updates(self, update_pkg_id: int, errata_id: int, module_ids: set, available_repo_ids: set,
-                                nevra: str, security_only: bool, third_party: bool) -> list:
+                                nevra: str, security_only: bool, third_party: bool,
+                                current_pkg_from_module: bool) -> list:
         errata_name = self.db_cache.errataid2name[errata_id]
         errata_detail = self.db_cache.errata_detail[errata_name]
 
@@ -166,8 +167,8 @@ class UpdatesAPI:
         if not third_party and errata_detail[ERRATA_THIRD_PARTY]:
             return []
 
-        if ((update_pkg_id, errata_id) in self.db_cache.pkgerrata2module and not
-                self.db_cache.pkgerrata2module[(update_pkg_id, errata_id)].intersection(module_ids)):
+        errata_modules = self.db_cache.pkgerrata2module.get((update_pkg_id, errata_id), set())
+        if (errata_modules or current_pkg_from_module) and not errata_modules.intersection(module_ids):
             return []
         repo_ids = self._get_repositories(errata_id, available_repo_ids)
         pkg_errata_updates = []
@@ -183,7 +184,7 @@ class UpdatesAPI:
         return pkg_errata_updates
 
     def _get_pkg_updates(self, update_pkg_id: int, arch_id: int, security_only: bool, module_ids: set,
-                         available_repo_ids: set, third_party: bool) -> list:
+                         available_repo_ids: set, third_party: bool, current_pkg_from_module: bool) -> list:
         if arch_id is None:
             return []
 
@@ -202,7 +203,8 @@ class UpdatesAPI:
         pkg_updates = []
         for errata_id in errata_ids:
             pkg_errata_updates = self._get_pkg_errata_updates(update_pkg_id, errata_id, module_ids, available_repo_ids,
-                                                              nevra, security_only, third_party)
+                                                              nevra, security_only, third_party,
+                                                              current_pkg_from_module)
             pkg_updates.extend(pkg_errata_updates)
         return pkg_updates
 
@@ -230,32 +232,53 @@ class UpdatesAPI:
             pkg_data['description'] = self._get_package_string(pkg_id, PKG_DESC_ID)
         return pkg_data
 
+    def _is_pkg_from_enabled_module(self, pkg_id: int, module_ids: set, repo_ids: set) -> bool:
+        errata = self.db_cache.pkgid2errataids.get(pkg_id, [])
+        for eid in errata:
+            erratum_repos = self.db_cache.errataid2repoids.get(eid, [])
+            valid_repo = False
+            for repo_id in repo_ids:
+                if repo_id in erratum_repos:
+                    valid_repo = True
+                    break
+            if not valid_repo:
+                continue
+            erratum_modules = self.db_cache.pkgerrata2module.get((pkg_id, eid), [])
+            for erratum_module in erratum_modules:
+                if erratum_module in module_ids:
+                    return True
+        return False
+
     def _get_nevra_updates(self, name_id: int, current_evr_ids: list, arch_id: int,
-                           api_version: int) -> (dict, list):
+                           api_version: int, module_ids: set, available_repo_ids: set) -> (dict, list, bool):
         pkg_data = {'available_updates': []}
         current_nevra_pkg_id = self._get_nevra_pkg_id(name_id, current_evr_ids, arch_id)
         # Package with given NEVRA not found in cache/DB
         if not current_nevra_pkg_id:
-            return pkg_data, []
+            return pkg_data, [], False
 
         # append metadata according to API version
         pkg_data = self._append_metadata(pkg_data, current_nevra_pkg_id, api_version)
 
+        current_from_module = self._is_pkg_from_enabled_module(current_nevra_pkg_id, module_ids, available_repo_ids)
+
         # No updates found for given NEVRA
         last_version_pkg_id = self.db_cache.updates[name_id][-1]
         if last_version_pkg_id == current_nevra_pkg_id:
-            return pkg_data, []
+            return pkg_data, [], current_from_module
 
         # Get candidate package IDs
         update_pkg_ids = self.db_cache.updates[name_id][current_evr_ids[-1] + 1:]
-        return pkg_data, update_pkg_ids
+        return pkg_data, update_pkg_ids, current_from_module
 
     def _process_package_updates(self, api_version: int, pkg_dict: dict, available_repo_ids: set, module_ids: set,
                                  security_only: bool, third_party: bool) -> dict:
         name_id, current_evr_ids, arch_id = self._extract_nevra_ids(pkg_dict)
         update_pkg_ids = []
+        pkg_from_module = False
         if current_evr_ids:
-            pkg_data, update_pkg_ids = self._get_nevra_updates(name_id, current_evr_ids, arch_id, api_version)
+            pkg_data, update_pkg_ids, pkg_from_module = \
+                self._get_nevra_updates(name_id, current_evr_ids, arch_id, api_version, module_ids, available_repo_ids)
         if not update_pkg_ids:
             # no nevra updates, try optimistic updates
             update_pkg_ids = self._get_optimistic_updates(name_id, pkg_dict)
@@ -269,7 +292,7 @@ class UpdatesAPI:
 
         for update_pkg_id in update_pkg_ids:
             pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
-                                                filtered_repo_ids, third_party)
+                                                filtered_repo_ids, third_party, pkg_from_module)
             pkg_data['available_updates'].extend(pkg_updates)
         return pkg_data
 
