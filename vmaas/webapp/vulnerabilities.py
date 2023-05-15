@@ -135,7 +135,7 @@ class VulnerabilitiesAPI:
     def _repos_to_definitions(self, content_set_list, basearch, releasever):  # pylint: disable=too-many-branches
         # TODO: some CPEs are not matching because they are substrings/subtrees
         if content_set_list is None:
-            return set()
+            return set(), set()
 
         repo_ids = set()
         content_set_ids = set()
@@ -162,11 +162,18 @@ class VulnerabilitiesAPI:
                 if content_set_id in self.db_cache.content_set_id2cpe_ids:
                     cpe_ids.update(self.db_cache.content_set_id2cpe_ids[content_set_id])
 
-        candidate_definitions = set()
+        candidate_patch_definitions = set()
+        candidate_vuln_definitions = set()
         for cpe_id in cpe_ids:
-            if cpe_id in self.db_cache.cpe_id2ovaldefinition_ids:
-                candidate_definitions.update(self.db_cache.cpe_id2ovaldefinition_ids[cpe_id])
-        return candidate_definitions
+            for definition_id in self.db_cache.cpe_id2ovaldefinition_ids.get(cpe_id, []):
+                definition_type, _ = self.db_cache.ovaldefinition_detail[definition_id]
+                if definition_type == OVAL_DEFINITION_TYPE_PATCH:
+                    candidate_patch_definitions.add(definition_id)
+                elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
+                    candidate_vuln_definitions.add(definition_id)
+                else:
+                    raise ValueError("Unsupported definition type: %s" % definition_type)
+        return candidate_patch_definitions, candidate_vuln_definitions
 
     @staticmethod
     def _serialize_dict(input_dict, extended=False):
@@ -182,15 +189,6 @@ class VulnerabilitiesAPI:
         manually_fixable_cve_dict = {}
         unpatched_cve_dict = {}
 
-        # Repositories
-        updates = self.updates_api.process_list(2, data)
-        for package in updates['update_list']:
-            for update in updates['update_list'][package].get('available_updates', []):
-                for cve in self.db_cache.errata_detail[update['erratum']][ERRATA_CVE]:
-                    cve_dict.setdefault(cve, {})["cve"] = cve
-                    cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                    cve_dict[cve].setdefault("errata", set()).add(update['erratum'])
-
         # OVAL
         # TODO: re-factor, double parsing input packages
         packages_to_process, _ = self.updates_api.process_input_packages(data)
@@ -200,53 +198,72 @@ class VulnerabilitiesAPI:
         # TODO: currently OVAL doesn't evaluate when there is not correct input repo list mapped to CPEs
         #       there needs to be better fallback at least to guess correctly RHEL version,
         #       use old VMaaS repo guessing?
-        candidate_definitions = self._repos_to_definitions(data.get('repository_list'),
-                                                           data.get('basearch'),
-                                                           data.get('releasever'))
-        if candidate_definitions:
+        candidate_patch_definitions, candidate_vuln_definitions = \
+            self._repos_to_definitions(data.get('repository_list'),
+                                       data.get('basearch'),
+                                       data.get('releasever'))
+
+        if CFG.oval_unfixed_eval_enabled and candidate_vuln_definitions:
             for package, parsed_package in packages_to_process.items():
                 name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
                 package_name_id = self.db_cache.packagename2id[name]
-                definition_ids = candidate_definitions.intersection(
+                definition_ids = candidate_vuln_definitions.intersection(
                     self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
                 # LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
                 for definition_id in definition_ids:
-                    definition_type, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
-                    # Skip if unfixed CVE feature flag is disabled
-                    if definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY and not CFG.oval_unfixed_eval_enabled:
-                        continue
+                    _, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
                     cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
                     # Skip if all CVEs from definition were already found somewhere
-                    if not [cve for cve in cves
-                            if cve not in cve_dict and
-                            cve not in manually_fixable_cve_dict and
-                            cve not in unpatched_cve_dict]:
+                    if not [cve for cve in cves if cve not in unpatched_cve_dict]:
                         continue
 
                     if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
                         # Vulnerable
                         # LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
-                        if definition_type == OVAL_DEFINITION_TYPE_PATCH:
-                            for cve in cves:
-                                # Skip CVEs found in repos
-                                if cve in cve_dict:
-                                    continue
-                                manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
-                                manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                                errata_ids = self.db_cache.ovaldefinition_id2errata_id.get(definition_id, [])
-                                errata_names = [res for e in errata_ids if (res := self.db_cache.errataid2name.get(e))]
-                                manually_fixable_cve_dict[cve].setdefault("errata", set()).update(errata_names)
-                        elif definition_type == OVAL_DEFINITION_TYPE_VULNERABILITY:
-                            for cve in cves:
-                                # Skip fixable CVEs (should never happen, just in case)
-                                if cve in cve_dict or cve in manually_fixable_cve_dict:
-                                    continue
-                                unpatched_cve_dict.setdefault(cve, {})["cve"] = cve
-                                unpatched_cve_dict[cve].setdefault("affected_packages", set()).add(package)
-                                # no erratum for unpatched CVEs
-                                unpatched_cve_dict[cve].setdefault("errata", set())
-                        else:
-                            raise ValueError("Unsupported definition type: %s" % definition_type)
+                        for cve in cves:
+                            unpatched_cve_dict.setdefault(cve, {})["cve"] = cve
+                            unpatched_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                            # no erratum for unpatched CVEs
+                            unpatched_cve_dict[cve].setdefault("errata", set())
+
+        # Repositories
+        updates = self.updates_api.process_list(2, data)
+        for package in updates['update_list']:
+            for update in updates['update_list'][package].get('available_updates', []):
+                for cve in self.db_cache.errata_detail[update['erratum']][ERRATA_CVE]:
+                    if cve not in unpatched_cve_dict:  # Skip CVEs found as unpatched
+                        cve_dict.setdefault(cve, {})["cve"] = cve
+                        cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                        cve_dict[cve].setdefault("errata", set()).add(update['erratum'])
+
+        if candidate_patch_definitions:
+            for package, parsed_package in packages_to_process.items():
+                name, epoch, ver, rel, arch = parsed_package["parsed_nevra"]
+                package_name_id = self.db_cache.packagename2id[name]
+                definition_ids = candidate_patch_definitions.intersection(
+                    self.db_cache.packagename_id2definition_ids.get(package_name_id, []))
+                # LOGGER.info("OVAL definitions found for package_name=%s, count=%s", name, len(definition_ids))
+                for definition_id in definition_ids:
+                    _, criteria_id = self.db_cache.ovaldefinition_detail[definition_id]
+                    cves = self.db_cache.ovaldefinition_id2cves.get(definition_id, [])
+                    # Skip if all CVEs from definition were already found somewhere
+                    if not [cve for cve in cves
+                            if cve not in unpatched_cve_dict and
+                            cve not in cve_dict]:
+                        continue
+
+                    if self._evaluate_criteria(criteria_id, (package_name_id, epoch, ver, rel, arch), modules_list):
+                        # Vulnerable
+                        # LOGGER.info("Definition id=%s, type=%s matched! Adding CVEs.", definition_id, definition_type)
+                        for cve in cves:
+                            # Skip CVEs found in repos or in unpatched
+                            if cve in unpatched_cve_dict or cve in cve_dict:
+                                continue
+                            manually_fixable_cve_dict.setdefault(cve, {})["cve"] = cve
+                            manually_fixable_cve_dict[cve].setdefault("affected_packages", set()).add(package)
+                            errata_ids = self.db_cache.ovaldefinition_id2errata_id.get(definition_id, [])
+                            errata_names = [res for e in errata_ids if (res := self.db_cache.errataid2name.get(e))]
+                            manually_fixable_cve_dict[cve].setdefault("errata", set()).update(errata_names)
 
         return {'cve_list': self._serialize_dict(cve_dict, extended=extended),
                 'manually_fixable_cve_list': self._serialize_dict(manually_fixable_cve_dict, extended=extended),
