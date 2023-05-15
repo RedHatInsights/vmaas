@@ -2,9 +2,10 @@
 Module to handle /vulnerabilities API calls.
 """
 
+import rpm
+
 from vmaas.webapp.cache import ERRATA_CVE, CFG, REPO_BASEARCH, REPO_RELEASEVER
 from vmaas.webapp.repos import REPO_PREFIXES
-from vmaas.common.rpm_utils import rpmver2array
 from vmaas.common.webapp_utils import format_datetime, strip_prefixes
 
 OVAL_OPERATION_EVR_EQUALS = 1
@@ -35,16 +36,7 @@ class VulnerabilitiesAPI:
         if oval_operation_evr == OVAL_OPERATION_EVR_EQUALS:
             matched = epoch == candidate_epoch and ver == candidate_ver and rel == candidate_rel
         elif oval_operation_evr == OVAL_OPERATION_EVR_LESS_THAN:
-            epoch = rpmver2array(epoch)
-            candidate_epoch = rpmver2array(candidate_epoch)
-            ver = rpmver2array(ver)
-            candidate_ver = rpmver2array(candidate_ver)
-            rel = rpmver2array(rel)
-            candidate_rel = rpmver2array(candidate_rel)
-
-            matched = ((epoch < candidate_epoch) or
-                       (epoch == candidate_epoch and ver < candidate_ver) or
-                       (epoch == candidate_epoch and ver == candidate_ver and rel < candidate_rel))
+            matched = rpm.labelCompare((str(epoch), ver, rel), (str(candidate_epoch), candidate_ver, candidate_rel)) < 0
         else:
             raise ValueError("Unsupported oval_operation_evr: %s" % oval_operation_evr)
 
