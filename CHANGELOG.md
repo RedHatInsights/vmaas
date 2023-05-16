@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.46.0 (2023-05-16)
+### Feature
+* Add epoch_required request option ([`44bf2d3`](https://github.com/RedHatInsights/vmaas/commit/44bf2d33ddeba8827a87a0c8fa17f8bcd7d8e748))
+
 ## v2.45.2 (2023-05-15)
 ### Fix
 * Use standardized compare func ([`12fa9b2`](https://github.com/RedHatInsights/vmaas/commit/12fa9b259ec2bc2d6488ff9d603e6567b3b11e6b))
