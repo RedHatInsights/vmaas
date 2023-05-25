@@ -83,22 +83,6 @@ services:
       - vmaas_reposcan
       - vmaas_webapp # to proxy requests
 
-  vmaas_webapp_utils:
-    command: /vmaas/entrypoint.sh webapp-utils
-    container_name: vmaas-webapp-utils
-    hostname: vmaas-webapp-utils
-    image: vmaas/app:latest
-    restart: unless-stopped
-    env_file:
-      - ./conf/common.env
-      - ./conf/webapp_utils.env
-      - ./conf/database-connection-reader.env
-    ports:
-      - 8084:8000
-    depends_on:
-      - vmaas_webapp
-
-
   vmaas_prometheus:
     container_name: vmaas-prometheus
     image: prom/prometheus:v2.21.0
