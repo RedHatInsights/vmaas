@@ -5,12 +5,22 @@
 workdir="/tmp/"
 dockerfile="Dockerfile-pipenv"
 
-cmd=$(command -v podman)
-if [[ "$cmd" == "" ]]; then
-    cmd=$(command -v docker)
-fi
+for runtime in podman docker; do
+    cmd=$(command -v $runtime)
+    if [[ "$cmd" != "" ]] && $cmd ps &> /dev/null; then
+        break
+    else
+        echo "Unable to use $runtime"
+        cmd=""
+    fi
+done
 
-echo "Using: $cmd"
+if [[ "$cmd" != "" ]]; then
+    echo "Using: $cmd"
+else
+    echo "No container runtime found!"
+    exit 1
+fi
 
 cat <<EOF > $workdir$dockerfile
 FROM registry.access.redhat.com/ubi8/ubi-minimal
