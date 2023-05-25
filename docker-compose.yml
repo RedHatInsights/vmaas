@@ -118,8 +118,8 @@ services:
       - vmaas_reposcan
       - vmaas_webapp
     restart: unless-stopped
-    logging:
-      driver: none
+    profiles:
+      - monitoring
 
   vmaas_grafana:
     container_name: vmaas-grafana
@@ -132,8 +132,8 @@ services:
     ports:
       - 3000:3000
     restart: unless-stopped
-    logging:
-      driver: none
+    profiles:
+      - monitoring
 
 volumes:
   vmaas-db-data:
