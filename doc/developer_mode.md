@@ -22,15 +22,7 @@ Now you have bash inside vmaas_webapp container, run:
 
 ```./entrypoint.sh```
 
-3. Switch to **webapp_utils** container:
-~~~bash
-sudo podman exec -it vmaas-webapp-utils bash
-~~~
-Now run:
-
-```./entrypoint.sh```
-
-4. Switch into **reposcan** container:
+3. Switch into **reposcan** container:
 ~~~bash
 sudo podman exec -it vmaas-reposcan bash
 ~~~
@@ -38,7 +30,7 @@ Now run:
 
 ```./entrypoint.sh```
 
-5. Switch to **database** container to gain access to db:
+4. Switch to **database** container to gain access to db:
 ~~~bash
 sudo podman exec -it vmaas-database bash
 ~~~
@@ -46,7 +38,7 @@ Now you can run database terminal with:
 
 ```psql -d vmaas```
 
-6. Safe EXIT
+5. Safe EXIT
 ~~~bash
 sudo podman-compose down
 ~~~
