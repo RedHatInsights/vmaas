@@ -12,8 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Context context.Context
-var CancelContext context.CancelFunc
+var (
+	Context       context.Context
+	CancelContext context.CancelFunc
+)
 
 func init() {
 	Context, CancelContext = context.WithCancel(context.Background())

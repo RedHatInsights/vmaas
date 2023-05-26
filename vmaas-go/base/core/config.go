@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"testing"
 
 	"github.com/redhatinsights/vmaas-lib/vmaas"
 	"github.com/redhatinsights/vmaas/base/utils"
@@ -37,7 +36,7 @@ func SetupTestEnvironment() {
 	ConfigureApp()
 }
 
-func SetupTest(t *testing.T) {
+func SetupTest() {
 	if !testSetupRan {
 		SetupTestEnvironment()
 		testSetupRan = true

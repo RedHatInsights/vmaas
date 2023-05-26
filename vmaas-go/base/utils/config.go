@@ -47,8 +47,10 @@ type Config struct {
 	EnableProfiler       bool
 }
 
-type Endpoint clowder.DependencyEndpoint
-type PrivateEndpoint clowder.PrivateDependencyEndpoint
+type (
+	Endpoint        clowder.DependencyEndpoint
+	PrivateEndpoint clowder.PrivateDependencyEndpoint
+)
 
 func init() {
 	if !clowder.IsClowderEnabled() {
@@ -88,18 +90,20 @@ func initAPI() {
 
 func initEndpoints() {
 	for _, e := range clowder.LoadedConfig.Endpoints {
+		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" {
 			switch {
 			case strings.Contains(e.Name, "reposcan"):
-				Cfg.ReposcanAddress = (*Endpoint)(&e).BuildUrl("http")
+				Cfg.ReposcanAddress = (*Endpoint)(&e).BuildURL("http")
 			case strings.Contains(e.Name, "webapp") && !strings.Contains(e.Name, "go"):
-				Cfg.OGWebappAddress = (*Endpoint)(&e).BuildUrl("http")
+				Cfg.OGWebappAddress = (*Endpoint)(&e).BuildURL("http")
 			}
 		}
 	}
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
+		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" && strings.Contains(e.Name, "reposcan") {
-			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildUrl("http"))
+			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildURL("http"))
 		}
 	}
 }
@@ -122,15 +126,15 @@ func initEnv() {
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
 }
 
-func (e *Endpoint) BuildUrl(scheme string) string {
-	return buildUrl(scheme, e.Hostname, e.Port, e.TlsPort)
+func (e *Endpoint) BuildURL(scheme string) string {
+	return buildURL(scheme, e.Hostname, e.Port, e.TlsPort)
 }
 
-func (e *PrivateEndpoint) BuildUrl(scheme string) string {
-	return buildUrl(scheme, e.Hostname, e.Port, e.TlsPort)
+func (e *PrivateEndpoint) BuildURL(scheme string) string {
+	return buildURL(scheme, e.Hostname, e.Port, e.TlsPort)
 }
 
-func buildUrl(scheme, host string, port int, tlsPort *int) string {
+func buildURL(scheme, host string, port int, tlsPort *int) string {
 	if clowder.LoadedConfig.TlsCAPath != nil {
 		scheme += "s"
 		if tlsPort != nil {
