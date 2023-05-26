@@ -1,7 +1,7 @@
-// nolint:lll
-// inspired by: https://github.com/RedHatInsights/insights-ingress-go/blob/3ea33a8d793c2154f7cfa12057ca005c5f6031fa/logger/logger.go
+// inspired by:
+// https://github.com/RedHatInsights/insights-ingress-go/blob/3ea33a8d793c2154f7cfa12057ca005c5f6031fa/logger/logger.go
 //
-//	https://github.com/kdar/logrus-cloudwatchlogs
+// https://github.com/kdar/logrus-cloudwatchlogs
 package utils
 
 import (

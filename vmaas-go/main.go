@@ -14,8 +14,7 @@ func main() {
 
 	defer utils.LogPanics(true)
 	if len(os.Args) > 1 {
-		switch os.Args[1] {
-		case "webapp":
+		if os.Args[1] == "webapp" {
 			webapp.Run()
 			return
 		}
