@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func ObserveSecondsSince(timeStart time.Time, observer prometheus.Observer) {
