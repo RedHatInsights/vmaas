@@ -30,6 +30,8 @@ objects:
           value: ${GOMAXPROCS_WEBAPP}
         - name: GOGC
           value: ${GOGC}
+        - name: GOMEMLIMIT
+          value: ${GOMEMLIMIT}
         - name: LOG_LEVEL
           value: ${LOGGING_LEVEL_APP}
         - name: LOG_STYLE
@@ -337,7 +339,10 @@ parameters:
   value: release
 - name: GOGC
   description: Golang garbage collector, run GC when heap increases by ${GOGC}%
-  value: "25"
+  value: "100"
+- name: GOMEMLIMIT
+  description: Soft memory limit for the application
+  value: '2750MiB'
 - name: CPU_REQUEST_WEBAPP
   description: CPU request for pod
   value: '500m'
