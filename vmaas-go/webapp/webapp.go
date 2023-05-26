@@ -18,7 +18,6 @@ import (
 
 var basepaths = []string{"/api/v3", "/api/vmaas/v3"}
 
-// nolint: lll
 // @title VMaaS webapp API
 // @version  {{.Version}}
 // @description API of the VMaaS application on [console.redhat.com](https://console.redhat.com)
