@@ -42,26 +42,6 @@ objects:
           value: ${VMAAS_LIB_MAX_GOROUTINES}
         - name: SSL_CERT_DIR
           value: ${SSL_CERT_DIR}
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 10
-          timeoutSeconds: 1
-          periodSeconds: 30
-          successThreshold: 1
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 180
-          timeoutSeconds: 1
-          periodSeconds: 30
-          successThreshold: 1
-          failureThreshold: 3
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
