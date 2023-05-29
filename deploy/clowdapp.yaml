@@ -481,7 +481,7 @@ parameters:
 - name: REDHAT_CVEMAP_URL
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
 - name: OVAL_UNFIXED_EVAL_ENABLED
-  value: "FALSE"
+  value: "TRUE"
 - name: REPO_NAME_PREFIXES
   description: Repo name prefixes to be stripped
   value: "rhui-"
