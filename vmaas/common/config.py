@@ -37,7 +37,7 @@ class BaseConfig:
         self.private_port = None
         self.metrics_port = None
 
-        self.oval_unfixed_eval_enabled = strtobool(os.getenv("OVAL_UNFIXED_EVAL_ENABLED", "FALSE"))
+        self.oval_unfixed_eval_enabled = strtobool(os.getenv("OVAL_UNFIXED_EVAL_ENABLED", "TRUE"))
         self.prometheus_multiproc_dir = os.getenv("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc_dir")
 
 
