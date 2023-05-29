@@ -6,7 +6,10 @@ data:
             "list": [
                 {
                     "builtIn": 1,
-                    "datasource": "-- Grafana --",
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
                     "enable": true,
                     "hide": true,
                     "iconColor": "rgba(0, 211, 255, 1)",
@@ -23,19 +26,15 @@ data:
         },
         "editable": true,
         "fiscalYearStartMonth": 0,
-        "gnetId": null,
         "graphTooltip": 0,
-        "id": 53,
-        "iteration": 1638893686153,
         "links": [],
         "liveNow": false,
         "panels": [
             {
                 "collapsed": false,
-                "datasource": null,
-                "fieldConfig": {
-                    "defaults": {},
-                    "overrides": []
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "PD776AFABBE26000A"
                 },
                 "gridPos": {
                     "h": 1,
@@ -45,12 +44,22 @@ data:
                 },
                 "id": 94,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "PD776AFABBE26000A"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "VMaaS errors",
                 "type": "row"
             },
             {
-                "cacheTimeout": null,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -95,7 +104,6 @@ data:
                     "y": 1
                 },
                 "id": 70,
-                "interval": null,
                 "links": [],
                 "maxDataPoints": 100,
                 "options": {
@@ -113,9 +121,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "expr": "sum(increase(vmaas_reposcan_failed_repository_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_import_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_update_total[$__range]))",
                         "format": "time_series",
                         "groupBy": [
@@ -158,8 +169,9 @@ data:
                 "type": "stat"
             },
             {
-                "cacheTimeout": null,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -204,7 +216,6 @@ data:
                     "y": 1
                 },
                 "id": 110,
-                "interval": null,
                 "links": [],
                 "maxDataPoints": 100,
                 "options": {
@@ -222,9 +233,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-reposcan.*\"}))",
                         "format": "time_series",
@@ -270,8 +284,9 @@ data:
                 "type": "stat"
             },
             {
-                "cacheTimeout": null,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -316,7 +331,6 @@ data:
                     "y": 1
                 },
                 "id": 112,
-                "interval": null,
                 "links": [],
                 "maxDataPoints": 100,
                 "options": {
@@ -334,9 +348,12 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-webapp.*\"}))",
                         "format": "time_series",
@@ -382,8 +399,10 @@ data:
                 "type": "stat"
             },
             {
-                "cacheTimeout": null,
-                "datasource": "$datasource",
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "color": {
@@ -428,7 +447,6 @@ data:
                     "y": 1
                 },
                 "id": 114,
-                "interval": null,
                 "links": [],
                 "maxDataPoints": 100,
                 "options": {
@@ -446,11 +464,15 @@ data:
                     "text": {},
                     "textMode": "auto"
                 },
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-websocket.*\"}))",
+                        "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-webapp-go.*\"}))",
                         "format": "time_series",
                         "groupBy": [
                             {
@@ -471,6 +493,7 @@ data:
                         "legendFormat": "",
                         "orderByTime": "ASC",
                         "policy": "default",
+                        "range": true,
                         "refId": "A",
                         "resultFormat": "time_series",
                         "select": [
@@ -490,15 +513,14 @@ data:
                         "tags": []
                     }
                 ],
-                "title": "websocket restarts",
+                "title": "webapp-go restarts",
                 "type": "stat"
             },
             {
                 "collapsed": false,
-                "datasource": null,
-                "fieldConfig": {
-                    "defaults": {},
-                    "overrides": []
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "PD776AFABBE26000A"
                 },
                 "gridPos": {
                     "h": 1,
@@ -508,6 +530,15 @@ data:
                 },
                 "id": 53,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "PD776AFABBE26000A"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Golden signals",
                 "type": "row"
             },
@@ -516,7 +547,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -552,7 +585,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -562,6 +595,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(vmaas_webapp_handler_invocations_total[5m])) by (status)",
                         "format": "time_series",
@@ -572,9 +608,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Webapp traffic (by status)",
                 "tooltip": {
                     "shared": true,
@@ -583,9 +617,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -595,23 +627,18 @@ data:
                         "format": "short",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:239",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -619,7 +646,10 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -633,6 +663,108 @@ data:
                     "w": 12,
                     "x": 12,
                     "y": 4
+                },
+                "hiddenSeries": false,
+                "id": 144,
+                "legend": {
+                    "avg": false,
+                    "current": false,
+                    "hideEmpty": false,
+                    "hideZero": false,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": false
+                },
+                "lines": true,
+                "linewidth": 1,
+                "links": [],
+                "nullPointMode": "null",
+                "options": {
+                    "alertThreshold": true
+                },
+                "percentage": false,
+                "pluginVersion": "9.3.8",
+                "pointradius": 5,
+                "points": false,
+                "renderer": "flot",
+                "seriesOverrides": [],
+                "spaceLength": 10,
+                "stack": false,
+                "steppedLine": false,
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (status)",
+                        "format": "time_series",
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": "{{status}}",
+                        "range": true,
+                        "refId": "B"
+                    }
+                ],
+                "thresholds": [],
+                "timeRegions": [],
+                "title": "Webapp-go traffic (by status)",
+                "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                },
+                "type": "graph",
+                "xaxis": {
+                    "mode": "time",
+                    "show": true,
+                    "values": []
+                },
+                "yaxes": [
+                    {
+                        "$$hashKey": "object:238",
+                        "format": "short",
+                        "label": "reqs/sec",
+                        "logBase": 1,
+                        "min": "0",
+                        "show": true
+                    },
+                    {
+                        "$$hashKey": "object:239",
+                        "format": "short",
+                        "logBase": 1,
+                        "show": true
+                    }
+                ],
+                "yaxis": {
+                    "align": false
+                }
+            },
+            {
+                "aliasColors": {},
+                "bars": false,
+                "dashLength": 10,
+                "dashes": false,
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "links": []
+                    },
+                    "overrides": []
+                },
+                "fill": 1,
+                "fillGradient": 0,
+                "gridPos": {
+                    "h": 7,
+                    "w": 12,
+                    "x": 0,
+                    "y": 11
                 },
                 "hiddenSeries": false,
                 "id": 136,
@@ -655,7 +787,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -665,19 +797,22 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
                         "exemplar": true,
                         "expr": "sum(rate(vmaas_webapp_processing_seconds_sum[5m]))",
                         "format": "time_series",
                         "interval": "",
                         "intervalFactor": 1,
-                        "legendFormat": "",
+                        "legendFormat": "latency",
+                        "range": true,
                         "refId": "B"
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Webapp latency",
                 "tooltip": {
                     "shared": true,
@@ -686,9 +821,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -696,25 +829,20 @@ data:
                     {
                         "$$hashKey": "object:180",
                         "format": "s",
-                        "label": "reqs/sec",
+                        "label": "",
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:181",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -722,7 +850,111 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "links": []
+                    },
+                    "overrides": []
+                },
+                "fill": 1,
+                "fillGradient": 0,
+                "gridPos": {
+                    "h": 7,
+                    "w": 12,
+                    "x": 12,
+                    "y": 11
+                },
+                "hiddenSeries": false,
+                "id": 145,
+                "legend": {
+                    "avg": false,
+                    "current": false,
+                    "hideEmpty": false,
+                    "hideZero": false,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": false
+                },
+                "lines": true,
+                "linewidth": 1,
+                "links": [],
+                "nullPointMode": "null",
+                "options": {
+                    "alertThreshold": true
+                },
+                "percentage": false,
+                "pluginVersion": "9.3.8",
+                "pointradius": 5,
+                "points": false,
+                "renderer": "flot",
+                "seriesOverrides": [],
+                "spaceLength": 10,
+                "stack": false,
+                "steppedLine": false,
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m]))",
+                        "format": "time_series",
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": "latency",
+                        "range": true,
+                        "refId": "B"
+                    }
+                ],
+                "thresholds": [],
+                "timeRegions": [],
+                "title": "Webapp-go latency",
+                "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                },
+                "type": "graph",
+                "xaxis": {
+                    "mode": "time",
+                    "show": true,
+                    "values": []
+                },
+                "yaxes": [
+                    {
+                        "$$hashKey": "object:180",
+                        "format": "s",
+                        "label": "",
+                        "logBase": 1,
+                        "min": "0",
+                        "show": true
+                    },
+                    {
+                        "$$hashKey": "object:181",
+                        "format": "short",
+                        "logBase": 1,
+                        "show": true
+                    }
+                ],
+                "yaxis": {
+                    "align": false
+                }
+            },
+            {
+                "aliasColors": {},
+                "bars": false,
+                "dashLength": 10,
+                "dashes": false,
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -735,7 +967,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 0,
-                    "y": 11
+                    "y": 18
                 },
                 "hiddenSeries": false,
                 "id": 12,
@@ -758,7 +990,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -768,6 +1000,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(vmaas_webapp_handler_invocations_total[5m])) by (path)",
                         "format": "time_series",
@@ -778,9 +1013,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Webapp traffic (by handler)",
                 "tooltip": {
                     "shared": true,
@@ -789,9 +1022,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -801,23 +1032,18 @@ data:
                         "format": "short",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:295",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -825,7 +1051,10 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -838,7 +1067,108 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 12,
-                    "y": 11
+                    "y": 18
+                },
+                "hiddenSeries": false,
+                "id": 146,
+                "legend": {
+                    "avg": false,
+                    "current": false,
+                    "hideEmpty": false,
+                    "hideZero": false,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": false
+                },
+                "lines": true,
+                "linewidth": 1,
+                "links": [],
+                "nullPointMode": "null",
+                "options": {
+                    "alertThreshold": true
+                },
+                "percentage": false,
+                "pluginVersion": "9.3.8",
+                "pointradius": 5,
+                "points": false,
+                "renderer": "flot",
+                "seriesOverrides": [],
+                "spaceLength": 10,
+                "stack": false,
+                "steppedLine": false,
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (path)",
+                        "format": "time_series",
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": "{{path}}",
+                        "range": true,
+                        "refId": "B"
+                    }
+                ],
+                "thresholds": [],
+                "timeRegions": [],
+                "title": "Webapp-go traffic (by handler)",
+                "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                },
+                "type": "graph",
+                "xaxis": {
+                    "mode": "time",
+                    "show": true,
+                    "values": []
+                },
+                "yaxes": [
+                    {
+                        "$$hashKey": "object:294",
+                        "format": "short",
+                        "label": "reqs/sec",
+                        "logBase": 1,
+                        "min": "0",
+                        "show": true
+                    },
+                    {
+                        "$$hashKey": "object:295",
+                        "format": "short",
+                        "logBase": 1,
+                        "show": true
+                    }
+                ],
+                "yaxis": {
+                    "align": false
+                }
+            },
+            {
+                "aliasColors": {},
+                "bars": false,
+                "dashLength": 10,
+                "dashes": false,
+                "datasource": {
+                    "uid": "$datasource"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "links": []
+                    },
+                    "overrides": []
+                },
+                "fill": 1,
+                "fillGradient": 0,
+                "gridPos": {
+                    "h": 7,
+                    "w": 12,
+                    "x": 0,
+                    "y": 25
                 },
                 "hiddenSeries": false,
                 "id": 134,
@@ -861,7 +1191,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -871,6 +1201,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(vmaas_webapp_processing_seconds_sum[5m])) by (path)",
                         "format": "time_series",
@@ -881,9 +1214,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Webapp latency (by handler)",
                 "tooltip": {
                     "shared": true,
@@ -892,9 +1223,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -904,23 +1233,18 @@ data:
                         "format": "s",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:181",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -928,7 +1252,111 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "$datasource"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "links": []
+                    },
+                    "overrides": []
+                },
+                "fill": 1,
+                "fillGradient": 0,
+                "gridPos": {
+                    "h": 7,
+                    "w": 12,
+                    "x": 12,
+                    "y": 25
+                },
+                "hiddenSeries": false,
+                "id": 147,
+                "legend": {
+                    "avg": false,
+                    "current": false,
+                    "hideEmpty": false,
+                    "hideZero": false,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": false
+                },
+                "lines": true,
+                "linewidth": 1,
+                "links": [],
+                "nullPointMode": "null",
+                "options": {
+                    "alertThreshold": true
+                },
+                "percentage": false,
+                "pluginVersion": "9.3.8",
+                "pointradius": 5,
+                "points": false,
+                "renderer": "flot",
+                "seriesOverrides": [],
+                "spaceLength": 10,
+                "stack": false,
+                "steppedLine": false,
+                "targets": [
+                    {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
+                        "editorMode": "code",
+                        "exemplar": true,
+                        "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m])) by (path)",
+                        "format": "time_series",
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": "{{path}}",
+                        "range": true,
+                        "refId": "B"
+                    }
+                ],
+                "thresholds": [],
+                "timeRegions": [],
+                "title": "Webapp-go latency (by handler)",
+                "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                },
+                "type": "graph",
+                "xaxis": {
+                    "mode": "time",
+                    "show": true,
+                    "values": []
+                },
+                "yaxes": [
+                    {
+                        "$$hashKey": "object:180",
+                        "format": "s",
+                        "label": "reqs/sec",
+                        "logBase": 1,
+                        "min": "0",
+                        "show": true
+                    },
+                    {
+                        "$$hashKey": "object:181",
+                        "format": "short",
+                        "logBase": 1,
+                        "show": true
+                    }
+                ],
+                "yaxis": {
+                    "align": false
+                }
+            },
+            {
+                "aliasColors": {},
+                "bars": false,
+                "dashLength": 10,
+                "dashes": false,
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -941,7 +1369,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 0,
-                    "y": 18
+                    "y": 32
                 },
                 "hiddenSeries": false,
                 "id": 141,
@@ -964,7 +1392,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -974,6 +1402,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(rate(container_cpu_usage_seconds_total{container=~\"vmaas-.*\"}[5m])) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"cpu\"}) by (container)",
                         "format": "time_series",
@@ -984,9 +1415,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "CPU consumed",
                 "tooltip": {
                     "shared": true,
@@ -995,9 +1424,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -1007,23 +1434,19 @@ data:
                         "format": "percentunit",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
+                        "max": "1",
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:295",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -1031,7 +1454,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -1044,7 +1469,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 12,
-                    "y": 18
+                    "y": 32
                 },
                 "hiddenSeries": false,
                 "id": 142,
@@ -1067,7 +1492,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -1077,6 +1502,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(container_memory_usage_bytes{container=~\"vmaas-.*\"}) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"memory\"}) by (container)",
                         "format": "time_series",
@@ -1087,9 +1515,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Memory consumed",
                 "tooltip": {
                     "shared": true,
@@ -1098,9 +1524,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -1110,36 +1534,44 @@ data:
                         "format": "percentunit",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
+                        "max": "1",
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:295",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
                 "collapsed": false,
-                "datasource": null,
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "PD776AFABBE26000A"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 25
+                    "y": 39
                 },
                 "id": 140,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "PD776AFABBE26000A"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "Reposcan",
                 "type": "row"
             },
@@ -1148,7 +1580,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -1161,7 +1595,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 0,
-                    "y": 26
+                    "y": 40
                 },
                 "hiddenSeries": false,
                 "id": 143,
@@ -1184,7 +1618,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -1194,6 +1628,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "exemplar": true,
                         "expr": "sum(kube_pod_container_status_restarts_total{pod=~\"vmaas.*\"}) by (container)",
                         "format": "time_series",
@@ -1204,9 +1641,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "Containers restarts",
                 "tooltip": {
                     "shared": true,
@@ -1215,9 +1650,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -1227,23 +1660,18 @@ data:
                         "format": "short",
                         "label": "reqs/sec",
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "$$hashKey": "object:295",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -1251,7 +1679,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource",
+                "datasource": {
+                    "uid": "$datasource"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -1264,7 +1694,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 12,
-                    "y": 26
+                    "y": 40
                 },
                 "hiddenSeries": false,
                 "id": 68,
@@ -1285,7 +1715,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -1295,6 +1725,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "expr": "sum(vmaas_reposcan_failed_cve_import_total)",
                         "format": "time_series",
                         "groupBy": [
@@ -1334,6 +1767,9 @@ data:
                         "tags": []
                     },
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "expr": "sum(vmaas_reposcan_failed_cve_update_total)",
                         "format": "time_series",
                         "intervalFactor": 1,
@@ -1341,6 +1777,9 @@ data:
                         "refId": "B"
                     },
                     {
+                        "datasource": {
+                            "uid": "$datasource"
+                        },
                         "expr": "sum(vmaas_reposcan_failed_repository_import_total)",
                         "format": "time_series",
                         "intervalFactor": 1,
@@ -1349,9 +1788,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "vmaas reposync errors",
                 "tooltip": {
                     "shared": true,
@@ -1360,46 +1797,50 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
                 "yaxes": [
                     {
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
                         "min": "0",
                         "show": true
                     },
                     {
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
                 "collapsed": false,
-                "datasource": null,
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "PD776AFABBE26000A"
+                },
                 "gridPos": {
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 33
+                    "y": 47
                 },
                 "id": 138,
                 "panels": [],
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "PD776AFABBE26000A"
+                        },
+                        "refId": "A"
+                    }
+                ],
                 "title": "RDS (database)",
                 "type": "row"
             },
@@ -1408,7 +1849,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource_rds",
+                "datasource": {
+                    "uid": "$datasource_rds"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -1421,7 +1864,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 0,
-                    "y": 34
+                    "y": 48
                 },
                 "hiddenSeries": false,
                 "id": 57,
@@ -1442,7 +1885,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 5,
                 "points": false,
                 "renderer": "flot",
@@ -1453,6 +1896,9 @@ data:
                 "targets": [
                     {
                         "alias": "",
+                        "datasource": {
+                            "uid": "$datasource_rds"
+                        },
                         "dimensions": {},
                         "expr": "sum(rdsosmetrics_fileSys_usedPercent{exported_instance=~\"vmaas-.*\"}) by (mount_point)",
                         "expression": "",
@@ -1460,7 +1906,9 @@ data:
                         "interval": "",
                         "legendFormat": "{{mount_point}}",
                         "matchExact": true,
+                        "metricEditorMode": 0,
                         "metricName": "",
+                        "metricQueryType": 0,
                         "namespace": "",
                         "refId": "A",
                         "region": "default",
@@ -1468,9 +1916,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "RDS storage usage",
                 "tooltip": {
                     "shared": true,
@@ -1479,9 +1925,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -1498,16 +1942,12 @@ data:
                     {
                         "$$hashKey": "object:202",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             },
             {
@@ -1515,7 +1955,9 @@ data:
                 "bars": false,
                 "dashLength": 10,
                 "dashes": false,
-                "datasource": "$datasource_rds",
+                "datasource": {
+                    "uid": "$datasource_rds"
+                },
                 "fieldConfig": {
                     "defaults": {
                         "links": []
@@ -1528,7 +1970,7 @@ data:
                     "h": 7,
                     "w": 12,
                     "x": 12,
-                    "y": 34
+                    "y": 48
                 },
                 "hiddenSeries": false,
                 "id": 133,
@@ -1548,7 +1990,7 @@ data:
                     "alertThreshold": true
                 },
                 "percentage": false,
-                "pluginVersion": "8.2.1",
+                "pluginVersion": "9.3.8",
                 "pointradius": 2,
                 "points": false,
                 "renderer": "flot",
@@ -1558,6 +2000,9 @@ data:
                 "steppedLine": false,
                 "targets": [
                     {
+                        "datasource": {
+                            "uid": "$datasource_rds"
+                        },
                         "expr": "sum(label_replace(rdsosmetrics_processList_cpuUsedPc{exported_instance=~\"vmaas-.*\", name=~\"postgres:.*\"}, \"db_user\", \"$1\", \"name\", \"postgres: ([^ ]+) .+\")) by (db_user)",
                         "interval": "",
                         "legendFormat": "{{db_user}}",
@@ -1565,9 +2010,7 @@ data:
                     }
                 ],
                 "thresholds": [],
-                "timeFrom": null,
                 "timeRegions": [],
-                "timeShift": null,
                 "title": "RDS CPU utilization",
                 "tooltip": {
                     "shared": true,
@@ -1576,9 +2019,7 @@ data:
                 },
                 "type": "graph",
                 "xaxis": {
-                    "buckets": null,
                     "mode": "time",
-                    "name": null,
                     "show": true,
                     "values": []
                 },
@@ -1586,45 +2027,35 @@ data:
                     {
                         "$$hashKey": "object:331",
                         "format": "percent",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     },
                     {
                         "$$hashKey": "object:332",
                         "format": "short",
-                        "label": null,
                         "logBase": 1,
-                        "max": null,
-                        "min": null,
                         "show": true
                     }
                 ],
                 "yaxis": {
-                    "align": false,
-                    "alignLevel": null
+                    "align": false
                 }
             }
         ],
         "refresh": "1m",
-        "schemaVersion": 31,
+        "schemaVersion": 37,
         "style": "dark",
         "tags": [],
         "templating": {
             "list": [
                 {
                     "current": {
-                        "selected": true,
+                        "selected": false,
                         "text": "crcp01ue1-prometheus",
                         "value": "crcp01ue1-prometheus"
                     },
-                    "description": null,
-                    "error": null,
                     "hide": 0,
                     "includeAll": false,
-                    "label": null,
                     "multi": false,
                     "name": "datasource",
                     "options": [],
@@ -1641,11 +2072,8 @@ data:
                         "text": "app-sre-prod-01-prometheus",
                         "value": "app-sre-prod-01-prometheus"
                     },
-                    "description": null,
-                    "error": null,
                     "hide": 0,
                     "includeAll": false,
-                    "label": null,
                     "multi": false,
                     "name": "datasource_rds",
                     "options": [],
@@ -1690,7 +2118,8 @@ data:
         "timezone": "utc",
         "title": "vmaas",
         "uid": "d2hPr3KMk",
-        "version": 1
+        "version": 2,
+        "weekStart": ""
     }
 kind: ConfigMap
 metadata:
