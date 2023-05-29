@@ -34,8 +34,6 @@ objects:
           value: ${LOGGING_LEVEL_APP}
         - name: LOG_STYLE
           value: ${LOG_STYLE}
-        - name: OVAL_UNFIXED_EVAL_ENABLED
-          value: ${OVAL_UNFIXED_EVAL_ENABLED}
         - name: CACHE_REFRESH_INTERVAL
           value: ${CACHE_REFRESH_INTERVAL}
         - name: ENABLE_PROFILER
