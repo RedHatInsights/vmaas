@@ -12,7 +12,7 @@ objects:
     envName: ${ENV_NAME}
     deployments:
     - name: webapp-go
-      minReplicas: ${{REPLICAS_WEBAPP_GO}}
+      replicas: ${{REPLICAS_WEBAPP_GO}}
       webServices:
         public:
           enabled: true
@@ -51,7 +51,7 @@ objects:
             memory: ${MEMORY_REQUEST_WEBAPP_GO}
 
     - name: webapp-service
-      minReplicas: ${{REPLICAS_WEBAPP}}
+      replicas: ${{REPLICAS_WEBAPP}}
       webServices:
         public:
           enabled: true
@@ -114,7 +114,7 @@ objects:
             memory: ${MEMORY_REQUEST_WEBAPP}
 
     - name: reposcan-service
-      minReplicas: ${{REPLICAS_REPOSCAN}}
+      replicas: ${{REPLICAS_REPOSCAN}}
       webServices:
         public:
           enabled: true
