@@ -8,12 +8,11 @@ from datetime import datetime
 from urllib.parse import urljoin
 import re
 from operator import attrgetter
-
+from prometheus_client import Counter
 from OpenSSL import crypto
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
-from vmaas.common.slack_notifications import send_slack_notification, prepare_msg_for_slack
 
 from vmaas.reposcan.database.repository_store import RepositoryStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
@@ -24,6 +23,7 @@ from vmaas.reposcan.repodata.repomd import RepoMD, RepoMDTypeNotFound
 from vmaas.reposcan.repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
+EXPIRATION_WARNING = Counter("certificate_expiration_warning", "Certificate expiration warning")
 
 
 class RepositoryController:
@@ -83,21 +83,17 @@ class RepositoryController:
             # Get expiration date and parse it to datetime object
             valid_to_dt = datetime.strptime(loaded_cert.get_notAfter().decode("utf-8"), "%Y%m%d%H%M%SZ")
             expire_in_days_td = (valid_to_dt - datetime.utcnow()).days
-            expire_tuple = (valid_to_dt, expire_in_days_td)
             if 30 >= expire_in_days_td > 0:
                 self.logger.warning('Certificate %s will expire in %s days!', cert_name, expire_in_days_td)
-                msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate will expire soon', expire_tuple)
-                send_slack_notification(msg)
+                EXPIRATION_WARNING.inc()
             elif expire_in_days_td <= 0:
                 self.logger.error('Certificate %s expired!', cert_name)
-                msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate expired', expire_tuple)
-                send_slack_notification(msg)
+                EXPIRATION_WARNING.inc()
             else:
                 self.logger.info('Certificate %s will expire in %s days.', cert_name, expire_in_days_td)
         except crypto.Error:
             self.logger.error('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
-            msg = prepare_msg_for_slack(cert_name, 'Reposcan CDN certificate not provided or incorrect')
-            send_slack_notification(msg)
+            EXPIRATION_WARNING.inc()
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
