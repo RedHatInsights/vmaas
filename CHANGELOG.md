@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.46.2 (2023-05-31)
+### Fix
+
+* **vmaas-go:** Add GOMEMLIMIT to remove GOGC workaround for avoiding OOMKill ([`17939d2`](https://github.com/RedHatInsights/vmaas/commit/17939d2ddff0895201e68a4dd9aeb267965cce02))
+
 ## v2.46.1 (2023-05-31)
 ### Fix
 
