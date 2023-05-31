@@ -7,6 +7,7 @@ import (
 	"time"
 
 	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
+	"github.com/redhatinsights/vmaas-lib/vmaas"
 )
 
 var Cfg = Config{}
@@ -45,6 +46,8 @@ type Config struct {
 	LogStyle             string
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
+	// lib
+	LibConfig vmaas.Config
 }
 
 type (
@@ -124,6 +127,10 @@ func initEnv() {
 	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 60) // 1 min default
 	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
+	Cfg.LibConfig = vmaas.Config{
+		OvalUnfixedEvalEnabled: GetBoolEnvOrDefault("OVAL_UNFIXED_EVAL_ENABLED", true),
+		MaxGoroutines:          GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20),
+	}
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
