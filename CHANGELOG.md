@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v2.46.1 (2023-05-31)
+### Fix
+
+* Return 400 if processing of packages or modules fails ([`cce1136`](https://github.com/RedHatInsights/vmaas/commit/cce11365623eebdc0a6738f6545c68bdf17b02f3))
+
 ## v2.46.0 (2023-05-16)
 ### Feature
 * Add epoch_required request option ([`44bf2d3`](https://github.com/RedHatInsights/vmaas/commit/44bf2d33ddeba8827a87a0c8fa17f8bcd7d8e748))
