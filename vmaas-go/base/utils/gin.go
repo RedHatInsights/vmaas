@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -105,7 +106,13 @@ func respStatusError(c *gin.Context, code int, err error) {
 }
 
 func LogAndRespError(c *gin.Context, err error) {
-	LogError("err", err.Error())
+	errStr := err.Error()
+	if strings.Contains(errStr, "processing") {
+		// if error is from processing the request, we should return 400
+		LogAndRespBadRequest(c, err)
+		return
+	}
+	LogError("err", errStr)
 	respStatusError(c, http.StatusInternalServerError, err)
 }
 
