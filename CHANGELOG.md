@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.47.0 (2023-06-05)
+
+### Feature
+
+* Remove & replace old Slack notifications ([`e15e077`](https://github.com/RedHatInsights/vmaas/commit/e15e07771f7525b0090a23fa343c84f2e5cc7bb0))
+
 ## v2.46.2 (2023-05-31)
 ### Fix
 
