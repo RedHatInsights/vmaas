@@ -20,7 +20,7 @@ boto3 = ">=1.16.13"
 botocore = ">=1.19.13"
 click = ">=0.7"
 connexion = {extras = ["swagger-ui"],version = "==2.14.1"}
-flask = "==2.2.3"
+flask = "==2.2.5"
 gitpython = ">=3.1.30"
 iso8601 = ">=0.1.12"
 jsonschema = ">=3.2.0"
