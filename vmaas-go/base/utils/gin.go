@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"github.com/redhatinsights/vmaas-lib/vmaas"
 )
 
 // ReadHeaderTimeout same as nginx default
@@ -106,13 +106,12 @@ func respStatusError(c *gin.Context, code int, err error) {
 }
 
 func LogAndRespError(c *gin.Context, err error) {
-	errStr := err.Error()
-	if strings.Contains(errStr, "processing") {
+	if errors.Is(err, vmaas.ErrProcessingInput) {
 		// if error is from processing the request, we should return 400
 		LogAndRespBadRequest(c, err)
 		return
 	}
-	LogError("err", errStr)
+	LogError("err", err.Error())
 	respStatusError(c, http.StatusInternalServerError, err)
 }
 

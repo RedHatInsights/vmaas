@@ -566,6 +566,12 @@ components:
                     package:
                       type: string
                       example: kernel-2.6.32-696.23.1.el6.x86_64
+                    package_name:
+                      type: string
+                      example: kernel
+                    evra:
+                      type: string
+                      example: 0:2.6.32-696.23.1.el6.x86_64
         repository_list:
           type: array
           items:
