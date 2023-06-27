@@ -16,6 +16,7 @@ objects:
       webServices:
         public:
           enabled: true
+          apiPath: vmaas
         private:
           enabled: false
       podSpec:
