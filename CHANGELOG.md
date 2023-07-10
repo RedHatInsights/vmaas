@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.48.1 (2023-07-10)
+
+### Fix
+
+* Update gin-gonic to fix CVE-2023-29401 ([`d1e1c4a`](https://github.com/RedHatInsights/vmaas/commit/d1e1c4a89806b812ee90119588d2a370ff20069d))
+
 ## v2.48.0 (2023-07-10)
 
 ### Feature
