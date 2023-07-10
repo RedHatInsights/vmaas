@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.48.0 (2023-07-10)
+
+### Feature
+
+* Show package_name and evra in updates response ([`2f9ebcc`](https://github.com/RedHatInsights/vmaas/commit/2f9ebcc660eeb388ec80f1963e00ac4253a790c4))
+
 ## v2.47.0 (2023-06-05)
 
 ### Feature
