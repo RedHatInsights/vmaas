@@ -12,7 +12,7 @@ CACHE_FROM_LATEST_IMAGE="true"
 
 export IQE_PLUGINS="vmaas"
 export IQE_MARKER_EXPRESSION=""
-export IQE_FILTER_EXPRESSION="not (TestUpdatesBasic and (v1-vim-enhanced or v2-vim-enhanced or test_post_multi) or test_post_single_eus or latest_only or TestPatchesAll)"
+export IQE_FILTER_EXPRESSION=""
 export IQE_REQUIREMENTS_PRIORITY=""
 export IQE_TEST_IMPORTANCE=""
 export IQE_CJI_TIMEOUT="30m"
