@@ -1,0 +1,3 @@
+[tool.semantic_release]
+version_variables = ["vmaas/common/constants.py:VMAAS_VERSION"]
+commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"

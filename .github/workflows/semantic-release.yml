@@ -27,9 +27,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Run python-semantic-release
         run: |
-          git config --global user.name "vmaas-bot"
-          git config --global user.email "40663028+vmaas-bot@users.noreply.github.com"
           pip install python-semantic-release
-          semantic-release publish
+          semantic-release version
         env:
           GH_TOKEN: "${{ secrets.GH_TOKEN }}"
