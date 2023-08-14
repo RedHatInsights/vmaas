@@ -28,7 +28,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
-from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT,\
+from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT, \
     FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
