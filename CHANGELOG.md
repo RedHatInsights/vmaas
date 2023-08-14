@@ -2,6 +2,23 @@
 
 
 
+## v2.48.3 (2023-08-14)
+
+### Chore
+
+* chore: fix new flake8 error ([`b168881`](https://github.com/RedHatInsights/vmaas/commit/b168881bb12e292cca623aea4a33f043734c7bf3))
+
+### Fix
+
+* fix: sorted availableUpdates
+
+RHINENG-1536 ([`b5c176c`](https://github.com/RedHatInsights/vmaas/commit/b5c176c27268761491926e00a8d01d6dd2456be7))
+
+### Unknown
+
+* Re-enable disabled smoke tests ([`cff88fd`](https://github.com/RedHatInsights/vmaas/commit/cff88fda3282620132d60886cd069039addafc6d))
+
+
 ## v2.48.2 (2023-07-20)
 
 ### Chore
