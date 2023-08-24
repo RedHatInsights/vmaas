@@ -2,6 +2,19 @@
 
 
 
+## v2.48.4 (2023-08-24)
+
+### Chore
+
+* chore: temporary ignore vulnerabilities in pipenv ([`a91e7f6`](https://github.com/RedHatInsights/vmaas/commit/a91e7f6aee413f75041dd8a1f95841b43ebcb376))
+
+### Fix
+
+* fix: consistent affected_packages in vulnerabilities response
+
+VMAAS-1461 ([`41667fd`](https://github.com/RedHatInsights/vmaas/commit/41667fde0d86b456aa6bcc8ea3ade716695fb945))
+
+
 ## v2.48.3 (2023-08-14)
 
 ### Chore
