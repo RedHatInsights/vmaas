@@ -2,6 +2,17 @@
 
 
 
+## v2.48.5 (2023-08-31)
+
+### Chore
+
+* chore: skip new vulnerabilities ([`5d58325`](https://github.com/RedHatInsights/vmaas/commit/5d583256a21694e3870d645b189c04953f6be5bc))
+
+### Fix
+
+* fix: sort updates also by other fields ([`aa12336`](https://github.com/RedHatInsights/vmaas/commit/aa123365fc64d05a1b88283d4656818513437742))
+
+
 ## v2.48.4 (2023-08-24)
 
 ### Chore
