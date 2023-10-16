@@ -295,6 +295,7 @@ class SqliteDump:
                                 product text,
                                 product_id integer,
                                 revision text,
+                                last_change text,
                                 third_party integer
                                )""")
         # Select repo detail mapping
@@ -308,6 +309,7 @@ class SqliteDump:
                                       p.name as product_name,
                                       p.id as product_id,
                                       r.revision,
+                                      r.last_change,
                                       cs.third_party
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
@@ -315,12 +317,13 @@ class SqliteDump:
                                  join product p on p.id = cs.product_id
                                  """)
             for oid, label, name, url, basearch, releasever, \
-                    product, product_id, revision, third_party in cursor:
-                dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    product, product_id, revision, last_change, third_party in cursor:
+                dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                              (oid, label, name, url, basearch,
                               releasever, product, product_id,
                               # Use NULLs in export
                               format_datetime(revision) if revision is not None else None,
+                              format_datetime(last_change),
                               1 if third_party else 0),)
 
         dump.execute("""create table if not exists pkg_repo (

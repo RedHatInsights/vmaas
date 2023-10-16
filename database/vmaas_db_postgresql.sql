@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 15);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 16);
 
 -- -----------------------------------------------------
 -- evr type
@@ -96,7 +96,21 @@ $set_last_updated$
 $set_last_updated$
   LANGUAGE 'plpgsql';
 
-
+create or replace FUNCTION repo_last_change()
+  RETURNS TRIGGER AS
+$repo_last_change$
+  BEGIN
+    IF TG_OP = 'UPDATE' THEN
+      IF NEW.revision IS DISTINCT FROM OLD.revision THEN
+        NEW.last_change = CURRENT_TIMESTAMP;
+      END IF;
+    ELSIF TG_OP = 'INSERT' THEN
+      NEW.last_change = CURRENT_TIMESTAMP;
+    END IF;
+    RETURN NEW;
+  END;
+$repo_last_change$
+  LANGUAGE 'plpgsql';
 -- -----------------------------------------------------
 -- Table vmaas.evr
 -- -----------------------------------------------------
@@ -429,6 +443,7 @@ CREATE TABLE IF NOT EXISTS repo (
   releasever TEXT NULL, CHECK (NOT empty(releasever)),
   eol BOOLEAN NOT NULL,
   revision TIMESTAMP WITH TIME ZONE NULL,
+  last_change TIMESTAMP WITH TIME ZONE NOT NULL,
   certificate_id INT NULL,
   PRIMARY KEY (id),
   CONSTRAINT content_set_id
@@ -448,6 +463,9 @@ CREATE UNIQUE INDEX repo_content_set_id_basearch_id_releasever_key ON repo (cont
 CREATE TRIGGER repo_changed AFTER INSERT OR UPDATE OR DELETE ON repo
   FOR EACH STATEMENT
   EXECUTE PROCEDURE repos_changed();
+CREATE TRIGGER repo_last_change BEFORE INSERT OR UPDATE ON repo
+  FOR EACH ROW
+  EXECUTE PROCEDURE repo_last_change();
 
 
 -- -----------------------------------------------------

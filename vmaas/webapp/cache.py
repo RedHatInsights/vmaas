@@ -256,7 +256,8 @@ class Cache:
             if src_pkg_id:
                 self.src_pkg_id2pkg_ids.setdefault(src_pkg_id, array.array('q')).append(id)
 
-        for row in self._sqlite_execute(data, "select * from repo_detail"):
+        for row in self._sqlite_execute(data, """select id, label, name, url, basearch, releasever,
+                                                 product, product_id, revision, third_party from repo_detail"""):
             id = row[0]
             url = row[3]
             repo = (row[1], row[2], url, row[4], row[5], row[6], row[7],
