@@ -27,11 +27,11 @@ cve_detail:
   - AV:N/AC:H/Au:N/C:P/I:P/A:P
   - Red Hat (CVE source)
 dbchange:
-  cve_changes: 2019-03-07 09:17:23.799995+00:00
-  errata_changes: 2019-03-07 09:16:34.790980+00:00
+  cve_changes: '2019-03-07T09:17:23.799995+00:00'
+  errata_changes: '2019-03-07T09:16:34.790980+00:00'
   exported: '2019-03-07T09:17:53.114083+00:00'
-  last_change: 2019-03-07 09:17:23.799995+00:00
-  repository_changes: 2019-03-07 09:16:34.689923+00:00
+  last_change: '2019-03-07T09:17:23.799995+00:00'
+  repository_changes: '2019-03-07T09:16:34.689923+00:00'
 errata_detail:
   RHBA-2015:0364: !!python/tuple
   - Errata synopsis...
@@ -497,6 +497,7 @@ repo_detail:
   - Red Hat Enterprise Linux Server
   - 1
   - 2018-04-10 09:02:26+00:00
+  - 2018-04-10 09:02:26+00:00
   - false
   2: !!python/tuple
   - rhel-8-for-x86_64-rt-rpms
@@ -506,6 +507,7 @@ repo_detail:
   - '8.1'
   - null
   - null
+  - 2020-01-03 05:24:17+00:00
   - 2020-01-03 05:24:17+00:00
   - false
   3: !!python/tuple
@@ -517,6 +519,7 @@ repo_detail:
   - null
   - null
   - 2019-09-20 06:25:14+00:00
+  - 2019-09-20 06:25:14+00:00
   - false
   4: !!python/tuple
   - rhel-8-for-x86_64-nfv-rpms
@@ -526,6 +529,7 @@ repo_detail:
   - '8.1'
   - null
   - null
+  - 2020-01-03 05:24:24+00:00
   - 2020-01-03 05:24:24+00:00
   - false
   5: !!python/tuple
@@ -537,6 +541,7 @@ repo_detail:
   - null
   - null
   - 2019-09-20 06:25:12+00:00
+  - 2019-09-20 06:25:12+00:00
   - false
   6: !!python/tuple
   - third-party-repo1
@@ -546,6 +551,7 @@ repo_detail:
   - '8.0'
   - null
   - null
+  - 2019-09-20 06:25:12+00:00
   - 2019-09-20 06:25:12+00:00
   - true
   7: !!python/tuple
@@ -557,6 +563,7 @@ repo_detail:
   - null
   - null
   - 2022-09-20 06:25:12+00:00
+  - 2022-09-20 06:25:12+00:00
   - false
   8: !!python/tuple
   - rhel-8-for-x86_64-appstream-rhui-rpms
@@ -566,6 +573,7 @@ repo_detail:
   - '8.0'
   - null
   - null
+  - 2022-09-20 06:25:12+00:00
   - 2022-09-20 06:25:12+00:00
   - false
 repolabel2ids:
