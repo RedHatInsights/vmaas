@@ -2,6 +2,13 @@
 
 
 
+## v2.49.1 (2023-10-18)
+
+### Fix
+
+* fix: url returns 404 ([`a7aaac6`](https://github.com/RedHatInsights/vmaas/commit/a7aaac60b730907f01077ab671ee35a1931a1fc3))
+
+
 ## v2.49.0 (2023-10-18)
 
 ### Feature
