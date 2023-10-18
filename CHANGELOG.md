@@ -2,6 +2,25 @@
 
 
 
+## v2.49.0 (2023-10-18)
+
+### Feature
+
+* feat(reposcan): store timestamp of last change of given repository
+
+RHINENG-2608 ([`d2efc4b`](https://github.com/RedHatInsights/vmaas/commit/d2efc4b222a8887e096d2aa2484f82b17e06ca47))
+
+### Unknown
+
+* Adding Security-Compliance Branch Build and Tagging Support (#1048)
+
+Add Security-Compliance Branch Build and Tagging Support. ([`7db1d81`](https://github.com/RedHatInsights/vmaas/commit/7db1d81a819f1eb9b9835f517f5c2df6deb85cc3))
+
+* Fix security vulnerabilities. (#1047)
+
+Upgrade vulnerable packages. ([`9e329b2`](https://github.com/RedHatInsights/vmaas/commit/9e329b2f81af373d9242c1f61abd3254504df348))
+
+
 ## v2.48.5 (2023-08-31)
 
 ### Chore
