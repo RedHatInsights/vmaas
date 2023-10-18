@@ -80,6 +80,7 @@ _repos = {
                 "url": str,
                 "basearch": Or(str, None),
                 "revision": str,
+                "last_change": str,
                 "label": str,
                 "cpes": [str],
                 "third_party": bool
@@ -91,6 +92,7 @@ _repos = {
     "page_size": int,
     "pages": int,
     "last_change": str,
+    "latest_repo_change": str,
 }
 
 _errata = {

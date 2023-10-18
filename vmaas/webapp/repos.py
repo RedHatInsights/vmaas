@@ -11,6 +11,7 @@ from vmaas.webapp.cache import (
     REPO_RELEASEVER,
     REPO_PRODUCT,
     REPO_REVISION,
+    REPO_LAST_CHANGE,
     REPO_THIRD_PARTY
 )
 from vmaas.common.date_utils import format_datetime
@@ -28,8 +29,8 @@ class RepoAPI:
 
     @staticmethod
     def _modified_since(repo_detail, modified_since_dt):
-        if not modified_since_dt or (repo_detail[REPO_REVISION] is not None and
-                                     repo_detail[REPO_REVISION] > modified_since_dt):
+        if not modified_since_dt or (repo_detail[REPO_LAST_CHANGE] is not None and
+                                     repo_detail[REPO_LAST_CHANGE] > modified_since_dt):
             return True
         return False
 
@@ -105,6 +106,7 @@ class RepoAPI:
 
         actual_page_size = 0
         repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
+        latest_repo_change = None
         for label in repo_page_to_process:
             cs_id = self.cache.label2content_set_id[label]
             for repo_id in self.cache.repolabel2ids.get(label, []):
@@ -122,13 +124,17 @@ class RepoAPI:
                         "releasever": none2empty(repo_detail[REPO_RELEASEVER]),
                         "product": repo_detail[REPO_PRODUCT],
                         "revision": format_datetime(repo_detail[REPO_REVISION]),
+                        "last_change": format_datetime(repo_detail[REPO_LAST_CHANGE]),
                         "cpes": [self.cache.cpe_id2label[cpe_id] for cpe_id in cpe_ids],
                         "third_party": repo_detail[REPO_THIRD_PARTY]
                     })
+                    if not latest_repo_change or repo_detail[REPO_LAST_CHANGE] > latest_repo_change:
+                        latest_repo_change = repo_detail[REPO_LAST_CHANGE]
             actual_page_size += len(repolist[label])
 
         response = {
             'repository_list': repolist,
+            'latest_repo_change': format_datetime(latest_repo_change) if latest_repo_change else None,
             'last_change': format_datetime(self.cache.dbchange['last_change'])
         }
 

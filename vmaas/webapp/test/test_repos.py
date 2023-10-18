@@ -19,7 +19,8 @@ REPO_JSON_NON_EXIST = {"repository_list": ["non-existent-repo"]}
 REPO_JSON_WITH_PREFIX = {"repository_list": ["rhul-rhel-7-server-rpms"]}
 
 EMPTY_RESPONSE = {"repository_list": {}, "page": 1, "page_size": 0, "pages": 0,
-                  "last_change": "2019-03-07T09:17:23.799995+00:00"}
+                  "last_change": "2019-03-07T09:17:23.799995+00:00",
+                  "latest_repo_change": None}
 
 
 class TestRepoAPI(TestBase):

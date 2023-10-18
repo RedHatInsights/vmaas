@@ -26,7 +26,8 @@ REPO_RELEASEVER = 4
 REPO_PRODUCT = 5
 REPO_PRODUCT_ID = 6
 REPO_REVISION = 7
-REPO_THIRD_PARTY = 8
+REPO_LAST_CHANGE = 8
+REPO_THIRD_PARTY = 9
 
 # package detail indexes
 PKG_NAME_ID = 0
@@ -257,11 +258,11 @@ class Cache:
                 self.src_pkg_id2pkg_ids.setdefault(src_pkg_id, array.array('q')).append(id)
 
         for row in self._sqlite_execute(data, """select id, label, name, url, basearch, releasever,
-                                                 product, product_id, revision, third_party from repo_detail"""):
+                                                 product, product_id, revision, last_change, third_party from repo_detail"""):
             id = row[0]
             url = row[3]
             repo = (row[1], row[2], url, row[4], row[5], row[6], row[7],
-                    parse_datetime(row[8]), bool(row[9]))
+                    parse_datetime(row[8]), parse_datetime(row[9]), bool(row[10]))
             self.repo_detail[id] = repo
             self.repolabel2ids.setdefault(repo[0], array.array('q')).append(id)
 
