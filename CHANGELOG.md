@@ -2,6 +2,15 @@
 
 
 
+## v2.50.0 (2023-10-19)
+
+### Feature
+
+* feat(webapp): return and display latest change of repo in vmaas
+
+RHINENG-2608 ([`8e483ad`](https://github.com/RedHatInsights/vmaas/commit/8e483adebe852c38e161c7d5c7ba1f4d504ec2a7))
+
+
 ## v2.49.1 (2023-10-18)
 
 ### Fix
