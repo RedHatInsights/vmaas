@@ -13,7 +13,7 @@ from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VAL
 from vmaas.reposcan.mnm import FAILED_CPE_METADATA
 from vmaas.reposcan.redhatcpe.cpe_dict import CpeDict
 
-CPE_DICT_URL = os.getenv('CPE_DICT_URL', 'https://www.redhat.com/security/data/metrics/cpe-dictionary.xml')
+CPE_DICT_URL = os.getenv('CPE_DICT_URL', 'https://access.redhat.com/security/data/meta/v1/cpe-dictionary.xml')
 REPO_TO_CPE_URL = os.getenv('REPO_TO_CPE_URL', 'https://www.redhat.com/security/data/metrics/repository-to-cpe.json')
 
 
