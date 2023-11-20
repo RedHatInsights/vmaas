@@ -2,6 +2,17 @@
 
 
 
+## v2.50.1 (2023-11-20)
+
+### Chore
+
+* chore: temporary ignore vulnerabilities in pipenv ([`1871dd3`](https://github.com/RedHatInsights/vmaas/commit/1871dd38e20f76379879e3db4ec8710d9d01573e))
+
+### Fix
+
+* fix: use new url for cpe dictionary xml ([`310d3cd`](https://github.com/RedHatInsights/vmaas/commit/310d3cd54b7f56c130f2674f493939b99147f2a8))
+
+
 ## v2.50.0 (2023-10-19)
 
 ### Feature
