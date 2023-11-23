@@ -2,6 +2,24 @@
 
 
 
+## v2.50.2 (2023-11-23)
+
+### Chore
+
+* chore: remove old cve ignores ([`a0872b4`](https://github.com/RedHatInsights/vmaas/commit/a0872b4cd43de7cdd4a7e9ff39a23376119e3bd5))
+
+* chore: update golang.org/x/net ([`216a7a2`](https://github.com/RedHatInsights/vmaas/commit/216a7a2830ddeefc32ca65d367de032badd4ad11))
+
+* chore: update dependencies ([`21e9fce`](https://github.com/RedHatInsights/vmaas/commit/21e9fce724ca013dfb382144a352a43e5dc65e9a))
+
+### Fix
+
+* fix: update go to 1.20 and update dependencies
+
+go 1.19 is unsupported and go1.20 is already available in ubi8
+RHINENG-3785 ([`0103109`](https://github.com/RedHatInsights/vmaas/commit/0103109781bef103f4c6fc8882ba9fbd65e07261))
+
+
 ## v2.50.1 (2023-11-20)
 
 ### Chore
