@@ -2,6 +2,13 @@
 
 
 
+## v2.50.3 (2023-11-24)
+
+### Fix
+
+* fix: update vmaas-lib ([`4ea8559`](https://github.com/RedHatInsights/vmaas/commit/4ea855902e2bfa735b2d9d686437023d21d31e4e))
+
+
 ## v2.50.2 (2023-11-23)
 
 ### Chore
