@@ -147,3 +147,4 @@ then
     echo "PR check failed"
     make_results_xml
 fi
+
