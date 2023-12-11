@@ -30,6 +30,7 @@ RH_TURNPIKE_IDENTITY_HEADER = {
     "x-rh-identity": base64.b64encode(json.dumps(TURNPIKE_IDENTITY).encode("utf-8"))
 }
 
+
 @pytest.mark.usefixtures('client_class')
 class FlaskTestCase:
     """Base class for vulnerability engine manager test cases"""

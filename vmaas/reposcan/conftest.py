@@ -61,10 +61,12 @@ def write_testing_data(conn):
         cursor.execute(VMAAS_DB_DATA.read_text(encoding="utf-8"))
     conn.commit()
 
+
 @pytest.fixture
 def client(app):
     with app.test_client() as client:
         yield client
+
 
 @pytest.fixture
 def client_class(request, client):
