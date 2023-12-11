@@ -4,7 +4,6 @@ Fixtures and utility methods for testing flask application using pytest
 import base64
 import json
 from http import HTTPStatus
-from flask import Flask
 import pytest
 from vmaas.reposcan import reposcan
 #  from tornado.wsgi import WSGIContainer
@@ -31,7 +30,6 @@ RH_TURNPIKE_IDENTITY_HEADER = {
     "x-rh-identity": base64.b64encode(json.dumps(TURNPIKE_IDENTITY).encode("utf-8"))
 }
 
-
 @pytest.mark.usefixtures('client_class')
 class FlaskTestCase:
     """Base class for vulnerability engine manager test cases"""
@@ -42,7 +40,7 @@ class FlaskTestCase:
         connexion_app = reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
                                              reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
                                              "": "reposcan.healthz.spec.yaml"})
-        return Flask(connexion_app)
+        return connexion_app.app
 
     def fetch(self, path, **kwargs):
         """Fetch method for vulnerability API."""
@@ -53,21 +51,22 @@ class FlaskTestCase:
         if 'data' in kwargs or 'json' in kwargs:
             headers.update({'Content-type': 'application/json'})
         method = kwargs.get('method', 'get')
+        self.client.headers = headers
         if method.upper() == 'PATCH':
-            response = self.client.patch(path, **kwargs)  # pylint: disable=no-member
+            response = self.client.patch(path, content=kwargs.get("data"))  # pylint: disable=no-member
         elif method.upper() == 'POST':
-            response = self.client.post(path, **kwargs)  # pylint: disable=no-member
+            response = self.client.post(path, content=kwargs.get("data"))  # pylint: disable=no-member
         elif method.upper() == 'PUT':
-            response = self.client.put(path, **kwargs)  # pylint: disable=no-member
+            response = self.client.put(path, content=kwargs.get("data"))  # pylint: disable=no-member
         elif method.upper() == 'DELETE':
-            response = self.client.delete(path, **kwargs)  # pylint: disable=no-member
+            response = self.client.delete(path)  # pylint: disable=no-member
         else:
-            response = self.client.get(path, **kwargs)  # pylint: disable=no-member
+            response = self.client.get(path)  # pylint: disable=no-member
         return FlaskTestResponse(response, method.upper(), path)
 
-    def raw_get(self, path, **kwargs):
+    def raw_get(self, path):
         """Raw get to an URI without headers"""
-        response = self.client.get(path, **kwargs)  # pylint: disable=no-member
+        response = self.client.get(path)  # pylint: disable=no-member
         return FlaskTestResponse(response, "GET", path)
 
     # pylint: disable=invalid-name
@@ -99,13 +98,13 @@ class FlaskTestResponse:
         """Loads the response content."""
         parsed = None
         try:
-            parsed = json.loads(response.data)
+            parsed = response.json()
         # pylint: disable=broad-except
         except Exception:
             pass
 
-        if not parsed and response.data:
-            parsed = str(response.data, "utf-8")
+        if not parsed and response.content:
+            parsed = str(response.content, "utf-8")
 
         return parsed
 
