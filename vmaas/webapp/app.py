@@ -17,6 +17,7 @@ from aiohttp import ClientSession
 from aiohttp import hdrs
 from aiohttp import web
 from aiohttp.client_exceptions import ClientConnectionError
+from connexion.options import SwaggerUIOptions
 from prometheus_client import generate_latest
 from jsonschema.exceptions import ValidationError
 from vmaas.webapp.cache import Cache
@@ -564,11 +565,12 @@ def create_app(specs):
         middlewares.append(gzip_middleware)
     middlewares.extend([error_handler, timing_middleware])
 
-    app = connexion.AioHttpApp(__name__, options={
-        'swagger_ui': True,
-        'openapi_spec_path': '/openapi.json',
-        'middlewares': middlewares
-    })
+    # app = connexion.AsyncApp(__name__, options={
+    #     'swagger_ui': True,
+    #     'openapi_spec_path': '/openapi.json',
+    #     'middlewares': middlewares
+    # })
+    app = connexion.AsyncApp(__name__, swagger_ui_options=SwaggerUIOptions(swagger_ui=True))
 
     def metrics(request, **kwargs):  # pylint: disable=unused-argument
         """Provide current prometheus metrics"""
@@ -580,16 +582,18 @@ def create_app(specs):
         """Dummy endpoint returning 200"""
         return web.Response()
 
-    async def on_prepare(request, response):  # pylint: disable=unused-argument
-        """Hook for preparing new responses"""
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS, POST'
+    # async def on_prepare(request, response):  # pylint: disable=unused-argument
+    #     """Hook for preparing new responses"""
+    #     response.headers["Access-Control-Allow-Origin"] = "*"
+    #     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    #     response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS, POST'
 
-    app.app.on_response_prepare.append(on_prepare)
-    app.app.router.add_get("/metrics", metrics)
-    app.app.router.add_get("/healthz", HealthHandler.get)
-    app.app.router.add_route("OPTIONS", "/api/v3/cves", dummy_200)
+    # app.app.on_response_prepare.append(on_prepare)
+    app.add_url_rule("/", 'metrics', metrics)
+    app.add_url_rule("/", 'healthz', HealthHandler.get)
+    # app.app.router.add_get("/metrics", metrics)
+    # app.app.router.add_get("/healthz", HealthHandler.get)
+    # app.app.router.add_route("OPTIONS", "/api/v3/cves", dummy_200)
 
     for route, spec in specs.items():
         app.add_api(spec, resolver=connexion.RestyResolver('app'),

@@ -17,6 +17,8 @@ from distutils.util import strtobool
 
 import connexion
 import git
+from a2wsgi import ASGIMiddleware
+from connexion.options import SwaggerUIOptions
 from flask import request
 from prometheus_client import generate_latest
 from tornado.ioloop import IOLoop, PeriodicCallback
@@ -926,10 +928,8 @@ def create_app(specs):
     for sig in KILL_SIGNALS:
         signal.signal(sig, terminate)
 
-    app = connexion.App(__name__, options={
-        'swagger_ui': True,
-        'openapi_spec_path': '/openapi.json'
-    })
+    app = connexion.App(__name__,
+                        swagger_ui_options=SwaggerUIOptions(swagger_ui=True))
 
     # Response validation is disabled due to returing streamed response in GET /pkgtree
     # https://github.com/zalando/connexion/pull/467 should fix it
@@ -953,4 +953,4 @@ def create_app(specs):
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         return response
 
-    return app
+    return ASGIMiddleware(app)  # As of connexion >3.0 ASGI server should be used as default, otherwise wrapped by such middleware.

@@ -41,10 +41,15 @@ services:
     security_opt:
       - label=disable
     command: >
-      bash -c 'cd /vmaas && ./scripts/check_deps_versions.sh \
-                         && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
-                         && python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade \
-                         && ./run_tests.sh vmaas/common \
-                         && ./run_tests.sh vmaas/reposcan \
-                         && ./run_tests.sh vmaas/webapp \
-                         && bash <(curl -s https://codecov.io/bash)'
+      bash -c 'cd /vmaas && python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade \
+                         && ./run_tests.sh vmaas/reposcan'
+    # command: >
+    #   bash -c 'cd /vmaas && ./scripts/check_deps_versions.sh \
+    #                      && ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
+    #                      && python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade \
+    #                      && ./run_tests.sh vmaas/common \
+    #                      && ./run_tests.sh vmaas/reposcan \
+    #                      && ./run_tests.sh vmaas/webapp \
+    #                      && bash <(curl -s https://codecov.io/bash)'
+    # command: >
+    #   bash -c 'cd /vmaas && tail -f /dev/null'

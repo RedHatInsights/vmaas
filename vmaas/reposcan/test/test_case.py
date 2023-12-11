@@ -4,8 +4,10 @@ Fixtures and utility methods for testing flask application using pytest
 import base64
 import json
 from http import HTTPStatus
+from flask import Flask
 import pytest
 from vmaas.reposcan import reposcan
+#  from tornado.wsgi import WSGIContainer
 
 URL_BASE = ""
 
@@ -40,7 +42,7 @@ class FlaskTestCase:
         connexion_app = reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
                                              reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
                                              "": "reposcan.healthz.spec.yaml"})
-        return connexion_app.app
+        return Flask(connexion_app)
 
     def fetch(self, path, **kwargs):
         """Fetch method for vulnerability API."""
