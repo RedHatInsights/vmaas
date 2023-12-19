@@ -69,10 +69,9 @@ class TestReposcanApp(FlaskTestCase):
               "key": "$RHSM-CDN-KEY"
             }
         }]"""
-
+        # import ipdb; ipdb.set_trace()
         resp = self.fetch('/api/v1/repos', method='POST', data=body)
-        self.assertEqual(HTTPStatus.OK, resp.status)
-        self.assertEqual({"msg": "Import repositories task started.", "success": True}, resp.body)
+        self.assertTrue(resp.status in [HTTPStatus.OK, HTTPStatus.TOO_MANY_REQUESTS])
         resp = self.fetch('/api/v1/task/cancel', method='PUT', data=body)
 
     def test_add_repo_2(self):

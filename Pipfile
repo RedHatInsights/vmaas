@@ -36,6 +36,7 @@ watchtower = ">=1.0.0"
 werkzeug = ">=1.0.1"
 yarl = ">=1.6.2"
 a2wsgi = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.9"
