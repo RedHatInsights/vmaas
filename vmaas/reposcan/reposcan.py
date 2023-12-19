@@ -842,6 +842,7 @@ class SyncTask:
     _running_task_type = None
     _pid = None
     workers = Pool(1)
+    ioloop = IOLoop.current()
 
     @classmethod
     def start(cls, task_type, func, callback, *args, **kwargs):
@@ -849,10 +850,10 @@ class SyncTask:
         cls._running = True
         cls._running_task_type = task_type
         cls._pid = cls.workers._pool[0].pid  # pylint: disable=protected-access
-        ioloop = IOLoop.instance()
+        cls.ioloop = IOLoop.current()
 
         def _callback(result):
-            ioloop.add_callback(lambda: callback(result))
+            cls.ioloop.add_callback(lambda: callback(result))
 
         def _err_callback(err):
             LOGGER.error("SyncTask error: %s", err)
@@ -953,4 +954,4 @@ def create_app(specs):
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         return response
 
-    return ASGIMiddleware(app)  # As of connexion >3.0 ASGI server should be used as default, otherwise wrapped by such middleware.
+    return ASGIMiddleware(app, loop=SyncTask.ioloop)  # As of connexion >3.0 ASGI server should be used as default, otherwise wrapped by such middleware.
