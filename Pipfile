@@ -13,7 +13,7 @@ pytest-flask = ">=1.1.0"
 testing-postgresql = ">=1.3.0"
 
 [packages]
-aiohttp = ">=3.8.0"
+aiohttp = ">=3.9.0"
 aiohttp-jinja2 = ">=1.5"
 app-common-python = ">=0.2.5"
 boto3 = ">=1.16.13"
