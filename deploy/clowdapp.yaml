@@ -11,9 +11,6 @@ objects:
   spec:
     envName: ${ENV_NAME}
     dependencies:
-    - host-inventory
-    - ingress
-    - vmaas
     - rbac
     deployments:
     - name: webapp-go
