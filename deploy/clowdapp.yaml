@@ -10,6 +10,11 @@ objects:
     name: vmaas
   spec:
     envName: ${ENV_NAME}
+    dependencies:
+    - host-inventory
+    - ingress
+    - vmaas
+    - rbac
     deployments:
     - name: webapp-go
       replicas: ${{REPLICAS_WEBAPP_GO}}
