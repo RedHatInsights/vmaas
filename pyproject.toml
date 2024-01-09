@@ -1,3 +1,52 @@
 [tool.semantic_release]
 version_variables = ["vmaas/common/constants.py:VMAAS_VERSION"]
+version_toml = ["pyproject.toml:tool.poetry.version"]
 commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"
+
+[tool.poetry]
+name = "vmaas"
+version = "2.50.3"
+description = ""
+authors = [""]
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "~3.9"
+aiohttp = ">=3.8.0"
+aiohttp-jinja2 = ">=1.5"
+app-common-python = ">=0.2.5"
+boto3 = ">=1.16.13"
+botocore = ">=1.19.13"
+click = ">=0.7"
+connexion = {extras = ["swagger-ui"],version = "2.14.1"}
+flask = "2.2.5"
+gitpython = ">=3.1.30"
+iso8601 = ">=0.1.12"
+jsonschema = ">=3.2.0"
+natsort = ">=7.0.1"
+psycopg2-binary = ">=2.8.6"
+prometheus-client = ">=0.8.0"
+pyopenssl = ">=19.1.0"
+python-dateutil = ">=2.8.1"
+pytz = ">=2020.4"
+pyyaml = ">=5.4.1"
+requests = ">=2.31.0"
+schema = ">=0.7.3"
+tornado = ">=6.0.3"
+watchtower = ">=1.0.0"
+werkzeug = ">=1.0.1"
+yarl = ">=1.6.2"
+
+[tool.poetry.group.dev.dependencies]
+coverage = ">=4.5.3"
+pur = ">=5.4.1"
+pytest = ">=5.0.1"
+pylint = ">=2.3.1"
+pytest-cov = ">=2.7.1"
+pytest-flask = ">=1.1.0"
+testing-postgresql = ">=1.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

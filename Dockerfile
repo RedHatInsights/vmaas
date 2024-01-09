@@ -19,16 +19,16 @@ RUN microdnf module enable postgresql:12 && \
 
 WORKDIR /vmaas
 
-ADD /Pipfile* /vmaas/
+ADD pyproject.toml /vmaas/
+ADD poetry.lock    /vmaas/
 
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
-ARG PIPENV_CHECK=1
-ARG PIPENV_PYUP_API_KEY=""
-ARG VAR_PIPENV_INSTALL_OPT=""
-RUN pip3 install --upgrade pip pipenv==2022.12.19 && \
-    pipenv install --ignore-pipfile --deploy --system $VAR_PIPENV_INSTALL_OPT && \
-    if [ "${PIPENV_CHECK}" == 1 ] ; then pipenv check --system -i 62142; fi
+ARG VAR_POETRY_INSTALL_OPT="--only main"
+RUN pip3 install --upgrade pip && \
+    pip3 install --upgrade poetry~=1.5
+RUN poetry export $VAR_POETRY_INSTALL_OPT -f requirements.txt --output requirements.txt && \
+    pip3 install -r requirements.txt
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas

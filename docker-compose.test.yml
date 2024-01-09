@@ -19,8 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         VAR_RPMS: "findutils"
-        VAR_PIPENV_INSTALL_OPT: "--dev"
-        PIPENV_CHECK: "${PIPENV_CHECK:-1}"
+        VAR_POETRY_INSTALL_OPT: "--with dev"
     image: vmaas/app:latest
     environment:
       CI: "${CI:-false}"

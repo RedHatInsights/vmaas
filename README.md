@@ -42,11 +42,6 @@ docker-compose down -v # Stop and remove containers and database data volume (bu
 docker-compose build
 ~~~
 
-### Building parameters
-~~~bash
-PIPENV_CHECK=0 docker-compose build # Builds images without performing "pipenv check" command
-~~~
-
 #### Managing containers
 All at once
 ~~~bash

@@ -24,12 +24,12 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pipenv run pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1
+pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1
 
 rc=$(($rc+$?))
 
 # Run pylint
-find . -iname '*.py' | xargs pipenv run pylint --rcfile=../../pylintrc --output-format=colorized
+find . -iname '*.py' | xargs pylint --rcfile=../../pylintrc --output-format=colorized
 rc=$(($rc+$?))
 
 exit $rc
