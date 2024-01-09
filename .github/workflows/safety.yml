@@ -1,0 +1,36 @@
+name: Safety
+
+on:
+  push:
+    branches:
+      - "master"
+      - "stable"
+  pull_request:
+    branches:
+      - "master"
+      - "stable"
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+        poetry-version: [1.5]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        run: pip install poetry~=1.5
+      - name: Set up Safety
+        run: pip install safety
+      - name: Export requirements.txt
+        run: poetry export --with dev -f requirements.txt --output requirements.txt
+      - name: Run safety
+        run: safety check -r requirements.txt
