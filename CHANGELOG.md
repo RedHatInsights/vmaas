@@ -2,6 +2,30 @@
 
 
 
+## v2.50.4 (2024-01-09)
+
+### Chore
+
+* chore: migrate from pipenv to poetry ([`6b0fd00`](https://github.com/RedHatInsights/vmaas/commit/6b0fd005149bf8bb187c26136e5c0c963f6f10a8))
+
+* chore: split github workflow steps in tests job ([`8404869`](https://github.com/RedHatInsights/vmaas/commit/84048691c28c0ed1f461661449afe7a7000d59e4))
+
+### Fix
+
+* fix: add required apiPath for app-common-go
+
+vmaas-webapp-go         | field apiPath in DependencyEndpoint: required
+vmaas-webapp-go         | panic: runtime error: invalid memory address or nil pointer dereference
+vmaas-webapp-go         | [signal SIGSEGV: segmentation violation code=0x1 addr=0x8 pc=0xb9bd3c]
+vmaas-webapp-go         |
+vmaas-webapp-go         | goroutine 1 [running]:
+vmaas-webapp-go         | github.com/redhatinsights/vmaas/base/utils.initDB()
+vmaas-webapp-go         | 	/vmaas/go/src/vmaas/base/utils/config.go:71 +0x2c
+vmaas-webapp-go         | github.com/redhatinsights/vmaas/base/utils.init.0()
+vmaas-webapp-go         | 	/vmaas/go/src/vmaas/base/utils/config.go:63 +0x30
+vmaas-webapp-go exited with code 2 ([`d8d4873`](https://github.com/RedHatInsights/vmaas/commit/d8d4873c7d33529c9151bd08dcddd6d49a9fe32f))
+
+
 ## v2.50.3 (2023-11-24)
 
 ### Fix
