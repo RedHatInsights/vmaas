@@ -11,12 +11,14 @@
     },
     "endpoints": [
         {
+            "apiPath": "api/vmaas/v3",
             "app": "vmaas",
             "hostname": "vmaas_webapp",
             "name": "webapp-service",
             "port": 8000
         },
         {
+            "apiPath": "api/vmaas/v1",
             "app": "vmaas",
             "hostname": "vmaas_reposcan",
             "name": "reposcan-service",
