@@ -41,6 +41,9 @@ class BatchList:
         last_batch.append(item)
         self.last_batch_filesize += file_size
 
+    def __len__(self):
+        return len(self.batches)
+
     def get_total_items(self):
         """Return total item count in all batches."""
         return sum(len(batch) for batch in self.batches)
