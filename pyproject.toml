@@ -37,6 +37,7 @@ tornado = ">=6.0.3"
 watchtower = ">=1.0.0"
 werkzeug = ">=1.0.1"
 yarl = ">=1.6.2"
+attrs = "^23.2.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = ">=4.5.3"
