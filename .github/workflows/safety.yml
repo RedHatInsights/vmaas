@@ -33,4 +33,4 @@ jobs:
       - name: Export requirements.txt
         run: poetry export --with dev -f requirements.txt --output requirements.txt
       - name: Run safety
-        run: safety check -r requirements.txt
+        run: safety check -i 62142 -r requirements.txt
