@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 16);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 17);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1270,6 +1270,17 @@ CREATE TABLE IF NOT EXISTS oval_definition_cpe (
   CONSTRAINT cpe_id
     FOREIGN KEY (cpe_id)
     REFERENCES cpe (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.csaf_file
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS csaf_file (
+  id        SERIAL,
+  name      TEXT UNIQUE NOT NULL, CHECK (NOT empty(name)),
+  updated   TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
 
