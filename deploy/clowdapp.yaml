@@ -243,6 +243,12 @@ objects:
           value: /tmp/prometheus_multiproc_dir
         - name: IS_FEDRAMP
           value: ${IS_FEDRAMP}
+        - name: CSAF_VEX_BASE_URL
+          value: ${CSAF_VEX_BASE_URL}
+        - name: CSAF_VEX_INDEX_CSV
+          value: ${CSAF_VEX_INDEX_CSV}
+        - name: CSAF_SYNC_ALL_FILES
+          value: ${CSAF_SYNC_ALL_FILES}
 
     database:
       name: vmaas
@@ -470,3 +476,9 @@ parameters:
   value: "FALSE"
 - name: SSL_CERT_DIR
   value: "/etc/ssl/certs:/etc/pki/tls/certs:/system/etc/security/cacerts:/cdapp/certs"
+- name: CSAF_VEX_BASE_URL
+  value: "https://access.redhat.com/security/data/csaf/beta/vex/"
+- name: CSAF_VEX_INDEX_CSV
+  value: "changes.csv"
+- name: CSAF_SYNC_ALL_FILES  # sync all csaf files, not only those which are changed
+  value: "true"
