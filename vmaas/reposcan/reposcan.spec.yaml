@@ -197,6 +197,16 @@ paths:
       tags:
         - Sync
 
+  /sync/csaf:
+    put:
+      summary: Sync CSAF metadata
+      operationId: vmaas.reposcan.reposcan.CsafSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /export/pkgtree:
     put:
       summary: Export package tree
