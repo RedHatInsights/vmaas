@@ -2,6 +2,55 @@
 
 
 
+## v2.51.0 (2024-01-11)
+
+### Chore
+
+* chore: add len() for batch_list ([`f48fcc1`](https://github.com/RedHatInsights/vmaas/commit/f48fcc1fac255e3f5444db824071b30bfee8b93d))
+
+* chore(deps): add attrs and recreate poetry lock ([`ba77d20`](https://github.com/RedHatInsights/vmaas/commit/ba77d206152449b78212ec7fe66eb745f040f25d))
+
+### Feature
+
+* feat(csaf): add logic for downloading csaf files
+
+RHINENG-6813 ([`6bb6436`](https://github.com/RedHatInsights/vmaas/commit/6bb6436b0cef071da337c83856c7b5d5ad451790))
+
+* feat(csaf): module for storing csaf to db
+
+RHINENG-6813 ([`d0acdc3`](https://github.com/RedHatInsights/vmaas/commit/d0acdc320b329208daa04127d9a7fd2f6f5ed4d8))
+
+* feat(csaf): model collection of csaf files
+
+RHINENG-6813 ([`121fbe4`](https://github.com/RedHatInsights/vmaas/commit/121fbe45ff14a310005c5cde87104e383b1c303a))
+
+* feat(csaf): add csaf_file table
+
+RHINENG-6813 ([`61a2cad`](https://github.com/RedHatInsights/vmaas/commit/61a2cad130bc5437cf8bd263f9e891ced819f9de))
+
+* feat(csaf): add basic metrics
+
+RHINENG-6813 ([`5c5175f`](https://github.com/RedHatInsights/vmaas/commit/5c5175f6a30c374500912071614dee851daa69e1))
+
+### Unknown
+
+* test pr check regarding rbac (#1060)
+
+* test pr check regarding rbac
+
+* Add rbac
+
+* Add dependencies to clowdapp
+
+* Remove unneeded dependencies to clowdapp
+
+* Add rbac as component
+
+* Add vmaas as component
+
+* Add dynaconf variable ([`dea8e6a`](https://github.com/RedHatInsights/vmaas/commit/dea8e6aa17abc171f9d5bfa71141d10be2819c59))
+
+
 ## v2.50.4 (2024-01-09)
 
 ### Chore
