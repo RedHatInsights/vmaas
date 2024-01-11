@@ -29,9 +29,10 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT, \
-    FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
+    CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
+from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
 from vmaas.reposcan.redhatoval.oval_controller import OvalController
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
@@ -67,6 +68,7 @@ SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_OVAL = strtobool(os.getenv("SYNC_OVAL", "yes"))
+SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 
 
 class TaskStatusResponse(dict):
@@ -740,6 +742,39 @@ def metrics():
     return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 
+class CsafSyncHandler(SyncHandler):
+    """Handler for CSAF sync API."""
+
+    task_type = "Sync CSAF metadata"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Sync CSAF metadata."""
+
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing CSAFs."""
+        try:
+            init_logging()
+            init_db()
+            controller = CsafController()
+            controller.store()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            CSAF_FAILED_IMPORT.inc()
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
 def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
@@ -748,6 +783,7 @@ def all_sync_handlers() -> list:
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])
     handlers.extend([OvalSyncHandler] if SYNC_OVAL else [])
+    handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])
     return handlers
 
 
