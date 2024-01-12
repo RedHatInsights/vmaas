@@ -4,12 +4,12 @@ Module containing class for UpdateInfo XML metadata.
 # pylint: disable=too-many-nested-blocks, too-many-branches
 # I really don't want to do that but, the way how updateinfo XML is done it's unfortuntately needed
 from datetime import datetime
-from distutils.util import strtobool
 import re
 import xml.etree.ElementTree as eT
 
 from vmaas.common.string import text_strip
 from vmaas.common.utc import UTC
+from vmaas.common.strtobool import strtobool
 
 DATETIME_PATTERNS = {
     "%Y-%m-%d %H:%M:%S": re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"),
