@@ -9,7 +9,6 @@ import signal
 import sre_constants
 import ssl
 import time
-from distutils.util import strtobool
 from json import loads
 
 import connexion
@@ -38,6 +37,7 @@ from vmaas.webapp.vulnerabilities import VulnerabilitiesAPI
 from vmaas.common.config import Config
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger
+from vmaas.common.strtobool import strtobool
 
 # pylint: disable=too-many-lines
 CFG = Config()

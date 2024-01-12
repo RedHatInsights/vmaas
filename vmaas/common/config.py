@@ -2,9 +2,10 @@
 Common VMaaS configuration.
 """
 import os
-from distutils.util import strtobool
 
 import app_common_python
+
+from vmaas.common.strtobool import strtobool
 
 
 class Singleton(type):

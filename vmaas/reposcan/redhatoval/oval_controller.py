@@ -6,11 +6,11 @@ import shutil
 import tempfile
 import json
 import re
-from distutils.util import strtobool
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
 from vmaas.common.date_utils import parse_datetime
+from vmaas.common.strtobool import strtobool
 
 from vmaas.reposcan.database.oval_store import OvalStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES

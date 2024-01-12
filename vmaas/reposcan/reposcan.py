@@ -13,7 +13,6 @@ import signal
 from contextlib import contextmanager
 from multiprocessing.pool import Pool
 from functools import reduce
-from distutils.util import strtobool
 
 import connexion
 import git
@@ -24,6 +23,7 @@ from psycopg2 import DatabaseError
 
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger, init_logging
+from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI

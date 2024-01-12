@@ -4,11 +4,11 @@ Module containing class for syncing set of CSAF files into the DB.
 import os
 import shutil
 import tempfile
-from distutils.util import strtobool
 from pathlib import Path
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
+from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
 from vmaas.reposcan.download.downloader import DownloadItem
 from vmaas.reposcan.download.downloader import FileDownloader

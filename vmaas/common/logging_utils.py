@@ -6,7 +6,6 @@ TODO: packaging changes that let this live in one place please
 import logging
 import os
 import time
-from distutils.util import strtobool  # pylint: disable=import-error, no-name-in-module
 from threading import Lock
 
 import watchtower
@@ -14,6 +13,7 @@ from boto3 import client
 from botocore.exceptions import ClientError
 
 from vmaas.common.config import Config
+from vmaas.common.strtobool import strtobool
 
 
 class OneLineExceptionFormatter(logging.Formatter):
