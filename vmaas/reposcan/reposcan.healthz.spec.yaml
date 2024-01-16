@@ -20,3 +20,17 @@ paths:
                 type: boolean
                 enum: [true, false]
       tags: [ Metadata ]
+  /metrics:
+    get:
+      summary: Application metrics
+      description: Return prometheus metrics
+      operationId: vmaas.reposcan.reposcan.metrics
+      x-methodName: getMetrics
+      responses:
+        200:
+          description: Application metrics
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+      tags: [ Metadata ]

@@ -3,10 +3,10 @@
 import os
 
 from http import HTTPStatus
-from vmaas.reposcan.test.test_case import FlaskTestCase
+from vmaas.reposcan.test.test_case import TestCase
 
 
-class TestReposcanApp(FlaskTestCase):
+class TestReposcanApp(TestCase):
     """Reposcan overall test."""
 
     def test_monitoring_health(self):
