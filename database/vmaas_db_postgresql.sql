@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 17);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 18);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1281,6 +1281,58 @@ CREATE TABLE IF NOT EXISTS csaf_file (
   name      TEXT UNIQUE NOT NULL, CHECK (NOT empty(name)),
   updated   TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.csaf_product_status
+-- https://docs.oasis-open.org/csaf/csaf/v2.0/os/csaf-v2.0-os.html#3239-vulnerabilities-property---product-status
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS csaf_product_status (
+    id   INT NOT NULL,
+    name TEXT UNIQUE NOT NULL, CHECK (NOT empty(name)),
+    PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+INSERT INTO csaf_product_status (id, name)
+VALUES  (1, 'first_affected'),
+        (2, 'first_fixed'),
+        (3, 'fixed'),
+        (4, 'known_affected'),
+        (5, 'known_not_affected'),
+        (6, 'last_affected'),
+        (7, 'recommended'),
+        (8, 'under_investigation')
+ON CONFLICT DO NOTHING;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.csaf_products
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS csaf_products (
+  id             SERIAL,
+  cpe            TEXT NOT NULL, CHECK (NOT empty(cpe)),
+  package        TEXT NULL, CHECK (NOT empty(package)),
+  module         TEXT NULL, CHECK (NOT empty(module)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+
+-- -----------------------------------------------------
+-- Table vmaas.csaf_cves
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS csaf_cves (
+  id                SERIAL,
+  cve               TEXT NOT NULL, CHECK (NOT empty(cve)),
+  csaf_product_id   INT NOT NULL,
+  product_status_id INT NOT NULL,    
+  PRIMARY KEY (id),
+  CONSTRAINT csaf_product_id
+    FOREIGN KEY (csaf_product_id)
+    REFERENCES csaf_products (id),
+  CONSTRAINT csaf_product_status_id
+    FOREIGN KEY (product_status_id)
+    REFERENCES csaf_product_status (id)
 )TABLESPACE pg_default;
 
 
