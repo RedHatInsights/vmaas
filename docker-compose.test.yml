@@ -12,15 +12,15 @@ services:
       - 5432:5432
 
   test:
-    container_name: vmaas-webapp
-    hostname: vmaas-webapp
+    container_name: vmaas-test
+    hostname: vmaas-test
     build:
       context: .
       dockerfile: Dockerfile
       args:
         VAR_RPMS: "findutils"
         VAR_POETRY_INSTALL_OPT: "--with dev"
-    image: vmaas/app:latest
+    image: vmaas/test:latest
     environment:
       CI: "${CI:-false}"
       GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"

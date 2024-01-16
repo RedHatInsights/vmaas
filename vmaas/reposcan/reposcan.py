@@ -10,16 +10,16 @@ import json
 import os
 import shutil
 import signal
-from contextlib import contextmanager
 from multiprocessing.pool import Pool
+import multiprocessing
 from functools import reduce
 
+from apscheduler.schedulers.background import BackgroundScheduler
 import connexion
 import git
-from flask import request
 from prometheus_client import generate_latest
-from tornado.ioloop import IOLoop, PeriodicCallback
 from psycopg2 import DatabaseError
+from starlette.middleware.cors import CORSMiddleware
 
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger, init_logging
@@ -457,22 +457,10 @@ class RepoListHandler(RepolistImportHandler):
     task_type = "Import repositories"
 
     @classmethod
-    def _parse_input_list(cls):
-        # check if JSON is passed as a file or as a body of POST request
-        data = None
-        if request.files:
-            json_data = request.files['file'][0]['body']  # pick up only first file (index 0)
-            data = json.loads(json_data)
-        elif request.data:
-            data = request.json
-
-        return cls.parse_repolist_json(data)
-
-    @classmethod
-    def post(cls, **kwargs):
+    def post(cls, body, **kwargs):
         """Add repositories listed in request to the DB"""
         try:
-            products, repos = cls._parse_input_list()
+            products, repos = cls.parse_repolist_json(body)
             if not products and not repos:
                 msg = "Input json is not valid"
                 LOGGER.warning(msg)
@@ -747,6 +735,11 @@ class OvalSyncHandler(SyncHandler):
         return "OK"
 
 
+def metrics():
+    """Generate Prometheus metrics."""
+    return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+
 def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
@@ -775,26 +768,6 @@ class AllSyncHandler(SyncHandler):
         """Function to start syncing all repositories from database + all CVEs."""
         tasks = ", ".join([h.run_task() for h in all_sync_handlers()])
         return tasks
-
-
-class PeriodicSync(AllSyncHandler):
-    """Handler for Periodic Sync"""
-
-    attempt_retry = None
-
-    @classmethod
-    def finish_task(cls, task_result):
-        """Retry the sync later if failed, otherwise behave normally."""
-        super().finish_task(task_result)
-        is_err = reduce(lambda was, msg: was if was else "DB_ERROR" in msg, task_result, False)
-        if is_err:
-            ioloop = IOLoop.instance()
-            if cls.attempt_retry:
-                ioloop.remove_timeout(cls.attempt_retry)
-                cls.attempt_retry = None
-            LOGGER.info("Repeating sync in %ss", CACHE_DUMP_RETRY_SECONDS)
-            cls.attempt_retry = ioloop.call_later(CACHE_DUMP_RETRY_SECONDS,
-                                                  AllSyncHandler.start_task)
 
 
 class CleanTmpHandler(SyncHandler):
@@ -836,40 +809,42 @@ class SyncTask:
     Static class providing methods for managing sync worker.
     Limit to single DB worker.
     """
-    _running = False
+    _process = None
     _running_task_type = None
-    _pid = None
-    workers = Pool(1)
+    workers = None
+
+    @classmethod
+    def init(cls):
+        """Initialize process pool for sync worker(s)."""
+        if not cls.workers:
+            # Don't inherit signal handlers in worker (set method to "spawn" instead of "fork").
+            # Terminating worker would result in terminating uvicorn otherwise.
+            multiprocessing.set_start_method("spawn")
+            cls.workers = Pool(1)
 
     @classmethod
     def start(cls, task_type, func, callback, *args, **kwargs):
         """Start specified function with given parameters in separate worker."""
-        cls._running = True
+        cls._process = cls.workers._pool[0]  # pylint: disable=protected-access
         cls._running_task_type = task_type
-        cls._pid = cls.workers._pool[0].pid  # pylint: disable=protected-access
-        ioloop = IOLoop.instance()
-
-        def _callback(result):
-            ioloop.add_callback(lambda: callback(result))
 
         def _err_callback(err):
             LOGGER.error("SyncTask error: %s", err)
             SyncTask.finish()
 
-        cls.workers.apply_async(func, args, kwargs, _callback, _err_callback)
+        cls.workers.apply_async(func, args, kwargs, callback, _err_callback)
 
     @classmethod
     def finish(cls):
         """Mark work as done."""
-        cls._running = False
+        cls._process = None
         cls._running_task_type = None
-        cls._pid = None
 
     @classmethod
     def is_running(cls):
         """Return True when some sync is running."""
         # If process is killed during sync, no exception is thrown but Pool respawns process
-        return cls._running and cls._pid == cls.workers._pool[0].pid  # pylint: disable=protected-access
+        return cls._process is not None and cls._process.pid == cls.workers._pool[0].pid  # pylint: disable=protected-access
 
     @classmethod
     def get_task_type(cls):
@@ -879,41 +854,29 @@ class SyncTask:
     @classmethod
     def cancel(cls):
         """Terminate the process pool."""
-        with disabled_signals():
-            cls.workers.terminate()
-            cls.workers.join()
-            cls.workers = Pool(1)
-            cls.finish()
+        cls._process.terminate()
+        cls._process.join()
+        cls.finish()
 
 
 def periodic_sync():
     """Function running both repo and CVE sync."""
 
     LOGGER.info("Periodic sync started.")
-    PeriodicSync.start_task()
-
-
-@contextmanager
-def disabled_signals():
-    """ Temporarily disables signal handlers, using contextlib to automatically re-enable them"""
-    handlers = {}
-    for sig in KILL_SIGNALS:
-        handlers[sig] = signal.signal(sig, signal.SIG_DFL)
-    try:
-        yield True
-    finally:
-        for sig in KILL_SIGNALS:
-            signal.signal(sig, handlers[sig])
+    AllSyncHandler.start_task()
 
 
 def create_app(specs):
     """Create reposcan app."""
-
     init_logging()
+    SyncTask.init()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
-    sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360")) * 60000
+    sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360"))
     if sync_interval > 0:
-        PeriodicCallback(periodic_sync, sync_interval).start()
+        sched = BackgroundScheduler()
+        sched.add_job(periodic_sync, trigger="interval", minutes=sync_interval)
+        sched.start()
+        LOGGER.info("Periodic syncing running every %s minute(s).", sync_interval)
     else:
         LOGGER.info("Periodic syncing disabled.")
 
@@ -926,10 +889,7 @@ def create_app(specs):
     for sig in KILL_SIGNALS:
         signal.signal(sig, terminate)
 
-    app = connexion.App(__name__, options={
-        'swagger_ui': True,
-        'openapi_spec_path': '/openapi.json'
-    })
+    app = connexion.AsyncApp(__name__, swagger_ui_options=connexion.options.SwaggerUIOptions(swagger_ui=True))
 
     # Response validation is disabled due to returing streamed response in GET /pkgtree
     # https://github.com/zalando/connexion/pull/467 should fix it
@@ -941,16 +901,5 @@ def create_app(specs):
                     arguments={"vmaas_version": VMAAS_VERSION}
                     )
 
-    @app.app.route('/metrics', methods=['GET'])
-    def metrics():  # pylint: disable=unused-variable
-        # /metrics API shouldn't be visible in the API documentation,
-        # hence it's added here in the create_app step
-        return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
-
-    @app.app.after_request
-    def set_headers(response):  # pylint: disable=unused-variable
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        return response
-
+    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["Content-Type"])
     return app

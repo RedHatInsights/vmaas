@@ -15,7 +15,8 @@ if [[ ! -z $1 ]]; then
         port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8083)")
         cat nginx.conf.template | sed "s/_PORT_/$port/g" > /tmp/nginx.conf
         nginx -c /tmp/nginx.conf
-        exec python3 -m vmaas.common.wait_for_services python3 -m main
+        port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.publicPort or 8000)")
+        exec python3 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port main:app
     elif [[ "$1" == "sleep" ]]; then
         # "developer" mode
         echo "Sleeping ..."
