@@ -5,7 +5,6 @@ import pytest
 from vmaas.webapp.test import yaml_cache
 
 # pylint: disable=invalid-name
-pytest_plugins = 'aiohttp.pytest_plugin'
 
 
 @pytest.fixture(scope="session")

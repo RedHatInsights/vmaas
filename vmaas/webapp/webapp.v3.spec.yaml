@@ -37,6 +37,9 @@ paths:
       responses:
         '200':
           description: Version of application returned
+          content:
+            text/plain:
+              schema: { type: string, example: '0.0.0'}
 
   /dbchange:
     get:
@@ -107,6 +110,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/CvesResponse'
         <<: *format_resps
+    options:
+      description: Empty response
+      operationId: vmaas.webapp.app.dummy_200
+      responses:
+        200:
+          description: Empty response
+          content:
+            text/plain:
+              schema:
+                type: string
 
   '/cves/{cve}':
     get:
@@ -1267,7 +1280,7 @@ components:
           last_change:
             type: string
             example: '2020-04-16 20:07:58.500192+00'
-                  
+
     RPMPkgNamesRequest:
       type: object
       properties:
