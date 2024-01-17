@@ -37,6 +37,9 @@ paths:
       responses:
         '200':
           description: Version of application returned
+          content:
+            text/plain:
+              schema: { type: string, example: '0.0.0'}
 
   /dbchange:
     get:

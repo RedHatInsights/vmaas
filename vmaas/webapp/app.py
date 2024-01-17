@@ -3,21 +3,19 @@
 Main web API module
 """
 import asyncio
-import gzip
+import json
 import os
 import signal
 import sre_constants
-import ssl
 import time
-from json import loads
 
 import connexion
-from aiohttp import ClientSession
-from aiohttp import hdrs
-from aiohttp import web
-from aiohttp.client_exceptions import ClientConnectionError
 from prometheus_client import generate_latest
-from jsonschema.exceptions import ValidationError
+import requests
+from starlette.datastructures import MutableHeaders
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
+
 from vmaas.webapp.cache import Cache
 from vmaas.webapp.cve import CveAPI
 from vmaas.webapp.dbchange import DBChange
@@ -37,6 +35,7 @@ from vmaas.webapp.vulnerabilities import VulnerabilitiesAPI
 from vmaas.common.config import Config
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger
+from vmaas.common.logging_utils import init_logging
 from vmaas.common.strtobool import strtobool
 
 # pylint: disable=too-many-lines
@@ -74,44 +73,23 @@ class BaseHandler:
     data_ready = False
 
     @classmethod
-    async def get_post_data(cls, request):
-        """extract input JSON from POST request"""
-        if request.headers.get(hdrs.CONTENT_TYPE, None) == 'application/json':
-            return await request.json()
-        raise web.HTTPUnsupportedMediaType(reason="Application/json media type is needed")
-
-    @classmethod
-    async def handle_request(cls, api_endpoint, api_version, param_name=None, param=None, **kwargs):
+    async def handle_request(cls, api_endpoint, api_version, body=None, param_name=None, param=None, **kwargs):  # pylint: disable=unused-argument
         """Takes care of validation of input and execution of request."""
         # If refreshing cache, return 503 so apps can detect this state
         if cls.refreshing:
-            return web.json_response("Data refresh in progress, please try again later.", status=503)
+            return "Data refresh in progress, please try again later.", 503
 
         if not cls.data_ready:
-            return web.json_response("Data not available, please try again later.", status=503)
-
-        request = kwargs.get('request', None)
-        if request is None:
-            raise ValueError('request not provided')
+            return "Data not available, please try again later.", 503
 
         data = None
         try:
-            if request.method == 'POST':
-                data = await cls.get_post_data(request)
-            else:
+            if body is not None:  # POST
+                data = body
+            else:  # GET
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
             code = 200
-        except web.HTTPError as exc:
-            # We cant return the e as response, this is being deprecated in aiohttp
-            response = {"detail": exc.reason, "status": exc.status_code}
-            return web.json_response(response, status=exc.status_code)
-        except ValidationError as valid_err:
-            if valid_err.absolute_path:
-                res = '%s : %s' % (valid_err.absolute_path.pop(), valid_err.message)
-            else:
-                res = '%s' % valid_err.message
-            code = 400
         except (ValueError, sre_constants.error) as ex:
             res = repr(ex)
             code = 400
@@ -121,7 +99,7 @@ class BaseHandler:
             code = 500
             LOGGER.exception(res)
             LOGGER.error("Input data for <%s>: %s", err_id, data)
-        return web.json_response(res, status=code)
+        return res, code
 
 
 class HealthHandler:
@@ -136,8 +114,7 @@ class HealthHandler:
              200:
                description: Application is alive
         """
-
-        return web.Response(status=200)
+        return ""
 
 
 class ReadyHandler(BaseHandler):
@@ -146,7 +123,8 @@ class ReadyHandler(BaseHandler):
     @classmethod
     async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get app status(whether the app is ready to serve requests)"""
-        return web.Response(status=503 if cls.refreshing or not cls.data_ready else 200)
+        status = 503 if cls.refreshing or not cls.data_ready else 200
+        return "", status
 
 
 class VersionHandler:
@@ -161,7 +139,7 @@ class VersionHandler:
              200:
                description: Version of application returned
         """
-        return web.Response(body=str(VMAAS_VERSION), status=200)
+        return VMAAS_VERSION
 
 
 class DBChangeHandler(BaseHandler):
@@ -172,7 +150,7 @@ class DBChangeHandler(BaseHandler):
     @classmethod
     async def get(cls, **kwargs):  # pylint: disable=unused-argument
         """Get last-updated-times for VMaaS DB """
-        return web.json_response(cls.dbchange_api.process())
+        return cls.dbchange_api.process()
 
 
 class UpdatesHandlerGet(BaseHandler):
@@ -181,16 +159,16 @@ class UpdatesHandlerGet(BaseHandler):
     @classmethod
     async def get(cls, nevra=None, **kwargs):
         """List security updates for single package NEVRA """
-        return await cls.handle_request(cls.updates_api, 1, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.updates_api, 1, None, 'package_list', nevra, **kwargs)
 
 
 class UpdatesHandlerPost(BaseHandler):
     """Handler for processing /updates POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """List security updates for list of package NEVRAs"""
-        return await cls.handle_request(cls.updates_api, 1, **kwargs)
+        return await cls.handle_request(cls.updates_api, 1, body, **kwargs)
 
 
 class UpdatesHandlerV2Get(BaseHandler):
@@ -199,16 +177,16 @@ class UpdatesHandlerV2Get(BaseHandler):
     @classmethod
     async def get(cls, nevra=None, **kwargs):
         """List security updates for single package NEVRA """
-        return await cls.handle_request(cls.updates_api, 2, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.updates_api, 2, None, 'package_list', nevra, **kwargs)
 
 
 class UpdatesHandlerV2Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """List security updates for list of package NEVRAs"""
-        return await cls.handle_request(cls.updates_api, 2, **kwargs)
+        return await cls.handle_request(cls.updates_api, 2, body, **kwargs)
 
 
 class UpdatesHandlerV3Get(BaseHandler):
@@ -217,16 +195,16 @@ class UpdatesHandlerV3Get(BaseHandler):
     @classmethod
     async def get(cls, nevra=None, **kwargs):
         """List security updates for single package NEVRA """
-        return await cls.handle_request(cls.updates_api, 3, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.updates_api, 3, None, 'package_list', nevra, **kwargs)
 
 
 class UpdatesHandlerV3Post(BaseHandler):
     """Handler for processing /updates POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """List security updates for list of package NEVRAs"""
-        return await cls.handle_request(cls.updates_api, 3, **kwargs)
+        return await cls.handle_request(cls.updates_api, 3, body, **kwargs)
 
 
 class CVEHandlerGet(BaseHandler):
@@ -237,19 +215,19 @@ class CVEHandlerGet(BaseHandler):
         """
         Get details about CVEs. It is possible to use POSIX regular expression as a pattern for CVE names.
         """
-        return await cls.handle_request(cls.cve_api, 1, 'cve_list', cve, **kwargs)
+        return await cls.handle_request(cls.cve_api, 1, None, 'cve_list', cve, **kwargs)
 
 
 class CVEHandlerPost(BaseHandler):
     """Handler for processing /cves POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """
         Get details about CVEs with additional parameters. As a "cve_list" parameter a complete list of CVE
         names can be provided OR one POSIX regular expression.
         """
-        return await cls.handle_request(cls.cve_api, 1, **kwargs)
+        return await cls.handle_request(cls.cve_api, 1, body, **kwargs)
 
 
 class ReposHandlerGet(BaseHandler):
@@ -261,19 +239,19 @@ class ReposHandlerGet(BaseHandler):
         Get details about a repository or repository-expression. It is allowed to use POSIX regular
         expression as a pattern for repository names.
         """
-        return await cls.handle_request(cls.repo_api, 1, 'repository_list', repo, **kwargs)
+        return await cls.handle_request(cls.repo_api, 1, None, 'repository_list', repo, **kwargs)
 
 
 class ReposHandlerPost(BaseHandler):
     """Handler for processing /repos POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """
         Get details about list of repositories. "repository_list" can be either a list of repository
         names, OR a single POSIX regular expression.
         """
-        return await cls.handle_request(cls.repo_api, 1, **kwargs)
+        return await cls.handle_request(cls.repo_api, 1, body, **kwargs)
 
 
 class ErrataHandlerGet(BaseHandler):
@@ -285,19 +263,19 @@ class ErrataHandlerGet(BaseHandler):
         Get details about errata. It is possible to use POSIX regular
         expression as a pattern for errata names.
         """
-        return await cls.handle_request(cls.errata_api, 1, 'errata_list', erratum, **kwargs)
+        return await cls.handle_request(cls.errata_api, 1, None, 'errata_list', erratum, **kwargs)
 
 
 class ErrataHandlerPost(BaseHandler):
     """ /errata API handler """
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """
         Get details about errata with additional parameters. "errata_list"
         parameter can be either a list of errata names OR a single POSIX regular expression.
         """
-        return await cls.handle_request(cls.errata_api, 1, **kwargs)
+        return await cls.handle_request(cls.errata_api, 1, body, **kwargs)
 
 
 class PackagesHandlerGet(BaseHandler):
@@ -306,25 +284,25 @@ class PackagesHandlerGet(BaseHandler):
     @classmethod
     async def get(cls, nevra=None, **kwargs):
         """Get details about packages."""
-        return await cls.handle_request(cls.packages_api, 1, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.packages_api, 1, None, 'package_list', nevra, **kwargs)
 
 
 class PackagesHandlerPost(BaseHandler):
     """ /packages API handler """
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """Get details about packages. "package_list" must be a list of"""
-        return await cls.handle_request(cls.packages_api, 1, **kwargs)
+        return await cls.handle_request(cls.packages_api, 1, body, **kwargs)
 
 
 class PkgListHandlerPost(BaseHandler):
     """ /pkglist API handler """
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """Get details about all packages."""
-        return await cls.handle_request(cls.pkglist_api, 1, **kwargs)
+        return await cls.handle_request(cls.pkglist_api, 1, body, **kwargs)
 
 
 class PkgtreeHandlerGet(BaseHandler):
@@ -333,7 +311,7 @@ class PkgtreeHandlerGet(BaseHandler):
     @classmethod
     async def get(cls, package_name=None, **kwargs):
         """Get package NEVRAs tree for a single package name."""
-        return await cls.handle_request(cls.pkgtree_api, 1, 'package_name_list', package_name, **kwargs)
+        return await cls.handle_request(cls.pkgtree_api, 1, None, 'package_name_list', package_name, **kwargs)
 
 
 class PkgtreeHandlerV3Get(BaseHandler):
@@ -342,25 +320,25 @@ class PkgtreeHandlerV3Get(BaseHandler):
     @classmethod
     async def get(cls, package_name=None, **kwargs):
         """Get package NEVRAs tree for a single package name."""
-        return await cls.handle_request(cls.pkgtree_api, 3, 'package_name_list', package_name, **kwargs)
+        return await cls.handle_request(cls.pkgtree_api, 3, None, 'package_name_list', package_name, **kwargs)
 
 
 class PkgtreeHandlerPost(BaseHandler):
     """ /pkgtree API handler """
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
-        return await cls.handle_request(cls.pkgtree_api, 1, **kwargs)
+        return await cls.handle_request(cls.pkgtree_api, 1, body, **kwargs)
 
 
 class PkgtreeHandlerV3Post(BaseHandler):
     """ /pkgtree API handler """
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """Get package NEVRAs trees for package names. "package_name_list" must be a list of package names."""
-        return await cls.handle_request(cls.pkgtree_api, 3, **kwargs)
+        return await cls.handle_request(cls.pkgtree_api, 3, body, **kwargs)
 
 
 class VulnerabilitiesHandlerGet(BaseHandler):
@@ -370,16 +348,16 @@ class VulnerabilitiesHandlerGet(BaseHandler):
     async def get(cls, nevra=None, **kwargs):
         """ List of applicable CVEs for a single package NEVRA
         """
-        return await cls.handle_request(cls.vulnerabilities_api, 1, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.vulnerabilities_api, 1, None, 'package_list', nevra, **kwargs)
 
 
 class VulnerabilitiesHandlerPost(BaseHandler):
     """Handler for processing /vulnerabilities POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """List of applicable CVEs to a package list. """
-        return await cls.handle_request(cls.vulnerabilities_api, 1, **kwargs)
+        return await cls.handle_request(cls.vulnerabilities_api, 1, body, **kwargs)
 
 
 class PatchesHandlerGet(BaseHandler):
@@ -389,25 +367,25 @@ class PatchesHandlerGet(BaseHandler):
     async def get(cls, nevra=None, **kwargs):
         """ List of applicable errata for a single package NEVRA
         """
-        return await cls.handle_request(cls.patches_api, 1, 'package_list', nevra, **kwargs)
+        return await cls.handle_request(cls.patches_api, 1, None, 'package_list', nevra, **kwargs)
 
 
 class PatchesHandlerPost(BaseHandler):
     """Handler for processing /patches POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """List of applicable errata to a package list. """
-        return await cls.handle_request(cls.patches_api, 1, **kwargs)
+        return await cls.handle_request(cls.patches_api, 1, body, **kwargs)
 
 
 class SRPMPkgNamesHandlerPost(BaseHandler):
     """Handler for processing /package_names/srpms POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
-        return await cls.handle_request(cls.srpm_pkg_names_api, 1, **kwargs)
+        return await cls.handle_request(cls.srpm_pkg_names_api, 1, body, **kwargs)
 
 
 class SRPMPkgNamesHandlerGet(BaseHandler):
@@ -416,16 +394,16 @@ class SRPMPkgNamesHandlerGet(BaseHandler):
     @classmethod
     async def get(cls, srpm=None, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
-        return await cls.handle_request(cls.srpm_pkg_names_api, 1, 'srpm_name_list', srpm, **kwargs)
+        return await cls.handle_request(cls.srpm_pkg_names_api, 1, None, 'srpm_name_list', srpm, **kwargs)
 
 
 class RPMPkgNamesHandlerPost(BaseHandler):
     """Handler for processing /package_names/rpms POST requests."""
 
     @classmethod
-    async def post(cls, **kwargs):
+    async def post(cls, body, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
-        return await cls.handle_request(cls.rpm_pkg_names_api, 1, **kwargs)
+        return await cls.handle_request(cls.rpm_pkg_names_api, 1, body, **kwargs)
 
 
 class RPMPkgNamesHandlerGet(BaseHandler):
@@ -434,7 +412,17 @@ class RPMPkgNamesHandlerGet(BaseHandler):
     @classmethod
     async def get(cls, rpm=None, **kwargs):
         """RPM list or Content Set list by SRPM list or RPM list"""
-        return await cls.handle_request(cls.rpm_pkg_names_api, 1, 'rpm_name_list', rpm, **kwargs)
+        return await cls.handle_request(cls.rpm_pkg_names_api, 1, None, 'rpm_name_list', rpm, **kwargs)
+
+
+def metrics():
+    """Provide current prometheus metrics"""
+    return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+
+def dummy_200():
+    """Dummy endpoint returning 200"""
+    return "", 200
 
 
 class RefreshTimer:
@@ -470,7 +458,7 @@ class RefreshTimer:
                 if latest_dump and latest_dump != BaseHandler.db_cache.dbchange.get('exported'):
                     LOGGER.info("New dump found: %s.", latest_dump)
                     await self._refresh_cache()
-            except ClientConnectionError:
+            except requests.exceptions.RequestException:
                 LOGGER.exception("Unable to connect to reposcan API: ")
             except:  # noqa pylint: disable=bare-except
                 LOGGER.exception("Refresh timer error occured: ")
@@ -479,10 +467,8 @@ class RefreshTimer:
     @staticmethod
     async def fetch_latest_dump():
         """Method fetches latest dump from reposcan"""
-        ssl_ctx = ssl.create_default_context(cafile=CFG.tls_ca_path)
-        async with ClientSession() as session:
-            async with session.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", ssl=ssl_ctx) as resp:
-                return await resp.text()
+        resp = requests.get(f"{CFG.reposcan_url}/{LATEST_DUMP_ENDPOINT}", verify=CFG.tls_ca_path, timeout=10)
+        return resp.text
 
 
 def load_cache_to_apis():
@@ -503,93 +489,12 @@ def load_cache_to_apis():
 
 def create_app(specs):
     """Create VmaaS application and servers"""
-
+    # pylint: disable=too-many-statements
+    init_logging()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
 
-    @web.middleware
-    async def timing_middleware(request, handler, **kwargs):
-        """ Middleware that handles timing of requests"""
-        start_time = time.time()
-        if asyncio.iscoroutinefunction(handler):
-            res = await handler(request, **kwargs)
-        else:
-            res = handler(request, **kwargs)
-
-        duration = time.time() - start_time
-        # (0)  /(1) /(2) /(3)
-        #     /api /v1  /updates
-        const_path = '/'.join(request.path.split('/')[:4])
-        REQUEST_TIME.labels(request.method, const_path).observe(duration)
-        REQUEST_COUNTS.labels(request.method, const_path, res.status).inc()
-
-        return res
-
-    @web.middleware
-    async def gzip_middleware(request, handler, **kwargs):
-        """ Middleware that compress response using gzip"""
-        res = await handler(request, **kwargs)
-        header = 'Accept-Encoding'
-
-        try:
-            if res.body is not None and header in request.headers and "gzip" in request.headers[header]:
-                gzipped_body = gzip.compress(res.body, compresslevel=GZIP_COMPRESS_LEVEL)
-                res.body = gzipped_body
-                res.headers["Content-Encoding"] = "gzip"
-                return res
-        except (TypeError, AttributeError):
-            LOGGER.warning("unable to gzip response '%s'", request.path)
-        return res
-
-    @web.middleware
-    async def error_handler(request, handler, **kwargs):
-        def format_error(detail, status):
-            res = {}
-            res["type"] = "about:blank"
-            res["detail"] = detail
-            res["status"] = status
-
-            return res
-
-        res = await handler(request, **kwargs)
-
-        if res.status >= 400 and res.body:
-            body = loads(res.body)
-            better_error = format_error(body, res.status)
-            return web.json_response(better_error, status=res.status)
-
-        return res
-
-    middlewares = []
-    if GZIP_RESPONSE_ENABLE:
-        middlewares.append(gzip_middleware)
-    middlewares.extend([error_handler, timing_middleware])
-
-    app = connexion.AioHttpApp(__name__, options={
-        'swagger_ui': True,
-        'openapi_spec_path': '/openapi.json',
-        'middlewares': middlewares
-    })
-
-    def metrics(request, **kwargs):  # pylint: disable=unused-argument
-        """Provide current prometheus metrics"""
-        # /metrics API shouldn't be visible in the API documentation,
-        # hence it's added here in the create_app step
-        return web.Response(text=generate_latest().decode('utf-8'))
-
-    def dummy_200(request, **kwargs):  # pylint: disable=unused-argument
-        """Dummy endpoint returning 200"""
-        return web.Response()
-
-    async def on_prepare(request, response):  # pylint: disable=unused-argument
-        """Hook for preparing new responses"""
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS, POST'
-
-    app.app.on_response_prepare.append(on_prepare)
-    app.app.router.add_get("/metrics", metrics)
-    app.app.router.add_get("/healthz", HealthHandler.get)
-    app.app.router.add_route("OPTIONS", "/api/v3/cves", dummy_200)
+    app = connexion.AsyncApp(__name__,
+                             swagger_ui_options=connexion.options.SwaggerUIOptions(swagger_ui=True))
 
     for route, spec in specs.items():
         app.add_api(spec, resolver=connexion.RestyResolver('app'),
@@ -599,8 +504,86 @@ def create_app(specs):
                     pass_context_arg_name='request',
                     arguments={'vmaas_version': VMAAS_VERSION})
 
+    class ErrorHandlerMiddleware:
+        """Middleware to wrap error message in JSON struct."""
+        def __init__(self, app):
+            self.app = app
+            self.start_message = None
+
+        def _format_error(self, detail):
+            res = {}
+            res["type"] = "about:blank"
+            res["detail"] = detail
+            res["status"] = self.start_message["status"]
+            return res
+
+        async def __call__(self, scope, receive, send):
+            if scope["type"] != "http":
+                await self.app(scope, receive, send)
+                return
+
+            async def send_with_formatted_error(message):
+                if message["type"] == "http.response.start":
+                    self.start_message = message
+                elif message["type"] == "http.response.body":
+                    if self.start_message["status"] >= 400:
+                        headers = MutableHeaders(raw=self.start_message["headers"])
+                        error = message["body"].decode("utf-8").strip().replace('"', '')
+                        better_error = json.dumps(self._format_error(error)).encode("utf-8")
+                        headers["Content-Length"] = str(len(better_error))
+                        message["body"] = better_error
+                    await send(self.start_message)
+                    await send(message)
+
+            await self.app(scope, receive, send_with_formatted_error)
+
+    class TimingMiddleware:
+        """Middleware to measure duration of requests to each endpoint and exporting it as Prometheus metric."""
+        def __init__(self, app):
+            self.app = app
+            self.start_time = None
+            self.start_message = None
+
+        async def __call__(self, scope, receive, send):
+            if scope["type"] != "http":
+                await self.app(scope, receive, send)
+                return
+
+            async def receive_started():
+                message = await receive()
+                self.start_time = time.time()
+                return message
+
+            async def send_finished(message):
+                if message["type"] == "http.response.start":
+                    self.start_message = message
+                elif message["type"] == "http.response.body":
+                    duration = time.time() - self.start_time
+                    method = scope["method"]
+                    path_parts = scope["path"].split('/')
+                    # (0) /(1) /(2)     /(3) /(4)
+                    #     /api (/vmaas) /v1  /updates
+                    if "vmaas" in path_parts:
+                        strip_limit = 5
+                    else:
+                        strip_limit = 4
+                    const_path = '/'.join(path_parts[:strip_limit])
+                    REQUEST_TIME.labels(method, const_path).observe(duration)
+                    REQUEST_COUNTS.labels(method, const_path, self.start_message["status"]).inc()
+                await send(message)
+
+            await self.app(scope, receive_started, send_finished)
+
+    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["Content-Type"], allow_methods=["GET", "OPTIONS", "POST"])
+    if GZIP_RESPONSE_ENABLE:
+        app.add_middleware(GZipMiddleware, minimum_size=1, compresslevel=GZIP_COMPRESS_LEVEL)
+    app.add_middleware(ErrorHandlerMiddleware)
+    app.add_middleware(TimingMiddleware)
+
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
+
+    init_refresh_timer()
 
     return app
 

@@ -45,5 +45,4 @@ services:
                          && python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade \
                          && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \
-                         && ./run_tests.sh vmaas/webapp \
-                         && bash <(curl -s https://codecov.io/bash)'
+                         && ./run_tests.sh vmaas/webapp'
