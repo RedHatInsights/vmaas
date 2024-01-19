@@ -35,25 +35,30 @@ jobs:
           flake8 vmaas/
       - name: Run container
         run: |
-          docker-compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test
+          docker compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test
       - name: Check dependencies
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test ./scripts/check_deps_versions.sh --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test ./scripts/check_deps_versions.sh --exit-code-from
       - name: Validate dashboards
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
       - name: Wait for services and upgrade DB
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade --exit-code-from
       - name: exec common tests
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/common --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/common --exit-code-from
+          docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/common/coverage.xml ./coverage_common.xml
       - name: exec reposcan tests
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/reposcan --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/reposcan --exit-code-from
+          docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/reposcan/coverage.xml ./coverage_reposcan.xml
       - name: exec webapp tests
         run: |
-          docker-compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/webapp --exit-code-from
-      - name: exec codecov
-        run: |
-          docker-compose -f docker-compose.test.yml exec -T test bash -c "bash <(curl -s https://codecov.io/bash)" --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/webapp --exit-code-from
+          docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/webapp/coverage.xml ./coverage_webapp.xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp.xml
+          verbose: true
