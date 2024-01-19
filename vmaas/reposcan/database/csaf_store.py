@@ -5,7 +5,8 @@ from psycopg2.extras import execute_values
 
 from vmaas.reposcan.database.object_store import ObjectStore
 from vmaas.reposcan.mnm import CSAF_FAILED_DELETE
-from vmaas.reposcan.redhatcsaf.modeling import CsafFileCollection
+from vmaas.reposcan.redhatcsaf.modeling import CsafData
+from vmaas.reposcan.redhatcsaf.modeling import CsafFiles
 
 
 class CsafStore(ObjectStore):
@@ -29,7 +30,7 @@ class CsafStore(ObjectStore):
         finally:
             cur.close()
 
-    def _save_csaf_files(self, csaf_files: CsafFileCollection) -> [int]:
+    def _save_csaf_files(self, csaf_files: CsafFiles) -> list[int]:
         cur = self.conn.cursor()
         db_ids = execute_values(
             cur,
@@ -45,7 +46,7 @@ class CsafStore(ObjectStore):
         self.conn.commit()
         return db_ids
 
-    def store(self, csaf_files: CsafFileCollection):
+    def store(self, csaf_data: CsafData):
         """Store collection of CSAF files into DB."""
-        self._save_csaf_files(csaf_files)
+        self._save_csaf_files(csaf_data.files)
         # TODO: populate future objects in csaf store

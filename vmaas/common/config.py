@@ -11,7 +11,7 @@ from vmaas.common.strtobool import strtobool
 class Singleton(type):
     """Singleton object."""
 
-    _instances = {}
+    _instances: dict = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
