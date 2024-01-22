@@ -141,7 +141,7 @@ class FileDownloader:
         for i in range(min(self.num_threads, self.queue.qsize())):
             self.logger.debug("Starting thread %d.", i)
             thread = FileDownloadThread(self.queue, self.logger, progress_logger, headers_only)
-            thread.setDaemon(True)
+            thread.daemon = True
             thread.start()
             threads.append(thread)
 

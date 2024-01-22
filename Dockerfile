@@ -12,9 +12,9 @@ ARG VAR_RPMS=""
 RUN microdnf module enable postgresql:12 && \
     microdnf module enable nginx:1.20 && \
     microdnf install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python39 python39-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
+        python311 python3.11-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
         $VAR_RPMS && \
-        ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.9/site-packages/rpm && \
+        ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.11/site-packages/rpm && \
     microdnf clean all
 
 WORKDIR /vmaas
