@@ -18,7 +18,7 @@ UNSUPPORTED_TESTS = {
     "{%s}uname_test" % NS['unix-def'],
 }
 
-UNSUPPORTED_TEST_CHILDS = {}
+UNSUPPORTED_TEST_CHILDS: dict = {}
 
 UNSUPPORTED_TEST_COMMENTS = {
     "kernel"
@@ -30,7 +30,7 @@ UNSUPPORTED_OBJECTS = {
     "{%s}uname_object" % NS['unix-def'],
 }
 
-UNSUPPORTED_OBJECT_CHILDS = {}
+UNSUPPORTED_OBJECT_CHILDS: dict = {}
 
 UNSUPPORTED_STATES = {
     "{%s}rpmverifyfile_state" % NS['red-def'],

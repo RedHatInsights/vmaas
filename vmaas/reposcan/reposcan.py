@@ -779,12 +779,12 @@ class CsafSyncHandler(SyncHandler):
 def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
-    handlers.extend([GitRepoListHandler] if SYNC_GIT_REPO_LIST else [])
-    handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])
-    handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])
-    handlers.extend([CpeSyncHandler] if SYNC_CPE else [])
-    handlers.extend([OvalSyncHandler] if SYNC_OVAL else [])
-    handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])
+    handlers.extend([GitRepoListHandler] if SYNC_GIT_REPO_LIST else [])  # type: ignore[list-item]
+    handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
+    handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
+    handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
+    handlers.extend([OvalSyncHandler] if SYNC_OVAL else [])  # type: ignore[list-item]
+    handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]
     return handlers
 
 
