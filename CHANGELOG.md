@@ -2,6 +2,55 @@
 
 
 
+## v2.52.0 (2024-01-22)
+
+### Chore
+
+* chore: update python version
+
+RHINENG-7727 ([`2e9b3a3`](https://github.com/RedHatInsights/vmaas/commit/2e9b3a38a89ca2f8457be81963b4f5cec31c9fe9))
+
+* chore: update checkout and setup-python actions ([`46f8412`](https://github.com/RedHatInsights/vmaas/commit/46f841209981d75d1617aa8e991eb0820eec9adc))
+
+* chore: fix code coverage report
+
+RHINENG-7698 ([`2e920bc`](https://github.com/RedHatInsights/vmaas/commit/2e920bc333d14bf3b7adea5c38a93be2d8484e74))
+
+* chore: replace strtobool by custom impl ([`0cb451e`](https://github.com/RedHatInsights/vmaas/commit/0cb451e6156e34ebc763f834af47e080e92c8e22))
+
+### Feature
+
+* feat(csaf): add csaf_ tables needed to store csaf data
+
+RHINENG-6814 ([`96dbd27`](https://github.com/RedHatInsights/vmaas/commit/96dbd278409ca0d35c42073e0cb32a788953a008))
+
+### Refactor
+
+* refactor(webapp): support connexion 3
+
+use AsyncApp instead of AioHttpApp
+
+RHINENG-5883 ([`9790f4f`](https://github.com/RedHatInsights/vmaas/commit/9790f4f6b09ba9554835d1d016512c8fe4ce2f68))
+
+* refactor(reposcan): support connexion 3
+
+use AsyncApp instead of FlaskApp
+use apscheduler instead of tornado PeriodicCallback
+
+re-factor subprocess handling
+
+RHINENG-5883 ([`560a1a5`](https://github.com/RedHatInsights/vmaas/commit/560a1a5d78ca839a90d018553bff11d78ff93fd2))
+
+* refactor: upgrade connexion
+
+remove unsupported aiohttp
+remove flask
+replace tornado PeriodicCallback functionality with apscheduler
+install uvicorn as ASGI server
+
+RHINENG-5883 ([`e461019`](https://github.com/RedHatInsights/vmaas/commit/e4610196da13f4966cdea15852da1f4d5b899c59))
+
+
 ## v2.51.0 (2024-01-11)
 
 ### Chore
