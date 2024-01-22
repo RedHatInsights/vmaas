@@ -23,16 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip codecov flake8
-      - name: Run flake8
-        run: |
-          flake8 vmaas/
       - name: Run container
         run: |
           docker compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test
@@ -62,3 +52,28 @@ jobs:
         with:
           files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp.xml
           verbose: true
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        run: |
+          pip install poetry~=1.5
+          poetry export --with dev -f requirements.txt --output requirements.txt
+          pip install -r requirements.txt
+      - name: Run flake8
+        run: |
+          flake8 vmaas/
+      - name: Run mypy
+        run: |
+          mypy .

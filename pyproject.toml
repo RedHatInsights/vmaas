@@ -40,7 +40,21 @@ pytest = ">=5.0.1"
 pylint = ">=2.3.1"
 pytest-cov = ">=2.7.1"
 testing-postgresql = ">=1.3.0"
+ipython = ">=8.18.1"
+mypy = ">=1.8.0"
+flake8 = "7.0.0"
+types-psycopg2 = "*"
+types-requests = "*"
+types-python-dateutil = "*"
+types-PyYAML = "*"
+types-pyOpenSSL = "*"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = '''(?x)(
+    ^vmaas/webapp        # exclude vmaas/webapp dir
+)'''
