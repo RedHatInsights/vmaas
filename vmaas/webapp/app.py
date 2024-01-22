@@ -6,7 +6,7 @@ import asyncio
 import json
 import os
 import signal
-import sre_constants
+import re
 import time
 
 import connexion
@@ -90,7 +90,7 @@ class BaseHandler:
                 data = {param_name: [param]}
             res = api_endpoint.process_list(api_version, data)
             code = 200
-        except (ValueError, sre_constants.error) as ex:
+        except (ValueError, re.error) as ex:
             res = repr(ex)
             code = 400
         except Exception as err:  # pylint: disable=broad-except
