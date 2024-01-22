@@ -508,13 +508,12 @@ def create_app(specs):
         """Middleware to wrap error message in JSON struct."""
         def __init__(self, app):
             self.app = app
-            self.start_message = None
 
-        def _format_error(self, detail):
+        def _format_error(self, detail, status):
             res = {}
             res["type"] = "about:blank"
             res["detail"] = detail
-            res["status"] = self.start_message["status"]
+            res["status"] = status
             return res
 
         async def __call__(self, scope, receive, send):
@@ -522,17 +521,20 @@ def create_app(specs):
                 await self.app(scope, receive, send)
                 return
 
+            start_message = None
+
             async def send_with_formatted_error(message):
+                nonlocal start_message
                 if message["type"] == "http.response.start":
-                    self.start_message = message
+                    start_message = message
                 elif message["type"] == "http.response.body":
-                    if self.start_message["status"] >= 400:
-                        headers = MutableHeaders(raw=self.start_message["headers"])
+                    if start_message["status"] >= 400:
+                        headers = MutableHeaders(raw=start_message["headers"])
                         error = message["body"].decode("utf-8").strip().replace('"', '')
-                        better_error = json.dumps(self._format_error(error)).encode("utf-8")
+                        better_error = json.dumps(self._format_error(error, start_message["status"])).encode("utf-8")
                         headers["Content-Length"] = str(len(better_error))
                         message["body"] = better_error
-                    await send(self.start_message)
+                    await send(start_message)
                     await send(message)
 
             await self.app(scope, receive, send_with_formatted_error)
@@ -541,24 +543,22 @@ def create_app(specs):
         """Middleware to measure duration of requests to each endpoint and exporting it as Prometheus metric."""
         def __init__(self, app):
             self.app = app
-            self.start_time = None
-            self.start_message = None
 
         async def __call__(self, scope, receive, send):
             if scope["type"] != "http":
                 await self.app(scope, receive, send)
                 return
 
-            async def receive_started():
-                message = await receive()
-                self.start_time = time.time()
-                return message
+            start_message = None
+            start_time = time.time()
 
             async def send_finished(message):
+                nonlocal start_message
+                nonlocal start_time
                 if message["type"] == "http.response.start":
-                    self.start_message = message
+                    start_message = message
                 elif message["type"] == "http.response.body":
-                    duration = time.time() - self.start_time
+                    duration = time.time() - start_time
                     method = scope["method"]
                     path_parts = scope["path"].split('/')
                     # (0) /(1) /(2)     /(3) /(4)
@@ -569,10 +569,10 @@ def create_app(specs):
                         strip_limit = 4
                     const_path = '/'.join(path_parts[:strip_limit])
                     REQUEST_TIME.labels(method, const_path).observe(duration)
-                    REQUEST_COUNTS.labels(method, const_path, self.start_message["status"]).inc()
+                    REQUEST_COUNTS.labels(method, const_path, start_message["status"]).inc()
                 await send(message)
 
-            await self.app(scope, receive_started, send_finished)
+            await self.app(scope, receive, send_finished)
 
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["Content-Type"], allow_methods=["GET", "OPTIONS", "POST"])
     if GZIP_RESPONSE_ENABLE:
