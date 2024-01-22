@@ -6,7 +6,7 @@ if [[ ! -z $1 ]]; then
     if [[ "$1" == "webapp" ]]; then
         cd vmaas/webapp
         port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.publicPort or 8000)")
-        [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="uvicorn --host 0.0.0.0 --port $port main:app"
+        [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="uvicorn --host 0.0.0.0 --port $port --no-access-log main:app"
         exec python3 -m vmaas.common.wait_for_services $cmd
     elif [[ "$1" == "webapp-go" ]]; then
         cd go/src/vmaas
@@ -17,7 +17,7 @@ if [[ ! -z $1 ]]; then
         cat nginx.conf.template | sed "s/_PORT_/$port/g" > /tmp/nginx.conf
         nginx -c /tmp/nginx.conf
         port=$(python3 -c "import app_common_python as a;print(a.LoadedConfig.publicPort or 8000)")
-        exec python3 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port main:app
+        exec python3 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port --no-access-log main:app
     elif [[ "$1" == "sleep" ]]; then
         # "developer" mode
         echo "Sleeping ..."

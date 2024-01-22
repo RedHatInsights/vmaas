@@ -23,6 +23,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger, init_logging
+from vmaas.common.middlewares import TimingLoggingMiddleware
 from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
@@ -902,4 +903,5 @@ def create_app(specs):
                     )
 
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["Content-Type"])
+    app.add_middleware(TimingLoggingMiddleware, position=connexion.middleware.MiddlewarePosition.BEFORE_EXCEPTION)
     return app
