@@ -2,6 +2,13 @@
 
 
 
+## v2.53.0 (2024-01-23)
+
+### Feature
+
+* feat(reposcan): add CSAF sync task ([`67c24d2`](https://github.com/RedHatInsights/vmaas/commit/67c24d275f01deff6bf44d3ec8c90f804b9ef800))
+
+
 ## v2.52.0 (2024-01-22)
 
 ### Chore
