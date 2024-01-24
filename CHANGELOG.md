@@ -2,6 +2,15 @@
 
 
 
+## v2.53.1 (2024-01-24)
+
+### Fix
+
+* fix: implement access log in middleware, allows adding timing info and solves cloudwatch support ([`e41fc94`](https://github.com/RedHatInsights/vmaas/commit/e41fc94f39a4a1ec730e32d1db4934193ac2b72d))
+
+* fix(webapp): middlewares should be stateless to work concurrently ([`7b4ea6b`](https://github.com/RedHatInsights/vmaas/commit/7b4ea6b41c400e792712de3347ab64d1e0957d31))
+
+
 ## v2.53.0 (2024-01-23)
 
 ### Feature
