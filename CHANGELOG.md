@@ -2,6 +2,31 @@
 
 
 
+## v2.54.0 (2024-01-29)
+
+### Chore
+
+* chore: don&#39;t sync all csaf files by default ([`ef41296`](https://github.com/RedHatInsights/vmaas/commit/ef412963d5803bf2a3625ca7a6fe7c336bcf7200))
+
+* chore: golang.org/x/crypto to &gt;= 0.17.0 ([`7318287`](https://github.com/RedHatInsights/vmaas/commit/7318287515119780c91c55883e055488c8e097e1))
+
+### Feature
+
+* feat(csaf): parse CSAF JSONs into CsafCves
+
+RHINENG-7697 ([`b2fccaa`](https://github.com/RedHatInsights/vmaas/commit/b2fccaaf3f4944b051fb8d8ff4c7506dafb4fabe))
+
+* feat(csaf): extend csaf models and fix type hints
+
+RHINENG-7697 ([`918745c`](https://github.com/RedHatInsights/vmaas/commit/918745c75abc418df20565c240c35af1b4ae4079))
+
+### Test
+
+* test(csaf): add unit tests for csaf model and parser
+
+RHINENG-7697 ([`b0c0e11`](https://github.com/RedHatInsights/vmaas/commit/b0c0e119e7c236be70be1e36ce436a7825a6a236))
+
+
 ## v2.53.1 (2024-01-24)
 
 ### Fix
