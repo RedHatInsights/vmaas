@@ -481,4 +481,4 @@ parameters:
 - name: CSAF_VEX_INDEX_CSV
   value: "changes.csv"
 - name: CSAF_SYNC_ALL_FILES  # sync all csaf files, not only those which are changed
-  value: "true"
+  value: "false"
