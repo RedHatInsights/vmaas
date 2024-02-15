@@ -2,6 +2,23 @@
 
 
 
+## v2.54.1 (2024-02-15)
+
+### Chore
+
+* chore: check reposcan code with mypy, simplify action with container
+
+RHINENG-7736 ([`27c5aaa`](https://github.com/RedHatInsights/vmaas/commit/27c5aaade286cf72282e2771dbd8caae74b16e52))
+
+### Fix
+
+* fix(metrics): log full endpoint in reposcan but only part of it in webapp
+
+to avoid too many metrics in prometheus ([`293a3e4`](https://github.com/RedHatInsights/vmaas/commit/293a3e4a70e50439bb0778571c38749c8b4351e3))
+
+* fix(metrics): update grafana dashboard with renamed metrics ([`8c4f76d`](https://github.com/RedHatInsights/vmaas/commit/8c4f76decc505f70a2a3f0392646664406400464))
+
+
 ## v2.54.0 (2024-01-29)
 
 ### Chore
