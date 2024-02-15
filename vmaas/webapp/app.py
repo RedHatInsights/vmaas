@@ -504,7 +504,8 @@ def create_app(specs):
     if GZIP_RESPONSE_ENABLE:
         app.add_middleware(GZipMiddleware, minimum_size=1, compresslevel=GZIP_COMPRESS_LEVEL)
     app.add_middleware(ErrorHandlerMiddleware)
-    app.add_middleware(TimingLoggingMiddleware, position=connexion.middleware.MiddlewarePosition.BEFORE_EXCEPTION)
+    app.add_middleware(TimingLoggingMiddleware, position=connexion.middleware.MiddlewarePosition.BEFORE_EXCEPTION,
+                       vmaas_component="webapp")
 
     BaseHandler.db_cache = Cache()
     load_cache_to_apis()
