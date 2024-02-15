@@ -548,6 +548,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
+                    "type": "prometheus",
                     "uid": "$datasource"
                 },
                 "fieldConfig": {
@@ -598,12 +599,14 @@ data:
                         "datasource": {
                             "uid": "$datasource"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_handler_invocations_total[5m])) by (status)",
+                        "expr": "sum(rate(vmaas_handler_invocations_total{service=\"vmaas-webapp-service\"}[5m])) by (status)",
                         "format": "time_series",
                         "interval": "",
                         "intervalFactor": 1,
                         "legendFormat": "{{status}}",
+                        "range": true,
                         "refId": "B"
                     }
                 ],
@@ -802,7 +805,7 @@ data:
                         },
                         "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_processing_seconds_sum[5m]))",
+                        "expr": "sum(rate(vmaas_handler_processing_seconds_sum{service=\"vmaas-webapp-service\"}[5m]))",
                         "format": "time_series",
                         "interval": "",
                         "intervalFactor": 1,
@@ -953,6 +956,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
+                    "type": "prometheus",
                     "uid": "$datasource"
                 },
                 "fieldConfig": {
@@ -1003,12 +1007,14 @@ data:
                         "datasource": {
                             "uid": "$datasource"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_handler_invocations_total[5m])) by (path)",
+                        "expr": "sum(rate(vmaas_handler_invocations_total{service=\"vmaas-webapp-service\"}[5m])) by (path)",
                         "format": "time_series",
                         "interval": "",
                         "intervalFactor": 1,
                         "legendFormat": "{{path}}",
+                        "range": true,
                         "refId": "B"
                     }
                 ],
@@ -1154,6 +1160,7 @@ data:
                 "dashLength": 10,
                 "dashes": false,
                 "datasource": {
+                    "type": "prometheus",
                     "uid": "$datasource"
                 },
                 "fieldConfig": {
@@ -1204,12 +1211,14 @@ data:
                         "datasource": {
                             "uid": "$datasource"
                         },
+                        "editorMode": "code",
                         "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_processing_seconds_sum[5m])) by (path)",
+                        "expr": "sum(rate(vmaas_handler_processing_seconds_sum{service=\"vmaas-webapp-service\"}[5m])) by (path)",
                         "format": "time_series",
                         "interval": "",
                         "intervalFactor": 1,
                         "legendFormat": "{{path}}",
+                        "range": true,
                         "refId": "B"
                     }
                 ],
@@ -1231,7 +1240,7 @@ data:
                     {
                         "$$hashKey": "object:180",
                         "format": "s",
-                        "label": "reqs/sec",
+                        "label": "latency",
                         "logBase": 1,
                         "min": "0",
                         "show": true
@@ -1333,7 +1342,7 @@ data:
                     {
                         "$$hashKey": "object:180",
                         "format": "s",
-                        "label": "reqs/sec",
+                        "label": "latency",
                         "logBase": 1,
                         "min": "0",
                         "show": true
@@ -1432,7 +1441,7 @@ data:
                     {
                         "$$hashKey": "object:294",
                         "format": "percentunit",
-                        "label": "reqs/sec",
+                        "label": "percent",
                         "logBase": 1,
                         "max": "1",
                         "min": "0",
@@ -1532,7 +1541,7 @@ data:
                     {
                         "$$hashKey": "object:294",
                         "format": "percentunit",
-                        "label": "reqs/sec",
+                        "label": "percent",
                         "logBase": 1,
                         "max": "1",
                         "min": "0",
@@ -1658,7 +1667,7 @@ data:
                     {
                         "$$hashKey": "object:294",
                         "format": "short",
-                        "label": "reqs/sec",
+                        "label": "count",
                         "logBase": 1,
                         "min": "0",
                         "show": true
@@ -2050,7 +2059,7 @@ data:
             "list": [
                 {
                     "current": {
-                        "selected": false,
+                        "selected": true,
                         "text": "crcp01ue1-prometheus",
                         "value": "crcp01ue1-prometheus"
                     },
