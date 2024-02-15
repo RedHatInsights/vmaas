@@ -939,5 +939,6 @@ def create_app(specs):
                     )
 
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_headers=["Content-Type"])
-    app.add_middleware(TimingLoggingMiddleware, position=connexion.middleware.MiddlewarePosition.BEFORE_EXCEPTION)
+    app.add_middleware(TimingLoggingMiddleware, position=connexion.middleware.MiddlewarePosition.BEFORE_EXCEPTION,
+                       vmaas_component="reposcan")
     return app

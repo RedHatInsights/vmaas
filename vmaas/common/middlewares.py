@@ -51,8 +51,9 @@ class ErrorHandlerMiddleware:
 
 class TimingLoggingMiddleware:
     """Middleware to measure duration of requests to each endpoint and exporting it as Prometheus metric."""
-    def __init__(self, app):
+    def __init__(self, app, vmaas_component):
         self.app = app
+        self.vmaas_component = vmaas_component
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -71,13 +72,11 @@ class TimingLoggingMiddleware:
                 duration = time.time() - start_time
                 method = scope["method"]
                 path_parts = scope["path"].split('/')
-                # (0) /(1) /(2)     /(3) /(4)
-                #     /api (/vmaas) /v1  /updates
-                if "vmaas" in path_parts:
-                    strip_limit = 5
-                else:
-                    strip_limit = 4
-                const_path = '/'.join(path_parts[:strip_limit])
+                if self.vmaas_component == "webapp":
+                    #                    (0) (1)  (2)     (3)
+                    # / api / vmaas / v1  /  cves  /  CVE-XXXX-YYYY
+                    path_parts = path_parts[:2]
+                const_path = '/'.join(path_parts)
                 REQUEST_TIME.labels(method, const_path).observe(duration)
                 REQUEST_COUNTS.labels(method, const_path, start_message["status"]).inc()
 
