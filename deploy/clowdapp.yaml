@@ -147,6 +147,8 @@ objects:
               value: ${{CW_ENABLED}}
             - name: INIT_CONTAINER
               value: "true"
+            - name: PG_MAX_STACK_DEPTH
+              value: ${PG_MAX_STACK_DEPTH}
         command:
         - /vmaas/entrypoint.sh
         - reposcan
@@ -482,3 +484,5 @@ parameters:
   value: "changes.csv"
 - name: CSAF_SYNC_ALL_FILES  # sync all csaf files, not only those which are changed
   value: "false"
+- name: PG_MAX_STACK_DEPTH
+  value: ''

@@ -63,6 +63,13 @@ class DatabaseUpgrade:
             self._get_db_lock(conn)
             LOGGER.info("Empty database, initializing...")
             with conn.cursor() as cur:
+                if cfg.pg_max_stack_depth:
+                    # vmaas.reposcan needs bigger max_stack_depth for ephemeral environment
+                    # increase max_stack_depth when the DB is empty (probably only in ephemeral env)
+                    cur.connection.autocommit = True  # autocommit to run queries without transaction
+                    cur.execute(f"ALTER SYSTEM SET max_stack_depth TO {cfg.pg_max_stack_depth}")
+                    cur.execute(f"ALTER DATABASE vmaas SET max_stack_depth TO {cfg.pg_max_stack_depth}")
+                    cur.connection.autocommit = False
                 with open(USER_CREATE_SQL_PATH, "r", encoding='utf8') as f_user, \
                         open(DB_CREATE_SQL_PATH, "r", encoding='utf8') as f_db:
                     cur.execute(f_user.read())
