@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 19);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 20);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1307,34 +1307,58 @@ ON CONFLICT DO NOTHING;
 
 
 -- -----------------------------------------------------
--- Table vmaas.csaf_products
+-- Table vmaas.csaf_product
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS csaf_products (
-  id             SERIAL,
-  cpe            TEXT NOT NULL, CHECK (NOT empty(cpe)),
-  package        TEXT NULL, CHECK (NOT empty(package)),
-  module         TEXT NULL, CHECK (NOT empty(module)),
-  CONSTRAINT unique_csaf_product UNIQUE (cpe, package, module),
-  PRIMARY KEY (id)
+CREATE TABLE IF NOT EXISTS csaf_product (
+  id                SERIAL,
+  cpe_id            INT NOT NULL,
+  package_name_id   INT NULL,
+  package_id        INT NULL,
+  module_stream     TEXT NULL CHECK (NOT empty(module_stream)),
+  PRIMARY KEY (id),
+  CONSTRAINT cpe_id
+    FOREIGN KEY (cpe_id)
+    REFERENCES cpe (id),
+  CONSTRAINT package_name_id
+    FOREIGN KEY (package_name_id)
+    REFERENCES package_name (id),
+  CONSTRAINT package_id
+    FOREIGN KEY (package_id)
+    REFERENCES package (id),
+  CONSTRAINT pkg_id CHECK(
+    (package_name_id IS NOT NULL AND package_id IS NULL) OR
+    (package_name_id IS NULL AND package_id IS NOT NULL))
 )TABLESPACE pg_default;
 
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_id) WHERE package_id IS NOT NULL AND package_name_id IS NULL AND module_stream IS NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, module_stream) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NOT NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_id, module_stream) WHERE package_id IS NOT NULL AND package_name_id IS NULL AND module_stream IS NOT NULL;
 
 -- -----------------------------------------------------
--- Table vmaas.csaf_cves
+-- Table vmaas.csaf_cve_product
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS csaf_cves (
-  id                SERIAL,
-  cve               TEXT NOT NULL, CHECK (NOT empty(cve)),
-  csaf_product_id   INT NOT NULL,
-  product_status_id INT NOT NULL,
-  CONSTRAINT unique_csaf_cve_product UNIQUE (cve, csaf_product_id),
+CREATE TABLE IF NOT EXISTS csaf_cve_product (
+  id                     SERIAL,
+  cve_id                 INT NOT NULL,
+  csaf_product_id        INT NOT NULL,
+  csaf_product_status_id INT NOT NULL,
+  csaf_file_id           INT NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT cve_id
+    FOREIGN KEY (cve_id)
+    REFERENCES cve (id),
   CONSTRAINT csaf_product_id
     FOREIGN KEY (csaf_product_id)
-    REFERENCES csaf_products (id),
+    REFERENCES csaf_product (id),
   CONSTRAINT csaf_product_status_id
-    FOREIGN KEY (product_status_id)
-    REFERENCES csaf_product_status (id)
+    FOREIGN KEY (csaf_product_status_id)
+    REFERENCES csaf_product_status (id),
+  CONSTRAINT csaf_file_id
+    FOREIGN KEY (csaf_file_id)
+    REFERENCES csaf_file (id),
+  CONSTRAINT csaf_cve_product_ids_uq
+    UNIQUE (cve_id, csaf_product_id)
 )TABLESPACE pg_default;
 
 
