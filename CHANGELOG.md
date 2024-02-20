@@ -2,6 +2,15 @@
 
 
 
+## v2.54.2 (2024-02-20)
+
+### Fix
+
+* fix(ephemeral): increase max_stack_depth
+
+RHINENG-8335 ([`6af693d`](https://github.com/RedHatInsights/vmaas/commit/6af693d140ab73b1a2c6bf5f6a6d1c76b795b9e3))
+
+
 ## v2.54.1 (2024-02-15)
 
 ### Chore
