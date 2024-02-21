@@ -7,6 +7,7 @@ import csv
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
+from enum import IntEnum
 from typing import Iterator
 from typing import Optional
 from typing import overload
@@ -14,6 +15,18 @@ from typing import overload
 import attr
 
 from vmaas.common.date_utils import parse_datetime
+
+
+class CsafProductStatus(IntEnum):
+    """CSAF product status enum."""
+    FIRST_AFFECTED = 1
+    FIRST_FIXED = 2
+    FIXED = 3
+    KNOWN_AFFECTED = 4
+    KNOWN_NOT_AFFECTED = 5
+    LAST_AFFECTED = 6
+    RECOMMENDED = 7
+    UNDER_INVESTIGATION = 8
 
 
 @dataclass
@@ -125,6 +138,7 @@ class CsafProduct:
 
     cpe: str
     package: str
+    status_id: int
     module: Optional[str] = None
 
 
