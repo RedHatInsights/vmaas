@@ -486,3 +486,5 @@ parameters:
   value: "false"
 - name: PG_MAX_STACK_DEPTH
   value: ''
+- name: CSAF_PRODUCT_STATUS_LIST
+  value: "known_affected" # comma delimited list of products to parse
