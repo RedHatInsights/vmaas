@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 from vmaas.common.batch_list import BatchList
+from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger
 from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
@@ -20,6 +21,7 @@ from vmaas.reposcan.redhatcsaf.modeling import CsafData
 from vmaas.reposcan.redhatcsaf.modeling import CsafFile
 from vmaas.reposcan.redhatcsaf.modeling import CsafFiles
 from vmaas.reposcan.redhatcsaf.modeling import CsafProduct
+from vmaas.reposcan.redhatcsaf.modeling import CsafProductStatus
 
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/beta/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
@@ -36,6 +38,7 @@ class CsafController:
         self.csaf_store = CsafStore()
         self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.index_path = self.tmp_directory / CSAF_VEX_INDEX_CSV
+        self.cfg = Config()
 
     def _download_index(self) -> dict[str, int]:
         """Download CSAF index changes.csv file."""
@@ -124,25 +127,29 @@ class CsafController:
         return cves
 
     def _parse_vulnerabilities(self, csaf: dict, product_cpe: dict) -> CsafCves:
+        # parse only CVEs with `known_affected` products aka `unfixed` CVEs
+        if any(x != "known_affected" for x in self.cfg.csaf_product_status_list):
+            raise NotImplementedError("parsing of csaf products other than 'known_affected' not supported")
+
         unfixed_cves = CsafCves()
         for vulnerability in csaf["vulnerabilities"]:
             if "cve" not in vulnerability:
                 # `vulnerability` can be identified by `cve` or `ids`, we are interested only in those with `cve`
                 continue
 
-            # parse only CVEs with `known_affected` products aka `unfixed` CVEs
-            # TODO: do we need to parse also `under_investigation` products, does that mean the CVE is unfixed too?
             unfixed_cves[vulnerability["cve"]] = []
-            for unfixed in vulnerability["product_status"].get("known_affected", []):
-                branch_product, rest = unfixed.split(":", 1)
-                pkg_name = rest
-                module = None
-                if "/" in rest:
-                    # it's a package with a module
-                    module, pkg_name = rest.split("/", 1)
+            for product_status in self.cfg.csaf_product_status_list:
+                status_id = CsafProductStatus[product_status.upper()].value
+                for unfixed in vulnerability["product_status"].get(product_status.lower(), []):
+                    branch_product, rest = unfixed.split(":", 1)
+                    pkg_name = rest
+                    module = None
+                    if "/" in rest:
+                        # it's a package with a module
+                        module, pkg_name = rest.split("/", 1)
 
-                csaf_product = CsafProduct(product_cpe[branch_product], pkg_name, module)
-                unfixed_cves[vulnerability["cve"]].append(csaf_product)
+                    csaf_product = CsafProduct(product_cpe[branch_product], pkg_name, status_id, module)
+                    unfixed_cves[vulnerability["cve"]].append(csaf_product)
 
         return unfixed_cves
 
