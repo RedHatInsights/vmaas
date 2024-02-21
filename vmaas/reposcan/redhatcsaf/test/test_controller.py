@@ -16,10 +16,10 @@ EXPECTED_PARSE = (
         CsafCves(
             {
                 "CVE-2023-0049": [
-                    CsafProduct("cpe:/o:redhat:enterprise_linux:6", "vim"),
-                    CsafProduct("cpe:/o:redhat:enterprise_linux:7", "vim"),
-                    CsafProduct("cpe:/o:redhat:enterprise_linux:8", "vim"),
-                    CsafProduct("cpe:/o:redhat:enterprise_linux:9", "vim"),
+                    CsafProduct("cpe:/o:redhat:enterprise_linux:6", "vim", 4),
+                    CsafProduct("cpe:/o:redhat:enterprise_linux:7", "vim", 4),
+                    CsafProduct("cpe:/o:redhat:enterprise_linux:8", "vim", 4),
+                    CsafProduct("cpe:/o:redhat:enterprise_linux:9", "vim", 4),
                 ]
             }
         ),
@@ -29,10 +29,10 @@ EXPECTED_PARSE = (
         CsafCves(
             {
                 "CVE-2023-1017": [
-                    CsafProduct("cpe:/o:redhat:enterprise_linux:8", "libtpms", "virt:rhel"),
-                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", "virt:8.2"),
-                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", "virt:8.3"),
-                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", "virt:av"),
+                    CsafProduct("cpe:/o:redhat:enterprise_linux:8", "libtpms", 4, "virt:rhel"),
+                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.2"),
+                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.3"),
+                    CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:av"),
                 ]
             }
         ),

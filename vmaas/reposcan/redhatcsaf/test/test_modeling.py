@@ -15,7 +15,7 @@ class TestModels:
     @pytest.fixture
     def csaf_product(self):
         """Returns CSAF product."""
-        return model.CsafProduct("cpe", "package", "module")
+        return model.CsafProduct("cpe", "package", 4, "module")
 
     @pytest.fixture
     def csaf_product_list(self, csaf_product):
