@@ -9,7 +9,7 @@ import (
 
 // respond with predefined 500 error in case of panic
 func InternalServerError() gin.RecoveryFunc {
-	return func(c *gin.Context, err interface{}) {
+	return func(c *gin.Context, _ interface{}) {
 		utils.LogAndRespError(c, errors.New("internal server error"))
 	}
 }
