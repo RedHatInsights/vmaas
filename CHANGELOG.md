@@ -2,6 +2,26 @@
 
 
 
+## v2.55.0 (2024-02-22)
+
+### Chore
+
+* chore(deps): update vulnerable dependencies
+
+starlette, python-multipart, and cryptography
+RHINENG-8390 ([`7d927cf`](https://github.com/RedHatInsights/vmaas/commit/7d927cf96be934631dda627ab0280665103f2ced))
+
+### Feature
+
+* feat: update vmaas-lib
+
+RHINENG-4854 ([`589a11f`](https://github.com/RedHatInsights/vmaas/commit/589a11f4cd700876c9a435602e4eee1908c6cc5d))
+
+### Fix
+
+* fix(webapp-go): unused variable ([`c404a55`](https://github.com/RedHatInsights/vmaas/commit/c404a55e891c118ba595f1e97610a68cd8f3fed7))
+
+
 ## v2.54.2 (2024-02-20)
 
 ### Fix
