@@ -1,10 +1,11 @@
 """Unit tests of csaf_controller.py."""
 import pathlib
-
+from datetime import datetime
 import pytest
 
+
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
-from vmaas.reposcan.redhatcsaf.modeling import CsafCves
+from vmaas.reposcan.redhatcsaf.modeling import CsafCves, CsafData, CsafFiles
 from vmaas.reposcan.redhatcsaf.modeling import CsafFile
 from vmaas.reposcan.redhatcsaf.modeling import CsafProduct
 
@@ -57,3 +58,12 @@ class TestCsafController:
         csaf_file = CsafFile(csaf_json, None)
         parsed = csaf.parse_csaf_file(csaf_file)
         assert parsed == expected
+
+    @pytest.mark.parametrize("data", EXPECTED_PARSE, ids=[x[0] for x in EXPECTED_PARSE])
+    def test_csaf_store(self, data, csaf: CsafController):
+        """Parse CSAF JSON and store its data to DB"""
+        csaf_json, _ = data
+        csaf_file = CsafFile(csaf_json, datetime(2022, 2, 14, 15, 30))
+        csaf_cves = csaf.parse_csaf_file(csaf_file)
+        csaf_data = CsafData(CsafFiles({csaf_json: csaf_file}), csaf_cves)
+        csaf.csaf_store.store(csaf_data)

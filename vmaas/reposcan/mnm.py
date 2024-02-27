@@ -43,5 +43,6 @@ OVAL_FAILED_DELETE = Counter('vmaas_reposcan_failed_oval_delete', '# of failed o
 CSAF_FAILED_DOWNLOAD = Counter('vmaas_reposcan_failed_csaf_download', '# of failed csaf-download attempts')
 CSAF_FAILED_DELETE = Counter('vmaas_reposcan_failed_csaf_delete', '# of failed csaf-delete attempts')
 CSAF_FAILED_IMPORT = Counter('vmaas_reposcan_failed_csaf_import', '# of failed csaf-import attempts')
+CSAF_FAILED_UPDATE = Counter('vmaas_reposcan_failed_csaf_update', '# of failed csaf-update attempts')
 
 REPOS_TO_CLEANUP = Gauge('vmaas_reposcan_repos_cleanup', '# of repos to cleanup from DB')
