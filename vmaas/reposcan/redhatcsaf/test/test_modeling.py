@@ -2,6 +2,7 @@
 from collections.abc import Iterable
 from datetime import datetime
 from datetime import timedelta
+from typing import KeysView
 
 import pytest
 
@@ -232,3 +233,32 @@ class TestModels:
         data.files.update(model.CsafFiles({csaf_file.name: csaf_file}))
         data.cves["key1"] = csaf_cves["key1"]
         data.cves.update(csaf_cves)
+
+    def test_cves_items_method(self):
+        """Test CsafCves _cves iteration with key and value pairs"""
+        cves_collection = model.CsafCves({
+            'key1': [model.CsafProduct(cpe='cpe123', package='kernel', status_id=4, module='module:8')],
+            'key2': [model.CsafProduct(cpe='cpe456', package='nginx', status_id=4, module='web')],
+        })
+
+        expected_items = [
+            ('key1', [model.CsafProduct(cpe='cpe123', package='kernel', status_id=4, module='module:8')]),
+            ('key2', [model.CsafProduct(cpe='cpe456', package='nginx', status_id=4, module='web')]),
+        ]
+
+        items_result = cves_collection.items()
+        assert list(items_result) == expected_items
+
+    def test_keys_empty_dictionary(self):
+        """Test the keys method with an empty dictionary"""
+        csaf_cves = model.CsafCves()
+        result = csaf_cves.keys()
+        assert not result
+
+    def test_keys_non_empty_dictionary(self):
+        """Test the keys method with a non-empty dictionary"""
+        key1 = "key1"
+        key2 = "key2"
+        csaf_cves = model.CsafCves({key1: [], key2: []})
+        result = csaf_cves.keys()
+        assert result == KeysView([key1, key2])

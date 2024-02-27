@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
 from enum import IntEnum
-from typing import Iterator
+from typing import ItemsView, Iterator, KeysView
 from typing import Optional
 from typing import overload
 
@@ -180,6 +180,14 @@ class CsafCves:
     def update(self, data: CsafCves) -> None:
         """Update data in collection - same as dict.update()."""
         self._cves.update(data._cves)  # pylint: disable=protected-access
+
+    def items(self) -> ItemsView[str, list[CsafProduct]]:
+        """Returns CVEs dict key and value pairs."""
+        return self._cves.items()
+
+    def keys(self) -> KeysView:
+        """Return a list of keys in the _cves dictionary."""
+        return self._cves.keys()
 
     def __getitem__(self, key: str) -> list[CsafProduct]:
         return self._cves[key]
