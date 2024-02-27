@@ -2,6 +2,23 @@
 
 
 
+## v2.55.1 (2024-02-27)
+
+### Fix
+
+* fix(csaf): set product status id in parser
+
+RHINENG-8391 ([`1955002`](https://github.com/RedHatInsights/vmaas/commit/1955002d66980068e3d21bca713483491c86ecb6))
+
+* fix(csaf): extend model with product status id
+
+RHINENG-8391 ([`7517f1d`](https://github.com/RedHatInsights/vmaas/commit/7517f1dde49ac493dad1eba9622d3fa9e5059347))
+
+* fix(csaf): env var to decide what statuses to parse
+
+RHINENG-8391 ([`8c320fa`](https://github.com/RedHatInsights/vmaas/commit/8c320faf19d4d056d5e766483be2e7e46d62ec07))
+
+
 ## v2.55.0 (2024-02-22)
 
 ### Chore
