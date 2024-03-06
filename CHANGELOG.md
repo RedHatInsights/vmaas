@@ -2,6 +2,13 @@
 
 
 
+## v2.56.0 (2024-03-06)
+
+### Feature
+
+* feat(reposcan): add Csaf Store DB insert ([`d73c5ce`](https://github.com/RedHatInsights/vmaas/commit/d73c5ce560683fe12333667455df3dfb850b186a))
+
+
 ## v2.55.1 (2024-02-27)
 
 ### Fix
