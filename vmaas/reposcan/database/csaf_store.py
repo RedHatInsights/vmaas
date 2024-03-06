@@ -32,20 +32,26 @@ class CsafStore(ObjectStore):
             cur.close()
 
     def _save_csaf_files(self, csaf_files: CsafFiles) -> list[int]:
+        res = []
         cur = self.conn.cursor()
-        db_ids = execute_values(
-            cur,
-            """
-                insert into csaf_file (name, updated) values %s
-                on conflict (name) do update set updated = excluded.updated
-                returning id
-            """,
-            csaf_files.to_tuples(("name", "csv_timestamp")),
-            fetch=True,
-        )
-        cur.close()
-        self.conn.commit()
-        return db_ids
+        try:
+            res = execute_values(
+                cur,
+                """
+                    insert into csaf_file (name, updated) values %s
+                    on conflict (name) do update set updated = excluded.updated
+                    returning id
+                """,
+                csaf_files.to_tuples(("name", "csv_timestamp")),
+                fetch=True,
+            )
+            self.conn.commit()
+        except Exception as exc:
+            CSAF_FAILED_IMPORT.inc()
+            self.logger.exception("Failed to import csaf file to DB: %s", exc)
+        finally:
+            cur.close()
+        return [r[0] for r in res]
 
     def _get_product_rows(self, products_by_status) -> tuple[dict[str, list[tuple[str, str, str]]], list[tuple[int, str]]]:
         to_associate_ids = []
