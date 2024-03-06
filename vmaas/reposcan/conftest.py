@@ -8,10 +8,41 @@ import pytest
 
 from vmaas.common.paths import USER_CREATE_SQL_PATH, DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import init_db
+from vmaas.reposcan.redhatcsaf import modeling as csaf_model
 
 VMAAS_DIR = Path(__file__).resolve().parent.parent.parent
 VMAAS_DB_DATA = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database", "test_data.sql")
 VMAAS_PG_OLD = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database", "vmaas_db_postgresql_old.sql")
+
+EXPECTED_CSAF = (
+    ("cve-2023-0030.json", csaf_model.CsafCves({"CVE-2023-0030": []})),
+    (
+        "cve-2023-0049.json",
+        csaf_model.CsafCves(
+            {
+                "CVE-2023-0049": [
+                    csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:6", "vim", 4),
+                    csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:7", "vim", 4),
+                    csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:8", "vim", 4),
+                    csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:9", "vim", 4),
+                ]
+            }
+        ),
+    ),
+    (
+        "cve-2023-1017.json",
+        csaf_model.CsafCves(
+            {
+                "CVE-2023-1017": [
+                    csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:8", "libtpms", 4, "virt:rhel"),
+                    csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.2"),
+                    csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.3"),
+                    csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:av"),
+                ]
+            }
+        ),
+    ),
+)
 
 
 @pytest.fixture(scope="session")
