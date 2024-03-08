@@ -137,7 +137,8 @@ class CsafController:
                 # `vulnerability` can be identified by `cve` or `ids`, we are interested only in those with `cve`
                 continue
 
-            unfixed_cves[vulnerability["cve"]] = []
+            cve = vulnerability["cve"].upper()
+            unfixed_cves[cve] = []
             for product_status in self.cfg.csaf_product_status_list:
                 status_id = CsafProductStatus[product_status.upper()].value
                 for unfixed in vulnerability["product_status"].get(product_status.lower(), []):
@@ -149,7 +150,7 @@ class CsafController:
                         module, pkg_name = rest.split("/", 1)
 
                     csaf_product = CsafProduct(product_cpe[branch_product], pkg_name, status_id, module)
-                    unfixed_cves[vulnerability["cve"]].append(csaf_product)
+                    unfixed_cves[cve].append(csaf_product)
 
         return unfixed_cves
 
