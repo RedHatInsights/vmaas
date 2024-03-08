@@ -4,13 +4,12 @@ Module containing models for CSAF objects.
 from __future__ import annotations
 
 import csv
+import typing as t
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
 from enum import IntEnum
-from typing import ItemsView, Iterator, KeysView
-from typing import Optional
-from typing import overload
+from pathlib import Path
 
 import attr
 
@@ -19,6 +18,7 @@ from vmaas.common.date_utils import parse_datetime
 
 class CsafProductStatus(IntEnum):
     """CSAF product status enum."""
+
     FIRST_AFFECTED = 1
     FIRST_FIXED = 2
     FIXED = 3
@@ -35,7 +35,7 @@ class CsafFile:
 
     name: str
     csv_timestamp: datetime
-    db_timestamp: Optional[datetime] = None
+    db_timestamp: datetime | None = None
     id_: int = 0
 
     @property
@@ -53,7 +53,7 @@ class CsafFiles:
     _files: dict[str, CsafFile] = attr.Factory(dict)
 
     @classmethod
-    def from_table_map_and_csv(cls, table_map: dict[str, tuple[int, datetime]], csv_path: str) -> CsafFiles:
+    def from_table_map_and_csv(cls, table_map: dict[str, tuple[int, datetime]], csv_path: Path) -> CsafFiles:
         """Initialize class from CsafStore.csaf_file_map table_map and changes.csv."""
         obj = cls()
         obj._update_from_table_map(table_map)
@@ -69,7 +69,7 @@ class CsafFiles:
             obj.db_timestamp = timestamp
             self[key] = obj
 
-    def _update_from_csv(self, path: str) -> None:
+    def _update_from_csv(self, path: Path) -> None:
         """Update files from CSAF changes.csv."""
         with open(path, newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile, ("name", "timestamp"))
@@ -84,7 +84,7 @@ class CsafFiles:
         """Filter generator of out of date files."""
         return filter(lambda x: x.out_of_date, self)
 
-    def to_tuples(self, attributes: tuple[str, ...]) -> list[tuple]:
+    def to_tuples(self, attributes: tuple[str, ...]) -> list[tuple[int | str | datetime | None, ...]]:
         """Transform data to list of tuples with chosen attributes."""
         res = []
         for item in self:
@@ -94,15 +94,15 @@ class CsafFiles:
             res.append(tuple(items))
         return res
 
-    @overload
-    def get(self, key: str, default: None = None) -> Optional[CsafFile]:
+    @t.overload
+    def get(self, key: str, default: None = None) -> CsafFile | None:
         ...
 
-    @overload
+    @t.overload
     def get(self, key: str, default: CsafFile) -> CsafFile:
         ...
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: CsafFile | None = None) -> CsafFile | None:
         """Return the value for key if key is in the collection, else default."""
         return self._files.get(key, default)
 
@@ -119,7 +119,7 @@ class CsafFiles:
     def __contains__(self, key: str) -> bool:
         return key in self._files
 
-    def __iter__(self) -> Iterator[CsafFile]:
+    def __iter__(self) -> t.Iterator[CsafFile]:
         return iter(self._files.values())
 
     def __next__(self) -> CsafFile:
@@ -131,6 +131,9 @@ class CsafFiles:
     def __len__(self) -> int:
         return len(self._files)
 
+    def __bool__(self) -> bool:
+        return bool(self._files)
+
 
 @dataclass
 class CsafProduct:
@@ -139,16 +142,129 @@ class CsafProduct:
     cpe: str
     package: str
     status_id: int
-    module: Optional[str] = None
+    module: str | None = None
+    id_: int | None = None
+    cpe_id: int | None = None
+    package_name_id: int | None = None
+    package_id: int | None = None
+
+
+@attr.s(auto_attribs=True, repr=False)
+class CsafProducts:
+    """List like collection of CSAF products with lookup by ids."""
+
+    _products: list[CsafProduct] = attr.Factory(list)
+    _lookup: dict[tuple[int, int | None, int | None, str | None], CsafProduct] = attr.Factory(dict)
+
+    def to_tuples(
+        self,
+        attributes: tuple[str, ...],
+        missing_only: bool = False,
+        with_id: bool = False,
+        with_cpe_id: bool = False,
+        with_pkg_id: bool = False,
+    ) -> list[tuple[int | str | None, ...]]:
+        """Transform data to list of tuples with chosen attributes by key.
+
+        :param tuple attributes: Attributes included in the response
+        :param bool missing_only: Include only products not present in DB (id_=None)
+        :param bool with_id: Include only products which have product id
+        :param bool with_cpe_id: Include only products which have cpe_id
+        :param bool with_pkg_id: Include only products which have either package_name_id or package_id
+
+        Example:
+            > collection = CsafProducts([CsafProduct(cpe='cpe123', package='kernel', module="module:8", status_id=4)])
+            > collection.to_tuples(("cpe", "package", "module"))
+            > [("cpe123", "kernel", "module:8")]
+
+        """
+        res = []
+        products: t.Iterable[CsafProduct] = self
+        if missing_only:
+            products = filter(lambda x: x.id_ is None, products)
+        if with_id:
+            products = filter(lambda x: x.id_, products)
+        if with_cpe_id:
+            products = filter(lambda x: x.cpe_id, products)
+        if with_pkg_id:
+            products = filter(lambda x: x.package_name_id or x.package_id, products)
+
+        for item in products:
+            items = []
+            for attribute in attributes:
+                items.append(getattr(item, attribute))
+            res.append(tuple(items))
+        return res
+
+    def get_by_ids_and_module(
+        self,
+        cpe_id: int,
+        package_name_id: int | None,
+        package_id: int | None,
+        module: str | None,
+    ) -> CsafProduct | None:
+        """Return product by (cpe_id, package_name_id, package_id, module)."""
+        key = (cpe_id, package_name_id, package_id, module)
+        product = self._lookup.get(key)
+        if product is None:
+            # not found in _lookup, try to find in _products and add to _lookup
+            for prod in self:
+                if (prod.cpe_id, prod.package_name_id, prod.package_id, module) == key:
+                    self.add_to_lookup(prod)
+                    return prod
+        return product
+
+    def add_to_lookup(self, val: CsafProduct) -> None:
+        """Add `val` to internal lookup dict."""
+        if val.cpe_id is not None:
+            key = (val.cpe_id, val.package_name_id, val.package_id, val.module)
+            self._lookup[key] = val
+
+    def append(self, val: CsafProduct) -> None:
+        """Append `val` to CsafProducts."""
+        self._products.append(val)
+        self.add_to_lookup(val)
+
+    def remove(self, val: CsafProduct) -> None:
+        """Remove `val` from CsafProducts."""
+        if val.cpe_id is not None:
+            key = (val.cpe_id, val.package_name_id, val.package_id, val.module)
+            self._lookup.pop(key, None)
+        self._products.remove(val)
+
+    def __getitem__(self, idx: int) -> CsafProduct:
+        return self._products[idx]
+
+    def __setitem__(self, idx: int, val: CsafProduct) -> None:
+        self._products[idx] = val
+        self.add_to_lookup(val)
+
+    def __iter__(self) -> t.Iterator[CsafProduct]:
+        return iter(self._products)
+
+    def __next__(self) -> CsafProduct:
+        return next(iter(self))
+
+    def __contains__(self, val: CsafProduct) -> bool:
+        return val in self._products
+
+    def __repr__(self) -> str:
+        return repr(self._products)
+
+    def __len__(self) -> int:
+        return len(self._products)
+
+    def __bool__(self) -> bool:
+        return bool(self._products)
 
 
 @attr.s(auto_attribs=True, repr=False)
 class CsafCves:
     """Collection of CSAF CVEs."""
 
-    _cves: dict[str, list[CsafProduct]] = attr.Factory(dict)
+    _cves: dict[str, CsafProducts] = attr.Factory(dict)
 
-    def to_tuples(self, key: str, attributes: tuple[str, ...]) -> list[tuple]:
+    def to_tuples(self, key: str, attributes: tuple[str, ...]) -> list[tuple[int | str | None, ...]]:
         """Transform data to list of tuples with chosen attributes by key.
 
         Example:
@@ -165,15 +281,15 @@ class CsafCves:
             res.append(tuple(items))
         return res
 
-    @overload
-    def get(self, key: str, default: None = None) -> Optional[list[CsafProduct]]:
+    @t.overload
+    def get(self, key: str, default: None = None) -> CsafProducts | None:
         ...
 
-    @overload
-    def get(self, key: str, default: list[CsafProduct]) -> list[CsafProduct]:
+    @t.overload
+    def get(self, key: str, default: CsafProducts) -> CsafProducts:
         ...
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: CsafProducts | None = None) -> CsafProducts | None:
         """Return the value for key if key is in the collection, else default."""
         return self._cves.get(key, default)
 
@@ -181,24 +297,24 @@ class CsafCves:
         """Update data in collection - same as dict.update()."""
         self._cves.update(data._cves)  # pylint: disable=protected-access
 
-    def items(self) -> ItemsView[str, list[CsafProduct]]:
+    def items(self) -> t.ItemsView[str, CsafProducts]:
         """Returns CVEs dict key and value pairs."""
         return self._cves.items()
 
-    def keys(self) -> KeysView:
+    def keys(self) -> t.KeysView[str]:
         """Return a list of keys in the _cves dictionary."""
         return self._cves.keys()
 
-    def __getitem__(self, key: str) -> list[CsafProduct]:
+    def __getitem__(self, key: str) -> CsafProducts:
         return self._cves[key]
 
-    def __setitem__(self, key: str, val: list[CsafProduct]) -> None:
+    def __setitem__(self, key: str, val: CsafProducts) -> None:
         self._cves[key] = val
 
-    def __iter__(self) -> Iterator[list[CsafProduct]]:
+    def __iter__(self) -> t.Iterator[CsafProducts]:
         return iter(self._cves.values())
 
-    def __next__(self) -> list[CsafProduct]:
+    def __next__(self) -> CsafProducts:
         return next(iter(self))
 
     def __contains__(self, key: str) -> bool:
@@ -209,6 +325,9 @@ class CsafCves:
 
     def __len__(self) -> int:
         return len(self._cves)
+
+    def __bool__(self) -> bool:
+        return bool(self._cves)
 
 
 @dataclass

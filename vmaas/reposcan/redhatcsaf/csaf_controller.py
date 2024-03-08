@@ -21,6 +21,7 @@ from vmaas.reposcan.redhatcsaf.modeling import CsafData
 from vmaas.reposcan.redhatcsaf.modeling import CsafFile
 from vmaas.reposcan.redhatcsaf.modeling import CsafFiles
 from vmaas.reposcan.redhatcsaf.modeling import CsafProduct
+from vmaas.reposcan.redhatcsaf.modeling import CsafProducts
 from vmaas.reposcan.redhatcsaf.modeling import CsafProductStatus
 
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/beta/vex/")
@@ -138,7 +139,7 @@ class CsafController:
                 continue
 
             cve = vulnerability["cve"].upper()
-            unfixed_cves[cve] = []
+            unfixed_cves[cve] = CsafProducts()
             for product_status in self.cfg.csaf_product_status_list:
                 status_id = CsafProductStatus[product_status.upper()].value
                 for unfixed in vulnerability["product_status"].get(product_status.lower(), []):
