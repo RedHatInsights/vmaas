@@ -15,17 +15,17 @@ VMAAS_DB_DATA = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database",
 VMAAS_PG_OLD = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database", "vmaas_db_postgresql_old.sql")
 
 EXPECTED_CSAF = (
-    ("cve-2023-0030.json", csaf_model.CsafCves({"CVE-2023-0030": []})),
+    ("cve-2023-0030.json", csaf_model.CsafCves({"CVE-2023-0030": csaf_model.CsafProducts()})),
     (
         "cve-2023-0049.json",
         csaf_model.CsafCves(
             {
-                "CVE-2023-0049": [
+                "CVE-2023-0049": csaf_model.CsafProducts([
                     csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:6", "vim", 4),
                     csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:7", "vim", 4),
                     csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:8", "vim", 4),
                     csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:9", "vim", 4),
-                ]
+                ])
             }
         ),
     ),
@@ -33,12 +33,12 @@ EXPECTED_CSAF = (
         "cve-2023-1017.json",
         csaf_model.CsafCves(
             {
-                "CVE-2023-1017": [
+                "CVE-2023-1017": csaf_model.CsafProducts([
                     csaf_model.CsafProduct("cpe:/o:redhat:enterprise_linux:8", "libtpms", 4, "virt:rhel"),
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.2"),
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.3"),
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:av"),
-                ]
+                ])
             }
         ),
     ),
