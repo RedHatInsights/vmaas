@@ -23,7 +23,7 @@ class Singleton(type):
 class BaseConfig:
     """Base configuration, same for clowder and non-clowder."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.postgresql_writer_password = os.getenv(
             "POSTGRESQL_WRITER_PASSWORD", "vmaas_writer_pwd"
         )
@@ -49,7 +49,7 @@ class BaseConfig:
 class Config(BaseConfig, metaclass=Singleton):
     """VMaaS configuration singleton."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not app_common_python.isClowderEnabled():
             raise EnvironmentError("Missing Clowder config.")
 
@@ -57,7 +57,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self._cfg = app_common_python.LoadedConfig
         self.clowder()
 
-    def clowder(self):
+    def clowder(self) -> None:
         """Configuration from Clowder."""
         self.db_name = getattr(self._cfg.database, "name", "")
         self.db_user = getattr(self._cfg.database, "username", "")
@@ -86,7 +86,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.private_port = self._cfg.privatePort
         self.metrics_port = self._cfg.metricsPort
 
-    def _build_url(self, endpoint, scheme="http"):
+    def _build_url(self, endpoint: object, scheme="http") -> str:
         scheme = f"{scheme}s" if self.tls_ca_path else scheme
         port = endpoint.tlsPort if self.tls_ca_path else endpoint.port
         return f"{scheme}://{endpoint.hostname}:{port}"

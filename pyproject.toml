@@ -54,7 +54,13 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-ignore_missing_imports = true
-exclude = '''(?x)(
-    ^vmaas/webapp        # exclude vmaas/webapp dir
-)'''
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+warn_return_any = true
+warn_unreachable = true
+follow_imports = "silent"
+packages = """
+    vmaas.reposcan.database.csaf_store,
+    vmaas.reposcan.redhatcsaf
+"""
