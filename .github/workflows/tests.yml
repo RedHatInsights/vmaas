@@ -76,4 +76,4 @@ jobs:
           flake8 vmaas/
       - name: Run mypy
         run: |
-          mypy .
+          mypy

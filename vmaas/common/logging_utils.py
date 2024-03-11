@@ -133,7 +133,7 @@ def init_logging(num_servers=1):
         setup_cw_logging(logger)
 
 
-def get_logger(name):
+def get_logger(name: str) -> logging.Logger:
     """
     Set logging level and return logger.
     Don't set custom logging level in root handler to not display debug messages from underlying libraries.

@@ -4,6 +4,7 @@ Module containing classes for downloading files using HTTP.
 import os
 from threading import Thread
 from queue import Queue, Empty
+from pathlib import Path
 
 from urllib3.exceptions import ProtocolError
 
@@ -27,7 +28,8 @@ class DownloadItem:
     and result HTTP status code of the download operation.
     """
 
-    def __init__(self, source_url=None, target_path=None, ca_cert=None, cert=None, key=None):
+    def __init__(self, source_url: str | None = None, target_path: Path | None = None,
+                 ca_cert: str | None = None, cert: str | None = None, key: str | None = None) -> None:
         self.source_url = source_url
         self.target_path = target_path
         self.ca_cert = ca_cert
@@ -124,16 +126,16 @@ class FileDownloader:
     are finished.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.queue = Queue()
         self.logger = get_logger(__name__)
         self.num_threads = int(os.getenv('THREADS', DEFAULT_THREADS))
 
-    def add(self, download_item):
+    def add(self, download_item: DownloadItem) -> None:
         """Add DownloadItem object into the queue."""
         self.queue.put(download_item)
 
-    def run(self, headers_only=False):
+    def run(self, headers_only: bool = False) -> None:
         """Start processing download queue using multiple threads."""
         progress_logger = ProgressLogger(self.logger, self.queue.qsize())
         self.logger.info("Downloading started.")

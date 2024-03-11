@@ -7,7 +7,7 @@ from dateutil import parser as dateutil_parser
 from dateutil import tz as dateutil_tz
 
 
-def parse_datetime(date):
+def parse_datetime(date: str) -> datetime:
     """Parse date from string in ISO format."""
     if date is None:
         return None

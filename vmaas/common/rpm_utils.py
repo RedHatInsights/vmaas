@@ -21,7 +21,8 @@ NEVRA_RE = re.compile(
     r'((?P<e1>[0-9]+):)?(?P<pn>[^:]+)(?(e1)-|-((?P<e2>[0-9]+):)?)(?P<ver>[^-:]+)-(?P<rel>[^-:]+)\.(?P<arch>[a-z0-9_]+)')
 
 
-def parse_rpm_name(rpm_name, default_epoch=None, raise_exception=False):
+def parse_rpm_name(rpm_name: str, default_epoch: str | None = None,
+                   raise_exception: bool = False) -> tuple[str, str, str, str, str]:
     """
     Extract components from rpm name.
     """

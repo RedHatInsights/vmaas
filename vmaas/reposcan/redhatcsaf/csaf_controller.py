@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import tempfile
+import typing as t
 from pathlib import Path
 
 from vmaas.common.batch_list import BatchList
@@ -32,29 +33,32 @@ CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "true"))
 class CsafController:
     """Class for importing/syncing set of CSAF files into DB."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = get_logger(__name__)
         self.downloader = FileDownloader()
         self.downloader.num_threads = 1  # rh.com returns 403 when downloading too quickly (DDoS protection?)
         self.csaf_store = CsafStore()
-        self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
+        self.tmp_directory: Path | None = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.index_path = self.tmp_directory / CSAF_VEX_INDEX_CSV
         self.cfg = Config()
 
-    def _download_index(self) -> dict[str, int]:
+    def _download_index(self) -> dict[Path, int]:
         """Download CSAF index changes.csv file."""
         item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_INDEX_CSV, target_path=self.index_path)
         self.downloader.add(item)
         self.downloader.run()
         # return failed download
-        if item.status_code not in VALID_HTTP_CODES:
+        if item.status_code not in VALID_HTTP_CODES and item.target_path:
             return {item.target_path: item.status_code}
         return {}
 
-    def _download_csaf_files(self, batch) -> dict[str, int]:
+    def _download_csaf_files(self, batch: list[CsafFile]) -> dict[Path, int]:
         """Download CSAF files."""
         download_items = []
         for csaf_file in batch:
+            if not self.tmp_directory:
+                self.logger.error("Missing temporary directory for csaf download")
+                return {}
             local_path = self.tmp_directory / csaf_file.name
             os.makedirs(os.path.dirname(local_path), exist_ok=True)  # Make sure subdirs exist
             item = DownloadItem(source_url=CSAF_VEX_BASE_URL + csaf_file.name, target_path=local_path)
@@ -64,16 +68,18 @@ class CsafController:
         self.downloader.run()
         # Return failed downloads
         return {
-            item.target_path: item.status_code for item in download_items if item.status_code not in VALID_HTTP_CODES
+            item.target_path: item.status_code
+            for item in download_items
+            if item.status_code not in VALID_HTTP_CODES and item.target_path
         }
 
-    def clean(self):
+    def clean(self) -> None:
         """Clean downloaded files for given batch."""
         if self.tmp_directory:
             shutil.rmtree(self.tmp_directory)
             self.tmp_directory = None
 
-    def store(self):
+    def store(self) -> None:
         """Process and store CSAF objects to DB."""
         self.logger.info("Checking CSAF index.")
         failed = self._download_index()
@@ -86,8 +92,8 @@ class CsafController:
 
         db_csaf_files = self.csaf_store.csaf_file_map.copy()
         batches = BatchList()
-        csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.index_path)
-        files_to_sync = csaf_files
+        csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.index_path)  # type: ignore[arg-type]
+        files_to_sync: t.Iterable[CsafFile] = csaf_files
         if not CSAF_SYNC_ALL_FILES:
             files_to_sync = csaf_files.out_of_date
 
@@ -120,6 +126,10 @@ class CsafController:
         product_cpe = {}
         cves = CsafCves()
 
+        if not self.tmp_directory:
+            self.logger.error("Missing temporary directory for csaf files")
+            raise FileNotFoundError("Missing csaf tmp dir")
+
         with open(self.tmp_directory / csaf_file.name, "r", encoding="utf-8") as csaf_json:
             csaf = json.load(csaf_json)
             product_cpe = self._parse_product_tree(csaf)
@@ -127,7 +137,7 @@ class CsafController:
             cves.update(unfixed_cves)
         return cves
 
-    def _parse_vulnerabilities(self, csaf: dict, product_cpe: dict) -> CsafCves:
+    def _parse_vulnerabilities(self, csaf: dict[str, t.Any], product_cpe: dict[str, str]) -> CsafCves:
         # parse only CVEs with `known_affected` products aka `unfixed` CVEs
         if any(x != "known_affected" for x in self.cfg.csaf_product_status_list):
             raise NotImplementedError("parsing of csaf products other than 'known_affected' not supported")
@@ -155,14 +165,14 @@ class CsafController:
 
         return unfixed_cves
 
-    def _parse_product_tree(self, csaf: dict) -> dict[str, str]:
+    def _parse_product_tree(self, csaf: dict[str, t.Any]) -> dict[str, str]:
         product_cpe: dict[str, str] = {}
         for branches in csaf.get("product_tree", {}).get("branches", []):
             self._parse_branches(branches, product_cpe)
 
         return product_cpe
 
-    def _parse_branches(self, branches: dict, product_cpe: dict[str, str]):
+    def _parse_branches(self, branches: dict[str, t.Any], product_cpe: dict[str, str]) -> None:
         if branches.get("category") not in ("vendor", "product_family"):
             return
         sub_branches = branches.get("branches", [])
