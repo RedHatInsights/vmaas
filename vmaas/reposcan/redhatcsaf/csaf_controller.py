@@ -114,8 +114,10 @@ class CsafController:
 
                 to_store = CsafData()
                 for csaf_file in batch:
+                    parsed_cves = self.parse_csaf_file(csaf_file)
+                    csaf_file.cves = list(parsed_cves.keys())
                     to_store.files[csaf_file.name] = csaf_file
-                    to_store.cves.update(self.parse_csaf_file(csaf_file))
+                    to_store.cves.update(parsed_cves)
 
                 self.csaf_store.store(to_store)
         finally:

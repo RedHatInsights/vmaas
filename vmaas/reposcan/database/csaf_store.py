@@ -1,7 +1,6 @@
 """
 Module containing classes for fetching/importing CSAF data from/into database.
 """
-import re
 from copy import deepcopy
 from typing import Any
 
@@ -17,7 +16,6 @@ from vmaas.reposcan.mnm import CSAF_FAILED_IMPORT
 from vmaas.reposcan.mnm import CSAF_FAILED_UPDATE
 from vmaas.reposcan.redhatcsaf import modeling as model
 
-CVE_PATTERN = re.compile(r"cve-\d+-\d+", re.IGNORECASE)
 FAILED_FILE_DELETE = "Failure while deleting CSAF file"
 FAILED_FILE_IMPORT = "Failed to import csaf file to DB"
 FAILED_PRODUCT_FETCH = "Failure while fetching CSAF products from the DB"
@@ -83,10 +81,11 @@ class CsafStore(ObjectStore):
         finally:
             cur.close()
         for row in rows:
-            # translate file name to cve, e.g. 2023/cve-2023-0030.json -> CVE-2023-0030
-            match = re.search(CVE_PATTERN, row[1])
-            if match:
-                cve = match[0].upper()
+            file_cves = csaf_files[row[1]].cves
+            if not file_cves:
+                self.logger.warning("File %s not associated with any CVEs", row[1])
+                continue
+            for cve in file_cves:
                 self.cve2file_id[cve] = row[0]
 
     def _get_product_attr_id(  # type: ignore[return]
