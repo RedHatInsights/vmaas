@@ -37,6 +37,9 @@ class CsafFile:
     csv_timestamp: datetime
     db_timestamp: datetime | None = None
     id_: int = 0
+    # it should be 1:1 mapping between file and cve
+    # but the json in file contains list of cves so add the whole list
+    cves: list[str] | None = None
 
     @property
     def out_of_date(self) -> bool:
