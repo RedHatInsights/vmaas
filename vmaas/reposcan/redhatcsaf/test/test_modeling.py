@@ -10,9 +10,10 @@ import pytest
 import vmaas.reposcan.redhatcsaf.modeling as m
 
 DictCollection = m.CsafCves | m.CsafFiles
+CsafCollection = DictCollection | m.CsafProducts
 
 
-# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-public-methods,protected-access
 class TestModels:
     """Test CSAF models."""
 
@@ -22,7 +23,7 @@ class TestModels:
         return m.CsafProduct("cpe", "package", 4, "module")
 
     @pytest.fixture
-    def csaf_product_list(self, csaf_product: m.CsafProduct) -> m.CsafProducts:
+    def csaf_products(self, csaf_product: m.CsafProduct) -> m.CsafProducts:
         """Returns list of CSAF products."""
         return m.CsafProducts([csaf_product])
 
@@ -34,9 +35,9 @@ class TestModels:
         return m.CsafFile("name", now1d, now)
 
     @pytest.fixture
-    def csaf_cves(self, csaf_product_list: m.CsafProducts) -> m.CsafCves:
+    def csaf_cves(self, csaf_products: m.CsafProducts) -> m.CsafCves:
         """Returns CSAF CVEs collection."""
-        return m.CsafCves({"key1": csaf_product_list, "key2": csaf_product_list})
+        return m.CsafCves({"key1": csaf_products, "key2": csaf_products})
 
     @pytest.fixture
     def csaf_files(self, csaf_file: m.CsafFile) -> m.CsafFiles:
@@ -49,7 +50,7 @@ class TestModels:
         return m.CsafProduct("cpe_updated", "package_updated", 4, "module_updated")
 
     @pytest.fixture
-    def csaf_product_list_updated(self, csaf_product_updated: m.CsafProduct) -> m.CsafProducts:
+    def csaf_products_updated(self, csaf_product_updated: m.CsafProduct) -> m.CsafProducts:
         """Returns list of CSAF products."""
         return m.CsafProducts([csaf_product_updated])
 
@@ -61,9 +62,9 @@ class TestModels:
         return m.CsafFile("name_updated", now1d, now)
 
     @pytest.fixture
-    def csaf_cves_updated(self, csaf_product_list_updated: m.CsafProducts) -> m.CsafCves:
+    def csaf_cves_updated(self, csaf_products_updated: m.CsafProducts) -> m.CsafCves:
         """Returns CSAF CVEs collection."""
-        return m.CsafCves({"key2": csaf_product_list_updated})
+        return m.CsafCves({"key2": csaf_products_updated})
 
     @pytest.fixture
     def csaf_files_updated(self, csaf_file_updated: m.CsafFile) -> m.CsafFiles:
@@ -71,7 +72,7 @@ class TestModels:
         return m.CsafFiles({"key2": csaf_file_updated})
 
     @pytest.mark.parametrize(
-        "collection_name, expected_arg", (("csaf_cves", "csaf_product_list"), ("csaf_files", "csaf_file"))
+        "collection_name, expected_arg", (("csaf_cves", "csaf_products"), ("csaf_files", "csaf_file"))
     )
     def test_get(self, collection_name: str, expected_arg: str, request: pytest.FixtureRequest) -> None:
         """Test get()"""
@@ -88,7 +89,7 @@ class TestModels:
         assert res == "default"
 
     @pytest.mark.parametrize(
-        "collection_name, expected_arg", (("csaf_cves", "csaf_product_list"), ("csaf_files", "csaf_file"))
+        "collection_name, expected_arg", (("csaf_cves", "csaf_products"), ("csaf_files", "csaf_file"))
     )
     def test_getitem(self, collection_name: str, expected_arg: str, request: pytest.FixtureRequest) -> None:
         """Test __getitem__."""
@@ -98,6 +99,12 @@ class TestModels:
 
         with pytest.raises(KeyError):
             collection["key99"]  # pylint: disable=pointless-statement
+
+    def test_products_getitem(self, csaf_products: m.CsafProducts, csaf_product: m.CsafProduct) -> None:
+        """Test __getitem__ of CsafProducts."""
+        assert csaf_products[0] == csaf_product
+        with pytest.raises(IndexError):
+            csaf_products[999]  # pylint: disable=pointless-statement
 
     @pytest.mark.parametrize(
         "collection_name, expected_arg", (("csaf_cves", "csaf_cves_updated"), ("csaf_files", "csaf_files_updated"))
@@ -109,6 +116,11 @@ class TestModels:
         collection["key2"] = expected["key2"]
         assert collection["key2"] == expected["key2"]
 
+    def test_products_setitem(self, csaf_products: m.CsafProducts, csaf_product_updated: m.CsafProduct) -> None:
+        """Test __setitem__ of CsafProducts."""
+        csaf_products[0] = csaf_product_updated
+        assert csaf_products[0] == csaf_product_updated
+
     @pytest.mark.parametrize(
         "collection_name, expected_arg", (("csaf_cves", "csaf_cves_updated"), ("csaf_files", "csaf_files_updated"))
     )
@@ -119,18 +131,19 @@ class TestModels:
         collection.update(expected)
         assert collection["key2"] == expected["key2"]
 
-    @pytest.mark.parametrize("collection_name", ("csaf_cves", "csaf_files"))
+    @pytest.mark.parametrize("collection_name", ("csaf_cves", "csaf_files", "csaf_products"))
     def test_iter(self, collection_name: str, request: pytest.FixtureRequest) -> None:
         """Test __iter__"""
-        collection: DictCollection = request.getfixturevalue(collection_name)
+        collection: CsafCollection = request.getfixturevalue(collection_name)
         assert isinstance(collection, Iterable)
 
     @pytest.mark.parametrize(
-        "collection_name, expected_arg", (("csaf_cves", "csaf_product_list"), ("csaf_files", "csaf_file"))
+        "collection_name, expected_arg",
+        (("csaf_cves", "csaf_products"), ("csaf_files", "csaf_file"), ("csaf_products", "csaf_product")),
     )
     def test_next(self, collection_name: str, expected_arg: str, request: pytest.FixtureRequest) -> None:
         """Test __next__"""
-        collection: DictCollection = request.getfixturevalue(collection_name)
+        collection: CsafCollection = request.getfixturevalue(collection_name)
         expected = request.getfixturevalue(expected_arg)
         assert next(collection) == expected
 
@@ -141,8 +154,20 @@ class TestModels:
         assert "key1" in collection
         assert "key99" not in collection
 
+    def test_products_contains(self, csaf_products: m.CsafProducts, csaf_product: m.CsafProduct) -> None:
+        """Test __contains of CsafProducts."""
+        assert csaf_product in csaf_products
+        assert m.CsafProduct("not_cpe", "not_package", 9) not in csaf_products
+
     @pytest.mark.parametrize(
-        "obj, expected", (("csaf_cves", "key1"), ("csaf_files", "key1"), ("csaf_product", "cpe"), ("csaf_file", "name"))
+        "obj, expected",
+        (
+            ("csaf_cves", "key1"),
+            ("csaf_files", "key1"),
+            ("csaf_product", "cpe"),
+            ("csaf_file", "name"),
+            ("csaf_products", "CsafProduct"),
+        ),
     )
     def test_repr(self, obj: str, expected: str, request: pytest.FixtureRequest) -> None:
         """Test __repr__"""
@@ -151,12 +176,12 @@ class TestModels:
         assert isinstance(res, str)
         assert expected in res
 
-    @pytest.mark.parametrize("collection_name", ("csaf_cves", "csaf_files"))
-    def test_len(self, collection_name: str, request: pytest.FixtureRequest) -> None:
+    @pytest.mark.parametrize("collection_name, expected", (("csaf_cves", 2), ("csaf_files", 2), ("csaf_products", 1)))
+    def test_len(self, collection_name: str, expected: int, request: pytest.FixtureRequest) -> None:
         """Test __len__"""
-        collection: DictCollection = request.getfixturevalue(collection_name)
+        collection: CsafCollection = request.getfixturevalue(collection_name)
         res = len(collection)
-        assert res == 2
+        assert res == expected
 
     @pytest.mark.parametrize(
         "class_name, args",
@@ -166,6 +191,7 @@ class TestModels:
             ("CsafProduct", ("x", "y", 4, "z")),
             ("CsafCves", None),
             ("CsafData", None),
+            ("CsafProducts", None),
         ),
     )
     def test_instantiate(self, class_name: str, args: tuple[str | int] | None) -> None:
@@ -209,13 +235,17 @@ class TestModels:
 
     @pytest.mark.parametrize(
         "collection_name, attr_tuple, by_key",
-        (("csaf_cves", ("cpe", "package", "module"), "key1"), ("csaf_files", ("name",), None)),
+        (
+            ("csaf_cves", ("cpe", "package", "module"), "key1"),
+            ("csaf_products", ("cpe", "package", "module"), None),
+            ("csaf_files", ("name",), None),
+        ),
     )
     def test_to_tuples(
         self, collection_name: str, attr_tuple: tuple[str], by_key: str | None, request: pytest.FixtureRequest
     ) -> None:
         """Test collection.to_tuples()"""
-        collection: DictCollection = request.getfixturevalue(collection_name)
+        collection: CsafCollection = request.getfixturevalue(collection_name)
 
         def _assert_tuples(item: tuple[Any, ...]) -> None:
             assert len(item) == len(attr_tuple)
@@ -229,12 +259,16 @@ class TestModels:
             files_tuple, *_ = collection.to_tuples(attr_tuple)
             _assert_tuples(files_tuple)
 
-    def test_to_tuples_exception(self, csaf_cves: m.CsafCves, csaf_files: m.CsafFiles) -> None:
+    def test_to_tuples_exception(
+        self, csaf_cves: m.CsafCves, csaf_files: m.CsafFiles, csaf_products: m.CsafProducts
+    ) -> None:
         """Test exceptions from collection.to_tuples()"""
         with pytest.raises(AttributeError):
             csaf_files.to_tuples(("not_existing",))
         with pytest.raises(AttributeError):
             csaf_cves.to_tuples("key1", ("not_existing",))
+        with pytest.raises(AttributeError):
+            csaf_products.to_tuples(("not_existing",))
         with pytest.raises(KeyError):
             csaf_cves.to_tuples("wrong_key", ("cpe",))
 
@@ -276,3 +310,95 @@ class TestModels:
         csaf_cves = m.CsafCves({key1: m.CsafProducts(), key2: m.CsafProducts()})
         result = csaf_cves.keys()
         assert result == {key1: "", key2: ""}.keys()
+
+    @pytest.fixture
+    def csaf_products_with_ids(self) -> m.CsafProducts:
+        """CsafProducts with multiple values with ids."""
+        return m.CsafProducts(
+            [
+                # with ids
+                m.CsafProduct("cpe1", "pkg1", 1, "module1", 1, 1, 1, None),
+                m.CsafProduct("cpe2", "pkg2", 2, "module2", 2, 2, 2, None),
+                # missing product id
+                m.CsafProduct("cpe3", "pkg3", 3, "module3", None, 3, 3, None),
+                # missing cpe_id
+                m.CsafProduct("cpe4", "pkg4", 4, "module4", 4, None, 4, None),
+                # missing package id
+                m.CsafProduct("cpe5", "pkg5", 5, "module5", 5, 5, None, None),
+            ]
+        )
+
+    def test_products_add_lookup(self, csaf_products_with_ids: m.CsafProducts) -> None:
+        """Test CsafProducts add_to_lookup."""
+        products = csaf_products_with_ids
+        for product in products:
+            assert product not in products._lookup.values()
+        for product in products:
+            if product.cpe_id:
+                products.add_to_lookup(product)
+                assert product in products._lookup.values()
+
+    def test_products_get(self, csaf_products_with_ids: m.CsafProducts) -> None:
+        """Test CsafProducts get_by_ids."""
+        products = csaf_products_with_ids
+        # get from _products (and add to lookup)
+        for prod in products:
+            if prod.cpe_id:
+                assert prod not in products._lookup.values()
+                res = products.get_by_ids_and_module(prod.cpe_id, prod.package_name_id, prod.package_id, prod.module)
+                assert res == prod
+        # get from _lookup (added by previous get_by_ids call)
+        for prod in products:
+            if prod.cpe_id:
+                assert prod in products._lookup.values()
+                res = products.get_by_ids_and_module(prod.cpe_id, prod.package_name_id, prod.package_id, prod.module)
+                assert res == prod
+
+    def test_products_append(self, csaf_products: m.CsafProducts) -> None:
+        """Test CsafProducts append."""
+        product = m.CsafProduct("cpe_append", "pkg_append", 1, cpe_id=1)
+        assert product not in csaf_products
+        csaf_products.append(product)
+        assert product in csaf_products
+        assert product in csaf_products._products
+        assert product in csaf_products._lookup.values()
+
+    def test_products_remove(self, csaf_products: m.CsafProducts) -> None:
+        """Test CsafProducts remove."""
+        product = m.CsafProduct("cpe_remove", "pkg_remove", 1)
+
+        def _assert_not_in_products() -> None:
+            assert product not in csaf_products
+            assert product not in csaf_products._products
+            assert product not in csaf_products._lookup.values()
+
+        _assert_not_in_products()
+        with pytest.raises(ValueError):
+            csaf_products.remove(product)
+
+        csaf_products.append(product)
+        assert product in csaf_products
+
+        csaf_products.remove(product)
+        _assert_not_in_products()
+
+    @pytest.mark.parametrize(
+        "filter_, expected",
+        (
+            ("missing_only", [("cpe3",)]),
+            ("with_id", [("cpe1",), ("cpe2",), ("cpe4",), ("cpe5",)]),
+            ("with_cpe_id", [("cpe1",), ("cpe2",), ("cpe3",), ("cpe5",)]),
+            ("with_pkg_id", [("cpe1",), ("cpe2",), ("cpe3",), ("cpe4",)]),
+            ("with_all", [("cpe1",), ("cpe2",)]),
+        ),
+    )
+    def test_products_tuples_filters(
+        self, filter_: str, expected: list[tuple[str]], csaf_products_with_ids: m.CsafProducts
+    ) -> None:
+        """Test filters in CsafProducts to_tuples."""
+        products = csaf_products_with_ids
+        kwargs = {filter_: True}
+        if filter_ == "with_all":
+            kwargs = {"with_id": True, "with_cpe_id": True, "with_pkg_id": True}
+        tuples = products.to_tuples(("cpe",), **kwargs)
+        assert tuples == expected
