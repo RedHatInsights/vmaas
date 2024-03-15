@@ -86,7 +86,7 @@ def reset_db(conn, old_schema: bool = False):
     conn.commit()
 
 
-def write_testing_data(conn):
+def write_testing_data(conn: psycopg2.extensions.connection) -> None:
     """Write testing data to the database."""
     with conn.cursor() as cursor:
         cursor.execute(VMAAS_DB_DATA.read_text(encoding="utf-8"))
