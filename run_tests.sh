@@ -24,7 +24,7 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1
+pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1 -rP
 
 rc=$(($rc+$?))
 
