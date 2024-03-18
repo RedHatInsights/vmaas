@@ -109,6 +109,13 @@ class CsafFiles:
         """Return the value for key if key is in the collection, else default."""
         return self._files.get(key, default)
 
+    def get_by_id(self, id_: int, default: CsafFile | None = None) -> CsafFile | None:
+        """Return the value for id_ if id_ is in the collection, else default."""
+        for csaf_file in self:
+            if csaf_file.id_ == id_:
+                return csaf_file
+        return default
+
     def update(self, data: CsafFiles) -> None:
         """Update data in collection - same as dict.update()."""
         self._files.update(data._files)  # pylint: disable=protected-access
