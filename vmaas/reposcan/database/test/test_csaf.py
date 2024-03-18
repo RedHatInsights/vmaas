@@ -27,6 +27,7 @@ NEW_PRODUCTS = [
     m.CsafProduct("cpe1002", "pkg1003", 4, "module:2"),
     m.CsafProduct("cpe1003", "pkg1002-1:1-1.noarch", 3, "module:2"),
 ]
+CVE = "CVE-0000-0001"
 
 
 # pylint: disable=protected-access
@@ -60,7 +61,7 @@ class TestCsafStore:
             (1003, 1003, None, 1003, "module:1"),
         )
         cur = csaf_store.conn.cursor()
-        execute_values(cur, "INSERT INTO csaf_file(id, name, updated) VALUES %s RETURNING id", ((1, "file1", timestamp),))
+        execute_values(cur, "INSERT INTO csaf_file(id, name, updated) VALUES %s RETURNING id", ((1, "file1", None),))
         execute_values(cur, "INSERT INTO cpe(id, label) VALUES %s RETURNING id", cpes)
         execute_values(cur, "INSERT INTO package_name(id, name) VALUES %s RETURNING id", package_names)
         execute_values(
@@ -78,10 +79,18 @@ class TestCsafStore:
 
         reset_db(csaf_store.conn)
 
+    @pytest.fixture
+    def files_obj_for_insert(self) -> tuple[m.CsafFiles, datetime]:
+        """Csaf files obj for insert_cves tests."""
+        now = datetime.now(timezone.utc)
+        files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, 1, [CVE])})
+        return files_obj, now
+
     def test_save_file(self, csaf_store: CsafStore) -> None:
         """Test saving csaf file."""
         now = datetime.now(timezone.utc)
-        csaf_store._save_csaf_files(m.CsafFiles({"file": m.CsafFile("file", now, cves=["CVE-2024-1234"])}))
+        files = m.CsafFiles({"file": m.CsafFile("file", now, cves=["CVE-2024-1234"])})
+        csaf_store._save_csaf_files(files)
         cur = csaf_store.conn.cursor()
         cur.execute("SELECT id, name FROM csaf_file WHERE name = 'file'")
         res = cur.fetchone()
@@ -89,6 +98,8 @@ class TestCsafStore:
         id_save = res[0]
         assert "CVE-2024-1234" in csaf_store.cve2file_id
         assert csaf_store.cve2file_id["CVE-2024-1234"] == id_save
+        for file in files:
+            assert file.id_
 
         # update row
         update_ts = datetime.now(timezone.utc)
@@ -97,7 +108,7 @@ class TestCsafStore:
         res = cur.fetchone()
         assert res
         assert res[0] == id_save
-        assert res[1] == update_ts
+        assert res[1] is None
 
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
         """Test getting product attribute_id."""
@@ -152,40 +163,79 @@ class TestCsafStore:
     def assert_cve_count(self, csaf_store: CsafStore, count: int) -> None:
         """Assert cve count in db"""
         cur = csaf_store.conn.cursor()
-        cur.execute("SELECT id FROM cve WHERE UPPER(name) = %s", ("CVE-0000-0001",))
+        cur.execute("SELECT id FROM cve WHERE UPPER(name) = %s", (CVE,))
         cve_id = cur.fetchone()[0]
         cur.execute("SELECT count(*) FROM csaf_cve_product WHERE cve_id = %s", (cve_id,))
         db_count = cur.fetchone()[0]
         assert db_count == count
 
-    def test_insert_cves(self, products: None) -> None:  # pylint: disable=unused-argument
+    def assert_file_timestamp(self, csaf_store: CsafStore, timestamp: datetime | None, id_: int = 1) -> None:
+        """Assert csaf_file timestamp after insert"""
+        cur = csaf_store.conn.cursor()
+        cur.execute("SELECT updated FROM csaf_file WHERE id = %s", (id_,))
+        updated = cur.fetchone()[0]
+        assert updated == timestamp
+
+    def test_insert_cves(  # pylint: disable=unused-argument
+        self, products: None, files_obj_for_insert: tuple[m.CsafFiles, datetime]
+    ) -> None:
         """Test inserting csaf_cve_product."""
         csaf_store = CsafStore()
-        csaf_store.cve2file_id["CVE-0000-0001"] = 1
+        csaf_store.cve2file_id[CVE] = 1
+        files, timestamp = files_obj_for_insert
         products_obj = m.CsafProducts(EXISTING_PRODUCTS)
         csaf_store._update_product_ids(products_obj)
-        csaf_store._insert_cves("CVE-0000-0001", products_obj)
+        csaf_store._insert_cves(CVE, products_obj)
+        csaf_store._update_file_timestamp(CVE, files)
         self.assert_cve_count(csaf_store, 4)
+        self.assert_file_timestamp(csaf_store, timestamp)
 
-    def test_insert_cves_no_product_ids(self, products: None) -> None:  # pylint: disable=unused-argument
+    def test_insert_cves_no_product_ids(  # pylint: disable=unused-argument
+        self, products: None, files_obj_for_insert: tuple[m.CsafFiles, datetime]
+    ) -> None:
         """Test inserting csaf_cve_product."""
         csaf_store = CsafStore()
-        csaf_store.cve2file_id["CVE-0000-0001"] = 1
+        csaf_store.cve2file_id[CVE] = 1
+        files, timestamp = files_obj_for_insert
         products_obj = m.CsafProducts([m.CsafProduct("cpe1000", "pkg1000", 4, None)])
-        csaf_store._insert_cves("CVE-0000-0001", products_obj)
+        csaf_store._insert_cves(CVE, products_obj)
+        csaf_store._update_file_timestamp(CVE, files)
         self.assert_cve_count(csaf_store, 0)
+        # file timestamp is updated also if CVE is skipped when no products are matched
+        self.assert_file_timestamp(csaf_store, timestamp)
 
-    def test_remove_cves(self, products: None) -> None:  # pylint: disable=unused-argument
+    def test_insert_cves_unknown_cpe(  # pylint: disable=unused-argument
+        self, products: None, files_obj_for_insert: tuple[m.CsafFiles, datetime]
+    ) -> None:
+        """Test inserting csaf_cve_product."""
+        csaf_store = CsafStore()
+        csaf_store.cve2file_id[CVE] = 1
+        files, timestamp = files_obj_for_insert
+        products_obj = m.CsafProducts([m.CsafProduct("cpe_unknown", "pkg1000", 4, None)])
+        csaf_store._update_product_ids(products_obj)
+        # insert product with missing cpe
+        csaf_store._insert_missing_products(products_obj)
+        csaf_store._insert_cves(CVE, products_obj)
+        csaf_store._update_file_timestamp(CVE, files)
+        self.assert_cve_count(csaf_store, 1)
+        self.assert_file_timestamp(csaf_store, timestamp)
+
+    def test_remove_cves(  # pylint: disable=unused-argument
+        self, products: None, files_obj_for_insert: tuple[m.CsafFiles, datetime]
+    ) -> None:
         """Test removing csaf_cve_product."""
         csaf_store = CsafStore()
-        csaf_store.cve2file_id["CVE-0000-0001"] = 1
+        csaf_store.cve2file_id[CVE] = 1
+        files, timestamp = files_obj_for_insert
         products_obj = m.CsafProducts([m.CsafProduct("cpe1000", "pkg1000", 4, None)])
         csaf_store._update_product_ids(products_obj)
-        csaf_store._insert_cves("CVE-0000-0001", products_obj)
+        csaf_store._insert_cves(CVE, products_obj)
         self.assert_cve_count(csaf_store, 1)
 
         # remove old cve-product
         products_obj = m.CsafProducts([m.CsafProduct("cpe1001", "pkg1001-1:1-1.noarch", 3, None)])
         csaf_store._update_product_ids(products_obj)
-        csaf_store._remove_cves("CVE-0000-0001", products_obj)
+        csaf_store._remove_cves(CVE, products_obj)
+        csaf_store._update_file_timestamp(CVE, files)
         self.assert_cve_count(csaf_store, 0)
+        self.assert_file_timestamp(csaf_store, timestamp)

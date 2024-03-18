@@ -66,11 +66,11 @@ class CsafStore(ObjectStore):
             rows = execute_values(
                 cur,
                 """
-                    insert into csaf_file (name, updated) values %s
-                    on conflict (name) do update set updated = excluded.updated
+                    insert into csaf_file (name) values %s
+                    on conflict (name) do nothing
                     returning id, name
                 """,
-                csaf_files.to_tuples(("name", "csv_timestamp")),
+                csaf_files.to_tuples(("name",)),
                 fetch=True,
             )
             self.conn.commit()
@@ -81,6 +81,7 @@ class CsafStore(ObjectStore):
         finally:
             cur.close()
         for row in rows:
+            csaf_files[row[1]].id_ = row[0]
             file_cves = csaf_files[row[1]].cves
             if not file_cves:
                 self.logger.warning("File %s not associated with any CVEs", row[1])
@@ -338,7 +339,21 @@ class CsafStore(ObjectStore):
         finally:
             cur.close()
 
-    def _populate_cves(self, csaf_cves: model.CsafCves) -> None:
+    def _update_file_timestamp(self, cve: str, files: model.CsafFiles) -> None:
+        cur = self.conn.cursor()
+        try:
+            file_id = self.cve2file_id[cve]
+            csaf_file = files.get_by_id(file_id)
+            if csaf_file is None:
+                raise CsafStoreException(f"csaf_file with id={file_id} not found")
+            cur.execute("UPDATE csaf_file SET updated = %s WHERE id = %s", (csaf_file.csv_timestamp, file_id))
+            self.conn.commit()
+        except Exception as exc:
+            raise CsafStoreException(f"failed to update csaf_file for {cve}") from exc
+        finally:
+            cur.close()
+
+    def _populate_cves(self, csaf_cves: model.CsafCves, files: model.CsafFiles) -> None:
         for cve, products in csaf_cves.items():
             products_copy = deepcopy(products)  # only for logging of failed cves
             try:
@@ -346,6 +361,7 @@ class CsafStore(ObjectStore):
                 self._insert_missing_products(products)
                 self._remove_cves(cve, products)
                 self._insert_cves(cve, products)
+                self._update_file_timestamp(cve, files)
             except CsafStoreSkippedCVE as exc:
                 self.logger.warning("Skipping cve: %s reason: %s", cve, exc)
                 self.logger.debug("Skipping cve: %s products: %s reason: %s", cve, products_copy, exc)
@@ -375,5 +391,5 @@ class CsafStore(ObjectStore):
     def store(self, csaf_data: model.CsafData) -> None:
         """Store collection of CSAF files into DB."""
         self._save_csaf_files(csaf_data.files)
-        self._populate_cves(csaf_data.cves)
+        self._populate_cves(csaf_data.cves, csaf_data.files)
         self._delete_unreferenced_products()
