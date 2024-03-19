@@ -127,12 +127,12 @@ class TestCsafStore:
             + [
                 # will be skipped - missing cpe
                 m.CsafProduct("cpe_missing", "pkg1000", 4, None),
-                # will be skipped - missing package
+                # will be inserted - missing package
                 m.CsafProduct("cpe1000", "pkg_missing", 4, None),
             ]
         )
         csaf_store._load_product_attr_ids(products_obj)
-        assert len(products_obj) == 4
+        assert len(products_obj) == len(EXISTING_PRODUCTS) + 1  # existing + missing cpe
         for product in products_obj:
             assert product.cpe_id
             assert product.package_name_id or product.package_id

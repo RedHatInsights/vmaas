@@ -42,7 +42,7 @@ class CpeStore(ObjectStore):
         cur.close()
         self.conn.commit()
 
-    def populate_cpes(self, cpes):  # pylint: disable=too-many-branches
+    def populate_cpes(self, cpes: dict[str, str | None]) -> None:  # pylint: disable=too-many-branches
         """
         Insert or update CPE items.
         """

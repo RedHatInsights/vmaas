@@ -102,6 +102,11 @@ class CsafStore(ObjectStore):
         for product in products:
             try:
                 product.cpe_id = self._get_product_attr_id("cpe", self.cpe_store.cpe_label_to_id, value=product.cpe)
+            except KeyError:
+                self.logger.debug("Inserting missing cpe %s", product.cpe)
+                self.cpe_store.populate_cpes({product.cpe: None})
+                product.cpe_id = self._get_product_attr_id("cpe", self.cpe_store.cpe_label_to_id, value=product.cpe)
+            try:
                 if product.status_id == model.CsafProductStatus.KNOWN_AFFECTED:
                     # product for unfixed cve, we have only package_name
                     product.package_name_id = self._get_product_attr_id(
