@@ -2,6 +2,50 @@
 
 
 
+## v2.56.1 (2024-03-25)
+
+### Chore
+
+* chore: update protobuf ([`b3837dd`](https://github.com/RedHatInsights/vmaas/commit/b3837ddd7e2f34e536986f60efb8822bcd8ba4c4))
+
+* chore(tests): capture logs in tests ([`d88e119`](https://github.com/RedHatInsights/vmaas/commit/d88e119b76e406dd6af4a744ddc021ce2a8c0fb6))
+
+* chore(csaf): add csaf_store tests ([`edc0943`](https://github.com/RedHatInsights/vmaas/commit/edc0943d72b256c588561d4b00db35a7091f7764))
+
+* chore(csaf): extend model tests ([`9218f7a`](https://github.com/RedHatInsights/vmaas/commit/9218f7a8f5f8bffce1d9cb264c69766330c1a309))
+
+* chore(mypy): improve checks and fix issues found by mypy ([`404e2ea`](https://github.com/RedHatInsights/vmaas/commit/404e2ea5ef57d7a9bc7578ab48ce1655c68d3c14))
+
+* chore(csaf): make sure CVEs are always uppercase ([`272b57d`](https://github.com/RedHatInsights/vmaas/commit/272b57d2894984285ccc6407b2cf51a029c9e131))
+
+* chore(csaf): move csaf test data to conftest ([`a818921`](https://github.com/RedHatInsights/vmaas/commit/a81892191b31d19e21020870232c7bf224041e61))
+
+* chore: ignore CVE-2023-6129 as we&#39;re not affected
+
+not running on PPC
+using the lib only for checking expiration dates ([`45fdf5e`](https://github.com/RedHatInsights/vmaas/commit/45fdf5e0156283cc5f22632295ae09bf19ba471b))
+
+### Fix
+
+* fix(csaf): store unique products to collection ([`31e1e4a`](https://github.com/RedHatInsights/vmaas/commit/31e1e4a8cba3841a7fcd9a6a197b2ba54af4e2eb))
+
+* fix(csaf): insert missing cpes ([`0942fd0`](https://github.com/RedHatInsights/vmaas/commit/0942fd01eebe6beda5c7e14a49fe547e812ecede))
+
+* fix(csaf): update file timestamp after successful cve insert/remove ([`2565635`](https://github.com/RedHatInsights/vmaas/commit/25656356bdb5b0ed2ff6e9b4d236f70191b4cd6e))
+
+* fix(csaf): don&#39;t guess cve name by file name ([`6759e29`](https://github.com/RedHatInsights/vmaas/commit/6759e29aeab60134c516765fc21e489ff8276154))
+
+* fix(csaf): modify csaf_store to reflect new schema ([`2be4213`](https://github.com/RedHatInsights/vmaas/commit/2be42138f5f249c254eca62a8aaee9e44a7b11ca))
+
+* fix(csaf): extend model with CsafProducts ([`5ece339`](https://github.com/RedHatInsights/vmaas/commit/5ece339e5b98a5bdd4d8e0d086cc38133c6cb4bd))
+
+* fix(csaf): handle exceptions when saving files ([`e0efcfd`](https://github.com/RedHatInsights/vmaas/commit/e0efcfd4a88ca0ebbe45efc976e727c097afc449))
+
+* fix(csaf): finalize db schema
+
+RHINENG-7862 ([`7fc6a22`](https://github.com/RedHatInsights/vmaas/commit/7fc6a227b0ae94d9c6936c0960c4e87b4ac6a120))
+
+
 ## v2.56.0 (2024-03-06)
 
 ### Feature
