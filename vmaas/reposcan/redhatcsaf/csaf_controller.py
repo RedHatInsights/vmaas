@@ -97,11 +97,13 @@ class CsafController:
         if not CSAF_SYNC_ALL_FILES:
             files_to_sync = csaf_files.out_of_date
 
+        file_count = 0
         for csaf_file in files_to_sync:
             batches.add_item(csaf_file)
+            file_count += 1
 
         self.logger.info("%d CSAF files.", len(csaf_files))
-        self.logger.info("%d CSAF files need to be synced.", len(list(files_to_sync)))
+        self.logger.info("%d CSAF files need to be synced.", file_count)
 
         try:
             for i, batch in enumerate(batches, 1):
