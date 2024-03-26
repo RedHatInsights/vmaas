@@ -101,7 +101,7 @@ class CsafController:
             batches.add_item(csaf_file)
 
         self.logger.info("%d CSAF files.", len(csaf_files))
-        self.logger.info("%d CSAF files need to be synced.", len(list(files_to_sync)))
+        self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
 
         try:
             for i, batch in enumerate(batches, 1):
