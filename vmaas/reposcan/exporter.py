@@ -63,6 +63,7 @@ class SqliteDump:
                 self._dump_cves(dump)
                 self._dump_modules(dump)
                 self._dump_oval(dump)
+                self._dump_csaf(dump)
                 self._dump_dbchange(dump, timestamp)
         except Exception as err:  # pylint: disable=broad-except
             # database exceptions caught here
@@ -747,6 +748,47 @@ class SqliteDump:
             for oval_module_test_id, module_stream in cursor:
                 dump.execute("insert into oval_module_test_detail values (?, ?)",
                              (oval_module_test_id, module_stream))
+
+    def _dump_csaf(self, dump):
+        """Select CSAF data"""
+        # Dump data from csaf_product table
+        dump.execute("""CREATE TABLE IF NOT EXISTS csaf_product (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        cpe_id INTEGER NOT NULL,
+                        package_name_id INTEGER DEFAULT 0,
+                        package_id INTEGER DEFAULT 0,
+                        module_stream TEXT DEFAULT ''
+                    )""")
+        with self._named_cursor() as cursor:
+            cursor.execute("""SELECT id, cpe_id, package_name_id, package_id, module_stream
+                            FROM csaf_product""")
+            for csaf_product_id, cpe_id, package_name_id, package_id, module_stream in cursor:
+                dump.execute("INSERT INTO csaf_product VALUES (?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, ''))",
+                             (csaf_product_id, cpe_id, package_name_id, package_id, module_stream))
+
+        # Dump data from csaf_cve_product table
+        dump.execute("""CREATE TABLE IF NOT EXISTS csaf_cve_product (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        cve_id INTEGER NOT NULL,
+                        csaf_product_id INTEGER NOT NULL,
+                        csaf_product_status_id INTEGER NOT NULL)
+                    """)
+        with self._named_cursor() as cursor:
+            cursor.execute("""SELECT id, cve_id, csaf_product_id, csaf_product_status_id
+                            FROM csaf_cve_product""")
+            for csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id in cursor:
+                dump.execute("INSERT INTO csaf_cve_product VALUES (?, ?, ?, ?)",
+                             (csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id))
+
+        # Dump data from csaf_product_status table
+        dump.execute("""CREATE TABLE IF NOT EXISTS csaf_product_status (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        name TEXT UNIQUE NOT NULL)""")
+        with self._named_cursor() as cursor:
+            cursor.execute("""SELECT id, name
+                            FROM csaf_product_status""")
+            for csaf_status_id, name in cursor:
+                dump.execute("INSERT INTO csaf_product_status VALUES (?, ?)", (csaf_status_id, name))
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
