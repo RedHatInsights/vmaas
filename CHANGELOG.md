@@ -2,6 +2,17 @@
 
 
 
+## v2.57.0 (2024-04-04)
+
+### Chore
+
+* chore: update cryptography package ([`c986484`](https://github.com/RedHatInsights/vmaas/commit/c9864849e8b59ac021b677fea8a9baf506faf275))
+
+### Feature
+
+* feat(reposcan): Add CSAF SQLite dump ([`11c8897`](https://github.com/RedHatInsights/vmaas/commit/11c88979f63282bfdc76b88958ce40246ffd6e93))
+
+
 ## v2.56.1 (2024-03-25)
 
 ### Chore
