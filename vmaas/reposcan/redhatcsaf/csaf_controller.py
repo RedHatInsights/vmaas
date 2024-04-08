@@ -159,8 +159,13 @@ class CsafController:
                     pkg_name = rest
                     module = None
                     if "/" in rest:
-                        # it's a package with a module
+                        # it's a package with a module or some other identifier
                         module, pkg_name = rest.split("/", 1)
+                        if len(module.split(":")) != 2:
+                            # it isn't a module but some other identifier
+                            # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
+                            # meaning it is not an rpm and we don't want to process this product
+                            continue
 
                     csaf_product = CsafProduct(product_cpe[branch_product], pkg_name, status_id, module)
                     uniq_products[(product_cpe[branch_product], pkg_name, module)] = csaf_product
