@@ -2,6 +2,15 @@
 
 
 
+## v2.58.0 (2024-04-11)
+
+### Feature
+
+* feat(csaf): load csaf dump in webapp
+
+RHINENG-9212 ([`770d7ed`](https://github.com/RedHatInsights/vmaas/commit/770d7ed5e78056f062ce4a4e9bc039adc59d9e36))
+
+
 ## v2.57.1 (2024-04-11)
 
 ### Chore
