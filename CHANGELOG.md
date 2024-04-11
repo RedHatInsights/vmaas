@@ -2,6 +2,19 @@
 
 
 
+## v2.57.1 (2024-04-11)
+
+### Chore
+
+* chore(csaf): fix count of files in log ([`6807625`](https://github.com/RedHatInsights/vmaas/commit/68076251a9e84a7160058216bc388320ca47b839))
+
+### Fix
+
+* fix(csaf): improve module parsing from csaf
+
+RHINENG-7868 ([`17e41dc`](https://github.com/RedHatInsights/vmaas/commit/17e41dc31acedc69675ddba522b5ed9534b39316))
+
+
 ## v2.57.0 (2024-04-04)
 
 ### Chore
