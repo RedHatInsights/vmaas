@@ -235,6 +235,24 @@ paths:
       tags:
         - Export
 
+  /export/pg_dump:
+    put:
+      summary: Export pg_dump
+      operationId: vmaas.reposcan.reposcan.DbDumpHandler.put
+      <<: *secured
+      responses:
+        200:
+          description: Sync started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStartResponse"
+
+        <<: *auth_resps
+        <<: *running_resp
+      tags:
+        - Export
+
   /task/status:
     get:
       summary: Get status of currently running background task
@@ -301,6 +319,31 @@ paths:
         <<: *sync_responses
       tags:
         - Maintenance
+
+  /download/pg_dump:
+    get:
+      summary: Get pg_dump
+      operationId: vmaas.reposcan.reposcan.DbDumpHandler.get
+      <<: *secured
+      responses:
+        200:
+          description: Returns pg_dump
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: pg_dump not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: 
+                    type: string
+      tags:
+        - Download
 
 components:
   securitySchemes:

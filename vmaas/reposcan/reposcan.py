@@ -28,6 +28,7 @@ from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
+from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
@@ -178,12 +179,15 @@ class SyncHandler:
     task_type = "Unknown"
 
     @classmethod
-    def start_task(cls, *args, **kwargs):
+    def start_task(cls, *args, export=True, **kwargs):
         """Start given task if DB worker isn't currently executing different task."""
         if not SyncTask.is_running():
             msg = "%s task started." % cls.task_type
             LOGGER.info(msg)
-            SyncTask.start(cls.task_type, cls.run_task_and_export, cls.finish_task, *args, **kwargs)
+            task = cls.run_task
+            if export:
+                task = cls.run_task_and_export
+            SyncTask.start(cls.task_type, task, cls.finish_task, *args, **kwargs)
             status_code = 200
             status_msg = TaskStartResponse(msg)
         else:
@@ -834,6 +838,34 @@ class CleanTmpHandler(SyncHandler):
                     LOGGER.info("Deleted file or directory: %s", full_path)
                 except Exception as err:  # pylint: disable=broad-except
                     LOGGER.warning("Unable to delete file or directory: %s (%s)", full_path, err)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            return "ERROR"
+        return "OK"
+
+
+class DbDumpHandler(SyncHandler):
+    """Handler for export . """
+
+    task_type = "Export pg_dbump"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Export pg_dump."""
+        status_code, status_msg = cls.start_task(export=False)
+        return status_msg, status_code
+
+    @classmethod
+    def get(cls, **kwargs):
+        """Get the pg_dump."""
+        return DbDumpAPI.download()
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start exporting disk dump."""
+        try:
+            DbDumpAPI.create()
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
