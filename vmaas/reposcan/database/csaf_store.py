@@ -63,16 +63,17 @@ class CsafStore(ObjectStore):
     def _save_csaf_files(self, csaf_files: model.CsafFiles) -> None:
         cur = self.conn.cursor()
         try:
-            rows = execute_values(
+            files = csaf_files.to_tuples(("name",))
+            execute_values(
                 cur,
                 """
                     insert into csaf_file (name) values %s
                     on conflict (name) do nothing
-                    returning id, name
                 """,
-                csaf_files.to_tuples(("name",)),
-                fetch=True,
+                files,
             )
+            cur.execute("select id, name from csaf_file where name in %s", files)
+            rows = cur.fetchall()
             self.conn.commit()
         except Exception as exc:
             CSAF_FAILED_IMPORT.inc()
