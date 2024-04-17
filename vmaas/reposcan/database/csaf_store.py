@@ -72,7 +72,7 @@ class CsafStore(ObjectStore):
                 """,
                 files,
             )
-            cur.execute("select id, name from csaf_file where name in %s", files)
+            cur.execute("select id, name from csaf_file where name in %s", (tuple(files),))
             rows = cur.fetchall()
             self.conn.commit()
         except Exception as exc:

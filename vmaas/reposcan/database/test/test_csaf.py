@@ -90,7 +90,9 @@ class TestCsafStore:
         """Test saving csaf file."""
         cve = "CVE-2024-1234"
         now = datetime.now(timezone.utc)
-        files = m.CsafFiles({"file": m.CsafFile("file", now, cves=[cve])})
+        files = m.CsafFiles(
+            {"file": m.CsafFile("file", now, cves=[cve]), "file2": m.CsafFile("file2", now, cves=[CVE])}
+        )
         csaf_store._save_csaf_files(files)
         cur = csaf_store.conn.cursor()
         cur.execute("SELECT id, name FROM csaf_file WHERE name = 'file'")
