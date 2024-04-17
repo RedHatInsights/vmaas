@@ -2,6 +2,15 @@
 
 
 
+## v2.58.2 (2024-04-17)
+
+### Fix
+
+* fix(csaf): populate mapping with updated files
+
+RHINENG-9510 ([`81b4ce6`](https://github.com/RedHatInsights/vmaas/commit/81b4ce627553d1084aa1b4356249de9aa158d9f4))
+
+
 ## v2.58.1 (2024-04-17)
 
 ### Fix
