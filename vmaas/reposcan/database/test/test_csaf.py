@@ -88,27 +88,40 @@ class TestCsafStore:
 
     def test_save_file(self, csaf_store: CsafStore) -> None:
         """Test saving csaf file."""
+        cve = "CVE-2024-1234"
         now = datetime.now(timezone.utc)
-        files = m.CsafFiles({"file": m.CsafFile("file", now, cves=["CVE-2024-1234"])})
+        files = m.CsafFiles({"file": m.CsafFile("file", now, cves=[cve])})
         csaf_store._save_csaf_files(files)
         cur = csaf_store.conn.cursor()
         cur.execute("SELECT id, name FROM csaf_file WHERE name = 'file'")
         res = cur.fetchone()
         assert res
         id_save = res[0]
-        assert "CVE-2024-1234" in csaf_store.cve2file_id
-        assert csaf_store.cve2file_id["CVE-2024-1234"] == id_save
+        assert cve in csaf_store.cve2file_id
+        assert csaf_store.cve2file_id[cve] == id_save
         for file in files:
             assert file.id_
 
         # update row
+        csaf_store.cve2file_id = {}  # reset cve2file mapping
         update_ts = datetime.now(timezone.utc)
-        csaf_store._save_csaf_files(m.CsafFiles({"file": m.CsafFile("file", update_ts, cves=["CVE-2024-1234"])}))
+        files = m.CsafFiles({"file": m.CsafFile("file", update_ts, cves=[cve])})
+        # save should not update timestamp
+        csaf_store._save_csaf_files(files)
         cur.execute("SELECT id, updated FROM csaf_file WHERE name = 'file'")
         res = cur.fetchone()
         assert res
         assert res[0] == id_save
         assert res[1] is None
+        assert cve in csaf_store.cve2file_id
+        assert csaf_store.cve2file_id[cve] == id_save
+        # update timestamp
+        csaf_store._update_file_timestamp(cve, files)
+        cur.execute("SELECT id, updated FROM csaf_file WHERE name = 'file'")
+        res = cur.fetchone()
+        assert res
+        assert res[0] == id_save
+        assert res[1] == update_ts
 
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
         """Test getting product attribute_id."""
