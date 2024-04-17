@@ -2,6 +2,15 @@
 
 
 
+## v2.58.3 (2024-04-17)
+
+### Fix
+
+* fix(csaf): query argument
+
+RHINENG-9510 ([`61cae18`](https://github.com/RedHatInsights/vmaas/commit/61cae1881db429a94043db56935190a448b74e1c))
+
+
 ## v2.58.2 (2024-04-17)
 
 ### Fix
