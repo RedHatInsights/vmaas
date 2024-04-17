@@ -2,6 +2,15 @@
 
 
 
+## v2.58.1 (2024-04-17)
+
+### Fix
+
+* fix(reposcan): add internal /download/pg_dump api
+
+RHINENG-9441 ([`92f1f31`](https://github.com/RedHatInsights/vmaas/commit/92f1f3184e292029580ee5eb48476ebfc832442c))
+
+
 ## v2.58.0 (2024-04-11)
 
 ### Feature
