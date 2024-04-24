@@ -3,6 +3,7 @@ Module to handle /repos API calls.
 """
 
 import os
+from collections import defaultdict
 
 from vmaas.webapp.cache import (
     REPO_NAME,
@@ -12,7 +13,11 @@ from vmaas.webapp.cache import (
     REPO_PRODUCT,
     REPO_REVISION,
     REPO_LAST_CHANGE,
-    REPO_THIRD_PARTY
+    REPO_THIRD_PARTY,
+    ERRATA_UPDATED,
+    ERRATA_ID,
+    ERRATA_PKGIDS,
+    PKG_NAME_ID
 )
 from vmaas.common.date_utils import format_datetime
 from vmaas.common.webapp_utils import paginate, none2empty, parse_datetime, \
@@ -31,6 +36,13 @@ class RepoAPI:
     def _modified_since(repo_detail, modified_since_dt):
         if not modified_since_dt or (repo_detail[REPO_LAST_CHANGE] is not None and
                                      repo_detail[REPO_LAST_CHANGE] > modified_since_dt):
+            return True
+        return False
+
+    @staticmethod
+    def _errata_modified_since(errata_detail, modified_since_dt):
+        if not modified_since_dt or (errata_detail[ERRATA_UPDATED] is not None and
+                                     errata_detail[ERRATA_UPDATED] > modified_since_dt):
             return True
         return False
 
@@ -66,6 +78,26 @@ class RepoAPI:
                 filtered_repos.append(label)
         return filtered_repos
 
+    def _set_updated_packages(self, repo, repo_id, repoid2errataids, modified_since_dt, show_packages):
+        if modified_since_dt and show_packages:
+            pkg_names = set()
+            for errata_id in repoid2errataids[repo_id]:
+                errata_name = self.cache.errataid2name[errata_id]
+                errata = self.cache.errata_detail[errata_name]
+                for pkg_id in errata[ERRATA_PKGIDS]:
+                    name_id = self.cache.package_details[pkg_id][PKG_NAME_ID]
+                    pkg_names.add(self.cache.id2packagename[name_id])
+            repo["updated_package_names"] = list(pkg_names)
+
+    def _build_repoid2errataids(self, modified_since_dt, show_packages):
+        repoid2errataids = defaultdict(list)
+        if modified_since_dt and show_packages:
+            for errata in self.cache.errata_detail.values():
+                if self._errata_modified_since(errata, modified_since_dt):
+                    for repo_id in self.cache.errataid2repoids[errata[ERRATA_ID]]:
+                        repoid2errataids[repo_id].append(errata[ERRATA_ID])
+        return repoid2errataids
+
     def process_list(self, api_version, data):  # pylint: disable=unused-argument
         """
         Returns repository details.
@@ -77,6 +109,7 @@ class RepoAPI:
         repos = data.get('repository_list', None)
         strip_prefixes(repos, REPO_PREFIXES)
         modified_since = data.get('modified_since', None)
+        show_packages = data.get("show_packages", False)
         modified_since_dt = parse_datetime(modified_since)
         page = data.get("page", None)
         page_size = data.get("page_size", None)
@@ -104,6 +137,8 @@ class RepoAPI:
                 repo_details[label] = self.cache.repo_detail[repo_id]
         filters.append((filter_item_if_exists, [repo_details]))
 
+        repoid2errataids = self._build_repoid2errataids(modified_since_dt, show_packages)
+
         actual_page_size = 0
         repo_page_to_process, pagination_response = paginate(repos, page, page_size, filters=filters)
         latest_repo_change = None
@@ -116,7 +151,8 @@ class RepoAPI:
                         cpe_ids = self.cache.repo_id2cpe_ids[repo_id]
                     else:
                         cpe_ids = self.cache.content_set_id2cpe_ids.get(cs_id, [])
-                    repolist.setdefault(label, []).append({
+
+                    repo = {
                         "label": label,
                         "name": repo_detail[REPO_NAME],
                         "url": repo_detail[REPO_URL],
@@ -127,7 +163,9 @@ class RepoAPI:
                         "last_change": format_datetime(repo_detail[REPO_LAST_CHANGE]),
                         "cpes": [self.cache.cpe_id2label[cpe_id] for cpe_id in cpe_ids],
                         "third_party": repo_detail[REPO_THIRD_PARTY]
-                    })
+                    }
+                    self._set_updated_packages(repo, repo_id, repoid2errataids, modified_since_dt, show_packages)
+                    repolist.setdefault(label, []).append(repo)
                     if not latest_repo_change or repo_detail[REPO_LAST_CHANGE] > latest_repo_change:
                         latest_repo_change = repo_detail[REPO_LAST_CHANGE]
             actual_page_size += len(repolist[label])

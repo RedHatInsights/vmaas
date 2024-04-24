@@ -738,6 +738,11 @@ components:
           enum: [ true, false ]
           description: Include content from "third party" repositories into the response, disabled by default.
           default: false
+        show_packages:
+          type: boolean
+          enum: [ true, false ]
+          description: Show updated package names in a repo since the last modified_since
+          default: false
         <<: *req_paging
       required:
         - repository_list
@@ -779,6 +784,11 @@ components:
                     example: cpe:/a:redhat
                 third_party:
                   type: boolean
+                updated_package_names:
+                  type: array
+                  items:
+                    type: string
+                    example: kernel
         last_change:
           type: string
           example: '2020-04-16 20:07:58.500192+00'
