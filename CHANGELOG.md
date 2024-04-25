@@ -2,6 +2,32 @@
 
 
 
+## v2.58.4 (2024-04-25)
+
+### Chore
+
+* chore(deps): bump golang.org/x/net from 0.18.0 to 0.23.0 in /vmaas-go
+
+Bumps [golang.org/x/net](https://github.com/golang/net) from 0.18.0 to 0.23.0.
+- [Commits](https://github.com/golang/net/compare/v0.18.0...v0.23.0)
+
+---
+updated-dependencies:
+- dependency-name: golang.org/x/net
+  dependency-type: indirect
+...
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt; ([`c7e6423`](https://github.com/RedHatInsights/vmaas/commit/c7e64233ae9d38fcd12d2850ab205ec5d5ee6547))
+
+* chore: upgrade to latest idna
+
+RHINENG-9574 ([`3230ca4`](https://github.com/RedHatInsights/vmaas/commit/3230ca4006a71ab85d7d4fe1d3454628af6b0c94))
+
+### Fix
+
+* fix(build_deploy): only create sc tag when building sc branch ([`6b2e818`](https://github.com/RedHatInsights/vmaas/commit/6b2e81844cc4f311daf4eac9306c75007abb8ffb))
+
+
 ## v2.58.3 (2024-04-17)
 
 ### Fix
