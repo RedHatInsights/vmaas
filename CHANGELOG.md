@@ -2,6 +2,15 @@
 
 
 
+## v2.59.0 (2024-04-25)
+
+### Feature
+
+* feat: list modified packages in modified repos
+
+RHINENG-9690 ([`d9a8181`](https://github.com/RedHatInsights/vmaas/commit/d9a818179e0417ce202d5b4ff21f3853a65fa22a))
+
+
 ## v2.58.4 (2024-04-25)
 
 ### Chore
