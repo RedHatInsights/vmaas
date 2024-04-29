@@ -2,6 +2,15 @@
 
 
 
+## v2.60.0 (2024-04-29)
+
+### Feature
+
+* feat(csaf): use csaf in /vulnerabilities
+
+RHINENG-7869 ([`7eb8980`](https://github.com/RedHatInsights/vmaas/commit/7eb8980b6d8866c86dc0cd268f3f42d5da1a5527))
+
+
 ## v2.59.0 (2024-04-25)
 
 ### Feature
