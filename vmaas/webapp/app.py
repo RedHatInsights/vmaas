@@ -41,6 +41,7 @@ REFRESH_CHECK_INTERVAL = 60
 
 GZIP_RESPONSE_ENABLE = strtobool(os.getenv("GZIP_RESPONSE_ENABLE", "off"))
 GZIP_COMPRESS_LEVEL = int(os.getenv("GZIP_COMPRESS_LEVEL", "5"))
+RESPONSE_TIMEOUT = int(os.getenv("RESPONSE_TIMEOUT", "60"))
 LATEST_DUMP_ENDPOINT = "api/v1/latestdump"
 
 LOGGER = get_logger(__name__)
@@ -78,6 +79,12 @@ class BaseHandler:
         if not cls.data_ready:
             return "Data not available, please try again later.", 503
 
+        def signal_handler(*args):  # pylint: disable=unused-argument
+            raise TimeoutError("timeout exceeded")
+
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(RESPONSE_TIMEOUT)
+
         data = None
         try:
             if body is not None:  # POST
@@ -89,6 +96,8 @@ class BaseHandler:
         except (ValueError, re.error) as ex:
             res = repr(ex)
             code = 400
+        except TimeoutError as ex:
+            res, code = str(ex), 504
         except Exception as err:  # pylint: disable=broad-except
             err_id = hash(err)
             res = 'Internal server error <%s>: please include this error id in bug report.' % err_id

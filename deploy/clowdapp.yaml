@@ -47,6 +47,8 @@ objects:
           value: ${VMAAS_LIB_MAX_GOROUTINES}
         - name: SSL_CERT_DIR
           value: ${SSL_CERT_DIR}
+        - name: RESPONSE_TIMEOUT
+          value: ${RESPONSE_TIMEOUT}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -90,6 +92,8 @@ objects:
           value: ${OVAL_UNFIXED_EVAL_ENABLED}
         - name: REPO_NAME_PREFIXES
           value: ${REPO_NAME_PREFIXES}
+        - name: RESPONSE_TIMEOUT
+          value: ${RESPONSE_TIMEOUT}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -488,3 +492,5 @@ parameters:
   value: ''
 - name: CSAF_PRODUCT_STATUS_LIST
   value: "known_affected" # comma delimited list of products to parse
+- name: RESPONSE_TIMEOUT
+  value: '60'  # API response timeout in seconds

@@ -139,3 +139,7 @@ func LogAndRespFailedDependency(c *gin.Context, err error) {
 	LogError("err", err.Error()) // log more descriptive error, possibly showing internal urls
 	respStatusError(c, http.StatusFailedDependency, errors.New("couldn't proxy request to vmaas-webapp-service"))
 }
+
+func RespGatewayTimeout(c *gin.Context, err error) {
+	respStatusError(c, http.StatusGatewayTimeout, err)
+}

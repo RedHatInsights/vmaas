@@ -45,6 +45,7 @@ type Config struct {
 	LogStyle             string
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
+	ResponseTimeout      time.Duration
 
 	// lib
 	OvalUnfixedEvalEnabled bool
@@ -130,6 +131,7 @@ func initEnv() {
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
 	Cfg.OvalUnfixedEvalEnabled = GetBoolEnvOrDefault("OVAL_UNFIXED_EVAL_ENABLED", true)
 	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
+	Cfg.ResponseTimeout = time.Second * time.Duration(GetIntEnvOrDefault("RESPONSE_TIMEOUT", 60))
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

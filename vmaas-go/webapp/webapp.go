@@ -43,6 +43,7 @@ func Run() {
 	// middlewares
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
+	app.Use(middlewares.WithTimeout(utils.Cfg.ResponseTimeout))
 	middlewares.Prometheus().Use(app)
 	app.HandleMethodNotAllowed = true
 
