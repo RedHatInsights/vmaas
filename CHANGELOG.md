@@ -2,6 +2,16 @@
 
 
 
+## v2.60.1 (2024-04-30)
+
+### Fix
+
+* fix: update vmaas-lib to improve concurrency
+
+RHINENG-9798
+RHINENG-9797 ([`112d19c`](https://github.com/RedHatInsights/vmaas/commit/112d19cede5b26978e1e25e9fad0b254f1f6b351))
+
+
 ## v2.60.0 (2024-04-29)
 
 ### Feature
