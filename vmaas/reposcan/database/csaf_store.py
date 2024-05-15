@@ -371,6 +371,7 @@ class CsafStore(ObjectStore):
             except CsafStoreSkippedCVE as exc:
                 self.logger.warning("Skipping cve: %s reason: %s", cve, exc)
                 self.logger.debug("Skipping cve: %s products: %s reason: %s", cve, products_copy, exc)
+                self._update_file_timestamp(cve, files)
             except CsafStoreException:
                 self.logger.exception("Failed to populate cve: %s products: %s ", cve, products_copy)
 
