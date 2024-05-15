@@ -34,5 +34,8 @@ class TestCsafController:
         csaf_json, _ = data
         csaf_file = m.CsafFile(csaf_json, datetime(2022, 2, 14, 15, 30))
         csaf_cves = csaf.parse_csaf_file(csaf_file)
-        csaf_data = m.CsafData(m.CsafFiles({csaf_json: csaf_file}), csaf_cves)
+        csaf_data = m.CsafData()
+        csaf_file.cves = list(csaf_cves.keys())
+        csaf_data.files[csaf_file.name] = csaf_file
+        csaf_data.cves.update(csaf_cves)
         csaf.csaf_store.store(csaf_data)
