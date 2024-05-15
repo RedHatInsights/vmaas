@@ -321,22 +321,25 @@ class CsafStore(ObjectStore):
             cur.close()
 
     def _remove_cves(self, cve: str, products: model.CsafProducts) -> None:
-        if not products:
-            return
-
         cur = self.conn.cursor()
+        q_inner = "DELETE FROM csaf_cve_product ccp USING cve WHERE {} RETURNING *"
+        q_where_all = "ccp.cve_id = cve.id AND cve.name = %s"
+        q_where_not_in = f"{q_where_all} AND csaf_product_id NOT IN %s"
+        query = f"WITH del AS ({q_inner}) SELECT count(*) FROM del"
+        if products:
+            query_params = (cve, tuple(x.id_ for x in products))
+            query = query.format(q_where_not_in)
+        else:
+            # remove all products associated with the CVE
+            query_params = (cve,)  # type: ignore[assignment]
+            query = query.format(q_where_all)
+
         try:
-            cur.execute(
-                """
-                    DELETE FROM csaf_cve_product ccp
-                    USING cve
-                    WHERE ccp.cve_id = cve.id
-                        AND cve.name = %s
-                        AND csaf_product_id NOT IN %s
-                """,
-                (cve, tuple(x.id_ for x in products)),
-            )
+            cur.execute(query, query_params)
+            res = cur.fetchone()
             self.conn.commit()
+            if res and len(res) > 0:
+                self.logger.debug("Deleted %d products from %s", res[0], cve)
         except Exception as exc:
             CSAF_FAILED_DELETE.inc()
             self.logger.exception("%s: ", FAILED_CVE_DELETE)
