@@ -86,6 +86,17 @@ class TestCsafStore:
         files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, 1, [CVE])})
         return files_obj, now
 
+    @pytest.fixture
+    def store_cve_product(self) -> CsafStore:  # pylint: disable=unused-argument
+        """CsafStore object with 1 inserted CVE-product in DB"""
+        csaf_store = CsafStore()
+        csaf_store.cve2file_id[CVE] = 1
+        products_obj = m.CsafProducts([m.CsafProduct("cpe1000", "pkg1000", 4, None)])
+        csaf_store._update_product_ids(products_obj)
+        csaf_store._insert_cves(CVE, products_obj)
+        self.assert_cve_count(csaf_store, 1)
+        return csaf_store
+
     def test_save_file(self, csaf_store: CsafStore) -> None:
         """Test saving csaf file."""
         cve = "CVE-2024-1234"
@@ -235,20 +246,23 @@ class TestCsafStore:
         self.assert_cve_count(csaf_store, 1)
         self.assert_file_timestamp(csaf_store, timestamp)
 
+    @pytest.mark.parametrize(
+        "products_obj",
+        [m.CsafProducts([m.CsafProduct("cpe1001", "pkg1001-1:1-1.noarch", 3, None)]), m.CsafProducts()],
+        ids=("fixed_product", "no_products"),
+    )
     def test_remove_cves(  # pylint: disable=unused-argument
-        self, products: None, files_obj_for_insert: tuple[m.CsafFiles, datetime]
+        self,
+        products: None,
+        files_obj_for_insert: tuple[m.CsafFiles, datetime],
+        store_cve_product: CsafStore,
+        products_obj: m.CsafProducts,
     ) -> None:
         """Test removing csaf_cve_product."""
-        csaf_store = CsafStore()
-        csaf_store.cve2file_id[CVE] = 1
+        csaf_store = store_cve_product
         files, timestamp = files_obj_for_insert
-        products_obj = m.CsafProducts([m.CsafProduct("cpe1000", "pkg1000", 4, None)])
-        csaf_store._update_product_ids(products_obj)
-        csaf_store._insert_cves(CVE, products_obj)
-        self.assert_cve_count(csaf_store, 1)
 
         # remove old cve-product
-        products_obj = m.CsafProducts([m.CsafProduct("cpe1001", "pkg1001-1:1-1.noarch", 3, None)])
         csaf_store._update_product_ids(products_obj)
         csaf_store._remove_cves(CVE, products_obj)
         csaf_store._update_file_timestamp(CVE, files)
