@@ -2,6 +2,15 @@
 
 
 
+## v2.60.3 (2024-05-16)
+
+### Fix
+
+* fix(csaf): remove products if they become fixed/unaffected
+
+RHINENG-10039 ([`f6b4702`](https://github.com/RedHatInsights/vmaas/commit/f6b470263b6d4af7e30cbc37897a58f7065d6621))
+
+
 ## v2.60.2 (2024-05-16)
 
 ### Chore
