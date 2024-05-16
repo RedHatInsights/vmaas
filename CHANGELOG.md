@@ -2,6 +2,25 @@
 
 
 
+## v2.60.2 (2024-05-16)
+
+### Chore
+
+* chore(csaf_test): fix input for test_csaf_store
+
+use correct CsafData content to call `store` function, this commit is not fixing the test itself which does not seem to have any asserts, test just runs the code ([`99d29c2`](https://github.com/RedHatInsights/vmaas/commit/99d29c27075bf19dd401c48e3b4fd0b910f9821f))
+
+* chore: update dependencies
+
+RHINENG-10048 ([`79be3aa`](https://github.com/RedHatInsights/vmaas/commit/79be3aa7f551c8e9cfb07250b4ca6bc8d41dd3f6))
+
+### Fix
+
+* fix(csaf): update file timestamp for skipped cve
+
+RHINENG-9586 ([`ca43ccc`](https://github.com/RedHatInsights/vmaas/commit/ca43ccc581b707a6889caf48eaa62ff94201478f))
+
+
 ## v2.60.1 (2024-04-30)
 
 ### Fix
