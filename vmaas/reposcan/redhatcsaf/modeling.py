@@ -153,6 +153,7 @@ class CsafProduct:
     package: str
     status_id: int
     module: str | None = None
+    erratum: str | None = None
     id_: int | None = None
     cpe_id: int | None = None
     package_name_id: int | None = None

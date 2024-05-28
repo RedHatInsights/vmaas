@@ -317,14 +317,14 @@ class TestModels:
         return m.CsafProducts(
             [
                 # with ids
-                m.CsafProduct("cpe1", "pkg1", 1, "module1", 1, 1, 1, None),
-                m.CsafProduct("cpe2", "pkg2", 2, "module2", 2, 2, 2, None),
+                m.CsafProduct("cpe1", "pkg1", 1, "module1", None, 1, 1, 1, None),
+                m.CsafProduct("cpe2", "pkg2", 2, "module2", None, 2, 2, 2, None),
                 # missing product id
-                m.CsafProduct("cpe3", "pkg3", 3, "module3", None, 3, 3, None),
+                m.CsafProduct("cpe3", "pkg3", 3, "module3", None, None, 3, 3, None),
                 # missing cpe_id
-                m.CsafProduct("cpe4", "pkg4", 4, "module4", 4, None, 4, None),
+                m.CsafProduct("cpe4", "pkg4", 4, "module4", None, 4, None, 4, None),
                 # missing package id
-                m.CsafProduct("cpe5", "pkg5", 5, "module5", 5, 5, None, None),
+                m.CsafProduct("cpe5", "pkg5", 5, "module5", None, 5, 5, None, None),
             ]
         )
 
