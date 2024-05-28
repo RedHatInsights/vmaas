@@ -3,6 +3,7 @@ Module containing class for syncing set of CSAF files into the DB.
 """
 import json
 import os
+import re
 import shutil
 import tempfile
 import typing as t
@@ -28,6 +29,11 @@ from vmaas.reposcan.redhatcsaf.modeling import CsafProductStatus
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/beta/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "true"))
+ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
+
+
+class ComponentError(Exception):
+    """CSAF component error."""
 
 
 class CsafController:
@@ -139,39 +145,71 @@ class CsafController:
             cves.update(unfixed_cves)
         return cves
 
-    def _parse_vulnerabilities(self, csaf: dict[str, t.Any], product_cpe: dict[str, str]) -> CsafCves:
-        # parse only CVEs with `known_affected` products aka `unfixed` CVEs
-        if any(x != "known_affected" for x in self.cfg.csaf_product_status_list):
-            raise NotImplementedError("parsing of csaf products other than 'known_affected' not supported")
+    def _parse_product(self, product: str, product_status: str) -> tuple[str, str, str | None]:
+        if ":" not in product:
+            raise ComponentError(f"Component without ':', '{product}'")
 
-        unfixed_cves = CsafCves()
+        branch_product, rest = product.split(":", 1)
+        pkg = rest
+        module = None
+        match product_status:
+            case "known_affected":
+                if "/" in rest:
+                    # it's a package with a module or some other identifier
+                    module, pkg = rest.split("/", 1)
+                    if len(module.split(":")) != 2:
+                        # it isn't a module but some other identifier
+                        # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
+                        # meaning it is not an rpm and we don't want to process this product
+                        raise ComponentError(f"Not RPM component '{product}'")
+            case "fixed":
+                # already parsed
+                # TODO: filter out containers or maven packages once ProdSec starts providing that information in purl
+                pass
+            case _:
+                raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
+
+        return branch_product, pkg, module
+
+    def _parse_vulnerabilities(self, csaf: dict[str, t.Any], product_cpe: dict[str, str]) -> CsafCves:
+        cves = CsafCves()
         for vulnerability in csaf["vulnerabilities"]:
             if "cve" not in vulnerability:
                 # `vulnerability` can be identified by `cve` or `ids`, we are interested only in those with `cve`
                 continue
 
+            product_erratum = self._parse_remediations(vulnerability)
             cve = vulnerability["cve"].upper()
             uniq_products = {}
             for product_status in self.cfg.csaf_product_status_list:
                 status_id = CsafProductStatus[product_status.upper()].value
-                for unfixed in vulnerability["product_status"].get(product_status.lower(), []):
-                    branch_product, rest = unfixed.split(":", 1)
-                    pkg_name = rest
-                    module = None
-                    if "/" in rest:
-                        # it's a package with a module or some other identifier
-                        module, pkg_name = rest.split("/", 1)
-                        if len(module.split(":")) != 2:
-                            # it isn't a module but some other identifier
-                            # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
-                            # meaning it is not an rpm and we don't want to process this product
-                            continue
+                product_status = product_status.lower()
+                for product in vulnerability["product_status"].get(product_status, []):
+                    try:
+                        branch_product, pkg, module = self._parse_product(product, product_status)
+                    except ComponentError as err:
+                        self.logger.debug("%s, %s", err, vulnerability["cve"])
+                        continue
+                    erratum = product_erratum.get(product)
+                    csaf_product = CsafProduct(product_cpe[branch_product], pkg, status_id, module, erratum)
+                    uniq_products[(product_cpe[branch_product], pkg, module)] = csaf_product
 
-                    csaf_product = CsafProduct(product_cpe[branch_product], pkg_name, status_id, module)
-                    uniq_products[(product_cpe[branch_product], pkg_name, module)] = csaf_product
-            unfixed_cves[cve] = CsafProducts(list(uniq_products.values()))
+            cves[cve] = CsafProducts(list(uniq_products.values()))
 
-        return unfixed_cves
+        return cves
+
+    def _parse_remediations(self, vulnerability: dict[str, t.Any]) -> dict[str, str]:
+        product_erratum: dict[str, str] = {}
+        for remediation in vulnerability.get("remediations", []):
+            if remediation.get("category") != "vendor_fix":
+                continue
+            if found := ERRATUM_RE.findall(remediation.get("url", "")):
+                erratum = found[0]
+                for product in remediation.get("product_ids", []):
+                    # TODO: use only RPM component/product once ProdSec provides purl
+                    product_erratum[product] = erratum
+
+        return product_erratum
 
     def _parse_product_tree(self, csaf: dict[str, t.Any]) -> dict[str, str]:
         product_cpe: dict[str, str] = {}
