@@ -108,14 +108,14 @@ class CsafStore(ObjectStore):
                 self.cpe_store.populate_cpes({product.cpe: None})
                 product.cpe_id = self._get_product_attr_id("cpe", self.cpe_store.cpe_label_to_id, value=product.cpe)
             try:
-                if product.status_id == model.CsafProductStatus.KNOWN_AFFECTED:
-                    # product for unfixed cve, we have only package_name
-                    product.package_name_id = self._get_product_attr_id(
-                        "package_name", self.package_store.package_name_map, value=product.package
-                    )
-                else:
-                    # parse package into NEVRA
-                    try:
+                match product.status_id:
+                    case model.CsafProductStatus.KNOWN_AFFECTED:
+                        # product for unfixed cve, we have only package_name
+                        product.package_name_id = self._get_product_attr_id(
+                            "package_name", self.package_store.package_name_map, value=product.package
+                        )
+                    case model.CsafProductStatus.FIXED:
+                        # parse package into NEVRA
                         name, epoch, ver, rel, arch = rpm.parse_rpm_name(product.package)
                         name_id = self.package_store.package_name_map[name]
                         evr_id = self.package_store.evr_map[(epoch, ver, rel)]
@@ -123,13 +123,11 @@ class CsafStore(ObjectStore):
                         product.package_id = self._get_product_attr_id(
                             "package", self.package_store.package_map, value=(name_id, evr_id, arch_id)
                         )
-                    except rpm.RPMParseException as err:
-                        self.logger.debug("Skipping product %s, %s", product, err)
-                        skipped.append(product)
-                        continue
+                    case _:
+                        raise NotImplementedError(f"Unsupported product_status_id '{product.status_id}'")
 
                 products.add_to_lookup(product)
-            except (AttributeError, KeyError) as err:
+            except (AttributeError, KeyError, rpm.RPMParseException) as err:
                 self.logger.debug("Skipping product %s, %s", product, err)
                 skipped.append(product)
 
