@@ -2,6 +2,15 @@
 
 
 
+## v2.60.4 (2024-05-28)
+
+### Fix
+
+* fix(csaf): cves for source packages
+
+RHINENG-9890 ([`6b7c3dc`](https://github.com/RedHatInsights/vmaas/commit/6b7c3dc7005fadfe06355cd21a6308388bb848b5))
+
+
 ## v2.60.3 (2024-05-16)
 
 ### Fix
