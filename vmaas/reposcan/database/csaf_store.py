@@ -295,16 +295,16 @@ class CsafStore(ObjectStore):
 
             file_id = self.cve2file_id[cve]
             to_upsert = [
-                (row[0], id_, status_id, file_id)
-                for id_, status_id in products.to_tuples(("id_", "status_id"), with_id=True)
+                (row[0], id_, status_id, file_id, erratum)
+                for id_, status_id, erratum in products.to_tuples(("id_", "status_id", "erratum"), with_id=True)
             ]
             execute_values(
                 cur,
                 """
-                    INSERT INTO csaf_cve_product (cve_id, csaf_product_id, csaf_product_status_id, csaf_file_id)
+                    INSERT INTO csaf_cve_product (cve_id, csaf_product_id, csaf_product_status_id, csaf_file_id, erratum)
                     VALUES %s
                     ON CONFLICT (cve_id, csaf_product_id)
-                    DO UPDATE SET csaf_product_status_id = EXCLUDED.csaf_product_status_id
+                    DO UPDATE SET csaf_product_status_id = EXCLUDED.csaf_product_status_id, erratum = EXCLUDED.erratum
                 """,
                 to_upsert,
             )
