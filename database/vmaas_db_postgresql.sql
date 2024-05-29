@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 20);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 21);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1344,6 +1344,7 @@ CREATE TABLE IF NOT EXISTS csaf_cve_product (
   csaf_product_id        INT NOT NULL,
   csaf_product_status_id INT NOT NULL,
   csaf_file_id           INT NOT NULL,
+  erratum                TEXT,
   PRIMARY KEY (id),
   CONSTRAINT cve_id
     FOREIGN KEY (cve_id)
