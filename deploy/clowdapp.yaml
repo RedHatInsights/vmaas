@@ -251,6 +251,8 @@ objects:
           value: ${CSAF_VEX_INDEX_CSV}
         - name: CSAF_SYNC_ALL_FILES
           value: ${CSAF_SYNC_ALL_FILES}
+        - name: CSAF_PRODUCT_STATUS_LIST
+          value: ${CSAF_PRODUCT_STATUS_LIST}
 
     database:
       name: vmaas
@@ -487,4 +489,4 @@ parameters:
 - name: PG_MAX_STACK_DEPTH
   value: ''
 - name: CSAF_PRODUCT_STATUS_LIST
-  value: "known_affected" # comma delimited list of products to parse
+  value: "known_affected,fixed" # comma delimited list of products to parse
