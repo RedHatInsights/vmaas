@@ -38,6 +38,13 @@ EXPECTED_CSAF = (
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.2"),
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:8.3"),
                     csaf_model.CsafProduct("cpe:/a:redhat:advanced_virtualization:8::el8", "libtpms", 4, "virt:av"),
+                    csaf_model.CsafProduct(
+                        "cpe:/a:redhat:rhel_eus:8.6::appstream",
+                        "SLOF-0:20210217-1.module+el8.6.0+14480+c0a3aa0f.noarch",
+                        3,
+                        None,
+                        "RHSA-2023:1833",
+                    )
                 ])
             }
         ),
