@@ -22,6 +22,7 @@ OVAL_FEED_BASE_URL = os.getenv("OVAL_FEED_BASE_URL", "https://www.redhat.com/sec
 OVAL_WITH_UNPATCHED_FILTER = strtobool(os.getenv("OVAL_WITH_UNPATCHED_FILTER", "TRUE"))
 # comma-separated keywords to filter out
 OVAL_LABEL_FILTER = os.getenv("OVAL_LABEL_FILTER", "RHEL5,rhel-7-alt").split(",")
+OVAL_SYNC_ALL_FILES = strtobool(os.getenv("OVAL_SYNC_ALL_FILES", "FALSE"))
 
 
 class OvalController:
@@ -140,7 +141,7 @@ class OvalController:
                 continue
             db_timestamp = db_oval_files.get(entry['id'])
             feed_timestamp = parse_datetime(entry["updated"])
-            if not db_timestamp or feed_timestamp > db_timestamp[1]:
+            if not db_timestamp or feed_timestamp > db_timestamp[1] or OVAL_SYNC_ALL_FILES:
                 local_path = os.path.join(self.tmp_directory, entry["content"]["src"].replace(OVAL_FEED_BASE_URL, ""))
                 oval_definitions_file = OvalDefinitions(entry["id"], feed_timestamp,
                                                         entry["content"]["src"], local_path)
