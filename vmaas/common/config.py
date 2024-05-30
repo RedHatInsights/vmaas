@@ -42,7 +42,7 @@ class BaseConfig:
         self.prometheus_multiproc_dir = os.getenv("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc_dir")
 
         self.pg_max_stack_depth = os.getenv("PG_MAX_STACK_DEPTH", "")
-        self.csaf_product_status_list = os.getenv("CSAF_PRODUCT_STATUS_LIST", "known_affected").split(",")
+        self.csaf_product_status_list = os.getenv("CSAF_PRODUCT_STATUS_LIST", "known_affected,fixed").split(",")
 
 
 # pylint: disable=too-many-instance-attributes
