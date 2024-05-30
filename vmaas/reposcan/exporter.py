@@ -771,14 +771,15 @@ class SqliteDump:
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         cve_id INTEGER NOT NULL,
                         csaf_product_id INTEGER NOT NULL,
-                        csaf_product_status_id INTEGER NOT NULL)
+                        csaf_product_status_id INTEGER NOT NULL,
+                        erratum TEXT)
                     """)
         with self._named_cursor() as cursor:
-            cursor.execute("""SELECT id, cve_id, csaf_product_id, csaf_product_status_id
+            cursor.execute("""SELECT id, cve_id, csaf_product_id, csaf_product_status_id, erratum
                             FROM csaf_cve_product""")
-            for csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id in cursor:
-                dump.execute("INSERT INTO csaf_cve_product VALUES (?, ?, ?, ?)",
-                             (csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id))
+            for csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id, erratum in cursor:
+                dump.execute("INSERT INTO csaf_cve_product VALUES (?, ?, ?, ?, ?)",
+                             (csaf_cve_id, cve_id, csaf_product_id, csaf_product_status_id, erratum))
 
         # Dump data from csaf_product_status table
         dump.execute("""CREATE TABLE IF NOT EXISTS csaf_product_status (
