@@ -207,6 +207,12 @@ class CsafController:
                 erratum = found[0]
                 for product in remediation.get("product_ids", []):
                     # TODO: use only RPM component/product once ProdSec provides purl
+                    if product in product_erratum:
+                        self.logger.warning(
+                            "Multiple errata (%s, %s) for single cve-product (%s, %s)",
+                            product_erratum[product], erratum,
+                            vulnerability["cve"], product,
+                        )
                     product_erratum[product] = erratum
 
         return product_erratum
