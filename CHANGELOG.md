@@ -2,6 +2,53 @@
 
 
 
+## v2.61.0 (2024-05-31)
+
+### Chore
+
+* chore(csaf): log warning if there are multiple errata
+
+RHINENG-10310 ([`7df7880`](https://github.com/RedHatInsights/vmaas/commit/7df7880517a0aa320546312b917cc58aeca5467e))
+
+* chore(csaf): raise NotImplementedError for unsupported status_id
+
+RHINENG-10310 ([`555b28d`](https://github.com/RedHatInsights/vmaas/commit/555b28d0526ced6221d2f87ab89caf29f8d68ddc))
+
+* chore: update go version and dependencies
+
+RHINENG-9601 ([`42162e2`](https://github.com/RedHatInsights/vmaas/commit/42162e20c20e844f31897380e4ef8e227a9753ba))
+
+### Feature
+
+* feat(csaf): dump erratum
+
+RHINENG-10310 ([`90443d3`](https://github.com/RedHatInsights/vmaas/commit/90443d357d4e082ac94393019c896dae4ff211bf))
+
+* feat(csaf): save errata to db
+
+RHINENG-10310 ([`5450b60`](https://github.com/RedHatInsights/vmaas/commit/5450b6041913977fcf3f62da4fe2d70daab5e610))
+
+* feat(csaf): add errata to db schema
+
+RHINENG-10310 ([`f6a5a12`](https://github.com/RedHatInsights/vmaas/commit/f6a5a126127621ead0a4b538cf76f5118c65e2e3))
+
+* feat(csaf): parse fixed csaf vex products
+
+RHINENG-10310 ([`6f2580d`](https://github.com/RedHatInsights/vmaas/commit/6f2580d5e6c348d5a6b84296b7e7b94b68628d23))
+
+### Fix
+
+* fix(csaf): start processing fixed product status
+
+RHINENG-10310 ([`c0a97e9`](https://github.com/RedHatInsights/vmaas/commit/c0a97e92dd6d42cb3fcb4951b30eb848d3cb3c75))
+
+### Test
+
+* test(csaf): extend test with errata parsing
+
+RHINENG-10310 ([`572cc41`](https://github.com/RedHatInsights/vmaas/commit/572cc414b683599d38e83af1432a6a4770f634e2))
+
+
 ## v2.60.4 (2024-05-28)
 
 ### Fix
