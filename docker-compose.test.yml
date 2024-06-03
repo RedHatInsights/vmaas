@@ -20,6 +20,7 @@ services:
       args:
         VAR_RPMS: "findutils"
         VAR_POETRY_INSTALL_OPT: "--with dev"
+        REQUIRE_RHEL: "no"
     image: vmaas/test:latest
     environment:
       CI: "${CI:-false}"
