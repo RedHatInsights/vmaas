@@ -120,6 +120,7 @@ class CsafStore(ObjectStore):
                         name_id = self.package_store.package_name_map[name]
                         evr_id = self.package_store.evr_map[(epoch, ver, rel)]
                         arch_id = self.package_store.arch_map[arch]
+                        product.package_name_id = name_id
                         product.package_id = self._get_product_attr_id(
                             "package", self.package_store.package_map, value=(name_id, evr_id, arch_id)
                         )
@@ -153,35 +154,31 @@ class CsafStore(ObjectStore):
 
         fields_unfixed = [cpe_field, package_name_field]
         fields_unfixed_module = [cpe_field, package_name_field, module_field]
-        fields_fixed = [cpe_field, package_field]
-        fields_fixed_module = [cpe_field, package_field, module_field]
+        fields_fixed = [cpe_field, package_name_field, package_field]
+        fields_fixed_module = [cpe_field, package_name_field, package_field, module_field]
 
         unfixed_module = {
             "products": [],
             "fields": sql.SQL(", ").join(fields_unfixed_module),
             "module_null": not_null,
-            "package_name_null": not_null,
             "package_null": null,
         }
         unfixed_no_module = {
             "products": [],
             "fields": sql.SQL(", ").join(fields_unfixed),
             "module_null": null,
-            "package_name_null": not_null,
             "package_null": null,
         }
         fixed_module = {
             "products": [],
             "fields": sql.SQL(", ").join(fields_fixed_module),
             "module_null": not_null,
-            "package_name_null": null,
             "package_null": not_null,
         }
         fixed_no_module = {
             "products": [],
             "fields": sql.SQL(", ").join(fields_fixed),
             "module_null": null,
-            "package_name_null": null,
             "package_null": not_null,
         }
 
@@ -199,16 +196,16 @@ class CsafStore(ObjectStore):
             if any(not isinstance(row[i], (int, str, type(None))) for i in range(4)):
                 raise TypeError(f"column of product row <{row}> is not of type (int, str, None)")
 
-            if row[1]:  # unfixed
+            if row[1] and not row[2]:  # unfixed
                 if row[3]:  # has module
                     res["unfixed_module"]["products"].append((row[0], row[1], row[3]))  # type: ignore[attr-defined]
                 else:
                     res["unfixed_no_module"]["products"].append((row[0], row[1]))  # type: ignore[attr-defined]
             elif row[2]:  # fixed
                 if row[3]:  # has module
-                    res["fixed_module"]["products"].append((row[0], row[2], row[3]))  # type: ignore[attr-defined]
+                    res["fixed_module"]["products"].append((row[0], row[1], row[2], row[3]))  # type: ignore[attr-defined]
                 else:
-                    res["fixed_no_module"]["products"].append((row[0], row[2]))  # type: ignore[attr-defined]
+                    res["fixed_no_module"]["products"].append((row[0], row[1], row[2]))  # type: ignore[attr-defined]
         return res
 
     def _update_product_ids(self, products: model.CsafProducts) -> None:
@@ -222,7 +219,6 @@ class CsafStore(ObjectStore):
             FROM csaf_product
             WHERE ({fields}) in %s
                 AND module_stream IS {module_null}
-                AND package_name_id IS {package_name_null}
                 AND package_id IS {package_null}
             """
         )
@@ -237,7 +233,6 @@ class CsafStore(ObjectStore):
                     formatted_query = query.format(
                         fields=val["fields"],  # type: ignore[arg-type]
                         module_null=val["module_null"],  # type: ignore[arg-type]
-                        package_name_null=val["package_name_null"],  # type: ignore[arg-type]
                         package_null=val["package_null"],  # type: ignore[arg-type]
                     )
                     cur.execute(formatted_query, (product_tuples,))

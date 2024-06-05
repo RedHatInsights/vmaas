@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 21);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 22);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1312,7 +1312,7 @@ ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS csaf_product (
   id                SERIAL,
   cpe_id            INT NOT NULL,
-  package_name_id   INT NULL,
+  package_name_id   INT NOT NULL,
   package_id        INT NULL,
   module_stream     TEXT NULL CHECK (NOT empty(module_stream)),
   PRIMARY KEY (id),
@@ -1324,10 +1324,7 @@ CREATE TABLE IF NOT EXISTS csaf_product (
     REFERENCES package_name (id),
   CONSTRAINT package_id
     FOREIGN KEY (package_id)
-    REFERENCES package (id),
-  CONSTRAINT pkg_id CHECK(
-    (package_name_id IS NOT NULL AND package_id IS NULL) OR
-    (package_name_id IS NULL AND package_id IS NOT NULL))
+    REFERENCES package (id)
 )TABLESPACE pg_default;
 
 CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NULL;
