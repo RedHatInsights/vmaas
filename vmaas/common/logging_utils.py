@@ -66,6 +66,7 @@ def setup_cw_logging(main_logger):
             log_group=cfg.cw_aws_log_group,
             stream_name=os.environ.get('HOSTNAME', 'vmaas')
         )
+        handler.formatter.add_log_record_attrs = ["levelname"]
     except ClientError:
         logger.exception("Unable to enable CloudWatch logging: ")
     else:  # pragma: no cover
