@@ -56,9 +56,9 @@ class TestCsafStore:
         )
         products = (
             (1000, 1000, 1000, None, None),
-            (1001, 1001, None, 1001, None),
+            (1001, 1001, 1001, 1001, None),
             (1002, 1002, 1002, None, "module:1"),
-            (1003, 1003, None, 1003, "module:1"),
+            (1003, 1003, 1003, 1003, "module:1"),
         )
         cur = csaf_store.conn.cursor()
         execute_values(cur, "INSERT INTO csaf_file(id, name, updated) VALUES %s RETURNING id", ((1, "file1", None),))
