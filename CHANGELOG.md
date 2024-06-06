@@ -2,6 +2,15 @@
 
 
 
+## v2.61.2 (2024-06-06)
+
+### Fix
+
+* fix: store package_name_id for fixed csaf_product
+
+RHINENG-10310 ([`bd09fe2`](https://github.com/RedHatInsights/vmaas/commit/bd09fe25b019f2f75f6efb5e161cf09ea2ec11b1))
+
+
 ## v2.61.1 (2024-06-06)
 
 ### Chore
