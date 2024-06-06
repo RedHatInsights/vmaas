@@ -2,6 +2,21 @@
 
 
 
+## v2.61.1 (2024-06-06)
+
+### Chore
+
+* chore: waive CVE-2019-8341 jinja2 (old CVE, we&#39;re using latest version, false positive?) ([`d66c1f2`](https://github.com/RedHatInsights/vmaas/commit/d66c1f25ba4e2a846ad0b89fffcfe69aba669cc3))
+
+* chore: Centos 8 Stream was removed, install postgresql and rpm-devel from COPR ([`dd006c6`](https://github.com/RedHatInsights/vmaas/commit/dd006c668178412d76d90c8532be56ebd4060831))
+
+### Fix
+
+* fix: include levelname in CW logs from python code
+
+RHINENG-8336 ([`eca466c`](https://github.com/RedHatInsights/vmaas/commit/eca466c4c6acfb6ac5bc4fa846499f3dc06a89b7))
+
+
 ## v2.61.0 (2024-05-31)
 
 ### Chore
