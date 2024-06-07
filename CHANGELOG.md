@@ -2,6 +2,15 @@
 
 
 
+## v2.61.3 (2024-06-07)
+
+### Fix
+
+* fix(build): update it-root-ca
+
+RHINENG-10539 ([`c1d7cca`](https://github.com/RedHatInsights/vmaas/commit/c1d7ccad297831e22c6944fa1789f72b90e31d1c))
+
+
 ## v2.61.2 (2024-06-06)
 
 ### Fix
