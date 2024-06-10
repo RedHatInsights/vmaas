@@ -42,6 +42,10 @@ UNSUPPORTED_STATE_CHILDS = {
     "{%s}signature_keyid" % NS['red-def'],
 }
 
+UNSUPPORTED_RESOLUTION_STATES = {
+    "Under investigation",
+}
+
 
 class OvalDefinitions:
     """Class parsing OVAL definitions file."""
@@ -68,17 +72,35 @@ class OvalDefinitions:
         elem = self.root.find(tag, NS)
         return elem if elem is not None else []
 
-    def _parse_criteria(self, criteria):
+    def _parse_criteria(self, definition, criteria, ignored_components, current_module=""):
         if criteria is None:
             return None
         criteria_obj = {"operator": criteria.get("operator"), "criterions": [], "criteria": []}
+        module_test_refs = set()
         for child in criteria:
             if child.tag == "{%s}criteria" % NS['default']:  # <criteria>
-                criteria_obj["criteria"].append(self._parse_criteria(child))
+                child_criteria = self._parse_criteria(definition, child, ignored_components, current_module=current_module)
+                if child_criteria:
+                    criteria_obj["criteria"].append(child_criteria)
             elif child.tag == "{%s}criterion" % NS['default']:  # <criterion>
+                parts = child.get("comment", "").split()
+                if parts and parts[0] == "Module" and parts[-1] == "enabled" and criteria_obj["operator"] == "AND":
+                    current_module = "%s/" % parts[1]
+                    module_test_refs.add(child.get("test_ref"))
+                elif parts and "%s%s" % (current_module, parts[0]) in ignored_components:
+                    self.logger.debug("Ignoring component: %s", "%s%s" % (current_module, parts[0]))
+                    continue
                 criteria_obj["criterions"].append(child.get("test_ref"))
             else:
                 self.logger.warning("Unknown tag: %s", child.tag)
+
+        # Remove empty branch
+        if not criteria_obj["criteria"] and not criteria_obj["criterions"]:
+            return None
+
+        # Remove branches with only module tests (all rpm package tests were filtered out)
+        if not criteria_obj["criteria"] and criteria_obj["criterions"] and all(test_ref in module_test_refs for test_ref in criteria_obj["criterions"]):
+            return None
 
         return criteria_obj
 
@@ -89,6 +111,8 @@ class OvalDefinitions:
                 cves = []
                 advisories = []
                 cpes = []
+                # E.g. ignore components in under investigation state as the vulnerability is not confirmed
+                ignored_components = set()
                 metadata = definition.find("default:metadata", NS)
                 if metadata is not None:
                     for child in metadata.findall("default:reference", NS):
@@ -105,7 +129,13 @@ class OvalDefinitions:
                         if affected_cpe_list is not None:
                             for child in affected_cpe_list.findall("default:cpe", NS):
                                 cpes.append(text_strip(child))
-                criteria = self._parse_criteria(definition.find("default:criteria", NS))  # <criteria> 0..1
+                        affected = advisory.find("default:affected", NS)
+                        if affected is not None:
+                            for resolution in affected.findall("default:resolution", NS):
+                                if resolution.get("state", "") in UNSUPPORTED_RESOLUTION_STATES:
+                                    for component in resolution.findall("default:component", NS):
+                                        ignored_components.add(text_strip(component))
+                criteria = self._parse_criteria(definition, definition.find("default:criteria", NS), ignored_components)  # <criteria> 0..1
 
                 # Parse tests
                 tests = []
