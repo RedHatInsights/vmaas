@@ -99,7 +99,7 @@ class CsafController:
         db_csaf_files = self.csaf_store.csaf_file_map.copy()
         batches = BatchList()
         csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.index_path)  # type: ignore[arg-type]
-        files_to_sync: t.Iterable[CsafFile] = csaf_files
+        files_to_sync = csaf_files.csv_files
         if not CSAF_SYNC_ALL_FILES:
             files_to_sync = csaf_files.out_of_date
 
