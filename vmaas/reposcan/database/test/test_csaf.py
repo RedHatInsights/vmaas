@@ -83,7 +83,7 @@ class TestCsafStore:
     def files_obj_for_insert(self) -> tuple[m.CsafFiles, datetime]:
         """Csaf files obj for insert_cves tests."""
         now = datetime.now(timezone.utc)
-        files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, 1, [CVE])})
+        files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, id_=1, cves=[CVE])})
         return files_obj, now
 
     @pytest.fixture

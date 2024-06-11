@@ -1,8 +1,9 @@
 """Unit tests of CSAF models."""
 from collections.abc import Iterable
-from pathlib import Path
+from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -210,6 +211,13 @@ class TestModels:
         """Test CsafFiles.out_of_date"""
         collection = m.CsafFiles({"x": csaf_file, "y": csaf_file})
         assert len(list(collection.out_of_date)) == 2
+
+    def test_csaf_files_csv(self, csaf_file: m.CsafFile) -> None:
+        """Test CsafFiles.csv_files"""
+        file2 = deepcopy(csaf_file)
+        file2.csv = True
+        collection = m.CsafFiles({"x": csaf_file, "y": file2})
+        assert len(list(collection.csv_files)) == 1
 
     def test_from_table_map_and_csv(self, tmp_path: Path) -> None:
         """Test CsafFiles.from_table_map_and_csv"""

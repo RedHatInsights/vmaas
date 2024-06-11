@@ -36,6 +36,7 @@ class CsafFile:
     name: str
     csv_timestamp: datetime
     db_timestamp: datetime | None = None
+    csv: bool = False
     id_: int = 0
     # it should be 1:1 mapping between file and cve
     # but the json in file contains list of cves so add the whole list
@@ -67,7 +68,7 @@ class CsafFiles:
         """Update files from `CsafStore.csaf_file_map` table_map."""
         for key, val in table_map.items():
             id_, timestamp = val
-            obj = self.get(key, CsafFile(key, timestamp, timestamp, id_))
+            obj = self.get(key, CsafFile(key, timestamp, db_timestamp=timestamp, id_=id_))
             obj.id_ = id_
             obj.db_timestamp = timestamp
             self[key] = obj
@@ -78,14 +79,20 @@ class CsafFiles:
             reader = csv.DictReader(csvfile, ("name", "timestamp"))
             for row in reader:
                 timestamp = parse_datetime(row["timestamp"])
-                obj = self.get(row["name"], CsafFile(row["name"], timestamp))
+                obj = self.get(row["name"], CsafFile(row["name"], timestamp, csv=True))
                 obj.csv_timestamp = timestamp
+                obj.csv = True
                 self[obj.name] = obj
 
     @property
     def out_of_date(self) -> filter[CsafFile]:
         """Filter generator of out of date files."""
         return filter(lambda x: x.out_of_date, self)
+
+    @property
+    def csv_files(self) -> filter[CsafFile]:
+        """Files from csv."""
+        return filter(lambda x: x.csv, self)
 
     def to_tuples(self, attributes: tuple[str, ...]) -> list[tuple[int | str | datetime | None, ...]]:
         """Transform data to list of tuples with chosen attributes."""
