@@ -61,6 +61,9 @@ class CsafStore(ObjectStore):
             cur.close()
 
     def _save_csaf_files(self, csaf_files: model.CsafFiles) -> None:
+        if not csaf_files:
+            return
+
         cur = self.conn.cursor()
         try:
             files = csaf_files.to_tuples(("name",))
@@ -393,6 +396,10 @@ class CsafStore(ObjectStore):
 
     def store(self, csaf_data: model.CsafData) -> None:
         """Store collection of CSAF files into DB."""
+        if not csaf_data:
+            self.logger.warning("CsafData without cves or files")
+            return
+
         self._save_csaf_files(csaf_data.files)
         self._populate_cves(csaf_data.cves, csaf_data.files)
         self._delete_unreferenced_products()

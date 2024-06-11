@@ -347,3 +347,6 @@ class CsafData:
 
     files: CsafFiles = field(default_factory=CsafFiles)
     cves: CsafCves = field(default_factory=CsafCves)
+
+    def __bool__(self) -> bool:
+        return bool(self.files) and bool(self.cves)
