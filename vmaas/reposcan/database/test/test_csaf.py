@@ -136,6 +136,15 @@ class TestCsafStore:
         assert res[0] == id_save
         assert res[1] == update_ts
 
+    def test_save_empty_csaf_files(self, csaf_store: CsafStore) -> None:
+        """Test saving empty csaf files."""
+        files = m.CsafFiles()
+        csaf_store._save_csaf_files(files)
+        cur = csaf_store.conn.cursor()
+        cur.execute("SELECT id, name FROM csaf_file WHERE name = 'file'")
+        res = cur.fetchone()
+        assert not res
+
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
         """Test getting product attribute_id."""
         mapping = {"key": 9}
