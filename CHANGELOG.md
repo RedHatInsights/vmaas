@@ -2,6 +2,21 @@
 
 
 
+## v2.61.4 (2024-06-13)
+
+### Chore
+
+* chore(reposcan): add OVAL_SYNC_ALL_FILES flag ([`484a105`](https://github.com/RedHatInsights/vmaas/commit/484a105d03007ade05d28ff03062e4eabbd9161a))
+
+### Fix
+
+* fix(csaf): syntax error with IN query
+
+vmaas-reposcan          | vmaas-reposcan 2024-06-03 17:50:17,781:ERROR:vmaas.reposcan.database.object_store:Failed to import csaf file to DB: &#39;Traceback (most recent call last):\n  File &#34;/vmaas/vmaas/reposcan/database/csaf_store.py&#34;, line 75, in _save_csaf_files\n    cur.execute(&#34;select id, name from csaf_file where name in %s&#34;, (tuple(files),))\npsycopg2.errors.SyntaxError: syntax error at or near &#34;)&#34;\nLINE 1: select id, name from csaf_file where name in ()\n                                                      ^\n&#39;|
+
+RHINENG-10604 ([`37b1e31`](https://github.com/RedHatInsights/vmaas/commit/37b1e31b7ba8de8e0c417065aeb28f958773a2a9))
+
+
 ## v2.61.3 (2024-06-07)
 
 ### Fix
