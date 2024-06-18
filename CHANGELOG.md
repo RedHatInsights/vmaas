@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.61.6 (2024-06-18)
+
+### Fix
+
+* fix(csaf): download only files from csv
+
+RHINENG-10605 ([`423c7a5`](https://github.com/RedHatInsights/vmaas/commit/423c7a5fe2bcbc8e1179e57e2f5ec4bdf5266609))
+
 ## v2.61.5 (2024-06-18)
 
 ### Fix
