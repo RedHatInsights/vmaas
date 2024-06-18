@@ -1,6 +1,16 @@
 # CHANGELOG
 
+## v2.61.5 (2024-06-18)
 
+### Fix
+
+* fix(reposcan): exclude under investigation CVEs from OVAL
+
+RHINENG-9878 ([`0aa518a`](https://github.com/RedHatInsights/vmaas/commit/0aa518a72210b7da1126a1cf5e6f20970785cb19))
+
+### Unknown
+
+* Adding Security-Scan Script to Enable Jenkins Security Scan Job ([`5a56460`](https://github.com/RedHatInsights/vmaas/commit/5a564604bb1006f783bcd617ec5bb88597f321ff))
 
 ## v2.61.4 (2024-06-13)
 
@@ -16,7 +26,6 @@ vmaas-reposcan          | vmaas-reposcan 2024-06-03 17:50:17,781:ERROR:vmaas.rep
 
 RHINENG-10604 ([`37b1e31`](https://github.com/RedHatInsights/vmaas/commit/37b1e31b7ba8de8e0c417065aeb28f958773a2a9))
 
-
 ## v2.61.3 (2024-06-07)
 
 ### Fix
@@ -25,7 +34,6 @@ RHINENG-10604 ([`37b1e31`](https://github.com/RedHatInsights/vmaas/commit/37b1e3
 
 RHINENG-10539 ([`c1d7cca`](https://github.com/RedHatInsights/vmaas/commit/c1d7ccad297831e22c6944fa1789f72b90e31d1c))
 
-
 ## v2.61.2 (2024-06-06)
 
 ### Fix
@@ -33,7 +41,6 @@ RHINENG-10539 ([`c1d7cca`](https://github.com/RedHatInsights/vmaas/commit/c1d7cc
 * fix: store package_name_id for fixed csaf_product
 
 RHINENG-10310 ([`bd09fe2`](https://github.com/RedHatInsights/vmaas/commit/bd09fe25b019f2f75f6efb5e161cf09ea2ec11b1))
-
 
 ## v2.61.1 (2024-06-06)
 
@@ -48,7 +55,6 @@ RHINENG-10310 ([`bd09fe2`](https://github.com/RedHatInsights/vmaas/commit/bd09fe
 * fix: include levelname in CW logs from python code
 
 RHINENG-8336 ([`eca466c`](https://github.com/RedHatInsights/vmaas/commit/eca466c4c6acfb6ac5bc4fa846499f3dc06a89b7))
-
 
 ## v2.61.0 (2024-05-31)
 
@@ -96,7 +102,6 @@ RHINENG-10310 ([`c0a97e9`](https://github.com/RedHatInsights/vmaas/commit/c0a97e
 
 RHINENG-10310 ([`572cc41`](https://github.com/RedHatInsights/vmaas/commit/572cc414b683599d38e83af1432a6a4770f634e2))
 
-
 ## v2.60.4 (2024-05-28)
 
 ### Fix
@@ -105,7 +110,6 @@ RHINENG-10310 ([`572cc41`](https://github.com/RedHatInsights/vmaas/commit/572cc4
 
 RHINENG-9890 ([`6b7c3dc`](https://github.com/RedHatInsights/vmaas/commit/6b7c3dc7005fadfe06355cd21a6308388bb848b5))
 
-
 ## v2.60.3 (2024-05-16)
 
 ### Fix
@@ -113,7 +117,6 @@ RHINENG-9890 ([`6b7c3dc`](https://github.com/RedHatInsights/vmaas/commit/6b7c3dc
 * fix(csaf): remove products if they become fixed/unaffected
 
 RHINENG-10039 ([`f6b4702`](https://github.com/RedHatInsights/vmaas/commit/f6b470263b6d4af7e30cbc37897a58f7065d6621))
-
 
 ## v2.60.2 (2024-05-16)
 
@@ -133,7 +136,6 @@ RHINENG-10048 ([`79be3aa`](https://github.com/RedHatInsights/vmaas/commit/79be3a
 
 RHINENG-9586 ([`ca43ccc`](https://github.com/RedHatInsights/vmaas/commit/ca43ccc581b707a6889caf48eaa62ff94201478f))
 
-
 ## v2.60.1 (2024-04-30)
 
 ### Fix
@@ -143,7 +145,6 @@ RHINENG-9586 ([`ca43ccc`](https://github.com/RedHatInsights/vmaas/commit/ca43ccc
 RHINENG-9798
 RHINENG-9797 ([`112d19c`](https://github.com/RedHatInsights/vmaas/commit/112d19cede5b26978e1e25e9fad0b254f1f6b351))
 
-
 ## v2.60.0 (2024-04-29)
 
 ### Feature
@@ -152,7 +153,6 @@ RHINENG-9797 ([`112d19c`](https://github.com/RedHatInsights/vmaas/commit/112d19c
 
 RHINENG-7869 ([`7eb8980`](https://github.com/RedHatInsights/vmaas/commit/7eb8980b6d8866c86dc0cd268f3f42d5da1a5527))
 
-
 ## v2.59.0 (2024-04-25)
 
 ### Feature
@@ -160,7 +160,6 @@ RHINENG-7869 ([`7eb8980`](https://github.com/RedHatInsights/vmaas/commit/7eb8980
 * feat: list modified packages in modified repos
 
 RHINENG-9690 ([`d9a8181`](https://github.com/RedHatInsights/vmaas/commit/d9a818179e0417ce202d5b4ff21f3853a65fa22a))
-
 
 ## v2.58.4 (2024-04-25)
 
@@ -187,7 +186,6 @@ RHINENG-9574 ([`3230ca4`](https://github.com/RedHatInsights/vmaas/commit/3230ca4
 
 * fix(build_deploy): only create sc tag when building sc branch ([`6b2e818`](https://github.com/RedHatInsights/vmaas/commit/6b2e81844cc4f311daf4eac9306c75007abb8ffb))
 
-
 ## v2.58.3 (2024-04-17)
 
 ### Fix
@@ -195,7 +193,6 @@ RHINENG-9574 ([`3230ca4`](https://github.com/RedHatInsights/vmaas/commit/3230ca4
 * fix(csaf): query argument
 
 RHINENG-9510 ([`61cae18`](https://github.com/RedHatInsights/vmaas/commit/61cae1881db429a94043db56935190a448b74e1c))
-
 
 ## v2.58.2 (2024-04-17)
 
@@ -205,7 +202,6 @@ RHINENG-9510 ([`61cae18`](https://github.com/RedHatInsights/vmaas/commit/61cae18
 
 RHINENG-9510 ([`81b4ce6`](https://github.com/RedHatInsights/vmaas/commit/81b4ce627553d1084aa1b4356249de9aa158d9f4))
 
-
 ## v2.58.1 (2024-04-17)
 
 ### Fix
@@ -214,7 +210,6 @@ RHINENG-9510 ([`81b4ce6`](https://github.com/RedHatInsights/vmaas/commit/81b4ce6
 
 RHINENG-9441 ([`92f1f31`](https://github.com/RedHatInsights/vmaas/commit/92f1f3184e292029580ee5eb48476ebfc832442c))
 
-
 ## v2.58.0 (2024-04-11)
 
 ### Feature
@@ -222,7 +217,6 @@ RHINENG-9441 ([`92f1f31`](https://github.com/RedHatInsights/vmaas/commit/92f1f31
 * feat(csaf): load csaf dump in webapp
 
 RHINENG-9212 ([`770d7ed`](https://github.com/RedHatInsights/vmaas/commit/770d7ed5e78056f062ce4a4e9bc039adc59d9e36))
-
 
 ## v2.57.1 (2024-04-11)
 
@@ -236,7 +230,6 @@ RHINENG-9212 ([`770d7ed`](https://github.com/RedHatInsights/vmaas/commit/770d7ed
 
 RHINENG-7868 ([`17e41dc`](https://github.com/RedHatInsights/vmaas/commit/17e41dc31acedc69675ddba522b5ed9534b39316))
 
-
 ## v2.57.0 (2024-04-04)
 
 ### Chore
@@ -246,7 +239,6 @@ RHINENG-7868 ([`17e41dc`](https://github.com/RedHatInsights/vmaas/commit/17e41dc
 ### Feature
 
 * feat(reposcan): Add CSAF SQLite dump ([`11c8897`](https://github.com/RedHatInsights/vmaas/commit/11c88979f63282bfdc76b88958ce40246ffd6e93))
-
 
 ## v2.56.1 (2024-03-25)
 
@@ -291,13 +283,11 @@ using the lib only for checking expiration dates ([`45fdf5e`](https://github.com
 
 RHINENG-7862 ([`7fc6a22`](https://github.com/RedHatInsights/vmaas/commit/7fc6a227b0ae94d9c6936c0960c4e87b4ac6a120))
 
-
 ## v2.56.0 (2024-03-06)
 
 ### Feature
 
 * feat(reposcan): add Csaf Store DB insert ([`d73c5ce`](https://github.com/RedHatInsights/vmaas/commit/d73c5ce560683fe12333667455df3dfb850b186a))
-
 
 ## v2.55.1 (2024-02-27)
 
@@ -314,7 +304,6 @@ RHINENG-8391 ([`7517f1d`](https://github.com/RedHatInsights/vmaas/commit/7517f1d
 * fix(csaf): env var to decide what statuses to parse
 
 RHINENG-8391 ([`8c320fa`](https://github.com/RedHatInsights/vmaas/commit/8c320faf19d4d056d5e766483be2e7e46d62ec07))
-
 
 ## v2.55.0 (2024-02-22)
 
@@ -335,7 +324,6 @@ RHINENG-4854 ([`589a11f`](https://github.com/RedHatInsights/vmaas/commit/589a11f
 
 * fix(webapp-go): unused variable ([`c404a55`](https://github.com/RedHatInsights/vmaas/commit/c404a55e891c118ba595f1e97610a68cd8f3fed7))
 
-
 ## v2.54.2 (2024-02-20)
 
 ### Fix
@@ -343,7 +331,6 @@ RHINENG-4854 ([`589a11f`](https://github.com/RedHatInsights/vmaas/commit/589a11f
 * fix(ephemeral): increase max_stack_depth
 
 RHINENG-8335 ([`6af693d`](https://github.com/RedHatInsights/vmaas/commit/6af693d140ab73b1a2c6bf5f6a6d1c76b795b9e3))
-
 
 ## v2.54.1 (2024-02-15)
 
@@ -360,7 +347,6 @@ RHINENG-7736 ([`27c5aaa`](https://github.com/RedHatInsights/vmaas/commit/27c5aaa
 to avoid too many metrics in prometheus ([`293a3e4`](https://github.com/RedHatInsights/vmaas/commit/293a3e4a70e50439bb0778571c38749c8b4351e3))
 
 * fix(metrics): update grafana dashboard with renamed metrics ([`8c4f76d`](https://github.com/RedHatInsights/vmaas/commit/8c4f76decc505f70a2a3f0392646664406400464))
-
 
 ## v2.54.0 (2024-01-29)
 
@@ -386,7 +372,6 @@ RHINENG-7697 ([`918745c`](https://github.com/RedHatInsights/vmaas/commit/918745c
 
 RHINENG-7697 ([`b0c0e11`](https://github.com/RedHatInsights/vmaas/commit/b0c0e119e7c236be70be1e36ce436a7825a6a236))
 
-
 ## v2.53.1 (2024-01-24)
 
 ### Fix
@@ -395,13 +380,11 @@ RHINENG-7697 ([`b0c0e11`](https://github.com/RedHatInsights/vmaas/commit/b0c0e11
 
 * fix(webapp): middlewares should be stateless to work concurrently ([`7b4ea6b`](https://github.com/RedHatInsights/vmaas/commit/7b4ea6b41c400e792712de3347ab64d1e0957d31))
 
-
 ## v2.53.0 (2024-01-23)
 
 ### Feature
 
 * feat(reposcan): add CSAF sync task ([`67c24d2`](https://github.com/RedHatInsights/vmaas/commit/67c24d275f01deff6bf44d3ec8c90f804b9ef800))
-
 
 ## v2.52.0 (2024-01-22)
 
@@ -451,7 +434,6 @@ install uvicorn as ASGI server
 
 RHINENG-5883 ([`e461019`](https://github.com/RedHatInsights/vmaas/commit/e4610196da13f4966cdea15852da1f4d5b899c59))
 
-
 ## v2.51.0 (2024-01-11)
 
 ### Chore
@@ -500,7 +482,6 @@ RHINENG-6813 ([`5c5175f`](https://github.com/RedHatInsights/vmaas/commit/5c5175f
 
 * Add dynaconf variable ([`dea8e6a`](https://github.com/RedHatInsights/vmaas/commit/dea8e6aa17abc171f9d5bfa71141d10be2819c59))
 
-
 ## v2.50.4 (2024-01-09)
 
 ### Chore
@@ -524,13 +505,11 @@ vmaas-webapp-go         | github.com/redhatinsights/vmaas/base/utils.init.0()
 vmaas-webapp-go         | 	/vmaas/go/src/vmaas/base/utils/config.go:63 +0x30
 vmaas-webapp-go exited with code 2 ([`d8d4873`](https://github.com/RedHatInsights/vmaas/commit/d8d4873c7d33529c9151bd08dcddd6d49a9fe32f))
 
-
 ## v2.50.3 (2023-11-24)
 
 ### Fix
 
 * fix: update vmaas-lib ([`4ea8559`](https://github.com/RedHatInsights/vmaas/commit/4ea855902e2bfa735b2d9d686437023d21d31e4e))
-
 
 ## v2.50.2 (2023-11-23)
 
@@ -549,7 +528,6 @@ vmaas-webapp-go exited with code 2 ([`d8d4873`](https://github.com/RedHatInsight
 go 1.19 is unsupported and go1.20 is already available in ubi8
 RHINENG-3785 ([`0103109`](https://github.com/RedHatInsights/vmaas/commit/0103109781bef103f4c6fc8882ba9fbd65e07261))
 
-
 ## v2.50.1 (2023-11-20)
 
 ### Chore
@@ -560,7 +538,6 @@ RHINENG-3785 ([`0103109`](https://github.com/RedHatInsights/vmaas/commit/0103109
 
 * fix: use new url for cpe dictionary xml ([`310d3cd`](https://github.com/RedHatInsights/vmaas/commit/310d3cd54b7f56c130f2674f493939b99147f2a8))
 
-
 ## v2.50.0 (2023-10-19)
 
 ### Feature
@@ -569,13 +546,11 @@ RHINENG-3785 ([`0103109`](https://github.com/RedHatInsights/vmaas/commit/0103109
 
 RHINENG-2608 ([`8e483ad`](https://github.com/RedHatInsights/vmaas/commit/8e483adebe852c38e161c7d5c7ba1f4d504ec2a7))
 
-
 ## v2.49.1 (2023-10-18)
 
 ### Fix
 
 * fix: url returns 404 ([`a7aaac6`](https://github.com/RedHatInsights/vmaas/commit/a7aaac60b730907f01077ab671ee35a1931a1fc3))
-
 
 ## v2.49.0 (2023-10-18)
 
@@ -595,7 +570,6 @@ Add Security-Compliance Branch Build and Tagging Support. ([`7db1d81`](https://g
 
 Upgrade vulnerable packages. ([`9e329b2`](https://github.com/RedHatInsights/vmaas/commit/9e329b2f81af373d9242c1f61abd3254504df348))
 
-
 ## v2.48.5 (2023-08-31)
 
 ### Chore
@@ -605,7 +579,6 @@ Upgrade vulnerable packages. ([`9e329b2`](https://github.com/RedHatInsights/vmaa
 ### Fix
 
 * fix: sort updates also by other fields ([`aa12336`](https://github.com/RedHatInsights/vmaas/commit/aa123365fc64d05a1b88283d4656818513437742))
-
 
 ## v2.48.4 (2023-08-24)
 
@@ -618,7 +591,6 @@ Upgrade vulnerable packages. ([`9e329b2`](https://github.com/RedHatInsights/vmaa
 * fix: consistent affected_packages in vulnerabilities response
 
 VMAAS-1461 ([`41667fd`](https://github.com/RedHatInsights/vmaas/commit/41667fde0d86b456aa6bcc8ea3ade716695fb945))
-
 
 ## v2.48.3 (2023-08-14)
 
@@ -636,7 +608,6 @@ RHINENG-1536 ([`b5c176c`](https://github.com/RedHatInsights/vmaas/commit/b5c176c
 
 * Re-enable disabled smoke tests ([`cff88fd`](https://github.com/RedHatInsights/vmaas/commit/cff88fda3282620132d60886cd069039addafc6d))
 
-
 ## v2.48.2 (2023-07-20)
 
 ### Chore
@@ -650,7 +621,6 @@ RHINENG-1536 ([`b5c176c`](https://github.com/RedHatInsights/vmaas/commit/b5c176c
 https://github.com/RedHatInsights/vmaas-lib/pull/42
 VMAAS-1461 ([`c29d8a3`](https://github.com/RedHatInsights/vmaas/commit/c29d8a31104a9d6cc6ed73882a8c092076e9eb29))
 
-
 ## v2.48.1 (2023-07-10)
 
 ### Chore
@@ -662,7 +632,6 @@ VMAAS-1461 ([`c29d8a3`](https://github.com/RedHatInsights/vmaas/commit/c29d8a311
 * fix: update gin-gonic to fix CVE-2023-29401
 
 VULN-2713 ([`d1e1c4a`](https://github.com/RedHatInsights/vmaas/commit/d1e1c4a89806b812ee90119588d2a370ff20069d))
-
 
 ## v2.48.0 (2023-07-10)
 
@@ -691,7 +660,6 @@ VMAAS-1458 ([`2f9ebcc`](https://github.com/RedHatInsights/vmaas/commit/2f9ebcc66
 
 * Update requests to address pyup vuln 58755 ([`ba6283a`](https://github.com/RedHatInsights/vmaas/commit/ba6283a36c6ff1c1da1eef7dd5ad626820e9a29c))
 
-
 ## v2.47.0 (2023-06-05)
 
 ### Feature
@@ -699,7 +667,6 @@ VMAAS-1458 ([`2f9ebcc`](https://github.com/RedHatInsights/vmaas/commit/2f9ebcc66
 * feat: remove &amp; replace old Slack notifications
 
 VMAAS-1455 ([`e15e077`](https://github.com/RedHatInsights/vmaas/commit/e15e07771f7525b0090a23fa343c84f2e5cc7bb0))
-
 
 ## v2.46.2 (2023-05-31)
 
@@ -718,7 +685,6 @@ VMAAS-1455 ([`e15e077`](https://github.com/RedHatInsights/vmaas/commit/e15e07771
 * Revert &#34;chore: webapp-go doesn&#39;t support OVAL_UNFIXED_EVAL_ENABLED flag&#34;
 
 This reverts commit 8145b47c3c06b7b661c8fec3ccaab5f87b824f57. ([`1e9214f`](https://github.com/RedHatInsights/vmaas/commit/1e9214f3eb0204c48c3af9c238e1b12fefb0080d))
-
 
 ## v2.46.1 (2023-05-31)
 
@@ -750,7 +716,6 @@ minReplicas is deprecated ([`012180c`](https://github.com/RedHatInsights/vmaas/c
 
 * fix: return 400 if processing of packages or modules fails ([`cce1136`](https://github.com/RedHatInsights/vmaas/commit/cce11365623eebdc0a6738f6545c68bdf17b02f3))
 
-
 ## v2.46.0 (2023-05-16)
 
 ### Feature
@@ -760,7 +725,6 @@ minReplicas is deprecated ([`012180c`](https://github.com/RedHatInsights/vmaas/c
 return error if pkg epoch is required and any pkg in request is missing epoch
 
 RHINENG-390 ([`44bf2d3`](https://github.com/RedHatInsights/vmaas/commit/44bf2d33ddeba8827a87a0c8fa17f8bcd7d8e748))
-
 
 ## v2.45.2 (2023-05-15)
 
@@ -779,13 +743,11 @@ this custom py implementation is buggy sometimes
 
 * fix: backport changed order evaluation (unfixed, fixed) to py ([`7631038`](https://github.com/RedHatInsights/vmaas/commit/76310389503b44a1692c932ab36c109b0c8b58b1))
 
-
 ## v2.45.1 (2023-05-15)
 
 ### Fix
 
 * fix(modules): package from module with disabled repo ([`aa79953`](https://github.com/RedHatInsights/vmaas/commit/aa79953c89441d1b6eedba9661957aacedaca2b6))
-
 
 ## v2.45.0 (2023-05-10)
 
@@ -795,13 +757,11 @@ this custom py implementation is buggy sometimes
 
 VMAAS-1454 ([`48f5c03`](https://github.com/RedHatInsights/vmaas/commit/48f5c03932a13d683522db3b6313b1b48360e103))
 
-
 ## v2.44.0 (2023-05-09)
 
 ### Feature
 
 * feat(oval): unpatched cves take precedence ([`83e1d3b`](https://github.com/RedHatInsights/vmaas/commit/83e1d3bb9314d9282339eea02f8d28ab581ca916))
-
 
 ## v2.43.1 (2023-05-03)
 
@@ -812,7 +772,6 @@ VMAAS-1454 ([`48f5c03`](https://github.com/RedHatInsights/vmaas/commit/48f5c0393
 oval: Check module stream in evaluateModuleTest (20be8ac)
 oval: Remove duplicates from UnpatchedCves list (9c48307)
 modules: Find updates in modular errata for package from module when module is enabled (cd99eef) ([`1b7b69f`](https://github.com/RedHatInsights/vmaas/commit/1b7b69fe529125048e98679c6e8b1fe798fd2485))
-
 
 ## v2.43.0 (2023-04-20)
 
@@ -832,20 +791,17 @@ VMAAS-1394 ([`f0d4437`](https://github.com/RedHatInsights/vmaas/commit/f0d4437e1
 
 * chore(vmaas-go) adjust cpu limit and gomaxprocs ([`b31febf`](https://github.com/RedHatInsights/vmaas/commit/b31febf35a33da02a8634af99d2f8da13fad6e4c))
 
-
 ## v2.42.4 (2023-04-03)
 
 ### Fix
 
 * fix(vmaas-go): modules_list consistency with python ([`b136588`](https://github.com/RedHatInsights/vmaas/commit/b1365886e224e065a1162cca7cc08ac160346b52))
 
-
 ## v2.42.3 (2023-03-30)
 
 ### Fix
 
 * fix(vmaas-go): don&#39;t gzip response from python vmaas ([`6322d12`](https://github.com/RedHatInsights/vmaas/commit/6322d1236f78a114ecb1777eaf2990f15ecc0cd8))
-
 
 ## v2.42.2 (2023-03-30)
 
@@ -856,7 +812,6 @@ VMAAS-1394 ([`f0d4437`](https://github.com/RedHatInsights/vmaas/commit/f0d4437e1
 ### Fix
 
 * fix(vmaas-go): bump to vmaas-lib with fixed locking ([`1f9d720`](https://github.com/RedHatInsights/vmaas/commit/1f9d7206debb181787ae05b7b36998d84013ab58))
-
 
 ## v2.42.1 (2023-03-29)
 
@@ -873,7 +828,6 @@ they are logged when app exits otherwise ([`b7f6ea0`](https://github.com/RedHatI
 ### Fix
 
 * fix(webapp): SSL context usage ([`cb98723`](https://github.com/RedHatInsights/vmaas/commit/cb98723577148d9b65b85407576aeb46c704f405))
-
 
 ## v2.42.0 (2023-03-29)
 
@@ -897,7 +851,6 @@ Co-authored-by: Michael Mraka &lt;michael.mraka@redhat.com&gt; ([`d158cdd`](http
 
 * feat(reposcan): add oval_definition_errata to cache ([`9a16df6`](https://github.com/RedHatInsights/vmaas/commit/9a16df619d8cf7ac4a103b3da9fba85cf4c925ef))
 
-
 ## v2.41.1 (2023-03-28)
 
 ### Chore
@@ -909,7 +862,6 @@ Co-authored-by: Michael Mraka &lt;michael.mraka@redhat.com&gt; ([`d158cdd`](http
 * fix: docker-compose build ([`25e44da`](https://github.com/RedHatInsights/vmaas/commit/25e44da7856cb52960dc492c0a14ffcbb1482ef2))
 
 * fix: handle exception when sending slack notification ([`7379d2a`](https://github.com/RedHatInsights/vmaas/commit/7379d2ae7a59dbf69373e0c6b3ffe9bb8f986201))
-
 
 ## v2.41.0 (2023-03-27)
 
@@ -930,7 +882,6 @@ reposcan webserver is single-threaded and serving large files is causing timeout
 ### Feature
 
 * feat(webapp): use timer instead of websocket to refresh data ([`4e14fa7`](https://github.com/RedHatInsights/vmaas/commit/4e14fa7db8511b4a09238ea6ca2b487f9dcebc2a))
-
 
 ## v2.40.0 (2023-03-14)
 
@@ -968,7 +919,6 @@ TODO: investigate how to use TLS with rsync ([`e3e9e71`](https://github.com/RedH
 
 * test: fix tests by specifying db password ([`c489e6f`](https://github.com/RedHatInsights/vmaas/commit/c489e6faaef23e13e1d51344d53515b005bef5ab))
 
-
 ## v2.39.3 (2023-02-17)
 
 ### Chore
@@ -991,7 +941,6 @@ VMAAS-1447 ([`23908a8`](https://github.com/RedHatInsights/vmaas/commit/23908a8f9
 
 VMAAS-1446 ([`5d2f900`](https://github.com/RedHatInsights/vmaas/commit/5d2f9001de52e89af17e698c14c0ec8a7dc53312))
 
-
 ## v2.39.2 (2023-01-23)
 
 ### Fix
@@ -1010,7 +959,6 @@ the expected response is:
     &#34;erp-handler-0:-.i386&#34;: {}
   } ([`cdf3f48`](https://github.com/RedHatInsights/vmaas/commit/cdf3f488174c9a10ae65e1cc6b0c18fdc33475a8))
 
-
 ## v2.39.1 (2023-01-20)
 
 ### Fix
@@ -1018,7 +966,6 @@ the expected response is:
 * fix: allow null repository_list
 
 VULN-2519 ([`0dc8546`](https://github.com/RedHatInsights/vmaas/commit/0dc8546191054bec26832c2338829226789406f4))
-
 
 ## v2.39.0 (2023-01-13)
 
@@ -1028,20 +975,17 @@ VULN-2519 ([`0dc8546`](https://github.com/RedHatInsights/vmaas/commit/0dc8546191
 
 VMAAS-1436 ([`6859dca`](https://github.com/RedHatInsights/vmaas/commit/6859dca4da5863c528d68494cdd07de3e4e8f639))
 
-
 ## v2.38.2 (2023-01-10)
 
 ### Fix
 
 * fix: watchtower params ([`02ccf10`](https://github.com/RedHatInsights/vmaas/commit/02ccf1026592dfc42b1a0b763fcfb9667d0e04cb))
 
-
 ## v2.38.1 (2023-01-09)
 
 ### Fix
 
 * fix(vmaas-go): incorrect cve-errata mapping ([`56094cf`](https://github.com/RedHatInsights/vmaas/commit/56094cffee0ffaff4b4e7218af51a03b69f9f2d6))
-
 
 ## v2.38.0 (2023-01-09)
 
@@ -1059,7 +1003,6 @@ VMAAS-1436 ([`6859dca`](https://github.com/RedHatInsights/vmaas/commit/6859dca4d
 
 VMAAS-1443 ([`c3e3b60`](https://github.com/RedHatInsights/vmaas/commit/c3e3b602fc8c6731bed14550cde967c5287cb495))
 
-
 ## v2.37.11 (2023-01-05)
 
 ### Chore
@@ -1069,7 +1012,6 @@ VMAAS-1443 ([`c3e3b60`](https://github.com/RedHatInsights/vmaas/commit/c3e3b602f
 ### Fix
 
 * fix(vmaas-go): cache reload, adjust GOGC ([`3ab6317`](https://github.com/RedHatInsights/vmaas/commit/3ab6317ef2c2f5547729f78553adf897fa9d46f3))
-
 
 ## v2.37.10 (2022-12-19)
 
@@ -1083,13 +1025,11 @@ VMAAS-1440 ([`eae365c`](https://github.com/RedHatInsights/vmaas/commit/eae365cb3
 
 * fix(vmaas-go): update vmaas-lib and set GC ([`6572ef5`](https://github.com/RedHatInsights/vmaas/commit/6572ef513ae21f909cdbc0109f54c57d85b2306c))
 
-
 ## v2.37.9 (2022-12-15)
 
 ### Fix
 
 * fix(vmaas-go): optimizations ([`8d2639c`](https://github.com/RedHatInsights/vmaas/commit/8d2639cda988217648216d6aff5421a92fdd1131))
-
 
 ## v2.37.8 (2022-12-12)
 
@@ -1097,13 +1037,11 @@ VMAAS-1440 ([`eae365c`](https://github.com/RedHatInsights/vmaas/commit/eae365cb3
 
 * fix(vmaas-go): updates when releasever in repo is empty ([`80c86c0`](https://github.com/RedHatInsights/vmaas/commit/80c86c0fa5e41a4b8a3e6333a2b7328812f5818d))
 
-
 ## v2.37.7 (2022-12-08)
 
 ### Fix
 
 * fix(vmaas-go): bump vmaas-lib version to fix arch compatibility ([`ecbd93a`](https://github.com/RedHatInsights/vmaas/commit/ecbd93a022662f0d79e1bf4edfe0cb2868cb231f))
-
 
 ## v2.37.6 (2022-12-08)
 
@@ -1121,7 +1059,6 @@ VMAAS-1437 ([`daf67c0`](https://github.com/RedHatInsights/vmaas/commit/daf67c0c6
 
 * test(vmaas-go): probe test ([`8c73ffa`](https://github.com/RedHatInsights/vmaas/commit/8c73ffae7c2bed9aaeee1a03831468a2fa46bbe8))
 
-
 ## v2.37.5 (2022-12-07)
 
 ### Chore
@@ -1132,13 +1069,11 @@ VMAAS-1437 ([`daf67c0`](https://github.com/RedHatInsights/vmaas/commit/daf67c0c6
 
 * fix(vmaas-go): recover from panic and respond 500 ([`09be0db`](https://github.com/RedHatInsights/vmaas/commit/09be0db507bf35ad9a32241beb9ae47e820858eb))
 
-
 ## v2.37.4 (2022-11-25)
 
 ### Fix
 
 * fix(vmaas-go): don&#39;t proxy request when error is present ([`6c86060`](https://github.com/RedHatInsights/vmaas/commit/6c86060465d95830b866e405bcdb5b5aa719a93e))
-
 
 ## v2.37.3 (2022-11-25)
 
@@ -1148,13 +1083,11 @@ VMAAS-1437 ([`daf67c0`](https://github.com/RedHatInsights/vmaas/commit/daf67c0c6
 
 VMAAS-1438 ([`6913cc9`](https://github.com/RedHatInsights/vmaas/commit/6913cc9b7a734db169c063c3d9bbe68d0a44d412))
 
-
 ## v2.37.2 (2022-11-24)
 
 ### Fix
 
 * fix: define cpu/memory limit/requests separately ([`22a96d9`](https://github.com/RedHatInsights/vmaas/commit/22a96d96015a1d3a0d7ece3d317a3a333a35852d))
-
 
 ## v2.37.1 (2022-11-23)
 
@@ -1167,7 +1100,6 @@ VMAAS-1438 ([`6913cc9`](https://github.com/RedHatInsights/vmaas/commit/6913cc9b7
 ### Fix
 
 * fix(probes): define custom probes ([`7a5c438`](https://github.com/RedHatInsights/vmaas/commit/7a5c4384f4f5e811cfb263817d9ec328869a4179))
-
 
 ## v2.37.0 (2022-11-22)
 
@@ -1230,7 +1162,6 @@ more than one erratum.
 
 VULN-2443 ([`fece842`](https://github.com/RedHatInsights/vmaas/commit/fece8426e9e19e587597780c10fff2a5fc0c13ca))
 
-
 ## v2.36.0 (2022-11-22)
 
 ### Chore
@@ -1257,7 +1188,6 @@ VMAAS-1431 ([`c7436c1`](https://github.com/RedHatInsights/vmaas/commit/c7436c1b2
 
 VMAAS-1431 ([`133b098`](https://github.com/RedHatInsights/vmaas/commit/133b098c1f124ff0d5d812a6772fe397259ad736))
 
-
 ## v2.35.4 (2022-11-14)
 
 ### Chore
@@ -1278,7 +1208,6 @@ VULN-2443 ([`4800058`](https://github.com/RedHatInsights/vmaas/commit/4800058fcb
 
 VULN-2443 ([`bfe0a7b`](https://github.com/RedHatInsights/vmaas/commit/bfe0a7ba750db0ba4e323e96fa362530e7dbee0b))
 
-
 ## v2.35.3 (2022-10-07)
 
 ### Fix
@@ -1286,7 +1215,6 @@ VULN-2443 ([`bfe0a7b`](https://github.com/RedHatInsights/vmaas/commit/bfe0a7ba75
 * fix(reposcan): collect prometheus metrics from child processes
 
 VMAAS-992 ([`4c16942`](https://github.com/RedHatInsights/vmaas/commit/4c16942abe5817c5a479d46f14d0ec7805d15afd))
-
 
 ## v2.35.2 (2022-07-19)
 
@@ -1317,7 +1245,6 @@ VMAAS-155 ([`868ab3e`](https://github.com/RedHatInsights/vmaas/commit/868ab3e2b3
 
 VMAAS-1425 ([`ca6d8c1`](https://github.com/RedHatInsights/vmaas/commit/ca6d8c1782a2122a028f247078ab35257c9ab7c9))
 
-
 ## v2.35.1 (2022-05-30)
 
 ### Chore
@@ -1336,7 +1263,6 @@ VMAAS-1425 ([`ca6d8c1`](https://github.com/RedHatInsights/vmaas/commit/ca6d8c178
 
 * VMAAS-1412: pass REPO_NAME_PREFIXES to webapp ([`2244774`](https://github.com/RedHatInsights/vmaas/commit/224477433783d3384e48d38e39afea10bd6aaebe))
 
-
 ## v2.35.0 (2022-03-07)
 
 ### Feature
@@ -1353,13 +1279,11 @@ VMAAS-1425 ([`ca6d8c1`](https://github.com/RedHatInsights/vmaas/commit/ca6d8c178
 
 Co-authored-by: michalslomczynski &lt;mslomczy@redhat.com&gt; ([`c851f99`](https://github.com/RedHatInsights/vmaas/commit/c851f99984fc9232b2e400963d609f4332b9bb2a))
 
-
 ## v2.34.6 (2022-03-02)
 
 ### Fix
 
 * fix(reposcan): fix lint in test_patchlist.py ([`b71de25`](https://github.com/RedHatInsights/vmaas/commit/b71de25e43286e5d39270b70af6844a4d2e42160))
-
 
 ## v2.34.5 (2022-03-01)
 
@@ -1379,7 +1303,6 @@ Co-authored-by: michalslomczynski &lt;mslomczy@redhat.com&gt; ([`c851f99`](https
 
 Co-authored-by: michalslomczynski &lt;mslomczy@redhat.com&gt; ([`394a60a`](https://github.com/RedHatInsights/vmaas/commit/394a60a2e7d01c611a842349b4848582fb50c2e0))
 
-
 ## v2.34.4 (2022-02-22)
 
 ### Chore
@@ -1389,7 +1312,6 @@ Co-authored-by: michalslomczynski &lt;mslomczy@redhat.com&gt; ([`394a60a`](https
 ### Fix
 
 * fix(local-deployment): official PostgreSQL container has different mount path ([`9fcc693`](https://github.com/RedHatInsights/vmaas/commit/9fcc69332f5bd91189e2918eb86fc1dc534bd331))
-
 
 ## v2.34.3 (2022-02-14)
 
@@ -1407,7 +1329,6 @@ Co-authored-by: michalslomczynski &lt;mslomczy@redhat.com&gt; ([`394a60a`](https
 
 VMAAS-1414 ([`f9fc5da`](https://github.com/RedHatInsights/vmaas/commit/f9fc5da8b88011bf80637c30131e66598ac2a40e))
 
-
 ## v2.34.2 (2022-02-07)
 
 ### Chore
@@ -1424,7 +1345,6 @@ VULN-1412 ([`4b0157e`](https://github.com/RedHatInsights/vmaas/commit/4b0157ef99
 
 * fix(reposcan): don&#39;t delete whole CS when want to delete only repo with null basearch and releasever ([`862c2cb`](https://github.com/RedHatInsights/vmaas/commit/862c2cb67a7a2fd74eed1f86a60d40ff0bb8681d))
 
-
 ## v2.34.1 (2022-02-02)
 
 ### Chore
@@ -1438,7 +1358,6 @@ VULN-1412 ([`4b0157e`](https://github.com/RedHatInsights/vmaas/commit/4b0157ef99
 ### Fix
 
 * fix(reposcan): allow redirects ([`dc433c8`](https://github.com/RedHatInsights/vmaas/commit/dc433c861551b34aec2a2713118fd12c2fefebc7))
-
 
 ## v2.34.0 (2022-01-25)
 
@@ -1456,7 +1375,6 @@ VMAAS-1404 ([`846fc10`](https://github.com/RedHatInsights/vmaas/commit/846fc1091
 
 VMAAS-1409 ([`e9ec3a8`](https://github.com/RedHatInsights/vmaas/commit/e9ec3a81bb08595a8d3d17168c0b1b26ca5aacfc))
 
-
 ## v2.33.1 (2022-01-21)
 
 ### Chore
@@ -1470,7 +1388,6 @@ VMAAS-1408 ([`45595a7`](https://github.com/RedHatInsights/vmaas/commit/45595a731
 * fix(webapp): Remove null probes in clowaddp.yaml
 
 - because of clowder upgrade ([`5e38b8d`](https://github.com/RedHatInsights/vmaas/commit/5e38b8dd703fc453285c0d7b36dcc9ff2ee0da19))
-
 
 ## v2.33.0 (2022-01-18)
 
@@ -1501,7 +1418,6 @@ VMAAS-1402 ([`9e06241`](https://github.com/RedHatInsights/vmaas/commit/9e06241f5
 * feat(reposcan): link CPEs with specific repos, not only content sets
 
 VMAAS-1402 ([`428bfad`](https://github.com/RedHatInsights/vmaas/commit/428bfad8e974ae0b0107d7fd557fb842f9b333aa))
-
 
 ## v2.32.11 (2022-01-10)
 
@@ -1581,7 +1497,6 @@ add microdnf opts to not install unneeded packages ([`d5c7e59`](https://github.c
 
 * Set private port protocol to tcp for rsync ([`83e93ec`](https://github.com/RedHatInsights/vmaas/commit/83e93ecb739bf1bf6afc22799528fc7c1e92bf9a))
 
-
 ## v2.32.10 (2021-12-08)
 
 ### Chore
@@ -1593,7 +1508,6 @@ VMAAS-1395 ([`a9b1c7e`](https://github.com/RedHatInsights/vmaas/commit/a9b1c7e65
 ### Performance
 
 * perf(webapp): don&#39;t evaluate unfixed CVEs by default now ([`3bec6c8`](https://github.com/RedHatInsights/vmaas/commit/3bec6c8c936b41592c34751a61acb617399f4582))
-
 
 ## v2.32.9 (2021-12-07)
 
@@ -1615,7 +1529,6 @@ VMAAS-1330 ([`a80071b`](https://github.com/RedHatInsights/vmaas/commit/a80071b2b
 
 VMAAS-1401 ([`3a7c489`](https://github.com/RedHatInsights/vmaas/commit/3a7c489f5e8f72883522e1237d94611f7917bd1c))
 
-
 ## v2.32.8 (2021-11-25)
 
 ### Fix
@@ -1630,13 +1543,11 @@ VULN-2022 ([`a971fe0`](https://github.com/RedHatInsights/vmaas/commit/a971fe0559
 
 This reverts commit c5341d7cbf3e65cac4abe21bfebd37ebeec61ffe. ([`5640172`](https://github.com/RedHatInsights/vmaas/commit/56401725c2fc9763dfd45b23fabbcd24864f405d))
 
-
 ## v2.32.7 (2021-11-24)
 
 ### Fix
 
 * fix(webapp): workaround with appProtocol tcp (clowder hardcodes http) - for istio ([`c5341d7`](https://github.com/RedHatInsights/vmaas/commit/c5341d7cbf3e65cac4abe21bfebd37ebeec61ffe))
-
 
 ## v2.32.6 (2021-11-19)
 
@@ -1672,7 +1583,6 @@ also remove old items from cache
 
 VMAAS-1397 ([`74b1c78`](https://github.com/RedHatInsights/vmaas/commit/74b1c784c24cb328cade9b7c260d429e3f273ccd))
 
-
 ## v2.32.5 (2021-11-15)
 
 ### Chore
@@ -1686,7 +1596,6 @@ VMAAS-1397 ([`74b1c78`](https://github.com/RedHatInsights/vmaas/commit/74b1c784c
 * fix(reposcan): do not store &#39;None&#39; string if last-modified header is not available
 
 VMAAS-1396 ([`55e908a`](https://github.com/RedHatInsights/vmaas/commit/55e908a44734848c67f03d8e1c39f16c675027b8))
-
 
 ## v2.32.4 (2021-11-12)
 
@@ -1708,7 +1617,6 @@ VULN-1387 ([`ecb8005`](https://github.com/RedHatInsights/vmaas/commit/ecb800505d
 
 VMAAS-1398 ([`0724a04`](https://github.com/RedHatInsights/vmaas/commit/0724a04a8cb97cedef1ddeee26430816c43adbeb))
 
-
 ## v2.32.3 (2021-11-08)
 
 ### Chore
@@ -1719,7 +1627,6 @@ VMAAS-1398 ([`0724a04`](https://github.com/RedHatInsights/vmaas/commit/0724a04a8
 
 * fix(webapp): aiohttp 3.8.0 - don&#39;t create new event loop, fix websocket connection ([`2fb0494`](https://github.com/RedHatInsights/vmaas/commit/2fb0494d568fd4c17eb6be3995fee86b306eb3f9))
 
-
 ## v2.32.2 (2021-11-08)
 
 ### Fix
@@ -1727,7 +1634,6 @@ VMAAS-1398 ([`0724a04`](https://github.com/RedHatInsights/vmaas/commit/0724a04a8
 * fix(webapp): rebuild index array on cache reload
 
 - VMAAS-1391 ([`9062a6e`](https://github.com/RedHatInsights/vmaas/commit/9062a6e033026e227e2bc075ce99d2d2d5ddf88b))
-
 
 ## v2.32.1 (2021-11-08)
 
@@ -1762,7 +1668,6 @@ This reverts commit 27f35aae537656bd511f7c15c48d4d99f9177224. ([`91af77b`](https
 * Revert &#34;chore: temporarily disable probes for webapp&#34;
 
 This reverts commit 5eff3baaad66510911f0f6d34567babd165f1073. ([`973338d`](https://github.com/RedHatInsights/vmaas/commit/973338df139890fa99034849cab5591c9e5b2961))
-
 
 ## v2.32.0 (2021-11-02)
 
@@ -1826,7 +1731,6 @@ VMAAS-1392 ([`467ac37`](https://github.com/RedHatInsights/vmaas/commit/467ac3718
 * feature(webapp): store errata id in errata_detail cache
 VMAAS-1392 ([`dc57f74`](https://github.com/RedHatInsights/vmaas/commit/dc57f74cfae3af881348cc5ae2052e8091450de2))
 
-
 ## v2.31.2 (2021-10-27)
 
 ### Fix
@@ -1834,7 +1738,6 @@ VMAAS-1392 ([`dc57f74`](https://github.com/RedHatInsights/vmaas/commit/dc57f74cf
 * fix(reposcan): skip populating empty repo data
 
 VMAAS-1378 ([`b7a11b3`](https://github.com/RedHatInsights/vmaas/commit/b7a11b380dd4491d9b24eda4fb3c84af073c1ece))
-
 
 ## v2.31.1 (2021-10-27)
 
@@ -1860,7 +1763,6 @@ VMAAS-1378 ([`b7a11b3`](https://github.com/RedHatInsights/vmaas/commit/b7a11b380
 
 - VMAAS-1393 ([`3afb539`](https://github.com/RedHatInsights/vmaas/commit/3afb53966ca4567ba76fc8dd2eff84909f006685))
 
-
 ## v2.31.0 (2021-10-21)
 
 ### Feature
@@ -1874,7 +1776,6 @@ VMAAS-1391 ([`5debe20`](https://github.com/RedHatInsights/vmaas/commit/5debe20a7
 * feat(reposcan): SQL updates - added package.modified timestamp column
 
 VMAAS-1391 ([`08d2b6a`](https://github.com/RedHatInsights/vmaas/commit/08d2b6a877afe2644383c5e6bae8cace179c97dd))
-
 
 ## v2.30.0 (2021-10-07)
 
@@ -1892,7 +1793,6 @@ VMAAS-1382
 
 * test: response schema changes ([`ab62a00`](https://github.com/RedHatInsights/vmaas/commit/ab62a00d7c9c6770944ee50eb39733683af82e75))
 
-
 ## v2.29.0 (2021-10-07)
 
 ### Feature
@@ -1901,13 +1801,11 @@ VMAAS-1382
 
 VMAAS-1386 ([`d7c1fe0`](https://github.com/RedHatInsights/vmaas/commit/d7c1fe03ffff9089dd615e8b028b0ecab8eb309c))
 
-
 ## v2.28.4 (2021-10-07)
 
 ### Fix
 
 * fix(webapp): load as many tables as possible even when dump is not up to date ([`751989b`](https://github.com/RedHatInsights/vmaas/commit/751989b6c9256575ac3071fae6bee93be9a4ae9b))
-
 
 ## v2.28.3 (2021-10-06)
 
@@ -1918,7 +1816,6 @@ VMAAS-1386 ([`d7c1fe0`](https://github.com/RedHatInsights/vmaas/commit/d7c1fe03f
 - Include third-party package repositories - not included before
 - Exclude package with third-party repositories if needed
 - VMAAS-1351 ([`717d79c`](https://github.com/RedHatInsights/vmaas/commit/717d79c820ed3e7f6b021b58b9cac7501b07225e))
-
 
 ## v2.28.2 (2021-10-05)
 
@@ -1936,7 +1833,6 @@ VULN-1948 ([`1155152`](https://github.com/RedHatInsights/vmaas/commit/1155152a9f
 
 VMAAS-1346 ([`0f1d73e`](https://github.com/RedHatInsights/vmaas/commit/0f1d73ed3542b94a4cfa35156e941a338e7a7f6d))
 
-
 ## v2.28.1 (2021-09-17)
 
 ### Chore
@@ -1952,7 +1848,6 @@ VMAAS-1383 ([`99403a8`](https://github.com/RedHatInsights/vmaas/commit/99403a8f1
 * fix: set timeout for requests while waiting for services
 
 requests will hang if no timeout is set which causes unnecessary pod restarts just after deploy ([`ab4cb40`](https://github.com/RedHatInsights/vmaas/commit/ab4cb40b791df2e5f9558da664428574c1e9fad5))
-
 
 ## v2.28.0 (2021-09-14)
 
@@ -2000,7 +1895,6 @@ test_repository_store.py:57: PytestUnknownMarkWarning: Unknown pytest.mark.first
 
 * fix: update developer setup to single app layout ([`9810bc2`](https://github.com/RedHatInsights/vmaas/commit/9810bc2ea42165ed9cd1c4005dbd45a344e95db2))
 
-
 ## v2.27.2 (2021-09-07)
 
 ### Build
@@ -2031,7 +1925,6 @@ Traceback (most recent call last):
     if value.lower() == &#39;true&#39;:
 AttributeError: &#39;bool&#39; object has no attribute &#39;lower&#39; ([`1d73e3b`](https://github.com/RedHatInsights/vmaas/commit/1d73e3b92619afd15d7eb267cbcf869852c8cebe))
 
-
 ## v2.27.1 (2021-09-07)
 
 ### Fix
@@ -2039,7 +1932,6 @@ AttributeError: &#39;bool&#39; object has no attribute &#39;lower&#39; ([`1d73e3
 * fix(reposcan): fixed advisory &#34;reboot_suggested&#34; value parsing
 
 VMAAS-1365 ([`85c1ddd`](https://github.com/RedHatInsights/vmaas/commit/85c1ddda23531c9118a7000d711cabae99c47eef))
-
 
 ## v2.27.0 (2021-09-06)
 
@@ -2063,7 +1955,6 @@ VMAAS-1365 ([`309f35e`](https://github.com/RedHatInsights/vmaas/commit/309f35e2d
 
 VMAAS-1365 ([`f38da8e`](https://github.com/RedHatInsights/vmaas/commit/f38da8e14de4143bde3fd310f75166a79f8bc1aa))
 
-
 ## v2.26.1 (2021-09-06)
 
 ### Fix
@@ -2073,7 +1964,6 @@ VMAAS-1365 ([`f38da8e`](https://github.com/RedHatInsights/vmaas/commit/f38da8e14
 VMAAS-1375
 
 It was failing when used with third_party and optimistic_updates ([`c24be27`](https://github.com/RedHatInsights/vmaas/commit/c24be272d61c2e385efbfd9da176c70ae58434bd))
-
 
 ## v2.26.0 (2021-09-03)
 
@@ -2094,7 +1984,6 @@ VMAAS-1332 ([`38322bf`](https://github.com/RedHatInsights/vmaas/commit/38322bf6c
 * revert: change memory limits in webapp
 
 VULN-1906 ([`8d42a21`](https://github.com/RedHatInsights/vmaas/commit/8d42a218816379c7eef0455e8a28eac856f93f3c))
-
 
 ## v2.25.0 (2021-09-01)
 
@@ -2137,7 +2026,6 @@ see also https://github.com/quay/claircore/commit/baff66333b025d863779cea58e1a5a
 
 * fix(database): add missing file_id foreign key ([`a6a23a9`](https://github.com/RedHatInsights/vmaas/commit/a6a23a95feb45a9560fd580ad84f095b6b1a6019))
 
-
 ## v2.24.1 (2021-07-28)
 
 ### Chore
@@ -2152,7 +2040,6 @@ VULN-1742 ([`081a2ac`](https://github.com/RedHatInsights/vmaas/commit/081a2ac0b3
 
 * fix(clowder): use rds ca path ([`9f8a568`](https://github.com/RedHatInsights/vmaas/commit/9f8a5684d3dc02641d59926f31e1f4d975ecc274))
 
-
 ## v2.24.0 (2021-07-15)
 
 ### Feature
@@ -2160,7 +2047,6 @@ VULN-1742 ([`081a2ac`](https://github.com/RedHatInsights/vmaas/commit/081a2ac0b3
 * feat(reposcan): support filtering OVAL files
 
 put a warning in a log ([`29d555c`](https://github.com/RedHatInsights/vmaas/commit/29d555c7c67939e3e37eb3840935bc590b426450))
-
 
 ## v2.23.6 (2021-07-14)
 
@@ -2182,7 +2068,6 @@ put a warning in a log ([`29d555c`](https://github.com/RedHatInsights/vmaas/comm
 
 * refactor: migrate from configmap to deployment ([`f3b6f31`](https://github.com/RedHatInsights/vmaas/commit/f3b6f31b60348e7aa6594b3af9cbc96e36649783))
 
-
 ## v2.23.5 (2021-07-12)
 
 ### Chore
@@ -2192,7 +2077,6 @@ put a warning in a log ([`29d555c`](https://github.com/RedHatInsights/vmaas/comm
 ### Fix
 
 * fix(reposcan): products being a list instead of dict in reposcan ([`cfba1fd`](https://github.com/RedHatInsights/vmaas/commit/cfba1fd69cd94af0a2c08aa458075f904e3b6bc3))
-
 
 ## v2.23.4 (2021-07-12)
 
@@ -2208,13 +2092,11 @@ put a warning in a log ([`29d555c`](https://github.com/RedHatInsights/vmaas/comm
 
 * Fix multiple content-set syncing process ([`433b9f6`](https://github.com/RedHatInsights/vmaas/commit/433b9f628a192727e75cd8decc6074092dbd9742))
 
-
 ## v2.23.3 (2021-07-01)
 
 ### Fix
 
 * fix(reposcan): remove parenthesis from returning statement ([`7e54a90`](https://github.com/RedHatInsights/vmaas/commit/7e54a904eeefc11473251ab1c3fc4f614019c8a3))
-
 
 ## v2.23.2 (2021-07-01)
 
@@ -2228,13 +2110,11 @@ put a warning in a log ([`29d555c`](https://github.com/RedHatInsights/vmaas/comm
 
 notices from truncate command are printed to stderr ([`1046e97`](https://github.com/RedHatInsights/vmaas/commit/1046e976680670245eb40ce5f10ed946003b1de7))
 
-
 ## v2.23.1 (2021-07-01)
 
 ### Fix
 
 * fix(database): apply migration file as single transaction ([`c64d11f`](https://github.com/RedHatInsights/vmaas/commit/c64d11f7b14411834657a29710ce1d0083976374))
-
 
 ## v2.23.0 (2021-07-01)
 
@@ -2245,7 +2125,6 @@ notices from truncate command are printed to stderr ([`1046e97`](https://github.
 ### Feature
 
 * feat(database): bump database to rhel8/centos8 ([`8fc0b23`](https://github.com/RedHatInsights/vmaas/commit/8fc0b23953cb5a97f8accbca057e14f6dd223fd0))
-
 
 ## v2.22.1 (2021-07-01)
 
@@ -2263,13 +2142,11 @@ improves incremental updates where oval_id can change ([`c69017a`](https://githu
 
 * fix(database): re-structure OVAL-file associations ([`c3e2d6b`](https://github.com/RedHatInsights/vmaas/commit/c3e2d6b8374c5d91b91d1f616c840abc82fd9110))
 
-
 ## v2.22.0 (2021-06-17)
 
 ### Feature
 
 * feat(reposcan): Accept multiple repolists for git sync ([`f85f4a0`](https://github.com/RedHatInsights/vmaas/commit/f85f4a01b206063b1221de8853b5ce92aa6b30d0))
-
 
 ## v2.21.0 (2021-06-10)
 
@@ -2281,7 +2158,6 @@ improves incremental updates where oval_id can change ([`c69017a`](https://githu
 
 * feat(reposcan): retry periodic cache dump later if it failed ([`0694e3a`](https://github.com/RedHatInsights/vmaas/commit/0694e3a9f6c15164eeeedd4ce8b918704224681d))
 
-
 ## v2.20.2 (2021-06-09)
 
 ### Fix
@@ -2290,7 +2166,6 @@ improves incremental updates where oval_id can change ([`c69017a`](https://githu
 
 * fix: default ssl mode can&#39;t be empty string ([`17a366e`](https://github.com/RedHatInsights/vmaas/commit/17a366e40246c9a9106e06824a4abcccc6cff5f7))
 
-
 ## v2.20.1 (2021-06-08)
 
 ### Fix
@@ -2298,7 +2173,6 @@ improves incremental updates where oval_id can change ([`c69017a`](https://githu
 * fix(webapp): revert: add &#34;modified_since&#34; to /v3/pkgtree response&#34;
 
 This reverts commit aee93a6a20d1bee6a9f4af45d07e1ae6d399c79a. ([`ae15ba0`](https://github.com/RedHatInsights/vmaas/commit/ae15ba02709fca396a6b678fdfdb84f4d0b35ade))
-
 
 ## v2.20.0 (2021-06-02)
 
@@ -2318,14 +2192,12 @@ This reverts commit aee93a6a20d1bee6a9f4af45d07e1ae6d399c79a. ([`ae15ba0`](https
 
 * refactor(webapp): make responses more consistent ([`00447bb`](https://github.com/RedHatInsights/vmaas/commit/00447bb331347c3ec1c7502a198b794edc95fa43))
 
-
 ## v2.19.2 (2021-05-25)
 
 ### Fix
 
 * fix(webapp): add &#34;modified_since&#34; to /v3/pkgtree response
 - to be consistent with /cves /errata endpoints ([`aee93a6`](https://github.com/RedHatInsights/vmaas/commit/aee93a6a20d1bee6a9f4af45d07e1ae6d399c79a))
-
 
 ## v2.19.1 (2021-05-25)
 
@@ -2339,7 +2211,6 @@ e.g. failure in comparing microcode_ctl-4:20180807a-2.el8.x86_64 and microcode_c
 
 * fix(webapp): if CVE is not in DB from cvemap, it&#39;s not connected with definition ([`d244df0`](https://github.com/RedHatInsights/vmaas/commit/d244df04e69c0b839f8674de9fc638890a0bb92c))
 
-
 ## v2.19.0 (2021-05-19)
 
 ### Feature
@@ -2347,7 +2218,6 @@ e.g. failure in comparing microcode_ctl-4:20180807a-2.el8.x86_64 and microcode_c
 * feat(webapp): filter modules_list in OVAL evaluation ([`ab8011f`](https://github.com/RedHatInsights/vmaas/commit/ab8011f443a16299aab4f11aaa20f132bd32bb35))
 
 * feat(reposcan): import OVAL module streams ([`0408efc`](https://github.com/RedHatInsights/vmaas/commit/0408efcec808297f09226c648eddb3f11f95279e))
-
 
 ## v2.18.1 (2021-05-17)
 
@@ -2360,7 +2230,6 @@ e.g. failure in comparing microcode_ctl-4:20180807a-2.el8.x86_64 and microcode_c
 ### Fix
 
 * fix(reposcan): fix path to wait script and replace it with python version ([`8d40e09`](https://github.com/RedHatInsights/vmaas/commit/8d40e097d31632f0eb505b8de960ede448376117))
-
 
 ## v2.18.0 (2021-05-14)
 
@@ -2396,13 +2265,11 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * fix(reposcan): /data is mount point ([`a2c93b7`](https://github.com/RedHatInsights/vmaas/commit/a2c93b7f2fbd29bf313614b1ae45a4bd173a6400))
 
-
 ## v2.17.0 (2021-05-12)
 
 ### Feature
 
 * feat(reposcan): allow repolists to opt_out of default certificates ([`dc00b21`](https://github.com/RedHatInsights/vmaas/commit/dc00b215c1b4d4283f87f9b63a02fa26fcc27aa1))
-
 
 ## v2.16.0 (2021-05-12)
 
@@ -2410,13 +2277,11 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * feat(reposcan): accept lists for content set data ([`24be17e`](https://github.com/RedHatInsights/vmaas/commit/24be17ec2ae0ef344eca161556c617cefa95669b))
 
-
 ## v2.15.2 (2021-05-05)
 
 ### Fix
 
 * fix(webapp): default to false until it&#39;s well tested, apps can request it anyway using param ([`646b3f6`](https://github.com/RedHatInsights/vmaas/commit/646b3f683a2e5eafd33a2750e0895aa8c4f153bd))
-
 
 ## v2.15.1 (2021-05-04)
 
@@ -2425,7 +2290,6 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 * fix(webapp): add more as_long_arr casts ([`17d5137`](https://github.com/RedHatInsights/vmaas/commit/17d513726b333445bcbfb012d1c6b0cd913cc100))
 
 * fix(webapp): productid2repoids is not used ([`9483f9d`](https://github.com/RedHatInsights/vmaas/commit/9483f9dc18f113491b1371f472733f0a7c745691))
-
 
 ## v2.15.0 (2021-05-04)
 
@@ -2439,13 +2303,11 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * fix(webapp): warn but don&#39;t crash ([`8f4c0c2`](https://github.com/RedHatInsights/vmaas/commit/8f4c0c294fd877a3e4ec26dac6b92f07db8a1079))
 
-
 ## v2.14.1 (2021-04-29)
 
 ### Fix
 
 * fix(reposcan): fix KeyError when importing new repos ([`9303d34`](https://github.com/RedHatInsights/vmaas/commit/9303d347c364757e2af715321c53fb6415939c45))
-
 
 ## v2.14.0 (2021-04-28)
 
@@ -2459,7 +2321,6 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * fix(reposcan): sync CPE substrings from OVAL files ([`605d020`](https://github.com/RedHatInsights/vmaas/commit/605d020a28a8bbaf67f043e24507d87e8739af11))
 
-
 ## v2.13.2 (2021-04-28)
 
 ### Chore
@@ -2472,13 +2333,11 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * fix(reposcan): delete from new dependent tables ([`ebcb5cb`](https://github.com/RedHatInsights/vmaas/commit/ebcb5cb83f58dd0342c9c12dc8ce745e5829c0f0))
 
-
 ## v2.13.1 (2021-04-21)
 
 ### Fix
 
 * fix(webapp): include packages without errata ([`4b4e409`](https://github.com/RedHatInsights/vmaas/commit/4b4e409769dd14864f8275f51118beda159fa4d8))
-
 
 ## v2.13.0 (2021-04-20)
 
@@ -2490,14 +2349,12 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 * feat(webapp): add &#34;modified_since&#34; support to /pkgtree v3 ([`922c84b`](https://github.com/RedHatInsights/vmaas/commit/922c84bab2dc2af861f1d6cba362dc6dc58cc887))
 
-
 ## v2.12.0 (2021-04-20)
 
 ### Feature
 
 * feat(webapp): add new /pkgtree endpoint options
 - return_{errata, repositories, summary, description} ([`5811f2f`](https://github.com/RedHatInsights/vmaas/commit/5811f2f6da52c8fbf192ce01944b230bb3a1d2bb))
-
 
 ## v2.11.0 (2021-04-19)
 
@@ -2519,7 +2376,6 @@ Extract sqlite dump generation code from the semtezv/next branch ([`eedcd53`](ht
 
 Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github.com/RedHatInsights/vmaas/commit/ddeeb1f52a73f9398775003d704de2b86e5c65f2))
 
-
 ## v2.10.0 (2021-04-16)
 
 ### Chore
@@ -2536,7 +2392,6 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 
 * feat(webapp): added pagination to /pkgtree (api_version=3) ([`568497d`](https://github.com/RedHatInsights/vmaas/commit/568497df7f29fa139c0544a863c525a613110ba4))
 
-
 ## v2.9.0 (2021-04-15)
 
 ### Feature
@@ -2551,7 +2406,6 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 
 * Simpler pkgtree response in openapi docs ([`ffa7cc8`](https://github.com/RedHatInsights/vmaas/commit/ffa7cc848ad4996732eebffe9fe1e899a1668c43))
 
-
 ## v2.8.2 (2021-04-08)
 
 ### Chore
@@ -2562,7 +2416,6 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 
 * fix(webapp): close dbm after loading cache ([`e6aad5c`](https://github.com/RedHatInsights/vmaas/commit/e6aad5c3f3e34527dd74ab347d5a272170d337b3))
 
-
 ## v2.8.1 (2021-04-08)
 
 ### Fix
@@ -2571,13 +2424,11 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 
 * fix(reposcan): empty insert ([`49022a4`](https://github.com/RedHatInsights/vmaas/commit/49022a415a964999b5ac45097f15c96d98be3990))
 
-
 ## v2.8.0 (2021-04-08)
 
 ### Feature
 
 * feat(reposcan): support cleaning /tmp manually ([`504aa3d`](https://github.com/RedHatInsights/vmaas/commit/504aa3dd34839ee9b281b566c8f90ee711f80aef))
-
 
 ## v2.7.1 (2021-04-07)
 
@@ -2589,7 +2440,6 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 
 * fix(reposcan): handling of repolist urls ([`de3b8a0`](https://github.com/RedHatInsights/vmaas/commit/de3b8a0595bb5d0ff95d63258100ba47ab4a5445))
 
-
 ## v2.7.0 (2021-04-06)
 
 ### Feature
@@ -2597,7 +2447,6 @@ Signed-off-by: bennyturns &lt;bturner@redhat.com&gt; ([`ddeeb1f`](https://github
 * feat(webapp): Third party content support - Webapp
 
 Signed-off-by: mhornick &lt;mhornick@redhat.com&gt; ([`c001a8d`](https://github.com/RedHatInsights/vmaas/commit/c001a8db08efde47786ddcd119adf314288b5fea))
-
 
 ## v2.6.0 (2021-04-06)
 
@@ -2623,7 +2472,6 @@ Signed-off-by: mhornick &lt;mhornick@redhat.com&gt; ([`c001a8d`](https://github.
 
 * updated webapp API with &#34;optimistic_updates&#34; flag ([`3c123de`](https://github.com/RedHatInsights/vmaas/commit/3c123def9de8fc10318b0d36f05e514f577e07d0))
 
-
 ## v2.5.0 (2021-03-29)
 
 ### Feature
@@ -2633,7 +2481,6 @@ Signed-off-by: mhornick &lt;mhornick@redhat.com&gt; ([`c001a8d`](https://github.
 ### Unknown
 
 * add third_party flag to API spec ([`385541b`](https://github.com/RedHatInsights/vmaas/commit/385541ba08c681c275dcd7ce546861eba72ffc62))
-
 
 ## v2.4.1 (2021-03-26)
 
@@ -2647,7 +2494,6 @@ modified the input to get some real updates ([`f31e3dc`](https://github.com/RedH
 
 * refactored updates.py to be easier to read ([`bc2dbe6`](https://github.com/RedHatInsights/vmaas/commit/bc2dbe6869012d8d8daa09bcbf2d5f1517b00702))
 
-
 ## v2.4.0 (2021-03-23)
 
 ### Chore
@@ -2657,7 +2503,6 @@ modified the input to get some real updates ([`f31e3dc`](https://github.com/RedH
 ### Feature
 
 * feat(webapp): define interface for patched/unpatched CVEs and OVAL evaluation toggles ([`125c839`](https://github.com/RedHatInsights/vmaas/commit/125c8397041c138b09c611d19095258151321aae))
-
 
 ## v2.3.0 (2021-03-18)
 
@@ -2681,20 +2526,17 @@ modified the input to get some real updates ([`f31e3dc`](https://github.com/RedH
 
 * feat(database): introduce cpe tables ([`8247fde`](https://github.com/RedHatInsights/vmaas/commit/8247fded0468b7f19846b8d3827cdc13c1935bba))
 
-
 ## v2.2.1 (2021-03-08)
 
 ### Fix
 
 * fix: waiting for DB and rsync port in e2e-deploy and docker-compose ([`9aad355`](https://github.com/RedHatInsights/vmaas/commit/9aad35511be74ef0dfa74ca5b8c8a829b08da3db))
 
-
 ## v2.2.0 (2021-03-05)
 
 ### Feature
 
 * feat(clowder): integrate with clowder ([`e419895`](https://github.com/RedHatInsights/vmaas/commit/e419895249391f3a6c00f363435f97084ae2b215))
-
 
 ## v2.1.1 (2021-03-03)
 
@@ -2715,7 +2557,6 @@ All versions of package tornado are vulnerable to Web Cache Poisoning by using a
 
 no complete authentication/authorization done here, we just parse&amp;log header from turnpike ([`d0e5a4f`](https://github.com/RedHatInsights/vmaas/commit/d0e5a4f639fd00f9a9a5c12238ab1bb734526d87))
 
-
 ## v2.1.0 (2021-01-28)
 
 ### Chore
@@ -2725,7 +2566,6 @@ no complete authentication/authorization done here, we just parse&amp;log header
 * chore: bump vmaas major version ([`245aee5`](https://github.com/RedHatInsights/vmaas/commit/245aee5ec64cbb8283763f0187bcf8a88815994f))
 
 * chore: update libs ([`ea5d3e2`](https://github.com/RedHatInsights/vmaas/commit/ea5d3e2b2c8d5c6b252f7eb9b9aba36e224f069d))
-
 
 ## v1.20.7 (2021-01-05)
 
@@ -2737,13 +2577,11 @@ VMAAS-1315
 
 asyncio: [ERROR] Task exception was never retrievedfuture: &lt;Task finished coro=&lt;Websocket._refresh_cache() done, defined at /vmaas/webapp/app.py:422&gt; exception=AttributeError(&#34;&#39;NoneType&#39; object has no attribute &#39;send_str&#39;&#34;,)&gt;&#39;Traceback (most recent call last):\n  File &#34;/vmaas/webapp/app.py&#34;, line 428, in _refresh_cache\n    await self.report_version()\n  File &#34;/vmaas/webapp/app.py&#34;, line 476, in report_version\n    await self.websocket.send_str(f&#34;version {BaseHandler.db_cache.dbchange.get(\&#39;exported\&#39;)}&#34;)\nAttributeError: \&#39;NoneType\&#39; object has no attribute \&#39;send_str\&#39;&#39;| ([`6f529d1`](https://github.com/RedHatInsights/vmaas/commit/6f529d1a014441c7341bd89f32bc32fde728685f))
 
-
 ## v1.20.6 (2020-12-03)
 
 ### Fix
 
 * fix(reposcan): skip repos with invalid sqlite database ([`35388b5`](https://github.com/RedHatInsights/vmaas/commit/35388b551c3de19f745f50451601e898c3b09b7b))
-
 
 ## v1.20.5 (2020-11-19)
 
@@ -2771,7 +2609,6 @@ This reverts commit d2795913d105b1ebcfceda913f0d197b5768bb7d. ([`736fdfa`](https
 
 This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https://github.com/RedHatInsights/vmaas/commit/c71596f7b33db9d1e4ca75e7354419205845cdf7))
 
-
 ## v1.20.4 (2020-10-29)
 
 ### Chore
@@ -2783,7 +2620,6 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 ### Fix
 
 * fix: use pod name for log-stream in CW config ([`f03fed4`](https://github.com/RedHatInsights/vmaas/commit/f03fed4ff38fa50a6c1f414618759b724f8e3fc2))
-
 
 ## v1.20.3 (2020-10-09)
 
@@ -2805,7 +2641,6 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 
 * fix(reposcan): detect case when sync process is killed and reposcan is stucked ([`b0797e8`](https://github.com/RedHatInsights/vmaas/commit/b0797e81b9d03cf54b647c02c4db188f7145006f))
 
-
 ## v1.20.2 (2020-09-23)
 
 ### Chore
@@ -2816,7 +2651,6 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 
 * fix(webapp): init logging once ([`dcbaff3`](https://github.com/RedHatInsights/vmaas/commit/dcbaff349b57c9b711c3a0b73130c39708e5fde8))
 
-
 ## v1.20.1 (2020-09-22)
 
 ### Fix
@@ -2826,7 +2660,6 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 ### Unknown
 
 * Use marker for vmaas tests ([`7320c46`](https://github.com/RedHatInsights/vmaas/commit/7320c46d11d9d53347cf3afb5ff5cd21bd1a0a9c))
-
 
 ## v1.20.0 (2020-09-21)
 
@@ -2852,13 +2685,11 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 
 * fix(webapp): reuse function from common.rpm ([`9c3b2fa`](https://github.com/RedHatInsights/vmaas/commit/9c3b2faae773a379b191dd523dbc08abcad8cdb2))
 
-
 ## v1.19.2 (2020-09-14)
 
 ### Fix
 
 * fix(webapp): expose readiness endpoint ([`878d2c4`](https://github.com/RedHatInsights/vmaas/commit/878d2c4b3d3a07a74534dddafa806cd7bd054eb3))
-
 
 ## v1.19.1 (2020-09-12)
 
@@ -2888,7 +2719,6 @@ This reverts commit a50f85455ab3e0b824cad70b80136b37c6c25fc9. ([`c71596f`](https
 
 fix: gracefully exit sleeping scripts ([`08eeb41`](https://github.com/RedHatInsights/vmaas/commit/08eeb416f73ce3e329556315740298e25b5a2597))
 
-
 ## v1.19.0 (2020-09-02)
 
 ### Chore
@@ -2903,7 +2733,6 @@ fix: gracefully exit sleeping scripts ([`08eeb41`](https://github.com/RedHatInsi
 
 * fix: build app image only once ([`a33dfdd`](https://github.com/RedHatInsights/vmaas/commit/a33dfddfde0da025cc4eb5d7427a13014e78e213))
 
-
 ## v1.18.3 (2020-07-29)
 
 ### Chore
@@ -2917,7 +2746,6 @@ fix: gracefully exit sleeping scripts ([`08eeb41`](https://github.com/RedHatInsi
 * fix(reposcan): fixing ISE in prepare msg function
 
 reposcan: [ERROR] Internal server error &lt;-9223363273888645507&gt;&#39;Traceback (most recent call last):\n  File &#34;/vmaas/reposcan/repodata/repository_controller.py&#34;, line 81, in _check_cert_expiration_date\n    loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)\n  File &#34;/usr/local/lib/python3.6/site-packages/OpenSSL/crypto.py&#34;, line 1794, in load_certificate\n    _raise_current_error()\n  File &#34;/usr/local/lib/python3.6/site-packages/OpenSSL/_util.py&#34;, line 54, in exception_from_error_queue\n    raise exception_type(errors)\nOpenSSL.crypto.Error: [(\&#39;PEM routines\&#39;, \&#39;get_name\&#39;, \&#39;no start line\&#39;)]\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File &#34;/vmaas/reposcan/reposcan.py&#34;, line 518, in run_task\n    repository_controller.store()\n  File &#34;/vmaas/reposcan/repodata/repository_controller.py&#34;, line 272, in store\n    failed = self._download_repomds()\n  File &#34;/vmaas/reposcan/repodata/repository_controller.py&#34;, line 72, in _download_repomds\n    self._check_cert_expiration_date(cert_name, cert)\n  File &#34;/vmaas/reposcan/repodata/repository_controller.py&#34;, line 96, in _check_cert_expiration_date\n    msg = prepare_msg_for_slack(cert_name, \&#39;Reposcan CDN certificate not provided or incorrect\&#39;)\n  File &#34;/vmaas/reposcan/common/slack_notifications.py&#34;, line 48, in prepare_msg_for_slack\n    (valid_to_dt, expire_in_days_td) = expire_tuple\nTypeError: \&#39;NoneType\&#39; object is not iterable&#39;| ([`04c7258`](https://github.com/RedHatInsights/vmaas/commit/04c7258dfc630172ace90e73ad7ee8cfbe9c0104))
-
 
 ## v1.18.2 (2020-07-23)
 
@@ -2941,13 +2769,11 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 
 * refactor: use single dockerfile for all app services ([`aa21829`](https://github.com/RedHatInsights/vmaas/commit/aa21829807ced2b2339834972e2dd52f92a19497))
 
-
 ## v1.18.1 (2020-07-10)
 
 ### Fix
 
 * fix(reposcan): export pkg_cve mappings only for cves with source ([`3bb9bac`](https://github.com/RedHatInsights/vmaas/commit/3bb9bacc56b6502f6f11aa5e88f1bba11ed5f564))
-
 
 ## v1.18.0 (2020-07-09)
 
@@ -2955,13 +2781,11 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 
 * feat(reposcan): add cdn expiration notifications to slack ([`25e61f4`](https://github.com/RedHatInsights/vmaas/commit/25e61f400538b5f4ead453af74422ae82c658b51))
 
-
 ## v1.17.4 (2020-07-08)
 
 ### Fix
 
 * fix(websocket): fix key error and incorrect timestamp extraction ([`3c0e4c0`](https://github.com/RedHatInsights/vmaas/commit/3c0e4c0815deaff3fa0c359fd88878dab54b56f7))
-
 
 ## v1.17.3 (2020-07-02)
 
@@ -2972,7 +2796,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 * fix(webapp): updated tests default modules update ([`ad063ef`](https://github.com/RedHatInsights/vmaas/commit/ad063ef46647596ef6e9936ea9d8e28cc356e3cd))
 
 * fix(webapp): removed updates when modules_list is not provided ([`952a89c`](https://github.com/RedHatInsights/vmaas/commit/952a89cdaa5a907cd753bbe009aefa26fe64b22e))
-
 
 ## v1.17.2 (2020-06-25)
 
@@ -2986,7 +2809,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 
 * fixed errata saving, removed severity key error ([`04f8be9`](https://github.com/RedHatInsights/vmaas/commit/04f8be9321bb937730b5ca24b42ff89b152eaa0f))
 
-
 ## v1.17.1 (2020-06-24)
 
 ### Fix
@@ -2994,7 +2816,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 * fix(reposcan): delete rows from module_rpm_artifact ([`f8889a4`](https://github.com/RedHatInsights/vmaas/commit/f8889a4fc3449bdc29187518e0d500f83948f8c0))
 
 * fix(reposcan): add src_pkg_names to content set mapping to cache ([`c7020e7`](https://github.com/RedHatInsights/vmaas/commit/c7020e701616a2adcef033bc5a5cb6f1b39803de))
-
 
 ## v1.17.0 (2020-06-19)
 
@@ -3010,7 +2831,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 
 * fixed gzipping swagger responses in webapp ([`6181b10`](https://github.com/RedHatInsights/vmaas/commit/6181b10572968efdfa022699668dc582dbdbdbb4))
 
-
 ## v1.16.1 (2020-06-16)
 
 ### Fix
@@ -3021,7 +2841,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 
 * refactor: tag experimental endpoints ([`51b97fa`](https://github.com/RedHatInsights/vmaas/commit/51b97fab0b3d13f085b1a80e098b7e12ca341fbf))
 
-
 ## v1.16.0 (2020-06-11)
 
 ### Feature
@@ -3031,7 +2850,6 @@ Moved null to end ([`75a6de7`](https://github.com/RedHatInsights/vmaas/commit/75
 ### Refactor
 
 * refactor: remove version lock workaround ([`75f702b`](https://github.com/RedHatInsights/vmaas/commit/75f702bf9a83f440ed60ccbecd33c9eb8ca47179))
-
 
 ## v1.15.2 (2020-06-05)
 
@@ -3057,20 +2875,17 @@ have enabled ([`1a8a5ba`](https://github.com/RedHatInsights/vmaas/commit/1a8a5ba
 
 * Fix srpm API performance that resulted in timeouts ([`d207be2`](https://github.com/RedHatInsights/vmaas/commit/d207be2ca8e582f38d47afad61b05048c64c2139))
 
-
 ## v1.15.1 (2020-05-26)
 
 ### Fix
 
 * fix(webapp): fixed gzip middleware null-pointer ([`134fcf8`](https://github.com/RedHatInsights/vmaas/commit/134fcf8da5ed598701416ceb59b6ebd5f41ad5d8))
 
-
 ## v1.15.0 (2020-05-22)
 
 ### Feature
 
 * feat(common): add slack notification module ([`3664752`](https://github.com/RedHatInsights/vmaas/commit/3664752de9429d7e2c9f0c0d2aaef8b830f06014))
-
 
 ## v1.14.1 (2020-05-20)
 
@@ -3081,7 +2896,6 @@ have enabled ([`1a8a5ba`](https://github.com/RedHatInsights/vmaas/commit/1a8a5ba
 ### Test
 
 * test: make upgrade test work in dirty git in container ([`5acb7ec`](https://github.com/RedHatInsights/vmaas/commit/5acb7ec67cfbbf51b503ef58ef1f93386856ace6))
-
 
 ## v1.14.0 (2020-05-18)
 
@@ -3101,13 +2915,11 @@ PIPENV_PYUP_API_KEY= can be removed when pipenv-2020.X.X is released ([`5c6ac7d`
 
 * added gzip response middleware ([`327c588`](https://github.com/RedHatInsights/vmaas/commit/327c58843c1b8edcd2438afa60142075369558e1))
 
-
 ## v1.13.5 (2020-05-05)
 
 ### Fix
 
 * fix(webapp): fix content set filtering in package_names/srpms api endpoint ([`ee323bf`](https://github.com/RedHatInsights/vmaas/commit/ee323bfc0da8ad80efffe8c936d80f488f862214))
-
 
 ## v1.13.4 (2020-05-05)
 
@@ -3138,7 +2950,6 @@ of the hotcache is so low that it&#39;s actually slowing evaluation ([`68e7528`]
 
 * fix(webapp) removed hotcache tests ([`0b00e44`](https://github.com/RedHatInsights/vmaas/commit/0b00e446a61d4883da1c1e45b2d617f654d8f1dc))
 
-
 ## v1.13.3 (2020-04-27)
 
 ### Chore
@@ -3151,20 +2962,17 @@ of the hotcache is so low that it&#39;s actually slowing evaluation ([`68e7528`]
 
 * fix(webapp): distinguish existining and nonex. packages on /srpms ([`d7f4e50`](https://github.com/RedHatInsights/vmaas/commit/d7f4e500a320cc6916c196ed4bd9b88097b82f40))
 
-
 ## v1.13.2 (2020-04-22)
 
 ### Fix
 
 * fix(reposcan): Do not show bad token to log ([`c4f1c0d`](https://github.com/RedHatInsights/vmaas/commit/c4f1c0d36556860ffd40250f18a1f3cc7db1208a))
 
-
 ## v1.13.1 (2020-04-20)
 
 ### Fix
 
 * fix: patches API should return ALL errata, not just security ones ([`82f80a8`](https://github.com/RedHatInsights/vmaas/commit/82f80a87c136791643ef6285e900bc2455bb3fc4))
-
 
 ## v1.13.0 (2020-04-20)
 
@@ -3177,7 +2985,6 @@ of the hotcache is so low that it&#39;s actually slowing evaluation ([`68e7528`]
 test(package_names): add unit tests for package_names
 
 feat(webapp): move from /package_names to /package_names/srpms and separate srpms and rpms calls and add GET method to /srpms ([`bda5cb5`](https://github.com/RedHatInsights/vmaas/commit/bda5cb5ef880b7a697c67ccf6d56870f2d64f9ca))
-
 
 ## v1.12.2 (2020-04-17)
 
@@ -3195,7 +3002,6 @@ feat(webapp): move from /package_names to /package_names/srpms and separate srpm
 
 * fix(database): default 64mb is not always enough for PostgreSQL 12 ([`0677cab`](https://github.com/RedHatInsights/vmaas/commit/0677cab792eec7e4928251055f96ebcf04616ee4))
 
-
 ## v1.12.1 (2020-04-16)
 
 ### Chore
@@ -3210,7 +3016,6 @@ $ PIPENV_CHECK=0 docker-compose up --build ([`89c0e08`](https://github.com/RedHa
 * fix(webapp): switch to refreshing mode and return 503 ([`f5e15ab`](https://github.com/RedHatInsights/vmaas/commit/f5e15ab4a52f81d1b4d4ef3510c7d7773d7f1516))
 
 * fix(webapp): don&#39;t block API during cache refreshes ([`9b85909`](https://github.com/RedHatInsights/vmaas/commit/9b8590991853d94f4b40e75967624f6a861ced01))
-
 
 ## v1.12.0 (2020-04-15)
 
@@ -3228,7 +3033,6 @@ $ PIPENV_CHECK=0 docker-compose up --build ([`89c0e08`](https://github.com/RedHa
 
 * feat(webapp): new API to list only applicable errata to a package list ([`8c92679`](https://github.com/RedHatInsights/vmaas/commit/8c9267983ccc1f6a61a7575b4148be6f8a159dfe))
 
-
 ## v1.11.3 (2020-04-09)
 
 ### Chore
@@ -3243,7 +3047,6 @@ $ PIPENV_CHECK=0 docker-compose up --build ([`89c0e08`](https://github.com/RedHa
 
 error: Error running transaction: package systemd-libs-239-18.el8_1.5.x86_64 (which is newer than systemd-libs-239-18.el8_1.4.x86_64) is already installed ([`edfee79`](https://github.com/RedHatInsights/vmaas/commit/edfee7945f61d40565ea1dcf9504c38f4e3508bd))
 
-
 ## v1.11.2 (2020-03-31)
 
 ### Fix
@@ -3251,7 +3054,6 @@ error: Error running transaction: package systemd-libs-239-18.el8_1.5.x86_64 (wh
 * fix(webapp): fix cache data race fetching when websocket crashes ([`d9c9ae8`](https://github.com/RedHatInsights/vmaas/commit/d9c9ae8acee1ada883e3cb4e7dc0cc3c5a1d28e5))
 
 * fix(webapp): add webapp automatical reconnect to ws ([`403e209`](https://github.com/RedHatInsights/vmaas/commit/403e209ff5a9d7dcd7d58ce1a005c1dab2a9d902))
-
 
 ## v1.11.1 (2020-03-27)
 
@@ -3283,7 +3085,6 @@ select to_timestamp(&#39;2020-03-26T19:37:00.846691+00:00&#39;, &#39;YYYY-MM-DDT
 
 * test: base test image on UBI 8 and PG 12 ([`43d9985`](https://github.com/RedHatInsights/vmaas/commit/43d99854d44b78e7006f93abf3dad59a4d2440ad))
 
-
 ## v1.11.0 (2020-03-25)
 
 ### Feature
@@ -3299,20 +3100,17 @@ re-introduce 2 dockerfiles because registry.redhat.io doesn&#39;t allow unauthen
 - not available from UBI repos
 - microdnf install from custom repo fails in OpenShift env, using workaround using rpm ([`e8b6210`](https://github.com/RedHatInsights/vmaas/commit/e8b621092b5ffd2e282ebc44c25c29e4fc6fbf19))
 
-
 ## v1.10.3 (2020-03-24)
 
 ### Fix
 
 * fix(reposcan): set source id to null instead of deleting it ([`613c615`](https://github.com/RedHatInsights/vmaas/commit/613c6150fdb0ecff2dc535f74ffa718728ac4624))
 
-
 ## v1.10.2 (2020-03-23)
 
 ### Fix
 
 * fix(reposcan): invalidate webapp cache only when task succeeded (#678) ([`c9befc5`](https://github.com/RedHatInsights/vmaas/commit/c9befc5cc97bbebc9fddddab116f096e4e1775d4))
-
 
 ## v1.10.1 (2020-03-18)
 
@@ -3323,7 +3121,6 @@ re-introduce 2 dockerfiles because registry.redhat.io doesn&#39;t allow unauthen
 * fix: Revert &#34;temporarily ignore cve in pipenv&#34;
 
 This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https://github.com/RedHatInsights/vmaas/commit/20e535b37f7f3c4161b941952b372274b2da0fea))
-
 
 ## v1.10.0 (2020-03-18)
 
@@ -3339,7 +3136,6 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 
 * test: replace commit ref with actual one ([`5645482`](https://github.com/RedHatInsights/vmaas/commit/56454821420688d081063343b98ea6287aeb44f4))
 
-
 ## v1.9.0 (2020-03-12)
 
 ### Chore
@@ -3350,20 +3146,17 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 
 * feat(reposcan): add function to check cert expiration date ([`857fe35`](https://github.com/RedHatInsights/vmaas/commit/857fe350fa95e1bfe10b9d946b3cde92bd8faee9))
 
-
 ## v1.8.0 (2020-03-11)
 
 ### Feature
 
 * feat(webapp): Add autoscaler to webapp, format secrets as a list of yaml values ([`58d7a56`](https://github.com/RedHatInsights/vmaas/commit/58d7a5697874d481163b59c120035b4e2add754b))
 
-
 ## v1.7.0 (2020-03-10)
 
 ### Feature
 
 * feat(webapp): add lite error formatter ([`98bacd3`](https://github.com/RedHatInsights/vmaas/commit/98bacd3b0be1e76676bf6ad3a222e50dbf6902b1))
-
 
 ## v1.6.1 (2020-03-09)
 
@@ -3377,13 +3170,11 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 
 * fix: temporarily ignore cve in pipenv ([`ec23cb5`](https://github.com/RedHatInsights/vmaas/commit/ec23cb5226ded5d245c3bfce244f190481ad676c))
 
-
 ## v1.6.0 (2020-03-05)
 
 ### Feature
 
 * feat(reposcan): add failed repo-download methrics for different http codes ([`80b71a8`](https://github.com/RedHatInsights/vmaas/commit/80b71a85b758df39e37d9ddaec611c89b67eb39a))
-
 
 ## v1.5.0 (2020-02-26)
 
@@ -3483,7 +3274,6 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 
 * Revert back webapp yaml cache to full_load ([`b56c681`](https://github.com/RedHatInsights/vmaas/commit/b56c681916919e85d690125e756c2a783a7195df))
 
-
 ## v1.4.4 (2020-02-18)
 
 ### Chore
@@ -3493,7 +3283,6 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 ### Fix
 
 * fix(reposcan): use left join instead of inner ([`1288da4`](https://github.com/RedHatInsights/vmaas/commit/1288da4d29f2de511353786021085e21db810037))
-
 
 ## v1.4.3 (2020-02-18)
 
@@ -3509,7 +3298,6 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 
 * fix(webapp): set 415 error code and change detail message for incorrect content type ([`bd37916`](https://github.com/RedHatInsights/vmaas/commit/bd37916779c55555d63d21c7f47d6d5457a664e5))
 
-
 ## v1.4.2 (2020-02-18)
 
 ### Fix
@@ -3519,7 +3307,6 @@ This reverts commit ec23cb5226ded5d245c3bfce244f190481ad676c. ([`20e535b`](https
 fix(reposcan): import null severity to db
 
 fix(webapp): return null instead of empty string ([`0657527`](https://github.com/RedHatInsights/vmaas/commit/065752791726a28f7f934b3b409ca2a03e6009fa))
-
 
 ## v1.4.1 (2020-01-28)
 
@@ -3533,13 +3320,11 @@ related probably to switch to UBI 8 images and newer git version ([`91a7e75`](ht
 
 * fix(reposcan): init logging in Git sync ([`c10fff8`](https://github.com/RedHatInsights/vmaas/commit/c10fff83c7f03c8c0d1fbc976d7d95327d6a8b3d))
 
-
 ## v1.4.0 (2020-01-27)
 
 ### Feature
 
 * feat(reposcan): add metrics to count failed imports of cves and repos ([`e17de4d`](https://github.com/RedHatInsights/vmaas/commit/e17de4d5848195593d9b5c6eda7e1db7db978c67))
-
 
 ## v1.3.6 (2020-01-14)
 
@@ -3550,7 +3335,6 @@ related probably to switch to UBI 8 images and newer git version ([`91a7e75`](ht
 ### Fix
 
 * fix(manifests): fix manifest push process ([`c48d226`](https://github.com/RedHatInsights/vmaas/commit/c48d2268f868760d4be24e6b96d76e130f7a1036))
-
 
 ## v1.3.5 (2020-01-10)
 
@@ -3576,13 +3360,11 @@ related probably to switch to UBI 8 images and newer git version ([`91a7e75`](ht
 
 * refactor: wait for postgresql without psql ([`510dd5a`](https://github.com/RedHatInsights/vmaas/commit/510dd5a46b2bd9dc1b18e3e514f299182534814d))
 
-
 ## v1.3.4 (2020-01-08)
 
 ### Fix
 
 * fix(reposcan): duplicate conflict while importing repos ([`ffd4b00`](https://github.com/RedHatInsights/vmaas/commit/ffd4b00a9e81a79e3b432bc3ee1008df3d9dfd16))
-
 
 ## v1.3.3 (2019-12-18)
 
@@ -3590,13 +3372,11 @@ related probably to switch to UBI 8 images and newer git version ([`91a7e75`](ht
 
 * fix(reposcan): syntax error while deleting repos ([`a58e48c`](https://github.com/RedHatInsights/vmaas/commit/a58e48c185b0378d67d5ce4993c593444da88c4a))
 
-
 ## v1.3.2 (2019-12-10)
 
 ### Fix
 
 * fix(reposcan): delete module by repo fk reference ([`d192ff1`](https://github.com/RedHatInsights/vmaas/commit/d192ff1b4667c8cbc60f7f59c6e4cae07c8e2ede))
-
 
 ## v1.3.1 (2019-12-09)
 
@@ -3618,7 +3398,6 @@ Without slash it runs also vulnerability tests because of jenkins workspace path
 
 * refactor(websocket): unify entrypoint in websocket with other containers ([`6e6c8a0`](https://github.com/RedHatInsights/vmaas/commit/6e6c8a0b8597e90a097b8807ff70d5d8a17712c4))
 
-
 ## v1.3.0 (2019-12-03)
 
 ### Feature
@@ -3629,13 +3408,11 @@ allowing to return all/security updates only based on &#39;security_only&#39; pa
 
 * feat(reposcan): export all updates, not only security ([`2373c48`](https://github.com/RedHatInsights/vmaas/commit/2373c484d956235d4341e736c9110a84c867ba89))
 
-
 ## v1.2.1 (2019-11-27)
 
 ### Fix
 
 * fix(reposcan): optimize and fix source package associations ([`9d41a50`](https://github.com/RedHatInsights/vmaas/commit/9d41a50163916e2e19330a0ff00f3d9f1983257c))
-
 
 ## v1.2.0 (2019-11-26)
 
@@ -3651,7 +3428,6 @@ allowing to return all/security updates only based on &#39;security_only&#39; pa
 
 * fix(reposcan): sync IAVA when available ([`1768ad7`](https://github.com/RedHatInsights/vmaas/commit/1768ad7b8e66a00cff0783961fe42bea4cbbd7ab))
 
-
 ## v1.1.5 (2019-11-26)
 
 ### Fix
@@ -3663,7 +3439,6 @@ allowing to return all/security updates only based on &#39;security_only&#39; pa
 * Change &#34;developer mode&#34; containers startup with PODMAN ([`9bfa3ad`](https://github.com/RedHatInsights/vmaas/commit/9bfa3ad1a6d9fca0d5105d55014fc6cb2c395a34))
 
 * Update podman-compose module and fix mountPoint KeyError ([`eca8bb0`](https://github.com/RedHatInsights/vmaas/commit/eca8bb0c788f56000f1bfa0d5cb4366624eac059))
-
 
 ## v1.1.4 (2019-11-21)
 
@@ -3679,7 +3454,6 @@ allowing to return all/security updates only based on &#39;security_only&#39; pa
 
 * Don&#39;t fail whole job when some of the tests failed ([`5cf843c`](https://github.com/RedHatInsights/vmaas/commit/5cf843cf2fadc741a0e1b2e161fd9508bad4574d))
 
-
 ## v1.1.3 (2019-11-21)
 
 ### Chore
@@ -3690,20 +3464,17 @@ allowing to return all/security updates only based on &#39;security_only&#39; pa
 
 * fix(reposcan): revision has to be updated but only sometimes ([`66a4e43`](https://github.com/RedHatInsights/vmaas/commit/66a4e4394b621149473ea905325de464b281d977))
 
-
 ## v1.1.2 (2019-11-20)
 
 ### Fix
 
 * fix: correctly display version in swagger ([`c88f0d1`](https://github.com/RedHatInsights/vmaas/commit/c88f0d14621b8d1f1b1c05494bb970bcbfba3211))
 
-
 ## v1.1.1 (2019-11-20)
 
 ### Fix
 
 * fix(reposcan): don&#39;t reset timestamp and update only things that make sense ([`153371b`](https://github.com/RedHatInsights/vmaas/commit/153371b084db186b84959cdee0ebc1565c705e17))
-
 
 ## v1.1.0 (2019-11-19)
 
@@ -3738,7 +3509,6 @@ interrupt download instead ([`62fb346`](https://github.com/RedHatInsights/vmaas/
 * tests(webapp): Hotfix wrong expected results from tests ([`07a2b50`](https://github.com/RedHatInsights/vmaas/commit/07a2b50bd2b9b71ccb6e39a356c2adc8bce55033))
 
 * Run long running tests against master ([`dbd62ba`](https://github.com/RedHatInsights/vmaas/commit/dbd62baee17013caba83b74015da65f1d8aa5551))
-
 
 ## v1.0.0 (2019-11-15)
 
@@ -4167,7 +3937,6 @@ info about binary packages built from given source package ([`9c545d8`](https://
 
 exported mapping of &#34;source package id&#34; to &#34;bin package ids&#34; ([`82a2f90`](https://github.com/RedHatInsights/vmaas/commit/82a2f905010ad451d6125edd8430947ebfdbfd69))
 
-
 ## v0.13.0 (2019-06-12)
 
 ### Unknown
@@ -4346,7 +4115,6 @@ as after one API call the cached things were garbage collected ([`fbd65fa`](http
 
 * add probes for /updates hot cache hits/misses ([`9c61bac`](https://github.com/RedHatInsights/vmaas/commit/9c61bac53b16bbcc57e347961b007d9674ff4676))
 
-
 ## v0.12.0 (2019-04-23)
 
 ### Unknown
@@ -4363,7 +4131,6 @@ as after one API call the cached things were garbage collected ([`fbd65fa`](http
 
 vmaas-webapp       | f44bdb3ffc28 2019-04-04 08:13:25,084 __main__: [ERROR] Internal server error &lt;-9223363243124068951&gt;: please include this error id in bug report.&#39;Traceback (most recent call last):\n  File &#34;/webapp/app.py&#34;, line 105, in handle_post\n    res = api_endpoint.process_list(api_version, data)\n  File &#34;/webapp/updates.py&#34;, line 381, in process_list\n    module_info = [(x[\&#39;module_name\&#39;], x[\&#39;module_stream\&#39;]) for x in modules_list]\n  File &#34;/webapp/updates.py&#34;, line 381, in &lt;listcomp&gt;\n    module_info = [(x[\&#39;module_name\&#39;], x[\&#39;module_stream\&#39;]) for x in modules_list]\nKeyError: \&#39;module_stream\&#39;&#39;|
 vmaas-webapp       | f44bdb3ffc28 2019-04-04 08:13:25,084 __main__: [INFO] Input data for &lt;-9223363243124068951&gt;: {&#39;package_list&#39;: [&#39;postgresql-9.6.10-1.el8+1547+210b7007.x86_64.rpm&#39;], &#39;modules_list&#39;: [{&#39;module_name&#39;: &#39;postgresql&#39;}]} ([`e06177d`](https://github.com/RedHatInsights/vmaas/commit/e06177d4ee942c1ef307adbbe38377ae123f0c8f))
-
 
 ## v0.11.0 (2019-04-02)
 
@@ -4442,7 +4209,6 @@ how to export their info. ([`507a986`](https://github.com/RedHatInsights/vmaas/c
 * search for module rpms in right data structure ([`e8b2206`](https://github.com/RedHatInsights/vmaas/commit/e8b2206d8dad2b57195b85759f3abce8115b36a0))
 
 * export modularity information into disk dump ([`68c393c`](https://github.com/RedHatInsights/vmaas/commit/68c393c1b893f3ca4b92c0ec4eea0836817a43db))
-
 
 ## v0.10.0 (2019-02-21)
 
@@ -4545,7 +4311,6 @@ it&#39;s not needed to call &#34;yield self.flush()&#34;, self.flush() is called
 
 * Add support for Prometheus monitoring to webapp ([`d56aba3`](https://github.com/RedHatInsights/vmaas/commit/d56aba3da75b5051f4025f692fd6e7ba1bd55f1a))
 
-
 ## v0.9.0 (2018-12-19)
 
 ### Unknown
@@ -4601,7 +4366,6 @@ API_URLS env variable was both defined in Dockerfile and conf/apidoc.env ([`6276
 * ignore vscode project settings ([`456784d`](https://github.com/RedHatInsights/vmaas/commit/456784dd7f81d35b607fe19eb2ff9ecd2ef2b96f))
 
 * Fix #411 - adding &#34;exported&#34; to the dbchange api docs ([`c530c46`](https://github.com/RedHatInsights/vmaas/commit/c530c465a240cde036b0fb4a289726177f4d3dab))
-
 
 ## v0.8.0 (2018-10-17)
 
@@ -4670,7 +4434,6 @@ highly unlikely that these tables will have &gt; 1000 rows ([`fa1ec5e`](https://
 
 * Fix pkgtree export when repo.basearch_id is null ([`3133d99`](https://github.com/RedHatInsights/vmaas/commit/3133d99e53d571ff3756010c7867d16eb95b5a57))
 
-
 ## v0.7.0 (2018-09-17)
 
 ### Unknown
@@ -4704,7 +4467,6 @@ Environment variables with username and password are used to create a new accoun
 * reposcan: log successful requests to management API ([`dc12cd0`](https://github.com/RedHatInsights/vmaas/commit/dc12cd0d6ebddb35259bf6f580dbed73bbd96e7e))
 
 * read reposcan host from env variable for rsync ([`df01d9e`](https://github.com/RedHatInsights/vmaas/commit/df01d9e630497b1e87ed9ebc0ab9b5da8e429525))
-
 
 ## v0.6.0 (2018-08-01)
 
@@ -4882,7 +4644,6 @@ in OpenShift healthchecks are per container, it doesn&#39;t work if there is ano
 
 so you can (re)use it to start app in development setup ([`b5e79ef`](https://github.com/RedHatInsights/vmaas/commit/b5e79efa4cbf865e4d8142ae9f519f5e604774cb))
 
-
 ## v0.5.0 (2018-06-20)
 
 ### Unknown
@@ -5035,7 +4796,6 @@ Error: [Errno 14] HTTPS Error 404 - Not Found
 ERROR: Service &#39;webapp&#39; failed to build: The command &#39;/bin/sh -c yum -y update     &amp;&amp; yum -y install yum-plugin-copr     &amp;&amp; yum -y copr enable @vmaas/libs     &amp;&amp; yum -y install epel-release     &amp;&amp; yum -y install python-tornado python-psycopg2 python2-apispec postgresql python-dateutil python2-futures python2-jsonschema     &amp;&amp; rm -rf /var/cache/yum/*&#39; returned a non-zero code: 1 ([`f890db3`](https://github.com/RedHatInsights/vmaas/commit/f890db307cba109e85075f92eba856ac5da95e48))
 
 * rewrite /updates API to use cached data only ([`eeb1e36`](https://github.com/RedHatInsights/vmaas/commit/eeb1e3607c995ecf666b39fcf404c7834aea7be3))
-
 
 ## v0.4.0 (2018-05-17)
 
@@ -5240,7 +5000,6 @@ null, the CVE continues to be filtered out by modified-since ([`cdd8122`](https:
 * fix TypeError: Parser must be a string or character stream, not NoneType ([`9758672`](https://github.com/RedHatInsights/vmaas/commit/9758672f29f867d55b72a28a8e06786d0c07595a))
 
 * fix TypeError: Parser must be a string or character stream, not NoneType ([`a512423`](https://github.com/RedHatInsights/vmaas/commit/a5124237a8107e757e044bf0b941d13f2fe722e5))
-
 
 ## v0.3.0 (2018-04-06)
 
@@ -5463,7 +5222,6 @@ and deduplicate code ([`7122535`](https://github.com/RedHatInsights/vmaas/commit
 
 * api: updates: fix issue #115. API method updates should return security-related erratum by default. ([`c2c88f8`](https://github.com/RedHatInsights/vmaas/commit/c2c88f8a8beffa0e2f28791bfd12da690159ac6b))
 
-
 ## v0.2.0 (2018-03-15)
 
 ### Unknown
@@ -5618,7 +5376,6 @@ i.e. `vmaas updates rubygem-psych-2.0.0-33.el7_4.x86_64` ([`9ceeb81`](https://gi
 * moved database connection code to a module ([`e8cac0c`](https://github.com/RedHatInsights/vmaas/commit/e8cac0c838b018b7578ee09f520bc0e106858e91))
 
 * api: updates: add GET request processing. ([`3eb717c`](https://github.com/RedHatInsights/vmaas/commit/3eb717cc1b7cc3c01c8af58a86d5e6b93d4cfea7))
-
 
 ## v0.1.0 (2018-03-08)
 
