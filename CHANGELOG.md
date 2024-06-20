@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v2.61.8 (2024-06-20)
+
+### Fix
+
+* fix(csaf): increase default memory request for webapp-go ([`a126792`](https://github.com/RedHatInsights/vmaas/commit/a12679247fe67a785a1df6b968388e49444f5b2f))
+
+* fix(csaf): use purl,parse only rpm products
+
+RHINENG-9590 ([`1623068`](https://github.com/RedHatInsights/vmaas/commit/162306825f829b622e65c20b0ea067dbb5de1c51))
+
 ## v2.61.7 (2024-06-20)
 
 ### Fix
