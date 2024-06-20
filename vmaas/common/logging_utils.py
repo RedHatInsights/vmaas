@@ -3,6 +3,7 @@ Common logging functionality to be used for multiple apps
 (should be identical to reposcan/common/logging.py)
 TODO: packaging changes that let this live in one place please
 """
+import json
 import logging
 import os
 import time
@@ -40,6 +41,21 @@ class OneLineExceptionFormatter(logging.Formatter):
         return fmt_str
 
 
+class CloudWatchLogFormatterCustom(watchtower.CloudWatchLogFormatter):
+    """
+    Formatter used for loging in CloudWatch.
+    Compared to CloudWatchLogFormatter it formats string arguments in the message when the message is JSON.
+    """
+
+    def format(self, message):
+        """
+        Include level name and dump as JSON.
+        """
+        formatted_message = logging.Formatter.format(self, message)
+        msg = {"levelname": getattr(message, "levelname"), "msg": formatted_message}
+        return json.dumps(msg, default=self.json_serialize_default)
+
+
 def setup_cw_logging(main_logger):
     """Setup CloudWatch logging"""
     logger = get_logger(__name__)
@@ -66,7 +82,7 @@ def setup_cw_logging(main_logger):
             log_group=cfg.cw_aws_log_group,
             stream_name=os.environ.get('HOSTNAME', 'vmaas')
         )
-        handler.formatter.add_log_record_attrs = ["levelname"]
+        handler.setFormatter(CloudWatchLogFormatterCustom())
     except ClientError:
         logger.exception("Unable to enable CloudWatch logging: ")
     else:  # pragma: no cover
