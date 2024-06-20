@@ -348,10 +348,10 @@ parameters:
   value: '3Gi'
 - name: MEMORY_REQUEST_WEBAPP_GO
   description: Memory request for pod
-  value: '1536Mi'
+  value: '2Gi'
 - name: MEMORY_LIMIT_WEBAPP_GO
   description: Maximum memory limit for pod
-  value: '3Gi'
+  value: '4Gi'
 - name: MEMORY_REQUEST_REPOSCAN
   description: Memory request for pod
   value: '1Gi'
