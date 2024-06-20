@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v2.61.7 (2024-06-20)
+
+### Fix
+
+* fix: string formatting in CloudWatch
+
+RHINENG-8336 ([`7d2d84d`](https://github.com/RedHatInsights/vmaas/commit/7d2d84d61e592bee4e79fcc371d9c1e1eca011fa))
+
+### Unknown
+
+* RHINENG-10310: manually_fixable_cves from csaf ([`b8a9908`](https://github.com/RedHatInsights/vmaas/commit/b8a990818f69b9d5d5af358d1265b2f44036b5c7))
+
 ## v2.61.6 (2024-06-18)
 
 ### Fix
