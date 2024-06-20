@@ -1,6 +1,7 @@
 """
 Module containing class for syncing set of CSAF files into the DB.
 """
+
 import json
 import os
 import re
@@ -131,7 +132,6 @@ class CsafController:
 
     def parse_csaf_file(self, csaf_file: CsafFile) -> CsafCves:
         """Parse CSAF file to CsafCves."""
-        product_cpe = {}
         cves = CsafCves()
 
         if not self.tmp_directory:
@@ -140,38 +140,49 @@ class CsafController:
 
         with open(self.tmp_directory / csaf_file.name, "r", encoding="utf-8") as csaf_json:
             csaf = json.load(csaf_json)
-            product_cpe = self._parse_product_tree(csaf)
-            unfixed_cves = self._parse_vulnerabilities(csaf, product_cpe)
+            product_cpe, product_purl = self._parse_product_tree(csaf)
+            unfixed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl)
             cves.update(unfixed_cves)
         return cves
 
-    def _parse_product(self, product: str, product_status: str) -> tuple[str, str, str | None]:
+    def _parse_package(self, product: str, product_purl: dict[str, str]) -> tuple[str, str | None]:
+        purl = product_purl.get(product)
+        if purl is None:
+            raise ComponentError(f"Not RPM component '{product}'")
+
+        kind, rest = purl.split(":", 1)
+        if kind == "pkg":
+            splitted = rest.split("/")
+            # remove information about arch to get package
+            pkg = splitted[-1].split("?")[0]
+            # package with version in purl is with `@`, use product instead
+            if "@" in pkg:
+                pkg = product
+            match splitted[0]:
+                case "rpm":
+                    return pkg, None
+                case "rpmmod":
+                    module = splitted[-2]
+                    return pkg, module
+
+        raise ComponentError(f"Not RPM component '{product}'")
+
+    def _parse_product(
+        self, product: str, product_status: str, product_purl: dict[str, str]
+    ) -> tuple[str, str, str | None]:
         if ":" not in product:
             raise ComponentError(f"Component without ':', '{product}'")
 
         branch_product, rest = product.split(":", 1)
-        pkg = rest
-        module = None
-        match product_status:
-            case "known_affected":
-                if "/" in rest:
-                    # it's a package with a module or some other identifier
-                    module, pkg = rest.split("/", 1)
-                    if len(module.split(":")) != 2:
-                        # it isn't a module but some other identifier
-                        # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
-                        # meaning it is not an rpm and we don't want to process this product
-                        raise ComponentError(f"Not RPM component '{product}'")
-            case "fixed":
-                # already parsed
-                # TODO: filter out containers or maven packages once ProdSec starts providing that information in purl
-                pass
-            case _:
-                raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
+        if product_status not in ("known_affected", "fixed"):
+            raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
 
+        pkg, module = self._parse_package(rest, product_purl)
         return branch_product, pkg, module
 
-    def _parse_vulnerabilities(self, csaf: dict[str, t.Any], product_cpe: dict[str, str]) -> CsafCves:
+    def _parse_vulnerabilities(
+        self, csaf: dict[str, t.Any], product_cpe: dict[str, str], product_purl: dict[str, str]
+    ) -> CsafCves:
         cves = CsafCves()
         for vulnerability in csaf["vulnerabilities"]:
             if "cve" not in vulnerability:
@@ -186,7 +197,7 @@ class CsafController:
                 product_status = product_status.lower()
                 for product in vulnerability["product_status"].get(product_status, []):
                     try:
-                        branch_product, pkg, module = self._parse_product(product, product_status)
+                        branch_product, pkg, module = self._parse_product(product, product_status, product_purl)
                     except ComponentError as err:
                         self.logger.debug("%s, %s", err, vulnerability["cve"])
                         continue
@@ -206,38 +217,48 @@ class CsafController:
             if found := ERRATUM_RE.findall(remediation.get("url", "")):
                 erratum = found[0]
                 for product in remediation.get("product_ids", []):
-                    # TODO: use only RPM component/product once ProdSec provides purl
                     if product in product_erratum:
                         self.logger.warning(
                             "Multiple errata (%s, %s) for single cve-product (%s, %s)",
-                            product_erratum[product], erratum,
-                            vulnerability["cve"], product,
+                            product_erratum[product],
+                            erratum,
+                            vulnerability["cve"],
+                            product,
                         )
                     product_erratum[product] = erratum
 
         return product_erratum
 
-    def _parse_product_tree(self, csaf: dict[str, t.Any]) -> dict[str, str]:
+    def _parse_product_tree(self, csaf: dict[str, t.Any]) -> tuple[dict[str, str], dict[str, str]]:
         product_cpe: dict[str, str] = {}
+        product_purl: dict[str, str] = {}
         for branches in csaf.get("product_tree", {}).get("branches", []):
-            self._parse_branches(branches, product_cpe)
+            self._parse_branches(branches, product_cpe, product_purl)
 
-        return product_cpe
+        return product_cpe, product_purl
 
-    def _parse_branches(self, branches: dict[str, t.Any], product_cpe: dict[str, str]) -> None:
-        if branches.get("category") not in ("vendor", "product_family"):
+    def _parse_branches(
+        self,
+        branches: dict[str, t.Any],
+        product_cpe: dict[str, str],
+        product_purl: dict[str, str],
+    ) -> None:
+        if branches.get("category") not in ("vendor", "product_family", "architecture"):
             return
         sub_branches = branches.get("branches", [])
         for sub_branch in sub_branches:
             if "branches" in sub_branch:
-                self._parse_branches(sub_branch, product_cpe)
+                self._parse_branches(sub_branch, product_cpe, product_purl)
 
-            if sub_branch.get("category") != "product_name":
+            if sub_branch.get("category") not in ("product_name", "product_version"):
                 continue
 
             product = sub_branch.get("product", {})
             product_id = product.get("product_id")
-            cpe = product.get("product_identification_helper", {}).get("cpe")
-            if product_id is None or cpe is None:
+            if product_id is None:
                 continue
-            product_cpe[product_id] = cpe
+
+            if cpe := product.get("product_identification_helper", {}).get("cpe"):
+                product_cpe[product_id] = cpe
+            if purl := product.get("product_identification_helper", {}).get("purl"):
+                product_purl[product_id] = purl
