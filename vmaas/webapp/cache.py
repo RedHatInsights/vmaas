@@ -423,4 +423,3 @@ class Cache:
             LOGGER.info("Loaded dump version: %s", self.dbchange.get('exported', 'unknown'))
         except Exception as err:
             LOGGER.warning("Failed to load data %s: %s", filename, err)
-            return
