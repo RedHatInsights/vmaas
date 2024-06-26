@@ -290,6 +290,8 @@ class UpdatesAPI:
         # get repositories for update packages
         filtered_repo_ids = self._repos_by_pkgs(update_pkg_ids, available_repo_ids)
 
+        if not pkg_data:
+            pkg_data = {}
         for update_pkg_id in update_pkg_ids:
             pkg_updates = self._get_pkg_updates(update_pkg_id, arch_id, security_only, module_ids,
                                                 filtered_repo_ids, third_party, pkg_from_module)
