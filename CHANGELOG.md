@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## v2.61.9 (2024-06-27)
+
+### Chore
+
+* chore: new pylint ([`4048e0c`](https://github.com/RedHatInsights/vmaas/commit/4048e0c4d42ea0203880df81c1a2acd6883b7c21))
+
+* chore: update dependencies
+
+RHINENG-10319 ([`fda9928`](https://github.com/RedHatInsights/vmaas/commit/fda9928a102f4f944917520bf2631fb9d6d4483d))
+
+* chore: increase webapp memory request/limit ([`364f681`](https://github.com/RedHatInsights/vmaas/commit/364f681b374b068e59a772f7335ae347d3764e8a))
+
+### Fix
+
+* fix: match cpe pattern substrings
+
+RHINENG-10943 ([`e3b5f54`](https://github.com/RedHatInsights/vmaas/commit/e3b5f54e6cab5b69950a7cb8d3cbbebd9f8301c9))
+
 ## v2.61.8 (2024-06-20)
 
 ### Fix
