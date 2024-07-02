@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.62.0 (2024-07-02)
+
+### Feature
+
+* feat(webapp-go): report module info for unfixed CVEs
+
+RHINENG-10771 ([`ec1ca01`](https://github.com/RedHatInsights/vmaas/commit/ec1ca013b54ab551ef162f97b68499ccadc73a32))
+
 ## v2.61.9 (2024-06-27)
 
 ### Chore
