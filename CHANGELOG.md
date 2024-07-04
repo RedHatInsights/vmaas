@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.62.1 (2024-07-04)
+
+### Fix
+
+* fix: detect all affected packages for unfixed vulns
+
+RHINENG-11201 ([`052b781`](https://github.com/RedHatInsights/vmaas/commit/052b781c4e8390c869ad9bf2f348fdb20b6b7549))
+
 ## v2.62.0 (2024-07-02)
 
 ### Feature
