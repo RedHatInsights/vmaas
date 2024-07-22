@@ -345,6 +345,35 @@ paths:
       tags:
         - Download
 
+  /pprof/{param}:
+    get:
+      summary: Run pprof profiler on webapp-go
+      description: |
+        Use /pprof/{heap|profile|block|mutex|trace} for profiling,
+        see https://pkg.go.dev/net/http/pprof for more info about pprof
+      operationId: vmaas.reposcan.reposcan.WebappPprof.get
+      parameters:
+        - name: param
+          in: path
+          description: What to profile
+          required: true
+          schema:
+            type: string
+            enum:
+              - profile
+              - heap
+              - block
+              - mutex
+              - trace
+      <<: *secured
+      responses:
+        200:
+          description: OK
+          content: {}
+        <<: *auth_resps
+      tags:
+        - Debug
+
 components:
   securitySchemes:
     ApiKeyAuthAdmin:

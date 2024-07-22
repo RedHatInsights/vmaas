@@ -19,8 +19,11 @@ import connexion
 import git
 from prometheus_client import generate_latest
 from psycopg2 import DatabaseError
+import requests
+import starlette.responses
 from starlette.middleware.cors import CORSMiddleware
 
+from vmaas.common.config import Config
 from vmaas.common.constants import VMAAS_VERSION
 from vmaas.common.logging_utils import get_logger, init_logging
 from vmaas.common.middlewares import TimingLoggingMiddleware
@@ -41,6 +44,7 @@ from vmaas.reposcan.repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
 KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+CFG = Config()
 
 DEFAULT_CHUNK_SIZE = "1048576"
 
@@ -871,6 +875,24 @@ class DbDumpHandler(SyncHandler):
             LOGGER.exception(msg)
             return "ERROR"
         return "OK"
+
+
+class WebappPprof:
+    """Handler for webapp-go profile info."""
+
+    @classmethod
+    def get(cls, param, **kwargs):
+        """Get webapp-go profile info."""
+        if not strtobool(os.getenv("ENABLE_PROFILER", "false")):
+            return "Set ENABLE_PROFILER=true to enable profiler"
+        res = requests.get(url=f"{CFG.webapp_go_url}/debug/pprof/{param}", timeout=60)
+        headers = {"Content-Disposition": f"attachment; filename={param}"}
+        return starlette.responses.Response(
+            content=res.content,
+            status_code=200,
+            media_type="application/octet-stream",
+            headers=headers,
+        )
 
 
 class SyncTask:

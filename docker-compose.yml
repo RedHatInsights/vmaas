@@ -78,6 +78,7 @@ services:
       - ./conf/webapp_go.env
     ports:
       - 8000:8000
+      - 9000:9000
       - 9088:10000
     depends_on:
       - vmaas_reposcan
