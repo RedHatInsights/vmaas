@@ -81,3 +81,14 @@ cat /tmp/pgdump.sql.gz | gzip -d | docker-compose exec -T vmaas_database psql -U
 # Generate new webapp sqlite dump
 ./scripts/turnpike-mock curl -X PUT http://localhost:8081/api/v1/export/dump
 ~~~
+
+### Profiling
+Webapp-go can be profiled using [/net/http/pprof](https://pkg.go.dev/net/http/pprof). Profiler is exposed on app's private port.
+#### Local development
+- set `ENABLE_PROFILE=true` in the `conf/common.env`
+- `docker-compose up --build`
+- `go tool pprof http://localhost:9000/debug/pprof/{heap|profile|block|mutex}`
+#### Admin API
+- set `ENABLE_PROFILE=true` in the ClowdApp
+- download the profile file using internal api `/api/vmaas/v1/pprof/{heap|profile|block|mutex|trace}`
+- `go tool pprof <saved.file>`

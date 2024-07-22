@@ -18,7 +18,7 @@ objects:
           enabled: true
           apiPath: vmaas
         private:
-          enabled: false
+          enabled: true
       podSpec:
         image: ${IMAGE}:${IMAGE_TAG}
         command:
@@ -255,6 +255,8 @@ objects:
           value: ${CSAF_SYNC_ALL_FILES}
         - name: CSAF_PRODUCT_STATUS_LIST
           value: ${CSAF_PRODUCT_STATUS_LIST}
+        - name: ENABLE_PROFILER
+          value: ${ENABLE_PROFILER}
 
     database:
       name: vmaas

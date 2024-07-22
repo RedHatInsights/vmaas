@@ -31,6 +31,12 @@
             "hostname": "vmaas_reposcan",
             "name": "reposcan-service",
             "port": 9000
+        },
+        {
+            "app": "vmaas",
+            "hostname": "vmaas_webapp_go",
+            "name": "webapp-go",
+            "port": 9000
         }
     ],
     "logging": {

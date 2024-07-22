@@ -75,12 +75,15 @@ class Config(BaseConfig, metaclass=Singleton):
 
         self.tls_ca_path = self._cfg.tlsCAPath
         self.reposcan_url = ""
+        self.webapp_go_url = ""
         for endpoint in self._cfg.endpoints:
             if "reposcan" in endpoint.hostname:
                 self.reposcan_url = self._build_url(endpoint)
         for endpoint in self._cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
                 self.remote_dump = f"{self._build_url(endpoint)}/vmaas.db"
+            if "webapp" in endpoint.hostname and "go" in endpoint.hostname:
+                self.webapp_go_url = self._build_url(endpoint)
 
         self.public_port = self._cfg.publicPort
         self.private_port = self._cfg.privatePort

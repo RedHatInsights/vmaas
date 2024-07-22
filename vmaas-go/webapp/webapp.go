@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/redhatinsights/vmaas/base"
@@ -14,6 +13,8 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 	"github.com/redhatinsights/vmaas/webapp/middlewares"
 	"github.com/redhatinsights/vmaas/webapp/routes"
+
+	_ "net/http/pprof" //nolint:gosec
 )
 
 var basepaths = []string{"/api/v3", "/api/vmaas/v3"}
@@ -36,9 +37,6 @@ func Run() {
 	utils.LogInfo(fmt.Sprintf("Webapp starting at port %d", port))
 	// create web app
 	app := gin.New()
-	if utils.Cfg.EnableProfiler {
-		pprof.Register(app)
-	}
 
 	// middlewares
 	app.Use(middlewares.Recovery())
@@ -53,6 +51,9 @@ func Run() {
 		api := app.Group(path)
 		routes.InitAPI(api)
 	}
+
+	// profiler
+	go runProfiler()
 
 	go base.TryExposeOnMetricsPort(app)
 	err := utils.RunServer(base.Context, app, port)
@@ -85,4 +86,16 @@ func vmaasProxy(c *gin.Context) {
 	}
 	c.Header("Content-Encoding", res.Header.Get("Content-Encoding"))
 	c.Data(res.StatusCode, res.Header.Get("Content-Type"), resBody)
+}
+
+// run net/http/pprof on privatePort
+func runProfiler() {
+	if utils.Cfg.EnableProfiler {
+		go func() {
+			err := http.ListenAndServe(fmt.Sprintf(":%d", utils.Cfg.PrivatePort), nil) //nolint:gosec
+			if err != nil {
+				utils.LogWarn("err", err.Error(), "couldn't start profiler")
+			}
+		}()
+	}
 }
