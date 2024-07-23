@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.62.3 (2024-07-23)
+
+### Fix
+
+* fix: update dependencies
+
+RHINENG-11425 ([`b143604`](https://github.com/RedHatInsights/vmaas/commit/b143604914fdb1ba8264fe0795eb7017e1591c41))
+
 ## v2.62.2 (2024-07-23)
 
 ### Fix
