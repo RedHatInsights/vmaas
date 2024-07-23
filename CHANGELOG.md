@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.62.2 (2024-07-23)
+
+### Fix
+
+* fix: stop using beta vex files
+
+RHINENG-11599 ([`3c34f7b`](https://github.com/RedHatInsights/vmaas/commit/3c34f7bf103c9bea8c966ddb6a43a87328a0f667))
+
 ## v2.62.1 (2024-07-04)
 
 ### Fix
