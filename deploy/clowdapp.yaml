@@ -485,7 +485,7 @@ parameters:
 - name: SSL_CERT_DIR
   value: "/etc/ssl/certs:/etc/pki/tls/certs:/system/etc/security/cacerts:/cdapp/certs"
 - name: CSAF_VEX_BASE_URL
-  value: "https://access.redhat.com/security/data/csaf/beta/vex/"
+  value: "https://access.redhat.com/security/data/csaf/v2/vex/"
 - name: CSAF_VEX_INDEX_CSV
   value: "changes.csv"
 - name: CSAF_SYNC_ALL_FILES  # sync all csaf files, not only those which are changed
