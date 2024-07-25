@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.62.4 (2024-07-25)
+
+### Fix
+
+* fix: add internal endpoint for profiling webapp-go
+
+RHINENG-11507 ([`451d8c2`](https://github.com/RedHatInsights/vmaas/commit/451d8c2971967458dfec1a91c7b535a298bf8a7b))
+
 ## v2.62.3 (2024-07-23)
 
 ### Fix
