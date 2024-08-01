@@ -44,7 +44,14 @@ EXPECTED_CSAF = (
                         3,
                         None,
                         "RHSA-2023:1833",
-                    )
+                    ),
+                    csaf_model.CsafProduct(
+                        "cpe:/a:redhat:rhel_eus:8.6::appstream",
+                        "SLOF-0:20210217-1.module+el8.6.0+14480+c0a3aa0f.src",
+                        3,
+                        "virt:rhel",
+                        "RHSA-2023:1833",
+                    ),
                 ])
             }
         ),

@@ -8,6 +8,7 @@ import re
 import shutil
 import tempfile
 import typing as t
+from collections import namedtuple
 from pathlib import Path
 
 from vmaas.common.batch_list import BatchList
@@ -31,6 +32,8 @@ CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/se
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "true"))
 ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
+
+ProductRelationship = namedtuple("ProductRelationship", ["product_reference", "module"])
 
 
 class ComponentError(Exception):
@@ -140,48 +143,58 @@ class CsafController:
 
         with open(self.tmp_directory / csaf_file.name, "r", encoding="utf-8") as csaf_json:
             csaf = json.load(csaf_json)
-            product_cpe, product_purl = self._parse_product_tree(csaf)
-            unfixed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl)
+            product_cpe, product_purl, product_rel = self._parse_product_tree(csaf)
+            unfixed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl, product_rel)
             cves.update(unfixed_cves)
         return cves
 
-    def _parse_package(self, product: str, product_purl: dict[str, str]) -> tuple[str, str | None]:
-        purl = product_purl.get(product)
-        if purl is None:
-            raise ComponentError(f"Not RPM component '{product}'")
-
-        kind, rest = purl.split(":", 1)
-        if kind == "pkg":
-            splitted = rest.split("/")
-            # remove information about arch to get package
-            pkg = splitted[-1].split("?")[0]
-            # package with version in purl is with `@`, use product instead
-            if "@" in pkg:
-                pkg = product
-            match splitted[0]:
-                case "rpm":
-                    return pkg, None
-                case "rpmmod":
-                    module = splitted[-2]
-                    return pkg, module
-
-        raise ComponentError(f"Not RPM component '{product}'")
-
     def _parse_product(
-        self, product: str, product_status: str, product_purl: dict[str, str]
+        self,
+        product: str,
+        product_status: str,
+        product_purl: dict[str, str],
+        product_rel: dict[str, ProductRelationship],
     ) -> tuple[str, str, str | None]:
         if ":" not in product:
             raise ComponentError(f"Component without ':', '{product}'")
 
         branch_product, rest = product.split(":", 1)
-        if product_status not in ("known_affected", "fixed"):
-            raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
+        pkg = rest
+        module = None
+        match product_status:
+            case "known_affected":
+                if "/" in rest:
+                    # it's a package with a module or some other identifier
+                    module, pkg = rest.split("/", 1)
+                    if len(module.split(":")) != 2:
+                        # it isn't a module but some other identifier
+                        # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
+                        # meaning it is not an rpm and we don't want to process this product
+                        raise ComponentError(f"Not RPM component '{product}'")
+            case "fixed":
+                if ".module" in product:
+                    rel = product_rel.get(product)
+                    if rel is None:
+                        # this might happen until csaf vex files are not updated with modules for fixed products
+                        # return the package as it didn't have a module
+                        self.logger.warning("Missing module for modular product '%s'", product)
+                        return branch_product, pkg, module
+                    pkg, module = rel.product_reference, rel.module
+                purl = product_purl.get(pkg)
+                if purl is None or "rpm" not in purl or "rpmmod" in purl:
+                    # rpmmod is a module product for fixed rpm, not the actual rpm
+                    raise ComponentError(f"Not RPM component '{product}'")
+            case _:
+                raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
 
-        pkg, module = self._parse_package(rest, product_purl)
         return branch_product, pkg, module
 
     def _parse_vulnerabilities(
-        self, csaf: dict[str, t.Any], product_cpe: dict[str, str], product_purl: dict[str, str]
+        self,
+        csaf: dict[str, t.Any],
+        product_cpe: dict[str, str],
+        product_purl: dict[str, str],
+        product_rel: dict[str, ProductRelationship],
     ) -> CsafCves:
         cves = CsafCves()
         for vulnerability in csaf["vulnerabilities"]:
@@ -197,7 +210,9 @@ class CsafController:
                 product_status = product_status.lower()
                 for product in vulnerability["product_status"].get(product_status, []):
                     try:
-                        branch_product, pkg, module = self._parse_product(product, product_status, product_purl)
+                        branch_product, pkg, module = self._parse_product(
+                            product, product_status, product_purl, product_rel
+                        )
                     except ComponentError as err:
                         self.logger.debug("%s, %s", err, vulnerability["cve"])
                         continue
@@ -229,13 +244,19 @@ class CsafController:
 
         return product_erratum
 
-    def _parse_product_tree(self, csaf: dict[str, t.Any]) -> tuple[dict[str, str], dict[str, str]]:
+    def _parse_product_tree(
+        self, csaf: dict[str, t.Any]
+    ) -> tuple[dict[str, str], dict[str, str], dict[str, ProductRelationship]]:
         product_cpe: dict[str, str] = {}
         product_purl: dict[str, str] = {}
+        product_rel: dict[str, ProductRelationship] = {}
         for branches in csaf.get("product_tree", {}).get("branches", []):
             self._parse_branches(branches, product_cpe, product_purl)
 
-        return product_cpe, product_purl
+        for rel in csaf.get("product_tree", {}).get("relationships", []):
+            self._parse_relationships(rel, product_purl, product_rel)
+
+        return product_cpe, product_purl, product_rel
 
     def _parse_branches(
         self,
@@ -262,3 +283,16 @@ class CsafController:
                 product_cpe[product_id] = cpe
             if purl := product.get("product_identification_helper", {}).get("purl"):
                 product_purl[product_id] = purl
+
+    def _parse_relationships(
+        self, rel: dict[str, t.Any], product_purl: dict[str, str], product_rel: dict[str, ProductRelationship]
+    ) -> None:
+        product_id = rel.get("full_product_name", {}).get("product_id")
+        product_ref = rel.get("product_reference")
+        relates_to = rel.get("relates_to_product_reference", "")
+        # store `relates_to_product_reference` only for modular products
+        if ":" in relates_to:
+            _, component = relates_to.split(":", 1)
+            if "rpmmod" in product_purl.get(component, ""):
+                name_stream = ":".join(relates_to.split(":")[1:3])
+                product_rel[product_id] = ProductRelationship(product_ref, name_stream)
