@@ -144,8 +144,8 @@ class CsafController:
         with open(self.tmp_directory / csaf_file.name, "r", encoding="utf-8") as csaf_json:
             csaf = json.load(csaf_json)
             product_cpe, product_purl, product_rel = self._parse_product_tree(csaf)
-            unfixed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl, product_rel)
-            cves.update(unfixed_cves)
+            parsed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl, product_rel)
+            cves.update(parsed_cves)
         return cves
 
     def _parse_product(
