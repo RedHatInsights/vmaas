@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## v2.62.5 (2024-08-07)
+
+### Chore
+
+* chore(csaf): rename variable including fixed cves ([`2970df5`](https://github.com/RedHatInsights/vmaas/commit/2970df5924ad8c98201145232d35dc460a5a2e78))
+
+### Fix
+
+* fix(csaf): module parsing
+
+- don&#39;t use purl for unfixed cves
+- use module product to get module of fixed product
+
+RHINENG-11803
+RHINENG-11156 ([`c5a197f`](https://github.com/RedHatInsights/vmaas/commit/c5a197fffc4014ad3f244c7d69431f1ad54efa78))
+
 ## v2.62.4 (2024-07-25)
 
 ### Fix
