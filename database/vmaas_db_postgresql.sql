@@ -1328,9 +1328,9 @@ CREATE TABLE IF NOT EXISTS csaf_product (
 )TABLESPACE pg_default;
 
 CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NULL;
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_id) WHERE package_id IS NOT NULL AND package_name_id IS NULL AND module_stream IS NULL;
 CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, module_stream) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NOT NULL;
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_id, module_stream) WHERE package_id IS NOT NULL AND package_name_id IS NULL AND module_stream IS NOT NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, package_id) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, package_id, module_stream) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NOT NULL;
 
 -- -----------------------------------------------------
 -- Table vmaas.csaf_cve_product
