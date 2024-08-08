@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v2.62.6 (2024-08-08)
+
+### Fix
+
+* fix(csaf): update indexes for fixed products
+
+package_name_id is always stored (RHINENG-10310)
+
+RHINENG-11156 ([`620d218`](https://github.com/RedHatInsights/vmaas/commit/620d21855409d6320bfa6dae6478a4c8c6bec544))
+
 ## v2.62.5 (2024-08-07)
 
 ### Chore
