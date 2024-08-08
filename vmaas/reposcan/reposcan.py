@@ -885,6 +885,8 @@ class WebappPprof:
         """Get webapp-go profile info."""
         if not strtobool(os.getenv("ENABLE_PROFILER", "false")):
             return "Set ENABLE_PROFILER=true to enable profiler"
+        if param == "profile":
+            param = "profile?seconds=20"
         res = requests.get(url=f"{CFG.webapp_go_url}/debug/pprof/{param}", timeout=60)
         headers = {"Content-Disposition": f"attachment; filename={param}"}
         return starlette.responses.Response(
