@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.62.7 (2024-08-09)
+
+### Chore
+
+* chore(pprof): profile cpu for 20s
+
+use 20s profile instead of default 30s, 3scale timeout in stage/prod is 30s and profile would result in gateway timeout ([`dbb6b10`](https://github.com/RedHatInsights/vmaas/commit/dbb6b10561c2ab8d6c51689017833d1a723cb869))
+
+### Fix
+
+* fix(csaf): fixed products with moduels
+
+RHINENG-11156 ([`2ae057c`](https://github.com/RedHatInsights/vmaas/commit/2ae057c4b9a6514c03b656ae0523ecbc5d49b510))
+
 ## v2.62.6 (2024-08-08)
 
 ### Fix
