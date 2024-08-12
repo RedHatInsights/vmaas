@@ -67,7 +67,7 @@ def test_clear(cache):
     """Test cache clear method"""
     cache.clear()
     variables = vars(cache)
-    assert len(variables) == 49
+    assert len(variables) == 36
     for name, var in variables.items():
         if name == "filename":
             assert var == TEST_DUMP_FILE
