@@ -14,7 +14,7 @@ func VulnerabilitiesHandler(c *gin.Context) {
 		return
 	}
 	pkg := c.Param("package")
-	request := vmaas.Request{Packages: []string{pkg}}
+	request := vmaas.Request{Packages: []string{pkg}, UseCsaf: true}
 
 	vulnerabilities, err := core.VmaasAPI.Vulnerabilities(&request)
 	if err != nil {
@@ -28,14 +28,15 @@ func VulnerabilitiesPostHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
 	}
-	request, err := bindValidateJSON(c)
+	request := vmaas.Request{UseCsaf: true}
+	err := bindValidateJSON(c, &request)
 	if err != nil {
 		utils.LogAndRespBadRequest(c, err)
 		return
 	}
 
 	if request.Extended {
-		vulnerabilities, err := core.VmaasAPI.VulnerabilitiesExtended(request)
+		vulnerabilities, err := core.VmaasAPI.VulnerabilitiesExtended(&request)
 		if err != nil {
 			utils.LogAndRespError(c, err)
 			return
@@ -44,7 +45,7 @@ func VulnerabilitiesPostHandler(c *gin.Context) {
 		return
 	}
 
-	vulnerabilities, err := core.VmaasAPI.Vulnerabilities(request)
+	vulnerabilities, err := core.VmaasAPI.Vulnerabilities(&request)
 	if err != nil {
 		utils.LogAndRespError(c, err)
 		return

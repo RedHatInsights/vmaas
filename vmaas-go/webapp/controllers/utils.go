@@ -10,21 +10,23 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
-func bindValidateJSON(c *gin.Context) (*vmaas.Request, error) {
-	request := vmaas.Request{}
-	if err := c.BindJSON(&request); err != nil {
-		return nil, err
+func bindValidateJSON(c *gin.Context, request *vmaas.Request) error {
+	if request == nil {
+		return fmt.Errorf("nil vmaas request")
+	}
+	if err := c.BindJSON(request); err != nil {
+		return err
 	}
 	// validate module name:stream
 	for i, m := range request.Modules {
 		if m.Module == nil {
-			return nil, fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
+			return fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
 		}
 		if m.Stream == nil {
-			return nil, fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
+			return fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
 		}
 	}
-	return &request, nil
+	return nil
 }
 
 func isCacheLoaded(c *gin.Context) bool {
