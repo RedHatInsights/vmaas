@@ -290,6 +290,7 @@ paths:
 
   /vulnerabilities:
     post:
+      deprecated: true
       description: List of applicable CVEs to a package list.
       operationId: vmaas.webapp.app.VulnerabilitiesHandlerPost.post
       requestBody:
@@ -308,6 +309,7 @@ paths:
 
   '/vulnerabilities/{nevra}':
     get:
+      deprecated: true
       description: List of applicable CVEs for a single package NEVRA
       operationId: vmaas.webapp.app.VulnerabilitiesHandlerGet.get
       parameters:
