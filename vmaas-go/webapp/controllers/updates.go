@@ -28,13 +28,14 @@ func UpdatesPostHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
 	}
-	request, err := bindValidateJSON(c)
+	request := vmaas.Request{}
+	err := bindValidateJSON(c, &request)
 	if err != nil {
 		utils.LogAndRespBadRequest(c, err)
 		return
 	}
 
-	updates, err := core.VmaasAPI.Updates(request)
+	updates, err := core.VmaasAPI.Updates(&request)
 	if err != nil {
 		utils.LogAndRespError(c, err)
 		return
