@@ -47,8 +47,8 @@ type Config struct {
 	EnableProfiler       bool
 
 	// lib
-	OvalUnfixedEvalEnabled bool
-	VmaasLibMaxGoroutines  int
+	UnfixedEvalEnabled    bool
+	VmaasLibMaxGoroutines int
 }
 
 type (
@@ -128,7 +128,7 @@ func initEnv() {
 	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 60) // 1 min default
 	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
-	Cfg.OvalUnfixedEvalEnabled = GetBoolEnvOrDefault("OVAL_UNFIXED_EVAL_ENABLED", true)
+	Cfg.UnfixedEvalEnabled = GetBoolEnvOrDefault("CSAF_UNFIXED_EVAL_ENABLED", true)
 	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
 }
 
