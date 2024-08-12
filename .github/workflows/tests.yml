@@ -48,7 +48,7 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/webapp --exit-code-from
           docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/webapp/coverage.xml ./coverage_webapp.xml
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp.xml
           verbose: true
