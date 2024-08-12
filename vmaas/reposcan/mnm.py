@@ -33,13 +33,6 @@ FAILED_UPDATE_CVE = Counter('vmaas_reposcan_failed_cve_update', '# of failed cve
 FAILED_IMPORT_CPE = Counter('vmaas_reposcan_failed_cpe_import', '# of failed cpe-import attempts')
 FAILED_UPDATE_CPE = Counter('vmaas_reposcan_failed_cpe_update', '# of failed cpe-update attempts')
 
-OVAL_FAILED_DOWNLOAD = Counter('vmaas_reposcan_failed_oval_download', '# of failed oval-download attempts')
-OVAL_DELETED_STREAMS = Counter('vmaas_reposcan_oval_deleted_streams', '# of deleted oval streams')
-
-OVAL_FAILED_IMPORT = Counter('vmaas_reposcan_failed_oval_import', '# of failed oval-import attempts')
-OVAL_FAILED_UPDATE = Counter('vmaas_reposcan_failed_oval_update', '# of failed oval-update attempts')
-OVAL_FAILED_DELETE = Counter('vmaas_reposcan_failed_oval_delete', '# of failed oval-delete attempts')
-
 CSAF_FAILED_DOWNLOAD = Counter('vmaas_reposcan_failed_csaf_download', '# of failed csaf-download attempts')
 CSAF_FAILED_DELETE = Counter('vmaas_reposcan_failed_csaf_delete', '# of failed csaf-delete attempts')
 CSAF_FAILED_IMPORT = Counter('vmaas_reposcan_failed_csaf_import', '# of failed csaf-import attempts')
