@@ -275,48 +275,6 @@ CREATE TABLE module_stream_require (
                                 require_id integer
                                );
 INSERT INTO "module_stream_require" VALUES(1102,1103);
-CREATE TABLE oval_criteria_dependency (
-                                parent_criteria_id integer,
-                                dep_criteria_id integer,
-                                dep_test_id integer,
-                                dep_module_test_id integer
-                               );
-CREATE TABLE oval_criteria_type (
-                                criteria_id integer,
-                                type_id integer
-                               );
-CREATE TABLE oval_definition_cpe (
-                                cpe_id integer,
-                                definition_id integer
-                               );
-CREATE TABLE oval_definition_cve (
-                                definition_id integer,
-                                cve text
-                               );
-CREATE TABLE oval_definition_detail (
-                                id integer primary key,
-                                definition_type_id integer,
-                                criteria_id integer
-                               );
-CREATE TABLE oval_module_test_detail (
-                                id integer primary key,
-                                module_stream text
-                               );
-CREATE TABLE oval_state_arch (
-                                state_id integer,
-                                arch_id integer
-                               );
-CREATE TABLE oval_test_detail (
-                                id integer primary key,
-                                package_name_id integer,
-                                check_existence_id integer
-                               );
-CREATE TABLE oval_test_state (
-                                test_id integer,
-                                state_id integer,
-                                evr_id integer,
-                                evr_operation_id integer
-                               );
 CREATE TABLE package_detail (
                                 id integer primary key,
                                 name_id integer,
@@ -342,10 +300,6 @@ INSERT INTO "packagename" VALUES(101,'pkg-sec-errata1');
 INSERT INTO "packagename" VALUES(102,'pkg-no-sec-errata2');
 INSERT INTO "packagename" VALUES(103,'pkg-errata-cve3');
 INSERT INTO "packagename" VALUES(104,'pkg-sec-errata4');
-CREATE TABLE packagename_oval_definition (
-                                name_id integer,
-                                definition_id integer
-                               );
 CREATE TABLE pkg_errata (
                                 pkg_id integer,
                                 errata_id integer,
