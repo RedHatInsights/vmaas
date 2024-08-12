@@ -37,8 +37,8 @@ objects:
           value: ${LOGGING_LEVEL_APP}
         - name: LOG_STYLE
           value: ${LOG_STYLE}
-        - name: OVAL_UNFIXED_EVAL_ENABLED
-          value: ${OVAL_UNFIXED_EVAL_ENABLED}
+        - name: CSAF_UNFIXED_EVAL_ENABLED
+          value: ${CSAF_UNFIXED_EVAL_ENABLED}
         - name: CACHE_REFRESH_INTERVAL
           value: ${CACHE_REFRESH_INTERVAL}
         - name: ENABLE_PROFILER
@@ -86,8 +86,6 @@ objects:
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
           value: ${CLOWDER_ENABLED}
-        - name: OVAL_UNFIXED_EVAL_ENABLED
-          value: ${OVAL_UNFIXED_EVAL_ENABLED}
         - name: REPO_NAME_PREFIXES
           value: ${REPO_NAME_PREFIXES}
         livenessProbe:
@@ -233,12 +231,6 @@ objects:
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
           value: ${CLOWDER_ENABLED}
-        - name: OVAL_FEED_BASE_URL
-          value: ${OVAL_FEED_BASE_URL}
-        - name: OVAL_LABEL_FILTER
-          value: ${OVAL_LABEL_FILTER}
-        - name: OVAL_SYNC_ALL_FILES
-          value: ${OVAL_SYNC_ALL_FILES}
         - name: REDHAT_CVEMAP_URL
           value: ${REDHAT_CVEMAP_URL}
         - name: VMAAS_ENV
@@ -385,12 +377,6 @@ parameters:
 - name: CW_ENABLED
   description: CloudWatch enabled
   value: 'TRUE'
-- name: OVAL_FEED_BASE_URL
-  description: OVAL feed url
-  value: "https://www.redhat.com/security/data/oval/v2/"
-- name: OVAL_LABEL_FILTER
-  description: Comma-separated keywords to filter out
-  value: RHEL5,rhel-7-alt
 - name: LOGGING_LEVEL_APP
   description: Logging level in app code
   value: INFO
@@ -468,10 +454,8 @@ parameters:
   value: vmaas_writer_pwd
 - name: REDHAT_CVEMAP_URL
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
-- name: OVAL_UNFIXED_EVAL_ENABLED
+- name: CSAF_UNFIXED_EVAL_ENABLED
   value: "TRUE"
-- name: OVAL_SYNC_ALL_FILES  # sync all OVAL files, not only those which are changed
-  value: "FALSE"
 - name: REPO_NAME_PREFIXES
   description: Repo name prefixes to be stripped
   value: "rhui-"
