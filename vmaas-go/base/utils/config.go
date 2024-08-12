@@ -56,7 +56,7 @@ type (
 	PrivateEndpoint clowder.PrivateDependencyEndpoint
 )
 
-func init() {
+func ConfigureConfig() {
 	if !clowder.IsClowderEnabled() {
 		panic("Missing clowder config")
 	}

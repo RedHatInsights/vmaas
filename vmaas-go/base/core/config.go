@@ -15,6 +15,7 @@ var (
 )
 
 func ConfigureApp() {
+	utils.ConfigureConfig()
 	utils.ConfigureLogging()
 }
 
