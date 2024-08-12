@@ -33,13 +33,12 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
-from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, OVAL_FAILED_IMPORT, \
+from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
-from vmaas.reposcan.redhatoval.oval_controller import OvalController
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
@@ -73,7 +72,6 @@ SYNC_GIT_REPO_LIST = strtobool(os.getenv("SYNC_GIT_REPO_LIST", "yes"))
 SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
-SYNC_OVAL = strtobool(os.getenv("SYNC_OVAL", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 
 
@@ -515,36 +513,6 @@ class RepoDeleteHandler(SyncHandler):
         return "OK"
 
 
-class OvalDeleteHandler(SyncHandler):
-    """Handler for OVAL item API."""
-
-    task_type = "Delete OVAL files"
-
-    @classmethod
-    def delete(cls, oval_id, **kwargs):  # pylint: disable=arguments-differ
-        """Delete OVAL file."""
-        status_code, status_msg = cls.start_task(oval_id=oval_id)
-        return status_msg, status_code
-
-    @staticmethod
-    def run_task(*args, **kwargs):
-        """Function to start deleting OVAL files."""
-        try:
-            oval_id = kwargs.get("oval_id", None)
-            init_logging()
-            init_db()
-            oval_controller = OvalController()
-            oval_controller.delete_oval_file(oval_id)
-        except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % hash(err)
-            LOGGER.exception(msg)
-            DatabaseHandler.rollback()
-            return "ERROR"
-        finally:
-            DatabaseHandler.close_connection()
-        return "OK"
-
-
 class ExporterHandler(SyncHandler):
     """Handler for Export API."""
 
@@ -713,39 +681,6 @@ class CpeSyncHandler(SyncHandler):
         return "OK"
 
 
-class OvalSyncHandler(SyncHandler):
-    """Handler for Oval sync API."""
-
-    task_type = "Sync OVAL metadata"
-
-    @classmethod
-    def put(cls, **kwargs):
-        """Sync Oval metadata."""
-
-        status_code, status_msg = cls.start_task()
-        return status_msg, status_code
-
-    @staticmethod
-    def run_task(*args, **kwargs):
-        """Function to start syncing OVALs."""
-        try:
-            init_logging()
-            init_db()
-            controller = OvalController()
-            controller.store()
-        except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % hash(err)
-            LOGGER.exception(msg)
-            OVAL_FAILED_IMPORT.inc()
-            DatabaseHandler.rollback()
-            if isinstance(err, DatabaseError):
-                return "DB_ERROR"
-            return "ERROR"
-        finally:
-            DatabaseHandler.close_connection()
-        return "OK"
-
-
 def metrics():
     """Generate Prometheus metrics."""
     return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
@@ -791,7 +726,6 @@ def all_sync_handlers() -> list:
     handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
-    handlers.extend([OvalSyncHandler] if SYNC_OVAL else [])  # type: ignore[list-item]
     handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]
     return handlers
 
