@@ -24,13 +24,22 @@ for test_dir in $test_dirs; do
 done
 
 # Find and run tests
-pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1 -rP
-
-rc=$(($rc+$?))
+pytest --collect-only
+if [ $? -ne 5 ]; then # error code 5 - No tests collected
+    pytest -vvv --cov-report=xml --cov=. --color=yes --durations=1 -rP
+    rc=$(($rc+$?))
+fi
 
 # Run pylint
-find . -iname '*.py' | xargs pylint --rcfile=../../pylintrc --output-format=colorized
-rc=$(($rc+$?))
+if [ -f "../../pylintrc" ]; then
+    find . -iname '*.py' | xargs pylint --rcfile=../../pylintrc --output-format=colorized
+    rc=$(($rc+$?))
+fi
+
+# Run go test
+if [ -f "go.sum" ]; then
+    GIN_MODE=test go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+fi
 
 exit $rc
 )
