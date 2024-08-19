@@ -743,6 +743,11 @@ components:
           enum: [ true, false ]
           description: Show updated package names in a repo since the last modified_since
           default: false
+        has_packages:
+          type: boolean
+          enum: [ true, false ]
+          description: Return only repositories having advisories with packages released since the last modified_since
+          default: false
         <<: *req_paging
       required:
         - repository_list
