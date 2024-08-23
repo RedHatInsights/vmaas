@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.63.0 (2024-08-23)
+
+### Chore
+
+* chore: update gh actions ([`7a6b6c6`](https://github.com/RedHatInsights/vmaas/commit/7a6b6c6dc27f4dddc1e01525d78e0b718b43d528))
+
+### Feature
+
+* feat(csaf): exclude kernel-alt from evaluation
+
+https://github.com/RedHatInsights/vmaas-lib/pull/66
+
+RHINENG-12093 ([`3b31812`](https://github.com/RedHatInsights/vmaas/commit/3b318126a14a59f72d2f552ef2f08cc800a80160))
+
 ## v2.62.7 (2024-08-09)
 
 ### Chore
