@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.63.1 (2024-08-30)
+
+### Fix
+
+* fix(csaf): duplicate cpes while processing
+
+RHINENG-12112 ([`1d8a2c4`](https://github.com/RedHatInsights/vmaas/commit/1d8a2c4f33024e75148d6893979bd653d47aca63))
+
 ## v2.63.0 (2024-08-23)
 
 ### Chore
