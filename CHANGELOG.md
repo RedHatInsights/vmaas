@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.64.0 (2024-09-03)
+
+### Chore
+
+* chore(test): add vmaas-go tests ([`42fd879`](https://github.com/RedHatInsights/vmaas/commit/42fd879867919280b08c6206efa68268d138231f))
+
+* chore: don&#39;t initialize clowder config with init ([`8e4cee2`](https://github.com/RedHatInsights/vmaas/commit/8e4cee2d139f14e912d1437f03d188f19bd16d5a))
+
+### Feature
+
+* feat(csaf): use csaf evaluation by default
+
+RHINENG-7871 ([`39c28fe`](https://github.com/RedHatInsights/vmaas/commit/39c28fe9dbe53effe6746508bcf039149103e448))
+
 ## v2.63.1 (2024-08-30)
 
 ### Fix
