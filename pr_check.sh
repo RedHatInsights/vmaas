@@ -7,7 +7,6 @@ APP_NAME="vulnerability"  # name of app-sre "application" folder this component 
 COMPONENT_NAME="vmaas"  # name of app-sre "resourceTemplate" in deploy.yaml for this component
 IMAGE="quay.io/cloudservices/vmaas-app"  
 COMPONENTS="vmaas"
-COMPONENTS_W_RESOURCES="vmaas"
 CACHE_FROM_LATEST_IMAGE="true"
 
 export IQE_PLUGINS="vmaas"
