@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v2.64.1 (2024-09-18)
+
+### Chore
+
+* chore(ephemeral): remove --no-remove-resources
+
+RHINENG-11573 ([`68e9d39`](https://github.com/RedHatInsights/vmaas/commit/68e9d39799b96b869c5bc46c21778a5322245b68))
+
+### Fix
+
+* fix(webapp): don&#39;t show repositories without changed packages
+
+repository may be re-generated but no RPM erratum added
+(push of container images triggers RPM repodata re-generation) ([`fe87412`](https://github.com/RedHatInsights/vmaas/commit/fe87412522f3e025af5ddc1f2d8e32f4522781c1))
+
 ## v2.64.0 (2024-09-03)
 
 ### Chore
