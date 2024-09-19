@@ -134,7 +134,7 @@ objects:
             - sh
             - -c
             - >-
-              exec python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade
+              exec python3.11 -m vmaas.common.wait_for_services python3.11 -m vmaas.reposcan.database.upgrade
             env:
             - name: GIT_TOKEN
               valueFrom:

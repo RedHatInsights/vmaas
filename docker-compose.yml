@@ -41,7 +41,7 @@ services:
 
   vmaas_reposcan_db_init:
     command: >
-         python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade
+         python3.11 -m vmaas.common.wait_for_services python3.11 -m vmaas.reposcan.database.upgrade
     container_name: vmaas-reposcan-db-init
     hostname: vmaas-reposcan-db-init
     image: vmaas/app:latest
