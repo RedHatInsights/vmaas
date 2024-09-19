@@ -31,10 +31,10 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T test ./scripts/check_deps_versions.sh --exit-code-from
       - name: Validate dashboards
         run: |
-          docker compose -f docker-compose.test.yml exec -T test ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test python3.11 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
       - name: Wait for services and upgrade DB
         run: |
-          docker compose -f docker-compose.test.yml exec -T test python3 -m vmaas.common.wait_for_services python3 -m vmaas.reposcan.database.upgrade --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test python3.11 -m vmaas.common.wait_for_services python3.11 -m vmaas.reposcan.database.upgrade --exit-code-from
       - name: exec common tests
         run: |
           docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/common --exit-code-from
