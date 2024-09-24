@@ -45,13 +45,25 @@ class CsafStore(ObjectStore):
         )
         self.cve2file_id: dict[str, int] = {}
 
-    def delete_csaf_file(self, name: str) -> None:
-        """Deletes csaf file from DB."""
-        db_id = self.csaf_file_map[name][0]
+    def _delete_csaf_files(self, csaf_files: model.CsafFiles) -> None:
+        if not csaf_files:
+            return
+
+        removed_files = []
+        removed_file_names = []
+        for csaf_file in csaf_files.not_csv_files:
+            removed_files.append(csaf_file.id_)
+            removed_file_names.append(csaf_file.name)
+
+        if not removed_files:
+            return
+
         cur = self.conn.cursor()
         try:
-            cur.execute("delete from csaf_file where id = %s", (db_id,))
+            cur.execute("delete from csaf_cve_product where csaf_file_id in %s", (tuple(removed_files),))
+            cur.execute("delete from csaf_file where id in %s", (tuple(removed_files),))
             self.conn.commit()
+            self.logger.info("Removed csaf_files: %s", removed_file_names)
         except Exception as exc:
             CSAF_FAILED_DELETE.inc()
             self.logger.exception("%s: ", FAILED_FILE_DELETE)
@@ -400,6 +412,7 @@ class CsafStore(ObjectStore):
             self.logger.warning("CsafData without cves or files")
             return
 
+        self._delete_csaf_files(csaf_data.files)
         self._save_csaf_files(csaf_data.files)
         self._populate_cves(csaf_data.cves, csaf_data.files)
         self._delete_unreferenced_products()

@@ -219,6 +219,14 @@ class TestModels:
         collection = m.CsafFiles({"x": csaf_file, "y": file2})
         assert len(list(collection.csv_files)) == 1
 
+    def test_csaf_files_not_csv(self, csaf_file: m.CsafFile) -> None:
+        """Test CsafFiles.not_csv_files"""
+        file2 = deepcopy(csaf_file)
+        file2.csv = True
+        collection = m.CsafFiles({"x": csaf_file, "y": file2})
+        assert len(list(collection.not_csv_files)) == 1
+        assert list(collection.not_csv_files)[0] == csaf_file
+
     def test_from_table_map_and_csv(self, tmp_path: Path) -> None:
         """Test CsafFiles.from_table_map_and_csv"""
         now = datetime.now()
