@@ -97,6 +97,23 @@ class TestCsafStore:
         self.assert_cve_count(csaf_store, 1)
         return csaf_store
 
+    def test_delete_csaf_files(self, products: None) -> None:  # pylint: disable=unused-argument
+        """Test removing csaf files"""
+        csaf_store = CsafStore()
+        now = datetime.now(timezone.utc)
+        files = m.CsafFiles(
+            {"file1": m.CsafFile("file1", now, id_=1), "file2": m.CsafFile("file2", now, csv=True)}
+        )
+        csaf_store._delete_csaf_files(files)
+        cur = csaf_store.conn.cursor()
+        cur.execute("SELECT id FROM csaf_file WHERE name = 'file1'")
+        res = cur.fetchone()
+        assert not res
+
+        cur.execute("SELECT id FROM csaf_cve_product WHERE csaf_file_id = 1")
+        res = cur.fetchone()
+        assert not res
+
     def test_save_file(self, csaf_store: CsafStore) -> None:
         """Test saving csaf file."""
         cve = "CVE-2024-1234"

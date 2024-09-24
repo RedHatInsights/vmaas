@@ -94,6 +94,11 @@ class CsafFiles:
         """Files from csv."""
         return filter(lambda x: x.csv, self)
 
+    @property
+    def not_csv_files(self) -> filter[CsafFile]:
+        """Files not in csv."""
+        return filter(lambda x: not x.csv, self)
+
     def to_tuples(self, attributes: tuple[str, ...]) -> list[tuple[int | str | datetime | None, ...]]:
         """Transform data to list of tuples with chosen attributes."""
         res = []
