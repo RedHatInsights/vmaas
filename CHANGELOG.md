@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.65.0 (2024-09-25)
+
+### Feature
+
+* feat(webapp-go): get newer EUS manually fixable from repos ([`d9f8e89`](https://github.com/RedHatInsights/vmaas/commit/d9f8e898669990b04a22eb994106e8c150a549cb))
+
 ## v2.64.3 (2024-09-25)
 
 ### Fix
