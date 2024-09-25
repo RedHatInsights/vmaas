@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## v2.64.2 (2024-09-25)
+
+### Chore
+
+* chore(deps): update grafana/grafana docker tag to v11
+
+Signed-off-by: red-hat-konflux &lt;126015336+red-hat-konflux[bot]@users.noreply.github.com&gt; ([`68130f4`](https://github.com/RedHatInsights/vmaas/commit/68130f44c429f4cb5ea2188b97a19a2e1104b1b7))
+
+* chore: update dependencies
+
+RHINENG-12514 ([`24b9f05`](https://github.com/RedHatInsights/vmaas/commit/24b9f050877d35df6d58ad557c98ca1506921203))
+
+* chore: use ubi9
+
+RHINENG-12543
+
+RHINENG-12556 ([`7b783e5`](https://github.com/RedHatInsights/vmaas/commit/7b783e5c8f580cd450af96f4ea7589633a84917e))
+
+### Fix
+
+* fix: remove removed csaf files from db
+
+RHINENG-12773 ([`617fe70`](https://github.com/RedHatInsights/vmaas/commit/617fe70ef7c82904fbd8f8333621b9e9574223a8))
+
+### Unknown
+
+* Red Hat Konflux update vmaas
+Signed-off-by: red-hat-konflux &lt;konflux@no-reply.konflux-ci.dev&gt; ([`c47fdab`](https://github.com/RedHatInsights/vmaas/commit/c47fdab9db98686bb7cde8c5840f89537e3fb72b))
+
 ## v2.64.1 (2024-09-18)
 
 ### Chore
