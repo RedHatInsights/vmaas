@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.64.3 (2024-09-25)
+
+### Fix
+
+* fix: skip cves missing in mapping
+
+RHINENG-12773 ([`d1c478f`](https://github.com/RedHatInsights/vmaas/commit/d1c478f603a49b1d149848fda535dc78e0c9ebc2))
+
 ## v2.64.2 (2024-09-25)
 
 ### Chore
