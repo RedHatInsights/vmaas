@@ -6,6 +6,9 @@
   "tekton": {
     "automerge": true,
     "automergeStrategy": "rebase",
-    "ignoreTests": true
+    "automergeType": "pr",
+    "enabled": true,
+    "ignoreTests": true,
+    "platformAutomerge": true
   }
 }
