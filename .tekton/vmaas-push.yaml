@@ -16,6 +16,13 @@ metadata:
   name: vmaas-on-push
   namespace: insights-management-tenant
 spec:
+  taskRunSpecs:
+    - pipelineTaskName: ecosystem-cert-preflight-checks
+      computeResources:
+        requests:
+          memory: 1Gi
+        limits:
+          memory: 1Gi
   params:
   - name: git-url
     value: '{{source_url}}'
