@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## v2.65.1 (2024-09-30)
+
+### Chore
+
+* chore(deps): update konflux references
+
+Signed-off-by: red-hat-konflux &lt;126015336+red-hat-konflux[bot]@users.noreply.github.com&gt; ([`3cdba17`](https://github.com/RedHatInsights/vmaas/commit/3cdba1795ddd6e39460b8db531dbdefbf1e992b2))
+
+* chore: try to add additional automerge params ([`9a1e217`](https://github.com/RedHatInsights/vmaas/commit/9a1e217b5ee0d96c6cf186174350e60321ac0427))
+
+* chore(deps): update grafana/grafana docker tag to v11.2.1
+
+Signed-off-by: red-hat-konflux &lt;126015336+red-hat-konflux[bot]@users.noreply.github.com&gt; ([`cb28a4d`](https://github.com/RedHatInsights/vmaas/commit/cb28a4d6e72a8337b87d2ec0121bd73b434ba83c))
+
+* chore: add schema spec ([`91c419d`](https://github.com/RedHatInsights/vmaas/commit/91c419ddb708b713d075a61e99a0231901a60318))
+
+* chore: try to automerge updating tekton references ([`be501df`](https://github.com/RedHatInsights/vmaas/commit/be501df46c61a2acf309c3cc4b9fc5dbb64073f3))
+
+### Fix
+
+* fix(webapp-go): duplicate affected packages and incorrect manually fixable errata ([`f96f316`](https://github.com/RedHatInsights/vmaas/commit/f96f31620e2bd71a9b9e68f53db5ad55bd2aeaeb))
+
 ## v2.65.0 (2024-09-25)
 
 ### Feature
