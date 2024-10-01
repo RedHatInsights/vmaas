@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.66.1 (2024-10-01)
+
+### Fix
+
+* fix(vmaas-go): revert appendUniq due to performance hit ([`c9a2306`](https://github.com/RedHatInsights/vmaas/commit/c9a23060dbeed0881d9026b8207520f61b3c7b51))
+
 ## v2.66.0 (2024-10-01)
 
 ### Chore
