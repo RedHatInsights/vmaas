@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.66.0 (2024-10-01)
+
+### Chore
+
+* chore: increase ecosystem-cert-preflight-checks resources ([`6e35316`](https://github.com/RedHatInsights/vmaas/commit/6e35316c71908b1240a603026b84e4e41d056394))
+
+* chore: konflux image url ([`9e784a7`](https://github.com/RedHatInsights/vmaas/commit/9e784a781ec358280fa4c8002fa2c928aa299c42))
+
+### Feature
+
+* feat: remove oval in webapp-go
+
+RHINENG-7872 ([`e3cb099`](https://github.com/RedHatInsights/vmaas/commit/e3cb099a038260a133c245291e500cca6b99b3f0))
+
 ## v2.65.1 (2024-09-30)
 
 ### Chore
