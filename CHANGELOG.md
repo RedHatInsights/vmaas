@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## v2.67.0 (2024-10-07)
+
+### Chore
+
+* chore(test): cache contains less variables
+
+RHINENG-7872 ([`c1e26ca`](https://github.com/RedHatInsights/vmaas/commit/c1e26caa6aa7ee4cb34282371af6d59985e19da3))
+
+* chore(deps): update grafana/grafana docker tag to v11.2.2
+
+Signed-off-by: red-hat-konflux &lt;126015336+red-hat-konflux[bot]@users.noreply.github.com&gt; ([`a351d4a`](https://github.com/RedHatInsights/vmaas/commit/a351d4a726e70886dbf2b1cfadbcdf1e89389dcf))
+
+* chore: trigger stage deployment ([`e5984d3`](https://github.com/RedHatInsights/vmaas/commit/e5984d351ad4aece2ddb5aee0d28bf0c89ca9644))
+
+### Feature
+
+* feat: drop oval tables
+
+RHINENG-7872 ([`382bae7`](https://github.com/RedHatInsights/vmaas/commit/382bae705601d5f58190c2505e6d137e9bbb4e92))
+
+* feat: remove oval env variables
+
+RHINENG-7872 ([`6c860bf`](https://github.com/RedHatInsights/vmaas/commit/6c860bfb244dd9d4e95df661e5b262a5ce5abc61))
+
+* feat: remove oval download,parse,store
+
+RHINENG-7872 ([`18acfe6`](https://github.com/RedHatInsights/vmaas/commit/18acfe6f20347ba1ff0acde8e939425b7f305f20))
+
+* feat: remove oval export
+
+RHINENG-7872 ([`a6f5ba7`](https://github.com/RedHatInsights/vmaas/commit/a6f5ba7a1d9a032c7ea4e9a2a341599b7dd95b94))
+
+* feat: remove oval reposcan api
+
+RHINENG-7872 ([`0110356`](https://github.com/RedHatInsights/vmaas/commit/0110356d1f8ff8e2466b2608b550d06b2e8ad570))
+
+* feat: remove oval from webapp
+
+RHINENG-7872 ([`383d28b`](https://github.com/RedHatInsights/vmaas/commit/383d28b271bfb6422d41063674c144f0fed0a5aa))
+
 ## v2.66.1 (2024-10-01)
 
 ### Fix

@@ -5,7 +5,7 @@ commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"
 
 [tool.poetry]
 name = "vmaas"
-version = "2.66.1"
+version = "2.67.0"
 description = ""
 authors = [""]
 readme = "README.md"
