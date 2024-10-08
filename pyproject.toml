@@ -3,6 +3,22 @@ version_variables = ["vmaas/common/constants.py:VMAAS_VERSION"]
 version_toml = ["pyproject.toml:tool.poetry.version"]
 commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"
 
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test",
+]
+minor_tags = ["feat"]
+patch_tags = ["build", "chore", "ci", "fix", "perf", "refactor"]
+
 [tool.poetry]
 name = "vmaas"
 version = "2.67.0"
