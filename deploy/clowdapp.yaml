@@ -257,6 +257,8 @@ objects:
     database:
       name: vmaas
       version: 12
+    objectStore:
+      - ${DB_DUMP_BUCKET}
     testing:
       iqePlugin: vmaas
 
@@ -490,3 +492,5 @@ parameters:
 - name: NEWER_RELEASEVER_CSAF
   description: Enable finding updates/cves in newer releaseversion from CSAF
   value: "true"
+- name: DB_DUMP_BUCKET
+  value: insights-vmaas-dump-storage
