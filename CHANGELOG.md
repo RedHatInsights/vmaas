@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v2.68.0 (2024-10-15)
+
+### Features
+
+* feat: remove use_csaf from request
+
+RHINENG-7872 ([`50420e9`](https://github.com/RedHatInsights/vmaas/commit/50420e93c0de8622b3abf16eb31ea791a662fa3d))
+
+### Fixes
+
+* fix: env var to disable newer release version updates
+
+RHINENG-13676
+
+RHINENG-4854 ([`1513a35`](https://github.com/RedHatInsights/vmaas/commit/1513a358de1b895c8521649e5ba87f1a0eb99a65))
+
+
 ## v2.67.4 (2024-10-14)
 
 ### Chores
