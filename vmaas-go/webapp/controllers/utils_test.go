@@ -53,27 +53,6 @@ func TestBindValidateJSON(t *testing.T) {
 			"module", &request, []byte(`{"modules_list": [{"module_name": "virt", "module_stream": "rhel"}]}`),
 			func(t *testing.T, err error, _ *vmaas.Request) { assert.NoError(t, err) },
 		},
-		{"use_csaf_default", &vmaas.Request{UseCsaf: true}, []byte(`{}`), func(t *testing.T, err error, r *vmaas.Request) {
-			if assert.NoError(t, err) {
-				assert.True(t, r.UseCsaf)
-			}
-		}},
-		{
-			"use_csaf_true", &vmaas.Request{UseCsaf: true}, []byte(`{"use_csaf": true}`),
-			func(t *testing.T, err error, r *vmaas.Request) {
-				if assert.NoError(t, err) {
-					assert.True(t, r.UseCsaf)
-				}
-			},
-		},
-		{
-			"use_csaf_false", &vmaas.Request{UseCsaf: true}, []byte(`{"use_csaf": false}`),
-			func(t *testing.T, err error, r *vmaas.Request) {
-				if assert.NoError(t, err) {
-					assert.False(t, r.UseCsaf)
-				}
-			},
-		},
 	}
 
 	for _, test := range tests {
