@@ -32,7 +32,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
-from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump
+from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
@@ -208,6 +208,7 @@ class SyncHandler:
         if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler):
             result.append(ExporterHandler.run_task())
             result.append(PkgTreeHandler.run_task())
+            result.append(S3ExporterHandler.run_task())
         return result
 
     @staticmethod
@@ -565,6 +566,35 @@ class PkgTreeHandler(SyncHandler):
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
                 return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
+class S3ExporterHandler(SyncHandler):
+    """Handler for S3 Export API."""
+
+    task_type = "S3 Export dump"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Export disk dump to S3."""
+
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to export db dump to S3 bucket."""
+        try:
+            if not CFG.s3_available:
+                LOGGER.warning("S3 not available, skipping upload to S3")
+                return "SKIPPED"
+            upload_dump_s3()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
             return "ERROR"
         finally:
             DatabaseHandler.close_connection()
