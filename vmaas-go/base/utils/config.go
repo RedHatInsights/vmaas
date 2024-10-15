@@ -49,6 +49,8 @@ type Config struct {
 	// lib
 	UnfixedEvalEnabled    bool
 	VmaasLibMaxGoroutines int
+	NewerReleaseverRepos  bool
+	NewerReleaseverCsaf   bool
 }
 
 type (
@@ -130,6 +132,8 @@ func initEnv() {
 	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
 	Cfg.UnfixedEvalEnabled = GetBoolEnvOrDefault("CSAF_UNFIXED_EVAL_ENABLED", true)
 	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
+	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
+	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

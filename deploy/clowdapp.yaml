@@ -47,6 +47,10 @@ objects:
           value: ${VMAAS_LIB_MAX_GOROUTINES}
         - name: SSL_CERT_DIR
           value: ${SSL_CERT_DIR}
+        - name: NEWER_RELEASEVER_REPOS
+          value: ${NEWER_RELEASEVER_REPOS}
+        - name: NEWER_RELEASEVER_CSAF
+          value: ${NEWER_RELEASEVER_CSAF}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -480,3 +484,9 @@ parameters:
   value: ''
 - name: CSAF_PRODUCT_STATUS_LIST
   value: "known_affected,fixed" # comma delimited list of products to parse
+- name: NEWER_RELEASEVER_REPOS
+  description: Enable finding updates/cves in newer releaseversion from repositories
+  value: "true"
+- name: NEWER_RELEASEVER_CSAF
+  description: Enable finding updates/cves in newer releaseversion from CSAF
+  value: "true"
