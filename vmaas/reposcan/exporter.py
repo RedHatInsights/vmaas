@@ -9,6 +9,12 @@ import glob
 import os
 import sqlite3
 
+import zstandard as zstd
+
+from boto3 import client as boto3_client
+from botocore.exceptions import ClientError
+
+from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger, init_logging
 from vmaas.common.date_utils import format_datetime, now
 from vmaas.common.fileutil import remove_file_if_exists
@@ -16,7 +22,13 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
+DUMP_COMPRESSED = f"{DUMP}.zstd"
 LOGGER = get_logger(__name__)
+CFG = Config()
+
+
+class S3UploadError(Exception):
+    """S3 Error exception."""
 
 
 def fetch_latest_dump():
@@ -25,6 +37,36 @@ def fetch_latest_dump():
         return os.readlink(DUMP).split("-", 1)[1]
     except FileNotFoundError:
         return None
+
+
+def upload_dump_s3():
+    """Upload DB dump to S3 bucket."""
+    try:
+        client = boto3_client(
+            "s3",
+            endpoint_url=CFG.dump_s3_url,
+            aws_access_key_id=CFG.dump_s3_access_key,
+            aws_secret_access_key=CFG.dump_s3_secret_key,
+            use_ssl=CFG.dump_s3_tls,
+        )
+    except ClientError as err:
+        raise S3UploadError("Failed to create boto3 client") from err
+
+    try:
+        cctx = zstd.ZstdCompressor()
+        with open(DUMP, "rb") as ifd, open(DUMP_COMPRESSED, "wb") as ofd:
+            cctx.copy_stream(ifd, ofd)
+    except (ValueError, MemoryError, zstd.ZstdError) as err:
+        raise S3UploadError("Failed to compress vmaas.db") from err
+
+    try:
+        client.upload_file(
+            Filename=DUMP_COMPRESSED,
+            Bucket=CFG.dump_bucket_name,
+            Key="vmaas.db.zstd",
+        )
+    except ClientError as err:
+        raise S3UploadError("Failed to upload vmaas.db to s3") from err
 
 
 class SqliteDump:

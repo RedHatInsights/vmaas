@@ -72,6 +72,17 @@ class Config(BaseConfig, metaclass=Singleton):
         self.cw_aws_region = self._cfg.logging.cloudwatch.region
         self.cw_aws_log_group = self._cfg.logging.cloudwatch.logGroup
 
+        s3_buckets = getattr(self._cfg.objectStore, "buckets", [])
+        self.s3_available = bool(s3_buckets)
+        self.dump_bucket_name = s3_buckets[0].requestedName if self.s3_available else None
+        self.dump_s3_tls = getattr(self._cfg.objectStore, "tls", "")
+        s3_scheme = "http"
+        if self.dump_s3_tls:
+            s3_scheme += "s"
+        self.dump_s3_url = f"{s3_scheme}://{getattr(self._cfg.objectStore, 'hostname', '')}:{getattr(self._cfg.objectStore, 'port', '')}"
+        self.dump_s3_access_key = getattr(self._cfg.objectStore, "accessKey", "")
+        self.dump_s3_secret_key = getattr(self._cfg.objectStore, "secretKey", "")
+
         self.tls_ca_path = self._cfg.tlsCAPath
         self.reposcan_url = ""
         self.webapp_go_url = ""
