@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v2.68.3 (2024-10-16)
+
+### Chores
+
+* chore: update libs (mainly starlette vulnerability) ([`b6c56b8`](https://github.com/RedHatInsights/vmaas/commit/b6c56b86c8789f37893231c6b7e395ecef2848dd))
+
+### Continuous Integration
+
+* ci: pylint too-many-positional-arguments ([`cb3a7f5`](https://github.com/RedHatInsights/vmaas/commit/cb3a7f5ed87aeda1a27e778350fd1e784f55e46f))
+
+
 ## v2.68.2 (2024-10-16)
 
 ### Continuous Integration
