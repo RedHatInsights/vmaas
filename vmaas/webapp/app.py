@@ -34,6 +34,9 @@ from vmaas.common.logging_utils import init_logging
 from vmaas.common.middlewares import ErrorHandlerMiddleware, TimingLoggingMiddleware
 from vmaas.common.strtobool import strtobool
 
+# NOTE: this module is going to be removed soon
+# pylint: disable=too-many-positional-arguments
+
 # pylint: disable=too-many-lines
 CFG = Config()
 

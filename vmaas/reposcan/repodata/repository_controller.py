@@ -199,7 +199,7 @@ class RepositoryController:
                                              cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
                                              cert=repo_dict["cert"], key=repo_dict["key"]))
 
-    def add_repository(self, repo_url, content_set, basearch, releasever,
+    def add_repository(self, repo_url, content_set, basearch, releasever, *,
                        cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()

@@ -28,7 +28,7 @@ class DownloadItem:
     and result HTTP status code of the download operation.
     """
 
-    def __init__(self, source_url: str | None = None, target_path: Path | None = None,
+    def __init__(self, *, source_url: str | None = None, target_path: Path | None = None,
                  ca_cert: str | None = None, cert: str | None = None, key: str | None = None) -> None:
         self.source_url = source_url
         self.target_path = target_path
