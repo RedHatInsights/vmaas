@@ -229,7 +229,7 @@ class DatabaseUpgrade:
         conn.commit()
 
     @staticmethod
-    def _insert_log_entry(version, status, script, conn, returncode=None, stdout=None, stderr=None):
+    def _insert_log_entry(version, status, script, conn, *, returncode=None, stdout=None, stderr=None):
         with conn.cursor() as cur:
             cur.execute("""insert into db_upgrade_log
                         (version, status, script, returncode, stdout, stderr)

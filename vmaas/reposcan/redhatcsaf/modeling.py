@@ -182,6 +182,7 @@ class CsafProducts:
     def to_tuples(
         self,
         attributes: tuple[str, ...],
+        *,
         missing_only: bool = False,
         with_id: bool = False,
         with_cpe_id: bool = False,

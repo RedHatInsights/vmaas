@@ -13,6 +13,9 @@ from vmaas.common.rpm_utils import parse_rpm_name, join_rpm_name
 
 SECURITY_ERRATA_TYPE = 'security'
 
+# NOTE: this module is going to be removed soon
+# pylint: disable=too-many-positional-arguments
+
 
 def filter_non_security(errata_detail: dict, security_only: bool) -> bool:
     """Decide whether the errata should be filtered base on 'securiyt only' rule."""
