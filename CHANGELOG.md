@@ -1,6 +1,13 @@
 # CHANGELOG
 
 
+## v2.68.2 (2024-10-16)
+
+### Continuous Integration
+
+* ci: only build tagged commits ([`3613405`](https://github.com/RedHatInsights/vmaas/commit/361340577c03de14e41bbaec6eb22ba9de2c66ae))
+
+
 ## v2.68.1 (2024-10-16)
 
 ### Chores
