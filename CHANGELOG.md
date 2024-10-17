@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.69.2 (2024-10-17)
+
+### Chores
+
+* chore: intenral api to upload dump to s3
+
+RHINENG-13599 ([`6637c3e`](https://github.com/RedHatInsights/vmaas/commit/6637c3e1d537b9e46c778e404833ba550f9e1c58))
+
+
 ## v2.69.1 (2024-10-17)
 
 ### Chores
