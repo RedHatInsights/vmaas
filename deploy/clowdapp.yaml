@@ -256,7 +256,7 @@ objects:
 
     database:
       name: vmaas
-      version: 12
+      version: 16
     objectStore:
       - ${DB_DUMP_BUCKET}
     testing:

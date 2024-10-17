@@ -2,7 +2,7 @@ version: '3.4'
 services:
   vmaas_database:
     container_name: vmaas-database
-    image: docker.io/library/postgres:12
+    image: docker.io/library/postgres:16
     restart: unless-stopped
     environment:
       POSTGRES_DB: vmaas
