@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v2.69.0 (2024-10-17)
+
+### Features
+
+* feat: upload compressed sqlite dump to s3
+
+RHINENG-13599 ([`3c04002`](https://github.com/RedHatInsights/vmaas/commit/3c04002967063fdd9240a2e243f1d80b520554b1))
+
+* feat(dump): deploy app with object store
+
+RHINENG-13599 ([`497f005`](https://github.com/RedHatInsights/vmaas/commit/497f005320e14681620da135f075ec363a477ec9))
+
+
 ## v2.68.3 (2024-10-16)
 
 ### Chores
