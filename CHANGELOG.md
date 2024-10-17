@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.69.1 (2024-10-17)
+
+### Chores
+
+* chore: upgrade db to pg 16
+
+RHINENG-13735 ([`9a0a14e`](https://github.com/RedHatInsights/vmaas/commit/9a0a14e78f6f822cbd7c0b90a880d4fb560ed920))
+
+
 ## v2.69.0 (2024-10-17)
 
 ### Features
