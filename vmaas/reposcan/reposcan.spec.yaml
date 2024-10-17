@@ -223,6 +223,24 @@ paths:
       tags:
         - Export
 
+  /export/dump_s3:
+    put:
+      summary: Upload exported dump to S3 bucket
+      operationId: vmaas.reposcan.reposcan.S3ExporterHandler.put
+      <<: *secured
+      responses:
+        200:
+          description: Sync started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStartResponse"
+
+        <<: *auth_resps
+        <<: *running_resp
+      tags:
+        - Export
+
   /task/status:
     get:
       summary: Get status of currently running background task
