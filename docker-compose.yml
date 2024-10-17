@@ -3,7 +3,7 @@ version: '3'
 services:
   vmaas_database:
     container_name: vmaas-database
-    image: docker.io/library/postgres:12
+    image: docker.io/library/postgres:16
     restart: unless-stopped
     shm_size: '256mb'
     environment:
