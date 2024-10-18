@@ -80,9 +80,8 @@ class Config(BaseConfig, metaclass=Singleton):
         if self.dump_s3_tls:
             s3_scheme += "s"
         self.dump_s3_url = f"{s3_scheme}://{getattr(self._cfg.objectStore, 'hostname', '')}:{getattr(self._cfg.objectStore, 'port', '')}"
-        self.dump_s3_access_key = getattr(self._cfg.objectStore, "accessKey", "")
-        self.dump_s3_secret_key = getattr(self._cfg.objectStore, "secretKey", "")
-
+        self.dump_s3_access_key = getattr(s3_buckets[0], "accessKey", "") if self.s3_available else None
+        self.dump_s3_secret_key = getattr(s3_buckets[0], "secretKey", "") if self.s3_available else None
         self.tls_ca_path = self._cfg.tlsCAPath
         self.reposcan_url = ""
         self.webapp_go_url = ""
