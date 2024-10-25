@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.69.7 (2024-10-25)
+
+### Bug Fixes
+
+* fix(webapp): label key is not in result dict if all repos are skipped
+
+causing KeyError ([`d45a9a8`](https://github.com/RedHatInsights/vmaas/commit/d45a9a80c9f3118db66db3d686f840c0a3c2547f))
+
+
 ## v2.69.6 (2024-10-25)
 
 ### Chores
