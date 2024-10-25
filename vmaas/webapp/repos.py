@@ -173,7 +173,7 @@ class RepoAPI:
                         repolist.setdefault(label, []).append(repo)
                     if not latest_repo_change or repo_detail[REPO_LAST_CHANGE] > latest_repo_change:
                         latest_repo_change = repo_detail[REPO_LAST_CHANGE]
-            actual_page_size += len(repolist[label])
+            actual_page_size += len(repolist.get(label, []))
 
         response = {
             'repository_list': repolist,
