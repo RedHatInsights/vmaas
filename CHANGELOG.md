@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.69.6 (2024-10-25)
+
+### Chores
+
+* chore: revert to ubi8
+
+RHINENG-13902 ([`2951dc4`](https://github.com/RedHatInsights/vmaas/commit/2951dc4f6afb2afde5b806ef58ac24b1bf5fe122))
+
+
 ## v2.69.5 (2024-10-24)
 
 ### Chores
