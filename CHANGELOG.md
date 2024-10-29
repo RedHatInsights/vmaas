@@ -1,6 +1,13 @@
 # CHANGELOG
 
 
+## v2.69.9 (2024-10-29)
+
+### Bug Fixes
+
+* fix(s3): get accessKey from bucket not objectStore ([`d42dfaf`](https://github.com/RedHatInsights/vmaas/commit/d42dfaf0a6d559316c06d3c00ec5d2c7d192a611))
+
+
 ## v2.69.8 (2024-10-29)
 
 ### Chores
