@@ -28,7 +28,7 @@ readme = "README.md"
 packages = []
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = "~3.13.0"
 app-common-python = ">=0.2.5"
 apscheduler = "^3.10.4"
 boto3 = ">=1.16.13"
