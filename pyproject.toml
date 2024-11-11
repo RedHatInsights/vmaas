@@ -21,7 +21,7 @@ patch_tags = ["build", "chore", "ci", "fix", "perf", "refactor"]
 
 [tool.poetry]
 name = "vmaas"
-version = "2.69.11"
+version = "2.69.12"
 description = ""
 authors = [""]
 readme = "README.md"
