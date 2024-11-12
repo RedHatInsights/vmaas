@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v2.69.13 (2024-11-12)
+
+### Chores
+
+- Update dependencies
+  ([`1000eba`](https://github.com/RedHatInsights/vmaas/commit/1000eba36e6f1062f6db657c21f9954d171985ae))
+
+fix possible werkzeug vulnerabilities
+
+RHINENG-14310
+
+
 ## v2.69.12 (2024-11-11)
 
 ### Continuous Integration
