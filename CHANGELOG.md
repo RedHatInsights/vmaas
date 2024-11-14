@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.69.15 (2024-11-14)
+
+### Continuous Integration
+
+- Revert image temporarily until konflux is stable enough
+  ([`70d3301`](https://github.com/RedHatInsights/vmaas/commit/70d330112ecb4556d27c83644cdcd05290164aef))
+
+
 ## v2.69.14 (2024-11-12)
 
 ### Chores
