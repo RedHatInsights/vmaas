@@ -51,6 +51,8 @@ objects:
           value: ${NEWER_RELEASEVER_REPOS}
         - name: NEWER_RELEASEVER_CSAF
           value: ${NEWER_RELEASEVER_CSAF}
+        - name: ENABLE_GO_CVES
+          value: ${ENABLE_GO_CVES}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -494,3 +496,6 @@ parameters:
   value: "true"
 - name: DB_DUMP_BUCKET
   value: insights-vmaas-dump-storage
+- name: ENABLE_GO_CVES
+  description: Enable go implementation of the cves endpoint
+  value: "false"
