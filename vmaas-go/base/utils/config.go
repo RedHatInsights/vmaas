@@ -45,6 +45,7 @@ type Config struct {
 	LogStyle             string
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
+	EnableGoCves         bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -134,6 +135,7 @@ func initEnv() {
 	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
 	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
 	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
+	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
