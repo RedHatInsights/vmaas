@@ -26,5 +26,9 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/repos/:repo", controllers.ReposHandler)
 		api.POST("/repos", controllers.ReposPostHandler)
 	}
+	if utils.Cfg.EnableGoPkgTree {
+		api.GET("/pkgtree/:package_name", controllers.PkgTreeHandler)
+		api.POST("/pkgtree", controllers.PkgTreePostHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
