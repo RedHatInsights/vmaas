@@ -53,6 +53,8 @@ objects:
           value: ${NEWER_RELEASEVER_CSAF}
         - name: ENABLE_GO_CVES
           value: ${ENABLE_GO_CVES}
+        - name: ENABLE_GO_ERRATA
+          value: ${ENABLE_GO_ERRATA}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -498,4 +500,7 @@ parameters:
   value: insights-vmaas-dump-storage
 - name: ENABLE_GO_CVES
   description: Enable go implementation of the cves endpoint
+  value: "false"
+- name: ENABLE_GO_ERRATA
+  description: Enable go implementation of the errata endpoint
   value: "false"
