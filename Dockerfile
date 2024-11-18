@@ -49,6 +49,9 @@ RUN if [ "${STATIC_ASSETS}" == 1 ] ; then \
         git clone https://gitlab.cee.redhat.com/vmaas/vmaas-assets.git /vmaas/repolist_git ; \
     fi
 
+# remove testdata possibly containing vulnerable code
+RUN rm -rf /vmaas/go/pkg/mod/github.com/gabriel-vasile/mimetype\@v1.4.6/testdata/
+
 USER vmaas
 
 ADD entrypoint.sh               /vmaas/
