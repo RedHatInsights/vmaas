@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v2.69.17 (2024-11-19)
+
+### Chores
+
+- Solve issues reported by grype
+  ([`909b997`](https://github.com/RedHatInsights/vmaas/commit/909b997801b3fcdf2252002af769aca3bd37f76c))
+
+update dependencies
+
+remove /vmaas/go/pkg/mod/github.com/gabriel-vasile/mimetype\@v1.4.6/testdata which contains
+  vulnerable files RHINENG-14310
+
+
 ## v2.69.16 (2024-11-18)
 
 ### Chores
