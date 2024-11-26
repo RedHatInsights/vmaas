@@ -22,5 +22,9 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/errata/:erratum", controllers.ErrataHandler)
 		api.POST("/errata", controllers.ErrataPostHandler)
 	}
+	if utils.Cfg.EnableGoRepos {
+		api.GET("/repos/:repo", controllers.ReposHandler)
+		api.POST("/repos", controllers.ReposPostHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
