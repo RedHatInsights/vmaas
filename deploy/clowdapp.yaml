@@ -55,6 +55,8 @@ objects:
           value: ${ENABLE_GO_CVES}
         - name: ENABLE_GO_ERRATA
           value: ${ENABLE_GO_ERRATA}
+        - name: ENABLE_GO_REPOS
+          value: ${ENABLE_GO_REPOS}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -503,4 +505,7 @@ parameters:
   value: "false"
 - name: ENABLE_GO_ERRATA
   description: Enable go implementation of the errata endpoint
+  value: "false"
+- name: ENABLE_GO_REPOS
+  description: Enable go implementation of the repos endpoint
   value: "false"
