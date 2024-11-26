@@ -47,6 +47,7 @@ type Config struct {
 	EnableProfiler       bool
 	EnableGoCves         bool
 	EnableGoErrata       bool
+	EnableGoRepos        bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -138,6 +139,7 @@ func initEnv() {
 	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
 	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
 	Cfg.EnableGoErrata = GetBoolEnvOrDefault("ENABLE_GO_ERRATA", false)
+	Cfg.EnableGoRepos = GetBoolEnvOrDefault("ENABLE_GO_REPOS", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
