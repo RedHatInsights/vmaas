@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.69.20 (2024-11-28)
+
+### Bug Fixes
+
+- Ignore updates from rhel-alt el7a release
+  ([`2f409ef`](https://github.com/RedHatInsights/vmaas/commit/2f409efc4d34fedfc3ac3d43f7f98beb46d9781f))
+
+RHINENG-14561
+
+
 ## v2.69.19 (2024-11-23)
 
 ### Chores
