@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v2.69.24 (2024-12-06)
+
+### Chores
+
+- Upgrade python version
+  ([`0da3d3f`](https://github.com/RedHatInsights/vmaas/commit/0da3d3f08e4fe6b3521c174a89d50d07797476e5))
+
+RHINENG-14727
+
+RHINENG-14647
+
+RHINENG-14648
+
+
 ## v2.69.23 (2024-12-05)
 
 ### Chores
