@@ -7,9 +7,9 @@ RUN curl -o /etc/yum.repos.d/postgresql.repo \
 RUN microdnf module enable nginx:1.20 || :
 RUN microdnf module disable postgresql || :
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python311 python3.11-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
+        python312 python3.12-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
         $VAR_RPMS && \
-        ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.11/site-packages/rpm && \
+        ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
     microdnf clean all
 
 WORKDIR /vmaas
@@ -20,10 +20,10 @@ ADD poetry.lock    /vmaas/
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG VAR_POETRY_INSTALL_OPT="--only main"
-RUN pip3.11 install --upgrade pip && \
-    pip3.11 install --upgrade poetry~=1.5
+RUN pip3.12 install --upgrade pip && \
+    pip3.12 install --upgrade poetry~=1.5
 RUN poetry export $VAR_POETRY_INSTALL_OPT -f requirements.txt --output requirements.txt && \
-    pip3.11 install -r requirements.txt
+    pip3.12 install -r requirements.txt
 
 RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas
