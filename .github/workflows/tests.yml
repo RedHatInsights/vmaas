@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11]
+        python-version: [3.12]
     env:
       PGPORT: "5433"
     steps:
@@ -31,10 +31,10 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T test ./scripts/check_deps_versions.sh --exit-code-from
       - name: Validate dashboards
         run: |
-          docker compose -f docker-compose.test.yml exec -T test python3.11 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
       - name: Wait for services and upgrade DB
         run: |
-          docker compose -f docker-compose.test.yml exec -T test python3.11 -m vmaas.common.wait_for_services python3.11 -m vmaas.reposcan.database.upgrade --exit-code-from
+          docker compose -f docker-compose.test.yml exec -T test python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade --exit-code-from
       - name: exec common tests
         run: |
           docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/common --exit-code-from
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11]
+        python-version: [3.12]
     steps:
       - name: Checkout
         uses: actions/checkout@v4

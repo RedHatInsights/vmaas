@@ -25,9 +25,9 @@ fi
 cat <<EOF > $workdir$dockerfile
 FROM registry.access.redhat.com/ubi9/ubi-minimal
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python311 python3.11-pip python3.11-devel libpq-devel gcc git && \
+        python312 python3.12-pip python3.12-devel libpq-devel gcc git && \
     microdnf clean all
-RUN pip3.11 install --upgrade pip && pip3 install --upgrade poetry~=1.5
+RUN pip3.12 install --upgrade pip && pip3 install --upgrade poetry~=1.5
 EOF
 
 current_dir=$(pwd)
