@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -105,6 +106,25 @@ func respStatusError(c *gin.Context, code int, err error) {
 	})
 }
 
+func processBadRequestErrMessage(err error) error {
+	errMessage := err.Error()
+	if strings.HasPrefix(errMessage, "parsing time") {
+		parts := strings.Split(errMessage, `"`)
+		if len(parts) < 2 {
+			return errors.New("Wrong date format (not ISO format with timezone)")
+		}
+		return errors.New("Wrong date format (not ISO format with timezone): " + parts[1])
+	}
+	if strings.HasSuffix(errMessage, "looking for beginning of value") {
+		parts := strings.Split(errMessage, ` `)
+		if len(parts) < 3 {
+			return errors.New("malformed input")
+		}
+		return errors.New("malformed input: invalid character " + parts[2])
+	}
+	return err
+}
+
 func LogAndRespError(c *gin.Context, err error) {
 	if errors.Is(err, vmaas.ErrProcessingInput) {
 		// if error is from processing the request, we should return 400
@@ -116,6 +136,7 @@ func LogAndRespError(c *gin.Context, err error) {
 }
 
 func LogAndRespBadRequest(c *gin.Context, err error) {
+	err = processBadRequestErrMessage(err)
 	LogWarn("err", err.Error())
 	respStatusError(c, http.StatusBadRequest, err)
 }
