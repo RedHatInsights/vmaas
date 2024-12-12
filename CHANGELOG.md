@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.69.26 (2024-12-12)
+
+### Chores
+
+- **deps**: Update konflux references
+  ([`2e429e2`](https://github.com/RedHatInsights/vmaas/commit/2e429e2c5265f56d773f8e75cf2a838fe4bc73a6))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.69.25 (2024-12-12)
 
 ### Chores
