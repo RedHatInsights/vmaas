@@ -48,6 +48,7 @@ type Config struct {
 	EnableGoCves         bool
 	EnableGoErrata       bool
 	EnableGoRepos        bool
+	EnableGoPackages     bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -140,6 +141,7 @@ func initEnv() {
 	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
 	Cfg.EnableGoErrata = GetBoolEnvOrDefault("ENABLE_GO_ERRATA", false)
 	Cfg.EnableGoRepos = GetBoolEnvOrDefault("ENABLE_GO_REPOS", false)
+	Cfg.EnableGoPackages = GetBoolEnvOrDefault("ENABLE_GO_PACKAGES", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
