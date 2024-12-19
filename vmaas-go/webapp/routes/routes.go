@@ -26,5 +26,9 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/repos/:repo", controllers.ReposHandler)
 		api.POST("/repos", controllers.ReposPostHandler)
 	}
+	if utils.Cfg.EnableGoPackages {
+		api.GET("/packages/:nevra", controllers.PackagesHandler)
+		api.POST("/packages", controllers.PackagesPostHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
