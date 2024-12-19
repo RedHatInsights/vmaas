@@ -46,6 +46,7 @@ type Config struct {
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
 	EnableGoCves         bool
+	EnableGoPackages     bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -136,6 +137,7 @@ func initEnv() {
 	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
 	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
 	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
+	Cfg.EnableGoPackages = GetBoolEnvOrDefault("ENABLE_GO_PACKAGES", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
