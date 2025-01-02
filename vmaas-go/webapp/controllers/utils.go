@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas-lib/vmaas"
@@ -10,20 +11,37 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
-func bindValidateJSON(c *gin.Context, request *vmaas.Request) error {
+func bindValidateJSON(c *gin.Context, request interface{}) error {
 	if request == nil {
 		return fmt.Errorf("nil vmaas request")
 	}
 	if err := c.BindJSON(request); err != nil {
+		errMessage := err.Error()
+		if strings.HasPrefix(errMessage, "parsing time") {
+			parts := strings.Split(errMessage, `"`)
+			if len(parts) < 2 {
+				return errors.New("wrong date format (not ISO format with timezone)")
+			}
+			return errors.New("wrong date format (not ISO format with timezone): " + parts[1])
+		}
+		if strings.HasSuffix(errMessage, "looking for beginning of value") {
+			parts := strings.Split(errMessage, ` `)
+			if len(parts) < 3 {
+				return errors.New("malformed input")
+			}
+			return errors.New("malformed input: invalid character " + parts[2])
+		}
 		return err
 	}
-	// validate module name:stream
-	for i, m := range request.Modules {
-		if m.Module == nil {
-			return fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
-		}
-		if m.Stream == nil {
-			return fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
+
+	if reqest, ok := (request).(*vmaas.Request); ok {
+		for i, m := range reqest.Modules {
+			if m.Module == nil {
+				return fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
+			}
+			if m.Stream == nil {
+				return fmt.Errorf("'module_stream' is a required property - 'modules_list.%d'", i)
+			}
 		}
 	}
 	return nil
