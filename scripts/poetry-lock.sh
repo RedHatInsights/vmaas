@@ -2,7 +2,7 @@
 
 # Script to lock Poetry dependencies in container and copy generated lock file back
 
-workdir="/tmp/"
+workdir="/tmp/poetry-locker/"
 dockerfile="Dockerfile-poetry"
 
 for runtime in podman docker; do
@@ -22,6 +22,7 @@ else
     exit 1
 fi
 
+mkdir -p $workdir
 cat <<EOF > $workdir$dockerfile
 FROM registry.access.redhat.com/ubi9/ubi-minimal
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
