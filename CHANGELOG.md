@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v2.69.30 (2025-01-06)
+
+### Chores
+
+- Avoid adding other files in /tmp to build context
+  ([`1644781`](https://github.com/RedHatInsights/vmaas/commit/16447818fb148cd56b82bc7ce3cbdcd6c39782ce))
+
+- Update deps
+  ([`77293f2`](https://github.com/RedHatInsights/vmaas/commit/77293f22b508b3cf34c911827ab4a722cdfb7188))
+
+Closes #1202 Closes #1208 Closes #1209 Closes #1210 Closes #1211 Closes #1212 Closes #1213 Closes
+  #1215 Closes #1216 Closes #1218
+
+- Update to poetry 2.0
+  ([`97b2bb3`](https://github.com/RedHatInsights/vmaas/commit/97b2bb30cab6e213366eea01c4e4b2d410725173))
+
+
 ## v2.69.29 (2025-01-04)
 
 ### Chores
