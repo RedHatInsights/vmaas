@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.12]
-        poetry-version: [1.5]
+        poetry-version: [2.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        run: pip install poetry~=1.5
+        run: pip install poetry~=2.0 poetry-plugin-export
       - name: Set up Safety
         run: pip install safety
       - name: Export requirements.txt
