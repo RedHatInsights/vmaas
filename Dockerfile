@@ -21,7 +21,7 @@ ENV LC_ALL=C.utf8
 ENV LANG=C.utf8
 ARG VAR_POETRY_INSTALL_OPT="--only main"
 RUN pip3.12 install --upgrade pip && \
-    pip3.12 install --upgrade poetry~=1.5
+    pip3.12 install --upgrade poetry~=2.0 poetry-plugin-export
 RUN poetry export $VAR_POETRY_INSTALL_OPT -f requirements.txt --output requirements.txt && \
     pip3.12 install -r requirements.txt
 
