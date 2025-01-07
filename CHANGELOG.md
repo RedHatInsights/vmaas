@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.69.31 (2025-01-07)
+
+### Chores
+
+- Update go dependencies
+  ([`88f4ad0`](https://github.com/RedHatInsights/vmaas/commit/88f4ad042eb65b9c7aa69740cb1d7b40718d6ac4))
+
+
 ## v2.69.30 (2025-01-06)
 
 ### Chores
