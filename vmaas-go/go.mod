@@ -1,8 +1,6 @@
 module github.com/redhatinsights/vmaas
 
-go 1.21.0
-
-toolchain go1.21.13
+go 1.22
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
@@ -13,7 +11,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redhatinsights/app-common-go v1.6.8
 	github.com/redhatinsights/platform-go-middlewares v1.0.0
-	github.com/redhatinsights/vmaas-lib v1.14.6
+	github.com/redhatinsights/vmaas-lib v1.14.7-0.20250110172305-47fcde3ab5ec
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	github.com/zsais/go-gin-prometheus v0.1.0
@@ -21,11 +19,10 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.12.6 // indirect
-	github.com/bytedance/sonic/loader v0.2.1 // indirect
+	github.com/bytedance/sonic v1.12.7 // indirect
+	github.com/bytedance/sonic/loader v0.2.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
-	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ezamriy/gorpm v0.0.0-20160905202458-25f7273cbf51 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -58,7 +55,7 @@ require (
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/protobuf v1.36.1 // indirect
+	google.golang.org/protobuf v1.36.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
