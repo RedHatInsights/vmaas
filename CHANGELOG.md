@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.70.0 (2025-01-14)
+
+### Features
+
+- **webapp**: Add go controller for cves endpoint
+  ([`e315631`](https://github.com/RedHatInsights/vmaas/commit/e315631102fc080ef14694df105dca6bf1a8fda2))
+
+RHINENG-13545
+
+
 ## v2.69.31 (2025-01-07)
 
 ### Chores
