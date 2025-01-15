@@ -29,7 +29,7 @@ linters:
     - lll # Reports long lines [fast: true, auto-fix: false]
     - nakedret # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
     - prealloc # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
-    - exportloopref # checks for pointers to enclosing loop variables [fast: false, auto-fix: false]
+    - copyloopvar # checks for pointers to enclosing loop variables [fast: false, auto-fix: false]
     - stylecheck # Stylecheck is a replacement for golint [fast: true, auto-fix: false]
     - unconvert # Remove unnecessary type conversions [fast: true, auto-fix: false]
     - unparam # Reports unused function parameters [fast: true, auto-fix: false]

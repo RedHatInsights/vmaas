@@ -1,8 +1,8 @@
 module github.com/redhatinsights/vmaas
 
-go 1.21.0
+go 1.22
 
-toolchain go1.21.13
+toolchain go1.22.10
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
