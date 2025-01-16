@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 24);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 25);
 
 -- -----------------------------------------------------
 -- evr type
@@ -997,6 +997,20 @@ CREATE TABLE IF NOT EXISTS csaf_cve_product (
     UNIQUE (cve_id, csaf_product_id)
 )TABLESPACE pg_default;
 
+-- -----------------------------------------------------
+-- Table vmaas.operating_system
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS operating_system (
+  id SERIAL,
+  name TEXT NOT NULL, CHECK (NOT empty(name)),
+  major INT NOT NULL,
+  minor INT NOT NULL,
+  ga DATE NOT NULL,
+  system_profile JSONB,
+  PRIMARY KEY (id),
+  CONSTRAINT operating_system_name_major_minor_uq
+    UNIQUE (name, major, minor)
+)TABLESPACE pg_default;
 
 -- -----------------------------------------------------
 -- vmaas users permission setup:
