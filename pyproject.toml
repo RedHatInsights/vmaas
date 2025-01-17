@@ -79,6 +79,8 @@ warn_unreachable = true
 follow_imports = "silent"
 packages = """
     vmaas.reposcan.database.csaf_store,
+    vmaas.reposcan.database.release_store,
     vmaas.reposcan.database.test.test_csaf,
-    vmaas.reposcan.redhatcsaf
+    vmaas.reposcan.redhatcsaf,
+    vmaas.reposcan.redhatrelease
 """

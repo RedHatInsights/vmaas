@@ -34,11 +34,12 @@ from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
-    CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, REPOS_TO_CLEANUP, REGISTRY
+    CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
+from vmaas.reposcan.redhatrelease.release_controller import ReleaseController
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
 
 LOGGER = get_logger(__name__)
@@ -56,6 +57,7 @@ REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaa
 REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
+RELEASEMAP_PATH = os.getenv('RELEASEMAP_PATH', 'ga_dates.json')
 
 DEFAULT_CERT_NAME = "DEFAULT"
 DEFAULT_CA_CERT = os.getenv("DEFAULT_CA_CERT", "")
@@ -73,6 +75,7 @@ SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
+SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 
 
 class TaskStatusResponse(dict):
@@ -179,6 +182,58 @@ class SyncHandler:
     """Base handler class providing common methods for different sync types."""
 
     task_type = "Unknown"
+
+    @staticmethod
+    def fetch_git():
+        """Download and parse data from configured git repo"""
+        if IS_FEDRAMP:
+            LOGGER.info("FedRAMP env, using static assets source: %s", REPOLIST_STATIC_DIR)
+            repolist_dir = REPOLIST_STATIC_DIR
+        else:
+            LOGGER.info("Downloading assets from git %s", REPOLIST_GIT)
+            shutil.rmtree(REPOLIST_DIR, True)
+            os.makedirs(REPOLIST_DIR, exist_ok=True)
+
+            # Should we just use replacement or add a url handling library, which
+            # would be used replace the username in the provided URL ?
+            git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
+            git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
+
+            git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
+            repolist_dir = REPOLIST_DIR
+
+        if not os.path.isdir(repolist_dir):
+            LOGGER.error("Downloading assets git repo failed: Directory was not created")
+            return None, None, None
+
+        products, repos = {}, []
+
+        paths = REPOLIST_PATH.split(',')
+        for path in paths:
+            # Trim the spaces so we can have nicely formatted comma lists
+            path = path.strip()
+            if not os.path.isfile(repolist_dir + '/' + path):
+                LOGGER.error("Downloading git repo failed: File %s was not created", path)
+                return None, None, None
+
+            with open(repolist_dir + '/' + path, 'r', encoding='utf8') as json_file:
+                data = json.load(json_file)
+
+            item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
+            if not item_products and not item_repos:
+                LOGGER.warning("Input json is not valid")
+                return None, None, None
+            products.update(item_products)
+            repos += item_repos
+
+        if not os.path.isfile(repolist_dir + '/' + RELEASEMAP_PATH):
+            LOGGER.error("Downloading assets git repo failed: File %s was not created", RELEASEMAP_PATH)
+            return None, None, None
+
+        with open(repolist_dir + '/' + RELEASEMAP_PATH, 'r', encoding='utf8') as json_file:
+            releases = json.load(json_file)
+
+        return products, repos, releases
 
     @classmethod
     def start_task(cls, *args, export=True, **kwargs):
@@ -349,53 +404,13 @@ class GitRepoListHandler(RepolistImportHandler):
     task_type = "Import repositories from git"
 
     @staticmethod
-    def fetch_git_repolists():
-        """Download and parse repolists from configured git repo"""
-        if IS_FEDRAMP:
-            LOGGER.info("FedRAMP env, using static repolists source: %s", REPOLIST_STATIC_DIR)
-            repolist_dir = REPOLIST_STATIC_DIR
-        else:
-            LOGGER.info("Downloading repolists from git %s", REPOLIST_GIT)
-            shutil.rmtree(REPOLIST_DIR, True)
-            os.makedirs(REPOLIST_DIR, exist_ok=True)
-
-            # Should we just use replacement or add a url handling library, which
-            # would be used replace the username in the provided URL ?
-            git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
-            git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
-
-            git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
-            repolist_dir = REPOLIST_DIR
-
-        paths = REPOLIST_PATH.split(',')
-        products, repos = {}, []
-
-        for path in paths:
-            # Trim the spaces so we can have nicely formatted comma lists
-            path = path.strip()
-            if not os.path.isdir(repolist_dir) or not os.path.isfile(repolist_dir + '/' + path):
-                LOGGER.error("Downloading repolist failed: Directory was not created")
-                return None, None
-
-            with open(repolist_dir + '/' + path, 'r', encoding='utf8') as json_file:
-                data = json.load(json_file)
-            assert data
-            item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
-            if not item_products and not item_repos:
-                LOGGER.warning("Input json is not valid")
-                return None, None
-            products.update(item_products)
-            repos += item_repos
-        return products, repos
-
-    @staticmethod
     def run_task(*args, **kwargs):
         """Start importing from git"""
         init_logging()
         if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
             LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
             return "SKIPPED"
-        products, repos = GitRepoListHandler.fetch_git_repolists()
+        products, repos, _ = SyncHandler.fetch_git()
         if products is None or repos is None:
             return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
@@ -428,7 +443,7 @@ class GitRepoListCleanupHandler(SyncHandler):
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
                 return "SKIPPED"
 
-            _, repos = GitRepoListHandler.fetch_git_repolists()
+            _, repos, _ = SyncHandler.fetch_git()
             if not repos:
                 return "ERROR"
 
@@ -749,6 +764,39 @@ class CsafSyncHandler(SyncHandler):
         return "OK"
 
 
+class ReleaseSyncHandler(SyncHandler):
+    """Handler for RHEL OS release version sync API."""
+
+    task_type = "Sync RHEL releases"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Sync RHEL releases."""
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing RHEL releases."""
+        try:
+            init_logging()
+            init_db()
+            _, _, releases = SyncHandler.fetch_git()
+            controller = ReleaseController()
+            controller.store(releases)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            RELEASE_FAILED_IMPORT.inc()
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
 def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
@@ -757,6 +805,7 @@ def all_sync_handlers() -> list:
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
     handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]
+    handlers.extend([ReleaseSyncHandler] if SYNC_RELEASES else [])  # type: ignore[list-item]
     return handlers
 
 
