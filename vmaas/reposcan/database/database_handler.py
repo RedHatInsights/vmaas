@@ -35,7 +35,7 @@ class DatabaseHandler:
     connection = None
 
     @classmethod
-    def get_connection(cls):
+    def get_connection(cls) -> psycopg2.extensions.connection:
         """Get database connection. Create new connection if doesn't exist."""
         if cls.connection is None:
             cls.connection = psycopg2.connect(

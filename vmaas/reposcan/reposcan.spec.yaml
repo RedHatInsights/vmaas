@@ -177,6 +177,16 @@ paths:
       tags:
         - Sync
 
+  /sync/release:
+    put:
+      summary: Sync RHEL OS release version metadata
+      operationId: vmaas.reposcan.reposcan.ReleaseSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /export/pkgtree:
     put:
       summary: Export package tree
