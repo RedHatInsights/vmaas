@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.70.1 (2025-01-17)
+
+### Chores
+
+- Update go version
+  ([`ca06009`](https://github.com/RedHatInsights/vmaas/commit/ca06009c1e9e4109fba8fa8106c3f8205d9b6676))
+
+RHINENG-15256
+
+
 ## v2.70.0 (2025-01-14)
 
 ### Features
