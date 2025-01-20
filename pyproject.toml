@@ -32,7 +32,7 @@ python = "~3.12"
 app-common-python = ">=0.2.5"
 apscheduler = "^3.10.4"
 boto3 = ">=1.16.13"
-botocore = ">=1.19.13"
+botocore = ">=1.36.2"
 connexion = {extras = ["swagger-ui"],version = "^3.2.0"}
 gitpython = ">=3.1.30"
 iso8601 = ">=0.1.12"
