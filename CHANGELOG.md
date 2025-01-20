@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.71.0 (2025-01-20)
+
+### Features
+
+- **database**: Prepare operating_system table
+  ([`2b09545`](https://github.com/RedHatInsights/vmaas/commit/2b09545f43740e55c8327da0e0c1445a4a36cebe))
+
+RHINENG-15335
+
+- **reposcan**: Sync release versions GA dates
+  ([`5482260`](https://github.com/RedHatInsights/vmaas/commit/5482260feb727089a1ae207f60d3ea38584cff74))
+
+RHINENG-15335
+
+
 ## v2.70.1 (2025-01-17)
 
 ### Chores
