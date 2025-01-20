@@ -1,6 +1,26 @@
 # CHANGELOG
 
 
+## v2.71.1 (2025-01-20)
+
+### Chores
+
+- Update dependency boto3 to v1.36.2
+  ([`e6847cc`](https://github.com/RedHatInsights/vmaas/commit/e6847ccf0b91c57d501905ded94c6eb0171cfbd4))
+
+- Update dependency botocore to v1.36.2
+  ([`b2c1fb2`](https://github.com/RedHatInsights/vmaas/commit/b2c1fb21e0cba8b36ccd2460257af1b557a290b3))
+
+- Update dependency connexion to v3.2.0
+  ([`c9b3bb8`](https://github.com/RedHatInsights/vmaas/commit/c9b3bb829a112a9a9fd236b97c18797935d25871))
+
+- Update dependency pyopenssl to v25
+  ([`d58256d`](https://github.com/RedHatInsights/vmaas/commit/d58256d9435d25cc48afe2802c0441932d667a67))
+
+- Update poetry lock
+  ([`ff13257`](https://github.com/RedHatInsights/vmaas/commit/ff1325703177fa8d32446545e04f4f37954272e6))
+
+
 ## v2.71.0 (2025-01-20)
 
 ### Features
