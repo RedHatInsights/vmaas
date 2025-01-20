@@ -59,6 +59,8 @@ objects:
           value: ${ENABLE_GO_REPOS}
         - name: ENABLE_GO_PACKAGES
           value: ${ENABLE_GO_PACKAGES}
+        - name: ENABLE_GO_PKGLIST
+          value: ${ENABLE_GO_PKGLIST}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -513,4 +515,7 @@ parameters:
   value: "false"
 - name: ENABLE_GO_PACKAGES
   description: Enable go implementation of the packages endpoint
+  value: "false"
+- name: ENABLE_GO_PKGLIST
+  description: Enable go implementation of the pkglist endpoint
   value: "false"
