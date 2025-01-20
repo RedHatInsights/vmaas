@@ -18,4 +18,8 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/cves/:cve", controllers.CvesHandler)
 		api.POST("/cves", controllers.CvesPostHandler)
 	}
+	if utils.Cfg.EnableGoRepos {
+		api.GET("/repos/:repo", controllers.ReposHandler)
+		api.POST("/repos", controllers.ReposPostHandler)
+	}
 }
