@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.72.0 (2025-01-22)
+
+### Features
+
+- **reposcan**: Generate system profile for each RHEL release
+  ([`fc3eb62`](https://github.com/RedHatInsights/vmaas/commit/fc3eb62aa2a3e27bb9d721fe6e1561ab52168e9a))
+
+RHINENG-15335
+
+
 ## v2.71.1 (2025-01-20)
 
 ### Chores
