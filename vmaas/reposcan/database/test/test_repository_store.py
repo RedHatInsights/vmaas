@@ -64,13 +64,13 @@ class TestRepositoryStore:
         self.repo_store.store(repository[1])
 
         cur = db_conn.cursor()
-        cur.execute("select * from repo where url = '{}'".format(repository[1].repo_url))
+        cur.execute("select * from repo where url = %s", (repository[1].repo_url,))
         repo = cur.fetchone()
-        cur.execute("select * from content_set where id = {}".format(repo[REPO_CS_ID]))
+        cur.execute("select * from content_set where id = %s", (repo[REPO_CS_ID],))
         content_set = cur.fetchone()
-        cur.execute("select * from product where id = {}".format(content_set[CS_PRODUCT_ID]))
+        cur.execute("select * from product where id = %s", (content_set[CS_PRODUCT_ID],))
         product = cur.fetchone()
-        cur.execute("select * from arch where id = {}".format(repo[REPO_BASEARCH_ID]))
+        cur.execute("select * from arch where id = %s", (repo[REPO_BASEARCH_ID],))
         arch = cur.fetchone()
 
         assert repo[REPO_URL] == repository[1].repo_url
@@ -88,9 +88,9 @@ class TestRepositoryStore:
     def test_repo_pkgs(self, db_conn, repository):
         """Test that packages from repo are present in DB."""
         cur = db_conn.cursor()
-        cur.execute("select id from repo where url = '{}'".format(repository[1].repo_url))
+        cur.execute("select id from repo where url = %s", (repository[1].repo_url,))
         repo_id = cur.fetchone()[0]
-        cur.execute("select count(*) from pkg_repo where repo_id = {}".format(repo_id))
+        cur.execute("select count(*) from pkg_repo where repo_id = %s", (repo_id,))
         pkg_num = cur.fetchone()[0]
 
         assert pkg_num == 12  # 12 packages expected from primary.xml/primary.db
@@ -99,9 +99,9 @@ class TestRepositoryStore:
     def test_repo_errata(self, db_conn, repository):
         """Test that errata from repo are present in DB."""
         cur = db_conn.cursor()
-        cur.execute("select id from repo where url = '{}'".format(repository[1].repo_url))
+        cur.execute("select id from repo where url = %s", (repository[1].repo_url,))
         repo_id = cur.fetchone()[0]
-        cur.execute("select count(*) from errata_repo where repo_id = {}".format(repo_id))
+        cur.execute("select count(*) from errata_repo where repo_id = %s", (repo_id,))
         errata_num = cur.fetchone()[0]
 
         # only repository with updateifo has errata
