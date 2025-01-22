@@ -12,3 +12,4 @@ class Release:
     major: int
     minor: int
     ga_date: date
+    system_profile: dict[str, str | list[str]]

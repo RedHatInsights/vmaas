@@ -2,11 +2,15 @@
 Module containing class for syncing RHEL release metadata into database.
 """
 from datetime import date
+import json
+import subprocess
+import tempfile
 
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.release_store import ReleaseStore
 from vmaas.reposcan.redhatrelease.modeling import Release
 
+GEN_PACKAGES_SCRIPT = "/usr/local/bin/gen_package_profile.py"
 OS_DB_NAME = "RHEL"
 
 
@@ -17,18 +21,52 @@ class ReleaseController:
         self.logger = get_logger(__name__)
         self.release_store = ReleaseStore()
 
+    def _get_dnf_package_list(self, release: Release, repositories: dict[str, list[tuple[str, str, str, str, str]]]) -> list[str]:
+        with tempfile.TemporaryDirectory(prefix=f"dnf-{release.major}.{release.minor}-") as tmpdirname:
+            dnf_env = {"DNF_CACHEDIR": tmpdirname,
+                       "DNF_REPOS": json.dumps(repositories[f"{release.major}.{release.minor}"]),
+                       "DNF_PLATFORM_ID": f"platform:el{release.major}"}
+            proc = subprocess.run([GEN_PACKAGES_SCRIPT], env=dnf_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        if proc.returncode != 0:
+            self.logger.error("Executing package generation script failed: %s", proc.stderr)
+            raise ValueError("Unable to get valid package list")
+
+        # Extract package list from external script output
+        package_list: list[str] = json.loads(proc.stdout)["package_list"]
+        return package_list
+
+    def _generate_system_profile(self, release: Release, latest_releases: dict[int, int],
+                                 repositories: dict[str, list[tuple[str, str, str, str, str]]]) -> None:
+        self.logger.info("Generating system profile for release %d.%d", release.major, release.minor)
+        release.system_profile["package_list"] = sorted(self._get_dnf_package_list(release, repositories))
+        release.system_profile["repository_list"] = sorted([label for (label, _, _, _, _) in repositories[f"{release.major}.{release.minor}"]])
+        release.system_profile["basearch"] = "x86_64"
+        release.system_profile["releasever"] = f"{release.major}.{latest_releases[release.major]}"
+
     def _prepare_data(self, releases: dict[str, str]) -> list[Release]:
+        repositories = self.release_store.get_repositories(list(releases))
+        latest_releases: dict[int, int] = {}
         release_list = []
-        for release, ga_date in releases.items():
-            major, minor = release.split(".", 1)
+        for release_s, ga_date_s in releases.items():
+            ga_date = date.fromisoformat(ga_date_s)
+            # Filter out release versions not out yet, or those without repositories
+            if date.today() < ga_date or release_s not in repositories:
+                continue
+            major_s, minor_s = release_s.split(".", 1)
+            major, minor = int(major_s), int(minor_s)
+            if major not in latest_releases or minor > latest_releases[major]:
+                latest_releases[major] = minor
             release_list.append(
                 Release(
                     OS_DB_NAME,
-                    int(major),
-                    int(minor),
-                    date.fromisoformat(ga_date)
+                    major,
+                    minor,
+                    ga_date,
+                    {}
                 )
             )
+        for release in release_list:
+            self._generate_system_profile(release, latest_releases, repositories)
         return release_list
 
     def store(self, releases: dict[str, str]) -> None:
