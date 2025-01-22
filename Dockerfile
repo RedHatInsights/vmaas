@@ -7,7 +7,7 @@ RUN curl -o /etc/yum.repos.d/postgresql.repo \
 RUN microdnf module enable nginx:1.20 || :
 RUN microdnf module disable postgresql || :
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3.12-pip python3-rpm which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
+        python312 python3.12-pip python3-rpm python3-dnf which nginx rpm-devel git-core shadow-utils diffutils systemd libicu postgresql go-toolset \
         $VAR_RPMS && \
         ln -s /usr/lib64/python3.6/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
     microdnf clean all
@@ -60,3 +60,5 @@ ADD /database                   /vmaas/database
 ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common
+
+ADD /vmaas/reposcan/redhatrelease/gen_package_profile.py /usr/local/bin
