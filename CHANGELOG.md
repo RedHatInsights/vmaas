@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.73.1 (2025-01-23)
+
+### Chores
+
+- Fix theoretical sql injection
+  ([`1aeb122`](https://github.com/RedHatInsights/vmaas/commit/1aeb1223d26e310b24bfecf5ac1bac75b3126a84))
+
+
 ## v2.73.0 (2025-01-23)
 
 ### Features
