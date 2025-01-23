@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.74.0 (2025-01-23)
+
+### Features
+
+- **reposcan**: Export OS release system profiles to dump
+  ([`f85401f`](https://github.com/RedHatInsights/vmaas/commit/f85401f03d19ee65c83db3aa4dd1178bb8b7b515))
+
+RHINENG-15338
+
+
 ## v2.73.1 (2025-01-23)
 
 ### Chores
