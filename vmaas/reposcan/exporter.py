@@ -6,6 +6,7 @@ Tool for exporting preprocessed data from database for webapp nodes.
 # pylint: disable=too-many-lines
 
 import glob
+import json
 import os
 import sqlite3
 
@@ -23,6 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
+DUMP_SCHEMA_VERSION = 1
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -105,7 +107,9 @@ class SqliteDump:
                 self._dump_cves(dump)
                 self._dump_modules(dump)
                 self._dump_csaf(dump)
+                self._dump_os_releases(dump)
                 self._dump_dbchange(dump, timestamp)
+                self._dump_dump_schema_version(dump)
         except Exception as err:  # pylint: disable=broad-except
             # database exceptions caught here
             LOGGER.exception("Failed to create dbdump", exc_info=err)
@@ -690,6 +694,20 @@ class SqliteDump:
             for csaf_status_id, name in cursor:
                 dump.execute("INSERT INTO csaf_product_status VALUES (?, ?)", (csaf_status_id, name))
 
+    def _dump_os_releases(self, dump):
+        """Select all OS releases and put them into dictionary"""
+        dump.execute("""CREATE TABLE IF NOT EXISTS operating_system (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        major INTEGER NOT NULL,
+                        minor INTEGER NOT NULL,
+                        system_profile JSONB)
+                    """)
+        with self._named_cursor() as cursor:
+            cursor.execute("SELECT id, name, major, minor, system_profile FROM operating_system")
+            for os_id, name, major, minor, system_profile in cursor:
+                dump.execute("INSERT INTO operating_system VALUES (?, ?, ?, ?, ?)", (os_id, name, major, minor, json.dumps(system_profile)))
+
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
         dump.execute("""create table if not exists dbchange (
@@ -713,6 +731,13 @@ class SqliteDump:
                 format_datetime(row[3]) if row[3] is not None else None,
                 timestamp
             ))
+
+    def _dump_dump_schema_version(self, dump):
+        """Put dump schema version number into dump"""
+        dump.execute("""CREATE TABLE IF NOT EXISTS dump_schema (
+                        version INTEGER NOT NULL)
+                     """)
+        dump.execute("INSERT INTO dump_schema VALUES (?)", (DUMP_SCHEMA_VERSION,))
 
 
 def main():
