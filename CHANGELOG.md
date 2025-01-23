@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.73.0 (2025-01-23)
+
+### Features
+
+- **webapp**: Add go controller for errata endpoint
+  ([`ea1011c`](https://github.com/RedHatInsights/vmaas/commit/ea1011c817de979fe193c6695128e5427cad68ef))
+
+RHINENG-13555
+
+
 ## v2.72.0 (2025-01-22)
 
 ### Features
