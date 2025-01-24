@@ -24,7 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
-DUMP_SCHEMA_VERSION = 1
+DUMP_SCHEMA_VERSION = 2
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -701,7 +701,7 @@ class SqliteDump:
                         name TEXT NOT NULL,
                         major INTEGER NOT NULL,
                         minor INTEGER NOT NULL,
-                        system_profile JSONB)
+                        system_profile JSONB NOT NULL)
                     """)
         with self._named_cursor() as cursor:
             cursor.execute("SELECT id, name, major, minor, system_profile FROM operating_system")
