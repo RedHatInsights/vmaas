@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 25);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 26);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1006,7 +1006,7 @@ CREATE TABLE IF NOT EXISTS operating_system (
   major INT NOT NULL,
   minor INT NOT NULL,
   ga DATE NOT NULL,
-  system_profile JSONB,
+  system_profile JSONB NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT operating_system_name_major_minor_uq
     UNIQUE (name, major, minor)
