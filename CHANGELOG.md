@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.74.1 (2025-01-24)
+
+### Bug Fixes
+
+- **reposcan**: System_profile column should now be always NOT NULL
+  ([`3d63649`](https://github.com/RedHatInsights/vmaas/commit/3d636499fa6dcc220dbce5da0bf6a5c6883d7541))
+
+
 ## v2.74.0 (2025-01-23)
 
 ### Features
