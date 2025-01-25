@@ -47,7 +47,7 @@ requests = ">=2.32.0"
 schema = ">=0.7.3"
 uvicorn = "^0.34.0"
 watchtower = ">=1.0.0"
-attrs = "^23.2.0"
+attrs = "^25.0.0"
 zstandard = "^0.23.0"
 
 [tool.poetry.group.dev.dependencies]
