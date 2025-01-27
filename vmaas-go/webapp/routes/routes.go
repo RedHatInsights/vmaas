@@ -22,4 +22,5 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/errata/:erratum", controllers.ErrataHandler)
 		api.POST("/errata", controllers.ErrataPostHandler)
 	}
+	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
