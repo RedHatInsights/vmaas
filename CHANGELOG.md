@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.75.0 (2025-01-29)
+
+### Features
+
+- **vmaas-go**: Os Release Vulnerability Report API
+  ([`dca8171`](https://github.com/RedHatInsights/vmaas/commit/dca81714453189ac1b4fe21f1cffda425f74a2fb))
+
+RHINENG-15338
+
+
 ## v2.74.1 (2025-01-24)
 
 ### Bug Fixes
