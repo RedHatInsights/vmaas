@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.75.1 (2025-02-08)
+
+### Chores
+
+- **deps**: Update konflux references
+  ([`af31cf8`](https://github.com/RedHatInsights/vmaas/commit/af31cf8679070d25532c2281c4b4f5d545d49847))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.75.0 (2025-01-29)
 
 ### Features
@@ -1127,9 +1137,7 @@ RHINENG-9574
 Bumps [golang.org/x/net](https://github.com/golang/net) from 0.18.0 to 0.23.0. -
   [Commits](https://github.com/golang/net/compare/v0.18.0...v0.23.0)
 
---- updated-dependencies: - dependency-name: golang.org/x/net dependency-type: indirect
-
-...
+--- updated-dependencies: - dependency-name: golang.org/x/net dependency-type: indirect ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -3940,14 +3948,13 @@ no complete authentication/authorization done here, we just parse&log header fro
 - There is no fix for tornado vulnerability yet, disable this one check
   ([`fe4ec5f`](https://github.com/RedHatInsights/vmaas/commit/fe4ec5ff99935b42b44509a164df4b800e8e5198))
 
-39462: tornado <=6.1 resolved (6.0.3 installed)!
-
-All versions of package tornado are vulnerable to Web Cache Poisoning by using a vector called
-  parameter cloaking. When the attacker can separate query parameters using a semicolon (;), they
-  can cause a difference in the interpretation of the request between the proxy (running with
-  default configuration) and the server. This can result in malicious requests being cached as
-  completely safe ones, as the proxy would usually not see the semicolon as a separator, and
-  therefore would not include it in a cache key of an unkeyed parameter. See CVE-2020-28476.
+39462: tornado <=6.1 resolved (6.0.3 installed)! All versions of package tornado are vulnerable to
+  Web Cache Poisoning by using a vector called parameter cloaking. When the attacker can separate
+  query parameters using a semicolon (;), they can cause a difference in the interpretation of the
+  request between the proxy (running with default configuration) and the server. This can result in
+  malicious requests being cached as completely safe ones, as the proxy would usually not see the
+  semicolon as a separator, and therefore would not include it in a cache key of an unkeyed
+  parameter. See CVE-2020-28476.
 
 - Use redhat-actions/oc-installer
   ([`e416841`](https://github.com/RedHatInsights/vmaas/commit/e416841ee4cef85a619578c0c2a0df84c837ad33))
