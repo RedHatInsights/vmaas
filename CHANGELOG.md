@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.75.2 (2025-02-11)
+
+### Chores
+
+- Use ubi9 image
+  ([`6d4d4e6`](https://github.com/RedHatInsights/vmaas/commit/6d4d4e6333901a9a678133a25a9fc90e57799115))
+
+RHINENG-12543
+
+
 ## v2.75.1 (2025-02-08)
 
 ### Chores
