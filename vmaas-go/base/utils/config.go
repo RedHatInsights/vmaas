@@ -100,7 +100,6 @@ func initAPI() {
 
 func initEndpoints() {
 	for _, e := range clowder.LoadedConfig.Endpoints {
-		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" {
 			switch {
 			case strings.Contains(e.Name, "reposcan"):
@@ -111,7 +110,6 @@ func initEndpoints() {
 		}
 	}
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
-		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" && strings.Contains(e.Name, "reposcan") {
 			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildURL("http"))
 		}
