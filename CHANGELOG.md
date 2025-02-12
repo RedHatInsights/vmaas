@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.76.1 (2025-02-12)
+
+### Bug Fixes
+
+- Log with 'message' attribute instead of 'msg'
+  ([`d066e16`](https://github.com/RedHatInsights/vmaas/commit/d066e16f1be681bb4f93d0019b36f8ca34b71f5e))
+
+RHINENG-14264
+
+
 ## v2.76.0 (2025-02-12)
 
 ### Features
