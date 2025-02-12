@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.76.2 (2025-02-12)
+
+### Chores
+
+- Use the same poetry version as konflux
+  ([`0c6ec08`](https://github.com/RedHatInsights/vmaas/commit/0c6ec08f471941f008a4b7e80bd1e970224b3397))
+
+
 ## v2.76.1 (2025-02-12)
 
 ### Bug Fixes
