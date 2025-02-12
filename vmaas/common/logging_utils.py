@@ -52,7 +52,7 @@ class CloudWatchLogFormatterCustom(watchtower.CloudWatchLogFormatter):
         Include level name and dump as JSON.
         """
         formatted_message = logging.Formatter.format(self, message)
-        msg = {"levelname": getattr(message, "levelname"), "msg": formatted_message}
+        msg = {"levelname": getattr(message, "levelname"), "message": formatted_message}
         return json.dumps(msg, default=self.json_serialize_default)
 
 
