@@ -113,6 +113,7 @@ class CsafController:
         self.logger.info("%d CSAF files.", len(csaf_files))
         self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
 
+        self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
         try:
             for i, batch in enumerate(batches, 1):
                 self.logger.info("Syncing a batch of %d CSAF files [%d/%d]", len(batch), i, len(batches))
