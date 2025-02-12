@@ -121,6 +121,7 @@ class CsafController:
                 if failed:
                     CSAF_FAILED_DOWNLOAD.inc(len(failed))
                     self.logger.warning("%d CSAF files failed to download.", len(failed))
+                    self.logger.debug("CSAF files failed to download: %s", failed.keys())
                     batch = [f for f in batch if (self.tmp_directory / f.name) not in failed]
 
                 to_store = CsafData()
