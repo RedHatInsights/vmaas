@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.76.0 (2025-02-12)
+
+### Features
+
+- **webapp**: Add go controller for repos endpoint
+  ([`7b5e3f4`](https://github.com/RedHatInsights/vmaas/commit/7b5e3f424b2e06dbef43c8ba0d61f33899c6a688))
+
+RHINENG-13556
+
+
 ## v2.75.2 (2025-02-11)
 
 ### Chores
