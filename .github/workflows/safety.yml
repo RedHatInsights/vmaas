@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up Poetry
-        run: pip install poetry~=2.0 poetry-plugin-export
+        run: pip install poetry~=2.0.1 poetry-plugin-export
       - name: Set up Safety
         run: pip install safety
       - name: Export requirements.txt
