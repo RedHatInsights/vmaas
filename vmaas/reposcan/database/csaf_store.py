@@ -374,6 +374,7 @@ class CsafStore(ObjectStore):
             cur.close()
 
     def _populate_cves(self, csaf_cves: model.CsafCves, files: model.CsafFiles) -> None:
+        skipped_cves = {}
         for cve, products in csaf_cves.items():
             products_copy = deepcopy(products)  # only for logging of failed cves
             try:
@@ -383,11 +384,14 @@ class CsafStore(ObjectStore):
                 self._insert_cves(cve, products)
                 self._update_file_timestamp(cve, files)
             except CsafStoreSkippedCVE as exc:
-                self.logger.warning("Skipping cve: %s reason: %s", cve, exc)
+                if str(exc) not in skipped_cves:
+                    skipped_cves[str(exc)] = 0
+                skipped_cves[str(exc)] += 1
                 self.logger.debug("Skipping cve: %s products: %s reason: %s", cve, products_copy, exc)
                 self._update_file_timestamp(cve, files)
             except CsafStoreException:
                 self.logger.exception("Failed to populate cve: %s products: %s ", cve, products_copy)
+        self.logger.warning("Skipped cves: %s", skipped_cves)
 
     def _delete_unreferenced_products(self) -> None:
         cur = self.conn.cursor()
