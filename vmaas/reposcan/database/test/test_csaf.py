@@ -104,7 +104,7 @@ class TestCsafStore:
         files = m.CsafFiles(
             {"file1": m.CsafFile("file1", now, id_=1), "file2": m.CsafFile("file2", now, csv=True)}
         )
-        csaf_store._delete_csaf_files(files)
+        csaf_store.delete_csaf_files(files.not_csv_files)
         cur = csaf_store.conn.cursor()
         cur.execute("SELECT id FROM csaf_file WHERE name = 'file1'")
         res = cur.fetchone()

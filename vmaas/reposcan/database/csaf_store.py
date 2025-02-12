@@ -3,6 +3,7 @@ Module containing classes for fetching/importing CSAF data from/into database.
 """
 from copy import deepcopy
 from typing import Any
+from typing import Iterable
 
 from psycopg2 import sql
 from psycopg2.extras import execute_values
@@ -45,13 +46,14 @@ class CsafStore(ObjectStore):
         )
         self.cve2file_id: dict[str, int] = {}
 
-    def _delete_csaf_files(self, csaf_files: model.CsafFiles) -> None:
+    def delete_csaf_files(self, csaf_files: Iterable[model.CsafFile]) -> None:
+        """Delete csaf files from DB."""
         if not csaf_files:
             return
 
         removed_files = []
         removed_file_names = []
-        for csaf_file in csaf_files.not_csv_files:
+        for csaf_file in csaf_files:
             removed_files.append(csaf_file.id_)
             removed_file_names.append(csaf_file.name)
 
@@ -63,7 +65,8 @@ class CsafStore(ObjectStore):
             cur.execute("delete from csaf_cve_product where csaf_file_id in %s", (tuple(removed_files),))
             cur.execute("delete from csaf_file where id in %s", (tuple(removed_files),))
             self.conn.commit()
-            self.logger.info("Removed csaf_files: %s", removed_file_names)
+            self.logger.info("%d CSAF files removed", len(removed_file_names))
+            self.logger.debug("Removed csaf_files: %s", removed_file_names)
         except Exception as exc:
             CSAF_FAILED_DELETE.inc()
             self.logger.exception("%s: ", FAILED_FILE_DELETE)
@@ -412,7 +415,6 @@ class CsafStore(ObjectStore):
             self.logger.warning("CsafData without cves or files")
             return
 
-        self._delete_csaf_files(csaf_data.files)
         self._save_csaf_files(csaf_data.files)
         self._populate_cves(csaf_data.cves, csaf_data.files)
         self._delete_unreferenced_products()
