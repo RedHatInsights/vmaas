@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.76.4 (2025-02-13)
+
+### Chores
+
+- Enable go endpoints in docker compose
+  ([`d2d34f2`](https://github.com/RedHatInsights/vmaas/commit/d2d34f2eb04f5befa4f53d42c9f6facd192fdb9e))
+
+
 ## v2.76.3 (2025-02-13)
 
 ### Bug Fixes
