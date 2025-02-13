@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.76.3 (2025-02-13)
+
+### Bug Fixes
+
+- Delete removed csaf files from db
+  ([`6a94d86`](https://github.com/RedHatInsights/vmaas/commit/6a94d869e99604f5e49849e98d236f0baeafebfe))
+
+RHINENG-15930
+
+### Chores
+
+- Improve reposcan csaf logging
+  ([`df6a493`](https://github.com/RedHatInsights/vmaas/commit/df6a49378ab3779b918add52bd7a2bb499466e96))
+
+
 ## v2.76.2 (2025-02-12)
 
 ### Chores
