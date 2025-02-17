@@ -48,6 +48,7 @@ type Config struct {
 	EnableGoCves         bool
 	EnableGoErrata       bool
 	EnableGoRepos        bool
+	EnableGoPackages     bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -99,7 +100,6 @@ func initAPI() {
 
 func initEndpoints() {
 	for _, e := range clowder.LoadedConfig.Endpoints {
-		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" {
 			switch {
 			case strings.Contains(e.Name, "reposcan"):
@@ -110,7 +110,6 @@ func initEndpoints() {
 		}
 	}
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
-		e := e // re-assign iteration variable to use a new memory pointer
 		if e.App == "vmaas" && strings.Contains(e.Name, "reposcan") {
 			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildURL("http"))
 		}
@@ -140,6 +139,7 @@ func initEnv() {
 	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
 	Cfg.EnableGoErrata = GetBoolEnvOrDefault("ENABLE_GO_ERRATA", false)
 	Cfg.EnableGoRepos = GetBoolEnvOrDefault("ENABLE_GO_REPOS", false)
+	Cfg.EnableGoPackages = GetBoolEnvOrDefault("ENABLE_GO_PACKAGES", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

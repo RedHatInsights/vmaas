@@ -57,6 +57,8 @@ objects:
           value: ${ENABLE_GO_ERRATA}
         - name: ENABLE_GO_REPOS
           value: ${ENABLE_GO_REPOS}
+        - name: ENABLE_GO_PACKAGES
+          value: ${ENABLE_GO_PACKAGES}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -508,4 +510,7 @@ parameters:
   value: "false"
 - name: ENABLE_GO_REPOS
   description: Enable go implementation of the repos endpoint
+  value: "false"
+- name: ENABLE_GO_PACKAGES
+  description: Enable go implementation of the packages endpoint
   value: "false"
