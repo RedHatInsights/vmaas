@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v2.77.0 (2025-02-18)
+
+### Chores
+
+- Replace exportloopref with copyloopvar
+  ([`ebda868`](https://github.com/RedHatInsights/vmaas/commit/ebda8682a3586234a779ef6f9b60ec4eba595350))
+
+Since Go 1.22, loop vars don't need to be copied and exportloopref is deprecated.
+
+### Features
+
+- **webapp**: Add go controller for packages endpoint
+  ([`c1c5fe8`](https://github.com/RedHatInsights/vmaas/commit/c1c5fe8eefd044e1a54ef073d5fe778b9a4f520a))
+
+RHINENG-13557
+
+
 ## v2.76.9 (2025-02-18)
 
 ### Bug Fixes
