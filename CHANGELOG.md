@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.77.1 (2025-02-18)
+
+### Bug Fixes
+
+- **deps**: Update module github.com/gin-contrib/gzip to v1.2.2
+  ([`4324f6a`](https://github.com/RedHatInsights/vmaas/commit/4324f6affb6a4ba9531aab4f84b22ea3f1275f9c))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.77.0 (2025-02-18)
 
 ### Chores
