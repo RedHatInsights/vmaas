@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.76.9 (2025-02-18)
+
+### Bug Fixes
+
+- **deps**: Update module github.com/aws/aws-sdk-go to v1.55.6
+  ([`ae7aa65`](https://github.com/RedHatInsights/vmaas/commit/ae7aa656f6587877641d59f40765fe12731173cf))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.76.8 (2025-02-18)
 
 ### Chores
