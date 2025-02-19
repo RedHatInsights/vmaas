@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.78.0 (2025-02-19)
+
+### Features
+
+- **webapp**: Add go controller for pkglist endpoint
+  ([`6ea4a4a`](https://github.com/RedHatInsights/vmaas/commit/6ea4a4a5f7234bb255cf60be90ed23cb04d62edf))
+
+RHINENG-13558
+
+
 ## v2.77.1 (2025-02-18)
 
 ### Bug Fixes
