@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.78.3 (2025-02-24)
+
+### Chores
+
+- **deps**: Update dependency flake8 to v7.1.2
+  ([`2d0cc5b`](https://github.com/RedHatInsights/vmaas/commit/2d0cc5b7e609c0bd4bcee4b0d6ce1f4060ca6e8a))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+- **deps**: Update grafana/grafana docker tag to v11.5.2
+  ([`2bc5673`](https://github.com/RedHatInsights/vmaas/commit/2bc5673bc99cace0574f2ad86a230bc33aa72587))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.78.2 (2025-02-24)
 
 ### Chores
