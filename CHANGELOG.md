@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v2.79.0 (2025-02-24)
+
+### Features
+
+- Newer release cves not fixed in current release
+  ([`d64e5a3`](https://github.com/RedHatInsights/vmaas/commit/d64e5a36cd37f3d6a40fca0c0fdac19143f331e4))
+
+RHINENG-13498
+
+RHINENG-4854
+
+
 ## v2.78.3 (2025-02-24)
 
 ### Chores
