@@ -3,12 +3,16 @@ Module containing class for syncing RHEL release metadata into database.
 """
 from datetime import date
 import json
+import os
 import subprocess
 import tempfile
 
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.release_store import ReleaseStore
+from vmaas.reposcan.redhatrelease.modeling import LifecyclePhase
 from vmaas.reposcan.redhatrelease.modeling import Release
+
+ALLOWED_LONG_TERM_RELEASES = os.getenv("ALLOWED_LONG_TERM_RELEASES", "eus,aus").split(",")
 
 GEN_PACKAGES_SCRIPT = "/usr/local/bin/gen_package_profile.py"
 OS_DB_NAME = "RHEL"
@@ -21,10 +25,10 @@ class ReleaseController:
         self.logger = get_logger(__name__)
         self.release_store = ReleaseStore()
 
-    def _get_dnf_package_list(self, release: Release, repositories: dict[str, list[tuple[str, str, str, str, str]]]) -> list[str]:
+    def _get_dnf_package_list(self, release: Release, repositories: dict[str, dict[LifecyclePhase, list[tuple[str, str, str, str, str]]]]) -> list[str]:
         with tempfile.TemporaryDirectory(prefix=f"dnf-{release.major}.{release.minor}-") as tmpdirname:
             dnf_env = {"DNF_CACHEDIR": tmpdirname,
-                       "DNF_REPOS": json.dumps(repositories[f"{release.major}.{release.minor}"]),
+                       "DNF_REPOS": json.dumps(repositories[f"{release.major}.{release.minor}"][LifecyclePhase.MINOR]),
                        "DNF_PLATFORM_ID": f"platform:el{release.major}"}
             proc = subprocess.run([GEN_PACKAGES_SCRIPT], env=dnf_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
         if proc.returncode != 0:
@@ -36,15 +40,21 @@ class ReleaseController:
         return package_list
 
     def _generate_system_profile(self, release: Release, latest_releases: dict[int, int],
-                                 repositories: dict[str, list[tuple[str, str, str, str, str]]]) -> None:
-        self.logger.info("Generating system profile for release %d.%d", release.major, release.minor)
+                                 repositories: dict[str, dict[LifecyclePhase, list[tuple[str, str, str, str, str]]]]) -> None:
+        self.logger.info("Generating system profile for release %d.%d (%s).", release.major, release.minor, release.lifecycle_phase)
         release.system_profile["package_list"] = sorted(self._get_dnf_package_list(release, repositories))
-        release.system_profile["repository_list"] = sorted([label for (label, _, _, _, _) in repositories[f"{release.major}.{release.minor}"]])
+        release.system_profile["repository_list"] = sorted([label for (label, _, _, _, _)
+                                                            in repositories[f"{release.major}.{release.minor}"][release.lifecycle_phase]])
         release.system_profile["basearch"] = "x86_64"
-        release.system_profile["releasever"] = f"{release.major}.{latest_releases[release.major]}"
+        # Minor release: show updates from minor release to latest minor release
+        # EUS (and similar) release: show updates from minor release to EUS of the same minor release
+        if release.lifecycle_phase == LifecyclePhase.MINOR:
+            release.system_profile["releasever"] = f"{release.major}.{latest_releases[release.major]}"
+        else:
+            release.system_profile["releasever"] = f"{release.major}.{release.minor}"
 
     def _prepare_data(self, releases: dict[str, str]) -> list[Release]:
-        repositories = self.release_store.get_repositories(list(releases))
+        repositories = self.release_store.get_repositories(list(releases), ALLOWED_LONG_TERM_RELEASES)
         latest_releases: dict[int, int] = {}
         release_list = []
         for release_s, ga_date_s in releases.items():
@@ -56,15 +66,17 @@ class ReleaseController:
             major, minor = int(major_s), int(minor_s)
             if major not in latest_releases or minor > latest_releases[major]:
                 latest_releases[major] = minor
-            release_list.append(
-                Release(
-                    OS_DB_NAME,
-                    major,
-                    minor,
-                    ga_date,
-                    {}
+            for lifecycle_phase in repositories[release_s]:
+                release_list.append(
+                    Release(
+                        OS_DB_NAME,
+                        major,
+                        minor,
+                        lifecycle_phase,
+                        ga_date,
+                        {}
+                    )
                 )
-            )
         for release in release_list:
             self._generate_system_profile(release, latest_releases, repositories)
         return release_list
