@@ -24,7 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
-DUMP_SCHEMA_VERSION = 2
+DUMP_SCHEMA_VERSION = 3
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -701,12 +701,13 @@ class SqliteDump:
                         name TEXT NOT NULL,
                         major INTEGER NOT NULL,
                         minor INTEGER NOT NULL,
+                        lifecycle_phase TEXT NOT NULL,
                         system_profile JSONB NOT NULL)
                     """)
         with self._named_cursor() as cursor:
-            cursor.execute("SELECT id, name, major, minor, system_profile FROM operating_system")
-            for os_id, name, major, minor, system_profile in cursor:
-                dump.execute("INSERT INTO operating_system VALUES (?, ?, ?, ?, ?)", (os_id, name, major, minor, json.dumps(system_profile)))
+            cursor.execute("SELECT id, name, major, minor, lifecycle_phase, system_profile FROM operating_system")
+            for os_id, name, major, minor, lifecycle_phase, system_profile in cursor:
+                dump.execute("INSERT INTO operating_system VALUES (?, ?, ?, ?, ?, ?)", (os_id, name, major, minor, lifecycle_phase, json.dumps(system_profile)))
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
