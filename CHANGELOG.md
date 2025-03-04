@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.79.3 (2025-03-04)
+
+### Bug Fixes
+
+- **deps**: Update module github.com/redhatinsights/vmaas-lib to v1.21.1
+  ([`9ac31c9`](https://github.com/RedHatInsights/vmaas/commit/9ac31c93ef97e4dd22f448f30cf74c3a491fd8ea))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.79.2 (2025-03-01)
 
 ### Chores
