@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.79.4 (2025-03-05)
+
+### Bug Fixes
+
+- Update vmaas-lib to fix /repos
+  ([`a93fabf`](https://github.com/RedHatInsights/vmaas/commit/a93fabfcaa6f270bf95c44cb0fa7e362a4c7ce8b))
+
+RHINENG-15993
+
+
 ## v2.79.3 (2025-03-04)
 
 ### Bug Fixes
