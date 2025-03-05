@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.80.0 (2025-03-05)
+
+### Features
+
+- Initial support for different lifecycle phases
+  ([`82ea6b7`](https://github.com/RedHatInsights/vmaas/commit/82ea6b740d3078f2cea7fd762699fe0a6222ed36))
+
+RHINENG-15673
+
+
 ## v2.79.4 (2025-03-05)
 
 ### Bug Fixes
