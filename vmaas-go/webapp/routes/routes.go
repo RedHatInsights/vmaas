@@ -37,5 +37,9 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/pkgtree/:package_name", controllers.PkgTreeHandler)
 		api.POST("/pkgtree", controllers.PkgTreePostHandler)
 	}
+	if utils.Cfg.EnableGoPatches {
+		api.GET("/patches/:nevra", controllers.PatchesHandler)
+		api.POST("/patches", controllers.PatchesPostHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
