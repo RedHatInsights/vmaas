@@ -41,5 +41,9 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/patches/:nevra", controllers.PatchesHandler)
 		api.POST("/patches", controllers.PatchesPostHandler)
 	}
+	if utils.Cfg.EnableGoRPMPkgNames {
+		api.GET("/package_names/rpms/:rpm", controllers.RPMPkgNamesHandler)
+		api.POST("/package_names/rpms", controllers.RPMPkgNamesPostHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
