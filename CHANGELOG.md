@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.81.0 (2025-03-06)
+
+### Features
+
+- **webapp-go**: Add lifecycle_phase to the response
+  ([`63e89a4`](https://github.com/RedHatInsights/vmaas/commit/63e89a4d9983b68595e86cf5fb7fa3645127a3fe))
+
+RHINENG-15673
+
+
 ## v2.80.0 (2025-03-05)
 
 ### Features
