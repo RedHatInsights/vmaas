@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.82.0 (2025-03-06)
+
+### Features
+
+- **webapp**: Add go controller for pkgtree endpoints
+  ([`bf80280`](https://github.com/RedHatInsights/vmaas/commit/bf802804b8ef0555b7a52050ccdba4517add5a19))
+
+RHINENG-13559
+
+
 ## v2.81.0 (2025-03-06)
 
 ### Features
