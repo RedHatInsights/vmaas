@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.83.0 (2025-03-07)
+
+### Features
+
+- **webapp**: Add go controllers for patches endpoints
+  ([`159b57d`](https://github.com/RedHatInsights/vmaas/commit/159b57ddf1735b689a6fc89472da22596dbd68ad))
+
+RHINENG-13560
+
+
 ## v2.82.0 (2025-03-06)
 
 ### Features
