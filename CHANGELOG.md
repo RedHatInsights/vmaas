@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.83.1 (2025-03-11)
+
+### Chores
+
+- **deps**: Update jinja ([#1283](https://github.com/RedHatInsights/vmaas/pull/1283),
+  [`91c040e`](https://github.com/RedHatInsights/vmaas/commit/91c040e7901610fc999e77075eef93efecbe2c38))
+
+RHINENG-16473
+
+
 ## v2.83.0 (2025-03-07)
 
 ### Features
