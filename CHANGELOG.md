@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.83.2 (2025-03-12)
+
+### Chores
+
+- **deps**: Lock file maintenance
+  ([`2ca4e26`](https://github.com/RedHatInsights/vmaas/commit/2ca4e26d056f7ed9b54ec41d48b26c587f284447))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.83.1 (2025-03-11)
 
 ### Chores
