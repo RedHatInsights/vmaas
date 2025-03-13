@@ -53,6 +53,7 @@ type Config struct {
 	EnableGoPkgTree      bool
 	EnableGoPatches      bool
 	EnableGoRPMPkgNames  bool
+	EnableGoSRPMPkgNames bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -148,6 +149,7 @@ func initEnv() {
 	Cfg.EnableGoPkgTree = GetBoolEnvOrDefault("ENABLE_GO_PKGTREE", false)
 	Cfg.EnableGoPatches = GetBoolEnvOrDefault("ENABLE_GO_PATCHES", false)
 	Cfg.EnableGoRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_RPMPKGNAMES", false)
+	Cfg.EnableGoSRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_SRPMPKGNAMES", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

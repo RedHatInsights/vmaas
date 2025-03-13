@@ -42,3 +42,37 @@ func RPMPkgNamesPostHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+
+func SRPMPkgNamesHandler(c *gin.Context) {
+	if !isCacheLoaded(c) {
+		return
+	}
+	name := c.Param("srpm")
+	req := vmaas.SRPMPkgNamesRequest{SRPMNames: []string{name}}
+
+	res, err := core.VmaasAPI.SRPMPkgNames(&req)
+	if err != nil {
+		utils.LogAndRespError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func SRPMPkgNamesPostHandler(c *gin.Context) {
+	if !isCacheLoaded(c) {
+		return
+	}
+	req := vmaas.SRPMPkgNamesRequest{}
+	err := bindValidateJSON(c, &req)
+	if err != nil {
+		utils.LogAndRespBadRequest(c, err)
+		return
+	}
+
+	res, err := core.VmaasAPI.SRPMPkgNames(&req)
+	if err != nil {
+		utils.LogAndRespError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
