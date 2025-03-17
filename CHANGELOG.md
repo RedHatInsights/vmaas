@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v2.83.3 (2025-03-17)
+
+### Continuous Integration
+
+- Extending original config overrides the global schedule by adding schedule for each package
+  manager
+  ([`4e07b09`](https://github.com/RedHatInsights/vmaas/commit/4e07b092c48fb08f501b5ace7b071c444cc86426))
+
+- Group python dependencies preset
+  ([`3c2d57c`](https://github.com/RedHatInsights/vmaas/commit/3c2d57c5ba0d2766b41d366986dbda9da7a9a568))
+
+
 ## v2.83.2 (2025-03-12)
 
 ### Chores
