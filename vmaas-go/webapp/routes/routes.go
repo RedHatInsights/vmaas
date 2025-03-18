@@ -49,5 +49,8 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/package_names/srpms/:srpm", controllers.SRPMPkgNamesHandler)
 		api.POST("/package_names/srpms", controllers.SRPMPkgNamesPostHandler)
 	}
+	if utils.Cfg.EnableGoDBChange {
+		api.GET("/dbchange", controllers.DBChangeHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
