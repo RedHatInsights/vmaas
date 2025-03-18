@@ -52,6 +52,7 @@ type Config struct {
 	EnableGoPkgList      bool
 	EnableGoPkgTree      bool
 	EnableGoPatches      bool
+	EnableGoDBChange     bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -146,6 +147,7 @@ func initEnv() {
 	Cfg.EnableGoPkgList = GetBoolEnvOrDefault("ENABLE_GO_PKGLIST", false)
 	Cfg.EnableGoPkgTree = GetBoolEnvOrDefault("ENABLE_GO_PKGTREE", false)
 	Cfg.EnableGoPatches = GetBoolEnvOrDefault("ENABLE_GO_PATCHES", false)
+	Cfg.EnableGoDBChange = GetBoolEnvOrDefault("ENABLE_GO_DBCHANGE", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

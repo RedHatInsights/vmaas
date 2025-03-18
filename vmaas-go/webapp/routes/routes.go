@@ -41,5 +41,8 @@ func InitAPI(api *gin.RouterGroup) {
 		api.GET("/patches/:nevra", controllers.PatchesHandler)
 		api.POST("/patches", controllers.PatchesPostHandler)
 	}
+	if utils.Cfg.EnableGoDBChange {
+		api.GET("/dbchange", controllers.DBChangeHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }
