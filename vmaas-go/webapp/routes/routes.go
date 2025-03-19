@@ -52,5 +52,8 @@ func InitAPI(api *gin.RouterGroup) {
 	if utils.Cfg.EnableGoDBChange {
 		api.GET("/dbchange", controllers.DBChangeHandler)
 	}
+	if utils.Cfg.EnableGoVersion {
+		api.GET("/version", controllers.VersionHandler)
+	}
 	api.GET("/os/vulnerability/report", controllers.OSHandler)
 }

@@ -55,6 +55,7 @@ type Config struct {
 	EnableGoRPMPkgNames  bool
 	EnableGoSRPMPkgNames bool
 	EnableGoDBChange     bool
+	EnableGoVersion      bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -152,6 +153,7 @@ func initEnv() {
 	Cfg.EnableGoRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_RPMPKGNAMES", false)
 	Cfg.EnableGoSRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_SRPMPKGNAMES", false)
 	Cfg.EnableGoDBChange = GetBoolEnvOrDefault("ENABLE_GO_DBCHANGE", false)
+	Cfg.EnableGoVersion = GetBoolEnvOrDefault("ENABLE_GO_VERSION", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {

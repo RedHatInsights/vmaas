@@ -71,6 +71,8 @@ objects:
           value: ${ENABLE_GO_SRPMPKGNAMES}
         - name: ENABLE_GO_DBCHANGE
           value: ${ENABLE_GO_DBCHANGE}
+        - name: ENABLE_GO_VERSION
+          value: ${ENABLE_GO_VERSION}
         resources:
           limits:
             cpu: ${CPU_LIMIT_WEBAPP_GO}
@@ -545,6 +547,9 @@ parameters:
   value: "false"
 - name: ENABLE_GO_DBCHANGE
   description: Enable go implementation of the dbchange endpoint
+  value: "false"
+- name: ENABLE_GO_VERSION
+  description: Enable go implementation of the version endpoint
   value: "false"
 - name: ALLOWED_LONG_TERM_RELEASES
   description: List of allowed/exposed long-term release variants in the OS exposure report
