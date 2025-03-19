@@ -115,8 +115,8 @@ github.com/redhatinsights/app-common-go v1.6.8 h1:hyExMp6WHprlGkHKElQvSFF2ZPX8XT
 github.com/redhatinsights/app-common-go v1.6.8/go.mod h1:KW0BK+bnhp3kXU8BFwebQXqCqjdkcRewZsDlXCSNMyo=
 github.com/redhatinsights/platform-go-middlewares v1.0.0 h1:OxyiYt+VmNo+UucK/ey0b6UDFnpCni6JoGPeisGmmNI=
 github.com/redhatinsights/platform-go-middlewares v1.0.0/go.mod h1:dRH6XOjiZDbw8STvk6NNC7mMwqhTaV7X+1tn1oXOs24=
-github.com/redhatinsights/vmaas-lib v1.26.1 h1:NFdyCRHyW/bREcXffEpfQ5E+UB0aVImqCXIxMk+Ouwg=
-github.com/redhatinsights/vmaas-lib v1.26.1/go.mod h1:3jRU3URLLzBTdBfdN2Dn0eK+sCoAW4MJvD40rD2xKkk=
+github.com/redhatinsights/vmaas-lib v1.27.0 h1:bvindosEGcRkB3mx3Y44DsJOFlnPojpixC0wrlL6uT0=
+github.com/redhatinsights/vmaas-lib v1.27.0/go.mod h1:3jRU3URLLzBTdBfdN2Dn0eK+sCoAW4MJvD40rD2xKkk=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
