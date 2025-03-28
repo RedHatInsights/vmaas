@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.83.6 (2025-03-28)
+
+### Chores
+
+- **deps**: Update grafana/grafana docker tag to v11.6.0
+  ([`0f2cfb4`](https://github.com/RedHatInsights/vmaas/commit/0f2cfb461665e6033d6800ef1eac833628d73fcd))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.83.5 (2025-03-17)
 
 ### Chores
