@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.83.7 (2025-03-28)
+
+### Bug Fixes
+
+- **deps**: Update module github.com/prometheus/client_golang to v1.21.1
+  ([`597e45a`](https://github.com/RedHatInsights/vmaas/commit/597e45a3ff2affe54d7831164ed1138d8e018218))
+
+Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+
+
 ## v2.83.6 (2025-03-28)
 
 ### Chores
