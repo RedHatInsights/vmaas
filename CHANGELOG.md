@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.84.0 (2025-04-01)
+
+### Features
+
+- **webapp**: Add go controller for package_name/rpms endpoints
+  ([`ce7ba95`](https://github.com/RedHatInsights/vmaas/commit/ce7ba95839864ac0f164703028aaa97a9edf10ea))
+
+RHINENG-13561
+
+
 ## v2.83.7 (2025-03-28)
 
 ### Bug Fixes
