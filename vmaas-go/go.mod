@@ -20,7 +20,7 @@ require (
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.12.7 // indirect
-	github.com/bytedance/sonic/loader v0.2.2 // indirect
+	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
