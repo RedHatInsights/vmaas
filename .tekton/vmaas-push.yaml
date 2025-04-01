@@ -380,6 +380,69 @@ spec:
       workspaces:
         - name: workspace
           workspace: workspace
+    - name: sast-coverity-check
+      params:
+        - name: image-url
+          value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: IMAGE
+          value: $(params.output-image)
+        - name: DOCKERFILE
+          value: $(params.dockerfile)
+        - name: CONTEXT
+          value: $(params.path-context)
+        - name: HERMETIC
+          value: $(params.hermetic)
+        - name: PREFETCH_INPUT
+          value: $(params.prefetch-input)
+        - name: IMAGE_EXPIRES_AFTER
+          value: $(params.image-expires-after)
+        - name: COMMIT_SHA
+          value: $(tasks.clone-repository.results.commit)
+        - name: BUILD_ARGS
+          value:
+            - $(params.build-args[*])
+        - name: BUILD_ARGS_FILE
+          value: $(params.build-args-file)
+      runAfter:
+        - coverity-availability-check
+      taskRef:
+        params:
+          - name: name
+            value: sast-coverity-check
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-sast-coverity-check:0.2@sha256:8265dffa33306f930eb335a3304ef6990e6e31b24ef58979d8830fffcffcbb6f
+          - name: kind
+            value: task
+        resolver: bundles
+      when:
+        - input: $(params.skip-checks)
+          operator: in
+          values:
+            - "false"
+        - input: $(tasks.coverity-availability-check.results.STATUS)
+          operator: in
+          values:
+            - success
+      workspaces:
+        - name: source
+          workspace: workspace
+    - name: coverity-availability-check
+      runAfter:
+        - build-image-index
+      taskRef:
+        params:
+          - name: name
+            value: coverity-availability-check
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-coverity-availability-check:0.2@sha256:0b35292eed661c5e3ca307c0ba7f594d17555db2a1da567903b0b47697fa23ed
+          - name: kind
+            value: task
+        resolver: bundles
+      when:
+        - input: $(params.skip-checks)
+          operator: in
+          values:
+            - "false"
     - name: deprecated-base-image-check
       params:
       - name: IMAGE_URL
