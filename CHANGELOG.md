@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.85.0 (2025-04-02)
+
+### Features
+
+- **webapp**: Add go controller for package_name/srpms endpoints
+  ([`cb2cd20`](https://github.com/RedHatInsights/vmaas/commit/cb2cd205e85789ae39b6ec6947fbc69be99cfa85))
+
+RHINENG-16452
+
+
 ## v2.84.0 (2025-04-01)
 
 ### Features
