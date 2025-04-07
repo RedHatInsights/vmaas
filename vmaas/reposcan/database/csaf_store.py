@@ -34,6 +34,10 @@ class CsafStoreSkippedCVE(CsafStoreException):
     """CsafStoreSkippedCVE exception."""
 
 
+class CsafStoreRetryCVE(CsafStoreSkippedCVE):
+    """CsafStoreRetryCVE exception."""
+
+
 class CsafStore(ObjectStore):
     """Class providing interface for fetching/importing CSAF data from/into the DB."""
 
@@ -45,6 +49,7 @@ class CsafStore(ObjectStore):
             cols=("name",), to_cols=("id", "updated"), table="csaf_file"
         )
         self.cve2file_id: dict[str, int] = {}
+        self.skipped_cve_categories: dict[str, int] = {}
 
     def delete_csaf_files(self, csaf_files: Iterable[model.CsafFile]) -> None:
         """Delete csaf files from DB."""
@@ -304,7 +309,7 @@ class CsafStore(ObjectStore):
         try:
             cur.execute("SELECT id FROM cve WHERE UPPER(name) = %s", (cve,))
             if (row := cur.fetchone()) is None:
-                raise CsafStoreException(f"{cve} not found in DB")
+                raise CsafStoreRetryCVE(f"{cve} not found in DB")
 
             file_id = self.cve2file_id[cve]
             to_upsert = [
@@ -322,6 +327,8 @@ class CsafStore(ObjectStore):
                 to_upsert,
             )
             self.conn.commit()
+        except CsafStoreRetryCVE as exc:
+            raise exc
         except Exception as exc:
             CSAF_FAILED_IMPORT.inc()
             CSAF_FAILED_UPDATE.inc()
@@ -374,7 +381,6 @@ class CsafStore(ObjectStore):
             cur.close()
 
     def _populate_cves(self, csaf_cves: model.CsafCves, files: model.CsafFiles) -> None:
-        skipped_cves = {}
         for cve, products in csaf_cves.items():
             products_copy = deepcopy(products)  # only for logging of failed cves
             try:
@@ -383,15 +389,16 @@ class CsafStore(ObjectStore):
                 self._remove_cves(cve, products)
                 self._insert_cves(cve, products)
                 self._update_file_timestamp(cve, files)
+            except CsafStoreRetryCVE as exc:
+                self._categorize_skipped_cves(exc)
+                self.logger.debug("Skipping cve: %s products: %s reason: %s", cve, products_copy, exc)
             except CsafStoreSkippedCVE as exc:
-                if str(exc) not in skipped_cves:
-                    skipped_cves[str(exc)] = 0
-                skipped_cves[str(exc)] += 1
+                self._categorize_skipped_cves(exc)
                 self.logger.debug("Skipping cve: %s products: %s reason: %s", cve, products_copy, exc)
                 self._update_file_timestamp(cve, files)
             except CsafStoreException:
                 self.logger.exception("Failed to populate cve: %s products: %s ", cve, products_copy)
-        self.logger.warning("Skipped cves: %s", skipped_cves)
+        self.logger.warning("Skipped cves: %s", self.skipped_cve_categories)
 
     def _delete_unreferenced_products(self) -> None:
         cur = self.conn.cursor()
@@ -412,6 +419,11 @@ class CsafStore(ObjectStore):
             raise CsafStoreException(FAILED_PRODUCT_DELETE) from exc
         finally:
             cur.close()
+
+    def _categorize_skipped_cves(self, exc: Exception) -> None:
+        if str(exc) not in self.skipped_cve_categories:
+            self.skipped_cve_categories[str(exc)] = 0
+        self.skipped_cve_categories[str(exc)] += 1
 
     def store(self, csaf_data: model.CsafData) -> None:
         """Store collection of CSAF files into DB."""
