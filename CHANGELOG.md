@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.85.2 (2025-04-08)
+
+### Bug Fixes
+
+- Skip VEX CVE not found in DB
+  ([`53c503c`](https://github.com/RedHatInsights/vmaas/commit/53c503cd5e0dd7bafc80928210863edc2c28480e))
+
+RHINENG-17063
+
+
 ## v2.85.1 (2025-04-05)
 
 ### Chores
