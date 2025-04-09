@@ -20,10 +20,6 @@ func PkgListPostHandler(c *gin.Context) {
 		return
 	}
 
-	res, err := core.VmaasAPI.PkgList(&req)
-	if err != nil {
-		utils.LogAndRespError(c, err)
-		return
-	}
+	res := core.VmaasAPI.PkgList(&req)
 	c.JSON(http.StatusOK, res)
 }
