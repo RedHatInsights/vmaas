@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.85.3 (2025-04-11)
+
+### Bug Fixes
+
+- **webapp**: Remove unused err in pkglist controller
+  ([`a797678`](https://github.com/RedHatInsights/vmaas/commit/a79767824a1fa516d6f1f2111e297053ef793ea0))
+
+RHINENG-17233
+
+
 ## v2.85.2 (2025-04-08)
 
 ### Bug Fixes
