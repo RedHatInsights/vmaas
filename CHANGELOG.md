@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.86.0 (2025-04-22)
+
+### Features
+
+- **webapp**: Add go controller for dbchange endpoint
+  ([`d134884`](https://github.com/RedHatInsights/vmaas/commit/d13488412e46a65aae1c069ee12c8a6a737426cf))
+
+RHINENG-13562
+
+
 ## v2.85.3 (2025-04-11)
 
 ### Bug Fixes
