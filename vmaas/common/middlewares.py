@@ -65,7 +65,6 @@ class TimingLoggingMiddleware:
 
         async def send_finished(message):
             nonlocal start_message
-            nonlocal start_time
             if message["type"] == "http.response.start":
                 start_message = message
             elif message["type"] == "http.response.body":
