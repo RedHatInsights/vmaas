@@ -105,7 +105,7 @@ class RepositoryController:
             repomd_path = os.path.join(repository.tmp_directory, "repomd.xml")
             repomd = RepoMD(repomd_path)
             # Was repository already synced before?
-            repository_key = (repository.content_set, repository.basearch, repository.releasever)
+            repository_key = (repository.content_set, repository.basearch, repository.releasever, repository.organization)
             if repository_key in db_repositories:
                 db_revision = db_repositories[repository_key]["revision"]
             else:
@@ -192,20 +192,20 @@ class RepositoryController:
     def add_db_repositories(self):
         """Queue all previously imported repositories."""
         repos = self.repo_store.list_repositories()
-        for (content_set, basearch, releasever), repo_dict in repos.items():
+        for (content_set, basearch, releasever, organization), repo_dict in repos.items():
             # Reference content_set_label -> content set id
             self.repo_store.content_set_to_db_id[content_set] = repo_dict["content_set_id"]
-            self.repositories.add(Repository(repo_dict["url"], content_set, basearch, releasever,
+            self.repositories.add(Repository(repo_dict["url"], content_set, basearch, releasever, organization,
                                              cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
                                              cert=repo_dict["cert"], key=repo_dict["key"]))
 
-    def add_repository(self, repo_url, content_set, basearch, releasever, *,
+    def add_repository(self, repo_url, content_set, basearch, releasever, organization, *,  # pylint: disable=too-many-positional-arguments
                        cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"
-        self.repositories.add(Repository(repo_url, content_set, basearch, releasever, cert_name=cert_name,
+        self.repositories.add(Repository(repo_url, content_set, basearch, releasever, organization, cert_name=cert_name,
                                          ca_cert=ca_cert, cert=cert, key=key))
 
     def _write_certificate_cache(self):
@@ -247,10 +247,10 @@ class RepositoryController:
 
     def delete_repos(self, repos):
         """Deletes repos (cs+basearch+releasever) from DB."""
-        for content_set, basearch, releasever in repos:
+        for content_set, basearch, releasever, organization in repos:
             self.logger.info("Deleting repository: %s", ", ".join(
-                filter(None, (content_set, basearch, releasever))))
-            self.repo_store.delete_content_set(content_set, basearch=basearch, releasever=releasever)
+                filter(None, (content_set, basearch, releasever, organization))))
+            self.repo_store.delete_content_set(content_set, basearch=basearch, releasever=releasever, organization=organization)
         self.repo_store.cleanup_unused_data()
 
     def import_repositories(self):
@@ -333,12 +333,12 @@ class RepositoryController:
                         try:
                             repository.load_metadata()
                             self.logger.info("Syncing repository: %s [%s/%s]", ", ".join(
-                                filter(None, (repository.content_set, repository.basearch, repository.releasever))),
+                                filter(None, (repository.content_set, repository.basearch, repository.releasever, repository.organization))),
                                 completed_repositories, total_repositories)
                             self.repo_store.store(repository)
                         except Exception:  # pylint: disable=broad-except
                             self.logger.warning("Syncing repository failed: %s [%s/%s]", ", ".join(
-                                filter(None, (repository.content_set, repository.basearch, repository.releasever))),
+                                filter(None, (repository.content_set, repository.basearch, repository.releasever, repository.organization))),
                                 completed_repositories, total_repositories)
                             self.logger.exception("Exception: ")
                             FAILED_IMPORT_REPO.inc()

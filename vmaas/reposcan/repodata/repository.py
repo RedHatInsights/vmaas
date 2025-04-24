@@ -13,7 +13,8 @@ class Repository:
     """
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, repo_url, content_set, basearch, releasever, *, cert_name=None, ca_cert=None, cert=None, key=None):
+    def __init__(self, repo_url, content_set, basearch, releasever, organization, *,  # pylint: disable=too-many-positional-arguments
+                 cert_name=None, ca_cert=None, cert=None, key=None):
         self.repo_url = repo_url
         self.repomd = None
         self.primary = None
@@ -24,6 +25,7 @@ class Repository:
         self.content_set = content_set
         self.basearch = basearch
         self.releasever = releasever
+        self.organization = organization
         self.cert_name = cert_name
         self.ca_cert = ca_cert
         self.cert = cert

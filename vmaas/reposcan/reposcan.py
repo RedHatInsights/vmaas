@@ -60,6 +60,7 @@ REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
 RELEASEMAP_PATH = os.getenv('RELEASEMAP_PATH', 'ga_dates.json')
 
 DEFAULT_CERT_NAME = "DEFAULT"
+DEFAULT_ORG_NAME = "DEFAULT"
 DEFAULT_CA_CERT = os.getenv("DEFAULT_CA_CERT", "")
 DEFAULT_CERT = os.getenv("DEFAULT_CERT", "")
 DEFAULT_KEY = os.getenv("DEFAULT_KEY", "")
@@ -325,6 +326,7 @@ class RepolistImportHandler(SyncHandler):
         repos = []
         seen = set()
         for repo_group in data:
+            organization = repo_group.get("organization", DEFAULT_ORG_NAME)
             # Entitlement cert is optional, use default if not specified in input JSON
             if "entitlement_cert" in repo_group and isinstance(repo_group['entitlement_cert'], dict):
                 cert_name = repo_group["entitlement_cert"]["name"]
@@ -354,7 +356,7 @@ class RepolistImportHandler(SyncHandler):
                     products[product_name]["content_sets"][content_set_label] = content_set
                     for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
                         repos.append((repo_url, content_set_label, basearch, releasever,
-                                      cert_name, ca_cert, cert, key))
+                                      cert_name, ca_cert, cert, key, organization))
 
         return products, repos
 
@@ -376,15 +378,15 @@ class RepolistImportHandler(SyncHandler):
                 repository_controller = RepositoryController()
                 repos_in_db = repository_controller.repo_store.list_repositories()
                 # Sync repos from input
-                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key in repos:
-                    repository_controller.add_repository(repo_url, content_set, basearch, releasever,
+                for repo_url, content_set, basearch, releasever, cert_name, ca_cert, cert, key, organization in repos:
+                    repository_controller.add_repository(repo_url, content_set, basearch, releasever, organization,
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
-                    repos_in_db.pop((content_set, basearch, releasever), None)
+                    repos_in_db.pop((content_set, basearch, releasever, organization), None)
                 if git_sync:  # Warn about extra repos in DB when syncing main repolist from git
-                    for content_set, basearch, releasever in repos_in_db:
+                    for content_set, basearch, releasever, organization in repos_in_db:
                         LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
-                            filter(None, (content_set, basearch, releasever))))
+                            filter(None, (content_set, basearch, releasever, organization))))
                     REPOS_TO_CLEANUP.set(len(repos_in_db))
                 repository_controller.import_repositories()
         except Exception as err:  # pylint: disable=broad-except
@@ -449,8 +451,8 @@ class GitRepoListCleanupHandler(SyncHandler):
 
             repository_controller = RepositoryController()
             repos_in_db = repository_controller.repo_store.list_repositories()
-            for _, content_set, basearch, releasever, _, _, _, _ in repos:
-                repos_in_db.pop((content_set, basearch, releasever), None)
+            for _, content_set, basearch, releasever, _, _, _, _, organization in repos:
+                repos_in_db.pop((content_set, basearch, releasever, organization), None)
             repository_controller.delete_repos(repos_in_db)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)

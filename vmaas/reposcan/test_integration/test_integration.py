@@ -11,6 +11,7 @@ from vmaas.reposcan.database import product_store
 from vmaas.reposcan.download.downloader import DownloadItem, FileDownloadThread
 from vmaas.reposcan.conftest import reset_db, write_testing_data
 from vmaas.reposcan.database.database_handler import DatabaseHandler
+from vmaas.reposcan.reposcan import DEFAULT_ORG_NAME
 
 
 def download_mock(self, download_item: DownloadItem):
@@ -50,7 +51,7 @@ def test_phase_1(db_conn, caplog, monkeypatch):
     # Test store repo.
     rep_con = RepositoryController()
     rep_con.add_repository(repo_url=base_url, content_set=content_set,
-                           basearch=basearch, releasever=releasever)
+                           basearch=basearch, releasever=releasever, organization=DEFAULT_ORG_NAME)
     rep_con.import_repositories()
 
     rep_con1 = RepositoryController()
