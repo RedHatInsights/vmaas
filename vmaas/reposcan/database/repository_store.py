@@ -20,6 +20,7 @@ class RepositoryStore:
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
         self.content_set_to_db_id = self._prepare_content_set_map()
+        self.organization_to_db_id = {}
 
     def _prepare_content_set_map(self):
         cur = self.conn.cursor()
@@ -34,17 +35,18 @@ class RepositoryStore:
         """List repositories stored in DB. Dictionary with repository label as key is returned."""
         cur = self.conn.cursor()
         cur.execute("""select cs.label, a.name, r.releasever, r.id, r.url, r.revision, cs.id,
-                              c.name, c.ca_cert, c.cert, c.key
+                              c.name, c.ca_cert, c.cert, c.key, o.name
                        from repo r
+                       join organization o on r.org_id = o.id
                        left join arch a on r.basearch_id = a.id
                        left join certificate c on r.certificate_id = c.id
                        left join content_set cs on r.content_set_id = cs.id""")
         repos = {}
         for row in cur.fetchall():
             # (content_set_label, repo_arch, repo_releasever) -> repo_id, repo_url, repo_revision...
-            repos[(row[0], row[1], row[2])] = {"id": row[3], "url": row[4], "revision": row[5],
-                                               "content_set_id": row[6], "cert_name": row[7], "ca_cert": row[8],
-                                               "cert": row[9], "key": row[10]}
+            repos[(row[0], row[1], row[2], row[11])] = {"id": row[3], "url": row[4], "revision": row[5],
+                                                        "content_set_id": row[6], "cert_name": row[7], "ca_cert": row[8],
+                                                        "cert": row[9], "key": row[10]}
         cur.close()
         return repos
 
@@ -88,6 +90,24 @@ class RepositoryStore:
             cur.close()
         return cert_id[0]
 
+    def _import_organization(self, organization):
+        cur = self.conn.cursor()
+        try:
+            cur.execute("select id from organization where name = %s", (organization,))
+            org_id = cur.fetchone()
+            if not org_id:
+                cur.execute("""insert into organization (name)
+                            values (%s) returning id""", (organization,))
+                org_id = cur.fetchone()
+            self.conn.commit()
+        except Exception:
+            self.logger.exception("Failed to import organization.")
+            self.conn.rollback()
+            raise
+        finally:
+            cur.close()
+        return org_id[0]
+
     def cleanup_unused_data(self):
         """
         Deletes packages and errata not associated with any repo etc.
@@ -124,7 +144,8 @@ class RepositoryStore:
         finally:
             cur.close()
 
-    def delete_content_set(self, content_set_label, whole_content_set=False, basearch=None, releasever=None):
+    def delete_content_set(self, content_set_label,  # pylint: disable=too-many-positional-arguments
+                           whole_content_set=False, basearch=None, releasever=None, organization=None):
         """
         Deletes repositories and their content from DB.
         """
@@ -146,6 +167,9 @@ class RepositoryStore:
                 query_args.append(releasever)
             elif not whole_content_set:
                 query += " and releasever is null"
+            if organization and not whole_content_set:
+                query += " and org_id = (select id from organization where name = %s)"
+                query_args.append(organization)
             cur.execute(query, tuple(query_args))
             to_delete_repo_ids = cur.fetchall()
 
@@ -185,6 +209,11 @@ class RepositoryStore:
         """
         Imports or updates repository record in DB.
         """
+        org_id = self.organization_to_db_id.get(repo.organization)
+        if not org_id:
+            org_id = self._import_organization(repo.organization)
+            self.organization_to_db_id[repo.organization] = org_id
+
         if repo.ca_cert:
             # will raise exception if db error occurs
             cert_id = self._import_certificate(repo.cert_name, repo.ca_cert, repo.cert, repo.key)
@@ -203,14 +232,15 @@ class RepositoryStore:
             cur.execute("""select id, revision from repo where content_set_id = %s
                            and ((%s is null and basearch_id is null) or basearch_id = %s)
                            and ((%s is null and releasever is null) or releasever = %s)
+                           and org_id = %s
                         """,
-                        (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever))
+                        (content_set_id, basearch_id, basearch_id, repo.releasever, repo.releasever, org_id))
             db_repo = cur.fetchone()
             if not db_repo:
                 cur.execute("""insert into repo (url, content_set_id, basearch_id, releasever,
-                                                 revision, eol, certificate_id)
-                            values (%s, %s, %s, %s, %s, false, %s) returning id, revision""",
-                            (repo.repo_url, content_set_id, basearch_id, repo.releasever,
+                                                 org_id, revision, eol, certificate_id)
+                            values (%s, %s, %s, %s, %s, %s, false, %s) returning id, revision""",
+                            (repo.repo_url, content_set_id, basearch_id, repo.releasever, org_id,
                              repo.get_revision(), cert_id,))
                 db_repo = cur.fetchone()
             else:

@@ -7,6 +7,7 @@ from vmaas.reposcan.repodata.updateinfo import UpdateInfoMD
 from vmaas.reposcan.repodata.modules import ModuleMD
 from vmaas.reposcan.repodata.repository import Repository
 from vmaas.reposcan.repodata.test.test_updateinfo import KNOWN_UPDATE_TYPES
+from vmaas.reposcan.reposcan import DEFAULT_ORG_NAME
 
 PRIMARY_SQLITE_PATH = "test_data/repodata/primary_db.sqlite"
 PRIMARY_XML_PATH = "test_data/repodata/primary.xml"
@@ -22,13 +23,13 @@ class TestRepository:
     UPDATEINFO = UpdateInfoMD(UPDATEINFO_XML_PATH)
     MODULES = ModuleMD(MODULES_YAML_PATH)
 
-    REPOSITORY = Repository("repo_url", "content_set", "x86_64", "27")
+    REPOSITORY = Repository("repo_url", "content_set", "x86_64", "27", DEFAULT_ORG_NAME)
     REPOSITORY.primary = PRIMARY_DB
     REPOSITORY.updateinfo = UPDATEINFO
     REPOSITORY.modules = MODULES
-    REPOSITORY_WITHOUT_UPDATEINFO = Repository("repo_url", "content_set", "x86_64", "27")
+    REPOSITORY_WITHOUT_UPDATEINFO = Repository("repo_url", "content_set", "x86_64", "27", DEFAULT_ORG_NAME)
     REPOSITORY_WITHOUT_UPDATEINFO.primary = PRIMARY_DB
-    REPOSITORY_PRIMARY_XML = Repository("repo_url", "content_set", "x86_64", "27")
+    REPOSITORY_PRIMARY_XML = Repository("repo_url", "content_set", "x86_64", "27", DEFAULT_ORG_NAME)
     REPOSITORY_PRIMARY_XML.primary = PRIMARY
     REPOSITORY_PRIMARY_XML.updateinfo = UPDATEINFO
 
@@ -67,7 +68,7 @@ class TestRepository:
 
     def test_load_metadata(self):
         """Test package and update methods."""
-        repo = Repository(repo_url="", content_set="", basearch="", releasever="")
+        repo = Repository(repo_url="", content_set="", basearch="", releasever="", organization=DEFAULT_ORG_NAME)
         assert not repo.md_files
         assert repo.primary is None
         assert repo.updateinfo is None

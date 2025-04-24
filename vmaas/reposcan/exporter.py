@@ -24,7 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
-DUMP_SCHEMA_VERSION = 3
+DUMP_SCHEMA_VERSION = 4
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -342,7 +342,8 @@ class SqliteDump:
                                 product_id integer,
                                 revision text,
                                 last_change text,
-                                third_party integer
+                                third_party integer,
+                                organization text
                                )""")
         # Select repo detail mapping
         with self._named_cursor() as cursor:
@@ -356,21 +357,23 @@ class SqliteDump:
                                       p.id as product_id,
                                       r.revision,
                                       r.last_change,
-                                      cs.third_party
+                                      cs.third_party,
+                                      o.name
                                  from repo r
                                  join content_set cs on cs.id = r.content_set_id
                                  left join arch a on a.id = r.basearch_id
                                  join product p on p.id = cs.product_id
+                                 join organization o on o.id = r.org_id
                                  """)
             for oid, label, name, url, basearch, releasever, \
-                    product, product_id, revision, last_change, third_party in cursor:
-                dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    product, product_id, revision, last_change, third_party, organization in cursor:
+                dump.execute("insert into repo_detail values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                              (oid, label, name, url, basearch,
                               releasever, product, product_id,
                               # Use NULLs in export
                               format_datetime(revision) if revision is not None else None,
                               format_datetime(last_change),
-                              1 if third_party else 0),)
+                              1 if third_party else 0, organization),)
 
         dump.execute("""create table if not exists pkg_repo (
                                 pkg_id integer,

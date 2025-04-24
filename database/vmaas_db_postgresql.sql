@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 27);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 28);
 
 -- -----------------------------------------------------
 -- evr type
@@ -433,12 +433,26 @@ CREATE TABLE IF NOT EXISTS certificate (
 
 
 -- -----------------------------------------------------
+-- Table vmaas.organization
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS organization (
+  id SERIAL,
+  name TEXT NOT NULL UNIQUE, CHECK (NOT empty(name)),
+  PRIMARY KEY (id)
+)TABLESPACE pg_default;
+
+INSERT INTO organization (id, name) VALUES
+  (1, 'DEFAULT');
+
+
+-- -----------------------------------------------------
 -- Table vmaas.repo
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS repo (
   id SERIAL,
   url TEXT NOT NULL, CHECK (NOT empty(url)),
   content_set_id INT NOT NULL,
+  org_id INT NOT NULL,
   basearch_id INT NULL,
   releasever TEXT NULL, CHECK (NOT empty(releasever)),
   eol BOOLEAN NOT NULL,
@@ -449,6 +463,9 @@ CREATE TABLE IF NOT EXISTS repo (
   CONSTRAINT content_set_id
     FOREIGN KEY (content_set_id)
     REFERENCES content_set (id),
+  CONSTRAINT org_id
+    FOREIGN KEY (org_id)
+    REFERENCES organization (id),
   CONSTRAINT basearch_id
     FOREIGN KEY (basearch_id)
     REFERENCES arch (id),
@@ -456,10 +473,10 @@ CREATE TABLE IF NOT EXISTS repo (
     FOREIGN KEY (certificate_id)
     REFERENCES certificate (id)
 )TABLESPACE pg_default;
-CREATE UNIQUE INDEX repo_content_set_id_key ON repo (content_set_id) WHERE basearch_id IS NULL AND releasever IS NULL;
-CREATE UNIQUE INDEX repo_content_set_id_basearch_id_key ON repo (content_set_id, basearch_id) WHERE basearch_id IS NOT NULL AND releasever IS NULL;
-CREATE UNIQUE INDEX repo_content_set_id_releasever_key ON repo (content_set_id, releasever) WHERE basearch_id IS NULL AND releasever IS NOT NULL;
-CREATE UNIQUE INDEX repo_content_set_id_basearch_id_releasever_key ON repo (content_set_id, basearch_id, releasever) WHERE basearch_id IS NOT NULL AND releasever IS NOT NULL;
+CREATE UNIQUE INDEX repo_content_set_id_key ON repo (content_set_id, org_id) WHERE basearch_id IS NULL AND releasever IS NULL;
+CREATE UNIQUE INDEX repo_content_set_id_basearch_id_key ON repo (content_set_id, org_id, basearch_id) WHERE basearch_id IS NOT NULL AND releasever IS NULL;
+CREATE UNIQUE INDEX repo_content_set_id_releasever_key ON repo (content_set_id, org_id, releasever) WHERE basearch_id IS NULL AND releasever IS NOT NULL;
+CREATE UNIQUE INDEX repo_content_set_id_basearch_id_releasever_key ON repo (content_set_id, org_id, basearch_id, releasever) WHERE basearch_id IS NOT NULL AND releasever IS NOT NULL;
 CREATE TRIGGER repo_changed AFTER INSERT OR UPDATE OR DELETE ON repo
   FOR EACH STATEMENT
   EXECUTE PROCEDURE repos_changed();

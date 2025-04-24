@@ -22,18 +22,19 @@ from vmaas.reposcan.repodata.primary import PrimaryMD
 from vmaas.reposcan.repodata.primary_db import PrimaryDatabaseMD
 from vmaas.reposcan.repodata.repository import Repository
 from vmaas.reposcan.repodata.updateinfo import UpdateInfoMD
+from vmaas.reposcan.reposcan import DEFAULT_ORG_NAME
 
 PRIMARY_DB = PrimaryDatabaseMD("test_data/repodata/primary_db.sqlite")
 PRIMARY = PrimaryMD("test_data/repodata/primary.xml")
 UPDATEINFO = UpdateInfoMD("test_data/repodata/updateinfo.xml")
 PRODUCTS = {"product": {"product_id": 9, "content_sets": {"cs_label": {"name": "cs_name"}}}}
 
-REPOSITORY = Repository("repo_url1", "cs_label", "x86_64", "27")
+REPOSITORY = Repository("repo_url1", "cs_label", "x86_64", "27", DEFAULT_ORG_NAME)
 REPOSITORY.primary = PRIMARY_DB
 REPOSITORY.updateinfo = UPDATEINFO
-REPOSITORY_WITHOUT_UPDATEINFO = Repository("repo_url2", "cs_label", "i386", "27")
+REPOSITORY_WITHOUT_UPDATEINFO = Repository("repo_url2", "cs_label", "i386", "27", DEFAULT_ORG_NAME)
 REPOSITORY_WITHOUT_UPDATEINFO.primary = PRIMARY_DB
-REPOSITORY_PRIMARY_XML = Repository("repo_url3", "cs_label", "ppc64le", "27")
+REPOSITORY_PRIMARY_XML = Repository("repo_url3", "cs_label", "ppc64le", "27", DEFAULT_ORG_NAME)
 REPOSITORY_PRIMARY_XML.primary = PRIMARY
 REPOSITORY_PRIMARY_XML.updateinfo = UPDATEINFO
 

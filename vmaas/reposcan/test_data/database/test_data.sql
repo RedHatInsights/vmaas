@@ -60,9 +60,9 @@ INSERT INTO certificate (id, name, ca_cert, cert, key) VALUES
   (701, 'certificate-name-1', 'ca_cert_1', 'cert1', 'key1'),
   (702, 'certificate-name-2', 'ca_cert_2', 'cert2', 'key2');
 
-INSERT INTO repo (id, url, content_set_id, basearch_id, releasever, eol, revision, certificate_id) VALUES
-  (801, 'https://www.repourl.com/repo1', 601, 1, '1', true, '2019-08-01 01:00:00-05', 701),
-  (802, 'https://www.repourl.com/repo2', 602, 1, '1', true, '2019-08-02 01:00:00-05', 702);
+INSERT INTO repo (id, url, content_set_id, basearch_id, releasever, eol, revision, certificate_id, org_id) VALUES
+  (801, 'https://www.repourl.com/repo1', 601, 1, '1', true, '2019-08-01 01:00:00-05', 701, 1),
+  (802, 'https://www.repourl.com/repo2', 602, 1, '1', true, '2019-08-02 01:00:00-05', 702, 1);
 
 INSERT INTO pkg_repo (pkg_id, repo_id) VALUES
   (301, 801),
