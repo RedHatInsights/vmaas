@@ -1,6 +1,18 @@
 # CHANGELOG
 
 
+## v2.86.1 (2025-04-25)
+
+### Chores
+
+- Remove safety check
+  ([`3fd142f`](https://github.com/RedHatInsights/vmaas/commit/3fd142f4f22ec589bb157c81d07f923a08ea3afd))
+
+the version we've been using is deprecated and the newer version is paid
+
+RHINENG-17667
+
+
 ## v2.86.0 (2025-04-22)
 
 ### Features
