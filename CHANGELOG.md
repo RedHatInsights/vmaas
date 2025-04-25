@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v2.86.2 (2025-04-25)
+
+### Chores
+
+- Unused nonlocal start_time
+  ([`f9d2004`](https://github.com/RedHatInsights/vmaas/commit/f9d2004f025b85732e7909a98a1d8099b5bd88ba))
+
+vmaas/common/middlewares.py:68:13: F824 `nonlocal start_time` is unused: name is never assigned in
+  scope
+
+- Update dependencies
+  ([`9a37468`](https://github.com/RedHatInsights/vmaas/commit/9a37468d76e41d71e06842a57454c98c9048e5c4))
+
+RHINENG-17442
+
+
 ## v2.86.1 (2025-04-25)
 
 ### Chores
