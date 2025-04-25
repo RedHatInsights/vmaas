@@ -781,7 +781,12 @@ class ReleaseSyncHandler(SyncHandler):
         try:
             init_logging()
             init_db()
+
+            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
+                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of releases from git.")
+                return "SKIPPED"
             _, _, releases = SyncHandler.fetch_git()
+
             controller = ReleaseController()
             controller.store(releases)
         except Exception as err:  # pylint: disable=broad-except
