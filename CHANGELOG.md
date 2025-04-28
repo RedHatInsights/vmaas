@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.87.0 (2025-04-28)
+
+### Features
+
+- Support same repo in multiple orgs
+  ([`c304a4b`](https://github.com/RedHatInsights/vmaas/commit/c304a4b1ead72373a51370c664b1ddc8854db95d))
+
+RHINENG-17380
+
+
 ## v2.86.3 (2025-04-28)
 
 ### Bug Fixes
