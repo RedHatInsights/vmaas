@@ -15,6 +15,7 @@ WORKDIR /vmaas
 
 ADD pyproject.toml /vmaas/
 ADD poetry.lock    /vmaas/
+ADD VERSION        /vmaas/
 
 ENV LC_ALL=C.utf8
 ENV LANG=C.utf8

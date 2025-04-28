@@ -51,6 +51,8 @@ objects:
           value: ${NEWER_RELEASEVER_REPOS}
         - name: NEWER_RELEASEVER_CSAF
           value: ${NEWER_RELEASEVER_CSAF}
+        - name: VMAAS_VERSION_FILE_PATH
+          value: ${VMAAS_VERSION_FILE_PATH}
         - name: ENABLE_GO_CVES
           value: ${ENABLE_GO_CVES}
         - name: ENABLE_GO_ERRATA
@@ -516,6 +518,9 @@ parameters:
 - name: NEWER_RELEASEVER_CSAF
   description: Enable finding updates/cves in newer releaseversion from CSAF
   value: "true"
+- name: VMAAS_VERSION_FILE_PATH
+  description: Path to the VMaaS VERSION file
+  value: "/vmaas/VERSION"
 - name: DB_DUMP_BUCKET
   value: insights-vmaas-dump-storage
 - name: ENABLE_GO_CVES

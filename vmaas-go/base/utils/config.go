@@ -62,6 +62,7 @@ type Config struct {
 	VmaasLibMaxGoroutines int
 	NewerReleaseverRepos  bool
 	NewerReleaseverCsaf   bool
+	VmaasVersionFilePath  string
 }
 
 type (
@@ -143,6 +144,7 @@ func initEnv() {
 	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
 	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
 	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
+	Cfg.VmaasVersionFilePath = Getenv("VMAAS_VERSION_FILE_PATH", "/vmaas/VERSION")
 	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
 	Cfg.EnableGoErrata = GetBoolEnvOrDefault("ENABLE_GO_ERRATA", false)
 	Cfg.EnableGoRepos = GetBoolEnvOrDefault("ENABLE_GO_REPOS", false)
