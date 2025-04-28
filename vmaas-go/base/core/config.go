@@ -27,6 +27,7 @@ func ConfigureCache() {
 		vmaas.WithUnfixed(utils.Cfg.UnfixedEvalEnabled),
 		vmaas.WithNewerReleaseverRepos(utils.Cfg.NewerReleaseverRepos),
 		vmaas.WithNewerReleaseverCsaf(utils.Cfg.NewerReleaseverCsaf),
+		vmaas.WithVmaasVersionFilePath(utils.Cfg.VmaasVersionFilePath),
 	)
 	if err != nil {
 		utils.LogWarn("err", err.Error(), "Cache not available on app start")
