@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.86.3 (2025-04-28)
+
+### Bug Fixes
+
+- **reposcan**: Skip if token is not set
+  ([`efed605`](https://github.com/RedHatInsights/vmaas/commit/efed605921d0a6d4c80f7c77ccf488e9a22a138f))
+
+
 ## v2.86.2 (2025-04-25)
 
 ### Chores
