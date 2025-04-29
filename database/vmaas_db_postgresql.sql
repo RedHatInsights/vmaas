@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 28);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 29);
 
 -- -----------------------------------------------------
 -- evr type
@@ -443,6 +443,7 @@ CREATE TABLE IF NOT EXISTS organization (
 
 INSERT INTO organization (id, name) VALUES
   (1, 'DEFAULT');
+SELECT NEXTVAL('organization_id_seq');
 
 
 -- -----------------------------------------------------
