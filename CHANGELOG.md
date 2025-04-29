@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.87.1 (2025-04-29)
+
+### Bug Fixes
+
+- **database**: Bump the sequence to 2
+  ([`6bc0fe6`](https://github.com/RedHatInsights/vmaas/commit/6bc0fe640c43412055cbf018ab0477fbdf861c74))
+
+
 ## v2.87.0 (2025-04-28)
 
 ### Features
