@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.87.2 (2025-04-29)
+
+### Chores
+
+- Update h11 dependency
+  ([`32ba233`](https://github.com/RedHatInsights/vmaas/commit/32ba233beac67708edd3f2f6d8e16b2a27b20c5b))
+
+
 ## v2.87.1 (2025-04-29)
 
 ### Bug Fixes
