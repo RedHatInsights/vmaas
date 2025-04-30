@@ -102,6 +102,19 @@ paths:
       tags:
         - Repos
 
+  /repos/katello:
+    put:
+      summary: Add repositories to the DB from Katello API
+      operationId: vmaas.reposcan.reposcan.KatelloRepoListHandler.put
+      <<: *secured
+      responses:
+        <<: *repo_responses
+        <<: *running_resp
+        <<: *auth_resps
+        <<: *format_resps
+      tags:
+        - Repos
+
   /repos/{repo}:
     delete:
       summary: Delete repo from the DB
