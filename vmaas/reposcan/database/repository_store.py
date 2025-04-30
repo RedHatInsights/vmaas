@@ -31,6 +31,16 @@ class RepositoryStore:
         cur.close()
         return content_sets
 
+    def list_archs(self) -> list[str]:
+        """List known archs stored in DB."""
+        archs = []
+        cur = self.conn.cursor()
+        cur.execute("select name from arch")
+        for row in cur.fetchall():
+            archs.append(row[0])
+        cur.close()
+        return archs
+
     def list_repositories(self):
         """List repositories stored in DB. Dictionary with repository label as key is returned."""
         cur = self.conn.cursor()

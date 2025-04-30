@@ -34,6 +34,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
+from vmaas.reposcan.katello import KatelloApi
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, REPOS_TO_CLEANUP, REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
@@ -86,6 +87,10 @@ SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
+
+KATELLO_HOST = os.getenv("KATELLO_HOST", "")  # satellite.example.com
+KATELLO_API_USER = os.getenv("KATELLO_API_USER", "admin")
+KATELLO_API_PASS = os.getenv("KATELLO_API_PASS", "changeme")
 
 
 class TaskStatusResponse(dict):
@@ -270,7 +275,7 @@ class SyncHandler:
         """Run sync task of current class and export."""
         result = []
         result.append(cls.run_task(*args, **kwargs))
-        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, CleanTmpHandler):
+        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, KatelloRepoListHandler, CleanTmpHandler):
             result.append(ExporterHandler.run_task())
             result.append(PkgTreeHandler.run_task())
             result.append(S3ExporterHandler.run_task())
@@ -375,7 +380,8 @@ class RepolistImportHandler(SyncHandler):
         try:
             products = kwargs.get("products", None)
             repos = kwargs.get("repos", None)
-            git_sync = kwargs.get("git_sync", False)
+            verbose = kwargs.get("verbose", False)
+            delete = kwargs.get("delete", False)
             init_logging()
             init_db()
 
@@ -392,12 +398,15 @@ class RepolistImportHandler(SyncHandler):
                                                          cert_name=cert_name, ca_cert=ca_cert,
                                                          cert=cert, key=key)
                     repos_in_db.pop((content_set, basearch, releasever, organization), None)
-                if git_sync:  # Warn about extra repos in DB when syncing main repolist from git
+                if verbose:
                     for content_set, basearch, releasever, organization in repos_in_db:
-                        LOGGER.warning("Repository in DB but not in git repolist: %s", ", ".join(
+                        LOGGER.warning("Repository in DB but not in repolist: %s", ", ".join(
                             filter(None, (content_set, basearch, releasever, organization))))
                     REPOS_TO_CLEANUP.set(len(repos_in_db))
                 repository_controller.import_repositories()
+                # For certain repository sources (katello) delete unused repos from DB automatically
+                if delete:
+                    repository_controller.delete_repos(repos_in_db)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
@@ -424,7 +433,7 @@ class GitRepoListHandler(RepolistImportHandler):
         products, repos, _ = SyncHandler.fetch_git()
         if products is None or repos is None:
             return "ERROR"
-        return RepolistImportHandler.run_task(products=products, repos=repos, git_sync=True)
+        return RepolistImportHandler.run_task(products=products, repos=repos, verbose=True)
 
     @classmethod
     def put(cls, **kwargs):
@@ -477,6 +486,37 @@ class GitRepoListCleanupHandler(SyncHandler):
     @classmethod
     def delete(cls, **kwargs):
         """Cleanup repositories from DB"""
+        try:
+            status_code, status_msg = cls.start_task()
+            return status_msg, status_code
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            FAILED_IMPORT_REPO.inc()
+            return TaskStartResponse(msg, success=False), 400
+
+
+class KatelloRepoListHandler(RepolistImportHandler):
+    """Handler for importing repolists from Katello"""
+    task_type = "Import repositories from Katello"
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Start importing from Katello"""
+        init_logging()
+        init_db()
+        if not KATELLO_HOST or not KATELLO_API_USER or not KATELLO_API_PASS:
+            LOGGER.warning("KATELLO_HOST, KATELLO_API_USER or KATELLO_API_PASS not set, skipping download of repositories from Katello.")
+            return "SKIPPED"
+        katello_api = KatelloApi(KATELLO_HOST, KATELLO_API_USER, KATELLO_API_PASS)
+        products, repos, success = katello_api.get_products_repos()
+        if not success:
+            return "ERROR"
+        return RepolistImportHandler.run_task(products=products, repos=repos, verbose=True, delete=True)
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Add repositories listed in request to the DB"""
         try:
             status_code, status_msg = cls.start_task()
             return status_msg, status_code
@@ -817,6 +857,7 @@ def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
     handlers.extend([GitRepoListHandler] if SYNC_REPO_LIST_SOURCE == RepoListSource.GIT else [])  # type: ignore[list-item]
+    handlers.extend([KatelloRepoListHandler] if SYNC_REPO_LIST_SOURCE == RepoListSource.KATELLO else [])  # type: ignore[list-item]
     handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
