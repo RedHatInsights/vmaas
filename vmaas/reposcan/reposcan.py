@@ -12,6 +12,7 @@ import shutil
 import signal
 from multiprocessing.pool import Pool
 import multiprocessing
+from enum import StrEnum
 from functools import reduce
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -70,8 +71,16 @@ DEFAULT_PATH = "/api/vmaas"
 
 CACHE_DUMP_RETRY_SECONDS = int(os.getenv("CACHE_DUMP_RETRY_SECONDS", "300"))
 
+
+class RepoListSource(StrEnum):
+    """Supported repolist sources."""
+    MANUAL = "manual"
+    GIT = "git"
+    KATELLO = "katello"
+
+
+SYNC_REPO_LIST_SOURCE = os.getenv("SYNC_REPO_LIST_SOURCE", str(RepoListSource.MANUAL))
 # Allow to optionally disable some parts of sync (e.g. to speed up testing)
-SYNC_GIT_REPO_LIST = strtobool(os.getenv("SYNC_GIT_REPO_LIST", "yes"))
 SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
@@ -807,7 +816,7 @@ class ReleaseSyncHandler(SyncHandler):
 def all_sync_handlers() -> list:
     """Return all sync-handlers selected using env vars."""
     handlers = []
-    handlers.extend([GitRepoListHandler] if SYNC_GIT_REPO_LIST else [])  # type: ignore[list-item]
+    handlers.extend([GitRepoListHandler] if SYNC_REPO_LIST_SOURCE == RepoListSource.GIT else [])  # type: ignore[list-item]
     handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
@@ -992,6 +1001,11 @@ def create_app(specs):
         LOGGER.info("Periodic syncing running every %s minute(s).", sync_interval)
     else:
         LOGGER.info("Periodic syncing disabled.")
+
+    if SYNC_REPO_LIST_SOURCE in RepoListSource:
+        LOGGER.info("Repository list source: %s", SYNC_REPO_LIST_SOURCE)
+    else:
+        LOGGER.warning("Unsupported repository list source: %s", SYNC_REPO_LIST_SOURCE)
 
     def terminate(*_):
         """Trigger shutdown."""
