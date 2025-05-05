@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.87.3 (2025-05-05)
+
+### Chores
+
+- Enable all GO endpoints locally
+  ([`a5ce4fb`](https://github.com/RedHatInsights/vmaas/commit/a5ce4fb403a36dc6fb05908e3df381fb60b44309))
+
+
 ## v2.87.2 (2025-04-29)
 
 ### Chores
