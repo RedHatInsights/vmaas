@@ -72,13 +72,13 @@ class RepositoryStore:
             key = None
         cur = self.conn.cursor()
         try:
-            cur.execute("select id from certificate where name = %s", (cert_name,))
-            cert_id = cur.fetchone()
-            if not cert_id:
+            cur.execute("select id, ca_cert, cert, key from certificate where name = %s", (cert_name,))
+            cert_row = cur.fetchone()
+            if not cert_row:
                 cur.execute("""insert into certificate (name, ca_cert, cert, key)
                             values (%s, %s, %s, %s) returning id""", (cert_name, ca_cert, cert, key,))
-                cert_id = cur.fetchone()
-            else:
+                cert_row = cur.fetchone()
+            elif cert_row[1] != ca_cert or cert_row[2] != cert or cert_row[3] != key:
                 cur.execute("update certificate set ca_cert = %s, cert = %s, key = %s where name = %s",
                             (ca_cert, cert, key, cert_name,))
             self.conn.commit()
@@ -88,7 +88,7 @@ class RepositoryStore:
             raise
         finally:
             cur.close()
-        return cert_id[0]
+        return cert_row[0]
 
     def _import_organization(self, organization):
         cur = self.conn.cursor()
