@@ -72,13 +72,13 @@ class RepositoryStore:
             key = None
         cur = self.conn.cursor()
         try:
-            cur.execute("select id from certificate where name = %s", (cert_name,))
+            cur.execute("select id, ca_cert, cert, key from certificate where name = %s", (cert_name,))
             cert_id = cur.fetchone()
             if not cert_id:
                 cur.execute("""insert into certificate (name, ca_cert, cert, key)
                             values (%s, %s, %s, %s) returning id""", (cert_name, ca_cert, cert, key,))
                 cert_id = cur.fetchone()
-            else:
+            elif cert_id[1] != ca_cert or cert_id[2] != cert or cert_id[3] != key:
                 cur.execute("update certificate set ca_cert = %s, cert = %s, key = %s where name = %s",
                             (ca_cert, cert, key, cert_name,))
             self.conn.commit()
