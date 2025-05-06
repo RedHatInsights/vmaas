@@ -247,8 +247,8 @@ class SyncHandler:
             return None, None, None, None
 
         for graph in release_graph_dir.glob("*.json"):
-            with graph.open() as fd:
-                content = fd.read()
+            with graph.open() as fde:
+                content = fde.read()
                 release_graphs[graph.name] = ReleaseGraph(graph.name, content)
 
         return products, repos, releases, release_graphs
