@@ -715,7 +715,7 @@ class SqliteDump:
 
     def _dump_release_graph(self, dump):
         """Select all release graphs and put them into dictionary"""
-        dump.execute("""CREATE TABLE IF NOT EXIST release_graph (
+        dump.execute("""CREATE TABLE IF NOT EXISTS release_graph (
                         id INTEGER PRIMARY KEY,
                         name TEXT NOT NULL,
                         graph JSONB NOT NULL)
