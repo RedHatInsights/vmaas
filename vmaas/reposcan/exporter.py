@@ -24,7 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
-DUMP_SCHEMA_VERSION = 4
+DUMP_SCHEMA_VERSION = 5
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -108,6 +108,7 @@ class SqliteDump:
                 self._dump_modules(dump)
                 self._dump_csaf(dump)
                 self._dump_os_releases(dump)
+                self._dump_release_graph(dump)
                 self._dump_dbchange(dump, timestamp)
                 self._dump_dump_schema_version(dump)
         except Exception as err:  # pylint: disable=broad-except
@@ -711,6 +712,19 @@ class SqliteDump:
             cursor.execute("SELECT id, name, major, minor, lifecycle_phase, system_profile FROM operating_system")
             for os_id, name, major, minor, lifecycle_phase, system_profile in cursor:
                 dump.execute("INSERT INTO operating_system VALUES (?, ?, ?, ?, ?, ?)", (os_id, name, major, minor, lifecycle_phase, json.dumps(system_profile)))
+
+    def _dump_release_graph(self, dump):
+        """Select all release graphs and put them into dictionary without checksum"""
+        dump.execute("""CREATE TABLE IF NOT EXISTS release_graph (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        graph JSONB NOT NULL)
+                     """)
+        with self._named_cursor() as cur:
+            # checksum is not going to be used by the dump consumer therefore it is excluded in the dump
+            cur.execute("SELECT id, name, graph FROM release_graph")
+            for _id, name, graph in cur:
+                dump.execute("INSERT INTO release_graph VALUES (?, ?, ?)", (_id, name, json.dumps(graph)))
 
     def _dump_dbchange(self, dump, timestamp):
         """Select db change details"""
