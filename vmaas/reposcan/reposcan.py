@@ -14,6 +14,7 @@ from multiprocessing.pool import Pool
 import multiprocessing
 from enum import StrEnum
 from functools import reduce
+from pathlib import Path
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import connexion
@@ -36,13 +37,16 @@ from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
 from vmaas.reposcan.katello import KatelloApi
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
-    CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, REPOS_TO_CLEANUP, REGISTRY
+    CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
+    REGISTRY
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
 from vmaas.reposcan.redhatrelease.release_controller import ReleaseController
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
+from vmaas.reposcan.redhatreleasegraph.modeling import ReleaseGraph
+from vmaas.reposcan.database.release_graph_store import ReleaseGraphStore
 
 LOGGER = get_logger(__name__)
 KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
@@ -60,6 +64,7 @@ REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
 RELEASEMAP_PATH = os.getenv('RELEASEMAP_PATH', 'ga_dates.json')
+RELEASE_GRAPH_DIR = os.getenv("RELEASE_GRAPH_PATH", "release_graphs")
 
 DEFAULT_CERT_NAME = "DEFAULT"
 DEFAULT_ORG_NAME = "DEFAULT"
@@ -87,6 +92,7 @@ SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
+SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
 
 KATELLO_HOST = os.getenv("KATELLO_HOST", "")  # satellite.example.com
 KATELLO_API_USER = os.getenv("KATELLO_API_USER", "admin")
@@ -219,7 +225,7 @@ class SyncHandler:
 
         if not os.path.isdir(repolist_dir):
             LOGGER.error("Downloading assets git repo failed: Directory was not created")
-            return None, None, None
+            return None, None, None, None
 
         products, repos = {}, []
 
@@ -229,7 +235,7 @@ class SyncHandler:
             path = path.strip()
             if not os.path.isfile(repolist_dir + '/' + path):
                 LOGGER.error("Downloading git repo failed: File %s was not created", path)
-                return None, None, None
+                return None, None, None, None
 
             with open(repolist_dir + '/' + path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
@@ -237,18 +243,29 @@ class SyncHandler:
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
             if not item_products and not item_repos:
                 LOGGER.warning("Input json is not valid")
-                return None, None, None
+                return None, None, None, None
             products.update(item_products)
             repos += item_repos
 
         if not os.path.isfile(repolist_dir + '/' + RELEASEMAP_PATH):
             LOGGER.error("Downloading assets git repo failed: File %s was not created", RELEASEMAP_PATH)
-            return None, None, None
+            return None, None, None, None
 
         with open(repolist_dir + '/' + RELEASEMAP_PATH, 'r', encoding='utf8') as json_file:
             releases = json.load(json_file)
 
-        return products, repos, releases
+        release_graphs = {}
+        release_graph_dir = Path(repolist_dir) / RELEASE_GRAPH_DIR
+        if not release_graph_dir.is_dir():
+            LOGGER.error("Downloading assets git repo failed: Dir %s was not created", RELEASE_GRAPH_DIR)
+            return None, None, None, None
+
+        for graph in release_graph_dir.glob("*.json"):
+            with graph.open() as fde:
+                content = fde.read()
+                release_graphs[graph.name] = ReleaseGraph(graph.name, content)
+
+        return products, repos, releases, release_graphs
 
     @classmethod
     def start_task(cls, *args, export=True, **kwargs):
@@ -430,7 +447,7 @@ class GitRepoListHandler(RepolistImportHandler):
         if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
             LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
             return "SKIPPED"
-        products, repos, _ = SyncHandler.fetch_git()
+        products, repos, _, _ = SyncHandler.fetch_git()
         if products is None or repos is None:
             return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos, verbose=True)
@@ -463,7 +480,7 @@ class GitRepoListCleanupHandler(SyncHandler):
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
                 return "SKIPPED"
 
-            _, repos, _ = SyncHandler.fetch_git()
+            _, repos, _, _ = SyncHandler.fetch_git()
             if not repos:
                 return "ERROR"
 
@@ -836,7 +853,7 @@ class ReleaseSyncHandler(SyncHandler):
             if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of releases from git.")
                 return "SKIPPED"
-            _, _, releases = SyncHandler.fetch_git()
+            _, _, releases, _ = SyncHandler.fetch_git()
 
             controller = ReleaseController()
             controller.store(releases)
@@ -844,6 +861,43 @@ class ReleaseSyncHandler(SyncHandler):
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
             RELEASE_FAILED_IMPORT.inc()
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
+class ReleaseGraphSyncHandler(SyncHandler):
+    """Handler for RHEL release graph sync API."""
+
+    task_type = "Sync RHEL release graphs"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Sync RHEL release graphs."""
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing RHEL release graphs."""
+        try:
+            init_logging()
+            init_db()
+
+            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
+                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of release graphs from git.")
+                return "SKIPPED"
+            _, _, _, release_graphs = SyncHandler.fetch_git()
+            store = ReleaseGraphStore(release_graphs)
+            store.store()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            RELEASE_GRAPH_FAILED_IMPORT.inc()
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
                 return "DB_ERROR"
@@ -863,6 +917,7 @@ def all_sync_handlers() -> list:
     handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
     handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]
     handlers.extend([ReleaseSyncHandler] if SYNC_RELEASES else [])  # type: ignore[list-item]
+    handlers.extend([ReleaseGraphSyncHandler] if SYNC_RELEASE_GRAPH else [])  # type: ignore[list-item]
     return handlers
 
 

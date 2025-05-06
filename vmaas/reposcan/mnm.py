@@ -39,5 +39,6 @@ CSAF_FAILED_IMPORT = Counter('vmaas_reposcan_failed_csaf_import', '# of failed c
 CSAF_FAILED_UPDATE = Counter('vmaas_reposcan_failed_csaf_update', '# of failed csaf-update attempts')
 
 RELEASE_FAILED_IMPORT = Counter('vmaas_reposcan_failed_release_import', '# of failed release-import attempts')
+RELEASE_GRAPH_FAILED_IMPORT = Counter('vmaas_reposcan_failed_release_graph_import', '# of failed release-import attempts')
 
 REPOS_TO_CLEANUP = Gauge('vmaas_reposcan_repos_cleanup', '# of repos to cleanup from DB')

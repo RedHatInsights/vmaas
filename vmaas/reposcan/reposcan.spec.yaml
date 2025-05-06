@@ -200,6 +200,16 @@ paths:
       tags:
         - Sync
 
+  /sync/release_graphs:
+    put:
+      summary: Sync RHEL release graphs metadata
+      operationId: vmaas.reposcan.reposcan.ReleaseGraphSyncHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /export/pkgtree:
     put:
       summary: Export package tree
