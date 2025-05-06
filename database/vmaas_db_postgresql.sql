@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 29);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 30);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1031,6 +1031,17 @@ CREATE TABLE IF NOT EXISTS operating_system (
   PRIMARY KEY (id),
   CONSTRAINT operating_system_name_major_minor_lifecycle_phase_uq
     UNIQUE (name, major, minor, lifecycle_phase)
+)TABLESPACE pg_default;
+
+-- -----------------------------------------------------
+-- Table vmaas.release_graph
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS release_graph (
+  id    SERIAL,
+  name  TEXT UNIQUE NOT NULL, CHECK (NOT empty(name)),
+  graph JSONB NOT NULL,
+  checksum TEXT NOT NULL,
+  PRIMARY KEY (id)
 )TABLESPACE pg_default;
 
 -- -----------------------------------------------------
