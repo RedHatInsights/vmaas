@@ -14,6 +14,6 @@ CREATE TABLE IF NOT EXISTS release_graph (
 -- vmaas_writer - has rights to INSERT/UPDATE/DELETE; used by reposcan
 -- vmaas_reader - has SELECT only; used by webapp
 -- -----------------------------------------------------
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.operating_system TO vmaas_writer;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.operating_system_id_seq TO vmaas_writer;
-GRANT SELECT ON TABLE public.operating_system TO vmaas_reader;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.release_graph TO vmaas_writer;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.release_graph_id_seq TO vmaas_writer;
+GRANT SELECT ON TABLE public.release_graph TO vmaas_reader;
