@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.88.0 (2025-05-07)
+
+### Features
+
+- Add and setup VERSION file
+  ([`52f1f96`](https://github.com/RedHatInsights/vmaas/commit/52f1f964bb3a019fd0b40cd33228baaf1fc354ac))
+
+RHINENG-13563
+
+- **webapp**: Add go controller for version endpoint
+  ([`0e2d6ae`](https://github.com/RedHatInsights/vmaas/commit/0e2d6aef3666b3df7ed14c4e81d882332ccfc961))
+
+RHINENG-13563
+
+
 ## v2.87.3 (2025-05-05)
 
 ### Chores
