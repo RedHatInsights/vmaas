@@ -5,7 +5,10 @@ import os
 import shutil
 import tempfile
 
-import requests
+from requests import Session
+from requests.adapters import HTTPAdapter
+from requests.exceptions import RequestException
+from urllib3.util import Retry
 
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.repository_store import RepositoryStore
@@ -26,6 +29,14 @@ class KatelloApi:
         self.hostname: str = hostname
         self.api_user: str = api_user
         self.api_pass: str = api_pass
+
+        self.session = Session()
+        retries = Retry(
+            total=RETRY_COUNT,
+            backoff_factor=0.5,
+        )
+        self.session.mount('http://', HTTPAdapter(max_retries=retries))
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
 
         self.tmp_directory: str | None = None
 
@@ -68,34 +79,26 @@ class KatelloApi:
             headers = {}
 
         url = f"{scheme}://{self.hostname}{endpoint}"
-        tries = 0
 
-        while True:
-            if tries >= RETRY_COUNT:
-                break
-            try:
-                response = requests.request(
-                    method="GET",
-                    url=url,
-                    headers=headers,
-                    timeout=timeout,
-                    auth=auth,
-                    verify=verify,
-                    **kwargs,
-                )
-                if response.status_code == 200:
-                    if json:
-                        return response.json()
-                    return {"data": response.text}
+        try:
+            response = self.session.request(
+                method="GET",
+                url=url,
+                headers=headers,
+                timeout=timeout,
+                auth=auth,
+                verify=verify,
+                **kwargs,
+            )
+            if response.status_code == 200:
+                if json:
+                    return response.json()
+                return {"data": response.text}
+            
+            LOGGER.error("Error during GET request to url %s: HTTP %s, %s", url, response.status_code, response.text)
+        except RequestException:
+            LOGGER.exception("Error calling API %s: ", url)
 
-                tries += 1
-                LOGGER.error("Error during GET request to url %s: HTTP %s, %s", url, response.status_code, response.text)
-                # Do not retry for 4xx HTTP codes
-                if 400 <= response.status_code < 500:
-                    break
-            except requests.exceptions.RequestException:
-                tries += 1
-                LOGGER.exception("Error calling API %s: ", url)
         self.success = False
         return {}
 
