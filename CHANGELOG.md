@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.89.0 (2025-05-09)
+
+### Features
+
+- **webapp-go**: Support orgs in API
+  ([`cf87816`](https://github.com/RedHatInsights/vmaas/commit/cf878160156eb0c6bc86591308a90f3b19830192))
+
+RHINENG-17231
+
+
 ## v2.88.0 (2025-05-07)
 
 ### Features
