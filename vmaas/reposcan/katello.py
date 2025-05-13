@@ -15,8 +15,9 @@ from vmaas.reposcan.database.repository_store import RepositoryStore
 
 LOGGER = get_logger(__name__)
 
-KATELLO_CA_CERT_PATH = "/pub/katello-server-ca.crt"
-KATELLO_ACCESS_CERT_PATH = "/katello/api/v2/organizations/%s/download_debug_certificate"
+KATELLO_CA_CERT_PATH = "/katello-server-ca.crt"
+
+KATELLO_ACCESS_CERT_API = "/katello/api/v2/organizations/%s/download_debug_certificate"
 KATELLO_ORG_LIST_API = "/katello/api/v2/organizations"
 KATELLO_REPOS_LIST_API = "/katello/api/v2/repositories?organization_id=%s&search=redhat=true"
 
@@ -59,24 +60,20 @@ class KatelloApi:
                 return arch
         return None
 
-    def _fetch_katello(  # pylint: disable=too-many-branches
-        self, endpoint, scheme="https", json=True, timeout=30, **kwargs
+    def _fetch_katello(
+        self, endpoint, json=True, timeout=30, **kwargs
     ) -> dict:
         """Sends request to Katello server/API"""
-
-        if scheme == "https":
-            verify = os.path.join(self.tmp_directory, os.path.basename(KATELLO_CA_CERT_PATH))
-            auth = (self.api_user, self.api_pass)
-        else:
-            verify = True
-            auth = None
+        if not os.path.isfile(KATELLO_CA_CERT_PATH):
+            msg = f"Katello CA certificate is missing in path '{KATELLO_CA_CERT_PATH}'."
+            raise KatelloApiException(msg)
 
         if json:
             headers = {"Accept": "application/json"}
         else:
             headers = {}
 
-        url = f"{scheme}://{self.hostname}{endpoint}"
+        url = f"https://{self.hostname}{endpoint}"
 
         try:
             response = self.session.request(
@@ -84,8 +81,8 @@ class KatelloApi:
                 url=url,
                 headers=headers,
                 timeout=timeout,
-                auth=auth,
-                verify=verify,
+                auth=(self.api_user, self.api_pass),
+                verify=KATELLO_CA_CERT_PATH,
                 **kwargs,
             )
             if response.status_code == 200:
@@ -99,24 +96,20 @@ class KatelloApi:
 
         return {}
 
-    def _download_katello_ca_certificate(self) -> str:
-        LOGGER.info("Downloading Katello CA certificate.")
-
-        ca_certificate = self._fetch_katello(KATELLO_CA_CERT_PATH, scheme="http", json=False)
-        if not ca_certificate:
-            msg = "Katello CA certificate download failed."
+    def _load_katello_ca_certificate(self) -> str:
+        if not os.path.isfile(KATELLO_CA_CERT_PATH):
+            msg = f"Katello CA certificate is missing in path '{KATELLO_CA_CERT_PATH}'."
             raise KatelloApiException(msg)
 
-        # Write CA certificate to tempfile to be able to use with requests
-        with open(os.path.join(self.tmp_directory, os.path.basename(KATELLO_CA_CERT_PATH)), "w", encoding="utf-8") as ca_cert_tmpfile:
-            ca_cert_tmpfile.write(ca_certificate["data"])
+        with open(KATELLO_CA_CERT_PATH, encoding="utf-8") as cert_file:
+            cert = cert_file.read()
 
-        return ca_certificate["data"]
+        return cert
 
     def _download_katello_access_certificate(self, org_id: int, org_label: str) -> str:
         LOGGER.info("Downloading Katello organization '%s' access certificate.", org_label)
 
-        access_certificate_key = self._fetch_katello(KATELLO_ACCESS_CERT_PATH % org_id, json=False)
+        access_certificate_key = self._fetch_katello(KATELLO_ACCESS_CERT_API % org_id, json=False)
         if not access_certificate_key:
             msg = f"Katello access certificate download failed, skipping organization '{org_label}'."
             raise KatelloApiException(msg)
@@ -172,7 +165,7 @@ class KatelloApi:
         products, repos = {}, []
         try:
             self.tmp_directory = tempfile.mkdtemp(prefix="katello-")
-            ca_cert = self._download_katello_ca_certificate()
+            ca_cert = self._load_katello_ca_certificate()
             orgs = self._get_orgs()
             for org_id, org_label in orgs.items():
                 repos.extend(self._get_org_repos(org_id, org_label, ca_cert, products))
