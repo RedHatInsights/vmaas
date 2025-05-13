@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   vmaas_database:
     container_name: vmaas-database
@@ -36,6 +34,7 @@ services:
       - 9082:10000
     volumes:
       - vmaas-dump-data:/data:z
+      - ./conf/katello-server-ca.crt:/katello-server-ca.crt
     depends_on:
       - vmaas_database
 
