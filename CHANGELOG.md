@@ -1,6 +1,31 @@
 # CHANGELOG
 
 
+## v2.90.0 (2025-05-13)
+
+### Bug Fixes
+
+- **reposcan**: Mount CA certificate instead of downloading
+  ([`a882432`](https://github.com/RedHatInsights/vmaas/commit/a882432a4ed63f70e3f3950f2ae6ac38d13bbc38))
+
+### Features
+
+- **reposcan**: Sync repository list from Katello API
+  ([`3d23be6`](https://github.com/RedHatInsights/vmaas/commit/3d23be66a26465936029b8878021dd2297f235bc))
+
+RHINENG-17061 RHINENG-17231
+
+### Refactoring
+
+- **reposcan**: Define repository list source
+  ([`65c2ca1`](https://github.com/RedHatInsights/vmaas/commit/65c2ca1b73ae65c012ebe5c69fd828ed087b4a40))
+
+RHINENG-17061
+
+- **reposcan**: Update cert row only when changed
+  ([`3209169`](https://github.com/RedHatInsights/vmaas/commit/32091697f000a5c83478bb54c53ebc3f3cff4980))
+
+
 ## v2.89.0 (2025-05-09)
 
 ### Features
