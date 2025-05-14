@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 30);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 31);
 
 -- -----------------------------------------------------
 -- evr type
@@ -971,6 +971,7 @@ CREATE TABLE IF NOT EXISTS csaf_product (
   package_name_id   INT NOT NULL,
   package_id        INT NULL,
   module_stream     TEXT NULL CHECK (NOT empty(module_stream)),
+  variant_suffix    TEXT NOT NULL CHECK (NOT empty(variant_suffix)) DEFAULT 'N/A',
   PRIMARY KEY (id),
   CONSTRAINT cpe_id
     FOREIGN KEY (cpe_id)
@@ -983,10 +984,10 @@ CREATE TABLE IF NOT EXISTS csaf_product (
     REFERENCES package (id)
 )TABLESPACE pg_default;
 
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NULL;
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, module_stream) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NOT NULL;
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, package_id) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NULL;
-CREATE UNIQUE INDEX ON csaf_product(cpe_id, package_name_id, package_id, module_stream) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NOT NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, variant_suffix, package_name_id) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, variant_suffix, package_name_id, module_stream) WHERE package_name_id IS NOT NULL AND package_id IS NULL AND module_stream IS NOT NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, variant_suffix, package_name_id, package_id) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NULL;
+CREATE UNIQUE INDEX ON csaf_product(cpe_id, variant_suffix, package_name_id, package_id, module_stream) WHERE package_name_id IS NOT NULL and package_id IS NOT NULL AND module_stream IS NOT NULL;
 
 -- -----------------------------------------------------
 -- Table vmaas.csaf_cve_product
