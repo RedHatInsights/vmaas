@@ -27,6 +27,7 @@ from vmaas.reposcan.redhatcsaf.modeling import CsafFiles
 from vmaas.reposcan.redhatcsaf.modeling import CsafProduct
 from vmaas.reposcan.redhatcsaf.modeling import CsafProducts
 from vmaas.reposcan.redhatcsaf.modeling import CsafProductStatus
+from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/beta/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
@@ -156,13 +157,17 @@ class CsafController:
         product_status: str,
         product_purl: dict[str, str],
         product_rel: dict[str, ProductRelationship],
-    ) -> tuple[str, str, str | None]:
+    ) -> tuple[str, str, str | None, str]:
         if ":" not in product:
             raise ComponentError(f"Component without ':', '{product}'")
 
         branch_product, rest = product.split(":", 1)
         pkg = rest
         module = None
+        # we are interested only in a product variant of "fixed" products
+        # "known_affected" products don't have a product variant in product_id
+        # but it might change in the future with SECDATA-1025 or follow up work
+        variant_suffix = DEFAULT_VARIANT
         match product_status:
             case "known_affected":
                 if "/" in rest:
@@ -174,13 +179,17 @@ class CsafController:
                         # meaning it is not an rpm and we don't want to process this product
                         raise ComponentError(f"Not RPM component '{product}'")
             case "fixed":
+                splitted_product = branch_product.split("-", 1)
+                if len(splitted_product) != 2:
+                    raise ComponentError(f"Invalid product variant '{branch_product}'")
+                variant_suffix = splitted_product[1]
                 if ".module" in product:
                     rel = product_rel.get(product)
                     if rel is None:
                         # this might happen until csaf vex files are not updated with modules for fixed products
                         # return the package as it didn't have a module
                         self.logger.warning("Missing module for modular product '%s'", product)
-                        return branch_product, pkg, module
+                        return branch_product, pkg, module, variant_suffix
                     pkg, module = rel.product_reference, rel.module
                 purl = product_purl.get(pkg)
                 if purl is None or "rpm" not in purl or "rpmmod" in purl:
@@ -189,7 +198,7 @@ class CsafController:
             case _:
                 raise NotImplementedError(f"Unsupported product_status type '{product_status}'")
 
-        return branch_product, pkg, module
+        return branch_product, pkg, module, variant_suffix
 
     def _parse_vulnerabilities(
         self,
@@ -212,14 +221,21 @@ class CsafController:
                 product_status = product_status.lower()
                 for product in vulnerability["product_status"].get(product_status, []):
                     try:
-                        branch_product, pkg, module = self._parse_product(
+                        branch_product, pkg, module, variant_suffix = self._parse_product(
                             product, product_status, product_purl, product_rel
                         )
                     except ComponentError as err:
                         self.logger.debug("%s, %s", err, vulnerability["cve"])
                         continue
                     erratum = product_erratum.get(product)
-                    csaf_product = CsafProduct(product_cpe[branch_product], pkg, status_id, module, erratum)
+                    csaf_product = CsafProduct(
+                        cpe=product_cpe[branch_product],
+                        package=pkg,
+                        status_id=status_id,
+                        module=module,
+                        erratum=erratum,
+                        variant_suffix=variant_suffix,
+                    )
                     uniq_products[(product_cpe[branch_product], pkg, module)] = csaf_product
 
             cves[cve] = CsafProducts(list(uniq_products.values()))

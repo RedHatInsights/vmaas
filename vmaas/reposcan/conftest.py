@@ -44,6 +44,7 @@ EXPECTED_CSAF = (
                         3,
                         None,
                         "RHSA-2023:1833",
+                        variant_suffix="8.6.0.Z.EUS",
                     ),
                     csaf_model.CsafProduct(
                         "cpe:/a:redhat:rhel_eus:8.6::appstream",
@@ -51,6 +52,7 @@ EXPECTED_CSAF = (
                         3,
                         "virt:rhel",
                         "RHSA-2023:1833",
+                        variant_suffix="8.6.0.Z.EUS",
                     ),
                 ])
             }
