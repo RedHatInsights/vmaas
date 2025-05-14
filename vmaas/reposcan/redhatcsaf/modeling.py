@@ -181,7 +181,7 @@ class CsafProducts:
     """List like collection of CSAF products with lookup by ids."""
 
     _products: list[CsafProduct] = attr.Factory(list)
-    _lookup: dict[tuple[int, int | None, int | None, str | None], CsafProduct] = attr.Factory(dict)
+    _lookup: dict[tuple[int, str, int | None, int | None, str | None], CsafProduct] = attr.Factory(dict)
 
     def to_tuples(
         self,
@@ -224,20 +224,22 @@ class CsafProducts:
             res.append(tuple(items))
         return res
 
-    def get_by_ids_and_module(
+    def get_by_ids_module_variant(
         self,
+        *,
         cpe_id: int,
+        variant_suffix: str,
         package_name_id: int | None,
         package_id: int | None,
         module: str | None,
     ) -> CsafProduct | None:
         """Return product by (cpe_id, package_name_id, package_id, module)."""
-        key = (cpe_id, package_name_id, package_id, module)
+        key = (cpe_id, variant_suffix, package_name_id, package_id, module)
         product = self._lookup.get(key)
         if product is None:
             # not found in _lookup, try to find in _products and add to _lookup
             for prod in self:
-                if (prod.cpe_id, prod.package_name_id, prod.package_id, module) == key:
+                if (prod.cpe_id, prod.variant_suffix, prod.package_name_id, prod.package_id, module) == key:
                     self.add_to_lookup(prod)
                     return prod
         return product
@@ -245,7 +247,7 @@ class CsafProducts:
     def add_to_lookup(self, val: CsafProduct) -> None:
         """Add `val` to internal lookup dict."""
         if val.cpe_id is not None:
-            key = (val.cpe_id, val.package_name_id, val.package_id, val.module)
+            key = (val.cpe_id, val.variant_suffix, val.package_name_id, val.package_id, val.module)
             self._lookup[key] = val
 
     def append(self, val: CsafProduct) -> None:
@@ -256,7 +258,7 @@ class CsafProducts:
     def remove(self, val: CsafProduct) -> None:
         """Remove `val` from CsafProducts."""
         if val.cpe_id is not None:
-            key = (val.cpe_id, val.package_name_id, val.package_id, val.module)
+            key = (val.cpe_id, val.variant_suffix, val.package_name_id, val.package_id, val.module)
             self._lookup.pop(key, None)
         self._products.remove(val)
 

@@ -361,13 +361,25 @@ class TestModels:
         for prod in products:
             if prod.cpe_id:
                 assert prod not in products._lookup.values()
-                res = products.get_by_ids_and_module(prod.cpe_id, prod.package_name_id, prod.package_id, prod.module)
+                res = products.get_by_ids_module_variant(
+                    cpe_id=prod.cpe_id,
+                    variant_suffix=prod.variant_suffix,
+                    package_name_id=prod.package_name_id,
+                    package_id=prod.package_id,
+                    module=prod.module,
+                )
                 assert res == prod
         # get from _lookup (added by previous get_by_ids call)
         for prod in products:
             if prod.cpe_id:
                 assert prod in products._lookup.values()
-                res = products.get_by_ids_and_module(prod.cpe_id, prod.package_name_id, prod.package_id, prod.module)
+                res = products.get_by_ids_module_variant(
+                    cpe_id=prod.cpe_id,
+                    variant_suffix=prod.variant_suffix,
+                    package_name_id=prod.package_name_id,
+                    package_id=prod.package_id,
+                    module=prod.module,
+                )
                 assert res == prod
 
     def test_products_append(self, csaf_products: m.CsafProducts) -> None:
