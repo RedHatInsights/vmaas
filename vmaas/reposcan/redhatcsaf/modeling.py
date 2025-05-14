@@ -16,6 +16,9 @@ import attr
 from vmaas.common.date_utils import parse_datetime
 
 
+DEFAULT_VARIANT = "N/A"
+
+
 class CsafProductStatus(IntEnum):
     """CSAF product status enum."""
 
@@ -170,6 +173,7 @@ class CsafProduct:
     cpe_id: int | None = None
     package_name_id: int | None = None
     package_id: int | None = None
+    variant_suffix: str = DEFAULT_VARIANT
 
 
 @attr.s(auto_attribs=True, repr=False)
