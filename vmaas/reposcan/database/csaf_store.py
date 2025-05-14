@@ -160,7 +160,13 @@ class CsafStore(ObjectStore):
 
     def _set_product_ids(self, rows: list[tuple[Any, ...]], products: model.CsafProducts) -> None:
         for row in rows:
-            product = products.get_by_ids_and_module(row[1], row[2], row[3], row[4])
+            product = products.get_by_ids_module_variant(
+                cpe_id=row[1],
+                variant_suffix=row[2],
+                package_name_id=row[3],
+                package_id=row[4],
+                module=row[5],
+            )
             if product is None:
                 # log as error, this would be a programming error
                 self.logger.error("Product %s not found in model.CsafProducts lookup", product)
@@ -174,11 +180,12 @@ class CsafStore(ObjectStore):
         module_field = sql.Identifier("module_stream")
         package_name_field = sql.Identifier("package_name_id")
         package_field = sql.Identifier("package_id")
+        variant_field = sql.Identifier("variant_suffix")
 
-        fields_unfixed = [cpe_field, package_name_field]
-        fields_unfixed_module = [cpe_field, package_name_field, module_field]
-        fields_fixed = [cpe_field, package_name_field, package_field]
-        fields_fixed_module = [cpe_field, package_name_field, package_field, module_field]
+        fields_unfixed = [cpe_field, variant_field, package_name_field]
+        fields_unfixed_module = [cpe_field, variant_field, package_name_field, module_field]
+        fields_fixed = [cpe_field, variant_field, package_name_field, package_field]
+        fields_fixed_module = [cpe_field, variant_field, package_name_field, package_field, module_field]
 
         unfixed_module = {
             "products": [],
@@ -211,7 +218,7 @@ class CsafStore(ObjectStore):
             "fixed_module": fixed_module,
             "fixed_no_module": fixed_no_module,
         }
-        for row in products.to_tuples(("cpe_id", "package_name_id", "package_id", "module")):
+        for row in products.to_tuples(("cpe_id", "variant_suffix", "package_name_id", "package_id", "module")):
             if row[0] is None:
                 self.logger.error("Missing cpe_id for product %s", row)
                 continue
@@ -219,16 +226,16 @@ class CsafStore(ObjectStore):
             if any(not isinstance(row[i], (int, str, type(None))) for i in range(4)):
                 raise TypeError(f"column of product row <{row}> is not of type (int, str, None)")
 
-            if row[1] and not row[2]:  # unfixed
-                if row[3]:  # has module
-                    res["unfixed_module"]["products"].append((row[0], row[1], row[3]))  # type: ignore[attr-defined]
+            if row[2] and not row[3]:  # unfixed
+                if row[4]:  # has module
+                    res["unfixed_module"]["products"].append((row[0], row[1], row[2], row[4]))  # type: ignore[attr-defined]
                 else:
-                    res["unfixed_no_module"]["products"].append((row[0], row[1]))  # type: ignore[attr-defined]
-            elif row[2]:  # fixed
-                if row[3]:  # has module
-                    res["fixed_module"]["products"].append((row[0], row[1], row[2], row[3]))  # type: ignore[attr-defined]
+                    res["unfixed_no_module"]["products"].append((row[0], row[1], row[2]))  # type: ignore[attr-defined]
+            elif row[3]:  # fixed
+                if row[4]:  # has module
+                    res["fixed_module"]["products"].append((row[0], row[1], row[2], row[3], row[4]))  # type: ignore[attr-defined]
                 else:
-                    res["fixed_no_module"]["products"].append((row[0], row[1], row[2]))  # type: ignore[attr-defined]
+                    res["fixed_no_module"]["products"].append((row[0], row[1], row[2], row[3]))  # type: ignore[attr-defined]
         return res
 
     def _update_product_ids(self, products: model.CsafProducts) -> None:
@@ -238,7 +245,7 @@ class CsafStore(ObjectStore):
         all_rows = []
         query = sql.SQL(
             """
-            SELECT id, cpe_id, package_name_id, package_id, module_stream
+            SELECT id, cpe_id, variant_suffix, package_name_id, package_id, module_stream
             FROM csaf_product
             WHERE ({fields}) in %s
                 AND module_stream IS {module_null}
@@ -279,12 +286,12 @@ class CsafStore(ObjectStore):
             rows = execute_values(
                 cur,
                 """
-                    INSERT INTO csaf_product (cpe_id, package_name_id, package_id, module_stream)
+                    INSERT INTO csaf_product (cpe_id, variant_suffix, package_name_id, package_id, module_stream)
                     VALUES %s
-                    RETURNING id, cpe_id, package_name_id, package_id, module_stream
+                    RETURNING id, cpe_id, variant_suffix, package_name_id, package_id, module_stream
                 """,
                 products.to_tuples(
-                    ("cpe_id", "package_name_id", "package_id", "module"),
+                    ("cpe_id", "variant_suffix", "package_name_id", "package_id", "module"),
                     missing_only=True,
                     with_cpe_id=True,
                     with_pkg_id=True,
