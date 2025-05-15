@@ -1,6 +1,26 @@
 # CHANGELOG
 
 
+## v2.91.0 (2025-05-15)
+
+### Features
+
+- Add release graph table
+  ([`c33e839`](https://github.com/RedHatInsights/vmaas/commit/c33e83912318e54bdbdec55de6c74c1998116ba4))
+
+RHINENG-16730
+
+- Dump release graph
+  ([`32404db`](https://github.com/RedHatInsights/vmaas/commit/32404db3faccad3e82fb49bf7bd5df127204855e))
+
+RHINENG-16730
+
+- Sync and store release graph
+  ([`359d471`](https://github.com/RedHatInsights/vmaas/commit/359d471c67652118f24aed576f945372e47468f5))
+
+RHINENG-16730
+
+
 ## v2.90.0 (2025-05-13)
 
 ### Bug Fixes
