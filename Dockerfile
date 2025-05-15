@@ -15,6 +15,9 @@ ADD /vmaas-go /vmaas/go/src/vmaas
 WORKDIR /vmaas/go/src/vmaas
 RUN go build -v main.go && go clean -cache -modcache -testcache
 
+# Switch back to /vmaas because of golang tests running in this stage
+WORKDIR /vmaas
+
 # -------------
 # runtime image
 FROM ${RUNIMG} AS runtimeimg
