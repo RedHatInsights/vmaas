@@ -24,7 +24,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCurso
 DEFAULT_KEEP_COPIES = "2"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
-DUMP_SCHEMA_VERSION = 5
+DUMP_SCHEMA_VERSION = 6
 LOGGER = get_logger(__name__)
 CFG = Config()
 
@@ -664,14 +664,17 @@ class SqliteDump:
                         cpe_id INTEGER NOT NULL,
                         package_name_id INTEGER DEFAULT 0,
                         package_id INTEGER DEFAULT 0,
-                        module_stream TEXT DEFAULT ''
+                        module_stream TEXT DEFAULT '',
+                        variant_suffix TEXT DEFAULT 'N/A'
                     )""")
         with self._named_cursor() as cursor:
-            cursor.execute("""SELECT id, cpe_id, package_name_id, package_id, module_stream
+            cursor.execute("""SELECT id, cpe_id, variant_suffix, package_name_id, package_id, module_stream
                             FROM csaf_product""")
-            for csaf_product_id, cpe_id, package_name_id, package_id, module_stream in cursor:
-                dump.execute("INSERT INTO csaf_product VALUES (?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, ''))",
-                             (csaf_product_id, cpe_id, package_name_id, package_id, module_stream))
+            for csaf_product_id, cpe_id, variant_suffix, package_name_id, package_id, module_stream in cursor:
+                dump.execute("""INSERT INTO
+                             csaf_product(id, cpe_id, variant_suffix, package_name_id, package_id, module_stream)
+                             VALUES (?, ?, ?, COALESCE(?, 0), COALESCE(?, 0), COALESCE(?, ''))""",
+                             (csaf_product_id, cpe_id, variant_suffix, package_name_id, package_id, module_stream))
 
         # Dump data from csaf_cve_product table
         dump.execute("""CREATE TABLE IF NOT EXISTS csaf_cve_product (
