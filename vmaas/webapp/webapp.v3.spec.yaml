@@ -477,6 +477,17 @@ paths:
       tags:
         - experimental
 
+  /os/vulnerability/report:
+    get:
+      description: List count of vulnerabilities for RHEL release versions
+      responses:
+        '200':
+          description: Returns a List of RHEL release versions with counts of vulnerabilities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OSReportResponse'
+
 tags:
   - name: default
   - name: experimental
@@ -1401,3 +1412,68 @@ components:
           type: string
           example: '2018-04-05T01:23:45+02:00'
           format: date-time
+
+    OSReportResponse:
+      properties:
+        os_releases:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReleaseItem'
+        last_change:
+          type: string
+          example: '2020-04-16 20:07:58.500192+00'
+      required:
+        - os_releases
+
+    ReleaseItem:
+        type: object
+        properties:
+          name:
+            type: string
+            example: RHEL
+          major:
+            type: number
+            example: 9
+          minor:
+            type: number
+            example: 4
+          lifecycle_phase:
+            type: string
+            example: minor
+          cves_critical:
+            type: number
+            example: 1
+          cves_important:
+            type: number
+            example: 2
+          cves_moderate:
+            type: number
+            example: 3
+          cves_low:
+            type: number
+            example: 4
+          cves_unpatched_critical:
+            type: number
+            example: 5
+          cves_unpatched_important:
+            type: number
+            example: 6
+          cves_unpatched_moderate:
+            type: number
+            example: 7
+          cves_unpatched_low:
+            type: number
+            example: 8
+        required:
+          - name
+          - major
+          - minor
+          - lifecycle_phase
+          - cves_critical
+          - cves_important
+          - cves_moderate
+          - cves_low
+          - cves_unpatched_critical
+          - cves_unpatched_important
+          - cves_unpatched_moderate
+          - cves_unpatched_low
