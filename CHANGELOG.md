@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v2.92.0 (2025-05-16)
+
+### Features
+
+- **csaf**: Add product variant suffix to DB
+  ([`bf9eb30`](https://github.com/RedHatInsights/vmaas/commit/bf9eb30cad2d386b3f787f6e5ad2ff5762407d67))
+
+RHINENG-18019
+
+- **csaf**: Export product variant
+  ([`c170676`](https://github.com/RedHatInsights/vmaas/commit/c170676d0e4384dc497c196f4e64f4ffb7f2e020))
+
+RHINENG-18019
+
+- **csaf**: Parse product variants from vex
+  ([`6553f38`](https://github.com/RedHatInsights/vmaas/commit/6553f38f8f79146094e6f1b32e7125bbfb5ff2c6))
+
+RHINENG-18019
+
+- **csaf**: Store variant_suffixes to DB
+  ([`d7470dd`](https://github.com/RedHatInsights/vmaas/commit/d7470dda9128d8d6a12c23e43f5c927bfc12775e))
+
+Note: we might want to remove products with N/A variant and package_id=NULL from DB after sync since
+  these data will be redundant once we populate DB with product variants
+
+RHINENG-18019
+
+
 ## v2.91.1 (2025-05-16)
 
 ### Chores
