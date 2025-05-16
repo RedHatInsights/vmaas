@@ -1,6 +1,21 @@
 # CHANGELOG
 
 
+## v2.91.1 (2025-05-16)
+
+### Chores
+
+- Image size 1.8G -> 500M
+  ([`cca5ac6`](https://github.com/RedHatInsights/vmaas/commit/cca5ac60e639f9922e34d7fa997b0251ff4b27ba))
+
+RHINENG-18011
+
+### Testing
+
+- Go tests have to use buildimg
+  ([`d33552e`](https://github.com/RedHatInsights/vmaas/commit/d33552e8fd90e194da16c555cb8f9e3b747765e7))
+
+
 ## v2.91.0 (2025-05-15)
 
 ### Features
