@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.93.0 (2025-05-16)
+
+### Features
+
+- Load release graphs
+  ([`abffcad`](https://github.com/RedHatInsights/vmaas/commit/abffcad022ba6dd0192f1bb32b7e8e33ca2f2613))
+
+RHINENG-18017
+
+
 ## v2.92.0 (2025-05-16)
 
 ### Features
