@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.93.2 (2025-05-19)
+
+### Bug Fixes
+
+- **reposcan**: Add supporting indexes to make CSAF deletes faster
+  ([`d9f96e7`](https://github.com/RedHatInsights/vmaas/commit/d9f96e7a970776e916855ec2e484250f9c757d67))
+
+
 ## v2.93.1 (2025-05-19)
 
 ### Bug Fixes
