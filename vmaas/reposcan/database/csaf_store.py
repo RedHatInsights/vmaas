@@ -407,7 +407,8 @@ class CsafStore(ObjectStore):
                 self.logger.exception("Failed to populate cve: %s products: %s ", cve, products_copy)
         self.logger.warning("Skipped cves: %s", self.skipped_cve_categories)
 
-    def _delete_unreferenced_products(self) -> None:
+    def delete_unreferenced_products(self) -> None:
+        """Delete orphaned products no longer referenced in csaf_cve_product table."""
         cur = self.conn.cursor()
         try:
             cur.execute(
@@ -440,4 +441,3 @@ class CsafStore(ObjectStore):
 
         self._save_csaf_files(csaf_data.files)
         self._populate_cves(csaf_data.cves, csaf_data.files)
-        self._delete_unreferenced_products()
