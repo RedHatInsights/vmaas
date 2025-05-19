@@ -1016,6 +1016,9 @@ CREATE TABLE IF NOT EXISTS csaf_cve_product (
     UNIQUE (cve_id, csaf_product_id)
 )TABLESPACE pg_default;
 
+CREATE INDEX ON csaf_cve_product(csaf_product_id);
+CREATE INDEX ON csaf_cve_product(csaf_file_id);
+
 CREATE TYPE lp AS ENUM ('minor', 'eus', 'aus', 'e4s', 'els', 'tus');
 
 -- -----------------------------------------------------
