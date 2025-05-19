@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 31);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 32);
 
 -- -----------------------------------------------------
 -- evr type
@@ -110,6 +110,21 @@ $repo_last_change$
     RETURN NEW;
   END;
 $repo_last_change$
+  LANGUAGE 'plpgsql';
+
+create or replace FUNCTION delete_unreferenced_csaf_products()
+  RETURNS TRIGGER AS
+$delete_unreferenced_csaf_products$
+  BEGIN
+    DELETE FROM csaf_product p
+    WHERE p.id = OLD.csaf_product_id
+      AND NOT EXISTS (
+        SELECT 1 FROM csaf_cve_product c
+        WHERE c.csaf_product_id = p.id
+      );
+    RETURN NULL;
+  END;
+$delete_unreferenced_csaf_products$
   LANGUAGE 'plpgsql';
 -- -----------------------------------------------------
 -- Table vmaas.evr
@@ -1015,6 +1030,9 @@ CREATE TABLE IF NOT EXISTS csaf_cve_product (
   CONSTRAINT csaf_cve_product_ids_uq
     UNIQUE (cve_id, csaf_product_id)
 )TABLESPACE pg_default;
+CREATE TRIGGER csaf_cve_deleted AFTER DELETE ON csaf_cve_product
+  FOR EACH ROW
+  EXECUTE FUNCTION delete_unreferenced_csaf_products();
 
 CREATE TYPE lp AS ENUM ('minor', 'eus', 'aus', 'e4s', 'els', 'tus');
 

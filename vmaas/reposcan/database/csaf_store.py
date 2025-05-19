@@ -407,26 +407,6 @@ class CsafStore(ObjectStore):
                 self.logger.exception("Failed to populate cve: %s products: %s ", cve, products_copy)
         self.logger.warning("Skipped cves: %s", self.skipped_cve_categories)
 
-    def _delete_unreferenced_products(self) -> None:
-        cur = self.conn.cursor()
-        try:
-            cur.execute(
-                """DELETE FROM csaf_product
-                            WHERE id IN (
-                                SELECT p.id
-                                FROM csaf_product AS p
-                                LEFT JOIN csaf_cve_product AS c ON c.csaf_product_id = p.id
-                                WHERE c.csaf_product_id IS NULL)"""
-            )
-            self.conn.commit()
-        except Exception as exc:
-            CSAF_FAILED_DELETE.inc()
-            self.logger.exception("%s: ", FAILED_PRODUCT_DELETE)
-            self.conn.rollback()
-            raise CsafStoreException(FAILED_PRODUCT_DELETE) from exc
-        finally:
-            cur.close()
-
     def _categorize_skipped_cves(self, exc: Exception) -> None:
         if str(exc) not in self.skipped_cve_categories:
             self.skipped_cve_categories[str(exc)] = 0
@@ -440,4 +420,3 @@ class CsafStore(ObjectStore):
 
         self._save_csaf_files(csaf_data.files)
         self._populate_cves(csaf_data.cves, csaf_data.files)
-        self._delete_unreferenced_products()
