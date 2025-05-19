@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v2.93.1 (2025-05-19)
+
+### Bug Fixes
+
+- **csaf**: Delete orphaned products once after all batches are synced
+  ([`6c665d2`](https://github.com/RedHatInsights/vmaas/commit/6c665d283060ae715c4dd895d93252d38b6639ed))
+
+RHINENG-18161
+
+
 ## v2.93.0 (2025-05-16)
 
 ### Features
