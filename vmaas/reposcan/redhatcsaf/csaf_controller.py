@@ -133,6 +133,7 @@ class CsafController:
                     to_store.cves.update(parsed_cves)
 
                 self.csaf_store.store(to_store)
+            self.csaf_store.delete_unreferenced_products()
         finally:
             self.clean()
 
