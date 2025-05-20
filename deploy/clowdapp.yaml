@@ -456,7 +456,6 @@ parameters:
   value: '360'
 - name: REPOLIST_GIT
   description: Location of VMaaS assets git
-  value: 'https://github.com/RedHatInsights/vmaas-assets.git'
 - name: REPOLIST_GIT_PATH
   description: Path/comma separated paths, denoting repolist files in the git repo
   value: "repolist.json, epel-repolist.json"
