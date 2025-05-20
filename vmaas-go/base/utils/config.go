@@ -45,17 +45,6 @@ type Config struct {
 	LogStyle             string
 	CacheRefreshInterval time.Duration
 	EnableProfiler       bool
-	EnableGoCves         bool
-	EnableGoErrata       bool
-	EnableGoRepos        bool
-	EnableGoPackages     bool
-	EnableGoPkgList      bool
-	EnableGoPkgTree      bool
-	EnableGoPatches      bool
-	EnableGoRPMPkgNames  bool
-	EnableGoSRPMPkgNames bool
-	EnableGoDBChange     bool
-	EnableGoVersion      bool
 
 	// lib
 	UnfixedEvalEnabled    bool
@@ -145,17 +134,6 @@ func initEnv() {
 	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
 	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
 	Cfg.VmaasVersionFilePath = Getenv("VMAAS_VERSION_FILE_PATH", "/vmaas/VERSION")
-	Cfg.EnableGoCves = GetBoolEnvOrDefault("ENABLE_GO_CVES", false)
-	Cfg.EnableGoErrata = GetBoolEnvOrDefault("ENABLE_GO_ERRATA", false)
-	Cfg.EnableGoRepos = GetBoolEnvOrDefault("ENABLE_GO_REPOS", false)
-	Cfg.EnableGoPackages = GetBoolEnvOrDefault("ENABLE_GO_PACKAGES", false)
-	Cfg.EnableGoPkgList = GetBoolEnvOrDefault("ENABLE_GO_PKGLIST", false)
-	Cfg.EnableGoPkgTree = GetBoolEnvOrDefault("ENABLE_GO_PKGTREE", false)
-	Cfg.EnableGoPatches = GetBoolEnvOrDefault("ENABLE_GO_PATCHES", false)
-	Cfg.EnableGoRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_RPMPKGNAMES", false)
-	Cfg.EnableGoSRPMPkgNames = GetBoolEnvOrDefault("ENABLE_GO_SRPMPKGNAMES", false)
-	Cfg.EnableGoDBChange = GetBoolEnvOrDefault("ENABLE_GO_DBCHANGE", false)
-	Cfg.EnableGoVersion = GetBoolEnvOrDefault("ENABLE_GO_VERSION", false)
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
