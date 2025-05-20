@@ -215,8 +215,6 @@ objects:
           value: ${RETRY_COUNT}
         - name: THREADS
           value: ${THREADS}
-        - name: YEAR_SINCE
-          value: ${YEAR_SINCE}
         - name: KEEP_COPIES
           value: ${KEEP_COPIES}
         - name: REPOLIST_GIT
@@ -474,9 +472,6 @@ parameters:
 - name: THREADS
   description: Count of downloader threads
   value: '8'
-- name: YEAR_SINCE
-  description: Year since
-  value: '2002'
 - name: KEEP_COPIES
   description: Number of cache copies kept
   value: '3'
