@@ -59,7 +59,7 @@ IS_FEDRAMP = strtobool(os.getenv("IS_FEDRAMP", "FALSE"))
 REPOLIST_STATIC_DIR = '/vmaas/repolist_git'
 
 REPOLIST_DIR = '/tmp/repolist_git'
-REPOLIST_GIT = os.getenv('REPOLIST_GIT', 'https://github.com/RedHatInsights/vmaas-assets.git')
+REPOLIST_GIT = os.getenv('REPOLIST_GIT', '')
 REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
