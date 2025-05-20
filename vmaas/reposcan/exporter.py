@@ -21,7 +21,7 @@ from vmaas.common.date_utils import format_datetime, now
 from vmaas.common.fileutil import remove_file_if_exists
 from vmaas.reposcan.database.database_handler import DatabaseHandler, NamedCursor, init_db
 
-DEFAULT_KEEP_COPIES = "2"
+DEFAULT_KEEP_COPIES = "3"
 DUMP = '/data/vmaas.db'
 DUMP_COMPRESSED = f"{DUMP}.zstd"
 DUMP_SCHEMA_VERSION = 6
