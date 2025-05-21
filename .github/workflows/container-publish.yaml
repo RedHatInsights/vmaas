@@ -10,8 +10,6 @@ on:
     branches: [ "master" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "master" ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -22,7 +20,7 @@ env:
 
 jobs:
   build:
-    if: github.event_name == 'push' || github.event_name == 'schedule'
+    if: github.event_name == 'push'
     concurrency:
       group: "${{ github.workflow }}-${{ github.ref }}"
       cancel-in-progress: true
