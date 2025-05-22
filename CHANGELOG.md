@@ -1,6 +1,31 @@
 # CHANGELOG
 
 
+## v2.93.4 (2025-05-22)
+
+### Refactoring
+
+- **conf**: Add SYNC_RELEASE_GRAPH
+  ([`63edf5c`](https://github.com/RedHatInsights/vmaas/commit/63edf5c4d7b4ba3e5a1c9b8a17302c4be066929d))
+
+- **conf**: Empty REPOLIST_GIT
+  ([`bda1907`](https://github.com/RedHatInsights/vmaas/commit/bda19071bef42b18bac16c3e0cea89dac87a6cb8))
+
+- **conf**: Match KEEP_COPIES value with default
+  ([`7da2c6d`](https://github.com/RedHatInsights/vmaas/commit/7da2c6d34aa098538cb66506e1decba33ff488b6))
+
+- **conf**: Remove unused PROMETHEUS_PORT
+  ([`df62deb`](https://github.com/RedHatInsights/vmaas/commit/df62debbdf53dcbafff7bdf029bbf375d0a0c4b5))
+
+- **env**: Remove unused YEAR_SINCE
+  ([`942c35e`](https://github.com/RedHatInsights/vmaas/commit/942c35e9ba3ae92226990b9aa71bed10b5ae5ceb))
+
+- **webapp**: Allow all Golang APIs
+  ([`d00e0ef`](https://github.com/RedHatInsights/vmaas/commit/d00e0efbe448947972dfe9f125c87acbc51eae5b))
+
+Removes all ENABLE_GO_* env variables and its configuration, in favor of enabling all.
+
+
 ## v2.93.3 (2025-05-21)
 
 ### Chores
