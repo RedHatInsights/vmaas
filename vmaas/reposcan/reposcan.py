@@ -199,17 +199,26 @@ class DumpVersionHandler():
         return fetch_latest_dump()
 
 
-class SyncHandler:
-    """Base handler class providing common methods for different sync types."""
+class GitManager:
+    """Handler for setting up the git directory and parsing content"""
 
-    task_type = "Unknown"
+    git_dir = None
 
-    @staticmethod
-    def fetch_git():
-        """Download and parse data from configured git repo"""
+    @classmethod
+    def reset_git_dir(cls) -> None:
+        """Run on task start (in worker)"""
+        cls.git_dir = None
+
+    @classmethod
+    def fetch_git(cls) -> None:
+        """Download data from configured git repo"""
+        if cls.git_dir:
+            LOGGER.debug("Found previously set git assets")
+            return
+
         if IS_FEDRAMP:
             LOGGER.info("FedRAMP env, using static assets source: %s", REPOLIST_STATIC_DIR)
-            repolist_dir = REPOLIST_STATIC_DIR
+            git_dir = REPOLIST_STATIC_DIR
         else:
             LOGGER.info("Downloading assets from git %s", REPOLIST_GIT)
             shutil.rmtree(REPOLIST_DIR, True)
@@ -221,51 +230,77 @@ class SyncHandler:
             git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
 
             git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
-            repolist_dir = REPOLIST_DIR
+            git_dir = REPOLIST_DIR
 
-        if not os.path.isdir(repolist_dir):
+        # Success, git dir with files found
+        if os.path.isdir(git_dir):
+            cls.git_dir = git_dir
+        else:
             LOGGER.error("Downloading assets git repo failed: Directory was not created")
-            return None, None, None, None
+
+    @classmethod
+    def get_git_products_repos(cls) -> tuple[dict | None, list | None]:
+        """Parse data from set git dir and return products and repos"""
+        if not cls.git_dir:
+            LOGGER.error("Downloading git repo failed: Directory is missing")
+            return None, None
 
         products, repos = {}, []
-
         paths = REPOLIST_PATH.split(',')
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
             path = path.strip()
-            if not os.path.isfile(repolist_dir + '/' + path):
+            if not os.path.isfile(cls.git_dir + '/' + path):
                 LOGGER.error("Downloading git repo failed: File %s was not created", path)
-                return None, None, None, None
+                return None, None
 
-            with open(repolist_dir + '/' + path, 'r', encoding='utf8') as json_file:
+            with open(cls.git_dir + '/' + path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
 
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
             if not item_products and not item_repos:
                 LOGGER.warning("Input json is not valid")
-                return None, None, None, None
+                return None, None
             products.update(item_products)
             repos += item_repos
 
-        if not os.path.isfile(repolist_dir + '/' + RELEASEMAP_PATH):
-            LOGGER.error("Downloading assets git repo failed: File %s was not created", RELEASEMAP_PATH)
-            return None, None, None, None
+        return products, repos
 
-        with open(repolist_dir + '/' + RELEASEMAP_PATH, 'r', encoding='utf8') as json_file:
-            releases = json.load(json_file)
+    @classmethod
+    def get_git_releases(cls) -> dict | None:
+        """Parse data from set git dir and return releases"""
+        if not cls.git_dir or not os.path.isfile(cls.git_dir + '/' + RELEASEMAP_PATH):
+            LOGGER.error("Downloading git repo failed: Releasemap is missing")
+            return None
+
+        with open(cls.git_dir + '/' + RELEASEMAP_PATH, 'r', encoding='utf8') as json_file:
+            return json.load(json_file)
+
+    @classmethod
+    def get_git_release_graphs(cls) -> dict | None:
+        """Parse data from set git dir and return release graphs"""
+        if not cls.git_dir:
+            LOGGER.error("Downloading git repo failed: Directory is missing")
+            return None
 
         release_graphs = {}
-        release_graph_dir = Path(repolist_dir) / RELEASE_GRAPH_DIR
+        release_graph_dir = Path(cls.git_dir) / RELEASE_GRAPH_DIR
         if not release_graph_dir.is_dir():
             LOGGER.error("Downloading assets git repo failed: Dir %s was not created", RELEASE_GRAPH_DIR)
-            return None, None, None, None
+            return None
 
         for graph in release_graph_dir.glob("*.json"):
             with graph.open() as fde:
                 content = fde.read()
                 release_graphs[graph.name] = ReleaseGraph(graph.name, content)
 
-        return products, repos, releases, release_graphs
+        return release_graphs
+
+
+class SyncHandler:
+    """Base handler class providing common methods for different sync types."""
+
+    task_type = "Unknown"
 
     @classmethod
     def start_task(cls, *args, export=True, **kwargs):
@@ -444,10 +479,15 @@ class GitRepoListHandler(RepolistImportHandler):
     def run_task(*args, **kwargs):
         """Start importing from git"""
         init_logging()
+
+        if not kwargs.get("child_task", False):
+            GitManager.reset_git_dir()
+
         if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
             LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
             return "SKIPPED"
-        products, repos, _, _ = SyncHandler.fetch_git()
+        GitManager.fetch_git()
+        products, repos = GitManager.get_git_products_repos()
         if products is None or repos is None:
             return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos, verbose=True)
@@ -476,11 +516,15 @@ class GitRepoListCleanupHandler(SyncHandler):
             init_logging()
             init_db()
 
+            if not kwargs.get("child_task", False):
+                GitManager.reset_git_dir()
+
             if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
                 return "SKIPPED"
 
-            _, repos, _, _ = SyncHandler.fetch_git()
+            GitManager.fetch_git()
+            _, repos = GitManager.get_git_products_repos()
             if not repos:
                 return "ERROR"
 
@@ -850,10 +894,15 @@ class ReleaseSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
+            if not kwargs.get("child_task", False):
+                GitManager.reset_git_dir()
+
             if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of releases from git.")
                 return "SKIPPED"
-            _, _, releases, _ = SyncHandler.fetch_git()
+
+            GitManager.fetch_git()
+            releases = GitManager.get_git_releases()
 
             controller = ReleaseController()
             controller.store(releases)
@@ -888,10 +937,15 @@ class ReleaseGraphSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
+            if not kwargs.get("child_task", False):
+                GitManager.reset_git_dir()
+
             if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
                 LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of release graphs from git.")
                 return "SKIPPED"
-            _, _, _, release_graphs = SyncHandler.fetch_git()
+
+            GitManager.fetch_git()
+            release_graphs = GitManager.get_git_release_graphs()
             store = ReleaseGraphStore(release_graphs)
             store.store()
         except Exception as err:  # pylint: disable=broad-except
@@ -936,7 +990,8 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        tasks = ", ".join([h.run_task() for h in all_sync_handlers()])
+        GitManager.reset_git_dir()
+        tasks = ", ".join([h.run_task(child_task=True) for h in all_sync_handlers()])
         return tasks
 
 
