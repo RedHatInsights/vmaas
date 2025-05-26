@@ -226,7 +226,9 @@ class GitManager:
 
             # Should we just use replacement or add a url handling library, which
             # would be used replace the username in the provided URL ?
-            git_url = REPOLIST_GIT.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
+            git_url = REPOLIST_GIT
+            if REPOLIST_GIT_TOKEN:
+                git_url = git_url.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
             git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
 
             git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
@@ -483,9 +485,10 @@ class GitRepoListHandler(RepolistImportHandler):
         if not kwargs.get("child_task", False):
             GitManager.reset_git_dir()
 
-        if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
-            LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
+        if not any([REPOLIST_GIT, IS_FEDRAMP]):
+            LOGGER.warning("Git repository URL not set and can't use the static repository.")
             return "SKIPPED"
+
         GitManager.fetch_git()
         products, repos = GitManager.get_git_products_repos()
         if products is None or repos is None:
@@ -519,8 +522,8 @@ class GitRepoListCleanupHandler(SyncHandler):
             if not kwargs.get("child_task", False):
                 GitManager.reset_git_dir()
 
-            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
-                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of repositories from git.")
+            if not any([REPOLIST_GIT, IS_FEDRAMP]):
+                LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
             GitManager.fetch_git()
@@ -897,8 +900,8 @@ class ReleaseSyncHandler(SyncHandler):
             if not kwargs.get("child_task", False):
                 GitManager.reset_git_dir()
 
-            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
-                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of releases from git.")
+            if not any([REPOLIST_GIT, IS_FEDRAMP]):
+                LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
             GitManager.fetch_git()
@@ -940,8 +943,8 @@ class ReleaseGraphSyncHandler(SyncHandler):
             if not kwargs.get("child_task", False):
                 GitManager.reset_git_dir()
 
-            if not REPOLIST_GIT_TOKEN and not IS_FEDRAMP:
-                LOGGER.warning("REPOLIST_GIT_TOKEN not set, skipping download of release graphs from git.")
+            if not any([REPOLIST_GIT, IS_FEDRAMP]):
+                LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
             GitManager.fetch_git()
