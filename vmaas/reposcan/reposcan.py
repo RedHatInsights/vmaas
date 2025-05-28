@@ -908,6 +908,9 @@ class ReleaseSyncHandler(SyncHandler):
             GitManager.fetch_git()
             releases = GitManager.get_git_releases()
 
+            if releases is None:
+                return "ERROR"
+
             controller = ReleaseController()
             controller.store(releases)
         except Exception as err:  # pylint: disable=broad-except
@@ -950,6 +953,10 @@ class ReleaseGraphSyncHandler(SyncHandler):
 
             GitManager.fetch_git()
             release_graphs = GitManager.get_git_release_graphs()
+
+            if release_graphs is None:
+                return "ERROR"
+
             store = ReleaseGraphStore(release_graphs)
             store.store()
         except Exception as err:  # pylint: disable=broad-except
