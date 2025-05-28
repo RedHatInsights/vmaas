@@ -56,9 +56,9 @@ DEFAULT_CHUNK_SIZE = "1048576"
 
 # FedRAMP deployment using only baked-in content, no git cloning in runtime
 IS_FEDRAMP = strtobool(os.getenv("IS_FEDRAMP", "FALSE"))
-REPOLIST_STATIC_DIR = '/vmaas/repolist_git'
+REPOLIST_STATIC_DIR = Path("/vmaas/repolist_git")
 
-REPOLIST_DIR = '/tmp/repolist_git'
+REPOLIST_DIR = Path("/tmp/repolist_git")
 REPOLIST_GIT = os.getenv('REPOLIST_GIT', '')
 REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
 REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
@@ -235,7 +235,7 @@ class GitManager:
             git_dir = REPOLIST_DIR
 
         # Success, git dir with files found
-        if os.path.isdir(git_dir):
+        if git_dir.is_dir():
             cls.git_dir = git_dir
         else:
             LOGGER.error("Downloading assets git repo failed: Directory was not created")
@@ -251,12 +251,12 @@ class GitManager:
         paths = REPOLIST_PATH.split(',')
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
-            path = path.strip()
-            if not os.path.isfile(cls.git_dir + '/' + path):
+            file_path = cls.git_dir / path.strip()
+            if not file_path.is_file():
                 LOGGER.error("Downloading git repo failed: File %s was not created", path)
                 return None, None
 
-            with open(cls.git_dir + '/' + path, 'r', encoding='utf8') as json_file:
+            with open(file_path, 'r', encoding='utf8') as json_file:
                 data = json.load(json_file)
 
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
@@ -271,11 +271,12 @@ class GitManager:
     @classmethod
     def get_git_releases(cls) -> dict | None:
         """Parse data from set git dir and return releases"""
-        if not cls.git_dir or not os.path.isfile(cls.git_dir + '/' + RELEASEMAP_PATH):
+        releasemap_file = cls.git_dir / RELEASEMAP_PATH
+        if not cls.git_dir or not releasemap_file.is_file():
             LOGGER.error("Downloading git repo failed: Releasemap is missing")
             return None
 
-        with open(cls.git_dir + '/' + RELEASEMAP_PATH, 'r', encoding='utf8') as json_file:
+        with open(releasemap_file, 'r', encoding='utf8') as json_file:
             return json.load(json_file)
 
     @classmethod
@@ -286,7 +287,7 @@ class GitManager:
             return None
 
         release_graphs = {}
-        release_graph_dir = Path(cls.git_dir) / RELEASE_GRAPH_DIR
+        release_graph_dir = cls.git_dir / RELEASE_GRAPH_DIR
         if not release_graph_dir.is_dir():
             LOGGER.error("Downloading assets git repo failed: Dir %s was not created", RELEASE_GRAPH_DIR)
             return None
@@ -1015,16 +1016,16 @@ class CleanTmpHandler(SyncHandler):
         """Function to start cleaning temporary data."""
         try:
             init_logging()
-            for item in os.listdir("/tmp"):
-                full_path = os.path.join("/tmp", item)
+            tmpdir = Path("/tmp")
+            for item in tmpdir.iterdir():
                 try:
-                    if os.path.isdir(full_path):
-                        shutil.rmtree(full_path)
+                    if item.is_dir():
+                        shutil.rmtree(item)
                     else:
-                        os.unlink(full_path)
-                    LOGGER.info("Deleted file or directory: %s", full_path)
+                        os.unlink(item)
+                    LOGGER.info("Deleted file or directory: %s", item)
                 except Exception as err:  # pylint: disable=broad-except
-                    LOGGER.warning("Unable to delete file or directory: %s (%s)", full_path, err)
+                    LOGGER.warning("Unable to delete file or directory: %s (%s)", item, err)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
