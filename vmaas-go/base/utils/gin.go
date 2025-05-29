@@ -15,11 +15,12 @@ import (
 // ReadHeaderTimeout same as nginx default
 const ReadHeaderTimeout = 60 * time.Second
 
+// @Description Universal error response for all VMaaS endpoints.
 type ErrorResponse struct {
-	Type   string `json:"type"`
-	Title  string `json:"title"`
-	Detail string `json:"detail"`
-	Status int    `json:"status"`
+	Type   string `json:"type"`   // "about:blank"
+	Title  string `json:"title"`  // status text
+	Detail string `json:"detail"` // error message
+	Status int    `json:"status"` // status code
 }
 
 var errorTitles = map[int]string{

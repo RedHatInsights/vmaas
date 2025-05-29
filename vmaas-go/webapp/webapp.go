@@ -19,16 +19,17 @@ import (
 
 var basepaths = []string{"/api/v3", "/api/vmaas/v3"}
 
-// @title VMaaS webapp API
-// @version  {{.Version}}
-// @description API of the VMaaS application on [console.redhat.com](https://console.redhat.com)
+//	@title			VMaaS webapp API
+//	@version		{{.Version}}
+//	@description	API of the VMaaS application on [console.redhat.com](https://console.redhat.com)
 
-// @license.name GPLv3
-// @license.url https://www.gnu.org/licenses/gpl-3.0.en.html
+//	@license.name	GPLv3
+//	@license.url	https://www.gnu.org/licenses/gpl-3.0.en.html
 
-// @query.collection.format multi
+//	@query.collection.format	multi
 
-// @BasePath /api/vmaas/v3
+//	@BasePath	/api/vmaas/v3
+
 func Run() {
 	core.ConfigureApp()
 	go core.ConfigureCache()

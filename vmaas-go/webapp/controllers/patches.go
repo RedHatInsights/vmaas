@@ -9,6 +9,18 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
+// PatchesHandler godoc
+//
+//	@Summary		Get patches for a package
+//	@Description	Get a list of applicable errata for a package.
+//	@Produce		json
+//	@Param			nevra	path	string	true	"NEVRA"
+//	@Success		200	{object}	vmaas.Patches
+//	@Failure		400	{object}	utils.ErrorResponse
+//	@Failure		424	{object}	utils.ErrorResponse
+//	@Failure		500	{object}	utils.ErrorResponse
+//	@Failure		503	{object}	utils.ErrorResponse
+//	@Router			/patches/{nevra} [get]
 func PatchesHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
@@ -24,6 +36,19 @@ func PatchesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// PatchesPostHandler godoc
+//
+//	@Summary		Get patches for packages
+//	@Description	Get a list of applicable errata for a package list.
+//	@Accept			json
+//	@Produce		json
+//	@Param			package_list	body	vmaas.Request	true	"package_list"
+//	@Success		200	{object}	vmaas.Patches
+//	@Failure		400	{object}	utils.ErrorResponse
+//	@Failure		424	{object}	utils.ErrorResponse
+//	@Failure		500	{object}	utils.ErrorResponse
+//	@Failure		503	{object}	utils.ErrorResponse
+//	@Router			/patches [post]
 func PatchesPostHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
