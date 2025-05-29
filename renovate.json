@@ -14,5 +14,13 @@
     "enabled": true,
     "ignoreTests": true,
     "platformAutomerge": true
+  },
+  "packageRules": [
+  {
+    "description": "Pin Python version in pyproject.toml to the latest 3.12.x patch",
+    "matchPackageNames": ["python"],
+    "matchManagers": ["poetry"],
+    "allowedVersions": ">=3.12.0 <3.13.0"
   }
+]
 }
