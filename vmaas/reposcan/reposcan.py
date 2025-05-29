@@ -205,14 +205,9 @@ class GitManager:
     git_dir = None
 
     @classmethod
-    def reset_git_dir(cls) -> None:
-        """Run on task start (in worker)"""
-        cls.git_dir = None
-
-    @classmethod
-    def fetch_git(cls) -> None:
+    def fetch_git(cls, force: bool = True) -> None:
         """Download data from configured git repo"""
-        if cls.git_dir:
+        if not force and cls.git_dir:
             LOGGER.debug("Found previously set git assets")
             return
 
@@ -483,14 +478,11 @@ class GitRepoListHandler(RepolistImportHandler):
         """Start importing from git"""
         init_logging()
 
-        if not kwargs.get("child_task", False):
-            GitManager.reset_git_dir()
-
         if not any([REPOLIST_GIT, IS_FEDRAMP]):
             LOGGER.warning("Git repository URL not set and can't use the static repository.")
             return "SKIPPED"
 
-        GitManager.fetch_git()
+        GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
         products, repos = GitManager.get_git_products_repos()
         if products is None or repos is None:
             return "ERROR"
@@ -520,14 +512,11 @@ class GitRepoListCleanupHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not kwargs.get("child_task", False):
-                GitManager.reset_git_dir()
-
             if not any([REPOLIST_GIT, IS_FEDRAMP]):
                 LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git()
+            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
             _, repos = GitManager.get_git_products_repos()
             if not repos:
                 return "ERROR"
@@ -898,14 +887,11 @@ class ReleaseSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not kwargs.get("child_task", False):
-                GitManager.reset_git_dir()
-
             if not any([REPOLIST_GIT, IS_FEDRAMP]):
                 LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git()
+            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
             releases = GitManager.get_git_releases()
 
             if releases is None:
@@ -944,14 +930,11 @@ class ReleaseGraphSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not kwargs.get("child_task", False):
-                GitManager.reset_git_dir()
-
             if not any([REPOLIST_GIT, IS_FEDRAMP]):
                 LOGGER.warning("Git repository URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git()
+            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
             release_graphs = GitManager.get_git_release_graphs()
 
             if release_graphs is None:
@@ -1001,8 +984,8 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        GitManager.reset_git_dir()
-        tasks = ", ".join([h.run_task(child_task=True) for h in all_sync_handlers()])
+        GitManager.git_dir = None
+        tasks = ", ".join([h.run_task(force_git_fetch=False) for h in all_sync_handlers()])
         return tasks
 
 
