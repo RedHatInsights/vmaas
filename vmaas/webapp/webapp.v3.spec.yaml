@@ -480,6 +480,7 @@ paths:
   /os/vulnerability/report:
     get:
       description: List count of vulnerabilities for RHEL release versions
+      operationId: vmaas.webapp.app.dummy_report_200
       responses:
         '200':
           description: Returns a List of RHEL release versions with counts of vulnerabilities.

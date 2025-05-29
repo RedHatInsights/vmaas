@@ -424,6 +424,11 @@ def dummy_200():
     return "", 200
 
 
+def dummy_report_200():
+    """Dummy /os/vulnerability/report endpoint returning 200"""
+    return "", 200
+
+
 class RefreshTimer:
     """ main refresh timer handling class"""
 
