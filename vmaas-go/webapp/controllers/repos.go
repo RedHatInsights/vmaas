@@ -9,6 +9,19 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
+// ReposHandler godoc
+//
+//	@Summary		Get details for a repository
+//	@Description	Get details about a repository.
+//	@Description	It is possible to use a POSIX regular expression as a pattern for repository names.
+//	@Produce		json
+//	@Param			repo	path	string	true	"repository"
+//	@Success		200	{object}	vmaas.Repos
+//	@Failure		400	{object}	utils.ErrorResponse
+//	@Failure		424	{object}	utils.ErrorResponse
+//	@Failure		500	{object}	utils.ErrorResponse
+//	@Failure		503	{object}	utils.ErrorResponse
+//	@Router			/repos/{repo} [get]
 func ReposHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
@@ -24,6 +37,21 @@ func ReposHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// ReposPostHandler godoc
+//
+//	@Summary		Get details for repositories
+//	@Description	Get details about repositories. Use `repository_list` parameter to provide a list of repository names, or a single POSIX regular expression.
+//	@Accept			json
+//	@Produce		json
+//	@Param			repository_list	body	vmaas.ReposRequest	true	"repository_list"
+//	@Success		200	{object}	vmaas.Repos
+//	@Failure		400	{object}	utils.ErrorResponse
+//	@Failure		424	{object}	utils.ErrorResponse
+//	@Failure		500	{object}	utils.ErrorResponse
+//	@Failure		503	{object}	utils.ErrorResponse
+//	@Router			/repos [post]
+//
+//nolint:lll
 func ReposPostHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return

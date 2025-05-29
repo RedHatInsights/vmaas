@@ -9,6 +9,17 @@ import (
 	"github.com/redhatinsights/vmaas/base/utils"
 )
 
+// PkgListPostHandler godoc
+//
+//	@Summary		Get details for all packages
+//	@Description	Get details for all packages.
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	vmaas.PkgList
+//	@Failure		400	{object}	utils.ErrorResponse
+//	@Failure		424	{object}	utils.ErrorResponse
+//	@Failure		503	{object}	utils.ErrorResponse
+//	@Router			/pkglist [post]
 func PkgListPostHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
 		return
