@@ -17,10 +17,10 @@
   },
   "packageRules": [
   {
-    "description": "Pin Python version in pyproject.toml to the latest 3.12.x patch",
+    "description": "Disable Python version updates",
     "matchPackageNames": ["python"],
     "matchManagers": ["poetry"],
-    "allowedVersions": ">=3.12.0 <3.13.0"
+    "enabled": false
   }
 ]
 }
