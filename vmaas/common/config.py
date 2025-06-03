@@ -34,8 +34,6 @@ class BaseConfig:
         self.is_init_container = strtobool(os.environ.get("INIT_CONTAINER", "false"))
         self.is_test = strtobool(os.environ.get("IS_TEST", "false"))
         self.tls_ca_path = None
-        self.public_port = None
-        self.private_port = None
         self.metrics_port = None
 
         self.prometheus_multiproc_dir = os.getenv("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc_dir")
@@ -94,8 +92,6 @@ class Config(BaseConfig, metaclass=Singleton):
             if "webapp" in endpoint.hostname and "go" in endpoint.hostname:
                 self.webapp_go_url = self._build_url(endpoint)
 
-        self.public_port = self._cfg.publicPort
-        self.private_port = self._cfg.privatePort
         self.metrics_port = self._cfg.metricsPort
 
     def _build_url(self, endpoint: object, scheme="http") -> str:
