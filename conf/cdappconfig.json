@@ -4,10 +4,10 @@
         "adminUsername": "vmaas_admin",
         "hostname": "vmaas_database",
         "name": "vmaas",
-        "password": "vmaas_writer_pwd",
+        "password": "vmaas_admin_pwd",
         "port": 5432,
         "sslMode": "disable",
-        "username": "vmaas_writer"
+        "username": "vmaas_admin"
     },
     "endpoints": [
         {

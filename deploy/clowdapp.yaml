@@ -223,14 +223,6 @@ objects:
             secretKeyRef:
               key: DEFAULT_KEY
               name: cdn-certificate
-        - name: POSTGRESQL_WRITER_PASSWORD
-          value: ${POSTGRESQL_WRITER_PASSWORD}
-        - name: POSTGRESQL_READER_PASSWORD
-          value: ${POSTGRESQL_READER_PASSWORD}
-        - name: POSTGRESQL_PASSWORD
-          value: ${POSTGRESQL_PASSWORD}
-        - name: POSTGRESQL_USER
-          value: ${POSTGRESQL_USER}
         - name: CW_ENABLED
           value: ${{CW_ENABLED}}
         - name: CLOWDER_ENABLED
@@ -452,18 +444,6 @@ parameters:
 - name: KEEP_COPIES
   description: Number of cache copies kept
   value: '3'
-- name: POSTGRESQL_WRITER_PASSWORD
-  description: Database writer account password
-  value: vmaas_writer_pwd
-- name: POSTGRESQL_READER_PASSWORD
-  description: Database reader account password
-  value: vmaas_reader_pwd
-- name: POSTGRESQL_USER
-  description: Database user account name
-  value: vmaas_writer
-- name: POSTGRESQL_PASSWORD
-  description: Database user password
-  value: vmaas_writer_pwd
 - name: REDHAT_CVEMAP_URL
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
 - name: CSAF_UNFIXED_EVAL_ENABLED
