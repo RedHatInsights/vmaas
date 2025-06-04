@@ -8,6 +8,9 @@ import app_common_python
 from vmaas.common.strtobool import strtobool
 
 
+DUMP_PATH = "/vmaas.db"
+
+
 class Singleton(type):
     """Singleton object."""
 
@@ -88,7 +91,7 @@ class Config(BaseConfig, metaclass=Singleton):
                 self.reposcan_url = self._build_url(endpoint)
         for endpoint in self._cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
-                self.remote_dump = f"{self._build_url(endpoint)}/vmaas.db"
+                self.remote_dump = f"{self._build_url(endpoint)}{DUMP_PATH}"
             if "webapp" in endpoint.hostname and "go" in endpoint.hostname:
                 self.webapp_go_url = self._build_url(endpoint)
 
