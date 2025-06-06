@@ -1,11 +1,11 @@
 #!/bin/sh
 
 public_port () {
-    python3.12 -c "import app_common_python as a;print(a.LoadedConfig.publicPort or 8000)"
+    python3.12 -c "import os;import app_common_python as a;print(a.LoadedConfig.publicPort or os.getenv('BIND_PUBLIC_PORT', '8000'))"
 }
 
 private_port () {
-    python3.12 -c "import app_common_python as a;print(a.LoadedConfig.privatePort or 8083)"
+    python3.12 -c "import os;import app_common_python as a;print(a.LoadedConfig.privatePort or os.getenv('BIND_PRIVATE_PORT', '8083'))"
 }
 
 cd $(dirname $0)
