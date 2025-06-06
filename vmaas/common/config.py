@@ -8,6 +8,9 @@ import app_common_python
 from vmaas.common.strtobool import strtobool
 
 
+DUMP_PATH = "/vmaas.db"
+
+
 class Singleton(type):
     """Singleton object."""
 
@@ -34,9 +37,20 @@ class BaseConfig:
         self.is_init_container = strtobool(os.environ.get("INIT_CONTAINER", "false"))
         self.is_test = strtobool(os.environ.get("IS_TEST", "false"))
         self.tls_ca_path = None
-        self.public_port = None
-        self.private_port = None
         self.metrics_port = None
+
+        self.cw_aws_access_key_id = None
+        self.cw_aws_secret_access_key = None
+        self.cw_aws_region = None
+        self.cw_aws_log_group = None
+        self.s3_available = False
+        self.dump_bucket_name = None
+        self.dump_s3_tls = ""
+        self.dump_s3_url = ""
+        self.dump_s3_access_key = None
+        self.dump_s3_secret_key = None
+        self.reposcan_url = ""
+        self.webapp_go_url = ""
 
         self.prometheus_multiproc_dir = os.getenv("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_multiproc_dir")
 
@@ -49,12 +63,14 @@ class Config(BaseConfig, metaclass=Singleton):
     """VMaaS configuration singleton."""
 
     def __init__(self) -> None:
-        if not app_common_python.isClowderEnabled():
-            raise EnvironmentError("Missing Clowder config.")
-
         super().__init__()
-        self._cfg = app_common_python.LoadedConfig
-        self.clowder()
+        self._cfg = None
+
+        if app_common_python.isClowderEnabled():
+            self._cfg = app_common_python.LoadedConfig
+            self.clowder()
+        else:
+            self.env()
 
     def clowder(self) -> None:
         """Configuration from Clowder."""
@@ -83,20 +99,36 @@ class Config(BaseConfig, metaclass=Singleton):
         self.dump_s3_access_key = getattr(s3_buckets[0], "accessKey", "") if self.s3_available else None
         self.dump_s3_secret_key = getattr(s3_buckets[0], "secretKey", "") if self.s3_available else None
         self.tls_ca_path = self._cfg.tlsCAPath
-        self.reposcan_url = ""
-        self.webapp_go_url = ""
         for endpoint in self._cfg.endpoints:
             if "reposcan" in endpoint.hostname:
                 self.reposcan_url = self._build_url(endpoint)
         for endpoint in self._cfg.privateEndpoints:
             if "reposcan" in endpoint.hostname:
-                self.remote_dump = f"{self._build_url(endpoint)}/vmaas.db"
+                self.remote_dump = f"{self._build_url(endpoint)}{DUMP_PATH}"
             if "webapp" in endpoint.hostname and "go" in endpoint.hostname:
                 self.webapp_go_url = self._build_url(endpoint)
 
-        self.public_port = self._cfg.publicPort
-        self.private_port = self._cfg.privatePort
         self.metrics_port = self._cfg.metricsPort
+
+    def env(self) -> None:
+        """Configuration from environment variables"""
+        self.db_name = os.getenv("POSTGRESQL_DB", "vulnerability").strip()
+        self.db_user = os.getenv("POSTGRESQL_USER", "").strip()
+        self.db_pass = os.getenv("POSTGRESQL_PASSWORD", "")
+        self.db_host = os.getenv("POSTGRESQL_HOST", "ve_database").strip()
+        self.db_port = int(os.getenv("POSTGRESQL_PORT", "5432").strip())
+        self.db_ssl_mode = os.getenv("POSTGRESQL_SSL_MODE", "prefer").strip()
+        self.db_ssl_root_cert_path = os.getenv("POSTGRESQL_SSL_ROOT_CERT_PATH", "").strip()
+        self.db_available = bool(self.db_name)
+
+        self.metrics_port = int(os.getenv("PROMETHEUS_PORT", "9000").strip())
+
+        self.reposcan_url = os.getenv("REPOSCAN_PUBLIC_URL", "").strip()
+        reposcan_private_url = os.getenv("REPOSCAN_PRIVATE_URL", "").strip()
+        if reposcan_private_url:
+            self.remote_dump = f"{reposcan_private_url}{DUMP_PATH}"
+
+        self.webapp_go_url = os.getenv("WEBAPP_GO_URL", "")
 
     def _build_url(self, endpoint: object, scheme="http") -> str:
         scheme = f"{scheme}s" if self.tls_ca_path else scheme
