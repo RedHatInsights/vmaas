@@ -10,6 +10,7 @@ from vmaas.common.date_utils import parse_datetime, now
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.cvemap_store import CvemapStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
+from vmaas.reposcan.katello import KATELLO_HOST, KATELLO_CA_CERT_PATH
 from vmaas.reposcan.mnm import FAILED_CVEMAP
 from vmaas.reposcan.redhatcve.cvemap import CvemapHead, CvemapBody
 
@@ -36,9 +37,16 @@ class CvemapController:
     def _tmp_xml(self):
         return os.path.join(self.tmp_directory, 'cvemap.xml')
 
+    @staticmethod
+    def _get_ca_cert() -> str | None:
+        if KATELLO_HOST and KATELLO_HOST in URL and os.path.isfile(KATELLO_CA_CERT_PATH):
+            return KATELLO_CA_CERT_PATH
+        return None
+
     def _download_head(self):
         item = DownloadItem(source_url=URL,
-                            target_path=self._tmp_head())
+                            target_path=self._tmp_head(),
+                            ca_cert=self._get_ca_cert())
         download_items = [item]
         self.downloader.add(item)
         self.downloader.run(headers_only=True)
@@ -69,7 +77,8 @@ class CvemapController:
 
     def _download_xml(self):
         self.downloader.add(DownloadItem(source_url=URL,
-                                         target_path=self._tmp_xml()))
+                                         target_path=self._tmp_xml(),
+                                         ca_cert=self._get_ca_cert()))
         self.downloader.run()
 
     def _load_xml(self, lastmodified):

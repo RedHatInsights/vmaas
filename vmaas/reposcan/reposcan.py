@@ -35,7 +35,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
-from vmaas.reposcan.katello import KatelloApi
+from vmaas.reposcan.katello import KatelloApi, KATELLO_HOST, KATELLO_API_USER, KATELLO_API_PASS
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
     REGISTRY
@@ -93,10 +93,6 @@ SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
-
-KATELLO_HOST = os.getenv("KATELLO_HOST", "")  # satellite.example.com
-KATELLO_API_USER = os.getenv("KATELLO_API_USER", "admin")
-KATELLO_API_PASS = os.getenv("KATELLO_API_PASS", "changeme")
 
 
 class TaskStatusResponse(dict):

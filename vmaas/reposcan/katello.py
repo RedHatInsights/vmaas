@@ -15,6 +15,10 @@ from vmaas.reposcan.database.repository_store import RepositoryStore
 
 LOGGER = get_logger(__name__)
 
+KATELLO_HOST = os.getenv("KATELLO_HOST", "")  # satellite.example.com
+KATELLO_API_USER = os.getenv("KATELLO_API_USER", "admin")
+KATELLO_API_PASS = os.getenv("KATELLO_API_PASS", "changeme")
+
 KATELLO_CA_CERT_PATH = "/katello-server-ca.crt"
 
 KATELLO_ACCESS_CERT_API = "/katello/api/v2/organizations/%s/download_debug_certificate"
