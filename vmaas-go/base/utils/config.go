@@ -63,77 +63,77 @@ func ConfigureConfig() {
 	if !clowder.IsClowderEnabled() {
 		panic("Missing clowder config")
 	}
-	initDB()
-	initAPI()
-	initEndpoints()
-	initCloudwatch()
-	initEnv()
+	Cfg.initDB()
+	Cfg.initAPI()
+	Cfg.initEndpoints()
+	Cfg.initCloudwatch()
+	Cfg.initEnv()
 }
 
-func initDB() {
-	Cfg.DBHost = clowder.LoadedConfig.Database.Hostname
-	Cfg.DBName = clowder.LoadedConfig.Database.Name
-	Cfg.DBPort = clowder.LoadedConfig.Database.Port
-	Cfg.DBSslMode = clowder.LoadedConfig.Database.SslMode
+func (c *Config) initDB() {
+	c.DBHost = clowder.LoadedConfig.Database.Hostname
+	c.DBName = clowder.LoadedConfig.Database.Name
+	c.DBPort = clowder.LoadedConfig.Database.Port
+	c.DBSslMode = clowder.LoadedConfig.Database.SslMode
 	if clowder.LoadedConfig.Database.RdsCa != nil {
 		certPath, err := clowder.LoadedConfig.RdsCa()
 		if err != nil {
 			panic(err)
 		}
-		Cfg.DBSslRootCert = certPath
+		c.DBSslRootCert = certPath
 	}
-	Cfg.DBAdminUser = clowder.LoadedConfig.Database.AdminUsername
-	Cfg.DBAdminPassword = clowder.LoadedConfig.Database.AdminPassword
-	Cfg.DBUser = clowder.LoadedConfig.Database.Username
-	Cfg.DBPassword = clowder.LoadedConfig.Database.Password
+	c.DBAdminUser = clowder.LoadedConfig.Database.AdminUsername
+	c.DBAdminPassword = clowder.LoadedConfig.Database.AdminPassword
+	c.DBUser = clowder.LoadedConfig.Database.Username
+	c.DBPassword = clowder.LoadedConfig.Database.Password
 }
 
-func initAPI() {
-	Cfg.PublicPort = *clowder.LoadedConfig.PublicPort
-	Cfg.PrivatePort = *clowder.LoadedConfig.PrivatePort
-	Cfg.MetricsPort = clowder.LoadedConfig.MetricsPort
-	Cfg.MetricsPath = clowder.LoadedConfig.MetricsPath
+func (c *Config) initAPI() {
+	c.PublicPort = *clowder.LoadedConfig.PublicPort
+	c.PrivatePort = *clowder.LoadedConfig.PrivatePort
+	c.MetricsPort = clowder.LoadedConfig.MetricsPort
+	c.MetricsPath = clowder.LoadedConfig.MetricsPath
 }
 
-func initEndpoints() {
+func (c *Config) initEndpoints() {
 	for _, e := range clowder.LoadedConfig.Endpoints {
 		if e.App == "vmaas" {
 			switch {
 			case strings.Contains(e.Name, "reposcan"):
-				Cfg.ReposcanAddress = (*Endpoint)(&e).BuildURL("http")
+				c.ReposcanAddress = (*Endpoint)(&e).BuildURL("http")
 			case strings.Contains(e.Name, "webapp") && !strings.Contains(e.Name, "go"):
-				Cfg.OGWebappAddress = (*Endpoint)(&e).BuildURL("http")
+				c.OGWebappAddress = (*Endpoint)(&e).BuildURL("http")
 			}
 		}
 	}
 	for _, e := range clowder.LoadedConfig.PrivateEndpoints {
 		if e.App == "vmaas" && strings.Contains(e.Name, "reposcan") {
-			Cfg.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildURL("http"))
+			c.DumpAddress = fmt.Sprintf("%s/vmaas.db", (*PrivateEndpoint)(&e).BuildURL("http"))
 		}
 	}
 }
 
-func initCloudwatch() {
+func (c *Config) initCloudwatch() {
 	cwCfg := clowder.LoadedConfig.Logging.Cloudwatch
 	if cwCfg != nil {
-		Cfg.CloudWatchAccessKeyID = cwCfg.AccessKeyId
-		Cfg.CloudWatchSecretAccesskey = cwCfg.SecretAccessKey
-		Cfg.CloudWatchRegion = cwCfg.Region
-		Cfg.CloudWatchLogGroup = cwCfg.LogGroup
+		c.CloudWatchAccessKeyID = cwCfg.AccessKeyId
+		c.CloudWatchSecretAccesskey = cwCfg.SecretAccessKey
+		c.CloudWatchRegion = cwCfg.Region
+		c.CloudWatchLogGroup = cwCfg.LogGroup
 	}
 }
 
-func initEnv() {
-	Cfg.LogLevel = Getenv("LOG_LEVEL", "INFO")
-	Cfg.LogStyle = os.Getenv("LOG_STYLE")
+func (c *Config) initEnv() {
+	c.LogLevel = Getenv("LOG_LEVEL", "INFO")
+	c.LogStyle = os.Getenv("LOG_STYLE")
 	cacheRefreshSec := GetIntEnvOrDefault("CACHE_REFRESH_INTERVAL", 60) // 1 min default
-	Cfg.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
-	Cfg.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
-	Cfg.UnfixedEvalEnabled = GetBoolEnvOrDefault("CSAF_UNFIXED_EVAL_ENABLED", true)
-	Cfg.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
-	Cfg.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
-	Cfg.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
-	Cfg.VmaasVersionFilePath = Getenv("VMAAS_VERSION_FILE_PATH", "/vmaas/VERSION")
+	c.CacheRefreshInterval = time.Second * time.Duration(cacheRefreshSec)
+	c.EnableProfiler = GetBoolEnvOrDefault("ENABLE_PROFILER", false)
+	c.UnfixedEvalEnabled = GetBoolEnvOrDefault("CSAF_UNFIXED_EVAL_ENABLED", true)
+	c.VmaasLibMaxGoroutines = GetIntEnvOrDefault("VMAAS_LIB_MAX_GOROUTINES", 20)
+	c.NewerReleaseverRepos = GetBoolEnvOrDefault("NEWER_RELEASEVER_REPOS", true)
+	c.NewerReleaseverCsaf = GetBoolEnvOrDefault("NEWER_RELEASEVER_CSAF", true)
+	c.VmaasVersionFilePath = Getenv("VMAAS_VERSION_FILE_PATH", "/vmaas/VERSION")
 }
 
 func (e *Endpoint) BuildURL(scheme string) string {
