@@ -374,7 +374,7 @@ parameters:
   value: latest
 - description: Image name
   name: IMAGE
-  value: quay.io/cloudservices/vmaas-app
+  value: quay.io/redhat-services-prod/insights-management-tenant/insights-vulnerability/vmaas
 - description: Determines Clowder deployment
   name: CLOWDER_ENABLED
   value: "True"
