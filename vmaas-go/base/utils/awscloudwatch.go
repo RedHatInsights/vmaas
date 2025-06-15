@@ -10,7 +10,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	lc "github.com/redhatinsights/platform-go-middlewares/logging/cloudwatch"
+	lc "github.com/redhatinsights/platform-go-middlewares/v2/logging/cloudwatch"
 	log "github.com/sirupsen/logrus"
 )
 
