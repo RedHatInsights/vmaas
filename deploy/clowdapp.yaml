@@ -135,10 +135,8 @@ objects:
         image: ${IMAGE}:${IMAGE_TAG}
         initContainers:
           - command:
-            - sh
-            - -c
-            - >-
-              exec python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade
+            - /vmaas/entrypoint.sh
+            - database-upgrade
             env:
             - name: GIT_TOKEN
               valueFrom:
