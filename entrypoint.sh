@@ -15,6 +15,12 @@ fi
 
 cd $(dirname $0)
 
+if [[ "$1" == "database-upgrade" ]]; then
+    set -e
+    python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade
+    shift
+fi
+
 if [[ ! -z $1 ]]; then
     if [[ "$1" == "webapp" ]]; then
         cd vmaas/webapp
