@@ -1,16 +1,19 @@
-DO $$ 
-BEGIN
-    WITH wrong_cve_id AS (
-        SELECT id from cve where name = 'cve-2022-28693'
-    ), correct_cve_id AS (
-        SELECT id from cve where name = 'CVE-2022-28693'
-    )
+DELETE FROM cve_cwe
+USING cve
+WHERE cve_cwe.cve_id = cve.id
+  AND cve.published_date IS NULL
+  AND cve.modified_date IS NULL;
 
-    -- link the one incorrect cve being linked to csaf_cve_product
-    update csaf_cve_product
-        set cve_id = (select id from correct_cve_id)
-        where cve_id = (select id from wrong_cve_id);
-END $$;
+DELETE FROM errata_cve
+USING cve
+WHERE errata_cve.cve_id = cve.id
+  AND cve.published_date IS NULL
+  AND cve.modified_date IS NULL;
 
--- delete all wrong cves
-delete from cve where published_date is null and modified_date is null;
+DELETE FROM csaf_cve_product
+USING cve
+WHERE csaf_cve_product.cve_id = cve.id
+  AND cve.published_date IS NULL
+  AND cve.modified_date IS NULL;
+
+DELETE FROM cve WHERE published_date IS NULL AND modified_date IS NULL;
