@@ -8,6 +8,11 @@ private_port () {
     python3.12 -c "import os;import app_common_python as a;print(a.LoadedConfig.privatePort or os.getenv('BIND_PRIVATE_PORT', '10000'))"
 }
 
+if [[ "$#" == "0" ]]; then
+    echo "Please specify service name as the first argument."
+    exit 1
+fi
+
 cd $(dirname $0)
 
 if [[ ! -z $1 ]]; then
@@ -32,5 +37,3 @@ if [[ ! -z $1 ]]; then
         exec sleep infinity
     fi
 fi
-
-echo "Please specify service name as the first argument."
