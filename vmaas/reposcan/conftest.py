@@ -6,7 +6,7 @@ from pathlib import Path
 import psycopg2
 import pytest
 
-from vmaas.common.paths import USER_CREATE_SQL_PATH, DB_CREATE_SQL_PATH
+from vmaas.common.paths import DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import init_db
 from vmaas.reposcan.redhatcsaf import modeling as csaf_model
 
@@ -91,9 +91,6 @@ def reset_db(conn, old_schema: bool = False):
         cursor.execute("GRANT ALL ON SCHEMA public TO public")
 
     with conn.cursor() as cursor:
-        cursor.execute("DROP USER IF EXISTS vmaas_reader")
-        cursor.execute("DROP USER IF EXISTS vmaas_writer")
-        cursor.execute(USER_CREATE_SQL_PATH.read_text(encoding="utf-8"))
         if old_schema:
             cursor.execute(VMAAS_PG_OLD.read_text(encoding="utf-8"))
         else:

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 33);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 34);
 
 -- -----------------------------------------------------
 -- evr type
@@ -1047,12 +1047,3 @@ CREATE TABLE IF NOT EXISTS release_graph (
   checksum TEXT NOT NULL,
   PRIMARY KEY (id)
 )TABLESPACE pg_default;
-
--- -----------------------------------------------------
--- vmaas users permission setup:
--- vmaas_writer - has rights to INSERT/UPDATE/DELETE; used by reposcan
--- vmaas_reader - has SELECT only; used by webapp
--- -----------------------------------------------------
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO vmaas_writer;
-GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO vmaas_writer;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO vmaas_reader;

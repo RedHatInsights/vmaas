@@ -811,6 +811,8 @@ CREATE TRIGGER db_upgrade_log_set_last_updated
 -- vmaas_writer - has rights to INSERT/UPDATE/DELETE; used by reposcan
 -- vmaas_reader - has SELECT only; used by webapp
 -- -----------------------------------------------------
+CREATE USER vmaas_writer;
+CREATE USER vmaas_reader;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO vmaas_writer;
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO vmaas_writer;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO vmaas_reader;
