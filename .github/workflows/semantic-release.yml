@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
+        go-version: [1.22]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +31,17 @@ jobs:
           pip install python-semantic-release
           semantic-release version --print > VERSION
           git add VERSION
-          semantic-release version
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install swag v2
+        run: go install github.com/swaggo/swag/v2/cmd/swag@latest
+      - name: Genrate vmaas-go docs
+        run: |
+          bash scripts/generate_vmaas_go_docs.sh
+          git add vmaas-go/docs/openapi.json
+      - name: Submit changes
+        run: semantic-release version
         env:
           GH_TOKEN: "${{ secrets.GH_TOKEN }}"
