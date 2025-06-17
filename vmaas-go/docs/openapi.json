@@ -1,0 +1,2844 @@
+{
+  "components": {
+    "schemas": {
+      "utils.ErrorResponse": {
+        "description": "Universal error response for all VMaaS endpoints.",
+        "properties": {
+          "detail": {
+            "description": "error message",
+            "type": "string"
+          },
+          "status": {
+            "description": "status code",
+            "type": "integer"
+          },
+          "title": {
+            "description": "status text",
+            "type": "string"
+          },
+          "type": {
+            "description": "\"about:blank\"",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.AffectedPackage": {
+        "properties": {
+          "cpe": {
+            "type": "string"
+          },
+          "evra": {
+            "type": "string"
+          },
+          "module_name": {
+            "type": "string"
+          },
+          "module_stream": {
+            "type": "string"
+          },
+          "package_name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ContentData": {
+        "additionalProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": "TODO: use `omitzero` from go1.24",
+        "type": "object"
+      },
+      "vmaas.CveDetail": {
+        "properties": {
+          "cvss2_metrics": {
+            "type": "string"
+          },
+          "cvss2_score": {
+            "type": "string"
+          },
+          "cvss3_metrics": {
+            "type": "string"
+          },
+          "cvss3_score": {
+            "type": "string"
+          },
+          "cwe_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "description": {
+            "type": "string"
+          },
+          "errata_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "impact": {
+            "type": "string"
+          },
+          "modified_date": {
+            "type": "string"
+          },
+          "package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "public_date": {
+            "type": "string"
+          },
+          "redhat_url": {
+            "type": "string"
+          },
+          "secondary_url": {
+            "type": "string"
+          },
+          "source_package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "synopsis": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.CveDetails": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/vmaas.CveDetail"
+        },
+        "type": "object"
+      },
+      "vmaas.Cves": {
+        "properties": {
+          "cve_list": {
+            "$ref": "#/components/schemas/vmaas.CveDetails"
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.CvesRequest": {
+        "properties": {
+          "cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "errata_associated": {
+            "type": "boolean"
+          },
+          "modified_since": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "published_since": {
+            "type": "string"
+          },
+          "rh_only": {
+            "type": "boolean"
+          },
+          "third_party": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.DBChange": {
+        "properties": {
+          "cve_changes": {
+            "type": "string"
+          },
+          "errata_changes": {
+            "type": "string"
+          },
+          "exported": {
+            "type": "string"
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "repository_changes": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.Errata": {
+        "properties": {
+          "errata_list": {
+            "$ref": "#/components/schemas/vmaas.ErratumDetails"
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          },
+          "severity": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "type": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ErrataRequest": {
+        "properties": {
+          "errata_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "modified_since": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "severity": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "third_party": {
+            "type": "boolean"
+          },
+          "type": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ErratumDetail": {
+        "properties": {
+          "bugzilla_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "description": {
+            "type": "string"
+          },
+          "issued": {
+            "type": "string"
+          },
+          "modules_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.Module"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "reference_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "release_versions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "requires_reboot": {
+            "type": "boolean"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "solution": {
+            "type": "string"
+          },
+          "source_package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "summary": {
+            "type": "string"
+          },
+          "synopsis": {
+            "type": "string"
+          },
+          "third_party": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ErratumDetails": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/vmaas.ErratumDetail"
+        },
+        "type": "object"
+      },
+      "vmaas.Module": {
+        "properties": {
+          "module_context": {
+            "type": "string"
+          },
+          "module_name": {
+            "type": "string"
+          },
+          "module_stream": {
+            "type": "string"
+          },
+          "module_version": {
+            "type": "integer"
+          },
+          "package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "source_package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ModuleStream": {
+        "properties": {
+          "module_name": {
+            "type": "string"
+          },
+          "module_stream": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ModuleStreamPtrs": {
+        "properties": {
+          "module_name": {
+            "type": "string"
+          },
+          "module_stream": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.OSReleaseDetail": {
+        "properties": {
+          "cves_critical": {
+            "type": "integer"
+          },
+          "cves_important": {
+            "type": "integer"
+          },
+          "cves_low": {
+            "type": "integer"
+          },
+          "cves_moderate": {
+            "type": "integer"
+          },
+          "cves_unpatched_critical": {
+            "type": "integer"
+          },
+          "cves_unpatched_important": {
+            "type": "integer"
+          },
+          "cves_unpatched_low": {
+            "type": "integer"
+          },
+          "cves_unpatched_moderate": {
+            "type": "integer"
+          },
+          "lifecycle_phase": {
+            "type": "string"
+          },
+          "major": {
+            "type": "integer"
+          },
+          "minor": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PackageDetails": {
+        "additionalProperties": {},
+        "type": "object"
+      },
+      "vmaas.Packages": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "package_list": {
+            "$ref": "#/components/schemas/vmaas.PackageDetails"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PackagesRequest": {
+        "properties": {
+          "package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "third_party": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.Patches": {
+        "properties": {
+          "errata_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "last_change": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgList": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "package_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.PkgListItem"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgListItem": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          },
+          "nevra": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTree": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "package_name_list": {
+            "$ref": "#/components/schemas/vmaas.PkgTreeItems"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTreeErratumDetail": {
+        "properties": {
+          "cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "issued": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTreeItem": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "errata": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.PkgTreeErratumDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "first_published": {
+            "type": "string"
+          },
+          "nevra": {
+            "type": "string"
+          },
+          "repositories": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.PkgTreeRepoDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTreeItems": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/components/schemas/vmaas.PkgTreeItem"
+          },
+          "type": "array"
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTreeRepoDetail": {
+        "properties": {
+          "basearch": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "string"
+          },
+          "releasever": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.PkgTreeRequest": {
+        "properties": {
+          "modified_since": {
+            "type": "string"
+          },
+          "package_name_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "return_description": {
+            "type": "boolean"
+          },
+          "return_errata": {
+            "type": "boolean"
+          },
+          "return_repositories": {
+            "type": "boolean"
+          },
+          "return_summary": {
+            "type": "boolean"
+          },
+          "third_party": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.RPMData": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "description": "TODO: use `omitzero` from go1.24",
+        "type": "object"
+      },
+      "vmaas.RPMPkgNames": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "rpm_name_list": {
+            "$ref": "#/components/schemas/vmaas.ContentData"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.RPMPkgNamesRequest": {
+        "properties": {
+          "content_set_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "rpm_name_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.RepoDetail": {
+        "properties": {
+          "basearch": {
+            "type": "string"
+          },
+          "cpes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "label": {
+            "type": "string"
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "releasever": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string"
+          },
+          "third_party": {
+            "type": "boolean"
+          },
+          "updated_package_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.RepoDetails": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/components/schemas/vmaas.RepoDetail"
+          },
+          "type": "array"
+        },
+        "type": "object"
+      },
+      "vmaas.Repos": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "latest_repo_change": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          },
+          "repository_list": {
+            "$ref": "#/components/schemas/vmaas.RepoDetails"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.ReposRequest": {
+        "properties": {
+          "has_packages": {
+            "type": "boolean"
+          },
+          "modified_since": {
+            "type": "string"
+          },
+          "organization": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "repository_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "show_packages": {
+            "type": "boolean"
+          },
+          "third_party": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.Request": {
+        "properties": {
+          "basearch": {
+            "type": "string"
+          },
+          "epoch_required": {
+            "type": "boolean"
+          },
+          "extended": {
+            "type": "boolean"
+          },
+          "latest_only": {
+            "type": "boolean"
+          },
+          "modules_list": {
+            "description": "we need to use pointers to modules to distinguish between nil and \"\"\nto keep consistency with python implementation",
+            "items": {
+              "$ref": "#/components/schemas/vmaas.ModuleStreamPtrs"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "organization": {
+            "type": "string"
+          },
+          "package_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "releasever": {
+            "type": "string"
+          },
+          "repository_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "repository_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "security_only": {
+            "type": "boolean"
+          },
+          "third_party": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.SRPMPkgNames": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "srpm_name_list": {
+            "$ref": "#/components/schemas/vmaas.RPMData"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.SRPMPkgNamesRequest": {
+        "properties": {
+          "content_set_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "srpm_name_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.Update": {
+        "properties": {
+          "basearch": {
+            "type": "string"
+          },
+          "erratum": {
+            "type": "string"
+          },
+          "evra": {
+            "type": "string"
+          },
+          "package": {
+            "type": "string"
+          },
+          "package_name": {
+            "type": "string"
+          },
+          "releasever": {
+            "type": "string"
+          },
+          "repository": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.UpdateDetail": {
+        "properties": {
+          "available_updates": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.Update"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.UpdateList": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/vmaas.UpdateDetail"
+        },
+        "type": "object"
+      },
+      "vmaas.Updates": {
+        "properties": {
+          "basearch": {
+            "type": "string"
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "modules_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.ModuleStream"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "releasever": {
+            "type": "string"
+          },
+          "repository_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "repository_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "update_list": {
+            "$ref": "#/components/schemas/vmaas.UpdateList"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.Vulnerabilities": {
+        "properties": {
+          "cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "manually_fixable_cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "unpatched_cve_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.VulnerabilitiesExtended": {
+        "properties": {
+          "cve_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.VulnerabilityDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "last_change": {
+            "type": "string"
+          },
+          "manually_fixable_cve_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.VulnerabilityDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "unpatched_cve_list": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.VulnerabilityDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.VulnerabilityDetail": {
+        "properties": {
+          "affected": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.AffectedPackage"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "cve": {
+            "type": "string"
+          },
+          "errata": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object"
+          },
+          "packages": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "vmaas.VulnerabilityReport": {
+        "properties": {
+          "last_change": {
+            "type": "string"
+          },
+          "os_releases": {
+            "items": {
+              "$ref": "#/components/schemas/vmaas.OSReleaseDetail"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "": {
+        "in": "header",
+        "name": "x-rh-identity",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "API of the VMaaS application on [console.redhat.com](https://console.redhat.com)",
+    "license": {
+      "name": "GPLv3",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
+    },
+    "title": "VMaaS webapp API",
+    "version": "2.97.4"
+  },
+  "externalDocs": {
+    "description": "",
+    "url": ""
+  },
+  "paths": {
+    "/cves": {
+      "post": {
+        "description": "Get details about CVEs with additional parameters. Use `cve_list` parameter to provide a list of CVE names, or a single POSIX regular expression.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.CvesRequest"
+              }
+            }
+          },
+          "description": "cve_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Cves"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for CVEs"
+      }
+    },
+    "/cves/{cve}": {
+      "get": {
+        "description": "Get details for a CVE. It is possible to use a POSIX regular expression as a pattern for CVE names.",
+        "parameters": [
+          {
+            "description": "CVE",
+            "in": "path",
+            "name": "cve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Cves"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for a CVE"
+      }
+    },
+    "/dbchange": {
+      "get": {
+        "description": "Get last-updated times from VMaaS DB.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.DBChange"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get last-updated times from VMaaS DB"
+      }
+    },
+    "/errata": {
+      "post": {
+        "description": "Get details about errata with additional parameters. Use `errata_list` parameter to provide a list of errata names, or a single POSIX regular expression.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.ErrataRequest"
+              }
+            }
+          },
+          "description": "errata_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Errata"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for errata"
+      }
+    },
+    "/errata/{erratum}": {
+      "get": {
+        "description": "Get details about an erratum. It is possible to use a POSIX regular expression as a pattern for errata names.",
+        "parameters": [
+          {
+            "description": "erratum",
+            "in": "path",
+            "name": "erratum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Errata"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for an erratum"
+      }
+    },
+    "/os/vulnerability/report": {
+      "get": {
+        "description": "get OS vulnerability report",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.VulnerabilityReport"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get OS vulnerability report"
+      }
+    },
+    "/package_name/srpms": {
+      "post": {
+        "description": "Get content sets with associated RPM names by SRPM and content sets.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest"
+              }
+            }
+          },
+          "description": "srpm_name_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.SRPMPkgNames"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get content sets with associated RPM names by SRPM and content sets"
+      }
+    },
+    "/package_names/rpms": {
+      "post": {
+        "description": "Get a list of content sets by RPM name and content sets.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.RPMPkgNamesRequest"
+              }
+            }
+          },
+          "description": "rpm_name_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.RPMPkgNames"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get a list of content sets by RPM name and content sets"
+      }
+    },
+    "/package_names/rpms/{rpm}": {
+      "get": {
+        "description": "Get a list of content sets by RPM name.",
+        "parameters": [
+          {
+            "description": "RPM name",
+            "in": "path",
+            "name": "rpm",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.RPMPkgNames"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get a list of content sets by RPM name"
+      }
+    },
+    "/package_names/srpms/{srpm}": {
+      "get": {
+        "description": "Get content sets with associated RPM names by SRPM.",
+        "parameters": [
+          {
+            "description": "SRPM name",
+            "in": "path",
+            "name": "srpm",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.SRPMPkgNames"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get content sets with associated RPM names by SRPM"
+      }
+    },
+    "/packages": {
+      "post": {
+        "description": "Get details about packages. Use `package_list` to provide a list of package NEVRAs.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.PackagesRequest"
+              }
+            }
+          },
+          "description": "package_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Packages"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for packages"
+      }
+    },
+    "/packages/{nevra}": {
+      "get": {
+        "description": "Get details about a package.",
+        "parameters": [
+          {
+            "description": "NEVRA",
+            "in": "path",
+            "name": "nevra",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Packages"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for a package"
+      }
+    },
+    "/patches": {
+      "post": {
+        "description": "Get a list of applicable errata for a package list.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.Request"
+              }
+            }
+          },
+          "description": "package_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Patches"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get patches for packages"
+      }
+    },
+    "/patches/{nevra}": {
+      "get": {
+        "description": "Get a list of applicable errata for a package.",
+        "parameters": [
+          {
+            "description": "NEVRA",
+            "in": "path",
+            "name": "nevra",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Patches"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get patches for a package"
+      }
+    },
+    "/pkglist": {
+      "post": {
+        "description": "Get details for all packages.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.PkgList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for all packages"
+      }
+    },
+    "/pkgtree": {
+      "post": {
+        "description": "Get NEVRA trees for package names. Use `package_name_list` parameter to provide a list of package names, or a single POSIX regular expression.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.PkgTreeRequest"
+              }
+            }
+          },
+          "description": "package_name_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.PkgTree"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get NEVRA trees for package names"
+      }
+    },
+    "/pkgtree/{package_name}": {
+      "get": {
+        "description": "Get NEVRA tree for a package name. It is possible to use a POSIX regular expression as a pattern for package names.",
+        "parameters": [
+          {
+            "description": "package name",
+            "in": "path",
+            "name": "package_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.PkgTree"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get NEVRA tree for a package name"
+      }
+    },
+    "/repos": {
+      "post": {
+        "description": "Get details about repositories. Use `repository_list` parameter to provide a list of repository names, or a single POSIX regular expression.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.ReposRequest"
+              }
+            }
+          },
+          "description": "repository_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Repos"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for repositories"
+      }
+    },
+    "/repos/{repo}": {
+      "get": {
+        "description": "Get details about a repository.\nIt is possible to use a POSIX regular expression as a pattern for repository names.",
+        "parameters": [
+          {
+            "description": "repository",
+            "in": "path",
+            "name": "repo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Repos"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get details for a repository"
+      }
+    },
+    "/updates": {
+      "post": {
+        "description": "List all updates for list of package NEVRAs.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.Request"
+              }
+            }
+          },
+          "description": "package_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Updates"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get updates for packages"
+      }
+    },
+    "/updates/{package}": {
+      "get": {
+        "description": "List all updates for single package NEVRA.",
+        "parameters": [
+          {
+            "description": "NEVRA",
+            "in": "path",
+            "name": "package",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Updates"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get updates for a package"
+      }
+    },
+    "/version": {
+      "get": {
+        "description": "Get VMaaS version.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get VMaaS version"
+      }
+    },
+    "/vulnerabilities": {
+      "post": {
+        "description": "Get a list of applicable CVEs for a package list.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.Request"
+              }
+            }
+          },
+          "description": "package_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/vmaas.Vulnerabilities"
+                    },
+                    {
+                      "$ref": "#/components/schemas/vmaas.VulnerabilitiesExtended"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "if request.extended"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get vulnerabilities for packages"
+      }
+    },
+    "/vulnerabilities/{package}": {
+      "get": {
+        "description": "Get a list of applicable CVEs for a single package NEVRA.",
+        "parameters": [
+          {
+            "description": "NEVRA",
+            "in": "path",
+            "name": "package",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.Vulnerabilities"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "RhIdentity": []
+          }
+        ],
+        "summary": "Get vulnerabilities for a package"
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "/api/vmaas/v3"
+    }
+  ]
+}
