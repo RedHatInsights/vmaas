@@ -51,21 +51,6 @@ services:
     depends_on:
       - vmaas_database
 
-  vmaas_webapp:
-    command: /vmaas/entrypoint.sh webapp
-    container_name: vmaas-webapp
-    hostname: vmaas-webapp
-    image: vmaas/app:latest
-    restart: unless-stopped
-    env_file:
-      - ./conf/common.env
-      - ./conf/webapp.env
-    ports:
-      - 8080:8000
-      - 9081:10000
-    depends_on:
-      - vmaas_reposcan
-
   vmaas_webapp_go:
     command: /vmaas/entrypoint.sh webapp-go
     container_name: vmaas-webapp-go
@@ -81,7 +66,6 @@ services:
       - 9088:10000
     depends_on:
       - vmaas_reposcan
-      - vmaas_webapp # to proxy requests
 
   vmaas_prometheus:
     container_name: vmaas-prometheus

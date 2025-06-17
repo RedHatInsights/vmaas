@@ -53,47 +53,6 @@ objects:
           value: ${NEWER_RELEASEVER_CSAF}
         - name: VMAAS_VERSION_FILE_PATH
           value: ${VMAAS_VERSION_FILE_PATH}
-        resources:
-          limits:
-            cpu: ${CPU_LIMIT_WEBAPP_GO}
-            memory: ${MEMORY_LIMIT_WEBAPP_GO}
-          requests:
-            cpu: ${CPU_REQUEST_WEBAPP_GO}
-            memory: ${MEMORY_REQUEST_WEBAPP_GO}
-
-    - name: webapp-service
-      replicas: ${{REPLICAS_WEBAPP}}
-      webServices:
-        public:
-          enabled: true
-        private:
-          enabled: false
-        metrics:
-          enabled: true
-      podSpec:
-        image: ${IMAGE}:${IMAGE_TAG}
-        command:
-          - /vmaas/entrypoint.sh
-          - webapp
-        env:
-        - name: LOGGING_LEVEL_APP
-          value: ${LOGGING_LEVEL_APP}
-        - name: LOGGING_LEVEL_LIBS
-          value: ${WEBAPP_LOGGING_LEVEL_LIBS}
-        - name: LOGGING_TYPE
-          value: ${LOGGING_TYPE}
-        - name: MAX_VMAAS_SERVERS
-          value: ${MAX_VMAAS_SERVERS}
-        - name: GZIP_RESPONSE_ENABLE
-          value: ${GZIP_RESPONSE_ENABLE}
-        - name: GZIP_COMPRESS_LEVEL
-          value: ${GZIP_COMPRESS_LEVEL}
-        - name: CW_ENABLED
-          value: ${{CW_ENABLED}}
-        - name: CLOWDER_ENABLED
-          value: ${CLOWDER_ENABLED}
-        - name: REPO_NAME_PREFIXES
-          value: ${REPO_NAME_PREFIXES}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -116,11 +75,11 @@ objects:
           failureThreshold: 3
         resources:
           limits:
-            cpu: ${CPU_LIMIT_WEBAPP}
-            memory: ${MEMORY_LIMIT_WEBAPP}
+            cpu: ${CPU_LIMIT_WEBAPP_GO}
+            memory: ${MEMORY_LIMIT_WEBAPP_GO}
           requests:
-            cpu: ${CPU_REQUEST_WEBAPP}
-            memory: ${MEMORY_REQUEST_WEBAPP}
+            cpu: ${CPU_REQUEST_WEBAPP_GO}
+            memory: ${MEMORY_REQUEST_WEBAPP_GO}
 
     - name: reposcan-service
       replicas: ${{REPLICAS_REPOSCAN}}
@@ -308,7 +267,7 @@ objects:
       termination: edge
     to:
       kind: Service
-      name: vmaas-webapp-service
+      name: vmaas-webapp-go
       weight: 100
     wildcardPolicy: None
 
@@ -325,9 +284,6 @@ parameters:
 - name: CPU_REQUEST_WEBAPP
   description: CPU request for pod
   value: '500m'
-- name: CPU_LIMIT_WEBAPP
-  description: Maximum CPU limit for pod
-  value: '1000m'
 - name: CPU_REQUEST_WEBAPP_GO
   description: CPU request for pod
   value: '1'
@@ -343,9 +299,6 @@ parameters:
 - name: MEMORY_REQUEST_WEBAPP
   description: Memory request for pod
   value: '2Gi'
-- name: MEMORY_LIMIT_WEBAPP
-  description: Maximum memory limit for pod
-  value: '4Gi'
 - name: MEMORY_REQUEST_WEBAPP_GO
   description: Memory request for pod
   value: '2Gi'
@@ -358,9 +311,6 @@ parameters:
 - name: MEMORY_LIMIT_REPOSCAN
   description: Maximum memory limit for pod
   value: '2Gi'
-- name: REPLICAS_WEBAPP
-  description: Number of pods for webapp
-  value: '2'
 - name: REPLICAS_WEBAPP_GO
   description: Number of pods for webapp-go
   value: '2'
@@ -389,27 +339,15 @@ parameters:
 - name: REPOSCAN_LOGGING_LEVEL_LIBS
   description: Logging level in libs code
   value: WARNING
-- name: WEBAPP_LOGGING_LEVEL_LIBS
-  description: Logging level in libs code
-  value: INFO
 - name: LOGGING_TYPE
   description: Type of logging in webapp
   value: OPENSHIFT
 - name: LOG_STYLE
   description: Type of logging in webapp-go
   value: json
-- name: MAX_VMAAS_SERVERS
-  description: Maximum servers count of webapp
-  value: '1'
 - name: GOMAXPROCS_WEBAPP
   description: Maximum threads for webapp-go
   value: '2'
-- name: GZIP_RESPONSE_ENABLE
-  description: Sets GZIP compression in responses
-  value: "on"
-- name: GZIP_COMPRESS_LEVEL
-  description: Level of GZIP compression in responses
-  value: "5"
 - name: BATCH_MAX_SIZE
   description: Max size of batch in reposcan
   value: '500'
@@ -446,9 +384,6 @@ parameters:
   value: https://www.redhat.com/security/data/metrics/cvemap.xml
 - name: CSAF_UNFIXED_EVAL_ENABLED
   value: "TRUE"
-- name: REPO_NAME_PREFIXES
-  description: Repo name prefixes to be stripped
-  value: "rhui-"
 - name: CACHE_REFRESH_INTERVAL
   description: Interval for checking if newer cache exists, in seconds
   value: '60'
