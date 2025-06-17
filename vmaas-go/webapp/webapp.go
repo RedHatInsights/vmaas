@@ -43,6 +43,7 @@ func Run() {
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
 	middlewares.Prometheus().Use(app)
+	middlewares.SetSwagger(app)
 	app.HandleMethodNotAllowed = true
 
 	// routes
