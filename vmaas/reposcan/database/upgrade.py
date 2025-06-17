@@ -9,7 +9,7 @@ import psycopg2
 
 from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger, init_logging
-from vmaas.common.paths import DB_UPGRADES_PATH, USER_CREATE_SQL_PATH, DB_CREATE_SQL_PATH
+from vmaas.common.paths import DB_UPGRADES_PATH, DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 
 LOGGER = get_logger(__name__)
@@ -70,12 +70,8 @@ class DatabaseUpgrade:
                     cur.execute(f"ALTER SYSTEM SET max_stack_depth TO {cfg.pg_max_stack_depth}")
                     cur.execute(f"ALTER DATABASE vmaas SET max_stack_depth TO {cfg.pg_max_stack_depth}")
                     cur.connection.autocommit = False
-                with open(USER_CREATE_SQL_PATH, "r", encoding='utf8') as f_user, \
-                        open(DB_CREATE_SQL_PATH, "r", encoding='utf8') as f_db:
-                    cur.execute(f_user.read())
+                with open(DB_CREATE_SQL_PATH, "r", encoding='utf8') as f_db:
                     cur.execute(f_db.read())
-                    cur.execute(f"ALTER USER vmaas_writer WITH PASSWORD '{cfg.postgresql_writer_password}'")
-                    cur.execute(f"ALTER USER vmaas_reader WITH PASSWORD '{cfg.postgresql_reader_password}'")
 
             conn.commit()
         finally:

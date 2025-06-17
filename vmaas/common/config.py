@@ -27,12 +27,6 @@ class BaseConfig:
     """Base configuration, same for clowder and non-clowder."""
 
     def __init__(self) -> None:
-        self.postgresql_writer_password = os.getenv(
-            "POSTGRESQL_WRITER_PASSWORD", "vmaas_writer_pwd"
-        )
-        self.postgresql_reader_password = os.getenv(
-            "POSTGRESQL_READER_PASSWORD", "vmaas_reader_pwd"
-        )
         self.pod_hostname = os.environ.get("HOSTNAME")
         self.is_init_container = strtobool(os.environ.get("INIT_CONTAINER", "false"))
         self.is_test = strtobool(os.environ.get("IS_TEST", "false"))
