@@ -92,3 +92,23 @@ Webapp-go can be profiled using [/net/http/pprof](https://pkg.go.dev/net/http/pp
 - set `ENABLE_PROFILE=true` in the ClowdApp
 - download the profile file using internal api `/api/vmaas/v1/pprof/{heap|profile|block|mutex|trace}`
 - `go tool pprof <saved.file>`
+
+## Running on disconnected environments
+
+VMaaS Reposcan can run on a disconnected environment, supported by [Katello](https://theforeman.org/plugins/katello/) (Foreman plugin).
+
+Please note, that evaluation of manually fixable / not fixable CVEs is not supported in disconnected environments yet.
+
+The following environment variables can be used to utilize it:
+
+* `SYNC_REPO_LIST_SOURCE=katello`
+* `KATELLO_HOST` -- Katello hostname (and optional port)
+* `KATELLO_API_USER` -- Katello user that has access to list Katello repositories and get debug certificates (i.e. admin)
+* `KATELLO_API_PASS` -- password of the Katello user
+* `REDHAT_CVEMAP_URL` -- full URL of [`cvemap.xml`](https://www.redhat.com/security/data/metrics/cvemap.xml) location
+
+Make sure to mount Katello CA certificate to the reposcan container's path `/katello-server-ca.crt`.
+
+Please note, that the service supports only a basic authentication to Katello.
+
+The `cvemap.xml` is expected to be updated regularly outside of this service.
