@@ -1113,13 +1113,6 @@
         },
         "type": "object"
       }
-    },
-    "securitySchemes": {
-      "": {
-        "in": "header",
-        "name": "x-rh-identity",
-        "type": "apiKey"
-      }
     }
   },
   "info": {
@@ -1129,7 +1122,7 @@
       "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
     },
     "title": "VMaaS webapp API",
-    "version": "2.97.4"
+    "version": "2.98.0"
   },
   "externalDocs": {
     "description": "",
@@ -1202,11 +1195,6 @@
             "description": "Bad Request"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for CVEs"
       }
     },
@@ -1276,11 +1264,6 @@
             "description": "Bad Request"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for a CVE"
       }
     },
@@ -1319,11 +1302,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get last-updated times from VMaaS DB"
       }
     },
@@ -1393,11 +1371,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for errata"
       }
     },
@@ -1467,11 +1440,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for an erratum"
       }
     },
@@ -1530,86 +1498,7 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get OS vulnerability report"
-      }
-    },
-    "/package_name/srpms": {
-      "post": {
-        "description": "Get content sets with associated RPM names by SRPM and content sets.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest"
-              }
-            }
-          },
-          "description": "srpm_name_list",
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/vmaas.SRPMPkgNames"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Internal Server Error"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
-        "summary": "Get content sets with associated RPM names by SRPM and content sets"
       }
     },
     "/package_names/rpms": {
@@ -1678,11 +1567,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get a list of content sets by RPM name and content sets"
       }
     },
@@ -1752,12 +1636,76 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get a list of content sets by RPM name"
+      }
+    },
+    "/package_names/srpms": {
+      "post": {
+        "description": "Get content sets with associated RPM names by SRPM and content sets.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest"
+              }
+            }
+          },
+          "description": "srpm_name_list",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vmaas.SRPMPkgNames"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "424": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Failed Dependency"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/utils.ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get content sets with associated RPM names by SRPM and content sets"
       }
     },
     "/package_names/srpms/{srpm}": {
@@ -1826,11 +1774,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get content sets with associated RPM names by SRPM"
       }
     },
@@ -1900,11 +1843,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for packages"
       }
     },
@@ -1974,11 +1912,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for a package"
       }
     },
@@ -2048,11 +1981,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get patches for packages"
       }
     },
@@ -2122,11 +2050,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get patches for a package"
       }
     },
@@ -2184,11 +2107,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for all packages"
       }
     },
@@ -2258,11 +2176,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get NEVRA trees for package names"
       }
     },
@@ -2332,11 +2245,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get NEVRA tree for a package name"
       }
     },
@@ -2406,11 +2314,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for repositories"
       }
     },
@@ -2480,11 +2383,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get details for a repository"
       }
     },
@@ -2554,11 +2452,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get updates for packages"
       }
     },
@@ -2628,11 +2521,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get updates for a package"
       }
     },
@@ -2671,11 +2559,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get VMaaS version"
       }
     },
@@ -2752,11 +2635,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get vulnerabilities for packages"
       }
     },
@@ -2826,11 +2704,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "RhIdentity": []
-          }
-        ],
         "summary": "Get vulnerabilities for a package"
       }
     }
