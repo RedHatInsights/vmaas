@@ -15,6 +15,8 @@ import multiprocessing
 from enum import StrEnum
 from functools import reduce
 from pathlib import Path
+from datetime import datetime
+from datetime import timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import connexion
@@ -1134,11 +1136,14 @@ def create_app(specs):
     init_logging()
     SyncTask.init()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+    startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360"))
     if sync_interval > 0:
+        next_run_time = datetime.now() + timedelta(minutes=startup_sync_delay)
         sched = BackgroundScheduler()
-        sched.add_job(periodic_sync, trigger="interval", minutes=sync_interval)
+        sched.add_job(periodic_sync, trigger="interval", minutes=sync_interval, next_run_time=next_run_time)
         sched.start()
+        LOGGER.info("Running initial sync in %s minute(s).", startup_sync_delay)
         LOGGER.info("Periodic syncing running every %s minute(s).", sync_interval)
     else:
         LOGGER.info("Periodic syncing disabled.")
