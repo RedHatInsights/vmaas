@@ -52,6 +52,7 @@ from vmaas.reposcan.database.release_graph_store import ReleaseGraphStore
 
 LOGGER = get_logger(__name__)
 KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+ORIGINAL_SIG_HANDLERS = {}
 CFG = Config()
 
 DEFAULT_CHUNK_SIZE = "1048576"
@@ -1153,13 +1154,24 @@ def create_app(specs):
     else:
         LOGGER.warning("Unsupported repository list source: %s", SYNC_REPO_LIST_SOURCE)
 
-    def terminate(*_):
+    def terminate(signum, *_):
         """Trigger shutdown."""
         LOGGER.info("Signal received, stopping application.")
+        if SyncTask.is_running():
+            SyncTask.cancel()
         # Kill background pool
-        SyncTask.cancel()
+        SyncTask.workers.terminate()
+
+        # Re-raise signal to Uvicorn
+        for sig, handler in ORIGINAL_SIG_HANDLERS.items():
+            signal.signal(sig, handler)
+        signal.raise_signal(signum)
 
     for sig in KILL_SIGNALS:
+        # From Uvicorn server
+        orig_handler = signal.getsignal(sig)
+        if orig_handler:
+            ORIGINAL_SIG_HANDLERS[sig] = orig_handler
         signal.signal(sig, terminate)
 
     app = connexion.AsyncApp(__name__, swagger_ui_options=connexion.options.SwaggerUIOptions(swagger_ui=True))
