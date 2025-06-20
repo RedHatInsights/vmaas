@@ -69,6 +69,9 @@ types-pyOpenSSL = "*"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.basedpyright]
+typeCheckingMode = "off"
+
 [tool.mypy]
 disallow_any_generics = true
 disallow_untyped_defs = true

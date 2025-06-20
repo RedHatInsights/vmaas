@@ -5,11 +5,11 @@ Main entrypoint of reposcan tool. It provides and API and allows to sync specifi
 into specified PostgreSQL database.
 """
 
+import atexit
 import base64
 import json
 import os
 import shutil
-import signal
 from multiprocessing.pool import Pool
 import multiprocessing
 from enum import StrEnum
@@ -49,7 +49,6 @@ from vmaas.reposcan.redhatreleasegraph.modeling import ReleaseGraph
 from vmaas.reposcan.database.release_graph_store import ReleaseGraphStore
 
 LOGGER = get_logger(__name__)
-KILL_SIGNALS = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 CFG = Config()
 
 DEFAULT_CHUNK_SIZE = "1048576"
@@ -1088,6 +1087,8 @@ class SyncTask:
     @classmethod
     def start(cls, task_type, func, callback, *args, **kwargs):
         """Start specified function with given parameters in separate worker."""
+        if cls.workers is None:
+            raise RuntimeError("SyncTask not initialized")
         cls._process = cls.workers._pool[0]  # pylint: disable=protected-access
         cls._running_task_type = task_type
 
@@ -1116,10 +1117,28 @@ class SyncTask:
 
     @classmethod
     def cancel(cls):
-        """Terminate the process pool."""
-        cls._process.terminate()
-        cls._process.join()
+        """Terminate the current running sync task."""
+        if cls._process is not None:
+            try:
+                cls._process.terminate()
+                cls._process.join()
+            except Exception as err:  # pylint: disable=broad-except
+                LOGGER.warning("Error terminating sync process: %s", err)
         cls.finish()
+
+    @classmethod
+    def shutdown(cls):
+        """Shutdown the entire worker pool during application shutdown."""
+        # First cancel any running task
+        cls.cancel()
+        
+        # Then terminate the worker pool
+        if cls.workers is not None:
+            try:
+                cls.workers.terminate()
+                cls.workers.join()
+            except Exception as err:  # pylint: disable=broad-except
+                LOGGER.warning("Error terminating worker pool: %s", err)
 
 
 def periodic_sync():
@@ -1134,11 +1153,32 @@ def create_app(specs):
     init_logging()
     SyncTask.init()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+    
+    # Register cleanup handler for graceful shutdown
+    def cleanup_sync_tasks():
+        """Clean up running sync tasks on application shutdown."""
+        LOGGER.info("Application shutting down, performing cleanup.")
+        
+        # Shutdown periodic scheduler if running
+        if scheduler is not None:
+            try:
+                LOGGER.info("Shutting down periodic scheduler.")
+                scheduler.shutdown(wait=False)
+            except Exception as err:  # pylint: disable=broad-except
+                LOGGER.warning("Error shutting down scheduler: %s", err)
+        
+        # Shutdown sync tasks and worker pool
+        LOGGER.info("Shutting down sync tasks.")
+        SyncTask.shutdown()
+    
+    atexit.register(cleanup_sync_tasks)
+    # Store scheduler reference for cleanup
+    scheduler = None
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360"))
     if sync_interval > 0:
-        sched = BackgroundScheduler()
-        sched.add_job(periodic_sync, trigger="interval", minutes=sync_interval)
-        sched.start()
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(periodic_sync, trigger="interval", minutes=sync_interval)
+        scheduler.start()
         LOGGER.info("Periodic syncing running every %s minute(s).", sync_interval)
     else:
         LOGGER.info("Periodic syncing disabled.")
@@ -1148,14 +1188,8 @@ def create_app(specs):
     else:
         LOGGER.warning("Unsupported repository list source: %s", SYNC_REPO_LIST_SOURCE)
 
-    def terminate(*_):
-        """Trigger shutdown."""
-        LOGGER.info("Signal received, stopping application.")
-        # Kill background pool
-        SyncTask.cancel()
-
-    for sig in KILL_SIGNALS:
-        signal.signal(sig, terminate)
+    # Let uvicorn handle signals for graceful shutdown
+    # Custom shutdown cleanup is handled in the SyncTask class methods
 
     app = connexion.AsyncApp(__name__, swagger_ui_options=connexion.options.SwaggerUIOptions(swagger_ui=True))
 
