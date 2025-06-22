@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas/docs"
 
-	swaggerFiles "github.com/swaggo/files"
+	swaggerFiles "github.com/swaggo/files/v2"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
