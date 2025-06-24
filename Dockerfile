@@ -71,6 +71,8 @@ ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common
 
+ADD /vmaas-go/docs/openapi.json     /vmaas/go/src/vmaas/docs/v3/
+
 ADD /vmaas/reposcan/redhatrelease/gen_package_profile.py /usr/local/bin
 
 ADD VERSION /vmaas/
