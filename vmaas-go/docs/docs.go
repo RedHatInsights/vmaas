@@ -13,7 +13,7 @@ type openapiData struct {
 
 var appVersions = map[int]openapiData{
 	3: {
-		filepath: "./docs/openapi.json",
+		filepath: "/vmaas/go/src/vmaas/docs/v3/openapi.json",
 		url:      "/api/vmaas/v3/openapi.json",
 	},
 }
