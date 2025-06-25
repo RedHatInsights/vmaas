@@ -12,5 +12,5 @@ func SetSwagger(app *gin.Engine) {
 	// Serving openapi docs
 	openapiURL := docs.Init(app)
 	url := ginSwagger.URL(openapiURL)
-	app.GET("/openapi/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	app.GET("/api/vmaas/v3/ui/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
