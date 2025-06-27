@@ -78,6 +78,8 @@ class KatelloApi:
                 msg = f"Katello CA certificate is missing in path '{KATELLO_CA_CERT_PATH}'."
                 raise KatelloApiException(msg)
 
+        if self.api_user:
+            kwargs["auth"] = (self.api_user, self.api_pass)
 
         if json:
             headers = {"Accept": "application/json"}
@@ -90,7 +92,6 @@ class KatelloApi:
                 url=url,
                 headers=headers,
                 timeout=timeout,
-                auth=(self.api_user, self.api_pass),
                 **kwargs,
             )
             if response.status_code == 200:
