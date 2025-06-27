@@ -37,7 +37,7 @@ from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
-from vmaas.reposcan.katello import KatelloApi, KATELLO_HOST, KATELLO_API_USER, KATELLO_API_PASS
+from vmaas.reposcan.katello import KatelloApi, KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
     REGISTRY
@@ -558,10 +558,10 @@ class KatelloRepoListHandler(RepolistImportHandler):
         """Start importing from Katello"""
         init_logging()
         init_db()
-        if not KATELLO_HOST or not KATELLO_API_USER or not KATELLO_API_PASS:
-            LOGGER.warning("KATELLO_HOST, KATELLO_API_USER or KATELLO_API_PASS not set, skipping download of repositories from Katello.")
+        if not KATELLO_URL or not KATELLO_API_USER or not KATELLO_API_PASS:
+            LOGGER.warning("KATELLO_URL, KATELLO_API_USER or KATELLO_API_PASS not set, skipping download of repositories from Katello.")
             return "SKIPPED"
-        katello_api = KatelloApi(KATELLO_HOST, KATELLO_API_USER, KATELLO_API_PASS)
+        katello_api = KatelloApi(KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS)
         products, repos, success = katello_api.get_products_repos()
         if not success:
             return "ERROR"
