@@ -4,6 +4,7 @@ Module containing code interacting with Satellite/Katello server.
 import os
 import shutil
 import tempfile
+from urllib.parse import urlparse
 
 from requests import Session
 from requests.adapters import HTTPAdapter
@@ -15,7 +16,7 @@ from vmaas.reposcan.database.repository_store import RepositoryStore
 
 LOGGER = get_logger(__name__)
 
-KATELLO_HOST = os.getenv("KATELLO_HOST", "")  # satellite.example.com
+KATELLO_URL = os.getenv("KATELLO_URL", "")  # https://satellite.example.com
 KATELLO_API_USER = os.getenv("KATELLO_API_USER", "admin")
 KATELLO_API_PASS = os.getenv("KATELLO_API_PASS", "changeme")
 
@@ -34,8 +35,8 @@ class KatelloApiException(Exception):
 
 class KatelloApi:
     """Class used to obtain information from Satellite/Katello API."""
-    def __init__(self, hostname: str, api_user: str, api_pass: str):
-        self.hostname: str = hostname
+    def __init__(self, url: str, api_user: str, api_pass: str):
+        self.url: str = url
         self.api_user: str = api_user
         self.api_pass: str = api_pass
 
@@ -68,16 +69,20 @@ class KatelloApi:
         self, endpoint, json=True, timeout=30, **kwargs
     ) -> dict:
         """Sends request to Katello server/API"""
-        if not os.path.isfile(KATELLO_CA_CERT_PATH):
-            msg = f"Katello CA certificate is missing in path '{KATELLO_CA_CERT_PATH}'."
-            raise KatelloApiException(msg)
+        url = f"{self.url}{endpoint}"
+        parsed_url = urlparse(url)
+
+        if parsed_url.scheme == "https":
+            kwargs["verify"] = KATELLO_CA_CERT_PATH
+            if not os.path.isfile(KATELLO_CA_CERT_PATH):
+                msg = f"Katello CA certificate is missing in path '{KATELLO_CA_CERT_PATH}'."
+                raise KatelloApiException(msg)
+
 
         if json:
             headers = {"Accept": "application/json"}
         else:
             headers = {}
-
-        url = f"https://{self.hostname}{endpoint}"
 
         try:
             response = self.session.request(
@@ -86,7 +91,6 @@ class KatelloApi:
                 headers=headers,
                 timeout=timeout,
                 auth=(self.api_user, self.api_pass),
-                verify=KATELLO_CA_CERT_PATH,
                 **kwargs,
             )
             if response.status_code == 200:
