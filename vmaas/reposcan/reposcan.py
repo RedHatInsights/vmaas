@@ -558,8 +558,8 @@ class KatelloRepoListHandler(RepolistImportHandler):
         """Start importing from Katello"""
         init_logging()
         init_db()
-        if not KATELLO_URL or not KATELLO_API_USER or not KATELLO_API_PASS:
-            LOGGER.warning("KATELLO_URL, KATELLO_API_USER or KATELLO_API_PASS not set, skipping download of repositories from Katello.")
+        if not KATELLO_URL:
+            LOGGER.warning("KATELLO_URL not set, skipping download of repositories from Katello.")
             return "SKIPPED"
         katello_api = KatelloApi(KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS)
         products, repos, success = katello_api.get_products_repos()
