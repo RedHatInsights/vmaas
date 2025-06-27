@@ -206,8 +206,8 @@ objects:
           value: ${ALLOWED_LONG_TERM_RELEASES}
         - name: SYNC_REPO_LIST_SOURCE
           value: ${SYNC_REPO_LIST_SOURCE}
-        - name: KATELLO_HOST
-          value: ${KATELLO_HOST}
+        - name: KATELLO_URL
+          value: ${KATELLO_URL}
         - name: KATELLO_API_USER
           value: ${KATELLO_API_USER}
         - name: KATELLO_API_PASS
@@ -422,8 +422,8 @@ parameters:
 - name: SYNC_REPO_LIST_SOURCE
   description: Source of input repolist for automatic repo sync. Supported values - manual, git, katello
   value: git
-- name: KATELLO_HOST
-  description: Hostname of Satellite/Katello server. (unused in cloud environment)
+- name: KATELLO_URL
+  description: URL of Satellite/Katello server. (unused in cloud environment)
 - name: KATELLO_API_USER
   description: User name to access Katello API using basic auth. (unused in cloud environment)
   value: admin

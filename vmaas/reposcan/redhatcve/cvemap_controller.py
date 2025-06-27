@@ -10,7 +10,7 @@ from vmaas.common.date_utils import parse_datetime, now
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.cvemap_store import CvemapStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
-from vmaas.reposcan.katello import KATELLO_HOST, KATELLO_CA_CERT_PATH
+from vmaas.reposcan.katello import KATELLO_URL, KATELLO_CA_CERT_PATH
 from vmaas.reposcan.mnm import FAILED_CVEMAP
 from vmaas.reposcan.redhatcve.cvemap import CvemapHead, CvemapBody
 
@@ -39,7 +39,7 @@ class CvemapController:
 
     @staticmethod
     def _get_ca_cert() -> str | None:
-        if KATELLO_HOST and KATELLO_HOST in URL and os.path.isfile(KATELLO_CA_CERT_PATH):
+        if KATELLO_URL and URL.startswith(KATELLO_URL) and os.path.isfile(KATELLO_CA_CERT_PATH):
             return KATELLO_CA_CERT_PATH
         return None
 
