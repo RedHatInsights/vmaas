@@ -102,9 +102,9 @@ Please note, that evaluation of manually fixable / not fixable CVEs is not suppo
 The following environment variables can be used to utilize it:
 
 * `SYNC_REPO_LIST_SOURCE=katello`
-* `KATELLO_HOST` -- Katello hostname (and optional port)
-* `KATELLO_API_USER` -- Katello user that has access to list Katello repositories and get debug certificates (i.e. admin)
-* `KATELLO_API_PASS` -- password of the Katello user
+* `KATELLO_URL` -- Katello URL (ex: `https://foreman.example.com`)
+* `KATELLO_API_USER` -- (Optional) Katello user that has access to list Katello repositories and get debug certificates (i.e. admin)
+* `KATELLO_API_PASS` -- (Optional) password of the Katello user
 * `REDHAT_CVEMAP_URL` -- full URL of [`cvemap.xml`](https://www.redhat.com/security/data/metrics/cvemap.xml) location
 
 Make sure to mount Katello CA certificate to the reposcan container's path `/katello-server-ca.crt`.
