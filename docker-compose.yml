@@ -84,7 +84,7 @@ services:
       - 9090:9090
     depends_on:
       - vmaas_reposcan
-      - vmaas_webapp
+      - vmaas_webapp_go
     restart: unless-stopped
     profiles:
       - monitoring
