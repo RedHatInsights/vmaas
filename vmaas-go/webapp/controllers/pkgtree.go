@@ -17,7 +17,6 @@ import (
 //	@Param			package_name	path	string	true	"package name"
 //	@Success		200	{object}	vmaas.PkgTree
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/pkgtree/{package_name} [get]
@@ -47,7 +46,6 @@ func PkgTreeHandler(c *gin.Context) {
 //	@Param			package_name_list	body	vmaas.PkgTreeRequest	true	"package_name_list"
 //	@Success		200	{object}	vmaas.PkgTree
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/pkgtree [post]

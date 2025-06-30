@@ -2,12 +2,9 @@ package webapp
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"github.com/redhatinsights/vmaas/base"
 	"github.com/redhatinsights/vmaas/base/core"
 	"github.com/redhatinsights/vmaas/base/utils"
@@ -48,7 +45,6 @@ func Run() {
 
 	// routes
 	core.InitProbes(app)
-	app.NoRoute(vmaasProxy)
 	for _, path := range basepaths {
 		api := app.Group(path)
 		routes.InitAPI(api)
@@ -64,30 +60,6 @@ func Run() {
 		panic(err)
 	}
 	utils.LogInfo("webapp completed")
-}
-
-func vmaasProxy(c *gin.Context) {
-	u, err := url.Parse(utils.Cfg.OGWebappAddress)
-	if err != nil {
-		panic(err)
-	}
-	c.Request.RequestURI = ""
-	c.Request.URL.Scheme = u.Scheme
-	c.Request.URL.Host = u.Host
-	res, err := http.DefaultClient.Do(c.Request)
-	if err != nil {
-		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "error making http request"))
-		return
-	}
-	defer res.Body.Close()
-
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		utils.LogAndRespFailedDependency(c, errors.Wrap(err, "could not read response body"))
-		return
-	}
-	c.Header("Content-Encoding", res.Header.Get("Content-Encoding"))
-	c.Data(res.StatusCode, res.Header.Get("Content-Type"), resBody)
 }
 
 // run net/http/pprof on privatePort

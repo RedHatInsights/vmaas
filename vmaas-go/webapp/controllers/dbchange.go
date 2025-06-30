@@ -13,7 +13,6 @@ import (
 //	@Description	Get last-updated times from VMaaS DB.
 //	@Produce		json
 //	@Success		200	{object}	vmaas.DBChange
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/dbchange [get]
 func DBChangeHandler(c *gin.Context) {

@@ -16,7 +16,7 @@ import (
 //	@Produce		json
 //	@Param			cve	path	string	true	"CVE"
 //	@Success		200				{object}	vmaas.Cves
-//	@Failure		400,424,500,503	{object}	utils.ErrorResponse
+//	@Failure		400,500,503	{object}	utils.ErrorResponse
 //	@Router			/cves/{cve} [get]
 func CvesHandler(c *gin.Context) {
 	if !isCacheLoaded(c) {
@@ -41,7 +41,7 @@ func CvesHandler(c *gin.Context) {
 //	@Produce		json
 //	@Param			cve_list	body	vmaas.CvesRequest	true	"cve_list"
 //	@Success		200				{object}	vmaas.Cves
-//	@Failure		400,424,500,503	{object}	utils.ErrorResponse
+//	@Failure		400,500,503	{object}	utils.ErrorResponse
 //	@Router			/cves [post]
 //
 //nolint:lll

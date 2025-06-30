@@ -18,7 +18,6 @@ import (
 //	@Param			repo	path	string	true	"repository"
 //	@Success		200	{object}	vmaas.Repos
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/repos/{repo} [get]
@@ -46,7 +45,6 @@ func ReposHandler(c *gin.Context) {
 //	@Param			repository_list	body	vmaas.ReposRequest	true	"repository_list"
 //	@Success		200	{object}	vmaas.Repos
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/repos [post]
