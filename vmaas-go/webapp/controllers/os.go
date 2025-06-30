@@ -15,7 +15,6 @@ import (
 //	@Produce		json
 //	@Success		200	{object}	vmaas.VulnerabilityReport
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/os/vulnerability/report [get]

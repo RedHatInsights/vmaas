@@ -17,7 +17,6 @@ import (
 //	@Param			erratum	path	string	true	"erratum"
 //	@Success		200	{object}	vmaas.Errata
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/errata/{erratum} [get]
@@ -47,7 +46,6 @@ func ErrataHandler(c *gin.Context) {
 //	@Param			errata_list	body	vmaas.ErrataRequest	true	"errata_list"
 //	@Success		200	{object}	vmaas.Errata
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/errata [post]

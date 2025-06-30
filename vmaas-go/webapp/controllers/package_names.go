@@ -17,7 +17,6 @@ import (
 //	@Param			rpm	path	string	true	"RPM name"
 //	@Success		200	{object}	vmaas.RPMPkgNames
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/package_names/rpms/{rpm} [get]
@@ -45,7 +44,6 @@ func RPMPkgNamesHandler(c *gin.Context) {
 //	@Param			rpm_name_list	body	vmaas.RPMPkgNamesRequest	true	"rpm_name_list"
 //	@Success		200	{object}	vmaas.RPMPkgNames
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/package_names/rpms [post]
@@ -76,7 +74,6 @@ func RPMPkgNamesPostHandler(c *gin.Context) {
 //	@Param			srpm	path	string	true	"SRPM name"
 //	@Success		200	{object}	vmaas.SRPMPkgNames
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/package_names/srpms/{srpm} [get]
@@ -104,7 +101,6 @@ func SRPMPkgNamesHandler(c *gin.Context) {
 //	@Param			srpm_name_list	body	vmaas.SRPMPkgNamesRequest	true	"srpm_name_list"
 //	@Success		200	{object}	vmaas.SRPMPkgNames
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/package_names/srpms [post]

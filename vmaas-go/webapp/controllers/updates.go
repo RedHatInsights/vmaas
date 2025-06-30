@@ -17,7 +17,6 @@ import (
 //	@Param			package	path	string	true	"NEVRA"
 //	@Success		200	{object}	vmaas.Updates
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/updates/{package} [get]
@@ -45,7 +44,6 @@ func UpdatesHandler(c *gin.Context) {
 //	@Param			package_list	body	vmaas.Request	true	"package_list"
 //	@Success		200	{object}	vmaas.Updates
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/updates [post]

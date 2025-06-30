@@ -17,7 +17,6 @@ import (
 //	@Param			package	path	string	true	"NEVRA"
 //	@Success		200	{object}	vmaas.Vulnerabilities
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/vulnerabilities/{package} [get]
@@ -46,7 +45,6 @@ func VulnerabilitiesHandler(c *gin.Context) {
 //	@Success		200	{object}	vmaas.Vulnerabilities
 //	@Success		200	{object}	vmaas.VulnerabilitiesExtended	"if request.extended"
 //	@Failure		400	{object}	utils.ErrorResponse
-//	@Failure		424	{object}	utils.ErrorResponse
 //	@Failure		500	{object}	utils.ErrorResponse
 //	@Failure		503	{object}	utils.ErrorResponse
 //	@Router			/vulnerabilities [post]
