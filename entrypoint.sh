@@ -22,12 +22,7 @@ if [[ "$1" == "database-upgrade" ]]; then
 fi
 
 if [[ ! -z $1 ]]; then
-    if [[ "$1" == "webapp" ]]; then
-        cd vmaas/webapp
-        port=$(public_port)
-        [[ ! -z $QE_BUILD ]] && cmd="sleep infinity" || cmd="uvicorn --host 0.0.0.0 --port $port --no-access-log main:app"
-        exec python3.12 -m vmaas.common.wait_for_services $cmd
-    elif [[ "$1" == "webapp-go" ]]; then
+    if [[ "$1" == "webapp-go" ]]; then
         cd go/src/vmaas
         exec ./main webapp
     elif [[ "$1" == "reposcan" ]]; then
