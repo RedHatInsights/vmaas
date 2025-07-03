@@ -1122,7 +1122,7 @@
       "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
     },
     "title": "VMaaS webapp API",
-    "version": "2.102.0"
+    "version": "2.103.0"
   },
   "externalDocs": {
     "description": "",
@@ -1155,16 +1155,6 @@
             "description": "OK"
           },
           "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "424": {
             "content": {
               "application/json": {
                 "schema": {
@@ -1233,16 +1223,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -1280,16 +1260,6 @@
               }
             },
             "description": "OK"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "503": {
             "content": {
@@ -1339,16 +1309,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -1409,16 +1369,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -1466,16 +1416,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -1536,16 +1476,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -1604,16 +1534,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -1674,16 +1594,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -1742,16 +1652,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -1812,16 +1712,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -1880,16 +1770,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -1950,16 +1830,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -2019,16 +1889,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -2086,16 +1946,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "503": {
             "content": {
               "application/json": {
@@ -2144,16 +1994,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -2214,16 +2054,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -2282,16 +2112,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -2352,16 +2172,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -2420,16 +2230,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -2490,16 +2290,6 @@
             },
             "description": "Bad Request"
           },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
-          },
           "500": {
             "content": {
               "application/json": {
@@ -2537,16 +2327,6 @@
               }
             },
             "description": "OK"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "503": {
             "content": {
@@ -2603,16 +2383,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
@@ -2672,16 +2442,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "424": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/utils.ErrorResponse"
-                }
-              }
-            },
-            "description": "Failed Dependency"
           },
           "500": {
             "content": {
