@@ -9,6 +9,7 @@
 VMaaS is intended to be a microservice that has access to data connecting RPMs,
 repositories, errata, and CVEs, and can answer the question "What security changes do I
 have to apply to the following set of RPMs?"
+TEST
 
 The goal is to have a common set of data, that can be updated from multiple sources, and
 accessed from an arbitrary number of web-service instances. To that end, `database`
