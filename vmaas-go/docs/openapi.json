@@ -32,15 +32,21 @@
             "type": "string"
           },
           "module_name": {
+            "example": "rhn-tools",
             "type": "string"
           },
           "module_stream": {
+            "example": "1",
             "type": "string"
           },
           "package_name": {
             "type": "string"
           }
         },
+        "required": [
+          "module_name",
+          "module_stream"
+        ],
         "type": "object"
       },
       "vmaas.ContentData": {
@@ -56,18 +62,25 @@
       "vmaas.CveDetail": {
         "properties": {
           "cvss2_metrics": {
+            "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
             "type": "string"
           },
           "cvss2_score": {
+            "example": "5.600",
             "type": "string"
           },
           "cvss3_metrics": {
+            "example": "AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N",
             "type": "string"
           },
           "cvss3_score": {
+            "example": "5.1",
             "type": "string"
           },
           "cwe_list": {
+            "example": [
+              "CWE-20"
+            ],
             "items": {
               "type": "string"
             },
@@ -75,9 +88,13 @@
             "uniqueItems": false
           },
           "description": {
+            "example": "description text",
             "type": "string"
           },
           "errata_list": {
+            "example": [
+              "RHSA-2015:1981"
+            ],
             "items": {
               "type": "string"
             },
@@ -85,12 +102,27 @@
             "uniqueItems": false
           },
           "impact": {
+            "enum": [
+              "NotSet",
+              "None",
+              "Low",
+              "Medium",
+              "Moderate",
+              "Important",
+              "High",
+              "Critical"
+            ],
             "type": "string"
           },
           "modified_date": {
+            "example": "2018-03-31T01:29:00+00:00",
+            "format": "date-time",
             "type": "string"
           },
           "package_list": {
+            "example": [
+              "nss-devel-3.16.1-9.el6_5.x86_64"
+            ],
             "items": {
               "type": "string"
             },
@@ -98,15 +130,22 @@
             "uniqueItems": false
           },
           "public_date": {
+            "example": "2018-01-04T13:29:00+00:00",
+            "format": "date-time",
             "type": "string"
           },
           "redhat_url": {
+            "example": "https://access.redhat.com/security/cve/cve-2017-5715",
             "type": "string"
           },
           "secondary_url": {
+            "example": "https://seconday.url.com",
             "type": "string"
           },
           "source_package_list": {
+            "example": [
+              "nss-devel-3.16.1-9.el6_5.src"
+            ],
             "items": {
               "type": "string"
             },
@@ -114,6 +153,7 @@
             "uniqueItems": false
           },
           "synopsis": {
+            "example": "CVE-2017-5715",
             "type": "string"
           }
         },
@@ -131,6 +171,7 @@
             "$ref": "#/components/schemas/vmaas.CveDetails"
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "page": {
@@ -148,6 +189,9 @@
       "vmaas.CvesRequest": {
         "properties": {
           "cve_list": {
+            "example": [
+              "CVE-2017-57.*"
+            ],
             "items": {
               "type": "string"
             },
@@ -155,44 +199,62 @@
             "uniqueItems": false
           },
           "errata_associated": {
+            "description": "Return only those CVEs which are associated with at least one errata. Defaults to false.",
             "type": "boolean"
           },
           "modified_since": {
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "page": {
+            "example": 1,
             "type": "integer"
           },
           "page_size": {
+            "example": 10,
             "type": "integer"
           },
           "published_since": {
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "rh_only": {
             "type": "boolean"
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \\\"third party\\\" repositories into the response, disabled by default.",
             "type": "boolean"
           }
         },
+        "required": [
+          "cve_list"
+        ],
         "type": "object"
       },
       "vmaas.DBChange": {
+        "description": "VMaaS DB last-updated time stramps",
         "properties": {
           "cve_changes": {
+            "example": "2024-11-20T12:26:20.009512Z",
             "type": "string"
           },
           "errata_changes": {
+            "example": "2024-11-20T12:24:23.488871Z",
             "type": "string"
           },
           "exported": {
+            "example": "2024-11-20T12:37:47.605526Z",
             "type": "string"
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "repository_changes": {
+            "example": "2024-11-20T12:24:23.486827Z",
             "type": "string"
           }
         },
@@ -204,6 +266,7 @@
             "$ref": "#/components/schemas/vmaas.ErratumDetails"
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "page": {
@@ -217,12 +280,22 @@
           },
           "severity": {
             "items": {
+              "enum": [
+                "Low",
+                "Moderate",
+                "Important",
+                "Critical",
+                "null"
+              ],
               "type": "string"
             },
             "type": "array",
             "uniqueItems": false
           },
           "type": {
+            "example": [
+              "security"
+            ],
             "items": {
               "type": "string"
             },
@@ -235,6 +308,9 @@
       "vmaas.ErrataRequest": {
         "properties": {
           "errata_list": {
+            "example": [
+              "RHSA-2018:05.*"
+            ],
             "items": {
               "type": "string"
             },
@@ -242,25 +318,41 @@
             "uniqueItems": false
           },
           "modified_since": {
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "page": {
+            "example": 1,
             "type": "integer"
           },
           "page_size": {
+            "example": 10,
             "type": "integer"
           },
           "severity": {
             "items": {
+              "enum": [
+                "Low",
+                "Moderate",
+                "Important",
+                "Critical",
+                "null"
+              ],
               "type": "string"
             },
             "type": "array",
             "uniqueItems": false
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \\\"third party\\\" repositories into the response, disabled by default.",
             "type": "boolean"
           },
           "type": {
+            "example": [
+              "security"
+            ],
             "items": {
               "type": "string"
             },
@@ -268,11 +360,17 @@
             "uniqueItems": false
           }
         },
+        "required": [
+          "errata_list"
+        ],
         "type": "object"
       },
       "vmaas.ErratumDetail": {
         "properties": {
           "bugzilla_list": {
+            "example": [
+              "1519778"
+            ],
             "items": {
               "type": "string"
             },
@@ -280,6 +378,9 @@
             "uniqueItems": false
           },
           "cve_list": {
+            "example": [
+              "CVE-2017-5715"
+            ],
             "items": {
               "type": "string"
             },
@@ -287,9 +388,12 @@
             "uniqueItems": false
           },
           "description": {
+            "example": "description text",
             "type": "string"
           },
           "issued": {
+            "example": "2018-03-13T17:31:28+00:00",
+            "format": "date-time",
             "type": "string"
           },
           "modules_list": {
@@ -300,6 +404,9 @@
             "uniqueItems": false
           },
           "package_list": {
+            "example": [
+              "kernel-2.6.32-696.23.1.el6.x86_64"
+            ],
             "items": {
               "type": "string"
             },
@@ -307,6 +414,9 @@
             "uniqueItems": false
           },
           "reference_list": {
+            "example": [
+              "classification-RHSA-2018:0512"
+            ],
             "items": {
               "type": "string"
             },
@@ -314,6 +424,9 @@
             "uniqueItems": false
           },
           "release_versions": {
+            "example": [
+              "8.1"
+            ],
             "items": {
               "type": "string"
             },
@@ -324,12 +437,23 @@
             "type": "boolean"
           },
           "severity": {
+            "enum": [
+              "Low",
+              "Moderate",
+              "Important",
+              "Critical",
+              "null"
+            ],
             "type": "string"
           },
           "solution": {
+            "example": "solution text",
             "type": "string"
           },
           "source_package_list": {
+            "example": [
+              "kernel-2.6.32-696.23.1.el6.src"
+            ],
             "items": {
               "type": "string"
             },
@@ -337,21 +461,26 @@
             "uniqueItems": false
           },
           "summary": {
+            "example": "summary text",
             "type": "string"
           },
           "synopsis": {
+            "example": "Important: kernel security and bug fix update",
             "type": "string"
           },
           "third_party": {
             "type": "boolean"
           },
           "type": {
+            "example": "security",
             "type": "string"
           },
           "updated": {
+            "example": "2018-03-13T17:31:41+00:00",
             "type": "string"
           },
           "url": {
+            "example": "https://access.redhat.com/errata/RHSA-2018:0512",
             "type": "string"
           }
         },
@@ -408,12 +537,18 @@
       "vmaas.ModuleStreamPtrs": {
         "properties": {
           "module_name": {
+            "example": "rhn-tools",
             "type": "string"
           },
           "module_stream": {
+            "example": "1",
             "type": "string"
           }
         },
+        "required": [
+          "module_name",
+          "module_stream"
+        ],
         "type": "object"
       },
       "vmaas.OSReleaseDetail": {
@@ -464,6 +599,7 @@
       "vmaas.Packages": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "package_list": {
@@ -475,6 +611,9 @@
       "vmaas.PackagesRequest": {
         "properties": {
           "package_list": {
+            "example": [
+              "kernel-2.6.32-696.20.1.el6.x86_64"
+            ],
             "items": {
               "type": "string"
             },
@@ -482,14 +621,22 @@
             "uniqueItems": false
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \"third party\" repositories into the response, disabled by default.",
             "type": "boolean"
           }
         },
+        "required": [
+          "package_list"
+        ],
         "type": "object"
       },
       "vmaas.Patches": {
         "properties": {
           "errata_list": {
+            "example": [
+              "RHSA-2018:0151"
+            ],
             "items": {
               "type": "string"
             },
@@ -497,6 +644,7 @@
             "uniqueItems": false
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           }
         },
@@ -505,6 +653,7 @@
       "vmaas.PkgList": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "package_list": {
@@ -524,6 +673,8 @@
             "type": "integer"
           },
           "total": {
+            "description": "Total number of packages to return.",
+            "example": 100,
             "type": "integer"
           }
         },
@@ -532,15 +683,20 @@
       "vmaas.PkgListItem": {
         "properties": {
           "description": {
+            "example": "My package description",
             "type": "string"
           },
           "modified": {
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "nevra": {
+            "example": "kernel-rt-4.18.0-147.rt24.93.el8.x86_64",
             "type": "string"
           },
           "summary": {
+            "example": "My package summary",
             "type": "string"
           }
         },
@@ -549,6 +705,7 @@
       "vmaas.PkgTree": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "package_name_list": {
@@ -569,6 +726,9 @@
       "vmaas.PkgTreeErratumDetail": {
         "properties": {
           "cve_list": {
+            "example": [
+              "CVE-2018-13405"
+            ],
             "items": {
               "type": "string"
             },
@@ -576,20 +736,30 @@
             "uniqueItems": false
           },
           "issued": {
+            "example": "2019-11-19T09:41:05+00:00",
+            "format": "date-time",
             "type": "string"
           },
           "name": {
+            "example": "RHSA-2019:2730",
             "type": "string"
           },
           "updated": {
+            "example": "2019-11-19T09:41:05+00:00",
+            "format": "date-time",
             "type": "string"
           }
         },
+        "required": [
+          "issued",
+          "name"
+        ],
         "type": "object"
       },
       "vmaas.PkgTreeItem": {
         "properties": {
           "description": {
+            "example": "My package description",
             "type": "string"
           },
           "errata": {
@@ -600,9 +770,12 @@
             "uniqueItems": false
           },
           "first_published": {
+            "description": "Example: 2020-01-13T17:31:41+00:00",
+            "format": "date-time",
             "type": "string"
           },
           "nevra": {
+            "description": "Example: kernel-rt-4.18.0-147.rt24.93.el8.x86_64",
             "type": "string"
           },
           "repositories": {
@@ -613,9 +786,14 @@
             "uniqueItems": false
           },
           "summary": {
+            "example": "My package summary",
             "type": "string"
           }
         },
+        "required": [
+          "first_published",
+          "nevra"
+        ],
         "type": "object"
       },
       "vmaas.PkgTreeItems": {
@@ -630,32 +808,50 @@
       "vmaas.PkgTreeRepoDetail": {
         "properties": {
           "basearch": {
+            "example": "x86_64",
             "type": "string"
           },
           "label": {
+            "example": "rhel-6-server-rpms",
             "type": "string"
           },
           "name": {
+            "example": "Red Hat Enterprise Linux 6 Server (RPMs)",
             "type": "string"
           },
           "organization": {
             "type": "string"
           },
           "releasever": {
+            "example": "6Server",
             "type": "string"
           },
           "revision": {
+            "example": "2019-11-19T09:41:05+00:00",
+            "format": "date-time",
             "type": "string"
           }
         },
+        "required": [
+          "basearch",
+          "label",
+          "name",
+          "releasever",
+          "revision"
+        ],
         "type": "object"
       },
       "vmaas.PkgTreeRequest": {
         "properties": {
           "modified_since": {
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "package_name_list": {
+            "example": [
+              "kernel-rt"
+            ],
             "items": {
               "type": "string"
             },
@@ -663,27 +859,42 @@
             "uniqueItems": false
           },
           "page": {
+            "example": 1,
             "type": "integer"
           },
           "page_size": {
+            "example": 10,
             "type": "integer"
           },
           "return_description": {
+            "default": false,
+            "description": "Include nevra description info into the response.",
             "type": "boolean"
           },
           "return_errata": {
+            "default": true,
+            "description": "Include nevra errata info into the response.",
             "type": "boolean"
           },
           "return_repositories": {
+            "default": true,
+            "description": "Include nevra repositories info into the response.",
             "type": "boolean"
           },
           "return_summary": {
+            "default": false,
+            "description": "Include nevra summary info into the response.",
             "type": "boolean"
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \"third party\" repositories into the response, disabled by default.",
             "type": "boolean"
           }
         },
+        "required": [
+          "package_name_list"
+        ],
         "type": "object"
       },
       "vmaas.RPMData": {
@@ -696,12 +907,12 @@
           },
           "type": "object"
         },
-        "description": "TODO: use `omitzero` from go1.24",
         "type": "object"
       },
       "vmaas.RPMPkgNames": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "rpm_name_list": {
@@ -713,6 +924,9 @@
       "vmaas.RPMPkgNamesRequest": {
         "properties": {
           "content_set_list": {
+            "example": [
+              "rhel-7-desktop-rpms"
+            ],
             "items": {
               "type": "string"
             },
@@ -720,6 +934,9 @@
             "uniqueItems": false
           },
           "rpm_name_list": {
+            "example": [
+              "openssl-libs"
+            ],
             "items": {
               "type": "string"
             },
@@ -727,14 +944,21 @@
             "uniqueItems": false
           }
         },
+        "required": [
+          "rpm_name_list"
+        ],
         "type": "object"
       },
       "vmaas.RepoDetail": {
         "properties": {
           "basearch": {
+            "example": "x86_64",
             "type": "string"
           },
           "cpes": {
+            "example": [
+              "cpe:/a:redhat"
+            ],
             "items": {
               "type": "string"
             },
@@ -742,30 +966,38 @@
             "uniqueItems": false
           },
           "label": {
+            "example": "rhel-6-server-rpms",
             "type": "string"
           },
           "last_change": {
             "type": "string"
           },
           "name": {
+            "example": "Red Hat Enterprise Linux 6 Server (RPMs)",
             "type": "string"
           },
           "organization": {
             "type": "string"
           },
           "product": {
+            "example": "Red Hat Enterprise Linux Server",
             "type": "string"
           },
           "releasever": {
+            "example": "6Server",
             "type": "string"
           },
           "revision": {
+            "example": "2018-03-27T10:55:16+00:00",
             "type": "string"
           },
           "third_party": {
             "type": "boolean"
           },
           "updated_package_names": {
+            "example": [
+              "kernel"
+            ],
             "items": {
               "type": "string"
             },
@@ -773,9 +1005,16 @@
             "uniqueItems": false
           },
           "url": {
+            "example": "https://cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/os/",
             "type": "string"
           }
         },
+        "required": [
+          "basearch",
+          "label",
+          "name",
+          "releasever"
+        ],
         "type": "object"
       },
       "vmaas.RepoDetails": {
@@ -790,9 +1029,11 @@
       "vmaas.Repos": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "latest_repo_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "page": {
@@ -813,21 +1054,31 @@
       "vmaas.ReposRequest": {
         "properties": {
           "has_packages": {
+            "default": false,
+            "description": "Return only repositories having advisories with packages released since the last modified_since",
             "type": "boolean"
           },
           "modified_since": {
+            "description": "Return only repositories changed after the given date",
+            "example": "2018-04-05T01:23:45+02:00",
+            "format": "date-time",
             "type": "string"
           },
           "organization": {
             "type": "string"
           },
           "page": {
+            "example": 1,
             "type": "integer"
           },
           "page_size": {
+            "example": 10,
             "type": "integer"
           },
           "repository_list": {
+            "example": [
+              "rhel-6-server-rpms"
+            ],
             "items": {
               "type": "string"
             },
@@ -835,17 +1086,25 @@
             "uniqueItems": false
           },
           "show_packages": {
+            "default": false,
+            "description": "Show updated package names in a repo since the last modified_since",
             "type": "boolean"
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \\\"third party\\\" repositories into the response, disabled by default.",
             "type": "boolean"
           }
         },
+        "required": [
+          "repository_list"
+        ],
         "type": "object"
       },
       "vmaas.Request": {
         "properties": {
           "basearch": {
+            "example": "x86_64",
             "type": "string"
           },
           "epoch_required": {
@@ -858,7 +1117,6 @@
             "type": "boolean"
           },
           "modules_list": {
-            "description": "we need to use pointers to modules to distinguish between nil and \"\"\nto keep consistency with python implementation",
             "items": {
               "$ref": "#/components/schemas/vmaas.ModuleStreamPtrs"
             },
@@ -869,6 +1127,9 @@
             "type": "string"
           },
           "package_list": {
+            "example": [
+              "kernel-2.6.32-696.20.1.el6.x86_64"
+            ],
             "items": {
               "type": "string"
             },
@@ -876,9 +1137,13 @@
             "uniqueItems": false
           },
           "releasever": {
+            "example": "6Server",
             "type": "string"
           },
           "repository_list": {
+            "example": [
+              "rhel-6-server-rpms"
+            ],
             "items": {
               "type": "string"
             },
@@ -886,6 +1151,9 @@
             "uniqueItems": false
           },
           "repository_paths": {
+            "example": [
+              "/content/dist/rhel/rhui/server/7/7Server/x86_64/os/"
+            ],
             "items": {
               "type": "string"
             },
@@ -896,14 +1164,20 @@
             "type": "boolean"
           },
           "third_party": {
+            "default": false,
+            "description": "Include content from \"third party\" repositories into the response, disabled by default.",
             "type": "boolean"
           }
         },
+        "required": [
+          "package_list"
+        ],
         "type": "object"
       },
       "vmaas.SRPMPkgNames": {
         "properties": {
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "srpm_name_list": {
@@ -915,6 +1189,9 @@
       "vmaas.SRPMPkgNamesRequest": {
         "properties": {
           "content_set_list": {
+            "example": [
+              "rhel-7-desktop-rpms"
+            ],
             "items": {
               "type": "string"
             },
@@ -922,6 +1199,9 @@
             "uniqueItems": false
           },
           "srpm_name_list": {
+            "example": [
+              "openssl"
+            ],
             "items": {
               "type": "string"
             },
@@ -929,29 +1209,39 @@
             "uniqueItems": false
           }
         },
+        "required": [
+          "srpm_name_list"
+        ],
         "type": "object"
       },
       "vmaas.Update": {
         "properties": {
           "basearch": {
+            "example": "x86_64",
             "type": "string"
           },
           "erratum": {
+            "example": "RHSA-2018:0512",
             "type": "string"
           },
           "evra": {
+            "example": "0:2.6.32-696.23.1.el6.x86_64",
             "type": "string"
           },
           "package": {
+            "example": "kernel-2.6.32-696.23.1.el6.x86_64",
             "type": "string"
           },
           "package_name": {
+            "example": "kernel",
             "type": "string"
           },
           "releasever": {
+            "example": "6Server",
             "type": "string"
           },
           "repository": {
+            "example": "rhel-6-server-rpms",
             "type": "string"
           }
         },
@@ -978,9 +1268,11 @@
       "vmaas.Updates": {
         "properties": {
           "basearch": {
+            "example": "x86_64",
             "type": "string"
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "modules_list": {
@@ -991,9 +1283,13 @@
             "uniqueItems": false
           },
           "releasever": {
+            "example": "6Server",
             "type": "string"
           },
           "repository_list": {
+            "example": [
+              "rhel-6-server-rpms"
+            ],
             "items": {
               "type": "string"
             },
@@ -1001,6 +1297,7 @@
             "uniqueItems": false
           },
           "repository_paths": {
+            "description": "Example: /content/dist/rhel/rhui/server/7/7Server/x86_64/os/",
             "items": {
               "type": "string"
             },
@@ -1023,6 +1320,7 @@
             "uniqueItems": false
           },
           "last_change": {
+            "example": "2024-11-20T12:36:49.640592Z",
             "type": "string"
           },
           "manually_fixable_cve_list": {
@@ -1040,6 +1338,11 @@
             "uniqueItems": false
           }
         },
+        "required": [
+          "cve_list",
+          "manually_fixable_cve_list",
+          "unpatched_cve_list"
+        ],
         "type": "object"
       },
       "vmaas.VulnerabilitiesExtended": {
@@ -1122,7 +1425,7 @@
       "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
     },
     "title": "VMaaS webapp API",
-    "version": "2.103.0"
+    "version": "2.103.1"
   },
   "externalDocs": {
     "description": "",
