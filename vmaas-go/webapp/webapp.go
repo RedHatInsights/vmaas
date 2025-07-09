@@ -14,7 +14,7 @@ import (
 	_ "net/http/pprof" //nolint:gosec
 )
 
-var basepaths = []string{"/api/v3", "/api/vmaas/v3"}
+var basepaths = []string{"/api/v1", "/api/vmaas/v1", "/api/v2", "/api/vmaas/v2", "/api/v3", "/api/vmaas/v3"}
 
 //	@title			VMaaS webapp API
 //	@version		{{.Version}}
@@ -40,13 +40,13 @@ func Run() {
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
 	middlewares.Prometheus().Use(app)
-	middlewares.SetSwagger(app)
 	app.HandleMethodNotAllowed = true
 
 	// routes
 	core.InitProbes(app)
 	for _, path := range basepaths {
 		api := app.Group(path)
+		middlewares.SetSwagger(api)
 		routes.InitAPI(api)
 	}
 

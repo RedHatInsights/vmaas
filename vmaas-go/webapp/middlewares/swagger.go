@@ -8,9 +8,10 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetSwagger(app *gin.Engine) {
+func SetSwagger(app *gin.RouterGroup) {
 	// Serving openapi docs
 	openapiURL := docs.Init(app)
-	url := ginSwagger.URL(openapiURL)
-	app.GET("/api/vmaas/v3/ui/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	basepath := app.BasePath()
+	url := ginSwagger.URL(basepath + openapiURL)
+	app.GET("/ui/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
