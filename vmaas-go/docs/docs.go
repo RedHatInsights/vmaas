@@ -14,11 +14,11 @@ type openapiData struct {
 var appVersions = map[int]openapiData{
 	3: {
 		filepath: "/vmaas/go/src/vmaas/docs/v3/openapi.json",
-		url:      "/api/vmaas/v3/openapi.json",
+		url:      "/openapi.json",
 	},
 }
 
-func Init(app *gin.Engine) string {
+func Init(app *gin.RouterGroup) string {
 	maxVer := 1
 	for ver, data := range appVersions {
 		if ver > maxVer {
