@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/aws/aws-sdk-go v1.55.7
+	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-contrib/gzip v1.2.3
 	github.com/gin-gonic/gin v1.10.1
 	github.com/joho/godotenv v1.5.1
