@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/redhatinsights/vmaas/base"
 	"github.com/redhatinsights/vmaas/base/core"
@@ -39,6 +40,11 @@ func Run() {
 	// middlewares
 	app.Use(middlewares.Recovery())
 	app.Use(middlewares.RequestResponseLogger())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "OPTIONS", "POST"},
+		AllowHeaders: []string{"*"},
+	}))
 	middlewares.Prometheus().Use(app)
 	app.HandleMethodNotAllowed = true
 
