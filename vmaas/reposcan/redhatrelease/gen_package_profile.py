@@ -40,9 +40,12 @@ def main() -> None:
     base.conf.substitutions["arch"] = "x86_64"
     base.conf.module_platform_id = DNF_PLATFORM_ID
     for label, url, ca_cert, cert, key in DNF_REPOS:
-        ca_cert_path = _write_cert(label, "ca_cert", ca_cert)
-        cert_path = _write_cert(label, "cert", cert)
-        key_path = _write_cert(label, "key", key)
+        ca_cert_path, cert_path, key_path = None, None, None
+        if ca_cert:
+            ca_cert_path = _write_cert(label, "ca_cert", ca_cert)
+        if cert:
+            cert_path = _write_cert(label, "cert", cert)
+            key_path = _write_cert(label, "key", key)
         base.repos.add_new_repo(label,
                                 base.conf,
                                 baseurl=[url],
