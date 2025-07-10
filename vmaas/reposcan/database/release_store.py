@@ -38,7 +38,7 @@ class ReleaseStore:
         cur.execute("""SELECT r.releasever, cs.label, r.url, c.ca_cert, c.cert, c.key
                        FROM content_set cs JOIN
                             repo r ON cs.id = r.content_set_id JOIN
-                            arch a ON r.basearch_id = a.id JOIN
+                            arch a ON r.basearch_id = a.id LEFT JOIN
                             certificate c ON r.certificate_id = c.id
                        WHERE (cs.label SIMILAR TO %s OR
                               cs.label SIMILAR TO %s) AND
