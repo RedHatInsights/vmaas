@@ -1,0 +1,68 @@
+{
+    "cve_list": {
+        "CVE-2010-3080": {
+            "cvss3_score": "",
+            "cvss3_metrics": "",
+            "cvss2_score": "4.700",
+            "cvss2_metrics": "AV:L/AC:M/Au:N/C:N/I:N/A:C",
+            "cwe_list": [
+                "CWE-399"
+            ],
+            "description": "Double free vulnerability in the snd_seq_oss_open function in sound/core/seq/oss/seq_oss_init.c in the Linux kernel before 2.6.36-rc4 might allow local users to cause a denial of service or possibly have unspecified other impact via an unsuccessful attempt to open the /dev/sequencer device.",
+            "impact": "",
+            "modified_date": "2012-03-19T04:00:00+00:00",
+            "public_date": "2010-09-21T18:00:00+00:00",
+            "redhat_url": "https://access.redhat.com/security/cve/cve-2010-3080",
+            "secondary_url": "http://git.kernel.org/?p=linux/kernel/git/tiwai/sound-2.6.git;a=commit;h=c598337660c21c0afaa9df5a65bb4a7a0cf15be8",
+            "synopsis": "CVE-2010-3080"
+        },
+        "CVE-2016-0253": {
+            "cvss3_score": "5.400",
+            "cvss3_metrics": "CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N",
+            "cvss2_score": "3.500",
+            "cvss2_metrics": "AV:N/AC:M/Au:S/C:N/I:P/A:N",
+            "cwe_list": [
+                "CWE-79"
+            ],
+            "description": "Cross-site scripting (XSS) vulnerability in IBM Financial Transaction Manager (FTM) for ACH Services for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013, Financial Transaction Manager (FTM) for Check Services for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013, and Financial Transaction Manager (FTM) for Corporate Payment Services (CPS) for Multi-Platform 2.1.1.2 and 3.0.0.x before fp0013 allows remote attackers to inject arbitrary web script or HTML via unspecified vectors. IBM X-Force ID: 110562.",
+            "impact": "Medium",
+            "modified_date": "2018-03-26T18:12:00+00:00",
+            "public_date": "2018-03-09T19:29:00+00:00",
+            "redhat_url": "",
+            "secondary_url": "http://www-01.ibm.com/support/docview.wss?uid=swg21977245",
+            "synopsis": "CVE-2016-0253"
+        },
+        "CVE-2017-0001": {
+            "cvss3_score": "7.800",
+            "cvss3_metrics": "CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+            "cvss2_score": "7.200",
+            "cvss2_metrics": "AV:L/AC:L/Au:N/C:C/I:C/A:C",
+            "cwe_list": [
+                "CWE-264"
+            ],
+            "description": "The Graphics Device Interface (GDI) in Microsoft Windows Vista SP2; Windows Server 2008 SP2 and R2 SP1; Windows 7 SP1; Windows 8.1; Windows Server 2012 Gold and R2; Windows RT 8.1; and Windows 10 Gold, 1511, and 1607 allows local users to gain privileges via a crafted application, aka \"Windows GDI Elevation of Privilege Vulnerability.\" This vulnerability is different from those described in CVE-2017-0005, CVE-2017-0025, and CVE-2017-0047.",
+            "impact": "High",
+            "modified_date": "2017-07-12T01:29:00+00:00",
+            "public_date": "2017-03-17T00:59:00+00:00",
+            "redhat_url": "",
+            "secondary_url": "http://www.securityfocus.com/bid/96057",
+            "synopsis": "CVE-2017-0001"
+        },
+        "CVE-2018-0001": {
+            "cvss3_score": "9.800",
+            "cvss3_metrics": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+            "cvss2_score": "7.500",
+            "cvss2_metrics": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+            "cwe_list": [
+                "CWE-416"
+            ],
+            "description": "A remote, unauthenticated attacker may be able to execute code by exploiting a use-after-free defect found in older versions of PHP through injection of crafted data via specific PHP URLs within the context of the J-Web process. Affected releases are Juniper Networks Junos OS: 12.1X46 versions prior to 12.1X46-D67; 12.3 versions prior to 12.3R12-S5; 12.3X48 versions prior to 12.3X48-D35; 14.1 versions prior to 14.1R8-S5, 14.1R9; 14.1X53 versions prior to 14.1X53-D44, 14.1X53-D50; 14.2 versions prior to 14.2R7-S7, 14.2R8; 15.1 versions prior to 15.1R3; 15.1X49 versions prior to 15.1X49-D30; 15.1X53 versions prior to 15.1X53-D70.",
+            "impact": "Critical",
+            "modified_date": "2018-02-23T02:29:00+00:00",
+            "public_date": "2018-01-10T22:29:00+00:00",
+            "redhat_url": "",
+            "secondary_url": "http://www.securityfocus.com/bid/103092",
+            "synopsis": "CVE-2018-0001"
+        }
+    }
+}

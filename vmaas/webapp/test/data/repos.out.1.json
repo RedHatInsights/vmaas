@@ -1,0 +1,40 @@
+{
+    "repository_list": {
+        "rhel-7-server-rpms": [
+            {
+                "basearch": "x86_64",
+                "label": "rhel-7-server-rpms",
+                "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
+                "product": "Red Hat Enterprise Linux Server",
+                "releasever": "7.4",
+                "url": "https://cdn.redhat.com/content/dist/rhel/server/7/7.4/x86_64/os/"
+            },
+            {
+                "basearch": "x86_64",
+                "label": "rhel-7-server-rpms",
+                "name": "Red Hat Enterprise Linux 7 Server (RPMs)",
+                "product": "Red Hat Enterprise Linux Server",
+                "releasever": "7Server",
+                "url": "https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/"
+            }
+        ],
+        "rhel-7-workstation-rpms": [
+            {
+                "basearch": "x86_64",
+                "label": "rhel-7-workstation-rpms",
+                "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
+                "product": "Red Hat Enterprise Linux Workstation",
+                "releasever": "7.4",
+                "url": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7.4/x86_64/os/"
+            },
+            {
+                "basearch": "x86_64",
+                "label": "rhel-7-workstation-rpms",
+                "name": "Red Hat Enterprise Linux 7 Workstation (RPMs)",
+                "product": "Red Hat Enterprise Linux Workstation",
+                "releasever": "7Workstation",
+                "url": "https://cdn.redhat.com/content/dist/rhel/workstation/7/7Workstation/x86_64/os/"
+            }
+        ]
+    }
+}

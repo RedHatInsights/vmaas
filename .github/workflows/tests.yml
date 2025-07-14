@@ -43,6 +43,10 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/reposcan --exit-code-from
           docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/reposcan/coverage.xml ./coverage_reposcan.xml
+      - name: exec webapp tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas/webapp --exit-code-from
+          docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/webapp/coverage.xml ./coverage_webapp.xml
       - name: exec webapp-go tests
         run: |
           docker compose -f docker-compose.test.yml exec -T test_go ./run_tests.sh vmaas-go --exit-code-from
@@ -50,7 +54,7 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp_go.txt
+          files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp.xml,./coverage_webapp_go.txt
           verbose: true
   lint:
     runs-on: ubuntu-latest

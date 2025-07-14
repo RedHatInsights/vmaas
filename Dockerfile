@@ -67,6 +67,7 @@ COPY --from=buildimg --chown=vmaas:root /vmaas/go/src/vmaas/main /vmaas/go/src/v
 ADD entrypoint.sh               /vmaas/
 ADD conf                        /vmaas/conf
 ADD /database                   /vmaas/database
+ADD /vmaas/webapp               /vmaas/vmaas/webapp
 ADD /vmaas/reposcan             /vmaas/vmaas/reposcan
 ADD /vmaas/common               /vmaas/vmaas/common
 

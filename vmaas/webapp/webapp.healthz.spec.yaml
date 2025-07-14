@@ -1,0 +1,35 @@
+openapi: '3.0.0'
+
+info:
+  title: VMaaS Webapp
+  version: {{ vmaas_version }}
+
+paths:
+  /healthz:
+    get:
+      summary: Application availability
+      description: Check whether this application is live
+      operationId: vmaas.webapp.app.HealthHandler.get
+      x-methodName: getHealth
+      responses:
+        200:
+          description: Application available
+          content:
+            text/plain:
+              schema:
+                type: string
+      tags: [ Metadata ]
+  /metrics:
+    get:
+      summary: Application metrics
+      description: Return prometheus metrics
+      operationId: vmaas.webapp.app.metrics
+      x-methodName: getMetrics
+      responses:
+        200:
+          description: Application metrics
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+      tags: [ Metadata ]
