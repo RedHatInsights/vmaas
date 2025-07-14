@@ -31,6 +31,12 @@ spec:
     value: Dockerfile
   - name: path-context
     value: .
+  - name: hermetic
+    value: "true"
+  - name: prefetch-input
+    value: '[{"type": "pip", "path": ".", "requirements_files": ["requirements.txt", "requirements-build.txt", "requirements-extra.txt"]}, {"type": "rpm", "path": "."}, {"type": "gomod", "path": "./vmaas-go/"}]'
+  - name: prefetch-dev-package-managers
+    value: "true"
   pipelineRef:
     name: docker-build-oci-ta
   taskRunTemplate:

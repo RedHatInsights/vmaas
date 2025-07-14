@@ -46,7 +46,6 @@ dependencies = [
     "uvicorn (>=0.35.0,<1.0.0)",
     "watchtower>=1.0.0",
     "zstandard (>=0.23.0,<0.24.0)",
-    "rpds-py<=0.24.0",
 ]
 
 [tool.poetry.group.dev.dependencies]
@@ -65,7 +64,7 @@ types-requests = "*"
 types-urllib3 = "*"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core==2.1.3","rpds-py==0.24.0","setuptools-rust==1.11.1","setuptools==80.9.0","setuptools-scm==v9.1.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
