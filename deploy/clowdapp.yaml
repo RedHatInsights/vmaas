@@ -308,7 +308,7 @@ objects:
       termination: edge
     to:
       kind: Service
-      name: vmaas-webapp-service
+      name: vmaas-webapp-go
       weight: 100
     wildcardPolicy: None
 
