@@ -104,3 +104,9 @@ ENV/
 
 # cache files
 *~
+
+# helper files needed for hermetic builds maintenance
+redhat-uep.pem
+entitlement/
+requirements-build.in
+redhat.repo
