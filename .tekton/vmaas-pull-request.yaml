@@ -34,7 +34,7 @@ spec:
   - name: hermetic
     value: "true"
   - name: prefetch-input
-    value: '[{"type": "pip", "path": ".", "requirements_files": ["requirements.txt", "requirements-build.txt", "requirements-extras.txt"]}, {"type": "rpm", "path": "."}]'
+    value: '[{"type": "pip", "path": ".", "requirements_files": ["requirements.txt", "requirements-build.txt"]}, {"type": "rpm", "path": "."}]'
   - name: prefetch-dev-package-managers
     value: "true"
   pipelineRef:
