@@ -4,7 +4,7 @@ ARG RUNIMG=registry.access.redhat.com/ubi9/ubi-minimal
 FROM ${BUILDIMG} AS buildimg
 
 RUN curl -o /etc/yum.repos.d/postgresql.repo \
-        https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo
+        https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo || echo "Hermetic Konflux build"
 
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
         go-toolset rpm-devel && \
