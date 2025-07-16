@@ -47,6 +47,7 @@ uvicorn = "^0.35.0"
 watchtower = ">=1.0.0"
 attrs = "^25.0.0"
 zstandard = "^0.23.0"
+rpds-py = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = ">=4.5.3"
