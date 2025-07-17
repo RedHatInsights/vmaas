@@ -69,7 +69,7 @@ jobs:
       - name: Set up Poetry
         run: |
           pip install poetry~=2.0.1 poetry-plugin-export
-          poetry export --with dev -f requirements.txt --output requirements.txt
+          poetry export --extras dev -f requirements.txt --output requirements.txt
           pip install -r requirements.txt
       - name: Run flake8
         run: |
