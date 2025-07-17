@@ -26,47 +26,50 @@ packages = []
 package-mode = false
 requires-python = "~3.12"
 
-[tool.poetry.dependencies]
-app-common-python = ">=0.2.5"
-apscheduler = "^3.10.4"
-boto3 = ">=1.36.2"
-botocore = ">=1.36.2"
-# Locked to 3.1.0 due to https://github.com/spec-first/connexion/issues/2029
-connexion = {extras = ["swagger-ui"],version = "~=3.1.0"}
-gitpython = ">=3.1.30"
-iso8601 = ">=0.1.12"
-natsort = ">=7.0.1"
-psycopg2-binary = ">=2.8.6"
-prometheus-client = ">=0.8.0"
-pyopenssl = ">=25.0.0"
-python-dateutil = ">=2.8.1"
-pytz = ">=2020.4"
-pyyaml = ">=5.4.1"
-requests = ">=2.32.0"
-schema = ">=0.7.3"
-uvicorn = "^0.35.0"
-watchtower = ">=1.0.0"
-attrs = "^25.0.0"
-zstandard = "^0.23.0"
+dependencies = [
+    "app-common-python>=0.2.5",
+    "apscheduler>=3.10.4",
+    "boto3>=1.36.2",
+    "botocore>=1.36.2",
+    # Locked to 3.1.0 due to https://github.com/spec-first/connexion/issues/2029
+    "connexion[swagger-ui]==3.1.0",
+    "gitpython>=3.1.30",
+    "iso8601>=0.1.12",
+    "natsort>=7.0.1",
+    "psycopg2-binary>=2.8.6",
+    "prometheus-client>=0.8.0",
+    "pyopenssl>=25.0.0",
+    "python-dateutil>=2.8.1",
+    "pytz>=2020.4",
+    "pyyaml>=5.4.1",
+    "requests>=2.32.0",
+    "schema>=0.7.3",
+    "uvicorn(>=0.35.0,<1.0.0)",
+    "watchtower>=1.0.0",
+    "attrs (>=25.0.0, <26.0.0)",
+    "zstandard (>=0.23.0, <0.24.0)",
+]
 
-[tool.poetry.group.dev.dependencies]
-coverage = ">=4.5.3"
-pur = ">=5.4.1"
-pytest = ">=5.0.1"
-pylint = ">=2.3.1"
-pytest-cov = ">=2.7.1"
-testing-postgresql = ">=1.3.0"
-ipython = ">=8.18.1"
-mypy = ">=1.8.0"
-flake8 = "7.3.0"
-types-psycopg2 = "*"
-types-requests = "*"
-types-python-dateutil = "*"
-types-PyYAML = "*"
-types-pyOpenSSL = "*"
+[project.optional-dependencies]
+dev = [
+    "coverage>=4.5.3",
+    "pur>=5.4.1",
+    "pytest>=5.0.1",
+    "pylint>=2.3.1",
+    "pytest-cov>=2.7.1",
+    "testing-postgresql>=1.3.0",
+    "ipython>=8.18.1",
+    "mypy>=1.8.0",
+    "flake8>=7.3.0",
+    "types-psycopg2>=2.9.12",
+    "types-requests>=2.32.0",
+    "types-python-dateutil>=2.8.1",
+    "types-PyYAML>=6.0.12",
+    "types-pyOpenSSL>=23.2.0",
+]
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
