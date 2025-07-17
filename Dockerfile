@@ -1,12 +1,12 @@
 ARG BUILDIMG=registry.access.redhat.com/ubi9/ubi-minimal
 ARG RUNIMG=registry.access.redhat.com/ubi9/ubi-minimal
+ARG COPR_REPO=https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo
 
 FROM ${BUILDIMG} AS buildimg
 
-RUN curl -o /etc/yum.repos.d/postgresql.repo \
-        https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo
-
-RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+ARG COPR_REPO
+RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $COPR_REPO) && \
+    microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
         go-toolset rpm-devel && \
     microdnf clean all
 
@@ -22,11 +22,11 @@ WORKDIR /vmaas
 # runtime image
 FROM ${RUNIMG} AS runtimeimg
 
+ARG COPR_REPO
 ARG VAR_RPMS=""
-RUN curl -o /etc/yum.repos.d/postgresql.repo \
-        https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo
 
-RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $COPR_REPO) && \
+    microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
         python312 python3.12-pip python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql \
         $VAR_RPMS && \
         ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
