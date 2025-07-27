@@ -134,8 +134,8 @@ github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2
 github.com/ugorji/go/codec v1.3.0 h1:Qd2W2sQawAfG8XSvzwhBeoGq71zXOC/Q1E9y/wUcsUA=
 github.com/ugorji/go/codec v1.3.0/go.mod h1:pRBVtBSKl77K30Bv8R2P+cLSGaTtex6fsA2Wjqmfxj4=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-github.com/zsais/go-gin-prometheus v1.0.0 h1:ucg4uqyIg/Q2vFaKYirVH+WKAGD8NZR8pB6uW4odXHk=
-github.com/zsais/go-gin-prometheus v1.0.0/go.mod h1:BLzchNYsehhyPNY31G0YgK/Q6BaDbKpoGQe7OAcLMVU=
+github.com/zsais/go-gin-prometheus v1.0.1 h1:PtTa1rQhbXEAx0gNQkXr4+SGcElSF1YR/NmO3f5s3o4=
+github.com/zsais/go-gin-prometheus v1.0.1/go.mod h1:iKBYSOHzvGfe2FyGSOC8JSwUA0MITdnYzI6v+aAbw1Q=
 golang.org/x/arch v0.19.0 h1:LmbDQUodHThXE+htjrnmVD73M//D9GTH6wFZjyDkjyU=
 golang.org/x/arch v0.19.0/go.mod h1:bdwinDaKcfZUGpH09BB7ZmOfhalA8lQdzl62l8gGWsk=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
