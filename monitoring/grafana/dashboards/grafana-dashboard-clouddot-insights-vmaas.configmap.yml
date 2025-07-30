@@ -2,2133 +2,1551 @@ apiVersion: v1
 data:
   grafana.json: |
     {
-        "annotations": {
-            "list": [
-                {
-                    "builtIn": 1,
-                    "datasource": {
-                        "type": "datasource",
-                        "uid": "grafana"
-                    },
-                    "enable": true,
-                    "hide": true,
-                    "iconColor": "rgba(0, 211, 255, 1)",
-                    "name": "Annotations & Alerts",
-                    "target": {
-                        "limit": 100,
-                        "matchAny": false,
-                        "tags": [],
-                        "type": "dashboard"
-                    },
-                    "type": "dashboard"
-                }
-            ]
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 1025985,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 94,
+          "panels": [],
+          "title": "VMaaS errors",
+          "type": "row"
         },
-        "editable": true,
-        "fiscalYearStartMonth": 0,
-        "graphTooltip": 0,
-        "links": [],
-        "liveNow": false,
-        "panels": [
-            {
-                "collapsed": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "PD776AFABBE26000A"
-                },
-                "gridPos": {
-                    "h": 1,
-                    "w": 24,
-                    "x": 0,
-                    "y": 0
-                },
-                "id": 94,
-                "panels": [],
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "PD776AFABBE26000A"
-                        },
-                        "refId": "A"
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
                     }
-                ],
-                "title": "VMaaS errors",
-                "type": "row"
-            },
-            {
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "mappings": [
-                            {
-                                "options": {
-                                    "match": "null",
-                                    "result": {
-                                        "text": "N/A"
-                                    }
-                                },
-                                "type": "special"
-                            }
-                        ],
-                        "thresholds": {
-                            "mode": "absolute",
-                            "steps": [
-                                {
-                                    "color": "#299c46",
-                                    "value": null
-                                },
-                                {
-                                    "color": "#ef843c",
-                                    "value": 0.1
-                                },
-                                {
-                                    "color": "#d44a3a",
-                                    "value": 3
-                                }
-                            ]
-                        },
-                        "unit": "none"
-                    },
-                    "overrides": []
-                },
-                "gridPos": {
-                    "h": 2,
-                    "w": 3,
-                    "x": 0,
-                    "y": 1
-                },
-                "id": 70,
-                "links": [],
-                "maxDataPoints": 100,
-                "options": {
-                    "colorMode": "background",
-                    "graphMode": "none",
-                    "justifyMode": "auto",
-                    "orientation": "horizontal",
-                    "reduceOptions": {
-                        "calcs": [
-                            "mean"
-                        ],
-                        "fields": "",
-                        "values": false
-                    },
-                    "text": {},
-                    "textMode": "auto"
-                },
-                "pluginVersion": "9.3.8",
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "expr": "sum(increase(vmaas_reposcan_failed_repository_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_import_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_update_total[$__range]))",
-                        "format": "time_series",
-                        "groupBy": [
-                            {
-                                "params": [
-                                    "$__interval"
-                                ],
-                                "type": "time"
-                            },
-                            {
-                                "params": [
-                                    "null"
-                                ],
-                                "type": "fill"
-                            }
-                        ],
-                        "intervalFactor": 1,
-                        "orderByTime": "ASC",
-                        "policy": "default",
-                        "refId": "A",
-                        "resultFormat": "time_series",
-                        "select": [
-                            [
-                                {
-                                    "params": [
-                                        "value"
-                                    ],
-                                    "type": "field"
-                                },
-                                {
-                                    "params": [],
-                                    "type": "mean"
-                                }
-                            ]
-                        ],
-                        "tags": []
-                    }
-                ],
-                "title": "reposcan sync errors",
-                "type": "stat"
-            },
-            {
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "mappings": [
-                            {
-                                "options": {
-                                    "match": "null",
-                                    "result": {
-                                        "text": "N/A"
-                                    }
-                                },
-                                "type": "special"
-                            }
-                        ],
-                        "thresholds": {
-                            "mode": "absolute",
-                            "steps": [
-                                {
-                                    "color": "#299c46",
-                                    "value": null
-                                },
-                                {
-                                    "color": "rgba(237, 129, 40, 0.89)",
-                                    "value": 0.1
-                                },
-                                {
-                                    "color": "#d44a3a",
-                                    "value": 3
-                                }
-                            ]
-                        },
-                        "unit": "none"
-                    },
-                    "overrides": []
-                },
-                "gridPos": {
-                    "h": 2,
-                    "w": 3,
-                    "x": 3,
-                    "y": 1
-                },
-                "id": 110,
-                "links": [],
-                "maxDataPoints": 100,
-                "options": {
-                    "colorMode": "background",
-                    "graphMode": "none",
-                    "justifyMode": "auto",
-                    "orientation": "horizontal",
-                    "reduceOptions": {
-                        "calcs": [
-                            "mean"
-                        ],
-                        "fields": "",
-                        "values": false
-                    },
-                    "text": {},
-                    "textMode": "auto"
-                },
-                "pluginVersion": "9.3.8",
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "exemplar": true,
-                        "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-reposcan.*\"}))",
-                        "format": "time_series",
-                        "groupBy": [
-                            {
-                                "params": [
-                                    "$__interval"
-                                ],
-                                "type": "time"
-                            },
-                            {
-                                "params": [
-                                    "null"
-                                ],
-                                "type": "fill"
-                            }
-                        ],
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "",
-                        "orderByTime": "ASC",
-                        "policy": "default",
-                        "refId": "A",
-                        "resultFormat": "time_series",
-                        "select": [
-                            [
-                                {
-                                    "params": [
-                                        "value"
-                                    ],
-                                    "type": "field"
-                                },
-                                {
-                                    "params": [],
-                                    "type": "mean"
-                                }
-                            ]
-                        ],
-                        "tags": []
-                    }
-                ],
-                "title": "reposcan restarts",
-                "type": "stat"
-            },
-            {
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "mappings": [
-                            {
-                                "options": {
-                                    "match": "null",
-                                    "result": {
-                                        "text": "N/A"
-                                    }
-                                },
-                                "type": "special"
-                            }
-                        ],
-                        "thresholds": {
-                            "mode": "absolute",
-                            "steps": [
-                                {
-                                    "color": "#299c46",
-                                    "value": null
-                                },
-                                {
-                                    "color": "rgba(237, 129, 40, 0.89)",
-                                    "value": 0.1
-                                },
-                                {
-                                    "color": "#d44a3a",
-                                    "value": 3
-                                }
-                            ]
-                        },
-                        "unit": "none"
-                    },
-                    "overrides": []
-                },
-                "gridPos": {
-                    "h": 2,
-                    "w": 3,
-                    "x": 6,
-                    "y": 1
-                },
-                "id": 112,
-                "links": [],
-                "maxDataPoints": 100,
-                "options": {
-                    "colorMode": "background",
-                    "graphMode": "none",
-                    "justifyMode": "auto",
-                    "orientation": "horizontal",
-                    "reduceOptions": {
-                        "calcs": [
-                            "mean"
-                        ],
-                        "fields": "",
-                        "values": false
-                    },
-                    "text": {},
-                    "textMode": "auto"
-                },
-                "pluginVersion": "9.3.8",
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "exemplar": true,
-                        "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-webapp.*\"}))",
-                        "format": "time_series",
-                        "groupBy": [
-                            {
-                                "params": [
-                                    "$__interval"
-                                ],
-                                "type": "time"
-                            },
-                            {
-                                "params": [
-                                    "null"
-                                ],
-                                "type": "fill"
-                            }
-                        ],
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "",
-                        "orderByTime": "ASC",
-                        "policy": "default",
-                        "refId": "A",
-                        "resultFormat": "time_series",
-                        "select": [
-                            [
-                                {
-                                    "params": [
-                                        "value"
-                                    ],
-                                    "type": "field"
-                                },
-                                {
-                                    "params": [],
-                                    "type": "mean"
-                                }
-                            ]
-                        ],
-                        "tags": []
-                    }
-                ],
-                "title": "webapp restarts",
-                "type": "stat"
-            },
-            {
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {
-                            "mode": "thresholds"
-                        },
-                        "mappings": [
-                            {
-                                "options": {
-                                    "match": "null",
-                                    "result": {
-                                        "text": "N/A"
-                                    }
-                                },
-                                "type": "special"
-                            }
-                        ],
-                        "thresholds": {
-                            "mode": "absolute",
-                            "steps": [
-                                {
-                                    "color": "#299c46",
-                                    "value": null
-                                },
-                                {
-                                    "color": "rgba(237, 129, 40, 0.89)",
-                                    "value": 0.1
-                                },
-                                {
-                                    "color": "#d44a3a",
-                                    "value": 3
-                                }
-                            ]
-                        },
-                        "unit": "none"
-                    },
-                    "overrides": []
-                },
-                "gridPos": {
-                    "h": 2,
-                    "w": 3,
-                    "x": 9,
-                    "y": 1
-                },
-                "id": 114,
-                "links": [],
-                "maxDataPoints": 100,
-                "options": {
-                    "colorMode": "background",
-                    "graphMode": "none",
-                    "justifyMode": "auto",
-                    "orientation": "horizontal",
-                    "reduceOptions": {
-                        "calcs": [
-                            "mean"
-                        ],
-                        "fields": "",
-                        "values": false
-                    },
-                    "text": {},
-                    "textMode": "auto"
-                },
-                "pluginVersion": "9.3.8",
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "max(sum(kube_pod_container_status_restarts_total{pod=~\"vmaas-webapp-go.*\"}))",
-                        "format": "time_series",
-                        "groupBy": [
-                            {
-                                "params": [
-                                    "$__interval"
-                                ],
-                                "type": "time"
-                            },
-                            {
-                                "params": [
-                                    "null"
-                                ],
-                                "type": "fill"
-                            }
-                        ],
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "",
-                        "orderByTime": "ASC",
-                        "policy": "default",
-                        "range": true,
-                        "refId": "A",
-                        "resultFormat": "time_series",
-                        "select": [
-                            [
-                                {
-                                    "params": [
-                                        "value"
-                                    ],
-                                    "type": "field"
-                                },
-                                {
-                                    "params": [],
-                                    "type": "mean"
-                                }
-                            ]
-                        ],
-                        "tags": []
-                    }
-                ],
-                "title": "webapp-go restarts",
-                "type": "stat"
-            },
-            {
-                "collapsed": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "PD776AFABBE26000A"
-                },
-                "gridPos": {
-                    "h": 1,
-                    "w": 24,
-                    "x": 0,
-                    "y": 3
-                },
-                "id": 53,
-                "panels": [],
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "PD776AFABBE26000A"
-                        },
-                        "refId": "A"
-                    }
-                ],
-                "title": "Golden signals",
-                "type": "row"
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 4
-                },
-                "hiddenSeries": false,
-                "id": 135,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_handler_invocations_total{service=\"vmaas-webapp-service\"}[5m])) by (status)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{status}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp traffic (by status)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:238",
-                        "format": "short",
-                        "label": "reqs/sec",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:239",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
+                  },
+                  "type": "special"
                 }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46"
+                  },
+                  {
+                    "color": "#ef843c",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "none"
             },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 0,
+            "y": 1
+          },
+          "id": 70,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
             {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(increase(vmaas_reposcan_failed_repository_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_import_total[$__range])) + sum(increase(vmaas_reposcan_failed_cve_update_total[$__range]))",
+              "format": "time_series",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
                 },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 4
-                },
-                "hiddenSeries": false,
-                "id": 144,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (status)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{status}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp-go traffic (by status)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:238",
-                        "format": "short",
-                        "label": "reqs/sec",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:239",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
                 }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 11
-                },
-                "hiddenSeries": false,
-                "id": 136,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_handler_processing_seconds_sum{service=\"vmaas-webapp-service\"}[5m]))",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "latency",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp latency",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:180",
-                        "format": "s",
-                        "label": "",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:181",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 11
-                },
-                "hiddenSeries": false,
-                "id": 145,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m]))",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "latency",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp-go latency",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:180",
-                        "format": "s",
-                        "label": "",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:181",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 18
-                },
-                "hiddenSeries": false,
-                "id": 12,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_handler_invocations_total{service=\"vmaas-webapp-service\"}[5m])) by (path)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{path}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp traffic (by handler)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:294",
-                        "format": "short",
-                        "label": "reqs/sec",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:295",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 18
-                },
-                "hiddenSeries": false,
-                "id": 146,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (path)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{path}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp-go traffic (by handler)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:294",
-                        "format": "short",
-                        "label": "reqs/sec",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:295",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 25
-                },
-                "hiddenSeries": false,
-                "id": 134,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_handler_processing_seconds_sum{service=\"vmaas-webapp-service\"}[5m])) by (path)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{path}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp latency (by handler)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:180",
-                        "format": "s",
-                        "label": "latency",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:181",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 25
-                },
-                "hiddenSeries": false,
-                "id": 147,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "editorMode": "code",
-                        "exemplar": true,
-                        "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m])) by (path)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{path}}",
-                        "range": true,
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Webapp-go latency (by handler)",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:180",
-                        "format": "s",
-                        "label": "latency",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:181",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 32
-                },
-                "hiddenSeries": false,
-                "id": 141,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "exemplar": true,
-                        "expr": "sum(rate(container_cpu_usage_seconds_total{container=~\"vmaas-.*\"}[5m])) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"cpu\"}) by (container)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{container}}",
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "CPU consumed",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:294",
-                        "format": "percentunit",
-                        "label": "percent",
-                        "logBase": 1,
-                        "max": "1",
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:295",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 32
-                },
-                "hiddenSeries": false,
-                "id": 142,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "exemplar": true,
-                        "expr": "sum(container_memory_usage_bytes{container=~\"vmaas-.*\"}) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"memory\"}) by (container)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{container}}",
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Memory consumed",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:294",
-                        "format": "percentunit",
-                        "label": "percent",
-                        "logBase": 1,
-                        "max": "1",
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:295",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "collapsed": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "PD776AFABBE26000A"
-                },
-                "gridPos": {
-                    "h": 1,
-                    "w": 24,
-                    "x": 0,
-                    "y": 39
-                },
-                "id": 140,
-                "panels": [],
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "PD776AFABBE26000A"
-                        },
-                        "refId": "A"
-                    }
-                ],
-                "title": "Reposcan",
-                "type": "row"
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 40
-                },
-                "hiddenSeries": false,
-                "id": 143,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "hideEmpty": false,
-                    "hideZero": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "exemplar": true,
-                        "expr": "sum(kube_pod_container_status_restarts_total{pod=~\"vmaas.*\"}) by (container)",
-                        "format": "time_series",
-                        "interval": "",
-                        "intervalFactor": 1,
-                        "legendFormat": "{{container}}",
-                        "refId": "B"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "Containers restarts",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:294",
-                        "format": "short",
-                        "label": "count",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:295",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 40
-                },
-                "hiddenSeries": false,
-                "id": 68,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "expr": "sum(vmaas_reposcan_failed_cve_import_total)",
-                        "format": "time_series",
-                        "groupBy": [
-                            {
-                                "params": [
-                                    "$__interval"
-                                ],
-                                "type": "time"
-                            },
-                            {
-                                "params": [
-                                    "null"
-                                ],
-                                "type": "fill"
-                            }
-                        ],
-                        "intervalFactor": 1,
-                        "legendFormat": "cve import failed",
-                        "orderByTime": "ASC",
-                        "policy": "default",
-                        "refId": "A",
-                        "resultFormat": "time_series",
-                        "select": [
-                            [
-                                {
-                                    "params": [
-                                        "value"
-                                    ],
-                                    "type": "field"
-                                },
-                                {
-                                    "params": [],
-                                    "type": "mean"
-                                }
-                            ]
-                        ],
-                        "tags": []
-                    },
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "expr": "sum(vmaas_reposcan_failed_cve_update_total)",
-                        "format": "time_series",
-                        "intervalFactor": 1,
-                        "legendFormat": "cve update failed",
-                        "refId": "B"
-                    },
-                    {
-                        "datasource": {
-                            "uid": "$datasource"
-                        },
-                        "expr": "sum(vmaas_reposcan_failed_repository_import_total)",
-                        "format": "time_series",
-                        "intervalFactor": 1,
-                        "legendFormat": "repo import failed",
-                        "refId": "C"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "vmaas reposync errors",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "collapsed": false,
-                "datasource": {
-                    "type": "prometheus",
-                    "uid": "PD776AFABBE26000A"
-                },
-                "gridPos": {
-                    "h": 1,
-                    "w": 24,
-                    "x": 0,
-                    "y": 47
-                },
-                "id": 138,
-                "panels": [],
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "PD776AFABBE26000A"
-                        },
-                        "refId": "A"
-                    }
-                ],
-                "title": "RDS (database)",
-                "type": "row"
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource_rds"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 0,
-                    "y": 48
-                },
-                "hiddenSeries": false,
-                "id": 57,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 5,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "alias": "",
-                        "datasource": {
-                            "uid": "$datasource_rds"
-                        },
-                        "dimensions": {},
-                        "expr": "sum(rdsosmetrics_fileSys_usedPercent{exported_instance=~\"vmaas-.*\"}) by (mount_point)",
-                        "expression": "",
-                        "id": "",
-                        "interval": "",
-                        "legendFormat": "{{mount_point}}",
-                        "matchExact": true,
-                        "metricEditorMode": 0,
-                        "metricName": "",
-                        "metricQueryType": 0,
-                        "namespace": "",
-                        "refId": "A",
-                        "region": "default",
-                        "statistic": "Average"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "RDS storage usage",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:201",
-                        "format": "percent",
-                        "label": "",
-                        "logBase": 1,
-                        "max": "100",
-                        "min": "0",
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:202",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
-            },
-            {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": {
-                    "uid": "$datasource_rds"
-                },
-                "fieldConfig": {
-                    "defaults": {
-                        "links": []
-                    },
-                    "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                    "h": 7,
-                    "w": 12,
-                    "x": 12,
-                    "y": 48
-                },
-                "hiddenSeries": false,
-                "id": 133,
-                "legend": {
-                    "avg": false,
-                    "current": false,
-                    "max": false,
-                    "min": false,
-                    "show": true,
-                    "total": false,
-                    "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                    "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "9.3.8",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                    {
-                        "datasource": {
-                            "uid": "$datasource_rds"
-                        },
-                        "expr": "sum(label_replace(rdsosmetrics_processList_cpuUsedPc{exported_instance=~\"vmaas-.*\", name=~\"postgres:.*\"}, \"db_user\", \"$1\", \"name\", \"postgres: ([^ ]+) .+\")) by (db_user)",
-                        "interval": "",
-                        "legendFormat": "{{db_user}}",
-                        "refId": "A"
-                    }
-                ],
-                "thresholds": [],
-                "timeRegions": [],
-                "title": "RDS CPU utilization",
-                "tooltip": {
-                    "shared": true,
-                    "sort": 0,
-                    "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                    "mode": "time",
-                    "show": true,
-                    "values": []
-                },
-                "yaxes": [
-                    {
-                        "$$hashKey": "object:331",
-                        "format": "percent",
-                        "logBase": 1,
-                        "show": true
-                    },
-                    {
-                        "$$hashKey": "object:332",
-                        "format": "short",
-                        "logBase": 1,
-                        "show": true
-                    }
-                ],
-                "yaxis": {
-                    "align": false
-                }
+              ],
+              "intervalFactor": 1,
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
             }
-        ],
-        "refresh": "1m",
-        "schemaVersion": 37,
-        "style": "dark",
-        "tags": [],
-        "templating": {
-            "list": [
+          ],
+          "title": "reposcan sync errors",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
                 {
-                    "current": {
-                        "selected": true,
-                        "text": "crcp01ue1-prometheus",
-                        "value": "crcp01ue1-prometheus"
-                    },
-                    "hide": 0,
-                    "includeAll": false,
-                    "multi": false,
-                    "name": "datasource",
-                    "options": [],
-                    "query": "prometheus",
-                    "queryValue": "",
-                    "refresh": 1,
-                    "regex": "/devel-prometheus|crcs02ue1-prometheus|crcp01ue1-prometheus/",
-                    "skipUrlSync": false,
-                    "type": "datasource"
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46"
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 3,
+            "y": 1
+          },
+          "id": 110,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{pod=~\"vmaas-reposcan.*\"}[$__range]))",
+              "format": "time_series",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
                 },
                 {
-                    "current": {
-                        "selected": false,
-                        "text": "app-sre-prod-01-prometheus",
-                        "value": "app-sre-prod-01-prometheus"
-                    },
-                    "hide": 0,
-                    "includeAll": false,
-                    "multi": false,
-                    "name": "datasource_rds",
-                    "options": [],
-                    "query": "prometheus",
-                    "queryValue": "",
-                    "refresh": 1,
-                    "regex": "/devel-prometheus|app-sre-stage-01-prometheus|app-sre-prod-01-prometheus/",
-                    "skipUrlSync": false,
-                    "type": "datasource"
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
                 }
-            ]
+              ],
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "range": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "title": "reposcan restarts",
+          "type": "stat"
         },
-        "time": {
-            "from": "now-6h",
-            "to": "now"
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46"
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 3
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 6,
+            "y": 1
+          },
+          "id": 114,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{pod=~\"vmaas-webapp-go.*\"}[$__range]))",
+              "format": "time_series",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "range": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "title": "webapp-go restarts",
+          "type": "stat"
         },
-        "timepicker": {
-            "refresh_intervals": [
-                "5s",
-                "10s",
-                "30s",
-                "1m",
-                "5m",
-                "15m",
-                "30m",
-                "1h",
-                "2h",
-                "1d"
-            ],
-            "time_options": [
-                "5m",
-                "15m",
-                "1h",
-                "6h",
-                "12h",
-                "24h",
-                "2d",
-                "7d",
-                "30d"
-            ]
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 4
+          },
+          "id": 138,
+          "panels": [],
+          "title": "RDS (database)",
+          "type": "row"
         },
-        "timezone": "utc",
-        "title": "vmaas",
-        "uid": "d2hPr3KMk",
-        "version": 2,
-        "weekStart": ""
+        {
+          "datasource": {
+            "uid": "$datasource_rds"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 5
+          },
+          "id": 57,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "alias": "",
+              "datasource": {
+                "uid": "$datasource_rds"
+              },
+              "dimensions": {},
+              "expr": "sum(rdsosmetrics_fileSys_usedPercent{exported_instance=~\"vmaas-.*\"}) by (mount_point)",
+              "expression": "",
+              "id": "",
+              "interval": "",
+              "legendFormat": "{{mount_point}}",
+              "matchExact": true,
+              "metricEditorMode": 0,
+              "metricName": "",
+              "metricQueryType": 0,
+              "namespace": "",
+              "refId": "A",
+              "region": "default",
+              "statistic": "Average"
+            }
+          ],
+          "title": "RDS storage usage",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource_rds"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 5
+          },
+          "id": 133,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource_rds"
+              },
+              "expr": "sum(label_replace(rdsosmetrics_processList_cpuUsedPc{exported_instance=~\"vmaas-.*\", name=~\"postgres:.*\"}, \"db_user\", \"$1\", \"name\", \"postgres: ([^ ]+) .+\")) by (db_user)",
+              "interval": "",
+              "legendFormat": "{{db_user}}",
+              "refId": "A"
+            }
+          ],
+          "title": "RDS CPU utilization",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 12
+          },
+          "id": 140,
+          "panels": [],
+          "title": "Reposcan",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "count",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 143,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "exemplar": true,
+              "expr": "sum(kube_pod_container_status_restarts_total{pod=~\"vmaas.*\"}) by (container)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{container}}",
+              "refId": "B"
+            }
+          ],
+          "title": "Containers restarts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 68,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_cve_import_total)",
+              "format": "time_series",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "intervalFactor": 1,
+              "legendFormat": "cve import failed",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_cve_update_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "cve update failed",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_repository_import_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "repo import failed",
+              "refId": "C"
+            }
+          ],
+          "title": "vmaas reposync errors",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 53,
+          "panels": [],
+          "title": "Golden signals",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "percent",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "max": 1,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 21
+          },
+          "id": 141,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(container_cpu_usage_seconds_total{container=~\"vmaas-.*\"}[5m])) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"cpu\"}) by (container)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{container}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "CPU consumed",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "percent",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "max": 1,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 21
+          },
+          "id": 142,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "exemplar": true,
+              "expr": "sum(container_memory_usage_bytes{container=~\"vmaas-.*\"}) by (container)/ sum(kube_pod_container_resource_limits{container=~\"vmaas-.*\", resource=\"memory\"}) by (container)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{container}}",
+              "refId": "B"
+            }
+          ],
+          "title": "Memory consumed",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 28
+          },
+          "id": 145,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m]))",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "latency",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Webapp-go latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "reqs/sec",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 28
+          },
+          "id": 144,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (status)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{status}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Webapp-go traffic (by status)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "latency",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 35
+          },
+          "id": 147,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(vmaas_webapp_go_processing_seconds_sum[5m])) by (path)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{path}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Webapp-go latency (by handler)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "reqs/sec",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "links": [],
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 35
+          },
+          "id": 146,
+          "options": {
+            "alertThreshold": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "sum(rate(vmaas_webapp_go_handler_invocations[5m])) by (path)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{path}}",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Webapp-go traffic (by handler)",
+          "type": "timeseries"
+        }
+      ],
+      "preload": false,
+      "refresh": "1m",
+      "schemaVersion": 41,
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": "crcp01ue1-prometheus",
+              "value": "crcp01ue1-prometheus"
+            },
+            "includeAll": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "/devel-prometheus|crcs02ue1-prometheus|crcp01ue1-prometheus/",
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "text": "app-sre-prod-01-prometheus",
+              "value": "app-sre-prod-01-prometheus"
+            },
+            "includeAll": false,
+            "name": "datasource_rds",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "/devel-prometheus|aws-resources-exporter/",
+            "type": "datasource"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "utc",
+      "title": "vmaas",
+      "uid": "d2hPr3KMk",
+      "version": 1
     }
 kind: ConfigMap
 metadata:
