@@ -48,23 +48,21 @@ dependencies = [
     "zstandard (>=0.23.0,<0.24.0)",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "coverage>=4.5.3",
-    "flake8>=7.3.0",
-    "ipython>=8.18.1",
-    "mypy>=1.8.0",
-    "pur>=5.4.1",
-    "pytest>=5.0.1",
-    "pylint>=2.3.1",
-    "pytest-cov>=2.7.1",
-    "types-psycopg2",
-    "types-pyOpenSSL",
-    "types-python-dateutil",
-    "types-PyYAML",
-    "types-requests",
-    "types-urllib3",
-]
+[tool.poetry.group.dev.dependencies]
+coverage = ">=4.5.3"
+flake8 = ">=7.3.0"
+ipython = ">=8.18.1"
+mypy = ">=1.8.0"
+pur = ">=5.4.1"
+pytest = ">=5.0.1"
+pylint = ">=2.3.1"
+pytest-cov = ">=2.7.1"
+types-psycopg2 = "*"
+types-pyOpenSSL = "*"
+types-python-dateutil = "*"
+types-PyYAML = "*"
+types-requests = "*"
+types-urllib3 = "*"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

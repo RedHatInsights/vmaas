@@ -40,16 +40,14 @@ RUN install -m 1777 -d /data && \
 
 ENV PYTHONPATH=/vmaas
 
-ADD pyproject.toml /vmaas/
-ADD poetry.lock    /vmaas/
+ADD requirements.txt     /vmaas/
+ADD requirements-dev.txt /vmaas/
 
-ARG VAR_POETRY_INSTALL_OPT="--only main"
+ARG VAR_PIP_INSTALL_OPT=""
 RUN pip3.12 install --upgrade pip && \
-    pip3.12 install --upgrade poetry~=2.0.1 poetry-plugin-export && \
-    poetry export $VAR_POETRY_INSTALL_OPT -f requirements.txt --output requirements.txt && \
-    pip3.12 install -r requirements.txt && \
+    pip3.12 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
     pip3.12 cache purge && \
-    pip3.12 uninstall -y poetry-plugin-export poetry poetry-core pip
+    pip3.12 uninstall -y pip
 
 # Baked-in content for FedRAMP
 ARG STATIC_ASSETS=0

@@ -19,7 +19,7 @@ services:
       args:
         ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo"
         VAR_RPMS: "findutils"
-        VAR_POETRY_INSTALL_OPT: "--extras dev"
+        VAR_PIP_INSTALL_OPT: "-r requirements-dev.txt"
         REQUIRE_RHEL: "no"
     image: vmaas/test:latest
     environment:
