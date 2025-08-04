@@ -28,7 +28,7 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
         python312 python3.12-pip python3.12-devel libpq-devel gcc git && \
     microdnf clean all
-RUN pip3.12 install --upgrade pip && pip3 install --upgrade poetry~=2.0.1
+RUN pip3.12 install --upgrade pip && pip3.12 install --upgrade poetry~=2.0.1 poetry-plugin-export
 EOF
 
 current_dir=$(pwd)
@@ -40,6 +40,10 @@ $cmd run --rm -d --name poetry-locker-container poetry-locker sleep infinity
 $cmd exec poetry-locker-container bash -c "mkdir -p /tmp"
 $cmd cp "pyproject.toml" poetry-locker-container:"/tmp/"
 $cmd exec poetry-locker-container bash -c "cd /tmp && poetry lock"
+$cmd exec poetry-locker-container bash -c "cd /tmp && poetry export -f requirements.txt --output /tmp/requirements.txt"
+$cmd exec poetry-locker-container bash -c "cd /tmp && poetry export --only dev -f requirements.txt --output /tmp/requirements-dev.txt"
 $cmd cp poetry-locker-container:"/tmp/poetry.lock" "."
+$cmd cp poetry-locker-container:"/tmp/requirements.txt" "."
+$cmd cp poetry-locker-container:"/tmp/requirements-dev.txt" "."
 
 $cmd kill poetry-locker-container
