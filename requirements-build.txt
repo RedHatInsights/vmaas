@@ -290,9 +290,9 @@ setuptools-scm==8.3.1 \
     # via
     #   hatch-vcs
     #   urllib3
-setuptools-scm==9.0.1 \
-    --hash=sha256:46e1cf7e8a09652b613f9ba4fe9b55f2f496e7a233e4e00d25a7cb41f94c3c0b \
-    --hash=sha256:9c2dd7c4f274203f82b7737d7bb4f902ea0216974abbe4625db6e42f1d61bc0e
+setuptools-scm==9.0.2 \
+    --hash=sha256:6de38c58dbb9a24575380fcf15108f0ded438a8b6cd9e83f34b5661bc71e0537 \
+    --hash=sha256:c648bc8e0cfbf0ab6af4e9240a5d681cc5c0c76f20f1bf41dd2bb8df00c433c8
     # via
     #   anyio
     #   app-common-python
