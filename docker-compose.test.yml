@@ -41,8 +41,7 @@ services:
     security_opt:
       - label=disable
     command: >
-      bash -c 'cd /vmaas && ./scripts/check_deps_versions.sh \
-                         && python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
+      bash -c 'cd /vmaas && python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
                          && python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade \
                          && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \

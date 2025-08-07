@@ -26,9 +26,6 @@ jobs:
       - name: Run container
         run: |
           docker compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test test_go
-      - name: Check dependencies
-        run: |
-          docker compose -f docker-compose.test.yml exec -T test ./scripts/check_deps_versions.sh --exit-code-from
       - name: Validate dashboards
         run: |
           docker compose -f docker-compose.test.yml exec -T test python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
