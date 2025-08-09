@@ -339,7 +339,7 @@ tomlkit==0.13.3 ; python_version >= "3.12" and python_version < "3.13" \
 traitlets==5.14.3 ; python_version >= "3.12" and python_version < "3.13" \
     --hash=sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7 \
     --hash=sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f
-types-cffi==1.17.0.20250805 ; python_version >= "3.12" and python_version < "3.13" \
+types-cffi==1.17.0.20250809 ; python_version >= "3.12" and python_version < "3.13" \
     --hash=sha256:0cfb62718c8a1a612d709c4eff186e8fb6f024be0da2bc3f9a8763ebf34772d0 \
     --hash=sha256:b8e891fc3dcaa41a83f2a20f01ce88ec6e51a058889613306c2690d73b22e8d5
 types-psycopg2==2.9.21.20250718 ; python_version >= "3.12" and python_version < "3.13" \
