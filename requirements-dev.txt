@@ -342,7 +342,7 @@ traitlets==5.14.3 ; python_version >= "3.12" and python_version < "3.13" \
 types-cffi==1.17.0.20250805 ; python_version >= "3.12" and python_version < "3.13" \
     --hash=sha256:0cfb62718c8a1a612d709c4eff186e8fb6f024be0da2bc3f9a8763ebf34772d0 \
     --hash=sha256:b8e891fc3dcaa41a83f2a20f01ce88ec6e51a058889613306c2690d73b22e8d5
-types-psycopg2==2.9.21.20250718 ; python_version >= "3.12" and python_version < "3.13" \
+types-psycopg2==2.9.21.20250809 ; python_version >= "3.12" and python_version < "3.13" \
     --hash=sha256:bcf085d4293bda48f5943a46dadf0389b2f98f7e8007722f7e1c12ee0f541858 \
     --hash=sha256:dc09a97272ef67e739e57b9f4740b761208f4514257e311c0b05c8c7a37d04b4
 types-pyopenssl==24.1.0.20240722 ; python_version >= "3.12" and python_version < "3.13" \
