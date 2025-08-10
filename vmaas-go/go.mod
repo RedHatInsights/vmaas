@@ -26,7 +26,7 @@ require (
 	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudwego/base64x v0.1.5 // indirect
+	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ezamriy/gorpm v0.0.0-20160905202458-25f7273cbf51 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
