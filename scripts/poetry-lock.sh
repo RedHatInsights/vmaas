@@ -42,7 +42,6 @@ $cmd cp "pyproject.toml" poetry-locker-container:"/tmp/"
 $cmd exec poetry-locker-container bash -c "cd /tmp && poetry lock"
 $cmd exec poetry-locker-container bash -c "cd /tmp && poetry export -f requirements.txt --output /tmp/requirements.txt"
 $cmd exec poetry-locker-container bash -c "cd /tmp && poetry export --only dev -f requirements.txt --output /tmp/requirements-dev.txt"
-$cmd cp poetry-locker-container:"/tmp/poetry.lock" "."
 $cmd cp poetry-locker-container:"/tmp/requirements.txt" "."
 $cmd cp poetry-locker-container:"/tmp/requirements-dev.txt" "."
 
