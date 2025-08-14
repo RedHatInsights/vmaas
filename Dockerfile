@@ -27,7 +27,7 @@ ARG VAR_RPMS=""
 
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3.12-pip python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql \
+        python312 python3.12-pip python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
         $VAR_RPMS && \
         ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
         ln -s $(basename /usr/lib64/python3.9/site-packages/rpm/_rpm.*.so) /usr/lib64/python3.9/site-packages/rpm/_rpm.so && \
@@ -46,8 +46,7 @@ ADD requirements-dev.txt /vmaas/
 ARG VAR_PIP_INSTALL_OPT=""
 RUN pip3.12 install --upgrade pip && \
     pip3.12 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
-    pip3.12 cache purge && \
-    pip3.12 uninstall -y pip
+    pip3.12 cache purge
 
 # Baked-in content for FedRAMP
 ARG STATIC_ASSETS=0
