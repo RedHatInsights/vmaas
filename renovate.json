@@ -1,7 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "schedule": [
-    "on Monday after 3am and before 10am"
+  "extends": [
+    "github>konflux-ci/mintmaker//config/renovate/renovate.json",
+    "schedule:earlyMondays"
   ],
   "baseBranches": ["master"],
   "timezone": "Europe/Prague",
@@ -14,11 +15,11 @@
     "platformAutomerge": true
   },
   "packageRules": [
-  {
-    "description": "Disable Python version updates",
-    "matchPackageNames": ["python"],
-    "matchManagers": ["poetry"],
-    "enabled": false
-  }
-]
+    {
+      "description": "Disable Python version updates",
+      "matchPackageNames": ["python"],
+      "matchManagers": ["poetry"],
+      "enabled": false
+    }
+  ]
 }
