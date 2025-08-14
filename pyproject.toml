@@ -20,7 +20,7 @@ patch_tags = ["build", "chore", "ci", "fix", "perf", "refactor"]
 
 [project]
 name = "vmaas"
-version = "3.0.0"
+version = "3.0.1"
 readme = "README.md"
 packages = []
 package-mode = false
