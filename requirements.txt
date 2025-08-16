@@ -456,7 +456,7 @@ referencing==0.36.2 ; python_version == "3.12" \
 requests==2.32.4 ; python_version == "3.12" \
     --hash=sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c \
     --hash=sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422
-rpds-py==0.24.0 ; python_version == "3.12" \
+rpds-py==0.27.0 ; python_version == "3.12" \
     --hash=sha256:0047638c3aa0dbcd0ab99ed1e549bbf0e142c9ecc173b6492868432d8989a046 \
     --hash=sha256:006f4342fe729a368c6df36578d7a348c7c716be1da0a1a0f86e3021f8e98724 \
     --hash=sha256:041f00419e1da7a03c46042453598479f45be3d787eb837af382bfc169c0db33 \
