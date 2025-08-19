@@ -18,9 +18,9 @@ services:
       dockerfile: Dockerfile
       args:
         ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo"
-        VAR_RPMS: "findutils"
+        VAR_RPMS: "findutils git-core postgresql"
         VAR_PIP_INSTALL_OPT: "-r requirements-dev.txt"
-        REQUIRE_RHEL: "no"
+      target: buildimg
     image: vmaas/test:latest
     environment:
       CI: "${CI:-false}"
@@ -45,36 +45,5 @@ services:
                          && python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade \
                          && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \
-                         && ./run_tests.sh vmaas/webapp'
-
-  test_go:
-    container_name: vmaas-test-go
-    hostname: vmaas-test-go
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        REQUIRE_RHEL: "no"
-        ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo"
-      target: buildimg
-    image: vmaas/test-go:latest
-    environment:
-      CI: "${CI:-false}"
-      GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
-      GITHUB_REF: "${GITHUB_REF:-}"
-      GITHUB_HEAD_REF: "${GITHUB_HEAD_REF:-}"
-      GITHUB_SHA: "${GITHUB_SHA:-}"
-      GITHUB_REPOSITORY: "${GITHUB_REPOSITORY:-}"
-      GITHUB_RUN_ID: "${GITHUB_RUN_ID:-}"
-    env_file:
-      - ./conf/common.env
-      - ./conf/test.env
-    depends_on:
-      - vmaas_database
-    volumes:
-      - ./:/vmaas
-    user: root
-    security_opt:
-      - label=disable
-    command: >
-      bash -c 'cd /vmaas && ./run_tests.sh vmaas-go'
+                         && ./run_tests.sh vmaas/webapp \
+                         && ./run_tests.sh vmaas-go'

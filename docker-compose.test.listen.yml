@@ -1,5 +1,3 @@
 services:
   test:
     command: bash -c 'cd /vmaas && tail -f /dev/null'
-  test_go:
-    command: bash -c 'cd /vmaas && tail -f /dev/null'
