@@ -5,9 +5,12 @@ ARG ALT_REPO
 FROM ${BUILDIMG} AS buildimg
 
 ARG ALT_REPO
+
+ARG VAR_RPMS=""
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        go-toolset rpm-devel && \
+        go-toolset rpm-devel python3.12-pip cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
+        $VAR_RPMS && \
     microdnf clean all
 
 ADD /vmaas-go /vmaas/go/src/vmaas
@@ -18,17 +21,23 @@ RUN go build -v main.go && go clean -cache -modcache -testcache
 # Switch back to /vmaas because of golang tests running in this stage
 WORKDIR /vmaas
 
+ADD requirements.txt     /vmaas/
+ADD requirements-dev.txt /vmaas/
+
+ARG VAR_PIP_INSTALL_OPT=""
+RUN pip3.12 install --upgrade pip && \
+    pip3.12 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
+    pip3.12 cache purge
+
 # -------------
 # runtime image
 FROM ${RUNIMG} AS runtimeimg
 
 ARG ALT_REPO
-ARG VAR_RPMS=""
 
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3.12-pip python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
-        $VAR_RPMS && \
+        python312 python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql libpq && \
         ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
         ln -s $(basename /usr/lib64/python3.9/site-packages/rpm/_rpm.*.so) /usr/lib64/python3.9/site-packages/rpm/_rpm.so && \
     microdnf clean all
@@ -39,14 +48,6 @@ RUN install -m 1777 -d /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas
 
 ENV PYTHONPATH=/vmaas
-
-ADD requirements.txt     /vmaas/
-ADD requirements-dev.txt /vmaas/
-
-ARG VAR_PIP_INSTALL_OPT=""
-RUN pip3.12 install --upgrade pip && \
-    pip3.12 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
-    pip3.12 cache purge
 
 # Baked-in content for FedRAMP
 ARG STATIC_ASSETS=0
@@ -60,6 +61,13 @@ USER vmaas
 
 # Compiled Go binary
 COPY --from=buildimg --chown=vmaas:root /vmaas/go/src/vmaas/main /vmaas/go/src/vmaas/
+
+# Python deps
+COPY --from=buildimg /usr/local/lib/python3.12/site-packages   /usr/local/lib/python3.12/site-packages
+COPY --from=buildimg /usr/local/lib64/python3.12/site-packages /usr/local/lib64/python3.12/site-packages
+COPY --from=buildimg /usr/local/bin/uvicorn                    /usr/local/bin/
+
+COPY --from=buildimg --chown=vmaas:root /vmaas/requirements.txt /vmaas/
 
 ADD entrypoint.sh               /vmaas/
 ADD conf                        /vmaas/conf

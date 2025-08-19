@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
       - name: Run container
         run: |
-          docker compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test test_go
+          docker compose -f docker-compose.test.yml -f docker-compose.test.listen.yml up -d --build test
       - name: Validate dashboards
         run: |
           docker compose -f docker-compose.test.yml exec -T test python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ --exit-code-from
@@ -42,8 +42,8 @@ jobs:
           docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas/reposcan/coverage.xml ./coverage_reposcan.xml
       - name: exec webapp-go tests
         run: |
-          docker compose -f docker-compose.test.yml exec -T test_go ./run_tests.sh vmaas-go --exit-code-from
-          docker compose -f docker-compose.test.yml cp test_go:/vmaas/vmaas-go/coverage.txt ./coverage_webapp_go.txt
+          docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas-go --exit-code-from
+          docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas-go/coverage.txt ./coverage_webapp_go.txt
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
