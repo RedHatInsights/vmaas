@@ -75,7 +75,7 @@ cffi==1.17.1 ; python_version == "3.12" and platform_python_implementation != "P
 colorama==0.4.6 ; python_version == "3.12" and sys_platform == "win32" \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
-coverage==7.10.3 ; python_version == "3.12" \
+coverage==7.10.5 ; python_version == "3.12" \
     --hash=sha256:03db599f213341e2960430984e04cf35fb179724e052a3ee627a068653cf4a7c \
     --hash=sha256:07009152f497a0464ffdf2634586787aea0e69ddd023eafb23fc38267db94b84 \
     --hash=sha256:07790b4b37d56608536f7c1079bd1aa511567ac2966d33d5cec9cf520c50a7c8 \
