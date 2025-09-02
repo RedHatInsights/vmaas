@@ -3,7 +3,7 @@
 [![GitHub release](https://img.shields.io/github/release/RedHatInsights/vmaas.svg)](https://github.com/RedHatInsights/vmaas/releases/latest)
 
 # VMaaS
-**V**ulnerability **M**etadata **a**s **a** **S**ervice
+**V**ulnerability **M**etadata **a**s **a** **S**ervice Test
 
 ## What Is This Thing?
 VMaaS is intended to be a microservice that has access to data connecting RPMs,
