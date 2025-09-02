@@ -40,6 +40,16 @@ spec:
     value: "true"
   - name: build-source-image
     value: "true"
+  - name: labels
+    value:
+      - 'url="https://www.redhat.com"'
+      - 'name="iop-vmaas"'
+      - 'description="This adds the satellite/iop-vmaas-rhel9 image to the Red Hat container registry. To pull this container image, run the following command: podman pull registry.redhat.io/satellite/iop-vmaas-rhel9"'
+      - 'summary="A new satellite/iop-vmaas-rhel9 container image is now generally available in the Red Hat container registry."'
+      - 'com.redhat.component="iop-vmaas"'
+      - 'io.k8s.display-name="IoP Vmaas"'
+      - 'io.k8s.description="This adds the satellite/iop-vmaas-rhel9 image to the Red Hat container registry. To pull this container image, run the following command: podman pull registry.redhat.io/satellite/iop-vmaas-rhel9"'
+      - 'io.openshift.tags="insights satellite iop vmaas"'
   pipelineRef:
     name: docker-build-oci-ta
   taskRunTemplate:
