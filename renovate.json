@@ -4,7 +4,9 @@
     "github>konflux-ci/mintmaker//config/renovate/renovate.json",
     "schedule:earlyMondays"
   ],
-  "baseBranches": ["master"],
+  "baseBranchPatterns": [
+    "master"
+  ],
   "timezone": "Europe/Prague",
   "tekton": {
     "automerge": true,
@@ -17,8 +19,12 @@
   "packageRules": [
     {
       "description": "Disable Python version updates",
-      "matchPackageNames": ["python"],
-      "matchManagers": ["poetry"],
+      "matchPackageNames": [
+        "python"
+      ],
+      "matchManagers": [
+        "poetry"
+      ],
       "enabled": false
     }
   ]
