@@ -16,7 +16,7 @@ attrs==25.3.0 ; python_version == "3.12" \
 boto3==1.40.6 ; python_version == "3.12" \
     --hash=sha256:3f2375b7576de603085d7b7491cf2c4ab5c57d12965a5ce295821cdd4d10e950 \
     --hash=sha256:7685085b8ea679dd858330834c16364c61c5830edb892c5864fb12ed68798708
-botocore==1.40.6 ; python_version == "3.12" \
+botocore==1.40.35 ; python_version == "3.12" \
     --hash=sha256:b253f107617791a29ca81c6f0fca20ac1afdba01869eb43017022bbbb8387f34 \
     --hash=sha256:e132eac967a7526596e31ca571d7f1ef9676c6a9c4f1322446768994ccab64aa
 certifi==2025.8.3 ; python_version == "3.12" \
