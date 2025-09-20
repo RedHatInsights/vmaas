@@ -79,7 +79,7 @@ cffi==1.17.1 ; python_version == "3.12" \
     # via
     #   cryptography
     #   zstandard
-cython==3.1.3 \
+cython==3.1.4 \
     --hash=sha256:00264cafcc451dcefc01eaf29ed5ec150fb73af21d4d21105d97e9d829a53e99 \
     --hash=sha256:08ac646ff42781827f23b7a9b61669cdb92055f52724cd8cbe0e1defc56fce2e \
     --hash=sha256:097374fa1370e9967e48442a41a0acbebb94fe9d63976cad31eacd38424847bf \
