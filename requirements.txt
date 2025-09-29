@@ -7,7 +7,7 @@ app-common-python==0.2.8 ; python_version == "3.12" \
 apscheduler==3.11.0 ; python_version == "3.12" \
     --hash=sha256:4c622d250b0955a65d5d0eb91c33e6d43fd879834bf541e0a18661ae60460133 \
     --hash=sha256:fc134ca32e50f5eadcc4938e3a4545ab19131435e851abb40b34d63d5141c6da
-asgiref==3.9.1 ; python_version == "3.12" \
+asgiref==3.9.2 ; python_version == "3.12" \
     --hash=sha256:a5ab6582236218e5ef1648f242fd9f10626cfd4de8dc377db215d5d5098e3142 \
     --hash=sha256:f3bba7092a48005b5f5bacd747d36ee4a5a61f4a269a6df590b43144355ebd2c
 attrs==25.3.0 ; python_version == "3.12" \
