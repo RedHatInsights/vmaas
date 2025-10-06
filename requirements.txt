@@ -13,7 +13,7 @@ asgiref==3.9.1 ; python_version == "3.12" \
 attrs==25.3.0 ; python_version == "3.12" \
     --hash=sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3 \
     --hash=sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b
-boto3==1.40.6 ; python_version == "3.12" \
+boto3==1.40.45 ; python_version == "3.12" \
     --hash=sha256:3f2375b7576de603085d7b7491cf2c4ab5c57d12965a5ce295821cdd4d10e950 \
     --hash=sha256:7685085b8ea679dd858330834c16364c61c5830edb892c5864fb12ed68798708
 botocore==1.40.6 ; python_version == "3.12" \
