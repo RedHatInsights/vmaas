@@ -22,7 +22,7 @@ export REGISTRY_AUTH_FILE="$AUTH_CONF_DIR/auth.json"
 
 podman login -u="$QUAY_USER" -p="$QUAY_TOKEN" quay.io
 podman login -u="$RH_REGISTRY_USER" -p="$RH_REGISTRY_TOKEN" registry.redhat.io
-podman build --build-arg STATIC_ASSETS=1 --pull=true -f Dockerfile -t "${IMAGE}:${IMAGE_TAG}" .
+podman build --pull=true -f Dockerfile -t "${IMAGE}:${IMAGE_TAG}" .
 
 if [[ $GIT_BRANCH == "origin/security-compliance" ]]; then
     podman tag "${IMAGE}:${IMAGE_TAG}" "${IMAGE}:${SECURITY_COMPLIANCE_TAG}"
