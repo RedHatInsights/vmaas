@@ -49,14 +49,6 @@ RUN install -m 1777 -d /data && \
 
 ENV PYTHONPATH=/vmaas
 
-# Baked-in content for FedRAMP
-ARG STATIC_ASSETS=0
-RUN if [ "${STATIC_ASSETS}" == 1 ] ; then \
-        curl -o /etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem && \
-        update-ca-trust extract && \
-        git clone --depth 1 https://gitlab.cee.redhat.com/vmaas/vmaas-assets.git /vmaas/repolist_git && rm -rf /vmaas/repolist_git/.git ; \
-    fi
-
 USER vmaas
 
 # Compiled Go binary
