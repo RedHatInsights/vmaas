@@ -44,7 +44,7 @@ RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgre
 
 WORKDIR /vmaas
 
-RUN install -m 1777 -d /data && \
+RUN install -d -m 775 -g root /data && \
     adduser --gid 0 -d /vmaas --no-create-home vmaas
 
 ENV PYTHONPATH=/vmaas
