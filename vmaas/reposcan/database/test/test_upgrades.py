@@ -20,7 +20,8 @@ def _run_pg_dump(dump_args_in):
                  "-h", os.getenv("POSTGRESQL_HOST"),
                  "-p", os.getenv("POSTGRESQL_PORT"),
                  "-U", os.getenv("POSTGRESQL_USER"),
-                 "-d", os.getenv("POSTGRESQL_DATABASE")]
+                 "-d", os.getenv("POSTGRESQL_DATABASE"),
+                 "--restrict-key", "testupgrade"]
     dump_args.extend(dump_args_in)
     dump = subprocess.check_output(dump_args).decode("utf-8")
     dump = re.sub(r",?\n+", "\n", dump).splitlines()
