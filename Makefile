@@ -65,12 +65,16 @@ generate-rpm-lockfile: rpms.in.yaml
 # export ORG_ID=<org id>
 # podman run --rm -it -e KEY_NAME=${KEY_NAME} -e ORG_ID=${ORG_ID} -v $(pwd):/source:Z registry.access.redhat.com/ubi9
 # subscription-manager register --activationkey="$KEY_NAME" --org="$ORG_ID"
-# suibscription-manager refresh
+# subscription-manager refresh
 # cp -r /etc/pki/entitlement /source
 # cp /etc/rhsm/ca/redhat-uep.pem /source
 # cp /etc/yum.repos.d/redhat.repo /source/redhat.repo
 # exit
 # sed -i "s/$(uname -m)/\$basearch/g" redhat.repo
+# sed -i 's/sslclientkey = .*/sslclientkey = \$SSL_CLIENT_KEY/g' redhat.repo
+# sed -i 's/sslclientcert = .*/sslclientcert = \$SSL_CLIENT_CERT/g' redhat.repo
+# export SSL_KEY=`cat redhat.repo | grep sslclientkey | tail -1 | sed -n 's/^sslclientkey = \(.*\)/\1/gp'`
+# export SSL_CERT=`cat redhat.repo | grep sslclientcert | tail -1 | sed -n 's/^sslclientcert = \(.*\)/\1/gp'`
 # update rpms.in.yaml (add redhat.repo to repofiles)
 #
 # Usage: make generate-rpm-lockfile [BASE_IMAGE=<image>]
@@ -82,7 +86,7 @@ generate-rpm-lockfile-subscription: rpms.in.yaml
 	@curl -s https://raw.githubusercontent.com/konflux-ci/rpm-lockfile-prototype/refs/heads/main/Containerfile | \
 	podman build -t localhost/rpm-lockfile-prototype -
 	@container_dir=/work; \
-		podman run --rm -v $${PWD}:$${container_dir} -v $${PWD}/entitlement/:/etc/pki/entitlement -v $${PWD}/redhat-uep.pem:/etc/rhsm/ca/redhat-uep.pem localhost/rpm-lockfile-prototype:latest --outfile=$${container_dir}/rpms.lock.yaml --image $(BASE_IMAGE) $${container_dir}/rpms.in.yaml
+		podman run --rm -v $${PWD}:$${container_dir} -v $${PWD}/entitlement/:/etc/pki/entitlement -v $${PWD}/redhat-uep.pem:/etc/rhsm/ca/redhat-uep.pem localhost/rpm-lockfile-prototype:latest --outfile=$${container_dir}/rpms.lock.yaml --image $(BASE_IMAGE) $${container_dir}/rpms.in.yaml -e SSL_CLIENT_KEY=$${SSL_KEY} -e SSL_CLIENT_CERT=$${SSL_CERT}
 	@if [ ! -f rpms.lock.yaml ]; then \
 		echo "Error: rpms.lock.yaml was not generated"; \
 		exit 1; \
