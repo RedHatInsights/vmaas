@@ -1,4 +1,4 @@
-packages: [go-toolset, rpm-devel, python312, python3.12-pip, python3-rpm, python3-dnf, which, nginx, git-core, shadow-utils, diffutils, systemd, libicu, postgresql, cargo, rust, python3.12-devel, libffi-devel, postgresql-devel, openssl-devel, libgomp, expat, expat-devel]
+packages: [go-toolset, rpm-devel, python312, python3.12-pip, python3-rpm, python3-dnf, which, nginx, git-core, shadow-utils, diffutils, systemd, libicu, postgresql, cargo, rust, python3.12-devel, libffi-devel, postgresql-devel, openssl-devel]
 contentOrigin:
   repofiles: ["./redhat.repo"]
 arches: [x86_64]
