@@ -1,8 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>konflux-ci/mintmaker//config/renovate/renovate.json",
-    "schedule:earlyMondays"
+    "schedule:earlyMondays",
+    "github>RedHatInsights/konflux-pipelines//renovate/foreman_satellite/renovate.json"
   ],
   "baseBranchPatterns": [
     "master"
@@ -14,7 +14,8 @@
     "automergeType": "pr",
     "enabled": true,
     "ignoreTests": true,
-    "platformAutomerge": true
+    "platformAutomerge": true,
+    "schedule": ["at any time"]
   },
   "packageRules": [
     {
