@@ -40,6 +40,9 @@ func unifyParametrizedUrlsCounters(p *ginprometheus.Prometheus) {
 		for _, p := range c.Params {
 			url = strings.Replace(url, "/"+p.Value, "/:"+p.Key, 1)
 		}
+		if c.Writer.Status() == 404 {
+			return "/404"
+		}
 		return url
 	}
 }
