@@ -4,9 +4,6 @@
     "schedule:earlyMondays",
     "github>RedHatInsights/konflux-pipelines//renovate/foreman_satellite/renovate.json"
   ],
-  "baseBranchPatterns": [
-    "master"
-  ],
   "timezone": "Europe/Prague",
   "tekton": {
     "automerge": true,
