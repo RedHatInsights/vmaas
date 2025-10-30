@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 34);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 35);
 
 -- -----------------------------------------------------
 -- evr type
