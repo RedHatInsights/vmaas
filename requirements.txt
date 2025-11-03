@@ -4,7 +4,7 @@ anyio==4.10.0 ; python_version == "3.12" \
 app-common-python==0.2.8 ; python_version == "3.12" \
     --hash=sha256:4e3d12f17cec46755f3255c3a40abb192cef9fc04a13141e77f4abe7fd71fb58 \
     --hash=sha256:bf0e020b1b4d77b03e6e0e97e4f1f5112e3c27954721c2c82cd2ac40d20cb0f6
-apscheduler==3.11.0 ; python_version == "3.12" \
+apscheduler==3.11.1 ; python_version == "3.12" \
     --hash=sha256:4c622d250b0955a65d5d0eb91c33e6d43fd879834bf541e0a18661ae60460133 \
     --hash=sha256:fc134ca32e50f5eadcc4938e3a4545ab19131435e851abb40b34d63d5141c6da
 asgiref==3.9.1 ; python_version == "3.12" \
