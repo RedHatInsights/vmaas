@@ -109,4 +109,3 @@ ENV/
 redhat-uep.pem
 entitlement/
 requirements-build.in
-redhat.repo
