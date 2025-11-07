@@ -61,3 +61,18 @@ func TestBindValidateJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestBindValidateJSONInvalidDateFormat(t *testing.T) {
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	body := []byte(`{"modified_since": "2024-11-01"}`)
+	mockPOST(c, body)
+
+	req := vmaas.PkgListRequest{}
+	err := bindValidateJSON(c, &req)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "wrong date format")
+	assert.Contains(t, err.Error(), "2024-11-01")
+}
