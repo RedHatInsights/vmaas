@@ -33,6 +33,7 @@ def test_phase_1(db_conn, caplog, monkeypatch):
 
     DatabaseHandler.connection = db_conn
     reset_db(db_conn)
+    # delete_all_tables(db_conn)
 
     # write_testing_data(db_conn)
     basearch = "x86_64"
