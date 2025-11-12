@@ -121,3 +121,4 @@ def delete_all_tables(db_conn):
         cur.execute("TRUNCATE TABLE errata CASCADE")
         cur.execute("TRUNCATE TABLE cve CASCADE")
     db_conn.commit()
+
