@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
       == "security-compliance"
-    pipelinesascode.tekton.dev/pipeline: https://github.com/RedHatInsights/konflux-pipelines/raw/v1.54.0/pipelines/docker-build-oci-ta.yaml
+    pipelinesascode.tekton.dev/pipeline: https://github.com/RedHatInsights/konflux-pipelines/raw/v1.55.0/pipelines/docker-build-oci-ta.yaml
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: insights-vulnerability-sc
