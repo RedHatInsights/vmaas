@@ -106,5 +106,5 @@ class TestBatchList:
         Test creation of an invalid batch list.
         Should fail because single item is larger than max batch size
         """
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             self.test_batch_creation(batchlist, 102, int(BATCH_MAX_FILESIZE) + 1)
