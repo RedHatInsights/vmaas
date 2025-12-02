@@ -29,9 +29,11 @@ class BatchList:
         else:
             last_batch = None
 
-        assert BATCH_MAX_FILESIZE > file_size, \
-            'Single repo uses %d Bytes, which is more than allowed BATCH_MAX_FILESIZE(%d)' \
-            % (file_size, BATCH_MAX_FILESIZE)
+        if file_size >= BATCH_MAX_FILESIZE:
+            raise ValueError(
+                f'Single repo uses {file_size} Bytes, which is more than allowed '
+                f'BATCH_MAX_FILESIZE({BATCH_MAX_FILESIZE})'
+            )
 
         if last_batch is None or len(last_batch) >= BATCH_MAX_SIZE \
                 or self.last_batch_filesize + file_size > BATCH_MAX_FILESIZE:
