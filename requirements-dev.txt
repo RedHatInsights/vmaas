@@ -352,9 +352,9 @@ types-pyyaml==6.0.12.20250809 ; python_version == "3.12" \
 types-requests==2.32.4.20250809 ; python_version == "3.12" \
     --hash=sha256:d8060de1c8ee599311f56ff58010fb4902f462a1470802cf9f6ed27bc46c4df3 \
     --hash=sha256:f73d1832fb519ece02c85b1f09d5f0dd3108938e7d47e7f94bbfa18a6782b163
-types-setuptools==80.9.0.20250809 ; python_version == "3.12" \
-    --hash=sha256:7c6539b4c7ac7b4ab4db2be66d8a58fb1e28affa3ee3834be48acafd94f5976a \
-    --hash=sha256:e986ba37ffde364073d76189e1d79d9928fb6f5278c7d07589cde353d0218864
+types-setuptools==80.9.0.20250822; python_version == "3.12" \
+    --hash=sha256:070ea7716968ec67a84c7f7768d9952ff24d28b65b6594797a464f1b3066f965 \
+    --hash=sha256:53bf881cb9d7e46ed12c76ef76c0aaf28cfe6211d3fab12e0b83620b1a8642c3
 types-urllib3==1.26.25.14 ; python_version == "3.12" \
     --hash=sha256:229b7f577c951b8c1b92c1bc2b2fdb0b49847bd2af6d1cc2a2e3dd340f3bda8f \
     --hash=sha256:9683bbb7fb72e32bfe9d2be6e04875fbe1b3eeec3cbb4ea231435aa7fd6b4f0e
