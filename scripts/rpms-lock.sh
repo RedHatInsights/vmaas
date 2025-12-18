@@ -38,6 +38,7 @@ $cmd run --rm -d --name rpms-locker-container rpms-locker sleep infinity
 $cmd exec rpms-locker-container bash -c "mkdir -p /tmp"
 $cmd cp ".hermetic_builds/rpms.in.yaml" rpms-locker-container:"/tmp/"
 $cmd exec -it rpms-locker-container bash -c "subscription-manager register"
+$cmd exec -it rpms-locker-container bash -c "subscription-manager repos --enable rhel-9-for-x86_64-baseos-source-rpms --enable rhel-9-for-x86_64-appstream-source-rpms"
 $cmd exec rpms-locker-container bash -c "cp /etc/yum.repos.d/redhat.repo /tmp/ && sed -i \"s/\$(uname -m)/\\\$basearch/g\" /tmp/redhat.repo"
 $cmd exec rpms-locker-container bash -c "rpm-lockfile-prototype --outfile=/tmp/rpms.lock.yaml --image registry.access.redhat.com/ubi9/ubi-minimal:latest /tmp/rpms.in.yaml"
 
