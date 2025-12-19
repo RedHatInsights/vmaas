@@ -59,7 +59,7 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/swaggo/swag v1.16.6 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
-	github.com/ugorji/go/codec v1.3.0 // indirect
+	github.com/ugorji/go/codec v1.3.1 // indirect
 	golang.org/x/arch v0.19.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/mod v0.26.0 // indirect
