@@ -346,9 +346,9 @@ types-pyopenssl==24.1.0.20240722 ; python_version == "3.12" \
 types-python-dateutil==2.9.0.20250809 ; python_version == "3.12" \
     --hash=sha256:69cbf8d15ef7a75c3801d65d63466e46ac25a0baa678d89d0a137fc31a608cc1 \
     --hash=sha256:768890cac4f2d7fd9e0feb6f3217fce2abbfdfc0cadd38d11fba325a815e4b9f
-types-pyyaml==6.0.12.20250809 ; python_version == "3.12" \
-    --hash=sha256:032b6003b798e7de1a1ddfeefee32fac6486bdfe4845e0ae0e7fb3ee4512b52f \
-    --hash=sha256:af4a1aca028f18e75297da2ee0da465f799627370d74073e96fee876524f61b5
+types-PyYAML==6.0.12.20250915; python_version == "3.12" \
+    --hash=sha256:0f8b54a528c303f0e6f7165687dd33fafa81c807fcac23f632b63aa624ced1d3 \
+    --hash=sha256:e7d4d9e064e89a3b3cae120b4990cd370874d2bf12fa5f46c97018dd5d3c9ab6
 types-requests==2.32.4.20250809 ; python_version == "3.12" \
     --hash=sha256:d8060de1c8ee599311f56ff58010fb4902f462a1470802cf9f6ed27bc46c4df3 \
     --hash=sha256:f73d1832fb519ece02c85b1f09d5f0dd3108938e7d47e7f94bbfa18a6782b163
