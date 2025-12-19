@@ -210,9 +210,9 @@ click==8.2.1 ; python_version == "3.12" \
 colorama==0.4.6 ; python_version == "3.12" and platform_system == "Windows" \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
-connexion==3.1.0 ; python_version == "3.12" \
-    --hash=sha256:66a44580991f53955b6e409a84fa9fa65c7ca4db52dc217b49cd35c201066083 \
-    --hash=sha256:e92b6d0412eb54b3b69f2516b93d982a06b0e23f6d5c1ab94257c55d365f63ce
+connexion==3.3.0; python_version == "3.12" \
+    --hash=sha256:4ed0b1a90f5a39f58e984b270b3e945c5038a1d064748a23478833027428102c \
+    --hash=sha256:63e4b32c170c297f245b63e26a78e299d4df86f8f6f37ef1f70db62efaba77cf
 cryptography==45.0.7; python_version == "3.12" \
     --hash=sha256:06ce84dc14df0bf6ea84666f958e6080cdb6fe1231be2a51f3fc1267d9f3fb34 \
     --hash=sha256:16ede8a4f7929b4b7ff3642eba2bf79aa1d71f24ab6ee443935c0d269b6bc513 \
