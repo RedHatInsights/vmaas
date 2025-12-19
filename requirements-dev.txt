@@ -349,9 +349,9 @@ types-python-dateutil==2.9.0.20250809 ; python_version == "3.12" \
 types-pyyaml==6.0.12.20250809 ; python_version == "3.12" \
     --hash=sha256:032b6003b798e7de1a1ddfeefee32fac6486bdfe4845e0ae0e7fb3ee4512b52f \
     --hash=sha256:af4a1aca028f18e75297da2ee0da465f799627370d74073e96fee876524f61b5
-types-requests==2.32.4.20250809 ; python_version == "3.12" \
-    --hash=sha256:d8060de1c8ee599311f56ff58010fb4902f462a1470802cf9f6ed27bc46c4df3 \
-    --hash=sha256:f73d1832fb519ece02c85b1f09d5f0dd3108938e7d47e7f94bbfa18a6782b163
+types-requests==2.32.4.20250913; python_version == "3.12" \
+    --hash=sha256:78c9c1fffebbe0fa487a418e0fa5252017e9c60d1a2da394077f1780f655d7e1 \
+    --hash=sha256:abd6d4f9ce3a9383f269775a9835a4c24e5cd6b9f647d64f88aa4613c33def5d
 types-setuptools==80.9.0.20250822; python_version == "3.12" \
     --hash=sha256:070ea7716968ec67a84c7f7768d9952ff24d28b65b6594797a464f1b3066f965 \
     --hash=sha256:53bf881cb9d7e46ed12c76ef76c0aaf28cfe6211d3fab12e0b83620b1a8642c3
