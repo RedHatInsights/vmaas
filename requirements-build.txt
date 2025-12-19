@@ -4,9 +4,9 @@
 #
 #    pybuild-deps compile --generate-hashes --output-file=requirements-build.txt requirements.txt
 #
-calver==2025.4.17 \
-    --hash=sha256:460702737d620f5c3d4175450485180a1b7f7a422c5db0e6af3e655c7395ec7e \
-    --hash=sha256:82f0efe7f71c28167af5ed9712e0d9d6272eb0817acbbf852b8b2404666a0cf2
+calver==2025.10.20 \
+    --hash=sha256:c98b376c2424642224d456b2f70c51402343e008c63d204634665e1a2a2835f5 \
+    --hash=sha256:d7d75224eed9d9263f4fb30008487615196d208d14752bfd93fea7af2c84f508
     # via trove-classifiers
 cffi==1.17.1 ; python_version == "3.12" \
     --hash=sha256:045d61c734659cc045141be4bae381a41d89b741f795af1dd018bfb532fd0df8 \
