@@ -334,9 +334,9 @@ tomlkit==0.13.3 ; python_version == "3.12" \
 traitlets==5.14.3 ; python_version == "3.12" \
     --hash=sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7 \
     --hash=sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f
-types-cffi==1.17.0.20250809 ; python_version == "3.12" \
-    --hash=sha256:426099ada3e54a525795e04259edf10d96c8ea245b4efff29dcd086bdf242a64 \
-    --hash=sha256:d25a61025306cf2276a3010e11dc694e48da64d21fda694f3b323a9faddc3ea2
+types-cffi==1.17.0.20250915; python_version == "3.12" \
+    --hash=sha256:4362e20368f78dabd5c56bca8004752cc890e07a71605d9e0d9e069dbaac8c06 \
+    --hash=sha256:cef4af1116c83359c11bb4269283c50f0688e9fc1d7f0eeb390f3661546da52c
 types-psycopg2==2.9.21.20251012; python_version == "3.12" \
     --hash=sha256:4cdafd38927da0cfde49804f39ab85afd9c6e9c492800e42f1f0c1a1b0312935 \
     --hash=sha256:712bad5c423fe979e357edbf40a07ca40ef775d74043de72bd4544ca328cc57e
