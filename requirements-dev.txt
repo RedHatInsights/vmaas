@@ -343,9 +343,9 @@ types-psycopg2==2.9.21.20251012; python_version == "3.12" \
 types-pyopenssl==24.1.0.20240722 ; python_version == "3.12" \
     --hash=sha256:47913b4678a01d879f503a12044468221ed8576263c1540dcb0484ca21b08c39 \
     --hash=sha256:6a7a5d2ec042537934cfb4c9d4deb0e16c4c6250b09358df1f083682fe6fda54
-types-python-dateutil==2.9.0.20250809 ; python_version == "3.12" \
-    --hash=sha256:69cbf8d15ef7a75c3801d65d63466e46ac25a0baa678d89d0a137fc31a608cc1 \
-    --hash=sha256:768890cac4f2d7fd9e0feb6f3217fce2abbfdfc0cadd38d11fba325a815e4b9f
+types-python-dateutil==2.9.0.20251115; python_version == "3.12" \
+    --hash=sha256:8a47f2c3920f52a994056b8786309b43143faa5a64d4cbb2722d6addabdf1a58 \
+    --hash=sha256:9cf9c1c582019753b8639a081deefd7e044b9fa36bd8217f565c6c4e36ee0624
 types-pyyaml==6.0.12.20250809 ; python_version == "3.12" \
     --hash=sha256:032b6003b798e7de1a1ddfeefee32fac6486bdfe4845e0ae0e7fb3ee4512b52f \
     --hash=sha256:af4a1aca028f18e75297da2ee0da465f799627370d74073e96fee876524f61b5
