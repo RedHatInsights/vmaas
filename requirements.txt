@@ -13,9 +13,9 @@ asgiref==3.9.1 ; python_version == "3.12" \
 attrs==25.3.0 ; python_version == "3.12" \
     --hash=sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3 \
     --hash=sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b
-boto3==1.42.13; python_version == "3.12" \
-    --hash=sha256:4c9a62dcb5c3f905630fe99fb4b81131da84c5c92eedcc81a89cbd924c1c524f \
-    --hash=sha256:9d6aad3fa8b90567006bf7b32efa26489fc306fbe63946eaf57b72356a45761d
+boto3==1.42.19; python_version == "3.12" \
+    --hash=sha256:5933696a28bf8eb62fc54e4de5583f78a0efef59c8164ee1850436aa22f53aa7 \
+    --hash=sha256:c55b8b303c64931272536813a476f130b90ea7041d7b79c154d89cf1c18256b4
 botocore==1.42.13; python_version == "3.12" \
     --hash=sha256:7e4cf14bd5719b60600fb45d2bb3ae140feb3c182a863b93093aafce7f93cfee \
     --hash=sha256:b750b2de4a2478db9718a02395cb9da8698901ba02378d60037d6369ecb6bb88
