@@ -28,7 +28,7 @@ class DbDumpAPI:
                 with subprocess.Popen(["gzip"], stdin=dump_process.stdout, stdout=out) as gzip_process:
                     _, error = gzip_process.communicate()
                     if error:
-                        raise Exception(f"pg_dump exited with {error}")
+                        raise ChildProcessError(f"pg_dump exited with {error}")
 
     @staticmethod
     def download():
