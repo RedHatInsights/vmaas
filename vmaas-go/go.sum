@@ -99,8 +99,8 @@ github.com/prometheus/procfs v0.17.0 h1:FuLQ+05u4ZI+SS/w9+BWEM2TXiHKsUQ9TADiRH7D
 github.com/prometheus/procfs v0.17.0/go.mod h1:oPQLaDAMRbA+u8H5Pbfq+dl3VDAvHxMUOVhe0wYB2zw=
 github.com/psegedy/gorpm v0.0.0-20221128152921-427315f73216 h1:ho/IsahddrO8XC6CPIdfUc9NzJVsfiUlji66fuG+kT8=
 github.com/psegedy/gorpm v0.0.0-20221128152921-427315f73216/go.mod h1:vQitNpgQfyZg3wKlAp8RIx9yZ8R9xmgw0nxPoNvqDQk=
-github.com/redhatinsights/app-common-go v1.6.8 h1:hyExMp6WHprlGkHKElQvSFF2ZPX8XTW6X+54PLLyUv0=
-github.com/redhatinsights/app-common-go v1.6.8/go.mod h1:KW0BK+bnhp3kXU8BFwebQXqCqjdkcRewZsDlXCSNMyo=
+github.com/redhatinsights/app-common-go v1.6.9 h1:juGobZnDvMqpx6DAO2qq9aFk/g93MblQQVVPPwTAfdM=
+github.com/redhatinsights/app-common-go v1.6.9/go.mod h1:KW0BK+bnhp3kXU8BFwebQXqCqjdkcRewZsDlXCSNMyo=
 github.com/redhatinsights/platform-go-middlewares/v2 v2.0.0 h1:h/Dj/puWcGxaevSmuFW7IhF0fInlvWjCrxDoS9i3EY4=
 github.com/redhatinsights/platform-go-middlewares/v2 v2.0.0/go.mod h1:W5XsWVaMd+bIjULyCrls2dH4FFPnfxySY1PTzTZl1Dg=
 github.com/redhatinsights/vmaas-lib v1.32.0 h1:x7k7GJkNMTyOHUFR5xxYTAcwaM42rFxPCpV/0uv5aZY=
