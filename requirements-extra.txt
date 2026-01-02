@@ -136,9 +136,9 @@ setuptools-rust==1.11.1 \
     --hash=sha256:5eaaddaed268dc24a527ffa659ce56b22d3cf17b781247b779efd611031fe8ea \
     --hash=sha256:7dabc4392252ced314b8050d63276e05fdc5d32398fc7d3cce1f6a6ac35b76c0
     # via -r requirements-build.in
-setuptools-scm==9.1.1 \
-    --hash=sha256:24fe7df92a0429ca66264287c7bdfbb645180e4b008708f36c2e2966aa96ae61 \
-    --hash=sha256:9b47bba73d1dcf0074b043f0ece0c4e485d87e0a73803c9176797ab68d0c3015
+setuptools-scm==9.2.2 \
+    --hash=sha256:1c674ab4665686a0887d7e24c03ab25f24201c213e82ea689d2f3e169ef7ef57 \
+    --hash=sha256:30e8f84d2ab1ba7cb0e653429b179395d0c33775d54807fc5f1dd6671801aef7
     # via -r requirements-build.in
 
 # The following packages are considered to be unsafe in a requirements file:
