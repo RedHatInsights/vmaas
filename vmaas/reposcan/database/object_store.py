@@ -5,7 +5,7 @@ import typing as t
 from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.database_handler import DatabaseHandler
 
-PrepareTableMapT = dict[str, int] | dict[str, tuple[t.Any, ...]] | dict[tuple[str, ...], int] | dict[tuple[str, ...], tuple[t.Any, ...]]
+PrepareTableMapType = dict[str, int] | dict[str, tuple[t.Any, ...]] | dict[tuple[str, ...], int] | dict[tuple[str, ...], tuple[t.Any, ...]]
 
 
 class ObjectStore:
@@ -45,7 +45,7 @@ class ObjectStore:
         return modules_in_repo
 
     def _prepare_table_map(self, cols: t.Iterable[str], table: str, to_cols: t.Iterable[str] | None = None,
-                           where: str | None = None) -> PrepareTableMapT:
+                           where: str | None = None) -> PrepareTableMapType:
         """Create map from table map[columns] -> or(column, tuple(columns))."""
         if not to_cols:
             to_cols = ["id"]
