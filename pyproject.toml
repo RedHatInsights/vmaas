@@ -2,22 +2,6 @@
 version_toml = ["pyproject.toml:project.version"]
 commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"
 
-[tool.semantic_release.commit_parser_options]
-allowed_tags = [
-    "build",
-    "chore",
-    "ci",
-    "docs",
-    "feat",
-    "fix",
-    "perf",
-    "style",
-    "refactor",
-    "test",
-]
-minor_tags = ["feat"]
-patch_tags = ["build", "chore", "ci", "fix", "perf", "refactor"]
-
 [project]
 name = "vmaas"
 version = "3.2.29"
