@@ -10,19 +10,22 @@
     "automergeType": "pr",
     "enabled": true,
     "ignoreTests": true,
-    "platformAutomerge": true,
-    "schedule": ["at any time"]
+    "platformAutomerge": true
   },
   "packageRules": [
     {
-      "description": "Disable Python version updates",
-      "matchPackageNames": [
-        "python"
-      ],
       "matchManagers": [
-        "poetry"
+        "pip_requirements"
       ],
-      "enabled": false
+      "groupName": "requirements.txt",
+      "groupSlug": "pip-requirements"
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "groupName": "go modules",
+      "groupSlug": "go-modules"
     }
   ]
 }
