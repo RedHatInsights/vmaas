@@ -26,6 +26,13 @@
       ],
       "groupName": "go modules",
       "groupSlug": "go-modules"
+    },
+    {
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "groupName": "dockerfiles",
+      "groupSlug": "dockerfiles"
     }
   ]
 }
