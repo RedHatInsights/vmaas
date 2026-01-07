@@ -14,25 +14,30 @@
   },
   "packageRules": [
     {
-      "matchManagers": [
-        "pip_requirements"
-      ],
-      "groupName": "requirements.txt",
-      "groupSlug": "pip-requirements"
+      "matchCategories": ["python"],
+      "groupName": "python dependencies",
+      "groupSlug": "python-deps",
+      "separateMajorMinor": true,
+      "separateMultipleMajor": true
     },
     {
-      "matchManagers": [
-        "gomod"
-      ],
+      "matchCategories": ["golang"],
       "groupName": "go modules",
-      "groupSlug": "go-modules"
+      "groupSlug": "go-modules",
+      "separateMajorMinor": true,
+      "separateMultipleMajor": true
     },
     {
-      "matchManagers": [
-        "dockerfile"
-      ],
-      "groupName": "dockerfiles",
-      "groupSlug": "dockerfiles"
+      "matchCategories": ["docker"],
+      "groupName": "docker references",
+      "groupSlug": "docker-refs",
+      "pinDigests": true
+    },
+    {
+      "matchCategories": ["ci"],
+      "groupName": "ci references",
+      "groupSlug": "ci-refs",
+      "pinDigests": true
     }
   ]
 }
