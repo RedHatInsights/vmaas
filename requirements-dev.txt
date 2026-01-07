@@ -1,6 +1,6 @@
-astroid==4.0.2 ; python_version == "3.12" \
-    --hash=sha256:ac8fb7ca1c08eb9afec91ccc23edbd8ac73bb22cbdd7da1d488d9fb8d6579070 \
-    --hash=sha256:d7546c00a12efc32650b19a2bb66a153883185d3179ab0d4868086f807338b9b
+astroid==4.0.3; python_version == "3.12" \
+    --hash=sha256:08d1de40d251cc3dc4a7a12726721d475ac189e4e583d596ece7422bc176bda3 \
+    --hash=sha256:864a0a34af1bd70e1049ba1e61cee843a7252c826d97825fcee9b2fcbd9e1b14
 asttokens==3.0.1 ; python_version == "3.12" \
     --hash=sha256:15a3ebc0f43c2d0a50eeafea25e19046c68398e487b9f1f5b517f7c0f40f976a \
     --hash=sha256:71a4ee5de0bde6a31d64f6b13f2293ac190344478f081c3d1bccfcf5eacb0cb7
@@ -258,9 +258,9 @@ iniconfig==2.3.0 ; python_version == "3.12" \
 ipython-pygments-lexers==1.1.1 ; python_version == "3.12" \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
-ipython==9.8.0 ; python_version == "3.12" \
-    --hash=sha256:8e4ce129a627eb9dd221c41b1d2cdaed4ef7c9da8c17c63f6f578fe231141f83 \
-    --hash=sha256:ebe6d1d58d7d988fbf23ff8ff6d8e1622cfdb194daf4b7b73b792c4ec3b85385
+ipython==9.9.0; python_version == "3.12" \
+    --hash=sha256:48fbed1b2de5e2c7177eefa144aba7fcb82dac514f09b57e2ac9da34ddb54220 \
+    --hash=sha256:b457fe9165df2b84e8ec909a97abcf2ed88f565970efba16b1f7229c283d252b
 isort==7.0.0 ; python_version == "3.12" \
     --hash=sha256:1bcabac8bc3c36c7fb7b98a76c8abb18e0f841a3ba81decac7691008592499c1 \
     --hash=sha256:5513527951aadb3ac4292a41a16cbc50dd1642432f5e8c20057d414bdafb4187
@@ -464,9 +464,9 @@ types-python-dateutil==2.9.0.20251115 ; python_version == "3.12" \
 types-pyyaml==6.0.12.20250915 ; python_version == "3.12" \
     --hash=sha256:0f8b54a528c303f0e6f7165687dd33fafa81c807fcac23f632b63aa624ced1d3 \
     --hash=sha256:e7d4d9e064e89a3b3cae120b4990cd370874d2bf12fa5f46c97018dd5d3c9ab6
-types-requests==2.32.4.20250913 ; python_version == "3.12" \
-    --hash=sha256:78c9c1fffebbe0fa487a418e0fa5252017e9c60d1a2da394077f1780f655d7e1 \
-    --hash=sha256:abd6d4f9ce3a9383f269775a9835a4c24e5cd6b9f647d64f88aa4613c33def5d
+types-requests==2.32.4.20260107; python_version == "3.12" \
+    --hash=sha256:018a11ac158f801bfa84857ddec1650750e393df8a004a8a9ae2a9bec6fcb24f \
+    --hash=sha256:b703fe72f8ce5b31ef031264fe9395cac8f46a04661a79f7ed31a80fb308730d
 types-setuptools==80.9.0.20251223 ; python_version == "3.12" \
     --hash=sha256:1b36db79d724c2287d83dc052cf887b47c0da6a2fff044378be0b019545f56e6 \
     --hash=sha256:d3411059ae2f5f03985217d86ac6084efea2c9e9cacd5f0869ef950f308169b2
