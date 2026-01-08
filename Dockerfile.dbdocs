@@ -1,3 +1,3 @@
-FROM schemaspy/schemaspy
+FROM schemaspy/schemaspy@sha256:c8f98116a5cfe4b00b379eeb23b2022cdea4c9192cbccb843a75049e752479b7
 
 ADD /scripts/schemaspy.properties .
