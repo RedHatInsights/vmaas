@@ -152,7 +152,7 @@ class CsafController:
             cves.update(parsed_cves)
         return cves
 
-    def _parse_product(
+    def _parse_product(  # pylint: disable=too-many-branches
         self,
         product: str,
         product_status: str,
@@ -161,6 +161,15 @@ class CsafController:
     ) -> tuple[str, str, str | None, str]:
         if ":" not in product:
             raise ComponentError(f"Component without ':', '{product}'")
+
+        # Extract ::module:stream suffix from product_id if present
+        # e.g., "AppStream-8.1.0.Z.MAIN.EUS:php-fpm-0:7.2.11...x86_64::php:7.2"
+        original_product = product
+        module_from_suffix = None
+        if "::" in product:
+            product, suffix = product.rsplit("::", 1)
+            if ":" in suffix:
+                module_from_suffix = suffix
 
         branch_product, rest = product.split(":", 1)
         pkg = rest
@@ -185,11 +194,14 @@ class CsafController:
                     raise ComponentError(f"Invalid product variant '{branch_product}'")
                 variant_suffix = splitted_product[1]
                 if ".module" in product:
-                    rel = product_rel.get(product)
+                    rel = product_rel.get(original_product) or product_rel.get(product)
                     if rel is None:
-                        # this might happen until csaf vex files are not updated with modules for fixed products
-                        # return the package as it didn't have a module
-                        self.logger.warning("Missing module for modular product '%s'", product)
+                        # Use module info from ::module:stream suffix as fallback
+                        if module_from_suffix is not None:
+                            module = module_from_suffix
+                        else:
+                            self.logger.warning("Missing module for modular product '%s'", original_product)
+                        # Return early - skip purl check since we don't have relationship data
                         return branch_product, pkg, module, variant_suffix
                     pkg, module = rel.product_reference, rel.module
                 purl = product_purl.get(pkg)
