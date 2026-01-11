@@ -17,7 +17,7 @@ dependencies = [
     "boto3>=1.36.2",
     "botocore>=1.36.2",
     # Locked to 3.1.0 due to https://github.com/spec-first/connexion/issues/2029
-    "connexion[swagger-ui]==3.1.0",
+    "connexion[swagger-ui]==3.3.0",
     "gitpython>=3.1.30",
     "psycopg2-binary>=2.8.6",
     "prometheus-client>=0.8.0",
@@ -29,7 +29,7 @@ dependencies = [
     "urllib3>=2.5.0",
     "uvicorn (>=0.35.0,<1.0.0)",
     "watchtower>=1.0.0",
-    "zstandard (>=0.23.0,<0.24.0)",
+    "zstandard (>=0.25.0,<0.26.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]
