@@ -14,18 +14,18 @@
   },
   "packageRules": [
     {
-      "matchCategories": ["python"],
-      "groupName": "python dependencies",
-      "groupSlug": "python-deps",
-      "separateMajorMinor": true,
-      "separateMultipleMajor": true
+      "matchFileNames": ["**/requirements*.txt"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["poetry"],
+      "groupName": "poetry dependencies",
+      "groupSlug": "poetry-deps"
     },
     {
       "matchCategories": ["golang"],
       "groupName": "go modules",
-      "groupSlug": "go-modules",
-      "separateMajorMinor": true,
-      "separateMultipleMajor": true
+      "groupSlug": "go-modules"
     },
     {
       "matchCategories": ["docker"],
