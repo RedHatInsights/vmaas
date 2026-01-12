@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws" //nolint:staticcheck
+	"github.com/aws/aws-sdk-go/aws"             //nolint:staticcheck
 	"github.com/aws/aws-sdk-go/aws/credentials" //nolint:staticcheck
 	lc "github.com/redhatinsights/platform-go-middlewares/v2/logging/cloudwatch"
 	log "github.com/sirupsen/logrus"
