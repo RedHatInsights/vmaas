@@ -16,7 +16,9 @@ func RequestResponseLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tStart := time.Now()
 		c.Next()
-		var fields []interface{}
+		// Calculate exact size: 14 fixed fields + 1 ("request") + 2 per param
+		capacity := 15 + (len(c.Params) * 2)
+		fields := make([]interface{}, 0, capacity)
 
 		duration := time.Since(tStart).Nanoseconds() / 1e6
 		fields = append(fields, "durationMs", duration,
