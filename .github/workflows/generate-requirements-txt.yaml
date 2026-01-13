@@ -5,6 +5,7 @@ on:
     branches:
       - "master"
       - 'foreman-*.*'
+      - 'konflux/mintmaker/**'
 
 jobs:
   generate-requirements-txt:
