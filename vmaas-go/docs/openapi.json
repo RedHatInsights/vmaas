@@ -285,6 +285,11 @@
                 "Moderate",
                 "Important",
                 "Critical",
+                "null",
+                "Low",
+                "Moderate",
+                "Important",
+                "Critical",
                 "null"
               ],
               "type": "string"
@@ -333,6 +338,11 @@
           "severity": {
             "items": {
               "enum": [
+                "Low",
+                "Moderate",
+                "Important",
+                "Critical",
+                "null",
                 "Low",
                 "Moderate",
                 "Important",
@@ -1425,7 +1435,7 @@
       "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
     },
     "title": "VMaaS webapp API",
-    "version": "3.2.29"
+    "version": "3.2.30"
   },
   "externalDocs": {
     "description": "",
@@ -1439,7 +1449,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.CvesRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.CvesRequest",
+                    "summary": "cve_list",
+                    "description": "cve_list"
+                  }
+                ]
               }
             }
           },
@@ -1585,7 +1604,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.ErrataRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.ErrataRequest",
+                    "summary": "errata_list",
+                    "description": "errata_list"
+                  }
+                ]
               }
             }
           },
@@ -1751,7 +1779,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.RPMPkgNamesRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.RPMPkgNamesRequest",
+                    "summary": "rpm_name_list",
+                    "description": "rpm_name_list"
+                  }
+                ]
               }
             }
           },
@@ -1869,7 +1906,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest",
+                    "summary": "srpm_name_list",
+                    "description": "srpm_name_list"
+                  }
+                ]
               }
             }
           },
@@ -1987,7 +2033,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.PackagesRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.PackagesRequest",
+                    "summary": "package_list",
+                    "description": "package_list"
+                  }
+                ]
               }
             }
           },
@@ -2105,7 +2160,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.Request"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.Request",
+                    "summary": "package_list",
+                    "description": "package_list"
+                  }
+                ]
               }
             }
           },
@@ -2270,7 +2334,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.PkgTreeRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.PkgTreeRequest",
+                    "summary": "package_name_list",
+                    "description": "package_name_list"
+                  }
+                ]
               }
             }
           },
@@ -2388,7 +2461,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.ReposRequest"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.ReposRequest",
+                    "summary": "repository_list",
+                    "description": "repository_list"
+                  }
+                ]
               }
             }
           },
@@ -2506,7 +2588,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.Request"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.Request",
+                    "summary": "package_list",
+                    "description": "package_list"
+                  }
+                ]
               }
             }
           },
@@ -2652,7 +2743,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/vmaas.Request"
+                "oneOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "$ref": "#/components/schemas/vmaas.Request",
+                    "summary": "package_list",
+                    "description": "package_list"
+                  }
+                ]
               }
             }
           },
