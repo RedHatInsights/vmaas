@@ -116,20 +116,20 @@ arches:
     name: libnsl2
     evr: 2.0.0-1.el9
     sourcerpm: libnsl2-2.0.0-1.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libpq-13.20-1.el9_5.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libpq-13.23-1.el9_7.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 218118
-    checksum: sha256:49223c484013c214fe1b785d92232a9eff0f0329c5c0cdda8705d992b3ef51f7
+    size: 213691
+    checksum: sha256:36674e762f7e3d5f8e3c0c4b607c8b03eaaa5a830729dd8c8a9c8f8be93f6d60
     name: libpq
-    evr: 13.20-1.el9_5
-    sourcerpm: libpq-13.20-1.el9_5.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libpq-devel-13.20-1.el9_5.x86_64.rpm
+    evr: 13.23-1.el9_7
+    sourcerpm: libpq-13.23-1.el9_7.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libpq-devel-13.23-1.el9_7.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 104767
-    checksum: sha256:5ada557e3b9570b8d475647140cb380bdc5096103fa9cfba2b692563c49afa85
+    size: 100153
+    checksum: sha256:cee41c19f18f9bc97c41da9abb06741db322d5fc8e634d6acd3fe7f251610f83
     name: libpq-devel
-    evr: 13.20-1.el9_5
-    sourcerpm: libpq-13.20-1.el9_5.src.rpm
+    evr: 13.23-1.el9_7
+    sourcerpm: libpq-13.23-1.el9_7.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libxcrypt-compat-4.4.18-3.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 93189
@@ -784,12 +784,12 @@ arches:
     checksum: sha256:28fda2510dfa3d80c6f227354c3e917a104374e97566419e71ef5e246887c4e2
     name: libnsl2
     evr: 2.0.0-1.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/l/libpq-13.20-1.el9_5.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/l/libpq-13.23-1.el9_7.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
-    size: 21656211
-    checksum: sha256:f8a7450157ff99ce1e9268d62ca07f4495f81ece030b049937a939f57c71729e
+    size: 21691434
+    checksum: sha256:7653a5e0ed9149076cb95d0e25e0a1953cb75dd2b89545ca9b773e09b267f52f
     name: libpq
-    evr: 13.20-1.el9_5
+    evr: 13.23-1.el9_7
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/l/llvm-20.1.8-3.el9.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
     size: 147354701
@@ -845,7 +845,7 @@ arches:
     name: rust
     evr: 1.88.0-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/4ff61782a20028fa55af0b775f24b6c0f41978525043adc012972bc866983e3a-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/3e28e4091e95b6a4514e3788c37e828e90205150986a2068e132fe21b74773ee-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 40050
-    checksum: sha256:4ff61782a20028fa55af0b775f24b6c0f41978525043adc012972bc866983e3a
+    checksum: sha256:3e28e4091e95b6a4514e3788c37e828e90205150986a2068e132fe21b74773ee
