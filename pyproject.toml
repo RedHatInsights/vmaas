@@ -16,7 +16,6 @@ dependencies = [
     "attrs (>=25.0.0,<26.0.0)",
     "boto3>=1.36.2",
     "botocore>=1.36.2",
-    # Locked to 3.1.0 due to https://github.com/spec-first/connexion/issues/2029
     "connexion[swagger-ui]==3.3.0",
     "gitpython>=3.1.30",
     "psycopg2-binary>=2.8.6",
