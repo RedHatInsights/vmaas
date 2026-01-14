@@ -29,7 +29,7 @@ from vmaas.reposcan.redhatcsaf.modeling import CsafProducts
 from vmaas.reposcan.redhatcsaf.modeling import CsafProductStatus
 from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 
-CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/beta/vex/")
+CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/v2/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "true"))
 ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
