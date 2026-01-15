@@ -83,7 +83,7 @@ class TestCsafStore:
     def files_obj_for_insert(self) -> tuple[m.CsafFiles, datetime]:
         """Csaf files obj for insert_cves tests."""
         now = datetime.now(timezone.utc)
-        files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, id_=1, cves=[CVE])})
+        files_obj = m.CsafFiles({"file": m.CsafFile("file", now, None, id_=1, cves=[CVE], cve_file_timestamp=now)})
         return files_obj, now
 
     @pytest.fixture
@@ -119,7 +119,7 @@ class TestCsafStore:
         cve = "CVE-2024-1234"
         now = datetime.now(timezone.utc)
         files = m.CsafFiles(
-            {"file": m.CsafFile("file", now, cves=[cve]), "file2": m.CsafFile("file2", now, cves=[CVE])}
+            {"file": m.CsafFile("file", now, cves=[cve], cve_file_timestamp=now), "file2": m.CsafFile("file2", now, cves=[CVE], cve_file_timestamp=now)}
         )
         csaf_store._save_csaf_files(files)
         cur = csaf_store.conn.cursor()
@@ -135,7 +135,7 @@ class TestCsafStore:
         # update row
         csaf_store.cve2file_id = {}  # reset cve2file mapping
         update_ts = datetime.now(timezone.utc)
-        files = m.CsafFiles({"file": m.CsafFile("file", update_ts, cves=[cve])})
+        files = m.CsafFiles({"file": m.CsafFile("file", update_ts, cves=[cve], cve_file_timestamp=update_ts)})
         # save should not update timestamp
         csaf_store._save_csaf_files(files)
         cur.execute("SELECT id, updated FROM csaf_file WHERE name = 'file'")

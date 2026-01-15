@@ -5,6 +5,10 @@ import os
 import gzip
 import lzma
 import bz2
+import tarfile
+from pathlib import Path
+
+import zstandard as zstd
 
 from vmaas.common.logging_utils import ProgressLogger, get_logger
 from vmaas.common.fileutil import remove_file_if_exists
@@ -71,4 +75,38 @@ class FileUnpacker:
             self._unpack(file_path)
         # Make queue empty to be able to reuse this class multiple times in one run
         self.queue = []
+        self.logger.info("Unpacking finished.")
+
+
+class TarZstUnpacker:
+    """
+    Class unpacking single .tar.zst archive. Supports specifying list of files to unpack for very large archives.
+    """
+
+    def __init__(self, archive_path: Path):
+        self.logger = get_logger(__name__)
+        self.archive_path = archive_path
+        self.output_dir = os.path.dirname(archive_path)
+
+    def _extract(self, tar, member, files_to_extract: set = None):
+        if files_to_extract is None or member.name in files_to_extract:
+            tar.extract(member, path=self.output_dir, filter="data")
+            self.logger.debug("Extracting: %s", member.name)
+            if files_to_extract is not None:
+                files_to_extract.remove(member.name)
+
+    def run(self, files_to_extract: set = None):
+        """Unpack all files or specified files from tar."""
+        self.logger.info("Unpacking started.")
+        decompressor = zstd.ZstdDecompressor()
+        with open(self.archive_path, 'rb') as file_h:
+            with decompressor.stream_reader(file_h) as decompressed_file_h:
+                with tarfile.open(fileobj=decompressed_file_h, mode='r|') as tar:
+                    for member in tar:
+                        self._extract(tar, member, files_to_extract=files_to_extract)
+                        if files_to_extract is not None and len(files_to_extract) == 0:
+                            break
+
+        if files_to_extract:
+            self.logger.debug("Files not found in archive: %s", files_to_extract)
         self.logger.info("Unpacking finished.")
