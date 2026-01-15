@@ -9,16 +9,21 @@ import shutil
 import tempfile
 import typing as t
 from collections import namedtuple
+from datetime import datetime
+from datetime import timezone
 from pathlib import Path
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.config import Config
+from vmaas.common.date_utils import parse_datetime
+from vmaas.common.fileutil import remove_file_if_exists
 from vmaas.common.logging_utils import get_logger
 from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
 from vmaas.reposcan.download.downloader import DownloadItem
 from vmaas.reposcan.download.downloader import FileDownloader
 from vmaas.reposcan.download.downloader import VALID_HTTP_CODES
+from vmaas.reposcan.download.unpacker import TarZstUnpacker
 from vmaas.reposcan.mnm import CSAF_FAILED_DOWNLOAD
 from vmaas.reposcan.redhatcsaf.modeling import CsafCves
 from vmaas.reposcan.redhatcsaf.modeling import CsafData
@@ -31,7 +36,8 @@ from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/v2/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
-CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "true"))
+CSAF_VEX_ARCHIVE_TXT = os.getenv("CSAF_VEX_ARCHIVE_TXT", "archive_latest.txt")
+CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "false"))
 ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
 
 ProductRelationship = namedtuple("ProductRelationship", ["product_reference", "module"])
@@ -49,13 +55,15 @@ class CsafController:
         self.downloader = FileDownloader()
         self.downloader.num_threads = 1  # rh.com returns 403 when downloading too quickly (DDoS protection?)
         self.csaf_store = CsafStore()
-        self.tmp_directory: Path | None = Path(tempfile.mkdtemp(prefix="csaf-"))
-        self.index_path = self.tmp_directory / CSAF_VEX_INDEX_CSV
+        self.tmp_directory: Path = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.cfg = Config()
+        self.archive_name: str = "archive.tar.zst"
+        self.archive_timestamp: datetime | None = None
 
     def _download_index(self) -> dict[Path, int]:
         """Download CSAF index changes.csv file."""
-        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_INDEX_CSV, target_path=self.index_path)
+        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_INDEX_CSV,
+                            target_path=self.tmp_directory / CSAF_VEX_INDEX_CSV)
         self.downloader.add(item)
         self.downloader.run()
         # return failed download
@@ -67,16 +75,18 @@ class CsafController:
         """Download CSAF files."""
         download_items = []
         for csaf_file in batch:
-            if not self.tmp_directory:
-                self.logger.error("Missing temporary directory for csaf download")
-                return {}
             local_path = self.tmp_directory / csaf_file.name
+            # Don't download files if they are in the archive
+            # If we have archive timestamp and the CVE in changes.csv is newer - re-download it
+            if os.path.exists(local_path) and (self.archive_timestamp is None or csaf_file.csv_timestamp < self.archive_timestamp):
+                continue
             os.makedirs(os.path.dirname(local_path), exist_ok=True)  # Make sure subdirs exist
             item = DownloadItem(source_url=CSAF_VEX_BASE_URL + csaf_file.name, target_path=local_path)
             # Save for future status code check
             download_items.append(item)
             self.downloader.add(item)
-        self.downloader.run()
+        if download_items:
+            self.downloader.run()
         # Return failed downloads
         return {
             item.target_path: item.status_code
@@ -84,11 +94,45 @@ class CsafController:
             if item.status_code not in VALID_HTTP_CODES and item.target_path
         }
 
-    def clean(self) -> None:
+    def _download_csaf_archive(self) -> dict[Path, int]:
+        """Download CSAF archive."""
+        # Download TXT file with latest archive name
+        archive_latest_path = self.tmp_directory / CSAF_VEX_ARCHIVE_TXT
+        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_ARCHIVE_TXT,
+                            target_path=archive_latest_path)
+        self.downloader.add(item)
+        self.downloader.run()
+
+        # Return failed download
+        if item.status_code not in VALID_HTTP_CODES and item.target_path:
+            return {item.target_path: item.status_code}
+
+        # Read the latest archive name and download it
+        with open(archive_latest_path, "r", encoding="utf-8") as file_h:
+            self.archive_name = file_h.read().strip()
+        archive_ts_match = re.search(r'\d{4}-\d{2}-\d{2}', self.archive_name)
+        if archive_ts_match:
+            self.archive_timestamp = datetime.strptime(archive_ts_match.group(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+
+        local_path = self.tmp_directory / self.archive_name
+        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + self.archive_name,
+                            target_path=local_path)
+        self.downloader.add(item)
+        self.downloader.run()
+
+        # Return failed download
+        if item.status_code not in VALID_HTTP_CODES and item.target_path:
+            return {item.target_path: item.status_code}
+        return {}
+
+    def clean(self, batch: list[CsafFile] | None = None) -> None:
         """Clean downloaded files for given batch."""
-        if self.tmp_directory:
+        if batch is None:  # Delete all files
             shutil.rmtree(self.tmp_directory)
-            self.tmp_directory = None
+            self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
+        else:
+            for csaf_file in batch:
+                remove_file_if_exists(self.tmp_directory / csaf_file.name)
 
     def store(self) -> None:
         """Process and store CSAF objects to DB."""
@@ -103,7 +147,7 @@ class CsafController:
 
         db_csaf_files = self.csaf_store.csaf_file_map.copy()
         batches = BatchList()
-        csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.index_path)  # type: ignore[arg-type]
+        csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.tmp_directory / CSAF_VEX_INDEX_CSV)  # type: ignore[arg-type]
         files_to_sync = csaf_files.csv_files
         if not CSAF_SYNC_ALL_FILES:
             files_to_sync = csaf_files.out_of_date
@@ -113,26 +157,46 @@ class CsafController:
 
         self.logger.info("%d CSAF files.", len(csaf_files))
         self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
-
         self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
+
         try:
+            if batches.get_total_items():
+                self.logger.info("Downloading CSAF archive.")
+                failed = self._download_csaf_archive()
+                if failed:
+                    CSAF_FAILED_DOWNLOAD.inc()
+                    target, status = failed.popitem()
+                    self.logger.warning("CSAF archive failed to download, %s (HTTP CODE %d).", target, status)
+                    self.clean()
+                    return
+
+            unpacker = TarZstUnpacker(self.tmp_directory / self.archive_name)
+
             for i, batch in enumerate(batches, 1):
                 self.logger.info("Syncing a batch of %d CSAF files [%d/%d]", len(batch), i, len(batches))
-                failed = self._download_csaf_files(batch)
-                if failed:
-                    CSAF_FAILED_DOWNLOAD.inc(len(failed))
-                    self.logger.warning("%d CSAF files failed to download.", len(failed))
-                    self.logger.debug("CSAF files failed to download: %s", failed.keys())
-                    batch = [f for f in batch if (self.tmp_directory / f.name) not in failed]
+                try:
+                    unpacker.run({csaf_file.name for csaf_file in batch})
 
-                to_store = CsafData()
-                for csaf_file in batch:
-                    parsed_cves = self.parse_csaf_file(csaf_file)
-                    csaf_file.cves = list(parsed_cves.keys())
-                    to_store.files[csaf_file.name] = csaf_file
-                    to_store.cves.update(parsed_cves)
+                    # Download missing files that are not in the archive or are old
+                    # (added since last archive generation)
+                    failed = self._download_csaf_files(batch)
+                    if failed:
+                        CSAF_FAILED_DOWNLOAD.inc(len(failed))
+                        self.logger.warning("%d CSAF files failed to download.", len(failed))
+                        self.logger.debug("CSAF files failed to download: %s", failed.keys())
 
-                self.csaf_store.store(to_store)
+                    to_store = CsafData()
+                    for csaf_file in batch:
+                        if self.tmp_directory / csaf_file.name in failed:
+                            continue
+                        parsed_cves = self.parse_csaf_file(csaf_file)
+                        csaf_file.cves = list(parsed_cves.keys())
+                        to_store.files[csaf_file.name] = csaf_file
+                        to_store.cves.update(parsed_cves)
+
+                    self.csaf_store.store(to_store)
+                finally:
+                    self.clean(batch=batch)
             self.csaf_store.delete_unreferenced_products()
         finally:
             self.clean()
@@ -141,12 +205,9 @@ class CsafController:
         """Parse CSAF file to CsafCves."""
         cves = CsafCves()
 
-        if not self.tmp_directory:
-            self.logger.error("Missing temporary directory for csaf files")
-            raise FileNotFoundError("Missing csaf tmp dir")
-
         with open(self.tmp_directory / csaf_file.name, "r", encoding="utf-8") as csaf_json:
             csaf = json.load(csaf_json)
+            csaf_file.cve_file_timestamp = parse_datetime(csaf.get("document", {}).get("tracking", {}).get("current_release_date"))
             product_cpe, product_purl, product_rel = self._parse_product_tree(csaf)
             parsed_cves = self._parse_vulnerabilities(csaf, product_cpe, product_purl, product_rel)
             cves.update(parsed_cves)

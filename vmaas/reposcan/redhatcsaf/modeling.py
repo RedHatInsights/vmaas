@@ -39,6 +39,8 @@ class CsafFile:
     name: str
     csv_timestamp: datetime
     db_timestamp: datetime | None = None
+    # Actual timestamp found in CVE file
+    cve_file_timestamp: datetime | None = None
     csv: bool = False
     id_: int = 0
     # it should be 1:1 mapping between file and cve

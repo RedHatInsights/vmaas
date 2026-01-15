@@ -380,7 +380,7 @@ class CsafStore(ObjectStore):
             csaf_file = files.get_by_id(file_id)
             if csaf_file is None:
                 raise CsafStoreException(f"csaf_file with id={file_id} not found")
-            cur.execute("UPDATE csaf_file SET updated = %s WHERE id = %s", (csaf_file.csv_timestamp, file_id))
+            cur.execute("UPDATE csaf_file SET updated = %s WHERE id = %s", (csaf_file.cve_file_timestamp, file_id))
             self.conn.commit()
         except Exception as exc:
             raise CsafStoreException(f"failed to update csaf_file for {cve}") from exc
