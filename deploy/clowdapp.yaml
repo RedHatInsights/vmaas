@@ -350,7 +350,7 @@ parameters:
   value: '2'
 - name: BATCH_MAX_SIZE
   description: Max size of batch in reposcan
-  value: '500'
+  value: '5000'
 - name: BATCH_MAX_FILESIZE
   description: Max filesize of batch in reposcan
   value: '5_000_000_000'
