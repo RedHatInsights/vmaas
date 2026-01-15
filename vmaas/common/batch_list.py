@@ -4,7 +4,7 @@ Module containing class for list of batches.
 import os
 import typing as t
 
-BATCH_MAX_SIZE = int(os.getenv('BATCH_MAX_SIZE', "500"))
+BATCH_MAX_SIZE = int(os.getenv('BATCH_MAX_SIZE', "5000"))
 BATCH_MAX_FILESIZE = int(os.getenv('BATCH_MAX_FILESIZE', "14_000_000_000"))
 
 
