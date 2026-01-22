@@ -65,6 +65,45 @@ docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 You can build and start your container in ["developer mode"](doc/developer_mode.md).
 You can tune metrics using Prometheus and Grafana dev containers, see [doc/metrics.md](doc/metrics.md).
 
+### Development Server (devserver)
+The devserver container provides a local environment for testing VMaaS with real Red Hat repository data.
+
+**What it does:**
+- Downloads repository metadata (repomd.xml, primary, updateinfo, modules) from Red Hat CDN using subscription-manager
+- Serves the downloaded data via nginx on port 8000
+- Creates a local git repository (vmaas-assets.git) with the repolist pointing to the local nginx server
+
+**Usage:**
+1. Obtain your Red Hat System activation key from https://console.redhat.com/insights/connector/activation-keys
+
+2. Configure your activation key in `conf/devserver.env`:
+   ```bash
+   ACTIVATION_KEY_ORG_ID=your_org_id
+   ACTIVATION_KEY=your_activation_key
+   ```
+
+3. Start the application:
+   ```bash
+   docker-compose up
+   ```
+
+4. On first run, it will:
+   - Register with Red Hat Subscription Manager
+   - Download repository metadata from Red Hat CDN
+   - Generate a local git repository with modified URLs
+   - Start nginx and git daemon
+   - Unregister from Red Hat Subscription Manager and free the entitlement allocation
+
+5. Now you can sync your repository data into VMaaS using reposcan API:
+   ```bash
+   # Import repository definition
+   ./scripts/turnpike-mock curl -X PUT http://localhost:8081/api/vmaas/v1/repos/git
+   # Sync metadata from repositories cached on devserver
+   ./scripts/turnpike-mock curl -X PUT http://localhost:8081/api/vmaas/v1/sync/repo
+   ```
+
+**Note:** Downloaded data persists in a volume. To re-download fresh data, remove the container volume with `docker-compose down -v`.
+
 ### Copy database from live OpenShift instance (requires valid credentials)
 ~~~bash
 oc project vmaas-stage

@@ -1,0 +1,15 @@
+FROM quay.io/centos/centos:stream10-minimal
+
+WORKDIR /devserver
+
+COPY requirements.txt /devserver/
+
+RUN microdnf install -y git-daemon nginx subscription-manager python3-pip && \
+    microdnf clean all && \
+    pip3 install --no-cache-dir -r requirements.txt
+
+COPY vmaas       /devserver/vmaas
+COPY devserver/* /devserver/
+
+ENV ACTIVATION_KEY_ORG_ID ""
+ENV ACTIVATION_KEY ""

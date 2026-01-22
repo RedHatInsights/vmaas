@@ -1,0 +1,77 @@
+[
+    {
+        "organization": "DEFAULT",
+        "products": {
+            "Red Hat Enterprise Linux for x86_64": {
+                "content_sets": {
+                    "rhel-8-for-x86_64-baseos-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/baseos/os",
+                        "name": "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)",
+                        "releasever": [
+                            "8",
+                            "8.9"
+                        ]
+                    },
+                    "rhel-8-for-x86_64-appstream-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel8/$releasever/x86_64/appstream/os",
+                        "name": "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)",
+                        "releasever": [
+                            "8",
+                            "8.9"
+                        ]
+                    },
+                    "rhel-9-for-x86_64-baseos-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/baseos/os",
+                        "name": "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)",
+                        "releasever": [
+                            "9",
+                            "9.6"
+                        ]
+                    },
+                    "rhel-9-for-x86_64-appstream-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel9/$releasever/x86_64/appstream/os",
+                        "name": "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)",
+                        "releasever": [
+                            "9",
+                            "9.6"
+                        ]
+                    },
+                    "rhel-10-for-x86_64-baseos-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel10/$releasever/x86_64/baseos/os",
+                        "name": "Red Hat Enterprise Linux 10 for x86_64 - BaseOS (RPMs)",
+                        "releasever": [
+                            "10",
+                            "10.0"
+                        ]
+                    },
+                    "rhel-10-for-x86_64-appstream-rpms": {
+                        "basearch": [
+                            "x86_64"
+                        ],
+                        "baseurl": "https://cdn.redhat.com/content/dist/rhel10/$releasever/x86_64/appstream/os",
+                        "name": "Red Hat Enterprise Linux 10 for x86_64 - AppStream (RPMs)",
+                        "releasever": [
+                            "10",
+                            "10.0"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+]

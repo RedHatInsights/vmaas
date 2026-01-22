@@ -104,8 +104,22 @@ services:
     profiles:
       - monitoring
 
+  vmaas_devserver:
+    container_name: vmaas-devserver
+    build:
+      context: .
+      dockerfile: ./Dockerfile.devserver
+    image: vmaas/devserver:latest
+    command: /devserver/devserver.sh
+    restart: unless-stopped
+    env_file:
+      - ./conf/devserver.env
+    volumes:
+      - devserver-data:/data:z
+
 volumes:
   vmaas-db-data:
   vmaas-dump-data:
   prometheus-data:
   grafana-data:
+  devserver-data:
