@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS db_version (
 )TABLESPACE pg_default;
 
 -- Increment this when editing this file
-INSERT INTO db_version (name, version) VALUES ('schema_version', 35);
+INSERT INTO db_version (name, version) VALUES ('schema_version', 36);
 
 -- -----------------------------------------------------
 -- evr type
@@ -906,7 +906,7 @@ CREATE TRIGGER pkg_errata_changed AFTER INSERT OR UPDATE OR DELETE ON pkg_errata
 
 CREATE UNIQUE INDEX pkg_errata_pkgid_errataid ON pkg_errata (pkg_id, errata_id)
 WHERE module_stream_id IS NULL;
-CREATE UNIQUE INDEX pkg_errata_pkgid_streamid_errataid ON pkg_errata (pkg_id, module_stream_id, errata_id)
+CREATE UNIQUE INDEX pkg_errata_pkgid_errataid_streamid ON pkg_errata (pkg_id, errata_id, module_stream_id)
 WHERE module_stream_id IS NOT NULL;
 
 CREATE INDEX ON pkg_errata(errata_id);
