@@ -16,6 +16,7 @@ class UpdateStore(ObjectStore):
     def _get_associations_todo(self, repo_id, updates, update_map, update_to_packages):
         nevras_in_repo = self._get_nevras_in_repo(repo_id)
         modules_in_repo = self._get_modules_in_repo(repo_id)
+        module_ids_in_repo = set(modules_in_repo.values())
         to_associate = []
         for update in updates:
             update_id = update_map[update["id"]]
@@ -47,7 +48,11 @@ class UpdateStore(ObjectStore):
         to_disassociate = []
         for update_id in update_to_packages:
             for package_id, module_id in update_to_packages[update_id]:
-                to_disassociate.append((package_id, update_id, module_id))
+                # Can safely remove only tuples with module IDs in current repo
+                # otherwise we delete reference with other repo modules.
+                # Unfortunately module table has repo_id column so we hit this problem
+                if not module_id or module_id in module_ids_in_repo:
+                    to_disassociate.append((package_id, update_id, module_id))
 
         return to_associate, to_disassociate
 
