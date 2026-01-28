@@ -1,3 +1,686 @@
+#
+# Certificate-Based Repositories
+# Managed by (rhsm) subscription-manager
+#
+# *** This file is auto-generated.  Changes made here will be over-written. ***
+# *** Use "subscription-manager repo-override --help" if you wish to make changes. ***
+#
+# If this file is empty and this system is subscribed consider
+# a "yum repolist" to refresh available repos
+#
+
+[rhceph-5-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Ceph Storage Tools 5 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/5/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-2-for-rhel-9-$basearch-rpms]
+name = Red Hat Discovery 2 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/2/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[insights-proxy-1-tech-preview-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Insights Proxy 1 Tech Preview for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/insights-proxy-tech-preview/1/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-supplementary-source-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Supplementary (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/supplementary/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[insights-proxy-for-rhel-9-$basearch-rpms]
+name = Red Hat Insights Proxy for RHEL9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/insights-proxy/1/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-8-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Ceph Storage Tools 8 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/8/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.18-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Maintenance 6.18 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.18/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[insights-proxy-1-tech-preview-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Insights Proxy 1 Tech Preview for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/insights-proxy-tech-preview/1/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-extensions-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Extensions (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/extensions/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.17-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Maintenance 6.17 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.17/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-appstream-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - AppStream (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/appstream/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-extensions-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Extensions (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/extensions/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-client-6-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Client 6 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client/6/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-8-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Ceph Storage Tools 8 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/8/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-client-6-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Client 6 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client/6/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-rt-source-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/rt/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-baseos-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - BaseOS (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/baseos/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 1
+
+[satellite-maintenance-6.18-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Maintenance 6.18 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.18/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-client-6-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Client 6 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client/6/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.16-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Maintenance 6.16 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.16/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-nfv-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time for NFV (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/nfv/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-beta-for-rhel-9-$basearch-source-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools Beta for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/rhoso-tools/18/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta,file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-nfv-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time for NFV (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/nfv/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-6-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Ceph Storage Tools 6 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/6/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-5-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Ceph Storage Tools 5 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/5/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.17-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Utils 6.17 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.17/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-6-client-2-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite 6 Client 2 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client-2/6/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhoso-tools/18/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-2-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Discovery 2 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/2/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.18-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Utils 6.18 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.18/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-2-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Discovery 2 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/2/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[insights-proxy-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Insights Proxy for RHEL9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/insights-proxy/1/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-beta-for-rhel-9-$basearch-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools Beta for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/rhoso-tools/18/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta,file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.16-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Utils 6.16 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.16/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-5-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Ceph Storage Tools 5 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/5/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.17-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Utils 6.17 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.17/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-6-client-2-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite 6 Client 2 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client-2/6/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhv-4-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Virtualization 4 Tools for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhv-tools/4/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-1-for-rhel-9-$basearch-rpms]
+name = Red Hat Discovery 1 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/1/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[openstack-17-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat OpenStack Platform 17 Tools for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/openstack-tools/17/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhv-4-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Virtualization 4 Tools for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhv-tools/4/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.18-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Utils 6.18 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.18/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[insights-proxy-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Insights Proxy for RHEL9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/insights-proxy/1/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.18-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Utils 6.18 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.18/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.16-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Utils 6.16 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.16/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-7-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Ceph Storage Tools 7 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/7/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[openstack-17-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat OpenStack Platform 17 Tools for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/openstack-tools/17/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.16-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite Maintenance 6.16 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.16/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
 [rhel-9-for-$basearch-baseos-source-rpms]
 name = Red Hat Enterprise Linux 9 for $basearch - BaseOS (Source RPMs)
 baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/baseos/source/SRPMS
@@ -12,10 +695,10 @@ sslverifystatus = 1
 metadata_expire = 86400
 enabled_metadata = 1
 
-[rhel-9-for-$basearch-appstream-source-rpms]
-name = Red Hat Enterprise Linux 9 for $basearch - AppStream (Source RPMs)
-baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/appstream/source/SRPMS
-enabled = 1
+[rhceph-9-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Ceph Storage Tools 9 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/9/os
+enabled = 0
 gpgcheck = 1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslverify = 1
@@ -24,7 +707,231 @@ sslclientkey = $SSL_CLIENT_KEY
 sslclientcert = $SSL_CLIENT_CERT
 sslverifystatus = 1
 metadata_expire = 86400
-enabled_metadata = 1
+enabled_metadata = 0
+
+[insights-proxy-1-tech-preview-for-rhel-9-$basearch-rpms]
+name = Red Hat Insights Proxy 1 Tech Preview for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/insights-proxy-tech-preview/1/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-extensions-source-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Extensions (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/extensions/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-supplementary-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Supplementary (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/supplementary/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-9-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Ceph Storage Tools 9 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/9/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-for-rhel-9-$basearch-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhoso-tools/18/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-1-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Discovery 1 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/1/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[openstack-17-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat OpenStack Platform 17 Tools for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/openstack-tools/17/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-6-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Ceph Storage Tools 6 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/6/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-rt-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/rt/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[codeready-builder-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat CodeReady Linux Builder for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/codeready-builder/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[discovery-1-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Discovery 1 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/discovery/1/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-for-rhel-9-$basearch-source-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhoso-tools/18/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.17-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Maintenance 6.17 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.17/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[codeready-builder-for-rhel-9-$basearch-rpms]
+name = Red Hat CodeReady Linux Builder for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/codeready-builder/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.17-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Maintenance 6.17 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.17/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhoso-tools-18-beta-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat OpenStack Services on OpenShift 18 Tools Beta for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/beta/layered/rhel9/$basearch/rhoso-tools/18/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta,file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
 
 [rhel-9-for-$basearch-appstream-rpms]
 name = Red Hat Enterprise Linux 9 for $basearch - AppStream (RPMs)
@@ -40,9 +947,219 @@ sslverifystatus = 1
 metadata_expire = 86400
 enabled_metadata = 1
 
-[rhel-9-for-$basearch-baseos-rpms]
-name = Red Hat Enterprise Linux 9 for $basearch - BaseOS (RPMs)
-baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/baseos/os
+[rhceph-8-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Ceph Storage Tools 8 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/8/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-supplementary-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Supplementary (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/supplementary/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-6-client-2-for-rhel-9-$basearch-rpms]
+name = Red Hat Satellite 6 Client 2 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-client-2/6/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhv-4-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Virtualization 4 Tools for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhv-tools/4/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.16-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Utils 6.16 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.16/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.18-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Satellite Maintenance 6.18 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.18/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[codeready-builder-for-rhel-9-$basearch-source-rpms]
+name = Red Hat CodeReady Linux Builder for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/codeready-builder/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-rt-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/rt/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-7-tools-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Ceph Storage Tools 7 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/7/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-6-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Ceph Storage Tools 6 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/6/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-baseos-debug-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - BaseOS (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/baseos/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-utils-6.17-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Utils 6.17 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-utils/6.17/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-9-tools-for-rhel-9-$basearch-source-rpms]
+name = Red Hat Ceph Storage Tools 9 for RHEL 9 $basearch (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/9/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhceph-7-tools-for-rhel-9-$basearch-rpms]
+name = Red Hat Ceph Storage Tools 7 for RHEL 9 $basearch (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/rhceph-tools/7/os
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[satellite-maintenance-6.16-for-rhel-9-$basearch-debug-rpms]
+name = Red Hat Satellite Maintenance 6.16 for RHEL 9 $basearch (Debug RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/$basearch/sat-maintenance/6.16/debug
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0
+
+[rhel-9-for-$basearch-appstream-source-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - AppStream (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/appstream/source/SRPMS
 enabled = 1
 gpgcheck = 1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
@@ -53,3 +1170,17 @@ sslclientcert = $SSL_CLIENT_CERT
 sslverifystatus = 1
 metadata_expire = 86400
 enabled_metadata = 1
+
+[rhel-9-for-$basearch-nfv-source-rpms]
+name = Red Hat Enterprise Linux 9 for $basearch - Real Time for NFV (Source RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/$releasever/$basearch/nfv/source/SRPMS
+enabled = 0
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = $SSL_CLIENT_KEY
+sslclientcert = $SSL_CLIENT_CERT
+sslverifystatus = 1
+metadata_expire = 86400
+enabled_metadata = 0

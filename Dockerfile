@@ -35,7 +35,7 @@ ARG ALT_REPO
 
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql libpq && \
+        python312 python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql libpq curl-minimal libcurl-minimal && \
         ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
         ln -s $(basename /usr/lib64/python3.9/site-packages/rpm/_rpm.*.so) /usr/lib64/python3.9/site-packages/rpm/_rpm.so && \
     microdnf clean all
