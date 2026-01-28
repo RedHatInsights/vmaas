@@ -292,9 +292,9 @@ poetry-core==2.3.0 \
     # via
     #   connexion
     #   swagger-ui-bundle
-pycparser==2.23 ; platform_python_implementation != "PyPy" and implementation_name != "PyPy" and python_version == "3.12" \
-    --hash=sha256:78816d4f24add8f10a06d6f05b4d424ad9e96cfebf68a4ddc99c65c0720d00c2 \
-    --hash=sha256:e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934
+pycparser==3.0 ; platform_python_implementation != "PyPy" and implementation_name != "PyPy" and python_version == "3.12" \
+    --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
+    --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
     # via cffi
 semantic-version==2.10.0 \
     --hash=sha256:bdabb6d336998cbb378d4b9db3a4b56a1e3235701dc05ea2690d9a997ed5041c \
@@ -331,6 +331,7 @@ wheel==0.46.3 \
     --hash=sha256:4b399d56c9d9338230118d705d9737a2a468ccca63d5e813e2a4fc7815d8bc4d \
     --hash=sha256:e3e79874b07d776c40bd6033f8ddf76a7dad46a7b8aa1b2787a83083519a1803
     # via
+    #   pycparser
     #   python-dateutil
     #   tzdata
 
@@ -353,6 +354,7 @@ setuptools==80.10.2 \
     #   pathspec
     #   pluggy
     #   prometheus-client
+    #   pycparser
     #   python-dateutil
     #   pyyaml
     #   setuptools-rust
