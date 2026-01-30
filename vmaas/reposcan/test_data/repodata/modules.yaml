@@ -154,6 +154,7 @@ data:
       swig: [3.0]
     requires:
       platform: [el8]
+      dummy: [1.30, "5.32", 4]
   references:
     documentation: http://subversion.apache.org/docs/
     tracker: https://issues.apache.org/jira/projects/SVN

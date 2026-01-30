@@ -14,3 +14,6 @@ class TestModuleMD:
         keys = ("name", "stream", "version", "context", "arch", "artifacts", "default_stream", "profiles", "requires")
         assert len(keys) == len(mod.modules[0])
         assert all(key in mod.modules[0] for key in keys)
+        assert mod.modules[1]["name"] == "subversion"
+        assert mod.modules[1]["stream"] == "1.10"
+        assert all(key in mod.modules[1]["requires"]["dummy"] for key in ["1.30", "5.32", "4"])

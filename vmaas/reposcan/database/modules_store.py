@@ -96,7 +96,7 @@ class ModulesStore(ObjectStore):
         if 'requires' in module:
             for req_mod, req_streams in module['requires'].items():
                 for req_stream in req_streams:
-                    requires.add((req_mod, str(req_stream)))
+                    requires.add((req_mod, req_stream))
         return requires
 
     def _populate_stream_requires(self, modules):
@@ -112,6 +112,8 @@ class ModulesStore(ObjectStore):
                     req_id = stream_map.get(req)
                     if req_id:
                         stream_requires.add((module['stream_id'], req_id))
+                    else:
+                        self.logger.warning("Unable to map module: %s", req)
             if stream_requires:
                 execute_values(cur,
                                """insert into module_stream_require (module_stream_id, require_id)
