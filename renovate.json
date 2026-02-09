@@ -14,7 +14,7 @@
   },
   "packageRules": [
     {
-      "matchFileNames": ["**/requirements*.txt"],
+      "matchFileNames": ["**/requirements*.txt", "Dockerfile.devserver", "Dockerfile.dbdocs"],
       "enabled": false
     },
     {

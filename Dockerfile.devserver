@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream10-minimal@sha256:016815593032ee25a50f2fb40be74242ff9b0b2997492c703a34e2f564c1f938
+FROM quay.io/centos/centos:stream10-minimal
 
 WORKDIR /devserver
 
