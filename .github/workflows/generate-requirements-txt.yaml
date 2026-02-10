@@ -3,9 +3,7 @@ name: Generate requirements.txt
 on:
   push:
     branches:
-      - "master"
-      - 'foreman-*.*'
-      - 'konflux/mintmaker/**'
+      - 'konflux/mintmaker/**/*poetry-deps'
 
 jobs:
   generate-requirements-txt:
