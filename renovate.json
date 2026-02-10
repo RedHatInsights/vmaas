@@ -28,9 +28,9 @@
       "groupSlug": "go-modules"
     },
     {
-      "matchCategories": ["docker"],
-      "groupName": "docker references",
-      "groupSlug": "docker-refs",
+      "matchCategories": ["rpm-lockfile", "docker"],
+      "groupName": "docker and rpm references",
+      "groupSlug": "docker-rpm-refs",
       "pinDigests": true
     },
     {
