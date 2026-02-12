@@ -14,6 +14,10 @@
   },
   "packageRules": [
     {
+      "matchPackageNames": ["github.com/swaggo/files"],
+      "enabled": false
+    },
+    {
       "matchFileNames": ["**/requirements*.txt", "Dockerfile.devserver", "Dockerfile.dbdocs"],
       "enabled": false
     },
