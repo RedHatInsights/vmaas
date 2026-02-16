@@ -6,6 +6,7 @@ name: Container image build and publish
 # documentation.
 
 on:
+  pull_request:
   push:
     branches:
       - 'master'
@@ -23,7 +24,6 @@ env:
 
 jobs:
   build:
-    if: github.event_name == 'push'
     concurrency:
       group: "${{ github.workflow }}-${{ github.ref }}"
       cancel-in-progress: true
@@ -98,7 +98,7 @@ jobs:
       # transparency data even for private images, pass --force to cosign below.
       # https://github.com/sigstore/cosign
       - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
+        if: github.event_name != 'pull_request'
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ steps.meta.outputs.tags }}
