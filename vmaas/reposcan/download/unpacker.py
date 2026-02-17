@@ -21,7 +21,7 @@ class FileUnpacker:
     """
     Class unpacking queued files.
     Files to unpack are collected and then all unpacked at once into their locations.
-    Gz, Xz, Bz2 formats are supported.
+    Gz, Xz, Bz2, Zst formats are supported.
     """
 
     def __init__(self):
@@ -42,12 +42,15 @@ class FileUnpacker:
             return lzma.open
         if file_path.endswith(".bz2"):
             return bz2.open
+        if file_path.endswith(".zst"):
+            return zstd.open
         return None
 
     @staticmethod
     def get_unpacked_file_path(file_path):
         """Get unpacked file path for supported archive type."""
-        if file_path.endswith(".gz") or file_path.endswith(".xz") or file_path.endswith(".bz2"):
+        file_path_endings = (".gz", ".xz", ".bz2", ".zst")
+        if file_path.endswith(file_path_endings):
             file_path = file_path.rsplit(".", maxsplit=1)[0]
         return file_path
 
