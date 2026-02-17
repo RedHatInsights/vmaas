@@ -24,7 +24,7 @@ KATELLO_CA_CERT_PATH = "/katello-server-ca.crt"
 
 KATELLO_ACCESS_CERT_API = "/katello/api/v2/organizations/%s/download_debug_certificate"
 KATELLO_ORG_LIST_API = "/katello/api/v2/organizations"
-KATELLO_REPOS_LIST_API = "/katello/api/v2/repositories?organization_id=%s&search=redhat=true"
+KATELLO_REPOS_LIST_API = "/katello/api/v2/repositories?organization_id=%s&search=redhat=true&full_result=true"
 
 RETRY_COUNT = int(os.getenv("RETRY_COUNT", "3"))
 
