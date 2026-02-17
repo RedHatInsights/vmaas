@@ -4,7 +4,7 @@ commit_author = "vmaas-bot <40663028+vmaas-bot@users.noreply.github.com>"
 
 [project]
 name = "vmaas"
-version = "3.3.7"
+version = "3.4.0"
 readme = "README.md"
 packages = []
 package-mode = false
