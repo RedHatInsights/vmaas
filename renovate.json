@@ -35,6 +35,11 @@
       "enabled": false
     },
     {
+      "matchManagers": ["rpm-lockfile"],
+      "description": "Disable rpm-lockfile manager since it only makes sense to update RPM lockfile when base image changes (except few packages installed on top base image).",
+      "enabled": false
+    },
+    {
       "matchManagers": ["poetry"],
       "groupName": "poetry dependencies",
       "groupSlug": "poetry-deps"
@@ -45,10 +50,14 @@
       "groupSlug": "go-modules"
     },
     {
-      "matchCategories": ["rpm-lockfile", "docker"],
+      "matchCategories": ["docker"],
       "groupName": "docker and rpm references",
       "groupSlug": "docker-rpm-refs",
-      "pinDigests": true
+      "pinDigests": true,
+      "postUpgradeTasks": {
+        "commands": ["rpm-lockfile-prototype rpms.in.yaml"],
+        "fileFilters": ["**/rpms.lock.yaml"]
+      }
     },
     {
       "matchCategories": ["ci"],
