@@ -341,6 +341,16 @@ paths:
       tags:
         - Maintenance
 
+  /cleandata:
+    put:
+      summary: Clean /data data, keeps only latest dump
+      operationId: vmaas.reposcan.reposcan.CleanDataHandler.put
+      <<: *secured
+      responses:
+        <<: *sync_responses
+      tags:
+        - Maintenance
+
   /download/pg_dump:
     get:
       summary: Get pg_dump

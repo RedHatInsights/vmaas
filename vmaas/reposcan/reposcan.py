@@ -36,7 +36,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
 from vmaas.reposcan.database.product_store import ProductStore
 from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
-from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3
+from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3, DUMP
 from vmaas.reposcan.katello import KatelloApi, KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
@@ -324,7 +324,7 @@ class SyncHandler:
         """Run sync task of current class and export."""
         result = []
         result.append(cls.run_task(*args, **kwargs))
-        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, KatelloRepoListHandler, CleanTmpHandler):
+        if cls not in (ExporterHandler, PkgTreeHandler, RepoListHandler, GitRepoListHandler, KatelloRepoListHandler, CleanTmpHandler, CleanDataHandler):
             result.append(ExporterHandler.run_task())
             result.append(PkgTreeHandler.run_task())
             result.append(S3ExporterHandler.run_task())
@@ -1013,6 +1013,47 @@ class CleanTmpHandler(SyncHandler):
                     else:
                         os.unlink(item)
                     LOGGER.info("Deleted file or directory: %s", item)
+                except Exception as err:  # pylint: disable=broad-except
+                    LOGGER.warning("Unable to delete file or directory: %s (%s)", item, err)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            return "ERROR"
+        return "OK"
+
+
+class CleanDataHandler(SyncHandler):
+    """Handler for /data cleaning API."""
+
+    task_type = "Clean data dir"
+
+    @classmethod
+    def put(cls, **kwargs):
+        """Clean dump data."""
+
+        status_code, status_msg = cls.start_task()
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start cleaning dump data. Keeps only latest dump."""
+        try:
+            init_logging()
+            datadir = Path("/data")
+            dump_symlink = Path(DUMP)
+            latest_dump = None
+            if dump_symlink.is_symlink():
+                latest_dump = datadir / dump_symlink.readlink()
+            for item in datadir.iterdir():
+                try:
+                    if item.is_dir():
+                        shutil.rmtree(item)
+                        LOGGER.info("Deleted directory: %s", item)
+                    elif item not in (dump_symlink, latest_dump):
+                        os.unlink(item)
+                        LOGGER.info("Deleted file: %s", item)
+                    else:
+                        LOGGER.info("Skipped deleting file: %s", item)
                 except Exception as err:  # pylint: disable=broad-except
                     LOGGER.warning("Unable to delete file or directory: %s (%s)", item, err)
         except Exception as err:  # pylint: disable=broad-except
