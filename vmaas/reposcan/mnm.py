@@ -42,3 +42,5 @@ RELEASE_FAILED_IMPORT = Counter('vmaas_reposcan_failed_release_import', '# of fa
 RELEASE_GRAPH_FAILED_IMPORT = Counter('vmaas_reposcan_failed_release_graph_import', '# of failed release-import attempts')
 
 REPOS_TO_CLEANUP = Gauge('vmaas_reposcan_repos_cleanup', '# of repos to cleanup from DB')
+
+CERT_EXPIRATION_WARNING = Gauge('vmaas_reposcan_certificate_expiration_days', 'Days until CDN certificate expiration', ['cert_name'])
