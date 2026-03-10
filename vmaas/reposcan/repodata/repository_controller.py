@@ -83,7 +83,7 @@ class RepositoryController:
             valid_to_dt = datetime.strptime(loaded_cert.get_notAfter().decode("utf-8"), "%Y%m%d%H%M%SZ")
             expire_in_days = (valid_to_dt - datetime.utcnow()).days
             # Set gauge for alerting (when <= EXPIRATION_WARNING_DAYS)
-            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name or "unknown").set(expire_in_days)
+            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name).set(expire_in_days)
             if expire_in_days <= 0:
                 self.logger.error('Certificate %s expired!', cert_name)
             elif expire_in_days <= EXPIRATION_WARNING_DAYS:
@@ -93,7 +93,7 @@ class RepositoryController:
         except crypto.Error:
             self.logger.error('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
             # -1 for invalid certs, these should trigger alerts as well
-            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name or "unknown").set(-1)
+            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name).set(-1)
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
