@@ -13,12 +13,12 @@ asgiref==3.11.1 ; python_version == "3.12" \
 attrs==25.4.0 ; python_version == "3.12" \
     --hash=sha256:16d5969b87f0859ef33a48b35d55ac1be6e42ae49d5e853b597db70c35c57e11 \
     --hash=sha256:adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373
-boto3==1.42.47 ; python_version == "3.12" \
-    --hash=sha256:74812a2e29de7c2bd19e446d765cb887394f20f1517388484b51891a410f33b2 \
-    --hash=sha256:ed881ed246027028af566acbb80f008aa619be4d3fdbcc4ad3c75dbe8c34bfaf
-botocore==1.42.47 ; python_version == "3.12" \
-    --hash=sha256:c26e190c1b4d863ba7b44dc68cc574d8eb862ddae5f0fe3472801daee12a0378 \
-    --hash=sha256:c60f5feaf189423e17755aca3f1d672b7466620dd2032440b32aaac64ae8cac8
+boto3==1.42.51 ; python_version == "3.12" \
+    --hash=sha256:a010376cdc2432faa6c3338f04591142a1374da1b7eba94b80c0c7f1b525eff7 \
+    --hash=sha256:c3e75ab1c4df6b1049aecfae56d15f5ff99d68ec6a05f24741bab08ad5d5406e
+botocore==1.42.51 ; python_version == "3.12" \
+    --hash=sha256:216c4c148f37f882c7239fce1d8023acdc664643952ce1d6827c7edc829903d3 \
+    --hash=sha256:d7b03905b8066c25dd5bde1b7dc4af15ebdbaa313abbb2543db179b1d5efae3d
 certifi==2026.1.4 ; python_version == "3.12" \
     --hash=sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c \
     --hash=sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120
@@ -709,9 +709,9 @@ tzlocal==5.3.1 ; python_version == "3.12" \
 urllib3==2.6.3 ; python_version == "3.12" \
     --hash=sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed \
     --hash=sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4
-uvicorn==0.40.0 ; python_version == "3.12" \
-    --hash=sha256:839676675e87e73694518b5574fd0f24c9d97b46bea16df7b8c05ea1a51071ea \
-    --hash=sha256:c6c8f55bc8bf13eb6fa9ff87ad62308bbbc33d0b67f84293151efe87e0d5f2ee
+uvicorn==0.41.0 ; python_version == "3.12" \
+    --hash=sha256:09d11cf7008da33113824ee5a1c6422d89fbc2ff476540d69a34c87fab8b571a \
+    --hash=sha256:29e35b1d2c36a04b9e180d4007ede3bcb32a85fbdfd6c6aeb3f26839de088187
 watchtower==3.4.0 ; python_version == "3.12" \
     --hash=sha256:5eac65cbf2a7350bb43c3518485230a6135ed7dec7ccb88468828d68ab9fea26 \
     --hash=sha256:7d3c116aff72a73ce8f6fc0addd1d0daa04d3f9d53d87cedca3a5a65a264bf7d
