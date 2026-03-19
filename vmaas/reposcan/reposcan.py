@@ -38,6 +38,7 @@ from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3, DUMP
 from vmaas.reposcan.katello import KatelloApi, KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS
+from vmaas.reposcan.cert_expiration import update_cert_expiration_gauges
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
     REGISTRY
@@ -341,6 +342,8 @@ class SyncHandler:
         is_err = reduce(lambda was, msg: was if was else "ERROR" in msg, task_result, False)
         LOGGER.info("%s task finished: %s.", cls.task_type, task_result)
         SyncTask.finish()
+        # DB may have new certs after sync so refresh gauges in main process
+        update_cert_expiration_gauges()
         return is_err
 
 
@@ -1177,6 +1180,7 @@ def create_app(specs):
     """Create reposcan app."""
     init_logging()
     SyncTask.init()
+    update_cert_expiration_gauges()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
     startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360"))

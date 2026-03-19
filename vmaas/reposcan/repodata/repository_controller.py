@@ -4,11 +4,9 @@ Module containing class for syncing set of repositories into the DB.
 import os
 import shutil
 import tempfile
-from datetime import datetime
 from urllib.parse import urljoin
 import re
 from operator import attrgetter
-from OpenSSL import crypto
 
 from vmaas.common.batch_list import BatchList
 from vmaas.common.logging_utils import get_logger
@@ -16,13 +14,13 @@ from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.repository_store import RepositoryStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import FileUnpacker
-from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE, CERT_EXPIRATION_WARNING
+from vmaas.reposcan.metrics_refresh import check_cert_expiration
+from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
 
 from vmaas.reposcan.repodata.repomd import RepoMD, RepoMDTypeNotFound
 from vmaas.reposcan.repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
-EXPIRATION_WARNING_DAYS = 14
 
 
 class RepositoryController:
@@ -69,31 +67,12 @@ class RepositoryController:
             self.downloader.add(item)
 
         for cert_name, cert in certs_tmp_dict.items():
-            self._check_cert_expiration_date(cert_name, cert)
+            check_cert_expiration(cert_name, cert, logger=self.logger)
+
         self.downloader.run()
         # Return failed downloads
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
-
-    def _check_cert_expiration_date(self, cert_name, cert):
-        try:
-            # Load certificate
-            loaded_cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
-            # Get expiration date and parse it to datetime object
-            valid_to_dt = datetime.strptime(loaded_cert.get_notAfter().decode("utf-8"), "%Y%m%d%H%M%SZ")
-            expire_in_days = (valid_to_dt - datetime.utcnow()).days
-            # Set gauge for alerting (when <= EXPIRATION_WARNING_DAYS)
-            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name).set(expire_in_days)
-            if expire_in_days <= 0:
-                self.logger.error('Certificate %s expired!', cert_name)
-            elif expire_in_days <= EXPIRATION_WARNING_DAYS:
-                self.logger.warning('Certificate %s will expire in %s days!', cert_name, expire_in_days)
-            else:
-                self.logger.info('Certificate %s will expire in %s days.', cert_name, expire_in_days)
-        except crypto.Error:
-            self.logger.error('Certificate not provided or incorrect: %s', cert_name if cert_name else 'None')
-            # -1 for invalid certs, these should trigger alerts as well
-            CERT_EXPIRATION_WARNING.labels(cert_name=cert_name).set(-1)
 
     def _read_repomds(self):
         """Reads all downloaded repomd files. Checks if their download failed and checks if their metadata are
