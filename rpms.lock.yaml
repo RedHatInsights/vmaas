@@ -838,7 +838,7 @@ arches:
     name: rust
     evr: 1.88.0-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/ea23380504e99540cce6bb2a9a96f5131b631ca1440bfa90a624d4cbc898eca7-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/e9e44c6930b4e84d8747f7ac9e2bc38b7fce29bc75e541a41cd8f2083186c3df-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 44284
-    checksum: sha256:ea23380504e99540cce6bb2a9a96f5131b631ca1440bfa90a624d4cbc898eca7
+    checksum: sha256:e9e44c6930b4e84d8747f7ac9e2bc38b7fce29bc75e541a41cd8f2083186c3df
