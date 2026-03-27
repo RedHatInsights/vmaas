@@ -1,9 +1,7 @@
 """
-Metrics that need refreshing in the main process
-Updated at startup and after sync completes so they appear in the default registry
+Metrics that need refreshing in the main process (scheduled in reposcan.create_app).
 """
 
-import logging
 from datetime import datetime
 from typing import Optional, Set
 
@@ -25,11 +23,7 @@ class _CertGaugeState:
     tracked_names: Optional[Set[str]] = None
 
 
-def check_cert_expiration(
-    cert_name: str,
-    cert_pem: Optional[str],
-    logger: Optional[logging.Logger] = None,
-) -> int:
+def check_cert_expiration(cert_name: str, cert_pem: Optional[str]) -> int:
     """Parse cert, update Prometheus gauge, return days until expiry (-1 if invalid/missing)"""
     if not cert_pem:
         days = -1
@@ -44,27 +38,26 @@ def check_cert_expiration(
             days = -1
             CERT_EXPIRATION_WARNING.labels(cert_name=cert_name).set(days)
 
-    if logger is not None:
-        if days <= 0:
-            logger.error('Certificate %s expired!', cert_name if cert_name else 'None')
-        elif days <= EXPIRATION_WARNING_DAYS:
-            logger.warning('Certificate %s will expire in %s days!', cert_name, days)
-        else:
-            logger.info('Certificate %s will expire in %s days.', cert_name, days)
+    if days <= 0:
+        LOGGER.error('Certificate %s expired!', cert_name if cert_name else 'None')
+    elif days <= EXPIRATION_WARNING_DAYS:
+        LOGGER.warning('Certificate %s will expire in %s days!', cert_name, days)
+    else:
+        LOGGER.info('Certificate %s will expire in %s days.', cert_name, days)
 
     return days
 
 
 def update_cert_expiration_gauges():
-    """Update cert expiration gauges from DB (certs in use by repos). Main process."""
+    """Update cert expiration gauges from DB (certificates with PEM). Main process."""
+    LOGGER.info("Refreshing cert expiration gauges from database.")
     certs = {}
 
     try:
         init_db()
         cur = DatabaseHandler.get_connection().cursor()
         cur.execute("""
-            SELECT DISTINCT c.name, c.cert FROM certificate c
-            JOIN repo r ON r.certificate_id = c.id
+            SELECT c.name, c.cert FROM certificate c
             WHERE c.cert IS NOT NULL AND c.cert != ''
         """)
         for name, cert in cur.fetchall():
@@ -84,3 +77,8 @@ def update_cert_expiration_gauges():
 
     for cert_name, cert_pem in certs.items():
         check_cert_expiration(cert_name, cert_pem)
+
+
+def metrics_refresh() -> None:
+    """Scheduled entry point for main-process gauge refresh. Extend with more tasks as needed"""
+    update_cert_expiration_gauges()

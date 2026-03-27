@@ -14,7 +14,6 @@ from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.repository_store import RepositoryStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import FileUnpacker
-from vmaas.reposcan.metrics_refresh import check_cert_expiration
 from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
 
 from vmaas.reposcan.repodata.repomd import RepoMD, RepoMDTypeNotFound
@@ -46,14 +45,10 @@ class RepositoryController:
 
     def _download_repomds(self):
         download_items = []
-        certs_tmp_dict = {}
         for repository in sorted(self.repositories, key=attrgetter("repo_url")):
             repomd_url = urljoin(repository.repo_url, REPOMD_PATH)
             repository.tmp_directory = tempfile.mkdtemp(prefix="repo-")
             ca_cert, cert, key = self._get_certs_tuple(repository.cert_name)
-            # Check certificate expiration date
-            if repository.cert_name:
-                certs_tmp_dict[repository.cert_name] = repository.cert
 
             item = DownloadItem(
                 source_url=repomd_url,
@@ -65,9 +60,6 @@ class RepositoryController:
             # Save for future status code check
             download_items.append(item)
             self.downloader.add(item)
-
-        for cert_name, cert in certs_tmp_dict.items():
-            check_cert_expiration(cert_name, cert, logger=self.logger)
 
         self.downloader.run()
         # Return failed downloads
