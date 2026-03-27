@@ -38,6 +38,7 @@ from vmaas.reposcan.dbchange import DbChangeAPI
 from vmaas.reposcan.dbdump import DbDumpAPI
 from vmaas.reposcan.exporter import main as export_data, fetch_latest_dump, upload_dump_s3, DUMP
 from vmaas.reposcan.katello import KatelloApi, KATELLO_URL, KATELLO_API_USER, KATELLO_API_PASS
+from vmaas.reposcan.metrics_refresh import metrics_refresh
 from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, FAILED_IMPORT_CPE, \
     CSAF_FAILED_IMPORT, FAILED_IMPORT_REPO, RELEASE_FAILED_IMPORT, RELEASE_GRAPH_FAILED_IMPORT, REPOS_TO_CLEANUP, \
     REGISTRY
@@ -1179,16 +1180,38 @@ def create_app(specs):
     SyncTask.init()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
     startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
+    startup_metrics_gauge_delay = int(os.getenv('METRICS_GAUGE_REFRESH_DELAY_SECONDS', "30"))
+
     sync_interval = int(os.getenv('REPOSCAN_SYNC_INTERVAL_MINUTES', "360"))
+    metrics_refresh_interval = int(os.getenv('METRICS_GAUGE_REFRESH_INTERVAL_MINUTES', "240"))
+
+    # Sync jobs to run
+    periodic_job_intervals = (sync_interval, metrics_refresh_interval)
+
+    sched = None
+    if any(job > 0 for job in periodic_job_intervals):
+        sched = BackgroundScheduler()  # Initialize scheduler
+
     if sync_interval > 0:
         next_run_time = datetime.now() + timedelta(minutes=startup_sync_delay)
-        sched = BackgroundScheduler()
         sched.add_job(periodic_sync, trigger="interval", minutes=sync_interval, next_run_time=next_run_time)
-        sched.start()
         LOGGER.info("Running initial sync in %s minute(s).", startup_sync_delay)
         LOGGER.info("Periodic syncing running every %s minute(s).", sync_interval)
     else:
         LOGGER.info("Periodic syncing disabled.")
+
+    if metrics_refresh_interval > 0:
+        next_run_time = datetime.now() + timedelta(seconds=startup_metrics_gauge_delay)
+        sched.add_job(metrics_refresh, trigger="interval", minutes=metrics_refresh_interval, next_run_time=next_run_time)
+        LOGGER.info("First metrics gauge refresh in %s second(s).", startup_metrics_gauge_delay)
+        LOGGER.info("Periodic metrics gauge refresh every %s minute(s).", metrics_refresh_interval)
+        if sync_interval == 0:
+            LOGGER.warning("REPOSCAN_SYNC_INTERVAL_MINUTES is 0 - Certification metrics gauge may not show actual data.")
+    else:
+        LOGGER.info("Periodic metrics gauge disabled.")
+
+    if sched is not None:
+        sched.start()
 
     if SYNC_REPO_LIST_SOURCE in RepoListSource:
         LOGGER.info("Repository list source: %s", SYNC_REPO_LIST_SOURCE)
