@@ -157,7 +157,12 @@ class CsafController:
 
         self.logger.info("%d CSAF files.", len(csaf_files))
         self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
-        self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
+
+        if CSAF_SYNC_ALL_FILES:
+            # When syncing all files, delete every file from DB and sync them again
+            self.csaf_store.delete_csaf_files(csaf_files)
+        else:    
+            self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
 
         try:
             if batches.get_total_items():
