@@ -842,20 +842,21 @@ class CsafSyncHandler(SyncHandler):
     task_type = "Sync CSAF metadata"
 
     @classmethod
-    def put(cls, **kwargs):
+    def put(cls, sync_all=False, **kwargs):
         """Sync CSAF metadata."""
 
-        status_code, status_msg = cls.start_task()
+        status_code, status_msg = cls.start_task(sync_all=sync_all)
         return status_msg, status_code
 
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing CSAFs."""
         try:
+            sync_all = kwargs.get("sync_all", False)
             init_logging()
             init_db()
             controller = CsafController()
-            controller.store()
+            controller.store(sync_all=sync_all)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)

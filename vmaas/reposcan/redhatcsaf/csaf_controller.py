@@ -18,7 +18,6 @@ from vmaas.common.config import Config
 from vmaas.common.date_utils import parse_datetime
 from vmaas.common.fileutil import remove_file_if_exists
 from vmaas.common.logging_utils import get_logger
-from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
 from vmaas.reposcan.download.downloader import DownloadItem
 from vmaas.reposcan.download.downloader import FileDownloader
@@ -37,7 +36,6 @@ from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/v2/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_VEX_ARCHIVE_TXT = os.getenv("CSAF_VEX_ARCHIVE_TXT", "archive_latest.txt")
-CSAF_SYNC_ALL_FILES = strtobool(os.getenv("CSAF_SYNC_ALL_FILES", "false"))
 ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
 
 ProductRelationship = namedtuple("ProductRelationship", ["product_reference", "module"])
@@ -134,7 +132,7 @@ class CsafController:
             for csaf_file in batch:
                 remove_file_if_exists(self.tmp_directory / csaf_file.name)
 
-    def store(self) -> None:
+    def store(self, sync_all: bool = False) -> None:  # pylint: disable=too-many-branches
         """Process and store CSAF objects to DB."""
         self.logger.info("Checking CSAF index.")
         failed = self._download_index()
@@ -149,7 +147,7 @@ class CsafController:
         batches = BatchList()
         csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.tmp_directory / CSAF_VEX_INDEX_CSV)  # type: ignore[arg-type]
         files_to_sync = csaf_files.csv_files
-        if not CSAF_SYNC_ALL_FILES:
+        if not sync_all:
             files_to_sync = csaf_files.out_of_date
 
         for csaf_file in files_to_sync:
@@ -158,10 +156,10 @@ class CsafController:
         self.logger.info("%d CSAF files.", len(csaf_files))
         self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
 
-        if CSAF_SYNC_ALL_FILES:
+        if sync_all:
             # When syncing all files, delete every file from DB and sync them again
             self.csaf_store.delete_csaf_files(csaf_files)
-        else:    
+        else:
             self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
 
         try:
