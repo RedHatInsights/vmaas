@@ -290,7 +290,7 @@ parameters:
   value: '2'
 - name: CPU_REQUEST_REPOSCAN
   description: CPU request for pod
-  value: '200m'
+  value: '1000m'
 - name: CPU_LIMIT_REPOSCAN
   description: Maximum CPU limit for pod
   value: '1000m'
@@ -305,7 +305,7 @@ parameters:
   value: '4Gi'
 - name: MEMORY_REQUEST_REPOSCAN
   description: Memory request for pod
-  value: '1Gi'
+  value: '2Gi'
 - name: MEMORY_LIMIT_REPOSCAN
   description: Maximum memory limit for pod
   value: '2Gi'
