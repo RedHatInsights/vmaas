@@ -252,6 +252,8 @@ class CsafController:
                         # such as container (rhel-8/python-eventlet) or a java package (com.google.guava/guava)
                         # meaning it is not an rpm and we don't want to process this product
                         raise ComponentError(f"Not RPM component '{product}'")
+                elif module_from_suffix:
+                    module = module_from_suffix
             case "fixed":
                 splitted_product = branch_product.split("-", 1)
                 if len(splitted_product) != 2:
