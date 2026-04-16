@@ -38,6 +38,15 @@ spec:
     name: docker-build-oci-ta
   taskRunTemplate:
     serviceAccountName: build-pipeline-vmaas
+  taskRunSpecs:
+  - pipelineTaskName: prefetch-dependencies
+    stepSpecs:
+    - name: prefetch-dependencies
+      computeResources:
+        requests:
+          memory: 4Gi
+        limits:
+          memory: 4Gi
   workspaces:
   - name: git-auth
     secret:
