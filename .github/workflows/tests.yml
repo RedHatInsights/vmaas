@@ -4,11 +4,15 @@ on:
   push:
     branches:
       - "master"
-      - "stable"
+      - "hotfix"
+      - 'foreman-*.*'
+      - "security-compliance"
   pull_request:
     branches:
       - "master"
-      - "stable"
+      - "hotfix"
+      - 'foreman-*.*'
+      - "security-compliance"
 
 jobs:
   tests:
