@@ -252,30 +252,31 @@ hatchling==1.29.0 \
     #   urllib3
     #   uvicorn
     #   watchtower
-maturin==1.12.6 \
-    --hash=sha256:06fc8d089f98623ce924c669b70911dfed30f9a29956c362945f727f9abc546b \
-    --hash=sha256:2cb41139295eed6411d3cdafc7430738094c2721f34b7eeb44f33cac516115dc \
-    --hash=sha256:351f3af1488a7cbdcff3b6d8482c17164273ac981378a13a4a9937a49aec7d71 \
-    --hash=sha256:3f32e0a3720b81423c9d35c14e728cb1f954678124749776dc72d533ea1115e8 \
-    --hash=sha256:6892b4176992fcc143f9d1c1c874a816e9a041248eef46433db87b0f0aff4278 \
-    --hash=sha256:6dbddfe4dc7ddee60bbac854870bd7cfec660acb54d015d24597d59a1c828f61 \
-    --hash=sha256:75133e56274d43b9227fd49dca9a86e32f1fd56a7b55544910c4ce978c2bb5aa \
-    --hash=sha256:8fdb0f63e77ee3df0f027a120e9af78dbc31edf0eb0f263d55783c250c33b728 \
-    --hash=sha256:977290159d252db946054a0555263c59b3d0c7957135c69e690f4b1558ee9983 \
-    --hash=sha256:bae91976cdc8148038e13c881e1e844e5c63e58e026e8b9945aa2d19b3b4ae89 \
-    --hash=sha256:c0c742beeeef7fb93b6a81bd53e75507887e396fd1003c45117658d063812dad \
-    --hash=sha256:d37be3a811a7f2ee28a0fa0964187efa50e90f21da0c6135c27787fa0b6a89db \
-    --hash=sha256:e90dc12bc6a38e9495692a36c9e231c4d7e0c9bfde60719468ab7d8673db3c45 \
-    --hash=sha256:fa84b7493a2e80759cacc2e668fa5b444d55b9994e90707c42904f55d6322c1e
+maturin==1.13.1 \
+    --hash=sha256:001741c6cff56aa8ea59a0d78ae990c0550d0e3e82b00b683eedb4158a8ef7e6 \
+    --hash=sha256:01c845825c917c07c1d0b2c9032c59c16a7d383d1e649a46481d3e5693c2750f \
+    --hash=sha256:2839024dcd65776abb4759e5bca29941971e095574162a4d335191da4be9ff24 \
+    --hash=sha256:3da18cccf2f683c0977bff9146a0908d6ffce836d600665736ac01679f588cb9 \
+    --hash=sha256:416e4e01cb88b798e606ee43929df897e42c1647b722ef68283816cca99a8742 \
+    --hash=sha256:6b1e5916a253243e8f5f9e847b62bbc98420eec48c9ce2e2e8724c6da89d359b \
+    --hash=sha256:72888e87819ce546d0d2df900e4b385e4ef299077d92ee37b48923a5602dae94 \
+    --hash=sha256:98b5fcf1a186c217830a8295ecc2989c6b1cf50945417adfc15252107b9475b7 \
+    --hash=sha256:9a87ff3b8e4d1c6eac33ebfe8e261e8236516d98d45c0323550621819b5a1a2f \
+    --hash=sha256:a2017d2281203d0c6570240e7d746564d766d756105823b7de68bda6ae722711 \
+    --hash=sha256:c1490584f3c70af45466ee99065b49e6657ebdccac6b10571bb44681309c9396 \
+    --hash=sha256:c6a720b252c99de072922dbe4432ab19662b6f80045b0355fec23bdfccb450da \
+    --hash=sha256:dc91031e0619c1e28730279ef9ee5f106c9b9ec806b013f888676b242f892eb7 \
+    --hash=sha256:f69093ed4a0e6464e52a7fc26d714f859ce15630ec8070743398c6bf41f38a9e
     # via
     #   cryptography
     #   rpds-py
-packaging==26.0 \
-    --hash=sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4 \
-    --hash=sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529
+packaging==26.1 \
+    --hash=sha256:5d9c0669c6285e491e0ced2eee587eaf67b670d94a19e94e3984a481aba6802f \
+    --hash=sha256:f042152b681c4bfac5cae2742a55e103d27ab2ec0f3d88037136b6bfe7c9c5de
     # via
     #   hatchling
     #   setuptools-scm
+    #   vcs-versioning
     #   wheel
     #   zstandard
 pathspec==1.0.4 \
@@ -286,9 +287,9 @@ pluggy==1.6.0 \
     --hash=sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3 \
     --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
     # via hatchling
-poetry-core==2.3.1 \
-    --hash=sha256:96f791d5d7d4e040f3983d76779425cf9532690e2756a24fd5ca0f86af19ef82 \
-    --hash=sha256:db1cf63b782570deb38bfba61e2304a553eef0740dc17959a50cc0f5115ee634
+poetry-core==2.3.2 \
+    --hash=sha256:20cb71be27b774628da9f384effd9183dfceb53bcef84063248a8672aa47031f \
+    --hash=sha256:23df641b64f87fbb4ce1873c1915a4d4bb1b7d808c596e4307edc073e68d7234
     # via
     #   connexion
     #   swagger-ui-bundle
@@ -300,10 +301,20 @@ semantic-version==2.10.0 \
     --hash=sha256:bdabb6d336998cbb378d4b9db3a4b56a1e3235701dc05ea2690d9a997ed5041c \
     --hash=sha256:de78a3b8e0feda74cabc54aab2da702113e33ac9d9eb9d2389bcf1f58b7d9177
     # via setuptools-rust
-setuptools-rust==1.12.0 \
-    --hash=sha256:7e7db90547f224a835b45f5ad90c983340828a345554a9a660bdb2de8605dcdd \
-    --hash=sha256:d94a93f0c97751c17014565f07bdc324bee45d396cd1bba83d8e7af92b945f0c
+setuptools-rust==1.12.1 \
+    --hash=sha256:85ae70989d96c9cfeb5ef79cf3bac2d5200bc5564f720a06edceedbdf6664640 \
+    --hash=sha256:b7ebd6a182e7aefa97a072e880530c9b0ec8fcca8617e0bb8ff299c1a064f693
     # via maturin
+setuptools-scm==10.0.5 \
+    --hash=sha256:bbba8fe754516cdefd017f4456721775e6ef9662bd7887fb52ae26813d4838c3 \
+    --hash=sha256:f611037d8aae618221503b8fa89319f073438252ae3420e01c9ceec249131a0a
+    # via
+    #   anyio
+    #   app-common-python
+    #   apscheduler
+    #   hatch-vcs
+    #   pluggy
+    #   setuptools-rust
 setuptools-scm==7.1.0 \
     --hash=sha256:6c508345a771aad7d56ebff0e70628bf2b0ec7573762be9960214730de278f27 \
     --hash=sha256:73988b6d848709e2af142aa48c986ea29592bbcfca5375678064708205253d8e
@@ -312,12 +323,7 @@ setuptools-scm==9.2.2 \
     --hash=sha256:1c674ab4665686a0887d7e24c03ab25f24201c213e82ea689d2f3e169ef7ef57 \
     --hash=sha256:30e8f84d2ab1ba7cb0e653429b179395d0c33775d54807fc5f1dd6671801aef7
     # via
-    #   anyio
-    #   app-common-python
-    #   apscheduler
     #   hatch-vcs
-    #   pluggy
-    #   setuptools-rust
     #   urllib3
 trove-classifiers==2026.1.14.14 \
     --hash=sha256:00492545a1402b09d4858605ba190ea33243d361e2b01c9c296ce06b5c3325f3 \
@@ -326,6 +332,10 @@ trove-classifiers==2026.1.14.14 \
 typing-extensions==4.15.0 ; python_version == "3.12" \
     --hash=sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466 \
     --hash=sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548
+    # via setuptools-scm
+vcs-versioning==1.1.1 \
+    --hash=sha256:b541e2ba79fc6aaa3850f8a7f88af43d97c1c80649c01142ee4146eddbc599e4 \
+    --hash=sha256:fabd75a3cab7dd8ac02fe24a3a9ba936bf258667b5a62ed468c9a1da0f5775bc
     # via setuptools-scm
 wheel==0.46.3 \
     --hash=sha256:4b399d56c9d9338230118d705d9737a2a468ccca63d5e813e2a4fc7815d8bc4d \
@@ -336,10 +346,6 @@ wheel==0.46.3 \
     #   tzdata
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==81.0.0 \
-    --hash=sha256:487b53915f52501f0a79ccfd0c02c165ffe06631443a886740b91af4b7a5845a \
-    --hash=sha256:fdd925d5c5d9f62e4b74b30d6dd7828ce236fd6ed998a08d81de62ce5a6310d6
-    # via charset-normalizer
 setuptools==82.0.1 \
     --hash=sha256:7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9 \
     --hash=sha256:a59e362652f08dcd477c78bb6e7bd9d80a7995bc73ce773050228a348ce2e5bb
@@ -350,6 +356,7 @@ setuptools==82.0.1 \
     #   calver
     #   certifi
     #   cffi
+    #   charset-normalizer
     #   cryptography
     #   gitpython
     #   markupsafe
@@ -360,9 +367,11 @@ setuptools==82.0.1 \
     #   pycparser
     #   python-dateutil
     #   pyyaml
+    #   requests
     #   setuptools-rust
     #   setuptools-scm
     #   trove-classifiers
     #   tzdata
     #   tzlocal
+    #   vcs-versioning
     #   zstandard
