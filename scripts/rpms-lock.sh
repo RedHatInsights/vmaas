@@ -37,6 +37,7 @@ $cmd run --rm -d --name rpms-locker-container rpms-locker sleep infinity
 
 $cmd exec rpms-locker-container bash -c "mkdir -p /tmp/.hermetic_builds"
 $cmd cp "./rpms.in.yaml" rpms-locker-container:"/tmp/"
+$cmd cp ".hermetic_builds/hummingbird.repo" rpms-locker-container:"/tmp/.hermetic_builds/"
 $cmd exec -it rpms-locker-container bash -c "subscription-manager register"
 $cmd exec -it rpms-locker-container bash -c "subscription-manager repos --enable rhel-9-for-x86_64-baseos-source-rpms --enable rhel-9-for-x86_64-appstream-source-rpms"
 $cmd exec rpms-locker-container bash -c "cp /etc/yum.repos.d/redhat.repo /tmp/.hermetic_builds/ && sed -i \"s/\$(uname -m)/\\\$basearch/g\" /tmp/.hermetic_builds/redhat.repo"

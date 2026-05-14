@@ -2,12 +2,14 @@ ARG ALT_REPO
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1778562320@sha256:12db9874bd753eb98b1ab3d840e75de5d6842ac0604fbd68c012adefe97140be AS buildimg
 
+ADD .hermetic_builds/hummingbird.repo /etc/yum.repos.d/
+
 ARG ALT_REPO
 
 ARG VAR_RPMS=""
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        go-toolset rpm-devel python3.12-pip cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
+        golang1.25 rpm-devel python3.12-pip cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
         $VAR_RPMS && \
     microdnf clean all
 

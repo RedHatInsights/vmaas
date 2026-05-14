@@ -1,6 +1,6 @@
-packages: [go-toolset, rpm-devel, python312, python3.12-pip, python3-rpm, python3-dnf, which, nginx, git-core, shadow-utils, diffutils, systemd, libicu, postgresql, cargo, rust, python3.12-devel, libffi-devel, postgresql-devel, openssl-devel]
+packages: [golang1.25, rpm-devel, python312, python3.12-pip, python3-rpm, python3-dnf, which, nginx, git-core, shadow-utils, diffutils, systemd, libicu, postgresql, cargo, rust, python3.12-devel, libffi-devel, postgresql-devel, openssl-devel]
 contentOrigin:
-  repofiles: [".hermetic_builds/redhat.repo"]
+  repofiles: [".hermetic_builds/redhat.repo", ".hermetic_builds/hummingbird.repo"]
 arches: [x86_64]
 
 moduleEnable:
