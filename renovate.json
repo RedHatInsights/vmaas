@@ -27,7 +27,7 @@
   },
   "packageRules": [
     {
-      "matchPackageNames": ["github.com/swaggo/files"],
+      "matchPackageNames": ["github.com/swaggo/files", "maturin"],
       "enabled": false
     },
     {

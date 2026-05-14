@@ -29,6 +29,8 @@ dependencies = [
     "uvicorn (>=0.35.0,<1.0.0)",
     "watchtower>=1.0.0",
     "zstandard (>=0.25.0,<0.26.0)",
+    # maturin@1.13.2 requires rustc 1.89 (not in RHEL 9 yet)
+    "maturin==1.13.1",
 ]
 
 [tool.poetry.group.dev.dependencies]
