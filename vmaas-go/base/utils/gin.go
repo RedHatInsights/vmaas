@@ -81,8 +81,11 @@ func RunServer(ctx context.Context, handler http.Handler, port int) error {
 	addr := fmt.Sprintf(":%d", port)
 	srv := http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: ReadHeaderTimeout, MaxHeaderBytes: 65535}
 	go func() {
+		// Using WithoutCancel to create a shutdown context that won't be cancelled when ctx is done
+		// This avoids gosec G118 error while allowing graceful shutdown after signal
+		shutdownCtx := context.WithoutCancel(ctx)
 		<-ctx.Done()
-		err := srv.Shutdown(context.Background())
+		err := srv.Shutdown(shutdownCtx)
 		if err != nil {
 			LogError("err", err.Error(), "server shutting down failed")
 			return
