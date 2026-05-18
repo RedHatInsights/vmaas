@@ -42,12 +42,14 @@
     {
       "matchManagers": ["poetry"],
       "groupName": "poetry dependencies",
-      "groupSlug": "poetry-deps"
+      "groupSlug": "poetry-deps",
+      "minimumReleaseAge": "3 days"
     },
     {
       "matchCategories": ["golang"],
       "groupName": "go modules",
-      "groupSlug": "go-modules"
+      "groupSlug": "go-modules",
+      "minimumReleaseAge": "3 days"
     },
     {
       "matchCategories": ["docker"],
