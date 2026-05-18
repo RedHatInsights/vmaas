@@ -1,14 +1,15 @@
 ARG ALT_REPO
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1778562320@sha256:12db9874bd753eb98b1ab3d840e75de5d6842ac0604fbd68c012adefe97140be AS buildimg
+FROM registry.access.redhat.com/hi/go:1.25.9-builder as go-builder
 
 ARG ALT_REPO
+
+USER root
 
 ARG VAR_RPMS=""
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        go-toolset rpm-devel python3.12-pip cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel \
-        $VAR_RPMS && \
+        rpm-devel libffi-devel postgresql-devel openssl-devel && \
     microdnf clean all
 
 ADD /vmaas-go /vmaas/go/src/vmaas
@@ -16,8 +17,21 @@ ADD /vmaas-go /vmaas/go/src/vmaas
 WORKDIR /vmaas/go/src/vmaas
 RUN go build -v main.go && go clean -cache -modcache -testcache
 
+FROM registry.access.redhat.com/hi/python:3.12.13-builder as python-builder
+ARG ALT_REPO
+
+USER root
+
+ARG VAR_RPMS=""
+RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
+    microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+        rpm-devel cargo rust libffi-devel postgresql-devel openssl-devel \
+        $VAR_RPMS && \
+    microdnf clean all
 # Switch back to /vmaas because of golang tests running in this stage
 WORKDIR /vmaas
+
+RUN install -d -m 775 -g root data
 
 ADD requirements.txt     /vmaas/
 ADD requirements-dev.txt /vmaas/
@@ -29,35 +43,32 @@ RUN pip3.12 install --upgrade pip && \
 
 # -------------
 # runtime image
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1778562320@sha256:12db9874bd753eb98b1ab3d840e75de5d6842ac0604fbd68c012adefe97140be AS runtimeimg
+FROM registry.access.redhat.com/hi/python:3.12.13-builder as runtimeimg
+
+USER root
 
 ARG ALT_REPO
 
 RUN (microdnf module enable -y postgresql:16 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3-rpm python3-dnf which nginx git-core shadow-utils diffutils systemd libicu postgresql libpq && \
-        ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
-        ln -s $(basename /usr/lib64/python3.9/site-packages/rpm/_rpm.*.so) /usr/lib64/python3.9/site-packages/rpm/_rpm.so && \
+        python3-rpm python3-dnf nginx libicu postgresql postgresql-private-libs && \
+        ln -s /usr/lib64/python3.14/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
     microdnf clean all
 
 WORKDIR /vmaas
 
-RUN install -d -m 775 -g root /data && \
-    adduser --gid 0 -d /vmaas --no-create-home vmaas
-
 ENV PYTHONPATH=/vmaas
 
-USER vmaas
-
 # Compiled Go binary
-COPY --from=buildimg --chown=vmaas:root /vmaas/go/src/vmaas/main /vmaas/go/src/vmaas/
+COPY --from=go-builder --chown=root:root /vmaas/go/src/vmaas/main /vmaas/go/src/vmaas/
 
 # Python deps
-COPY --from=buildimg /usr/local/lib/python3.12/site-packages   /usr/local/lib/python3.12/site-packages
-COPY --from=buildimg /usr/local/lib64/python3.12/site-packages /usr/local/lib64/python3.12/site-packages
-COPY --from=buildimg /usr/local/bin/uvicorn                    /usr/local/bin/
+COPY --from=python-builder /usr/local/lib/python3.12/site-packages   /usr/local/lib/python3.12/site-packages
+COPY --from=python-builder /usr/local/bin/uvicorn                    /usr/local/bin/
 
-COPY --from=buildimg --chown=vmaas:root /vmaas/requirements.txt /vmaas/
+COPY --from=python-builder --chown=root:root /vmaas/requirements.txt /vmaas/
+
+COPY --from=python-builder --chown=root:root /vmaas/data/ /data/
 
 ADD entrypoint.sh               /vmaas/
 ADD conf                        /vmaas/conf
@@ -70,3 +81,5 @@ ADD /vmaas-go/docs/openapi.json     /vmaas/go/src/vmaas/docs/v3/
 ADD /vmaas/reposcan/redhatrelease/gen_package_profile.py /usr/local/bin
 
 ADD VERSION /vmaas/
+
+USER 65532
