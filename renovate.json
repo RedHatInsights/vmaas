@@ -41,18 +41,21 @@
     },
     {
       "matchManagers": ["poetry"],
+      "matchBaseBranches": ["master"],
       "groupName": "poetry dependencies",
       "groupSlug": "poetry-deps",
       "minimumReleaseAge": "3 days"
     },
     {
       "matchCategories": ["golang"],
+      "matchBaseBranches": ["master"],
       "groupName": "go modules",
       "groupSlug": "go-modules",
       "minimumReleaseAge": "3 days"
     },
     {
       "matchCategories": ["docker"],
+      "matchBaseBranches": ["master"],
       "groupName": "docker and rpm references",
       "groupSlug": "docker-rpm-refs",
       "pinDigests": true,
@@ -63,6 +66,7 @@
     },
     {
       "matchCategories": ["ci"],
+      "matchBaseBranches": ["master"],
       "groupName": "ci references",
       "groupSlug": "ci-refs",
       "pinDigests": true
