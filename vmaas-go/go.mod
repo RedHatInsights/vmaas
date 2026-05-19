@@ -89,4 +89,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/ezamriy/gorpm v0.0.0-20160905202458-25f7273cbf51 => github.com/psegedy/gorpm v0.0.0-20221128152921-427315f73216
+replace github.com/ezamriy/gorpm v0.0.0-20160905202458-25f7273cbf51 => github.com/MichaelMraka/gorpm v0.0.0-20251128174203-65cf25f01bac
