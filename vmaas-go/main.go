@@ -6,6 +6,7 @@ import (
 
 	"github.com/redhatinsights/vmaas/base"
 	"github.com/redhatinsights/vmaas/base/utils"
+	"github.com/redhatinsights/vmaas/reposcan_data_server"
 	"github.com/redhatinsights/vmaas/webapp"
 )
 
@@ -16,6 +17,10 @@ func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "webapp" {
 			webapp.Run()
+			return
+		}
+		if os.Args[1] == "reposcan-data-server" {
+			reposcan_data_server.Run()
 			return
 		}
 	}
