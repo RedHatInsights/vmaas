@@ -18,18 +18,18 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false # The auth token is persisted in the local git config. semantic-release picks this one instead of GH_TOKEN
       - name: Generate token
         id: app-token
-        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
         with:
           app-id: ${{ secrets.SEMANTIC_RELEASE_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_PK }}
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@e9aba2c848f5ebd159c070c61ea2c4e2b122355e # v2
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Run python-semantic-release
@@ -38,7 +38,7 @@ jobs:
           semantic-release version --print > VERSION
           git add VERSION
       - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install swag v2

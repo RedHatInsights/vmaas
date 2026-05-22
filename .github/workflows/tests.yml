@@ -24,7 +24,7 @@ jobs:
       PGPORT: "5433"
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
       - name: Run container
@@ -49,7 +49,7 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T test ./run_tests.sh vmaas-go --exit-code-from
           docker compose -f docker-compose.test.yml cp test:/vmaas/vmaas-go/coverage.txt ./coverage_webapp_go.txt
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
         with:
           files: ./coverage_common.xml,./coverage_reposcan.xml,./coverage_webapp_go.txt
           verbose: true
@@ -60,11 +60,11 @@ jobs:
         python-version: [3.12]
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
