@@ -1,6 +1,6 @@
 ARG ALT_REPO
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1777460003@sha256:24650313873554b6ba16c1a1b6b9f9142604f6ab735113e1695faf2dd07fdede AS buildimg
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1779709832@sha256:457cb288730d29e2a59823b3b56341466fa94f3158e399c5ab2c4409fee0c562 AS buildimg
 
 ARG ALT_REPO
 
@@ -29,7 +29,7 @@ RUN pip3.12 install --upgrade pip && \
 
 # -------------
 # runtime image
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1777460003@sha256:24650313873554b6ba16c1a1b6b9f9142604f6ab735113e1695faf2dd07fdede AS runtimeimg
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1779709832@sha256:457cb288730d29e2a59823b3b56341466fa94f3158e399c5ab2c4409fee0c562 AS runtimeimg
 
 ARG ALT_REPO
 
