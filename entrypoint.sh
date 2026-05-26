@@ -26,10 +26,8 @@ if [[ ! -z $1 ]]; then
         cd go/src/vmaas
         exec ./main webapp
     elif [[ "$1" == "reposcan" ]]; then
+        /vmaas/go/src/vmaas/main reposcan-data-server &
         cd vmaas/reposcan
-        port=$(private_port)
-        cat nginx.conf.template | sed "s/_PORT_/$port/g" > /tmp/nginx.conf
-        nginx -c /tmp/nginx.conf
         port=$(public_port)
         exec python3.12 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port --no-access-log main:app
     elif [[ "$1" == "sleep" ]]; then
