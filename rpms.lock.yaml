@@ -39,20 +39,20 @@ arches:
     name: git-core
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-266.el9_8.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-270.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 47101
-    checksum: sha256:9cce153edd234a16deb0c5a981f73fa2b5a6d7b42b5fb9e1f4a010612318d408
+    size: 47451
+    checksum: sha256:ac596cb6c59f74558e4b9b3674abc34d79c9772c4165f5cda866c1c24c81f939
     name: glibc-devel
-    evr: 2.34-266.el9_8
-    sourcerpm: glibc-2.34-266.el9_8.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-headers-2.34-266.el9_8.x86_64.rpm
+    evr: 2.34-270.el9_8
+    sourcerpm: glibc-2.34-270.el9_8.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-headers-2.34-270.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 567846
-    checksum: sha256:9dbaaaec43b9fc78ce26b660e75081c5de09245d7431a77c3f0c47ae0b657c9d
+    size: 568001
+    checksum: sha256:0eab0982c27442a8e4acbd7b32a66757174482dcc183ef27412427f54f8f36d7
     name: glibc-headers
-    evr: 2.34-266.el9_8
-    sourcerpm: glibc-2.34-266.el9_8.src.rpm
+    evr: 2.34-270.el9_8
+    sourcerpm: glibc-2.34-270.el9_8.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/go-toolset-1.26.2-1.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 13273
@@ -838,7 +838,7 @@ arches:
     name: rust
     evr: 1.92.0-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/09721fc6cad6565f56325519dd54633a2ff2c3fb22d1c74faa8039cc0ad740f8-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/66f1b92c744faa7af26d0952e9ec706c41ff252196f11e7e6b804e537f9f257f-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 52484
-    checksum: sha256:09721fc6cad6565f56325519dd54633a2ff2c3fb22d1c74faa8039cc0ad740f8
+    size: 52945
+    checksum: sha256:66f1b92c744faa7af26d0952e9ec706c41ff252196f11e7e6b804e537f9f257f
