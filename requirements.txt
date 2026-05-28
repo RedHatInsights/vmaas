@@ -696,9 +696,8 @@ six==1.17.0 ; python_version == "3.12" \
 smmap==5.0.2 ; python_version == "3.12" \
     --hash=sha256:26ea65a03958fa0c8a1c7e8c7a58fdc77221b8910f6be2131affade476898ad5 \
     --hash=sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e
-starlette==0.51.0 ; python_version == "3.12" \
-    --hash=sha256:4c4fda9b1bc67f84037d3d14a5112e523509c369d9d47b111b2f984b0cc5ba6c \
-    --hash=sha256:fb460a3d6fd3c958d729fdd96aee297f89a51b0181f16401fe8fd4cb6129165d
+starlette==1.0.1 ; python_version == "3.12" \
+    # hash removed - update with pip-compile
 swagger-ui-bundle==1.1.0 ; python_version == "3.12" \
     --hash=sha256:20673c3431c8733d5d1615ecf79d9acf30cff75202acaf21a7d9c7f489714529 \
     --hash=sha256:f7526f7bb99923e10594c54247265839bec97e96b0438561ac86faf40d40dd57
