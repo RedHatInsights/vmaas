@@ -22,6 +22,17 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false # The auth token is persisted in the local git config. semantic-release picks this one instead of GH_TOKEN
+      - name: Configure SSH commit signing
+        env:
+          SIGNING_KEY: ${{ secrets.SEMANTIC_RELEASE_SIGNING_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SIGNING_KEY" > ~/.ssh/signing_key
+          chmod 600 ~/.ssh/signing_key
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/signing_key
+          git config --global commit.gpgSign true
+          git config --global tag.gpgSign true
       - name: Generate token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
