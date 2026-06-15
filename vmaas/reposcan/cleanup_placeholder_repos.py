@@ -12,22 +12,25 @@ from vmaas.reposcan.database.repository_store import RepositoryStore
 
 LOGGER = get_logger(__name__)
 
+# Only never-synced repos (revision IS NULL, as a safety condition)
 UNRESOLVED_PLACEHOLDER_REPOS_SQL = """select cs.label, a.name, r.releasever, o.name, r.url
                                       from repo r
                                       join content_set cs on cs.id = r.content_set_id
                                       join organization o on o.id = r.org_id
                                       left join arch a on a.id = r.basearch_id
                                       where (r.url like %s or r.url like %s)
-                                      and r.revision is null""" # is null just safety condition 
+                                      and r.revision is null"""
 
 
 def find_placeholder_repos(conn):
+    """Return never-synced repos whose URL still contains placeholders"""
     with conn.cursor() as cur:
         cur.execute(UNRESOLVED_PLACEHOLDER_REPOS_SQL, ('%$releasever%', '%$basearch%'))
         return cur.fetchall()
 
 
 def main():
+    """CLI entry point for placeholder repository cleanup"""
     parser = argparse.ArgumentParser(
         description="Delete never-synced repos whose URL still contains $releasever or $basearch"
     )
