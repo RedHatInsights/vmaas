@@ -31,7 +31,7 @@
       "enabled": false
     },
     {
-      "matchFileNames": ["**/requirements*.txt", "Dockerfile.devserver", "Dockerfile.dbdocs", "**/grafana/Dockerfile"],
+      "matchFileNames": ["**/requirements*.txt", "Dockerfile.devserver", "**/grafana/Dockerfile"],
       "enabled": false
     },
     {
