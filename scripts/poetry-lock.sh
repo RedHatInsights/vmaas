@@ -28,7 +28,7 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
         python312 python3.12-pip python3.12-devel libpq-devel gcc git && \
     microdnf clean all
-RUN pip3.12 install --upgrade "pip<25.1" && pip3.12 install --upgrade poetry~=2.1.3 poetry-plugin-export pybuild-deps pip-tools
+RUN pip3.12 install --upgrade "pip<25.1" && pip3.12 install --upgrade poetry poetry-plugin-export pybuild-deps pip-tools
 EOF
 
 current_dir=$(pwd)
