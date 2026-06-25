@@ -45,13 +45,11 @@ def _copy_with_signature(tmp_path: Path, json_src: Path, signature_src: Path) ->
 
 
 @requires_gpg
-@requires_pub_key
 class TestVerifyCsafFileSignature:
     """Offline tests for _verify_csaf_signature using test fixtures"""
 
-    def test_public_key_file_uses_runtime_path(self, csaf: CsafController) -> None:
-        assert csaf.public_key_file == CSAF_VEX_PUB_SIG_KEY_FILE
-        assert csaf._public_key_available is True
+    def test_signature_verifier_is_available(self, csaf: CsafController) -> None:
+        assert csaf._get_signature_verifier() is not None
 
     def test_verify_valid_signed_json(self, csaf: CsafController) -> None:
         assert csaf._verify_csaf_signature(VALID_JSON) is True
@@ -59,24 +57,29 @@ class TestVerifyCsafFileSignature:
     def test_verify_mismatched_signature(self, csaf: CsafController) -> None:
         assert csaf._verify_csaf_signature(MISMATCHED_JSON) is False
 
-    def test_verify_wrong_public_key(self, csaf: CsafController, tmp_path: Path) -> None:
+    def test_verify_wrong_public_key(self, tmp_path: Path) -> None:
         file_path = _copy_with_signature(tmp_path, VALID_JSON, VALID_SIGNATURE)
-        csaf.public_key_file = WRONG_PUBLIC_KEY
-        assert csaf._verify_csaf_signature(file_path) is False
+        with patch("vmaas.reposcan.redhatcsaf.csaf_controller.CsafStore"):
+            with patch("vmaas.reposcan.redhatcsaf.csaf_controller.CSAF_VEX_PUB_SIG_KEY_FILE", WRONG_PUBLIC_KEY):
+                csaf = CsafController()
+                assert csaf._verify_csaf_signature(file_path) is False
 
     def test_verify_missing_signature_file(self, csaf: CsafController, tmp_path: Path) -> None:
         file_path = tmp_path / VALID_JSON.name
         shutil.copy(VALID_JSON, file_path)
         assert csaf._verify_csaf_signature(file_path) is False
 
-    @requires_gpg
     def test_missing_public_key_at_init(self, tmp_path: Path) -> None:
         missing_key = tmp_path / "missing-pub.key"
         with patch("vmaas.reposcan.redhatcsaf.csaf_controller.CsafStore"):
             with patch("vmaas.reposcan.redhatcsaf.csaf_controller.CSAF_VEX_PUB_SIG_KEY_FILE", missing_key):
                 csaf = CsafController()
-        assert csaf._public_key_available is False
-        assert csaf._verify_csaf_signature(VALID_JSON) is False
+                assert csaf._get_signature_verifier() is None
+                assert csaf._verify_csaf_signature(VALID_JSON) is False
+
+    @patch("vmaas.reposcan.redhatcsaf.csaf_controller.CSAF_VEX_SIGNATURE_VERIFY", False)
+    def test_verify_bypasses_when_disabled(self, csaf: CsafController) -> None:
+        assert csaf._verify_csaf_signature(VALID_JSON) is True
 
     @patch("vmaas.reposcan.redhatcsaf.csaf_controller.CSAF_VEX_SIGNATURE_VERIFY", False)
     def test_queue_skips_signature_when_disabled(self, csaf: CsafController) -> None:

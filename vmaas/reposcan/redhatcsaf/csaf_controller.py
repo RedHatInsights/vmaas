@@ -13,12 +13,12 @@ from datetime import datetime
 from datetime import timezone
 from pathlib import Path
 
-import gnupg
-
 from vmaas.common.batch_list import BatchList
 from vmaas.common.config import Config
 from vmaas.common.date_utils import parse_datetime
 from vmaas.common.fileutil import remove_file_if_exists
+from vmaas.common.gpg_signature_verifier import GpgSignatureVerifier
+from vmaas.common.gpg_signature_verifier import GpgSignatureVerifierError
 from vmaas.common.logging_utils import get_logger
 from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
@@ -62,18 +62,9 @@ class CsafController:
         self.csaf_store = CsafStore()
         self.tmp_directory: Path = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.cfg = Config()
-        self.public_key_file: Path = CSAF_VEX_PUB_SIG_KEY_FILE
-        self._public_key_available = self._check_public_key_file()
+        self._signature_verifier: GpgSignatureVerifier | None = None
         self.archive_name: str = "archive.tar.zst"
         self.archive_timestamp: datetime | None = None
-
-    def _check_public_key_file(self) -> bool:
-        if not CSAF_VEX_SIGNATURE_VERIFY:
-            return True
-        if self.public_key_file.is_file():
-            return True
-        self.logger.error("CSAF public key not found at %s", self.public_key_file)
-        return False
 
     def _download_index(self) -> dict[Path, int]:
         """Download CSAF index changes.csv file."""
@@ -86,39 +77,30 @@ class CsafController:
             return {item.target_path: item.status_code}
         return {}
 
+    def _get_signature_verifier(self) -> GpgSignatureVerifier | None:
+        """Return the verifier, or None if disabled or initialization fails."""
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            return None
+        if self._signature_verifier is None:
+            try:
+                self._signature_verifier = GpgSignatureVerifier(CSAF_VEX_PUB_SIG_KEY_FILE)
+            except GpgSignatureVerifierError:
+                self.logger.error("Failed to instantiate the signature verifier.")
+                return None
+        return self._signature_verifier
+
     def _verify_csaf_signature(self, original_file: Path) -> bool:
-        if not self._public_key_available:
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            self.logger.debug("Signature verification is disabled. Bypassing check for %s", original_file)
+            return True
+
+        verifier = self._get_signature_verifier()
+        if verifier is None:
+            self.logger.error("Blocking file %s: signature verification is enabled, but verifier is unavailable.", original_file)
             return False
+
         signature_file = Path(str(original_file) + CSAF_VEX_SIGNATURE_FILE_SUFFIX)
-        if not signature_file.is_file():
-            self.logger.error("CSAF signature file not found at %s", signature_file)
-            return False
-
-        # GPG requires a "home" directory (keyring) to store keys it uses
-        with tempfile.TemporaryDirectory() as temp_dir:
-            self.logger.debug(
-                "CSAF file %s signature will be verified against %s using %s.",
-                original_file, signature_file, self.public_key_file,
-            )
-            # Initialize the GPG wrapper, pointing it to temporary directory
-            gpg = gnupg.GPG(gnupghome=temp_dir)
-            # Load the key from file into the temp keyring
-            with open(self.public_key_file, encoding="utf-8") as key_file:
-                import_result = gpg.import_keys(key_file.read())
-                if import_result.count == 0:
-                    self.logger.error("Failed to load the public key used for CSAF signature verification")
-                    return False
-
-            with open(signature_file, "rb") as sig_f:
-                verified = gpg.verify_file(sig_f, data_filename=str(original_file))
-
-            if verified:
-                self.logger.debug("CSAF file %s signature is valid.", original_file)
-                self.logger.debug("Signed by: %s", verified.username)
-                return True
-
-            self.logger.error("CSAF file %s signature is invalid or corrupted.", original_file)
-            return False
+        return verifier.verify(original_file, signature_file)
 
     def _queue_download_csaf_payload_and_signature(self, csaf_payload_name: str) -> tuple[DownloadItem, DownloadItem | None]:
         """Queue a CSAF file/archive and optionally its signature for download."""
@@ -140,7 +122,9 @@ class CsafController:
     def _verify_payload_download(self, payload_item: DownloadItem, signature_item: DownloadItem | None) -> dict[Path, int]:
         """Return download or signature verification failure for a CSAF payload."""
         file_path = payload_item.target_path
-        if payload_item.status_code not in VALID_HTTP_CODES and file_path:
+        if file_path is None:
+            return {}
+        if payload_item.status_code not in VALID_HTTP_CODES:
             self.logger.warning("CSAF payload failed to download, %s (HTTP CODE %d).", file_path, payload_item.status_code)
             return {file_path: payload_item.status_code}
         if not CSAF_VEX_SIGNATURE_VERIFY:
@@ -205,6 +189,9 @@ class CsafController:
     def clean(self, batch: list[CsafFile] | None = None) -> None:
         """Clean downloaded files for given batch."""
         if batch is None:  # Delete all files
+            if self._signature_verifier is not None:
+                self._signature_verifier.close()
+                self._signature_verifier = None
             shutil.rmtree(self.tmp_directory)
             self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
         else:
