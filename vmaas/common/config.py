@@ -103,6 +103,7 @@ class Config(BaseConfig, metaclass=Singleton):
                 self.webapp_go_url = self._build_url(endpoint)
 
         self.metrics_port = self._cfg.metricsPort
+        self.private_port = self._cfg.privatePort
 
     def env(self) -> None:
         """Configuration from environment variables"""
@@ -116,6 +117,7 @@ class Config(BaseConfig, metaclass=Singleton):
         self.db_available = bool(self.db_name)
 
         self.metrics_port = int(os.getenv("PROMETHEUS_PORT", "9000").strip())
+        self.private_port = int(os.getenv("BIND_PRIVATE_PORT", "10000").strip())
 
         self.reposcan_url = os.getenv("REPOSCAN_PUBLIC_URL", "").strip()
         reposcan_private_url = os.getenv("REPOSCAN_PRIVATE_URL", "").strip()
