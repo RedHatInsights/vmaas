@@ -305,9 +305,9 @@ setuptools-rust==1.12.1 \
     --hash=sha256:85ae70989d96c9cfeb5ef79cf3bac2d5200bc5564f720a06edceedbdf6664640 \
     --hash=sha256:b7ebd6a182e7aefa97a072e880530c9b0ec8fcca8617e0bb8ff299c1a064f693
     # via maturin
-setuptools-scm==10.0.5 \
-    --hash=sha256:bbba8fe754516cdefd017f4456721775e6ef9662bd7887fb52ae26813d4838c3 \
-    --hash=sha256:f611037d8aae618221503b8fa89319f073438252ae3420e01c9ceec249131a0a
+setuptools-scm==10.1.2 \
+    --hash=sha256:24079818acc46e99aae0d65b8d511fafe965970d9cbd060c7b9f7275ded520fb \
+    --hash=sha256:8bb17e208fb22ebc11e4eaf6d765955db1903eefd21a3f0ed5518fc3fb186e84
     # via
     #   anyio
     #   app-common-python
@@ -328,9 +328,9 @@ typing-extensions==4.15.0 ; python_version == "3.12" \
     --hash=sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466 \
     --hash=sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548
     # via setuptools-scm
-vcs-versioning==1.1.1 \
-    --hash=sha256:b541e2ba79fc6aaa3850f8a7f88af43d97c1c80649c01142ee4146eddbc599e4 \
-    --hash=sha256:fabd75a3cab7dd8ac02fe24a3a9ba936bf258667b5a62ed468c9a1da0f5775bc
+vcs-versioning==2.1.2 \
+    --hash=sha256:7282122aee5de69d520a9dbe56ebac705a0be7e2cc9b1b97dde4333c45fe782c \
+    --hash=sha256:d559440f0cb46b6672e65492c34eadd45a736d61d5b28d43ae1ad37bc4a9f06f
     # via setuptools-scm
 wheel==0.47.0 \
     --hash=sha256:212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced \
@@ -361,6 +361,7 @@ setuptools==82.0.1 \
     #   prometheus-client
     #   pycparser
     #   python-dateutil
+    #   python-gnupg
     #   pyyaml
     #   requests
     #   setuptools-rust

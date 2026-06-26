@@ -196,6 +196,8 @@ objects:
           value: ${CSAF_VEX_BASE_URL}
         - name: CSAF_VEX_INDEX_CSV
           value: ${CSAF_VEX_INDEX_CSV}
+        - name: CSAF_VEX_SIGNATURE_VERIFY
+          value: ${CSAF_VEX_SIGNATURE_VERIFY}
         - name: CSAF_PRODUCT_STATUS_LIST
           value: ${CSAF_PRODUCT_STATUS_LIST}
         - name: ENABLE_PROFILER
@@ -397,6 +399,8 @@ parameters:
   value: "https://access.redhat.com/security/data/csaf/v2/vex/"
 - name: CSAF_VEX_INDEX_CSV
   value: "changes.csv"
+- name: CSAF_VEX_SIGNATURE_VERIFY
+  value: "true"
 - name: PG_MAX_STACK_DEPTH
   value: ''
 - name: CSAF_PRODUCT_STATUS_LIST

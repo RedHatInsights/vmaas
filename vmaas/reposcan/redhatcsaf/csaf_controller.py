@@ -17,7 +17,10 @@ from vmaas.common.batch_list import BatchList
 from vmaas.common.config import Config
 from vmaas.common.date_utils import parse_datetime
 from vmaas.common.fileutil import remove_file_if_exists
+from vmaas.common.gpg_signature_verifier import GpgSignatureVerifier
+from vmaas.common.gpg_signature_verifier import GpgSignatureVerifierError
 from vmaas.common.logging_utils import get_logger
+from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
 from vmaas.reposcan.download.downloader import DownloadItem
 from vmaas.reposcan.download.downloader import FileDownloader
@@ -36,6 +39,10 @@ from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/v2/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_VEX_ARCHIVE_TXT = os.getenv("CSAF_VEX_ARCHIVE_TXT", "archive_latest.txt")
+CSAF_VEX_SIGNATURE_VERIFY = strtobool(os.getenv("CSAF_VEX_SIGNATURE_VERIFY", "true"))
+CSAF_VEX_SIGNATURE_FILE_SUFFIX = ".asc"
+CSAF_VEX_PUB_SIG_KEY_FILE = Path("/vmaas/conf/csaf-vex-pub-sig-key.txt")
+CSAF_SIGNATURE_VERIFICATION_FAILED = -3
 ERRATUM_RE = re.compile(r"RH[BSE]{1}A-2\d{3}:\d+")
 
 ProductRelationship = namedtuple("ProductRelationship", ["product_reference", "module"])
@@ -55,6 +62,7 @@ class CsafController:
         self.csaf_store = CsafStore()
         self.tmp_directory: Path = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.cfg = Config()
+        self._signature_verifier: GpgSignatureVerifier | None = None
         self.archive_name: str = "archive.tar.zst"
         self.archive_timestamp: datetime | None = None
 
@@ -69,9 +77,72 @@ class CsafController:
             return {item.target_path: item.status_code}
         return {}
 
+    def _get_signature_verifier(self) -> GpgSignatureVerifier | None:
+        """Return the verifier, or None if disabled or initialization fails."""
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            return None
+        if self._signature_verifier is None:
+            try:
+                self._signature_verifier = GpgSignatureVerifier(CSAF_VEX_PUB_SIG_KEY_FILE)
+            except GpgSignatureVerifierError:
+                self.logger.error("Failed to instantiate the signature verifier.")
+                return None
+        return self._signature_verifier
+
+    def _verify_csaf_signature(self, original_file: Path) -> bool:
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            self.logger.debug("Signature verification is disabled. Bypassing check for %s", original_file)
+            return True
+
+        verifier = self._get_signature_verifier()
+        if verifier is None:
+            self.logger.error("Blocking file %s: signature verification is enabled, but verifier is unavailable.", original_file)
+            return False
+
+        signature_file = Path(str(original_file) + CSAF_VEX_SIGNATURE_FILE_SUFFIX)
+        return verifier.verify(original_file, signature_file)
+
+    def _queue_download_csaf_payload_and_signature(self, csaf_payload_name: str) -> tuple[DownloadItem, DownloadItem | None]:
+        """Queue a CSAF file/archive and optionally its signature for download."""
+        file_item = DownloadItem(
+            source_url=CSAF_VEX_BASE_URL + csaf_payload_name,
+            target_path=self.tmp_directory / csaf_payload_name,
+        )
+        self.downloader.add(file_item)
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            return (file_item, None)  # Signature verification is disabled, do not download signature files
+
+        signature_item = DownloadItem(
+            source_url=CSAF_VEX_BASE_URL + csaf_payload_name + CSAF_VEX_SIGNATURE_FILE_SUFFIX,
+            target_path=self.tmp_directory / (csaf_payload_name + CSAF_VEX_SIGNATURE_FILE_SUFFIX),
+        )
+        self.downloader.add(signature_item)
+        return (file_item, signature_item)
+
+    def _verify_payload_download(self, payload_item: DownloadItem, signature_item: DownloadItem | None) -> dict[Path, int]:
+        """Return download or signature verification failure for a CSAF payload."""
+        file_path = payload_item.target_path
+        if file_path is None:
+            return {}
+        if payload_item.status_code not in VALID_HTTP_CODES:
+            self.logger.warning("CSAF payload failed to download, %s (HTTP CODE %d).", file_path, payload_item.status_code)
+            return {file_path: payload_item.status_code}
+        if not CSAF_VEX_SIGNATURE_VERIFY:
+            return {}  # Signature verification is disabled, skip the signature verification part
+
+        if signature_item and signature_item.status_code not in VALID_HTTP_CODES and signature_item.target_path:
+            self.logger.warning("CSAF signature file failed to download for %s (HTTP CODE %d).", file_path, signature_item.status_code)
+            return {file_path: signature_item.status_code}
+        if not self._verify_csaf_signature(file_path):
+            # We update only original batch file item, there is no need to track the signature file anymore
+            self.logger.warning("CSAF payload rejected, %s (signature verification failed).", file_path)
+            return {file_path: CSAF_SIGNATURE_VERIFICATION_FAILED}
+        return {}
+
     def _download_csaf_files(self, batch: list[CsafFile]) -> dict[Path, int]:
         """Download CSAF files."""
-        download_items = []
+        # DownloadItem or None in case the signature verification is disabled
+        download_items: list[tuple[DownloadItem, DownloadItem | None]] = []
         for csaf_file in batch:
             local_path = self.tmp_directory / csaf_file.name
             # Don't download files if they are in the archive
@@ -79,18 +150,16 @@ class CsafController:
             if os.path.exists(local_path) and (self.archive_timestamp is None or csaf_file.csv_timestamp < self.archive_timestamp):
                 continue
             os.makedirs(os.path.dirname(local_path), exist_ok=True)  # Make sure subdirs exist
-            item = DownloadItem(source_url=CSAF_VEX_BASE_URL + csaf_file.name, target_path=local_path)
-            # Save for future status code check
-            download_items.append(item)
-            self.downloader.add(item)
+            # Queue items for download
+            download_items.append(self._queue_download_csaf_payload_and_signature(csaf_file.name))
         if download_items:
             self.downloader.run()
-        # Return failed downloads
-        return {
-            item.target_path: item.status_code
-            for item in download_items
-            if item.status_code not in VALID_HTTP_CODES and item.target_path
-        }
+
+        # Prepare dict of failed downloads including their status code
+        failed: dict[Path, int] = {}
+        for file_item, signature_item in download_items:
+            failed.update(self._verify_payload_download(file_item, signature_item))
+        return failed
 
     def _download_csaf_archive(self) -> dict[Path, int]:
         """Download CSAF archive."""
@@ -112,20 +181,17 @@ class CsafController:
         if archive_ts_match:
             self.archive_timestamp = datetime.strptime(archive_ts_match.group(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
-        local_path = self.tmp_directory / self.archive_name
-        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + self.archive_name,
-                            target_path=local_path)
-        self.downloader.add(item)
+        # Queue archive and archive signature file for download
+        archive_item, signature_item = self._queue_download_csaf_payload_and_signature(self.archive_name)
         self.downloader.run()
-
-        # Return failed download
-        if item.status_code not in VALID_HTTP_CODES and item.target_path:
-            return {item.target_path: item.status_code}
-        return {}
+        return self._verify_payload_download(archive_item, signature_item)
 
     def clean(self, batch: list[CsafFile] | None = None) -> None:
         """Clean downloaded files for given batch."""
         if batch is None:  # Delete all files
+            if self._signature_verifier is not None:
+                self._signature_verifier.close()
+                self._signature_verifier = None
             shutil.rmtree(self.tmp_directory)
             self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
         else:
@@ -169,7 +235,7 @@ class CsafController:
                 if failed:
                     CSAF_FAILED_DOWNLOAD.inc()
                     target, status = failed.popitem()
-                    self.logger.warning("CSAF archive failed to download, %s (HTTP CODE %d).", target, status)
+                    self.logger.warning("CSAF archive failed to download or verify signature, %s (CODE %d).", target, status)
                     self.clean()
                     return
 
@@ -185,8 +251,8 @@ class CsafController:
                     failed = self._download_csaf_files(batch)
                     if failed:
                         CSAF_FAILED_DOWNLOAD.inc(len(failed))
-                        self.logger.warning("%d CSAF files failed to download.", len(failed))
-                        self.logger.debug("CSAF files failed to download: %s", failed.keys())
+                        self.logger.warning("%d CSAF files failed to download or verify signature.", len(failed))
+                        self.logger.debug("CSAF files failed to download or verify: %s", failed)
 
                     to_store = CsafData()
                     for csaf_file in batch:
