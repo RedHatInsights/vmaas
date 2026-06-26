@@ -156,6 +156,12 @@ class HealthHandler():
     @classmethod
     def get(cls, **kwargs):
         """Get API status."""
+        try:
+            resp = requests.get(f"http://localhost:{CFG.private_port}/", timeout=5)
+            if resp.status_code != 200:
+                return "Data server check failed", 503
+        except requests.RequestException:
+            return "Data server check failed", 503
         return "Ok", 200
 
 
