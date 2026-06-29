@@ -29,7 +29,7 @@ on:
 
 jobs:
   PlatSec-Security-Workflow:
-    uses: RedHatInsights/platform-security-gh-workflow/.github/workflows/platsec-security-scan-reusable-workflow.yml@master
+    uses: RedHatInsights/platform-security-gh-workflow/.github/workflows/platsec-security-scan-reusable-workflow.yml@4f800d206c9be42430f70e7c15f4de3962052f46 # master
     ## The optional parameters below are used if you are using something other than the
     ## the defaults of root '.' for the path and 'Dockerfile' for the Dockerfile name.
     ## Additionally, if you have a Dockerfile you use as your BASE_IMG or you need to
