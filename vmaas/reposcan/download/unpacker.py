@@ -6,7 +6,10 @@ import gzip
 import lzma
 import bz2
 import tarfile
+from collections.abc import Generator, Iterator
+from contextlib import contextmanager
 from pathlib import Path
+from typing import IO
 
 import zstandard as zstd
 
@@ -91,6 +94,15 @@ class TarZstUnpacker:
         self.archive_path = archive_path
         self.output_dir = os.path.dirname(archive_path)
 
+    @contextmanager
+    def _open_tar(self) -> Generator[tarfile.TarFile, None, None]:
+        """Open the .tar.zst archive and yield the tar object."""
+        decompressor = zstd.ZstdDecompressor()
+        with open(self.archive_path, 'rb') as file_h:
+            with decompressor.stream_reader(file_h) as decompressed:
+                with tarfile.open(fileobj=decompressed, mode='r|') as tar:
+                    yield tar
+
     def _extract(self, tar, member, files_to_extract: set = None):
         if files_to_extract is None or member.name in files_to_extract:
             tar.extract(member, path=self.output_dir, filter="data")
@@ -101,15 +113,21 @@ class TarZstUnpacker:
     def run(self, files_to_extract: set = None):
         """Unpack all files or specified files from tar."""
         self.logger.info("Unpacking started.")
-        decompressor = zstd.ZstdDecompressor()
-        with open(self.archive_path, 'rb') as file_h:
-            with decompressor.stream_reader(file_h) as decompressed_file_h:
-                with tarfile.open(fileobj=decompressed_file_h, mode='r|') as tar:
-                    for member in tar:
-                        self._extract(tar, member, files_to_extract=files_to_extract)
-                        if files_to_extract is not None and len(files_to_extract) == 0:
-                            break
-
+        with self._open_tar() as tar:
+            for member in tar:
+                self._extract(tar, member, files_to_extract=files_to_extract)
+                if files_to_extract is not None and len(files_to_extract) == 0:
+                    break
         if files_to_extract:
             self.logger.debug("Files not found in archive: %s", files_to_extract)
         self.logger.info("Unpacking finished.")
+
+    def iter_files(self) -> Iterator[tuple[tarfile.TarInfo, IO[bytes]]]:
+        """Yield (member, fileobj) for each file in the archive without extracting to disk."""
+        with self._open_tar() as tar:
+            for member in tar:
+                if not member.isfile():
+                    continue
+                fileobj = tar.extractfile(member)
+                if fileobj is not None:
+                    yield member, fileobj

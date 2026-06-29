@@ -4,6 +4,7 @@ Module containing models for CSAF objects.
 from __future__ import annotations
 
 import csv
+import os
 import typing as t
 from dataclasses import dataclass
 from dataclasses import field
@@ -14,9 +15,11 @@ from pathlib import Path
 import attr
 
 from vmaas.common.date_utils import parse_datetime
+from vmaas.common.strtobool import strtobool
 
 
 DEFAULT_VARIANT = "N/A"
+CSAF_VEX_INDEX_CSV_ENABLED = strtobool(os.getenv("CSAF_VEX_INDEX_CSV_ENABLED", "true"))
 
 
 class CsafProductStatus(IntEnum):
@@ -41,7 +44,7 @@ class CsafFile:
     db_timestamp: datetime | None = None
     # Actual timestamp found in CVE file
     cve_file_timestamp: datetime | None = None
-    csv: bool = False
+    in_source: bool = False
     id_: int = 0
     # it should be 1:1 mapping between file and cve
     # but the json in file contains list of cves so add the whole list
@@ -52,7 +55,10 @@ class CsafFile:
         """Returns `True` if the file is out of date."""
         if self.db_timestamp is None:
             return True
-        return self.csv_timestamp > self.db_timestamp
+
+        if CSAF_VEX_INDEX_CSV_ENABLED:
+            return self.csv_timestamp > self.db_timestamp
+        return self.cve_file_timestamp is not None and self.cve_file_timestamp > self.db_timestamp
 
 
 @attr.s(auto_attribs=True, repr=False)
@@ -67,6 +73,20 @@ class CsafFiles:
         obj = cls()
         obj._update_from_table_map(table_map)
         obj._update_from_csv(csv_path)
+        return obj
+
+    @classmethod
+    def from_table_map_and_tarball(
+        cls, table_map: dict[str, tuple[int, datetime]], tarball_timestamps: dict[str, datetime]
+    ) -> CsafFiles:
+        """Initialize class from CsafStore.csaf_file_map table_map and tarball JSON timestamps."""
+        obj = cls()
+        obj._update_from_table_map(table_map)
+        for name, timestamp in tarball_timestamps.items():
+            file_obj = obj.get(name, CsafFile(name, None))  # type: ignore[arg-type]
+            file_obj.cve_file_timestamp = timestamp
+            file_obj.in_source = True
+            obj[file_obj.name] = file_obj
         return obj
 
     def _update_from_table_map(self, table_map: dict[str, tuple[int, datetime]]) -> None:
@@ -84,9 +104,9 @@ class CsafFiles:
             reader = csv.DictReader(csvfile, ("name", "timestamp"))
             for row in reader:
                 timestamp = parse_datetime(row["timestamp"])
-                obj = self.get(row["name"], CsafFile(row["name"], timestamp, csv=True))
+                obj = self.get(row["name"], CsafFile(row["name"], timestamp, in_source=True))
                 obj.csv_timestamp = timestamp
-                obj.csv = True
+                obj.in_source = True
                 self[obj.name] = obj
 
     @property
@@ -95,14 +115,14 @@ class CsafFiles:
         return filter(lambda x: x.out_of_date, self)
 
     @property
-    def csv_files(self) -> filter[CsafFile]:
-        """Files from csv."""
-        return filter(lambda x: x.csv, self)
+    def in_source_files(self) -> filter[CsafFile]:
+        """Files present in the external source (CSV or tarball)."""
+        return filter(lambda x: x.in_source, self)
 
     @property
-    def not_csv_files(self) -> filter[CsafFile]:
-        """Files not in csv."""
-        return filter(lambda x: not x.csv, self)
+    def not_in_source_files(self) -> filter[CsafFile]:
+        """Files in DB but not in the external source."""
+        return filter(lambda x: not x.in_source, self)
 
     def to_tuples(self, attributes: tuple[str, ...]) -> list[tuple[int | str | datetime | None, ...]]:
         """Transform data to list of tuples with chosen attributes."""
