@@ -102,9 +102,9 @@ class TestCsafStore:
         csaf_store = CsafStore()
         now = datetime.now(timezone.utc)
         files = m.CsafFiles(
-            {"file1": m.CsafFile("file1", now, id_=1), "file2": m.CsafFile("file2", now, csv=True)}
+            {"file1": m.CsafFile("file1", now, id_=1), "file2": m.CsafFile("file2", now, in_source=True)}
         )
-        csaf_store.delete_csaf_files(files.not_csv_files)
+        csaf_store.delete_csaf_files(files.not_in_source_files)
         cur = csaf_store.conn.cursor()
         cur.execute("SELECT id FROM csaf_file WHERE name = 'file1'")
         res = cur.fetchone()
