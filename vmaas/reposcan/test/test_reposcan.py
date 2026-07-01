@@ -1,17 +1,57 @@
 """Reposcan overall test."""
 
+import contextlib
 import os
-
+import socket
+import threading
 from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from unittest.mock import patch
+
 from vmaas.reposcan.test.test_case import TestCase
+
+
+class _OKHandler(BaseHTTPRequestHandler):
+    """Minimal HTTP handler that responds 200 to any GET, mimicking the Go data server."""
+
+    def do_GET(self):  # pylint: disable=invalid-name
+        """Respond with 200 OK."""
+        self.send_response(200)
+        self.end_headers()
+
+    def log_message(self, *args):  # pylint: disable=arguments-differ
+        """Suppress request logging."""
+
+
+@contextlib.contextmanager
+def _stub_data_server():
+    """Context manager that starts a minimal HTTP server on a free port and yields the port."""
+    with socket.socket() as sock:
+        sock.bind(("localhost", 0))
+        port = sock.getsockname()[1]
+    server = HTTPServer(("localhost", port), _OKHandler)
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
+    try:
+        yield port
+    finally:
+        server.shutdown()
 
 
 class TestReposcanApp(TestCase):
     """Reposcan overall test."""
 
     def test_monitoring_health(self):
-        """Test monitoring health endpoint."""
+        """Test monitoring health endpoint - data server unavailable returns 503."""
         resp = self.fetch('/api/v1/monitoring/health', method='GET')
+        self.assertEqual(HTTPStatus.SERVICE_UNAVAILABLE, resp.status)
+
+    def test_monitoring_health_ok(self):
+        """Test monitoring health endpoint - data server available returns 200."""
+        with _stub_data_server() as port:
+            with patch("vmaas.reposcan.reposcan.CFG.private_port", port):
+                resp = self.fetch('/api/v1/monitoring/health', method='GET')
         self.assertEqual(HTTPStatus.OK, resp.status)
 
     def test_version(self):
