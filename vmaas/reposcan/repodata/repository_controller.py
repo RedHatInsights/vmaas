@@ -16,10 +16,13 @@ from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VAL
 from vmaas.reposcan.download.unpacker import FileUnpacker
 from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
 
+from vmaas.reposcan.repodata.checksum import ChecksumError
+from vmaas.reposcan.repodata.checksum import verify_file_checksum
 from vmaas.reposcan.repodata.repomd import RepoMD, RepoMDTypeNotFound
 from vmaas.reposcan.repodata.repository import Repository
 
 REPOMD_PATH = "repodata/repomd.xml"
+CHECKSUM_VERIFICATION_FAILED = -4
 
 
 class RepositoryController:
@@ -137,6 +140,42 @@ class RepositoryController:
         # Return failed downloads
         return {item.target_path: item.status_code for item in download_items
                 if item.status_code not in VALID_HTTP_CODES}
+
+    def _verify_metadata_checksums(self, batch):
+        """Verify downloaded metadata files against checksums from repomd.xml."""
+        failed = {}
+        verified = 0
+        for repository in batch:
+            for md_type in repository.md_files:
+                local_path = os.path.join(repository.tmp_directory, os.path.basename(repository.md_files[md_type]))
+
+                try:
+                    metadata = repository.repomd.get_metadata(md_type)
+                    expected_checksum = metadata["checksum"]
+                    checksum_type = metadata["checksum_type"]
+                except (RepoMDTypeNotFound, KeyError) as err:
+                    self.logger.warning("Missing checksum metadata for %s: %s", md_type, str(err))
+                    failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                    continue
+
+                try:
+                    verify_file_checksum(local_path, expected_checksum, checksum_type)
+                    verified += 1
+                except ChecksumError as err:
+                    self.logger.warning("Checksum verification failed: %s", str(err))
+                    failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                except ValueError as err:
+                    self.logger.warning("Unsupported checksum type '%s' for %s: %s", checksum_type, local_path, str(err))
+                    failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                except Exception:  # pylint: disable=broad-except
+                    self.logger.exception("Unexpected error during checksum verification for %s", local_path)
+                    failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+        if verified:  # Lets keep track of verifications passed overall
+            self.logger.info(
+                "Metadata checksum verification passed for %d file(s) in %d repositories.",
+                verified, len(batch),
+            )
+        return failed
 
     def _unpack_metadata(self, batch):
         for repository in batch:
@@ -296,6 +335,13 @@ class RepositoryController:
                     if failed:
                         self.logger.warning("%d metadata files failed to download.", len(failed))
                         failed_repos = [repo for repo in batch if self._repo_download_failed(repo, failed)]
+                        self.clean_repodata(failed_repos)
+                        batch = [repo for repo in batch if repo not in failed_repos]
+                    # Verify checksums of downloaded archives
+                    checksum_failed = self._verify_metadata_checksums(batch)
+                    if checksum_failed:
+                        self.logger.warning("%d metadata files failed checksum verification.", len(checksum_failed))
+                        failed_repos = [repo for repo in batch if self._repo_download_failed(repo, checksum_failed)]
                         self.clean_repodata(failed_repos)
                         batch = [repo for repo in batch if repo not in failed_repos]
                     self._unpack_metadata(batch)
