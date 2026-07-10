@@ -10,7 +10,7 @@
     <open-size>25469005</open-size>
   </data>
   <data type="primary_db">
-    <checksum type="sha256">9e8077d9af8b79cb06c86de423eb7c2f032e419d5ac6c0b937fef8ca9f270c2d</checksum>
+    <checksum type="sha256">f8fe6d1e494c05865a864d7fcac63c3c1d29cb4c19d4a1d7a52bde557f3c4b4e</checksum>
     <open-checksum type="sha256">196f9ad6db36423ed7790c63441a7eedc0eae9d8217f3b2fbad4abd821304319</open-checksum>
     <location href="repodata/primary_db.sqlite.gz"/>
     <timestamp>1515547056</timestamp>
@@ -19,7 +19,7 @@
     <database_version>10</database_version>
   </data>
   <data type="updateinfo">
-    <checksum type="sha256">e40585f014fdfcfb6d69e46c0a64878be09105b26f8220324fb34bf6a348f209</checksum>
+    <checksum type="sha256">00c97ae1530653dc3ce79eff18994ebfe29e5776d464c70f66977d6076961665</checksum>
     <open-checksum type="sha256">1ec9205ebcba9763139f71f4e454ef55b1a2b831257494d3645ff372a2efc18d</open-checksum>
     <location href="repodata/updateinfo.xml.gz"/>
     <timestamp>1515549133</timestamp>
