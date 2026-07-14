@@ -36,6 +36,7 @@
     },
     {
       "matchManagers": ["rpm-lockfile"],
+      "matchBaseBranches": ["master"],
       "description": "Disable rpm-lockfile manager since it only makes sense to update RPM lockfile when base image changes (except few packages installed on top base image).",
       "enabled": false
     },
