@@ -155,6 +155,25 @@ paths:
       summary: Sync repositories from imported repolist
       operationId: vmaas.reposcan.reposcan.RepoSyncHandler.put
       <<: *secured
+      parameters:
+        - name: label
+          description: Content set label to queue for sync (e.g. rhel-8-for-x86_64-baseos-rpms)
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: releasever
+          description: Specific release version to queue (e.g. 8.9). If omitted, all versions of the label are queued.
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: basearch
+          description: Specific base architecture to queue (e.g. x86_64). If omitted, all architectures of the label are queued.
+          required: false
+          in: query
+          schema:
+            type: string
       responses:
         <<: *sync_responses
       tags:
