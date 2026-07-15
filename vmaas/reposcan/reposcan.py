@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import signal
+import threading
 from multiprocessing.pool import Pool
 import multiprocessing
 from enum import StrEnum
@@ -97,6 +98,13 @@ SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
+REPO_SYNC_QUEUE_INTERVAL_MINUTES = int(os.getenv("REPO_SYNC_QUEUE_INTERVAL_MINUTES", "5"))
+
+# Queue for per-repo sync requests.
+# Stores tuples of (label, releasever_or_None, basearch_or_None).
+# Protected by a lock because BackgroundScheduler and HTTP workers access it concurrently.
+_repo_queue: set[tuple[str, str | None, str | None, str]] = set()
+_repo_queue_lock = threading.Lock()
 
 
 class TaskStatusResponse(dict):
@@ -738,6 +746,17 @@ class DbChangeHandler():
         return result
 
 
+def _queue_repos(repos: list[dict]) -> str:
+    """Add repositories to the sync queue. Deduplication is handled by set uniqueness."""
+    for repo in repos:
+        label = repo["label"]
+        releasever = repo.get("releasever") or None
+        basearch = repo.get("basearch") or None
+        organization = repo.get("organization") or DEFAULT_ORG_NAME
+        _repo_queue.add((label, releasever, basearch, organization))
+    return "Queued %d repo(s). Queue size: %d." % (len(repos), len(_repo_queue))
+
+
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
@@ -746,7 +765,6 @@ class RepoSyncHandler(SyncHandler):
     @classmethod
     def put(cls, **kwargs):
         """Sync repositories stored in DB."""
-
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
 
@@ -759,6 +777,65 @@ class RepoSyncHandler(SyncHandler):
             repository_controller = RepositoryController()
             repository_controller.add_db_repositories()
             repository_controller.store()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
+class RepoQueueHandler:
+    """Handler for queuing specific repositories for sync."""
+
+    @staticmethod
+    def post(body, **kwargs):
+        """Queue repositories for sync. Accepts a JSON list of repo objects."""
+        with _repo_queue_lock:
+            msg = _queue_repos(body)
+        LOGGER.info(msg)
+        return TaskStartResponse(msg), 200
+
+
+class RepoQueueSyncHandler(SyncHandler):
+    """Handler for syncing only repositories queued via per-repo sync requests."""
+
+    task_type = "Sync queued repositories"
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Sync only repositories that were queued."""
+        queue: set[tuple[str, str | None, str | None, str]] = kwargs.get("queue", set())
+        try:
+            init_logging()
+            init_db()
+            controller = RepositoryController()
+            repos = controller.repo_store.list_repositories()
+            for (content_set, basearch, releasever, organization), repo_dict in repos.items():
+                for (q_label, q_releasever, q_basearch, q_org) in queue:
+                    if content_set != q_label:
+                        continue
+                    if q_releasever is not None and releasever != q_releasever:
+                        continue
+                    if q_basearch is not None and basearch != q_basearch:
+                        continue
+                    if organization != q_org:
+                        continue
+                    controller.repo_store.content_set_to_db_id[content_set] = repo_dict["content_set_id"]
+                    controller.add_repository(
+                        repo_dict["url"], content_set, basearch, releasever, organization,
+                        cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
+                        cert=repo_dict["cert"], key=repo_dict["key"],
+                    )
+                    break
+            if controller.repositories:
+                controller.store()
+            else:
+                LOGGER.info("No repositories found in DB for queue entries: %s, skipping sync.", queue)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
@@ -1181,7 +1258,23 @@ def periodic_sync():
     AllSyncHandler.start_task()
 
 
-def create_app(specs):
+def sync_queued_repos():
+    """Process per-repo sync requests queued."""
+    if SyncTask.is_running():
+        LOGGER.info("Repo queue sync skipped: another task already in progress. Queue size: %d", len(_repo_queue))
+        return
+
+    with _repo_queue_lock:
+        if not _repo_queue:
+            return
+        queue = _repo_queue.copy()
+        _repo_queue.clear()
+
+    LOGGER.info("Processing %d queued repository entries: %s", len(queue), queue)
+    RepoQueueSyncHandler.start_task(queue=queue)
+
+
+def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
     """Create reposcan app."""
     init_logging()
     SyncTask.init()
@@ -1193,7 +1286,7 @@ def create_app(specs):
     metrics_refresh_interval = int(os.getenv('METRICS_GAUGE_REFRESH_INTERVAL_MINUTES', "240"))
 
     # Sync jobs to run
-    periodic_job_intervals = (sync_interval, metrics_refresh_interval)
+    periodic_job_intervals = (sync_interval, metrics_refresh_interval, REPO_SYNC_QUEUE_INTERVAL_MINUTES)
 
     sched = None
     if any(job > 0 for job in periodic_job_intervals):
@@ -1216,6 +1309,12 @@ def create_app(specs):
             LOGGER.warning("REPOSCAN_SYNC_INTERVAL_MINUTES is 0 - Certification metrics gauge may not show actual data.")
     else:
         LOGGER.info("Periodic metrics gauge disabled.")
+
+    if REPO_SYNC_QUEUE_INTERVAL_MINUTES > 0:
+        sched.add_job(sync_queued_repos, trigger="interval", minutes=REPO_SYNC_QUEUE_INTERVAL_MINUTES)
+        LOGGER.info("Repo queue sync running every %s minute(s).", REPO_SYNC_QUEUE_INTERVAL_MINUTES)
+    else:
+        LOGGER.info("Repo queue sync disabled.")
 
     if sched is not None:
         sched.start()
