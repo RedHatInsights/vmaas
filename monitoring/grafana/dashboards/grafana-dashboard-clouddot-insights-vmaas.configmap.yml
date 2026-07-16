@@ -27,7 +27,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 1025985,
+      "id": 1,
       "links": [],
       "panels": [
         {
@@ -67,7 +67,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "#299c46"
+                    "color": "#299c46",
+                    "value": 0
                   },
                   {
                     "color": "#ef843c",
@@ -109,7 +110,7 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -180,7 +181,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "#299c46"
+                    "color": "#299c46",
+                    "value": 0
                   },
                   {
                     "color": "rgba(237, 129, 40, 0.89)",
@@ -222,7 +224,7 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -299,7 +301,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "#299c46"
+                    "color": "#299c46",
+                    "value": 0
                   },
                   {
                     "color": "rgba(237, 129, 40, 0.89)",
@@ -341,7 +344,7 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -427,7 +430,7 @@ data:
                 "steps": [
                   {
                     "color": "#d44a3a",
-                    "value": null
+                    "value": 0
                   },
                   {
                     "color": "#299c46",
@@ -465,7 +468,7 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -504,7 +507,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "#299c46"
+                    "color": "#299c46",
+                    "value": 0
                   },
                   {
                     "color": "rgba(237, 129, 40, 0.89)",
@@ -546,7 +550,7 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -599,6 +603,156 @@ data:
           "type": "stat"
         },
         {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": 0
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 15,
+            "y": 1
+          },
+          "id": 150,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "round(sum(increase(vmaas_reposcan_validation_failed_items_total[48h])))",
+              "format": "time_series",
+              "refId": "A"
+            }
+          ],
+          "title": "Validation failures [48h]",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 18,
+            "y": 1
+          },
+          "id": 151,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "round(sum(increase(vmaas_reposcan_validation_total_items_total[48h])))",
+              "format": "time_series",
+              "refId": "A"
+            }
+          ],
+          "title": "Items validated [48h]",
+          "type": "stat"
+        },
+        {
           "collapsed": false,
           "gridPos": {
             "h": 1,
@@ -644,6 +798,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -661,7 +816,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -694,7 +850,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "alias": "",
@@ -753,6 +909,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -768,7 +925,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -801,7 +959,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -862,6 +1020,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -878,7 +1037,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -911,7 +1071,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -962,6 +1122,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -978,7 +1139,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1011,7 +1173,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1125,6 +1287,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1142,7 +1305,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1175,7 +1339,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1228,6 +1392,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1245,7 +1410,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1278,7 +1444,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1330,6 +1496,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1346,7 +1513,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1379,7 +1547,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1433,6 +1601,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1449,7 +1618,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1482,7 +1652,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1536,6 +1706,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1552,7 +1723,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1585,7 +1757,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1639,6 +1811,7 @@ data:
                   "type": "linear"
                 },
                 "showPoints": "never",
+                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1655,7 +1828,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": 0
                   },
                   {
                     "color": "red",
@@ -1688,7 +1862,7 @@ data:
               "sort": "none"
             }
           },
-          "pluginVersion": "11.6.3",
+          "pluginVersion": "12.3.2",
           "targets": [
             {
               "datasource": {
@@ -1711,7 +1885,7 @@ data:
       ],
       "preload": false,
       "refresh": "1m",
-      "schemaVersion": 41,
+      "schemaVersion": 42,
       "tags": [],
       "templating": {
         "list": [
