@@ -425,6 +425,13 @@ class RepolistImportHandler(SyncHandler):
                 for content_set_label, content_set in product["content_sets"].items():
                     products[product_name]["content_sets"][content_set_label] = content_set
                     for repo_url, basearch, releasever in cls._content_set_to_repos(content_set):
+                        if "$releasever" in repo_url or "$basearch" in repo_url:
+                            LOGGER.info(
+                                "Skipping %s: unresolved URL placeholders in %s",
+                                content_set_label, repo_url,
+                            )
+                            # ... skip importing repositories, that have placeholders but not placeholders resolved as concrete releasever and basearch
+                            continue
                         repos.append((repo_url, content_set_label, basearch, releasever,
                                       cert_name, ca_cert, cert, key, organization))
 
