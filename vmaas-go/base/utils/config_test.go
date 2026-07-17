@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const schemeHTTP = "http"
+
 // Smoke test for default values when clowder is turned off.
 // Changing the default values might cause a braking change.
 func TestSmokeEnvDefault(t *testing.T) {
@@ -52,7 +54,7 @@ func TestBuildURL(t *testing.T) {
 	}{
 		{
 			name:    "HTTP without TLS",
-			scheme:  "http",
+			scheme:  schemeHTTP,
 			host:    "localhost",
 			port:    8000,
 			tlsPort: nil,
@@ -61,7 +63,7 @@ func TestBuildURL(t *testing.T) {
 		},
 		{
 			name:    "HTTP upgrades to HTTPS when TLS enabled with custom TLS port",
-			scheme:  "http",
+			scheme:  schemeHTTP,
 			host:    "api.example.com",
 			port:    8000,
 			tlsPort: intPtr(8443),
@@ -70,7 +72,7 @@ func TestBuildURL(t *testing.T) {
 		},
 		{
 			name:    "HTTP upgrades to HTTPS when TLS enabled without custom TLS port",
-			scheme:  "http",
+			scheme:  schemeHTTP,
 			host:    "api.example.com",
 			port:    8000,
 			tlsPort: nil,
