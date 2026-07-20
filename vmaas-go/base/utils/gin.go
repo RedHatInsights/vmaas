@@ -80,10 +80,9 @@ func CheckLimitOffset(limit int, offset int) error {
 func RunServer(ctx context.Context, handler http.Handler, port int) error {
 	addr := fmt.Sprintf(":%d", port)
 	srv := http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: ReadHeaderTimeout, MaxHeaderBytes: 65535}
-	//nolint:gosec // G118: seems like a false positive, ctx is already closed so context.Background() is correct here
 	go func() {
 		<-ctx.Done()
-		err := srv.Shutdown(context.Background())
+		err := srv.Shutdown(context.WithoutCancel(ctx))
 		if err != nil {
 			LogError("err", err.Error(), "server shutting down failed")
 			return
