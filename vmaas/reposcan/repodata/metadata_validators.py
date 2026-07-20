@@ -10,41 +10,13 @@ PACKAGE_NAME_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-]+$')
 RELEASE_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-~]+$')
 VERSION_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-~^]+$')
 
-# Architecture whitelist
-VALID_ARCHITECTURES = {
-    'noarch',
-    'i386',
-    'i486',
-    'i586',
-    'i686',
-    'alpha',
-    'alphaev6',
-    'ia64',
-    'sparc',
-    'sparcv9',
-    'sparc64',
-    's390',
-    'athlon',
-    's390x',
-    'ppc',
-    'ppc64',
-    'ppc64le',
-    'pSeries',
-    'iSeries',
-    'x86_64',
-    'ppc64iseries',
-    'ppc64pseries',
-    'ia32e',
-    'amd64',
-    'aarch64',
-    'armv7hnl',
-    'armv7hl',
-    'armv7l',
-    'armv6hl',
-    'armv6l',
-    'armv5tel',
-    'src',
-}
+# Populated from DB arch table at startup via init_validator_architectures()
+VALID_ARCHITECTURES = set()
+
+
+def init_validator_architectures(arch_names):
+    """Populate valid architectures from DB values"""
+    VALID_ARCHITECTURES.update(arch_names)
 
 
 class ValidationError(Exception):
