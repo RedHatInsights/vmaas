@@ -212,20 +212,20 @@ class TestModels:
         collection = m.CsafFiles({"x": csaf_file, "y": csaf_file})
         assert len(list(collection.out_of_date)) == 2
 
-    def test_csaf_files_csv(self, csaf_file: m.CsafFile) -> None:
-        """Test CsafFiles.csv_files"""
+    def test_csaf_files_in_source(self, csaf_file: m.CsafFile) -> None:
+        """Test CsafFiles.in_source_files"""
         file2 = deepcopy(csaf_file)
-        file2.csv = True
+        file2.in_source = True
         collection = m.CsafFiles({"x": csaf_file, "y": file2})
-        assert len(list(collection.csv_files)) == 1
+        assert len(list(collection.in_source_files)) == 1
 
-    def test_csaf_files_not_csv(self, csaf_file: m.CsafFile) -> None:
-        """Test CsafFiles.not_csv_files"""
+    def test_csaf_files_not_in_source(self, csaf_file: m.CsafFile) -> None:
+        """Test CsafFiles.not_in_source_files"""
         file2 = deepcopy(csaf_file)
-        file2.csv = True
+        file2.in_source = True
         collection = m.CsafFiles({"x": csaf_file, "y": file2})
-        assert len(list(collection.not_csv_files)) == 1
-        assert list(collection.not_csv_files)[0] == csaf_file
+        assert len(list(collection.not_in_source_files)) == 1
+        assert list(collection.not_in_source_files)[0] == csaf_file
 
     def test_from_table_map_and_csv(self, tmp_path: Path) -> None:
         """Test CsafFiles.from_table_map_and_csv"""
@@ -248,6 +248,40 @@ class TestModels:
 
         out_of_date = list(collection.out_of_date)
         assert len(out_of_date) == 2
+
+    def test_from_table_map_and_tarball(self) -> None:
+        """Test CsafFiles.from_table_map_and_tarball"""
+        now = datetime.now()
+        table_map = {"file1": (1, now), "file2": (2, now)}
+        modified = datetime.now()
+        tarball_timestamps = {"file2": modified, "file3": modified}
+
+        collection = m.CsafFiles.from_table_map_and_tarball(table_map, tarball_timestamps)
+        assert collection["file1"].db_timestamp == now
+        assert collection["file2"].db_timestamp == now
+        assert collection["file2"].cve_file_timestamp == modified
+        assert collection["file2"].in_source is True
+        assert collection["file3"].cve_file_timestamp == modified
+        assert collection["file3"].db_timestamp is None
+        assert collection["file3"].in_source is True
+        assert collection["file1"].in_source is False
+
+    def test_out_of_date_iop_mode(self) -> None:
+        """Test CsafFile.out_of_date in IoP mode (using cve_file_timestamp)"""
+        now = datetime.now()
+        modified = datetime.now()
+
+        up_to_date = m.CsafFile("file1", now, db_timestamp=now, cve_file_timestamp=now)
+        out_of_date = m.CsafFile("file2", now, db_timestamp=now, cve_file_timestamp=modified)
+        new_file = m.CsafFile("file3", now, db_timestamp=None, cve_file_timestamp=modified)
+        no_cve_ts = m.CsafFile("file4", now, db_timestamp=now, cve_file_timestamp=None)
+
+        with pytest.MonkeyPatch.context() as monkeypatch:
+            monkeypatch.setattr("vmaas.reposcan.redhatcsaf.modeling.CSAF_VEX_INDEX_CSV_ENABLED", False)
+            assert up_to_date.out_of_date is False
+            assert out_of_date.out_of_date is True
+            assert new_file.out_of_date is True
+            assert no_cve_ts.out_of_date is False
 
     @pytest.mark.parametrize(
         "collection_name, attr_tuple, by_key",

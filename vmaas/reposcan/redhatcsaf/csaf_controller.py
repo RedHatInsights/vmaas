@@ -39,6 +39,7 @@ from vmaas.reposcan.redhatcsaf.modeling import DEFAULT_VARIANT
 CSAF_VEX_BASE_URL = os.getenv("CSAF_VEX_BASE_URL", "https://access.redhat.com/security/data/csaf/v2/vex/")
 CSAF_VEX_INDEX_CSV = os.getenv("CSAF_VEX_INDEX_CSV", "changes.csv")
 CSAF_VEX_ARCHIVE_TXT = os.getenv("CSAF_VEX_ARCHIVE_TXT", "archive_latest.txt")
+CSAF_VEX_INDEX_CSV_ENABLED = strtobool(os.getenv("CSAF_VEX_INDEX_CSV_ENABLED", "true"))
 CSAF_VEX_SIGNATURE_VERIFY = strtobool(os.getenv("CSAF_VEX_SIGNATURE_VERIFY", "true"))
 CSAF_VEX_SIGNATURE_FILE_SUFFIX = ".asc"
 CSAF_VEX_PUB_SIG_KEY_FILE = Path("/vmaas/conf/csaf-vex-pub-sig-key.txt")
@@ -161,6 +162,29 @@ class CsafController:
             failed.update(self._verify_payload_download(file_item, signature_item))
         return failed
 
+    def _build_file_list_from_tarball(self) -> dict[str, datetime]:
+        """Extract file names and timestamps from JSON files inside the tarball.
+
+        Used in IoP mode where changes.csv is not available.
+        Reads each JSON's document.tracking.current_release_date as the timestamp.
+        """
+        timestamps: dict[str, datetime] = {}
+        unpacker = TarZstUnpacker(self.tmp_directory / self.archive_name)
+        for member, fileobj in unpacker.iter_files():
+            if not member.name.endswith(".json"):
+                continue
+            try:
+                csaf = json.load(fileobj)
+                release_date = csaf.get("document", {}).get("tracking", {}).get("current_release_date")
+                if release_date:
+                    timestamps[member.name] = parse_datetime(release_date)
+            except (json.JSONDecodeError, KeyError) as err:
+                self.logger.warning("Failed to read timestamp from %s: %s", member.name, err)
+            except ValueError as err:
+                self.logger.warning("Failed to parse release date from %s: %s", member.name, err)
+        self.logger.info("Found %d JSON files in tarball.", len(timestamps))
+        return timestamps
+
     def _download_csaf_archive(self) -> dict[Path, int]:
         """Download CSAF archive."""
         # Download TXT file with latest archive name
@@ -198,21 +222,38 @@ class CsafController:
             for csaf_file in batch:
                 remove_file_if_exists(self.tmp_directory / csaf_file.name)
 
-    def store(self, sync_all: bool = False) -> None:  # pylint: disable=too-many-branches
+    def store(self, sync_all: bool = False) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Process and store CSAF objects to DB."""
-        self.logger.info("Checking CSAF index.")
-        failed = self._download_index()
-        if failed:
-            CSAF_FAILED_DOWNLOAD.inc()
-            target, status = failed.popitem()
-            self.logger.warning("CSAF index failed to download, %s (HTTP CODE %d).", target, status)
-            self.clean()
-            return
-
         db_csaf_files = self.csaf_store.csaf_file_map.copy()
         batches = BatchList()
-        csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.tmp_directory / CSAF_VEX_INDEX_CSV)  # type: ignore[arg-type]
-        files_to_sync = csaf_files.csv_files
+
+        if CSAF_VEX_INDEX_CSV_ENABLED:
+            # Cloud mode: use changes.csv for incremental sync
+            self.logger.info("Checking CSAF index.")
+            failed = self._download_index()
+            if failed:
+                CSAF_FAILED_DOWNLOAD.inc()
+                target, status = failed.popitem()
+                self.logger.warning("CSAF index failed to download, %s (HTTP CODE %d).", target, status)
+                self.clean()
+                return
+
+            csaf_files = CsafFiles.from_table_map_and_csv(db_csaf_files, self.tmp_directory / CSAF_VEX_INDEX_CSV)  # type: ignore[arg-type]
+        else:
+            # IoP mode: download archive first, then build file list from tarball JSONs
+            self.logger.info("Index CSV disabled, downloading CSAF archive for IoP mode.")
+            failed = self._download_csaf_archive()
+            if failed:
+                CSAF_FAILED_DOWNLOAD.inc()
+                target, status = failed.popitem()
+                self.logger.warning("CSAF archive failed to download or verify signature, %s (CODE %d).", target, status)
+                self.clean()
+                return
+
+            tarball_timestamps = self._build_file_list_from_tarball()
+            csaf_files = CsafFiles.from_table_map_and_tarball(db_csaf_files, tarball_timestamps)  # type: ignore[arg-type]
+
+        files_to_sync = csaf_files.in_source_files
         if not sync_all:
             files_to_sync = csaf_files.out_of_date
 
@@ -223,13 +264,13 @@ class CsafController:
         self.logger.info("%d CSAF files need to be synced.", batches.get_total_items())
 
         if sync_all:
-            # When syncing all files, delete every file from DB and sync them again
             self.csaf_store.delete_csaf_files(csaf_files)
         else:
-            self.csaf_store.delete_csaf_files(csaf_files.not_csv_files)
+            self.csaf_store.delete_csaf_files(csaf_files.not_in_source_files)
 
         try:
-            if batches.get_total_items():
+            if CSAF_VEX_INDEX_CSV_ENABLED and batches.get_total_items():
+                # Cloud mode: download archive here (IoP already downloaded above)
                 self.logger.info("Downloading CSAF archive.")
                 failed = self._download_csaf_archive()
                 if failed:
@@ -246,13 +287,16 @@ class CsafController:
                 try:
                     unpacker.run({csaf_file.name for csaf_file in batch})
 
-                    # Download missing files that are not in the archive or are old
-                    # (added since last archive generation)
-                    failed = self._download_csaf_files(batch)
-                    if failed:
-                        CSAF_FAILED_DOWNLOAD.inc(len(failed))
-                        self.logger.warning("%d CSAF files failed to download or verify signature.", len(failed))
-                        self.logger.debug("CSAF files failed to download or verify: %s", failed)
+                    if CSAF_VEX_INDEX_CSV_ENABLED:
+                        # Cloud mode: download missing files not in archive
+                        failed = self._download_csaf_files(batch)
+                        if failed:
+                            CSAF_FAILED_DOWNLOAD.inc(len(failed))
+                            self.logger.warning("%d CSAF files failed to download or verify signature.", len(failed))
+                            self.logger.debug("CSAF files failed to download or verify: %s", failed)
+                    else:
+                        # IoP mode: tarball is the only source, no individual downloads
+                        failed = {}
 
                     to_store = CsafData()
                     for csaf_file in batch:
