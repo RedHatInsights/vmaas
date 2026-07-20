@@ -6,6 +6,7 @@ from vmaas.reposcan.database.database_handler import DatabaseHandler
 from vmaas.reposcan.database.modules_store import ModulesStore
 from vmaas.reposcan.database.package_store import PackageStore
 from vmaas.reposcan.database.update_store import UpdateStore
+from vmaas.reposcan.repodata.metadata_validators import ValidationError, init_validator_architectures
 
 
 class RepositoryStore:
@@ -19,6 +20,7 @@ class RepositoryStore:
         self.module_store = ModulesStore()
         self.package_store = PackageStore()
         self.update_store = UpdateStore()
+        init_validator_architectures(self.package_store.arch_map.keys())
         self.content_set_to_db_id = self._prepare_content_set_map()
         self.organization_to_db_id = {}
 
@@ -61,21 +63,10 @@ class RepositoryStore:
         return repos
 
     def _import_basearch(self, basearch):
-        cur = self.conn.cursor()
-        try:
-            cur.execute("select id from arch where name = %s", (basearch,))
-            arch_id = cur.fetchone()
-            if not arch_id:
-                cur.execute("insert into arch (name) values(%s) returning id", (basearch,))
-                arch_id = cur.fetchone()
-            self.conn.commit()
-        except Exception:
-            self.logger.exception("Failed to import basearch.")
-            self.conn.rollback()
-            raise
-        finally:
-            cur.close()
-        return arch_id[0]
+        arch_id = self.package_store.arch_map.get(basearch)
+        if not arch_id:
+            raise ValidationError(f"Invalid basearch: {basearch}")
+        return arch_id
 
     def _import_certificate(self, cert_name, ca_cert, cert, key):
         if not key:

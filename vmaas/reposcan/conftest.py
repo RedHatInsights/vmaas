@@ -8,11 +8,21 @@ import pytest
 
 from vmaas.common.paths import DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import init_db
+from vmaas.reposcan.repodata.metadata_validators import init_validator_architectures
 from vmaas.reposcan.redhatcsaf import modeling as csaf_model
 
 VMAAS_DIR = Path(__file__).resolve().parent.parent.parent
 VMAAS_DB_DATA = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database", "test_data.sql")
 VMAAS_PG_OLD = VMAAS_DIR.joinpath("vmaas", "reposcan", "test_data", "database", "vmaas_db_postgresql_old.sql")
+
+# Populate valid architectures before test modules import parsers at module level
+init_validator_architectures([
+    'noarch', 'i386', 'i486', 'i586', 'i686', 'alpha', 'alphaev6', 'ia64',
+    'sparc', 'sparcv9', 'sparc64', 's390', 'athlon', 's390x', 'ppc', 'ppc64',
+    'ppc64le', 'pSeries', 'iSeries', 'x86_64', 'ppc64iseries', 'ppc64pseries',
+    'ia32e', 'amd64', 'aarch64', 'armv7hnl', 'armv7hl', 'armv7l', 'armv6hl',
+    'armv6l', 'armv5tel', 'src',
+])
 
 EXPECTED_CSAF = (
     ("cve-2023-0030.json", csaf_model.CsafCves({"CVE-2023-0030": csaf_model.CsafProducts()})),

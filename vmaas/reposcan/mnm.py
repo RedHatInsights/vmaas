@@ -44,3 +44,11 @@ RELEASE_GRAPH_FAILED_IMPORT = Counter('vmaas_reposcan_failed_release_graph_impor
 REPOS_TO_CLEANUP = Gauge('vmaas_reposcan_repos_cleanup', '# of repos to cleanup from DB')
 
 CERT_EXPIRATION_WARNING = Gauge('vmaas_reposcan_certificate_expiration_days', 'Days until CDN certificate expiration', ['cert_name'])
+
+# Data integrity metrics
+VALIDATION_FAILED_ITEMS = Counter('vmaas_reposcan_validation_failed_items',
+                                  'Number of items that failed validation',
+                                  ['metadata_type', 'field'])
+VALIDATION_TOTAL_ITEMS = Counter('vmaas_reposcan_validation_total_items',
+                                 'Total number of items processed for validation',
+                                 ['metadata_type'])
