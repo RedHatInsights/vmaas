@@ -14,8 +14,15 @@ from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.repository_store import RepositoryStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import FileUnpacker
-from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
+from vmaas.reposcan.mnm import (
+    FAILED_REPOMD,
+    FAILED_IMPORT_REPO,
+    FAILED_REPO_WITH_HTTP_CODE,
+    VALIDATION_FAILED_ITEMS,
+    VALIDATION_TOTAL_ITEMS,
+)
 
+from vmaas.reposcan.repodata.metadata_validators import validate_architecture, ValidationError
 from vmaas.reposcan.repodata.repomd import RepoMD, RepoMDTypeNotFound
 from vmaas.reposcan.repodata.repository import Repository
 
@@ -173,6 +180,15 @@ class RepositoryController:
     def add_repository(self, repo_url, content_set, basearch, releasever, organization, *,  # pylint: disable=too-many-positional-arguments
                        cert_name=None, ca_cert=None, cert=None, key=None):
         """Queue repository to import/check updates."""
+        if basearch:
+            VALIDATION_TOTAL_ITEMS.labels(metadata_type='repolist').inc()
+            try:
+                basearch = validate_architecture(basearch)
+            except ValidationError as err:
+                VALIDATION_FAILED_ITEMS.labels(metadata_type='repolist', field='basearch').inc()
+                self.logger.warning("Validation failed, skipped repository %s: %s", content_set, err)
+                return
+
         repo_url = repo_url.strip()
         if not repo_url.endswith("/"):
             repo_url += "/"

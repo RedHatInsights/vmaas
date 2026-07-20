@@ -1,11 +1,14 @@
 """
 Unit test classes for repository module.
 """
+from unittest.mock import MagicMock
+
 from vmaas.reposcan.repodata.primary import PrimaryMD
 from vmaas.reposcan.repodata.primary_db import PrimaryDatabaseMD
 from vmaas.reposcan.repodata.updateinfo import UpdateInfoMD
 from vmaas.reposcan.repodata.modules import ModuleMD
 from vmaas.reposcan.repodata.repository import Repository
+from vmaas.reposcan.repodata.repository_controller import RepositoryController
 from vmaas.reposcan.repodata.test.test_updateinfo import KNOWN_UPDATE_TYPES
 from vmaas.reposcan.reposcan import DEFAULT_ORG_NAME
 
@@ -88,3 +91,32 @@ class TestRepository:
         assert repo.primary is None
         assert repo.updateinfo is None
         assert repo.modules is None
+
+
+class TestRepositoryControllerBasearch:
+    """Test basearch validation when queueing repositories."""
+
+    def _controller(self, monkeypatch):
+        monkeypatch.setattr(
+            "vmaas.reposcan.repodata.repository_controller.RepositoryStore", MagicMock
+        )
+        return RepositoryController()
+
+    def test_add_valid_basearch(self, monkeypatch):
+        """Valid basearch is queued."""
+        ctrl = self._controller(monkeypatch)
+        ctrl.add_repository("http://example.com/", "cs", "x86_64", "9", DEFAULT_ORG_NAME)
+        assert len(ctrl.repositories) == 1
+
+    def test_skip_invalid_basearch(self, monkeypatch, caplog):
+        """Invalid basearch is skipped with a warning."""
+        ctrl = self._controller(monkeypatch)
+        ctrl.add_repository("http://example.com/", "cs", "7Server", "9", DEFAULT_ORG_NAME)
+        assert len(ctrl.repositories) == 0
+        assert "Validation failed" in caplog.text
+
+    def test_add_without_basearch(self, monkeypatch):
+        """Repository without basearch is still queued."""
+        ctrl = self._controller(monkeypatch)
+        ctrl.add_repository("http://example.com/", "cs", None, "9", DEFAULT_ORG_NAME)
+        assert len(ctrl.repositories) == 1
