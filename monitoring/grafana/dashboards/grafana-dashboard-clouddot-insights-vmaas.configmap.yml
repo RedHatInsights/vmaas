@@ -1074,6 +1074,16 @@ data:
               "intervalFactor": 1,
               "legendFormat": "repo import failed",
               "refId": "C"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_metadata_checksum_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "metadata checksum failed",
+              "refId": "E"
             }
           ],
           "title": "vmaas reposync errors",

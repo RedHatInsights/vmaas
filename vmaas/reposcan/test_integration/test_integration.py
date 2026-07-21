@@ -21,7 +21,8 @@ def download_mock(self, download_item: DownloadItem):
     src_path = "test_data/repodata/integration/" + src
     if src.endswith(".gz"):  # prepare archive file
         base = src[:-3]
-        os.system(f"gzip -c test_data/repodata/{base} > /tmp/{src}")
+        # Use -n flag to create deterministic gzip (no timestamp) for checksum verification
+        os.system(f"gzip -n -c test_data/repodata/{base} > /tmp/{src}")
         src_path = f"/tmp/{src}"
     shutil.copy(src_path, download_item.target_path)
     self.logger.info(f"File {src} mock-downloaded.")
