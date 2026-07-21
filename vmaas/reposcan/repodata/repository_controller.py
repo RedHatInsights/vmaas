@@ -332,16 +332,12 @@ class RepositoryController:
                 self.logger.info("Syncing a batch of %d repositories", len(batch))
                 try:
                     failed = self._download_metadata(batch)
-                    if failed:
-                        self.logger.warning("%d metadata files failed to download.", len(failed))
-                        failed_repos = [repo for repo in batch if self._repo_download_failed(repo, failed)]
-                        self.clean_repodata(failed_repos)
-                        batch = [repo for repo in batch if repo not in failed_repos]
-                    # Verify checksums of downloaded archives
                     checksum_failed = self._verify_metadata_checksums(batch)
-                    if checksum_failed:
-                        self.logger.warning("%d metadata files failed checksum verification.", len(checksum_failed))
-                        failed_repos = [repo for repo in batch if self._repo_download_failed(repo, checksum_failed)]
+                    # We want to prefer failed over checksum failed ones on duplicate key, put as a second union
+                    all_failed = checksum_failed | failed
+                    if all_failed:
+                        self.logger.warning("%d metadata files failed to download or verify.", len(all_failed))
+                        failed_repos = [repo for repo in batch if self._repo_download_failed(repo, all_failed)]
                         self.clean_repodata(failed_repos)
                         batch = [repo for repo in batch if repo not in failed_repos]
                     self._unpack_metadata(batch)
