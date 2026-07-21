@@ -14,7 +14,7 @@ from vmaas.common.logging_utils import get_logger
 from vmaas.reposcan.database.repository_store import RepositoryStore
 from vmaas.reposcan.download.downloader import FileDownloader, DownloadItem, VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import FileUnpacker
-from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE
+from vmaas.reposcan.mnm import FAILED_REPOMD, FAILED_IMPORT_REPO, FAILED_REPO_WITH_HTTP_CODE, FAILED_METADATA_CHECKSUM
 
 from vmaas.reposcan.repodata.checksum import ChecksumError
 from vmaas.reposcan.repodata.checksum import verify_file_checksum
@@ -156,6 +156,7 @@ class RepositoryController:
                 except (RepoMDTypeNotFound, KeyError) as err:
                     self.logger.warning("Missing checksum metadata for %s: %s", md_type, str(err))
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                    FAILED_METADATA_CHECKSUM.inc()
                     continue
 
                 try:
@@ -164,12 +165,15 @@ class RepositoryController:
                 except ChecksumError as err:
                     self.logger.warning("Checksum verification failed: %s", str(err))
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                    FAILED_METADATA_CHECKSUM.inc()
                 except ValueError as err:
                     self.logger.warning("Unsupported checksum type '%s' for %s: %s", checksum_type, local_path, str(err))
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                    FAILED_METADATA_CHECKSUM.inc()
                 except Exception:  # pylint: disable=broad-except
                     self.logger.exception("Unexpected error during checksum verification for %s", local_path)
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
+                    FAILED_METADATA_CHECKSUM.inc()
         if verified:  # Lets keep track of verifications passed overall
             self.logger.info(
                 "Metadata checksum verification passed for %d file(s) in %d repositories.",

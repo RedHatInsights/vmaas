@@ -27,6 +27,8 @@ FAILED_REPO = Counter('vmaas_reposcan_failed_repository', '# of failed repo-down
 FAILED_REPO_WITH_HTTP_CODE = Counter('vmaas_reposcan_failed_repository_download_with_code',
                                      '# of failed repo-download attempts with http code', ['http_code'])
 
+FAILED_METADATA_CHECKSUM = Counter('vmaas_reposcan_failed_metadata_checksum', '# of failed metadata checksum verifications')
+
 FAILED_IMPORT_REPO = Counter('vmaas_reposcan_failed_repository_import', '# of failed repo-import/update attempts')
 FAILED_IMPORT_CVE = Counter('vmaas_reposcan_failed_cve_import', '# of failed cve-import attempts')
 FAILED_UPDATE_CVE = Counter('vmaas_reposcan_failed_cve_update', '# of failed cve-update attempts')
