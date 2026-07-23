@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import signal
+import threading
 from multiprocessing.pool import Pool
 import multiprocessing
 from enum import StrEnum
@@ -97,6 +98,13 @@ SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
+REPO_SYNC_QUEUE_INTERVAL_MINUTES = int(os.getenv("REPO_SYNC_QUEUE_INTERVAL_MINUTES", "5"))
+
+# Queue for per-repo sync requests from Satellite (IoP mode).
+# Stores tuples of (label, releasever_or_None, basearch_or_None).
+# Protected by a lock because BackgroundScheduler and HTTP workers access it concurrently.
+_repo_queue: set[tuple[str, str | None, str | None]] = set()
+_repo_queue_lock = threading.Lock()
 
 
 class TaskStatusResponse(dict):
@@ -738,14 +746,55 @@ class DbChangeHandler():
         return result
 
 
+def _queue_repo(label: str, releasever: str | None, basearch: str | None) -> str:
+    """Add a repo to the sync queue with subsumption check.
+
+    Broader entries subsume more specific ones:
+      (label, None, None)       covers everything for that label
+      (label, releasever, None) covers all archs for that releasever
+      (label, None, basearch)   covers all releasever for that basearch
+    Returns a log message describing what happened.
+    """
+    entry = (label, releasever, basearch)
+    if (label, None, None) in _repo_queue:
+        return "Repository label '%s' already queued for full sync, skipping %s/%s." % (
+            label, releasever, basearch)
+    if releasever is not None and basearch is not None and (label, releasever, None) in _repo_queue:
+        return "Repository label '%s' releasever '%s' already queued for all archs, skipping basearch=%s." % (
+            label, releasever, basearch)
+    if releasever is not None and basearch is not None and (label, None, basearch) in _repo_queue:
+        return "Repository label '%s' basearch '%s' already queued for all releasever, skipping releasever=%s." % (
+            label, basearch, releasever)
+    if releasever is None and basearch is None:
+        # Most general entry — remove all existing entries for this label
+        to_remove = {item for item in _repo_queue if item[0] == label}
+        _repo_queue.difference_update(to_remove)
+    elif releasever is not None and basearch is None:
+        # Covers all archs for this releasever — remove more specific (label, releasever, basearch)
+        to_remove = {item for item in _repo_queue if item[0] == label and item[1] == releasever}
+        _repo_queue.difference_update(to_remove)
+    elif releasever is None and basearch is not None:
+        # Covers all releasever for this basearch — remove more specific (label, releasever, basearch)
+        to_remove = {item for item in _repo_queue if item[0] == label and item[2] == basearch}
+        _repo_queue.difference_update(to_remove)
+    _repo_queue.add(entry)
+    return "Repository label '%s' (releasever=%s, basearch=%s) added to sync queue. Queue size: %d, entries: %s" % (
+        label, releasever, basearch, len(_repo_queue), _repo_queue)
+
+
 class RepoSyncHandler(SyncHandler):
     """Handler for repository sync API."""
 
     task_type = "Sync repositories"
 
     @classmethod
-    def put(cls, **kwargs):
-        """Sync repositories stored in DB."""
+    def put(cls, label=None, releasever=None, basearch=None, **kwargs):
+        """Sync repositories stored in DB, or queue a specific repo for sync."""
+        if label:
+            with _repo_queue_lock:
+                msg = _queue_repo(label, releasever or None, basearch or None)
+            LOGGER.info(msg)
+            return TaskStartResponse(msg), 200
 
         status_code, status_msg = cls.start_task()
         return status_msg, status_code
@@ -759,6 +808,49 @@ class RepoSyncHandler(SyncHandler):
             repository_controller = RepositoryController()
             repository_controller.add_db_repositories()
             repository_controller.store()
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error <%s>" % hash(err)
+            LOGGER.exception(msg)
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
+class RepoQueueSyncHandler(SyncHandler):
+    """Handler for syncing only repositories queued via per-repo sync requests (IoP mode)."""
+
+    task_type = "Sync queued repositories"
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Sync only repositories that were queued by Satellite."""
+        queue: set[tuple[str, str | None, str | None]] = kwargs.get("queue", set())
+        try:
+            init_logging()
+            init_db()
+            controller = RepositoryController()
+            repos = controller.repo_store.list_repositories()
+            for (content_set, basearch, releasever, organization), repo_dict in repos.items():
+                for (q_label, q_releasever, q_basearch) in queue:
+                    label_match = content_set == q_label
+                    releasever_match = q_releasever is None or releasever == q_releasever
+                    basearch_match = q_basearch is None or basearch == q_basearch
+                    if label_match and releasever_match and basearch_match:
+                        controller.repo_store.content_set_to_db_id[content_set] = repo_dict["content_set_id"]
+                        controller.add_repository(
+                            repo_dict["url"], content_set, basearch, releasever, organization,
+                            cert_name=repo_dict["cert_name"], ca_cert=repo_dict["ca_cert"],
+                            cert=repo_dict["cert"], key=repo_dict["key"],
+                        )
+                        break
+            if controller.repositories:
+                controller.store()
+            else:
+                LOGGER.info("No repositories found in DB for queue entries: %s, skipping sync.", queue)
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
@@ -1181,7 +1273,23 @@ def periodic_sync():
     AllSyncHandler.start_task()
 
 
-def create_app(specs):
+def sync_queued_repos():
+    """Process per-repo sync requests queued by Satellite (IoP mode)."""
+    if SyncTask.is_running():
+        LOGGER.info("Repo queue sync skipped: another task already in progress. Queue size: %d", len(_repo_queue))
+        return
+
+    with _repo_queue_lock:
+        if not _repo_queue:
+            return
+        queue = _repo_queue.copy()
+        _repo_queue.clear()
+
+    LOGGER.info("Processing %d queued repository entries: %s", len(queue), queue)
+    RepoQueueSyncHandler.start_task(queue=queue)
+
+
+def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
     """Create reposcan app."""
     init_logging()
     SyncTask.init()
@@ -1193,7 +1301,7 @@ def create_app(specs):
     metrics_refresh_interval = int(os.getenv('METRICS_GAUGE_REFRESH_INTERVAL_MINUTES', "240"))
 
     # Sync jobs to run
-    periodic_job_intervals = (sync_interval, metrics_refresh_interval)
+    periodic_job_intervals = (sync_interval, metrics_refresh_interval, REPO_SYNC_QUEUE_INTERVAL_MINUTES)
 
     sched = None
     if any(job > 0 for job in periodic_job_intervals):
@@ -1216,6 +1324,12 @@ def create_app(specs):
             LOGGER.warning("REPOSCAN_SYNC_INTERVAL_MINUTES is 0 - Certification metrics gauge may not show actual data.")
     else:
         LOGGER.info("Periodic metrics gauge disabled.")
+
+    if REPO_SYNC_QUEUE_INTERVAL_MINUTES > 0:
+        sched.add_job(sync_queued_repos, trigger="interval", minutes=REPO_SYNC_QUEUE_INTERVAL_MINUTES)
+        LOGGER.info("Repo queue sync running every %s minute(s).", REPO_SYNC_QUEUE_INTERVAL_MINUTES)
+    else:
+        LOGGER.info("Repo queue sync disabled.")
 
     if sched is not None:
         sched.start()

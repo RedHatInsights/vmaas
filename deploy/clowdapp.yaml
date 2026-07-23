@@ -200,6 +200,8 @@ objects:
           value: ${CSAF_VEX_SIGNATURE_VERIFY}
         - name: CSAF_VEX_INDEX_CSV_ENABLED
           value: ${CSAF_VEX_INDEX_CSV_ENABLED}
+        - name: REPO_SYNC_QUEUE_INTERVAL_MINUTES
+          value: ${REPO_SYNC_QUEUE_INTERVAL_MINUTES}
         - name: CSAF_PRODUCT_STATUS_LIST
           value: ${CSAF_PRODUCT_STATUS_LIST}
         - name: ENABLE_PROFILER
@@ -405,6 +407,8 @@ parameters:
   value: "true"
 - name: CSAF_VEX_INDEX_CSV_ENABLED
   value: "true"
+- name: REPO_SYNC_QUEUE_INTERVAL_MINUTES
+  value: "5"
 - name: PG_MAX_STACK_DEPTH
   value: ''
 - name: CSAF_PRODUCT_STATUS_LIST
