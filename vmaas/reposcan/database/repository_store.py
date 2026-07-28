@@ -62,12 +62,6 @@ class RepositoryStore:
         cur.close()
         return repos
 
-    def _import_basearch(self, basearch):
-        arch_id = self.package_store.arch_map.get(basearch)
-        if not arch_id:
-            raise ValidationError(f"Invalid basearch: {basearch}")
-        return arch_id
-
     def _import_certificate(self, cert_name, ca_cert, cert, key):
         if not key:
             key = None
@@ -222,8 +216,9 @@ class RepositoryStore:
             cert_id = None
 
         if repo.basearch:
-            # will raise exception if db error occurs
-            basearch_id = self._import_basearch(repo.basearch)
+            basearch_id = self.package_store.arch_map.get(repo.basearch)
+            if not basearch_id:
+                raise ValidationError(f"Invalid basearch: {repo.basearch}")
         else:
             basearch_id = None
 
