@@ -5,7 +5,6 @@ import re
 
 # Validation patterns
 CVE_PATTERN = re.compile(r'^CVE-\d{4}-\d+$')
-BUGZILLA_ID_PATTERN = re.compile(r'^\d+$')
 PACKAGE_NAME_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-]+$')
 RELEASE_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-~]+$')
 VERSION_PATTERN = re.compile(r'^[a-zA-Z0-9._+\-~^]+$')
@@ -37,7 +36,7 @@ def validate_bugzilla_id(bugzilla_id):
     """Validate Bugzilla ticket number format."""
     bugzilla_id = str(bugzilla_id).strip()
 
-    if not BUGZILLA_ID_PATTERN.match(bugzilla_id):
+    if not bugzilla_id.isdigit():
         raise ValidationError(f"Invalid Bugzilla ID format: {bugzilla_id}")
 
     return bugzilla_id
@@ -94,10 +93,24 @@ FIELD_VALIDATORS = {
 }
 
 
+_validated_cache = {'name': {}, 'version': {}, 'release': {}}
+
+
 def validate_field(value, field_type):
     """Unified validation function that validates a field based on its type"""
     validator = FIELD_VALIDATORS.get(field_type)
     if not validator:
         raise ValueError(f"Unknown field type: {field_type}")
 
-    return validator(value)
+    cache = _validated_cache.get(field_type)
+    if cache is not None:
+        cached = cache.get(value)
+        if cached is not None:
+            return cached
+
+    result = validator(value)
+
+    if cache is not None:
+        cache[value] = result
+
+    return result

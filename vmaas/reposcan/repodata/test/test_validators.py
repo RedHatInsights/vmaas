@@ -9,6 +9,8 @@ from vmaas.reposcan.repodata.metadata_validators import (
     validate_package_name,
     validate_version,
     validate_release,
+    validate_field,
+    _validated_cache,
     ValidationError,
 )
 
@@ -154,3 +156,34 @@ class TestReleaseValidation:
 
         with pytest.raises(ValidationError, match="Invalid"):
             validate_release("")
+
+
+class TestValidationCache:
+    """Test that validate_field caches results."""
+
+    def setup_method(self):
+        """Clear validation cache before each test."""
+        for cache in _validated_cache.values():
+            cache.clear()
+
+    def test_cache_returns_same_result(self):
+        """Test that repeated calls return cached result."""
+        first = validate_field("kernel", "name")
+        assert "kernel" in _validated_cache["name"]
+        second = validate_field("kernel", "name")
+        assert first == second
+
+    def test_cache_skips_invalid(self):
+        """Test that invalid values are not cached."""
+        with pytest.raises(ValidationError):
+            validate_field("bad package!", "name")
+        assert "bad package!" not in _validated_cache["name"]
+
+    def test_cache_per_field_type(self):
+        """Test that cache is separate per field type."""
+        validate_field("1.0.0", "version")
+        validate_field("1.el8", "release")
+        assert "1.0.0" in _validated_cache["version"]
+        assert "1.0.0" not in _validated_cache["release"]
+        assert "1.el8" in _validated_cache["release"]
+        assert "1.el8" not in _validated_cache["version"]
