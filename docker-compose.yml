@@ -1,7 +1,7 @@
 services:
   vmaas_database:
     container_name: vmaas-database
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:18
     restart: unless-stopped
     shm_size: '256mb'
     environment:
@@ -11,7 +11,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - vmaas-db-data:/var/lib/postgresql/data
+      - vmaas-db-data:/var/lib/postgresql
 
   vmaas_reposcan:
     command: /vmaas/entrypoint.sh reposcan
@@ -22,7 +22,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         REQUIRE_RHEL: "no"
-        ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo"
+        ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-18/repo/rhel-9/group_insights-postgresql-18-rhel-9.repo"
     image: vmaas/app:latest
     restart: unless-stopped
     env_file:
