@@ -88,13 +88,13 @@ arches:
     name: golang-src
     evr: 1.26.5-1.el9_8
     sourcerpm: golang-1.26.5-1.el9_8.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/k/kernel-headers-5.14.0-687.34.1.el9_8.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/k/kernel-headers-5.14.0-687.36.1.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 2901917
-    checksum: sha256:504e15343d3288cab0146755376113e17220e5837250aa9ab186fb2a56f812ed
+    size: 2903853
+    checksum: sha256:aa8f8d4579635787d6dda7323d472de1f2f630f97d694ebf5e0208791b76555c
     name: kernel-headers
-    evr: 5.14.0-687.34.1.el9_8
-    sourcerpm: kernel-5.14.0-687.34.1.el9_8.src.rpm
+    evr: 5.14.0-687.36.1.el9_8
+    sourcerpm: kernel-5.14.0-687.36.1.el9_8.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libffi-devel-3.4.2-8.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 32520
@@ -838,7 +838,7 @@ arches:
     name: rust
     evr: 1.92.0-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/a7289e240e9f9f0ceafbbe5f6700569b7dca58d49066e9c1978312eb7b90ca6b-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/df59c59248ba66e15694ab81ef1cd97968c709ebd8d16b6058930d11f537872a-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 64235
-    checksum: sha256:a7289e240e9f9f0ceafbbe5f6700569b7dca58d49066e9c1978312eb7b90ca6b
+    size: 65787
+    checksum: sha256:df59c59248ba66e15694ab81ef1cd97968c709ebd8d16b6058930d11f537872a
