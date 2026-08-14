@@ -14,6 +14,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure SSH commit signing
+        env:
+          SIGNING_KEY: ${{ secrets.SEMANTIC_RELEASE_SIGNING_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SIGNING_KEY" > ~/.ssh/signing_key
+          chmod 600 ~/.ssh/signing_key
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/signing_key
+          git config --global commit.gpgSign true
+          git config --global tag.gpgSign true
+
       - name: Install Python tools
         run: |
           # https://github.com/hermetoproject/pybuild-deps/issues/295
@@ -36,8 +48,8 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "vmaas-bot"
+          git config --global user.email "40663028+vmaas-bot@users.noreply.github.com"
 
           git add .
           
