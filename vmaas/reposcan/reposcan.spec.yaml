@@ -160,6 +160,40 @@ paths:
       tags:
         - Sync
 
+  /sync/repo/queue:
+    post:
+      summary: Queue repositories for sync
+      operationId: vmaas.reposcan.reposcan.RepoQueueHandler.post
+      <<: *secured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required:
+                  - label
+                properties:
+                  label:
+                    type: string
+                    description: Content set label (e.g. rhel-8-for-x86_64-baseos-rpms)
+                  releasever:
+                    type: string
+                    description: Release version (e.g. 8.9). If omitted, all versions are queued.
+                  basearch:
+                    type: string
+                    description: Base architecture (e.g. x86_64). If omitted, all architectures are queued.
+                  organization:
+                    type: string
+                    description: Organization name. Defaults to DEFAULT if omitted.
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /sync/cvemap:
     put:
       summary: Sync the CVE map
