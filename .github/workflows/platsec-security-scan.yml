@@ -44,7 +44,7 @@ jobs:
     #   base_dockerbuild_path: './testbuild.base'
     #   base_dockerfile_path: './test'
     #   base_dockerfile_name: 'Dockerfile.base'
-        build_arg: '--build-arg ALT_REPO="https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-16/repo/epel-9/group_insights-postgresql-16-epel-9.repo"'
+        build_arg: '--build-arg ALT_REPO="https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-18/repo/rhel-9/group_insights-postgresql-18-rhel-9.repo"'
     #   only_fixed: true
     #   fail_on_vulns: true
     #   severity_fail_cutoff: high

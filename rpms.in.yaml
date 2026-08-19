@@ -4,4 +4,4 @@ contentOrigin:
 arches: [x86_64]
 
 moduleEnable:
-  - postgresql:16
+  - postgresql:18
