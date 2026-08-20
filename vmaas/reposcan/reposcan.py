@@ -18,10 +18,10 @@ from functools import reduce
 from pathlib import Path
 from datetime import datetime
 from datetime import timedelta
+from urllib.parse import urljoin
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import connexion
-import git
 from prometheus_client import generate_latest
 from psycopg2 import DatabaseError
 import requests
@@ -59,17 +59,16 @@ CFG = Config()
 
 DEFAULT_CHUNK_SIZE = "1048576"
 
-# FedRAMP deployment using only baked-in content, no git cloning in runtime
+# FedRAMP deployment using only baked-in content, no runtime downloads
 IS_FEDRAMP = strtobool(os.getenv("IS_FEDRAMP", "FALSE"))
 REPOLIST_STATIC_DIR = Path("/vmaas/repolist_git")
 
-REPOLIST_DIR = Path("/tmp/repolist_git")
-REPOLIST_GIT = os.getenv('REPOLIST_GIT', '')
-REPOLIST_GIT_REF = os.getenv('REPOLIST_GIT_REF', 'master')
-REPOLIST_GIT_TOKEN = os.getenv('REPOLIST_GIT_TOKEN', '')
+VMAAS_ASSETS_BASE_URL = os.getenv('VMAAS_ASSETS_BASE_URL', '')
+VMAAS_ASSETS_TOKEN = os.getenv('VMAAS_ASSETS_TOKEN', '')
 REPOLIST_PATH = os.getenv('REPOLIST_PATH', 'repolist.json')
 RELEASEMAP_PATH = os.getenv('RELEASEMAP_PATH', 'ga_dates.json')
 RELEASE_GRAPH_DIR = os.getenv("RELEASE_GRAPH_PATH", "release_graphs")
+RELEASE_GRAPH_INDEX_PATH = os.getenv("RELEASE_GRAPH_INDEX_PATH", "release_graphs_index.json")
 
 DEFAULT_CERT_NAME = "DEFAULT"
 DEFAULT_ORG_NAME = "DEFAULT"
@@ -213,60 +212,70 @@ class DumpVersionHandler():
         return fetch_latest_dump()
 
 
-class GitManager:
-    """Handler for setting up the git directory and parsing content"""
+class HttpAssetSource:
+    """Fetches asset files from a static HTTP(S) server (e.g. raw file host, S3, nginx)."""
 
-    git_dir = None
+    def __init__(self, base_url: str, token: str = "") -> None:
+        self.base_url = base_url if base_url.endswith('/') else f"{base_url}/"
+        self.token = token
 
-    @classmethod
-    def fetch_git(cls, force: bool = True) -> None:
-        """Download data from configured git repo"""
-        if not force and cls.git_dir:
-            LOGGER.debug("Found previously set git assets")
-            return
+    def fetch(self, path: str) -> str | None:
+        """Fetch raw text content of a relative path, or None if unavailable."""
+        url = urljoin(self.base_url, path.strip().lstrip('/'))
+        headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        try:
+            response = requests.get(url, headers=headers, timeout=60)
+            response.raise_for_status()
+            return response.text
+        except requests.RequestException as err:
+            LOGGER.error("Failed to download asset from %s: %s", url, err)
+            return None
 
+
+class LocalAssetSource:
+    """Fetches asset files from a local directory (e.g. FedRAMP baked-in content)."""
+
+    def __init__(self, base_dir: Path) -> None:
+        self.base_dir = base_dir
+
+    def fetch(self, path: str) -> str | None:
+        """Read raw text content of a relative path, or None if unavailable."""
+        file_path = self.base_dir / path.strip().lstrip('/')
+        if not file_path.is_file():
+            LOGGER.error("Asset file %s was not found in %s", path, self.base_dir)
+            return None
+        return file_path.read_text(encoding='utf8')
+
+
+class AssetManager:
+    """Fetches and parses vmaas-assets content (repolist, releases, release graphs)."""
+
+    @staticmethod
+    def _get_source() -> HttpAssetSource | LocalAssetSource | None:
+        """Return the configured asset source, or None if none is configured."""
         if IS_FEDRAMP:
             LOGGER.info("FedRAMP env, using static assets source: %s", REPOLIST_STATIC_DIR)
-            git_dir = REPOLIST_STATIC_DIR
-        else:
-            LOGGER.info("Downloading assets from git %s", REPOLIST_GIT)
-            shutil.rmtree(REPOLIST_DIR, True)
-            os.makedirs(REPOLIST_DIR, exist_ok=True)
-
-            # Should we just use replacement or add a url handling library, which
-            # would be used replace the username in the provided URL ?
-            git_url = REPOLIST_GIT
-            if REPOLIST_GIT_TOKEN:
-                git_url = git_url.replace('https://', f'https://{REPOLIST_GIT_TOKEN}:x-oauth-basic@')
-            git_ref = REPOLIST_GIT_REF if REPOLIST_GIT_REF else 'master'
-
-            git.Repo.clone_from(git_url, REPOLIST_DIR, branch=git_ref)
-            git_dir = REPOLIST_DIR
-
-        # Success, git dir with files found
-        if git_dir.is_dir():
-            cls.git_dir = git_dir
-        else:
-            LOGGER.error("Downloading assets git repo failed: Directory was not created")
+            return LocalAssetSource(REPOLIST_STATIC_DIR)
+        if not VMAAS_ASSETS_BASE_URL:
+            LOGGER.error("VMAAS_ASSETS_BASE_URL is not set.")
+            return None
+        return HttpAssetSource(VMAAS_ASSETS_BASE_URL, VMAAS_ASSETS_TOKEN)
 
     @classmethod
     def get_git_products_repos(cls) -> tuple[dict | None, list | None]:
-        """Parse data from set git dir and return products and repos"""
-        if not cls.git_dir:
-            LOGGER.error("Downloading git repo failed: Directory is missing")
+        """Fetch and parse products and repos from the configured assets source"""
+        source = cls._get_source()
+        if not source:
             return None, None
 
         products, repos = {}, []
         paths = REPOLIST_PATH.split(',')
         for path in paths:
             # Trim the spaces so we can have nicely formatted comma lists
-            file_path = cls.git_dir / path.strip()
-            if not file_path.is_file():
-                LOGGER.error("Downloading git repo failed: File %s was not created", path)
+            content = source.fetch(path.strip())
+            if content is None:
                 return None, None
-
-            with open(file_path, 'r', encoding='utf8') as json_file:
-                data = json.load(json_file)
+            data = json.loads(content)
 
             item_products, item_repos = RepolistImportHandler.parse_repolist_json(data)
             if not item_products and not item_repos:
@@ -279,32 +288,38 @@ class GitManager:
 
     @classmethod
     def get_git_releases(cls) -> dict | None:
-        """Parse data from set git dir and return releases"""
-        releasemap_file = cls.git_dir / RELEASEMAP_PATH
-        if not cls.git_dir or not releasemap_file.is_file():
-            LOGGER.error("Downloading git repo failed: Releasemap is missing")
+        """Fetch and parse releases from the configured assets source"""
+        source = cls._get_source()
+        if not source:
             return None
 
-        with open(releasemap_file, 'r', encoding='utf8') as json_file:
-            return json.load(json_file)
+        content = source.fetch(RELEASEMAP_PATH)
+        if content is None:
+            return None
+        return json.loads(content)
 
     @classmethod
     def get_git_release_graphs(cls) -> dict | None:
-        """Parse data from set git dir and return release graphs"""
-        if not cls.git_dir:
-            LOGGER.error("Downloading git repo failed: Directory is missing")
+        """Fetch and parse release graphs from the configured assets source"""
+        source = cls._get_source()
+        if not source:
+            return None
+
+        index_content = source.fetch(RELEASE_GRAPH_INDEX_PATH)
+        if index_content is None:
+            return None
+        try:
+            graph_names = json.loads(index_content)
+        except json.JSONDecodeError:
+            LOGGER.error("Release graph index %s is not valid JSON", RELEASE_GRAPH_INDEX_PATH)
             return None
 
         release_graphs = {}
-        release_graph_dir = cls.git_dir / RELEASE_GRAPH_DIR
-        if not release_graph_dir.is_dir():
-            LOGGER.error("Downloading assets git repo failed: Dir %s was not created", RELEASE_GRAPH_DIR)
-            return None
-
-        for graph in release_graph_dir.glob("*.json"):
-            with graph.open() as fde:
-                content = fde.read()
-                release_graphs[graph.name] = ReleaseGraph(graph.name, content)
+        for name in graph_names:
+            content = source.fetch(f"{RELEASE_GRAPH_DIR}/{name}")
+            if content is None:
+                return None
+            release_graphs[name] = ReleaseGraph(name, content)
 
         return release_graphs
 
@@ -492,12 +507,11 @@ class GitRepoListHandler(RepolistImportHandler):
         """Start importing from git"""
         init_logging()
 
-        if not any([REPOLIST_GIT, IS_FEDRAMP]):
-            LOGGER.warning("Git repository URL not set and can't use the static repository.")
+        if not any([VMAAS_ASSETS_BASE_URL, IS_FEDRAMP]):
+            LOGGER.warning("Assets base URL not set and can't use the static repository.")
             return "SKIPPED"
 
-        GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
-        products, repos = GitManager.get_git_products_repos()
+        products, repos = AssetManager.get_git_products_repos()
         if products is None or repos is None:
             return "ERROR"
         return RepolistImportHandler.run_task(products=products, repos=repos, verbose=True)
@@ -526,12 +540,11 @@ class GitRepoListCleanupHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not any([REPOLIST_GIT, IS_FEDRAMP]):
-                LOGGER.warning("Git repository URL not set and can't use the static repository.")
+            if not any([VMAAS_ASSETS_BASE_URL, IS_FEDRAMP]):
+                LOGGER.warning("Assets base URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
-            _, repos = GitManager.get_git_products_repos()
+            _, repos = AssetManager.get_git_products_repos()
             if not repos:
                 return "ERROR"
 
@@ -971,12 +984,11 @@ class ReleaseSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not any([REPOLIST_GIT, IS_FEDRAMP]):
-                LOGGER.warning("Git repository URL not set and can't use the static repository.")
+            if not any([VMAAS_ASSETS_BASE_URL, IS_FEDRAMP]):
+                LOGGER.warning("Assets base URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
-            releases = GitManager.get_git_releases()
+            releases = AssetManager.get_git_releases()
 
             if releases is None:
                 return "ERROR"
@@ -1014,12 +1026,11 @@ class ReleaseGraphSyncHandler(SyncHandler):
             init_logging()
             init_db()
 
-            if not any([REPOLIST_GIT, IS_FEDRAMP]):
-                LOGGER.warning("Git repository URL not set and can't use the static repository.")
+            if not any([VMAAS_ASSETS_BASE_URL, IS_FEDRAMP]):
+                LOGGER.warning("Assets base URL not set and can't use the static repository.")
                 return "SKIPPED"
 
-            GitManager.fetch_git(force=kwargs.get("force_git_fetch", True))
-            release_graphs = GitManager.get_git_release_graphs()
+            release_graphs = AssetManager.get_git_release_graphs()
 
             if release_graphs is None:
                 return "ERROR"
@@ -1068,8 +1079,7 @@ class AllSyncHandler(SyncHandler):
     @staticmethod
     def run_task(*args, **kwargs):
         """Function to start syncing all repositories from database + all CVEs."""
-        GitManager.git_dir = None
-        tasks = ", ".join([h.run_task(force_git_fetch=False) for h in all_sync_handlers()])
+        tasks = ", ".join([h.run_task() for h in all_sync_handlers()])
         return tasks
 
 

@@ -32,13 +32,6 @@ arches:
     name: gcc
     evr: 11.5.0-14.el9
     sourcerpm: gcc-11.5.0-14.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/git-core-2.52.0-1.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 5293286
-    checksum: sha256:6264aa556d583604f34def3674f5830a70cfee0aac283719e4df295db38acb53
-    name: git-core
-    evr: 2.52.0-1.el9
-    sourcerpm: git-2.52.0-1.el9.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-275.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 46499
@@ -88,13 +81,13 @@ arches:
     name: golang-src
     evr: 1.26.5-1.el9_8
     sourcerpm: golang-1.26.5-1.el9_8.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/k/kernel-headers-5.14.0-687.39.1.el9_8.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/k/kernel-headers-5.14.0-687.41.1.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 2906125
-    checksum: sha256:978a5d84f2c2e74a7ec915f71eea4dd5fb3a72a15fe9aea192cc47be32e7f671
+    size: 2911313
+    checksum: sha256:7fab4963bb2f80e238051586a6df2b0ffea787daf7ef59659ba8d0fa3648f46e
     name: kernel-headers
-    evr: 5.14.0-687.39.1.el9_8
-    sourcerpm: kernel-5.14.0-687.39.1.el9_8.src.rpm
+    evr: 5.14.0-687.41.1.el9_8
+    sourcerpm: kernel-5.14.0-687.41.1.el9_8.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/l/libffi-devel-3.4.2-8.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 32520
@@ -417,20 +410,6 @@ arches:
     name: kmod-libs
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/less-590-6.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 166025
-    checksum: sha256:5bd040f9dd813167935fc390d546c119d90e0a9c77447a3d9ed1ef69c6f5a32a
-    name: less
-    evr: 590-6.el9
-    sourcerpm: less-590-6.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libcbor-0.7.0-5.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 60575
-    checksum: sha256:588e8736af3376abfb3cdf372c10baef02c40d916a55958f3bee9767f9ad8526
-    name: libcbor
-    evr: 0.7.0-5.el9
-    sourcerpm: libcbor-0.7.0-5.el9.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libcomps-0.1.18-1.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-rpms
     size: 81851
@@ -466,13 +445,6 @@ arches:
     name: libfdisk
     evr: 2.37.4-25.el9
     sourcerpm: util-linux-2.37.4-25.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libfido2-1.13.0-2.el9.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 102746
-    checksum: sha256:6da940c0528f3e4453db84cb85b402c8f4293a197b1921158df9651edb4845e0
-    name: libfido2
-    evr: 1.13.0-2.el9
-    sourcerpm: libfido2-1.13.0-2.el9.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libgomp-11.5.0-14.el9.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-rpms
     size: 263723
@@ -529,20 +501,6 @@ arches:
     name: make
     evr: 1:4.3-8.el9
     sourcerpm: make-4.3-8.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/o/openssh-9.9p1-9.el9_8.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 442241
-    checksum: sha256:cd14a09ebe95a8d09a779838bf71f8e05f809cbd1d7ef4553294284d35249a60
-    name: openssh
-    evr: 9.9p1-9.el9_8
-    sourcerpm: openssh-9.9p1-9.el9_8.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/o/openssh-clients-9.9p1-9.el9_8.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 799148
-    checksum: sha256:2e10d31aa0d2c2aaf521b4b1b46cd76b734a781a9ffaf496f8d39c53f4897705
-    name: openssh-clients
-    evr: 9.9p1-9.el9_8
-    sourcerpm: openssh-9.9p1-9.el9_8.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/o/openssl-3.5.5-6.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-rpms
     size: 1564334
@@ -718,12 +676,6 @@ arches:
     checksum: sha256:5fa267daa0e7df3e072c17e81db41b809b256da8cfb0372669d9a1bea937a01a
     name: delve
     evr: 1.26.1-1.el9_8
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/g/git-2.52.0-1.el9.src.rpm
-    repoid: rhel-9-for-x86_64-appstream-source-rpms
-    size: 8014389
-    checksum: sha256:791f7585f247061d5a6f55416f480a7dbb09b19578e7d7f664aa8aba20074802
-    name: git
-    evr: 2.52.0-1.el9
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/g/golang-1.26.5-1.el9_8.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
     size: 36513301
@@ -886,12 +838,12 @@ arches:
     checksum: sha256:645080ac16b4cc7d858b419642ae8a606d7f637e721a6eb7be5203bc3eb6c995
     name: ima-evm-utils
     evr: 1.6.2-2.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/k/kernel-5.14.0-687.39.1.el9_8.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/k/kernel-5.14.0-687.41.1.el9_8.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 152374943
-    checksum: sha256:7002d750cf1966a61a9131f2b5b24887816d989509efd27e5a4ed0dc8243e002
+    size: 152395202
+    checksum: sha256:59ce85c21f55f88b54cf4cb1c43d7d9a9551c96b568b998b833df3f1072be2ec
     name: kernel
-    evr: 5.14.0-687.39.1.el9_8
+    evr: 5.14.0-687.41.1.el9_8
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/k/keyutils-1.6.3-1.el9.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
     size: 150790
@@ -904,18 +856,6 @@ arches:
     checksum: sha256:4f6fefbf0d004b23494fe18ccfff2b9151ea887a276c56a6f25ea597a250991c
     name: kmod
     evr: 28-11.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/less-590-6.el9.src.rpm
-    repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 382338
-    checksum: sha256:4a5023846942905da4226503f6a9da91a66bf6c179dc21d2e4210b3371399b17
-    name: less
-    evr: 590-6.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libcbor-0.7.0-5.el9.src.rpm
-    repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 276760
-    checksum: sha256:0fe4d1387cdb9c79ee26a6677df578b4d30facf4afa06cfa674fb686c3fa754a
-    name: libcbor
-    evr: 0.7.0-5.el9
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libcomps-0.1.18-1.el9.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
     size: 3723982
@@ -952,12 +892,6 @@ arches:
     checksum: sha256:2b384204cc70c8f23d3a86e5cc9f736306a7a91a72e282044e3b23f3fd831647
     name: libffi
     evr: 3.4.2-8.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libfido2-1.13.0-2.el9.src.rpm
-    repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 865138
-    checksum: sha256:c3f125f8b3242600cc1013183930e990b4b791c0d6c6544bf371a28c7abfebe1
-    name: libfido2
-    evr: 1.13.0-2.el9
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libpwquality-1.4.4-8.el9.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
     size: 447225
@@ -994,12 +928,6 @@ arches:
     checksum: sha256:a5cc45d6c158b255cda528c496dbb8bc7783acb9898b97a39a1811230e102d7c
     name: make
     evr: 1:4.3-8.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/o/openssh-9.9p1-9.el9_8.src.rpm
-    repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 2555730
-    checksum: sha256:38b311178cf42e1611eb250747dee0780e19c41afbdc3b1cd189ddf5d5897acd
-    name: openssh
-    evr: 9.9p1-9.el9_8
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/o/openssl-3.5.5-6.el9_8.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
     size: 53369050
@@ -1079,7 +1007,7 @@ arches:
     name: zstd
     evr: 1.5.5-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/d66f4cb1e719b6ddb0054b242ce88640e7dad23435362440632fa12d4d66a5a7-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/fd294a6548d7d1416dbd95f1ad17699dbac5d6827e0010805ea50ddbb1dbcb08-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 66907
-    checksum: sha256:d66f4cb1e719b6ddb0054b242ce88640e7dad23435362440632fa12d4d66a5a7
+    checksum: sha256:fd294a6548d7d1416dbd95f1ad17699dbac5d6827e0010805ea50ddbb1dbcb08
