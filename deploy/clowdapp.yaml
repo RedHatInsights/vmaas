@@ -154,6 +154,8 @@ objects:
           value: ${KEEP_COPIES}
         - name: REPOLIST_GIT
           value: ${REPOLIST_GIT}
+        - name: REPOLIST_GIT_REF
+          value: ${REPOLIST_GIT_REF}
         - name: REPOLIST_PATH
           value: ${REPOLIST_GIT_PATH}
         - name: REPOLIST_GIT_TOKEN
@@ -366,6 +368,9 @@ parameters:
   value: '360'
 - name: REPOLIST_GIT
   description: Location of VMaaS assets git
+- name: REPOLIST_GIT_REF
+  description: Git ref to sync vmaas-assets from
+  value: master
 - name: REPOLIST_GIT_PATH
   description: Path/comma separated paths, denoting repolist files in the git repo
   value: "repolist.json, epel-repolist.json"
