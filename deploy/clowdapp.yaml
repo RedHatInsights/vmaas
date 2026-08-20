@@ -152,21 +152,15 @@ objects:
           value: ${THREADS}
         - name: KEEP_COPIES
           value: ${KEEP_COPIES}
-        - name: REPOLIST_GIT
-          value: ${REPOLIST_GIT}
-        - name: REPOLIST_GIT_REF
-          value: ${REPOLIST_GIT_REF}
+        - name: VMAAS_ASSETS_BASE_URL
+          value: ${VMAAS_ASSETS_BASE_URL}
         - name: REPOLIST_PATH
           value: ${REPOLIST_GIT_PATH}
-        - name: REPOLIST_GIT_TOKEN
+        - name: VMAAS_ASSETS_TOKEN
           valueFrom:
             secretKeyRef:
               key: GIT_TOKEN
               name: github-vmaas-bot
-        - name: GIT_COMMITTER_NAME
-          value: ${GIT_COMMITTER_NAME}
-        - name: GIT_COMMITTER_EMAIL
-          value: ${GIT_COMMITTER_EMAIL}
         - name: DEFAULT_CA_CERT
           valueFrom:
             secretKeyRef:
@@ -366,20 +360,11 @@ parameters:
 - name: REPOSCAN_SYNC_INTERVAL_MINUTES
   description: Reposcan periodic sync interval
   value: '360'
-- name: REPOLIST_GIT
-  description: Location of VMaaS assets git
-- name: REPOLIST_GIT_REF
-  description: Git ref to sync vmaas-assets from
-  value: master
+- name: VMAAS_ASSETS_BASE_URL
+  description: Base URL of the HTTP server hosting VMaaS assets (repolist, releases, release graphs)
 - name: REPOLIST_GIT_PATH
-  description: Path/comma separated paths, denoting repolist files in the git repo
+  description: Path/comma separated paths, denoting repolist files served from the assets base URL
   value: "repolist.json, epel-repolist.json"
-- name: GIT_COMMITTER_NAME
-  description: Commiter name in assets repo
-  value: 'vmaas'
-- name: GIT_COMMITTER_EMAIL
-  description: Commiter email in assets repo
-  value: 'vmaas@localhost'
 - name: RETRY_COUNT
   description: Retry count of downloader
   value: '3'
