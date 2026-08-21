@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
       args:
         ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-18/repo/rhel-9/group_insights-postgresql-18-rhel-9.repo"
-        VAR_RPMS: "findutils git-core postgresql"
+        VAR_RPMS: "findutils postgresql"
         VAR_PIP_INSTALL_OPT: "-r requirements-dev.txt"
       target: buildimg
     image: vmaas/test:latest
