@@ -34,6 +34,8 @@ persistent=yes
 # active Python interpreter and may run arbitrary code.
 unsafe-load-any-extension=no
 
+# Allow pylint to analyze C extensions for pysequoia only
+extension-pkg-allow-list=pysequoia
 
 [MESSAGES CONTROL]
 

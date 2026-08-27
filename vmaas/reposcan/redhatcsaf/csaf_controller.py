@@ -214,7 +214,6 @@ class CsafController:
         """Clean downloaded files for given batch."""
         if batch is None:  # Delete all files
             if self._signature_verifier is not None:
-                self._signature_verifier.close()
                 self._signature_verifier = None
             shutil.rmtree(self.tmp_directory)
             self.tmp_directory = Path(tempfile.mkdtemp(prefix="csaf-"))
