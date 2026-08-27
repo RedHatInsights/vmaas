@@ -1170,7 +1170,7 @@ def create_app(specs):
     for sig in KILL_SIGNALS:
         # From Uvicorn server
         orig_handler = signal.getsignal(sig)
-        if orig_handler:
+        if orig_handler is not None:
             ORIGINAL_SIG_HANDLERS[sig] = orig_handler
         signal.signal(sig, terminate)
 
