@@ -17,8 +17,8 @@ from vmaas.common.batch_list import BatchList
 from vmaas.common.config import Config
 from vmaas.common.date_utils import parse_datetime
 from vmaas.common.fileutil import remove_file_if_exists
-from vmaas.common.gpg_signature_verifier import GpgSignatureVerifier
-from vmaas.common.gpg_signature_verifier import GpgSignatureVerifierError
+from vmaas.common.signature_verifier import SignatureVerifier
+from vmaas.common.signature_verifier import SignatureVerifierError
 from vmaas.common.logging_utils import get_logger
 from vmaas.common.strtobool import strtobool
 from vmaas.reposcan.database.csaf_store import CsafStore
@@ -63,7 +63,7 @@ class CsafController:
         self.csaf_store = CsafStore()
         self.tmp_directory: Path = Path(tempfile.mkdtemp(prefix="csaf-"))
         self.cfg = Config()
-        self._signature_verifier: GpgSignatureVerifier | None = None
+        self._signature_verifier: SignatureVerifier | None = None
         self.archive_name: str = "archive.tar.zst"
         self.archive_timestamp: datetime | None = None
 
@@ -78,14 +78,14 @@ class CsafController:
             return {item.target_path: item.status_code}
         return {}
 
-    def _get_signature_verifier(self) -> GpgSignatureVerifier | None:
+    def _get_signature_verifier(self) -> SignatureVerifier | None:
         """Return the verifier, or None if disabled or initialization fails."""
         if not CSAF_VEX_SIGNATURE_VERIFY:
             return None
         if self._signature_verifier is None:
             try:
-                self._signature_verifier = GpgSignatureVerifier(CSAF_VEX_PUB_SIG_KEY_FILE)
-            except GpgSignatureVerifierError:
+                self._signature_verifier = SignatureVerifier(CSAF_VEX_PUB_SIG_KEY_FILE)
+            except SignatureVerifierError:
                 self.logger.error("Failed to instantiate the signature verifier.")
                 return None
         return self._signature_verifier
