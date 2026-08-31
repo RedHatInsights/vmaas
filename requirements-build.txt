@@ -259,7 +259,6 @@ hatchling==1.32.0 \
     --hash=sha256:0e17c9c3b9aa7c625acc8d0f5b622f107d5049af9ecf5ada4de1aada5be7cdbc
     # via
     #   attrs
-    #   colorama
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
     #   httpcore
@@ -392,7 +391,6 @@ setuptools==84.0.0 \
     #   cffi
     #   charset-normalizer
     #   cryptography
-    #   gitpython
     #   markupsafe
     #   maturin
     #   pathspec

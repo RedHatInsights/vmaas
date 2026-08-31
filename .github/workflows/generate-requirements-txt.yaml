@@ -29,7 +29,7 @@ jobs:
       - name: Install Python tools
         run: |
           # https://github.com/hermetoproject/pybuild-deps/issues/295
-          pip install --upgrade "pip<25.1" && pip install --upgrade poetry poetry-plugin-export pybuild-deps pip-tools
+          pip install --upgrade "pip<25.1" && pip install --upgrade poetry poetry-plugin-export pybuild-deps "pip-tools<7.6.1"
 
       - name: Export requirements.txt
         run: |
