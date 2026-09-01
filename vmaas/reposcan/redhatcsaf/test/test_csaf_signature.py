@@ -20,8 +20,8 @@ VALID_SIGNATURE = TEST_DIR / "cve-2026-0006.json.asc"
 # Repo copy of cve-2023-0030.json and .asc are not a matching download pair
 MISMATCHED_JSON = TEST_DIR / "cve-2023-0030.json"
 
-pytest.importorskip("gnupg")
-requires_gpg = pytest.mark.skipif(shutil.which("gpg") is None, reason="gpg binary required")
+pytest.importorskip("pysequoia")
+
 requires_pub_key = pytest.mark.skipif(
     not CSAF_VEX_PUB_SIG_KEY_FILE.is_file(),
     reason=f"CSAF public key missing at {CSAF_VEX_PUB_SIG_KEY_FILE}",
@@ -44,7 +44,6 @@ def _copy_with_signature(tmp_path: Path, json_src: Path, signature_src: Path) ->
     return target_json
 
 
-@requires_gpg
 class TestVerifyCsafFileSignature:
     """Offline tests for _verify_csaf_signature using test fixtures"""
 

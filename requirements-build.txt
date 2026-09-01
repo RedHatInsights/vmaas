@@ -259,7 +259,6 @@ hatchling==1.32.0 \
     --hash=sha256:0e17c9c3b9aa7c625acc8d0f5b622f107d5049af9ecf5ada4de1aada5be7cdbc
     # via
     #   attrs
-    #   colorama
     #   hatch-fancy-pypi-readme
     #   hatch-vcs
     #   httpcore
@@ -287,7 +286,9 @@ maturin==1.13.1 ; python_version == "3.12" \
     --hash=sha256:c6a720b252c99de072922dbe4432ab19662b6f80045b0355fec23bdfccb450da \
     --hash=sha256:dc91031e0619c1e28730279ef9ee5f106c9b9ec806b013f888676b242f892eb7 \
     --hash=sha256:f69093ed4a0e6464e52a7fc26d714f859ce15630ec8070743398c6bf41f38a9e
-    # via rpds-py
+    # via
+    #   pysequoia
+    #   rpds-py
 maturin==1.15.0 ; python_version == "3.12" \
     --hash=sha256:0ebf9767892725083138e671c34482c660317a2f3d6a29fc0e0f34e9d8c99136 \
     --hash=sha256:126e12e618b4db42f68c779a56d41f82a390145ba36ac3f621d057eb34f5ad9d \
@@ -400,7 +401,6 @@ setuptools==84.0.0 \
     #   prometheus-client
     #   pycparser
     #   python-dateutil
-    #   python-gnupg
     #   pyyaml
     #   requests
     #   setuptools-rust
