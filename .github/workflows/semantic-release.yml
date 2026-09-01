@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        go-version: [1.22]
+        go-version: [1.25]
     steps:
       - name: Cancel previous builds
         uses: rokroskar/workflow-run-cleanup-action@c631227427d0452af4994af0940d7655ebc50c7c # master
