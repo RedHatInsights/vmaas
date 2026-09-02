@@ -18,6 +18,7 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - run: sudo apt update
       - run: sudo apt install -y librpm-dev rpm
       - uses: actions/setup-go@v5
         with:
