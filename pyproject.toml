@@ -34,7 +34,7 @@ dependencies = [
     "botocore>=1.36.2",
     # Locked to 3.1.0 due to https://github.com/spec-first/connexion/issues/2029
     "connexion[swagger-ui]==3.1.0",
-    "gitpython>=3.1.52",
+    "gitpython>=3.1.58",
     "psycopg2-binary>=2.8.6",
     "prometheus-client>=0.8.0",
     "pyopenssl>=26.0.0",

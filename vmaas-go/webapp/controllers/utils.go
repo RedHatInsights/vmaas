@@ -39,7 +39,7 @@ func bindValidateJSON(c *gin.Context, request interface{}) error {
 		return err
 	}
 
-	if reqest, ok := (request).(*vmaas.Request); ok {
+	if reqest, ok := request.(*vmaas.Request); ok {
 		for i, m := range reqest.Modules {
 			if m.Module == nil {
 				return fmt.Errorf("'module_name' is a required property - 'modules_list.%d'", i)
