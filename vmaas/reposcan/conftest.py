@@ -61,6 +61,28 @@ EXPECTED_CSAF = (
 )
 
 
+@pytest.fixture(autouse=True)
+def _stop_leftover_sync_task():
+    """Ensure no background sync worker survives a test and pollutes the shared DB.
+
+    Reposcan API tests (e.g. test_add_repo_*) POST to /api/v1/repos, which starts an
+    asynchronous import in a separate spawned SyncTask worker process with its own DB
+    connection. That import is only best-effort cancelled by the test. If the worker is
+    still running when a later test runs, it can commit rows (such as the
+    'testing-repo-name' content_set) to the shared test database after that test's
+    reset_db(), causing intermittent failures like test_integration.test_phase_1
+    (assert 2 == 1). Terminate any worker still running at teardown so it cannot leak a
+    late commit across a test boundary; any row it already committed is then removed by
+    the next test's reset_db().
+    """
+    yield
+    # Imported lazily so collection never depends on the sync worker being initialized.
+    from vmaas.reposcan.reposcan import SyncTask  # pylint: disable=import-outside-toplevel
+
+    if SyncTask.workers is not None and SyncTask.is_running():
+        SyncTask.cancel()
+
+
 @pytest.fixture(scope="session")
 def db_conn():
     """Fixture for db connection."""
