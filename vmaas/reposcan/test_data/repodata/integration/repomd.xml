@@ -19,8 +19,8 @@
     <database_version>10</database_version>
   </data>
   <data type="updateinfo">
-    <checksum type="sha256">00c97ae1530653dc3ce79eff18994ebfe29e5776d464c70f66977d6076961665</checksum>
-    <open-checksum type="sha256">1ec9205ebcba9763139f71f4e454ef55b1a2b831257494d3645ff372a2efc18d</open-checksum>
+    <checksum type="sha256">9cdffd0bef34214f3877c7ba6c16d48dd3fdd13c4f7ca2c087df378a5e076436</checksum>
+    <open-checksum type="sha256">e84fba05b16b56aa084e0a113e7746633dc2fb444f55ec9a239f18b2a4b75e74</open-checksum>
     <location href="repodata/updateinfo.xml.gz"/>
     <timestamp>1515549133</timestamp>
     <size>1164888</size>
