@@ -167,7 +167,9 @@ class RepositoryController:
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
                     FAILED_METADATA_CHECKSUM.inc()
                 except ValueError as err:
-                    self.logger.warning("Unsupported checksum type '%s' for %s: %s", checksum_type, local_path, str(err))
+                    self.logger.warning("Unsupported checksum type '%s' for %s (repo: %s, arch: %s, releasever: %s): %s",
+                                        checksum_type, local_path, repository.content_set, repository.basearch,
+                                        repository.releasever, str(err))
                     failed[local_path] = CHECKSUM_VERIFICATION_FAILED
                     FAILED_METADATA_CHECKSUM.inc()
                 except Exception:  # pylint: disable=broad-except
