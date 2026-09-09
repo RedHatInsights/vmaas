@@ -21,6 +21,10 @@ def verify_file_checksum(file_path, expected_checksum, checksum_type):
     # Map common checksum type names to hashlib algorithm names
     checksum_type = checksum_type.lower()
 
+    # Handle 'sha' checksum type from older repositories
+    if checksum_type == 'sha':
+        checksum_type = 'sha1'
+
     # Compute the file's checksum
     try:
         hasher = hashlib.new(checksum_type)

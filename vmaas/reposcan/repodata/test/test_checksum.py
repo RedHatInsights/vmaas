@@ -80,6 +80,25 @@ class TestChecksum:
         finally:
             os.unlink(temp_path)
 
+    def test_transition_sha_checksum(self):
+        """
+        Test that legacy 'sha' checksum type is treated as 'sha1'.
+        Older repositories use checksum type='sha' in their repomd.xml.
+        This tests that 'sha' is silently mapped to 'sha1' for compatibility.
+        """
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+            temp_file.write("test content\n")
+            temp_path = temp_file.name
+
+        # SHA1 of "test content\n"
+        expected = "4fe2b8dd12cd9cd6a413ea960cd8c09c25f19527"
+
+        try:
+            # Legacy 'sha' should be treated as 'sha1' and pass verification without error
+            verify_file_checksum(temp_path, expected, "sha")
+        finally:
+            os.unlink(temp_path)
+
     def test_case_insensitive_checksum(self):
         """Test whether checksum comparison is case-insensitive."""
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
