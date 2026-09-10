@@ -134,8 +134,8 @@ github.com/quic-go/quic-go v0.59.1 h1:0Gmua0HW1Tv7ANR7hUYwRyD0MG5OJfgvYSZasGZzBi
 github.com/quic-go/quic-go v0.59.1/go.mod h1:upnsH4Ju1YkqpLXC305eW3yDZ4NfnNbmQRCMWS58IKU=
 github.com/redhatinsights/app-common-go v1.6.9 h1:juGobZnDvMqpx6DAO2qq9aFk/g93MblQQVVPPwTAfdM=
 github.com/redhatinsights/app-common-go v1.6.9/go.mod h1:KW0BK+bnhp3kXU8BFwebQXqCqjdkcRewZsDlXCSNMyo=
-github.com/redhatinsights/vmaas-lib v1.32.4 h1:zhdYPp4YyFBV+yOSTWX0r9dgx/A5KVN4clVvnRfmcIo=
-github.com/redhatinsights/vmaas-lib v1.32.4/go.mod h1:MHk+lbx+j1h6gqqjYKUUBCfem4lMiT0Rl0/+eEA+qvs=
+github.com/redhatinsights/vmaas-lib v1.33.0 h1:ZcRUU/2LI7jJnuYeBEP2q3YIVD03TEgw0mO88vnb4tM=
+github.com/redhatinsights/vmaas-lib v1.33.0/go.mod h1:MHk+lbx+j1h6gqqjYKUUBCfem4lMiT0Rl0/+eEA+qvs=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/sirupsen/logrus v1.9.4 h1:TsZE7l11zFCLZnZ+teH4Umoq5BhEIfIzfRDZ1Uzql2w=
