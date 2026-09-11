@@ -94,8 +94,7 @@ SYNC_REPO_LIST_SOURCE = os.getenv("SYNC_REPO_LIST_SOURCE", str(RepoListSource.MA
 # Allow to optionally disable some parts of sync (e.g. to speed up testing)
 SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
-SYNC_CPE = strtobool(os.getenv("SYNC_CPE", "yes"))
-SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))
+SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))  # CPE sync is included in CSAF sync
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
 REPO_SYNC_QUEUE_INTERVAL_MINUTES = int(os.getenv("REPO_SYNC_QUEUE_INTERVAL_MINUTES", "5"))
@@ -881,69 +880,57 @@ class CvemapSyncHandler(SyncHandler):
         return "OK"
 
 
-class CpeSyncHandler(SyncHandler):
-    """Handler for Cpe sync API."""
-
-    task_type = "Sync CPE metadata"
-
-    @classmethod
-    def put(cls, **kwargs):
-        """Sync CPE metadata."""
-
-        status_code, status_msg = cls.start_task()
-        return status_msg, status_code
-
-    @staticmethod
-    def run_task(*args, **kwargs):
-        """Function to start syncing all CVEs."""
-        try:
-            init_logging()
-            init_db()
-            controller = CpeController()
-            controller.store()
-        except Exception as err:  # pylint: disable=broad-except
-            msg = "Internal server error <%s>" % hash(err)
-            LOGGER.exception(msg)
-            FAILED_IMPORT_CPE.inc()
-            DatabaseHandler.rollback()
-            if isinstance(err, DatabaseError):
-                return "DB_ERROR"
-            return "ERROR"
-        finally:
-            DatabaseHandler.close_connection()
-        return "OK"
-
-
 def metrics():
     """Generate Prometheus metrics."""
     return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 
 class CsafSyncHandler(SyncHandler):
-    """Handler for CSAF sync API."""
+    """Handler for CPE + CSAF sync API."""
 
-    task_type = "Sync CSAF metadata"
+    task_type = "Sync CPE + CSAF metadata"
 
     @classmethod
     def put(cls, sync_all=False, **kwargs):
-        """Sync CSAF metadata."""
+        """Sync CPE + CSAF metadata."""
 
         status_code, status_msg = cls.start_task(sync_all=sync_all)
         return status_msg, status_code
 
     @staticmethod
-    def run_task(*args, **kwargs):
-        """Function to start syncing CSAFs."""
+    def run_task(*args, **kwargs):  # pylint: disable=too-many-return-statements
+        """Function to start syncing CPEs and CSAFs."""
         try:
             sync_all = kwargs.get("sync_all", False)
             init_logging()
             init_db()
-            controller = CsafController()
-            controller.store(sync_all=sync_all)
+
+            try:
+                cpe_controller = CpeController()
+                cpe_controller.store()
+            except Exception as err:  # pylint: disable=broad-except
+                msg = "CPE sync error <%s>" % hash(err)
+                LOGGER.exception(msg)
+                FAILED_IMPORT_CPE.inc()
+                DatabaseHandler.rollback()
+                if isinstance(err, DatabaseError):
+                    return "DB_ERROR"
+                return "ERROR"
+
+            try:
+                controller = CsafController()
+                controller.store(sync_all=sync_all)
+            except Exception as err:  # pylint: disable=broad-except
+                msg = "CSAF sync error <%s>" % hash(err)
+                LOGGER.exception(msg)
+                CSAF_FAILED_IMPORT.inc()
+                DatabaseHandler.rollback()
+                if isinstance(err, DatabaseError):
+                    return "DB_ERROR"
+                return "ERROR"
         except Exception as err:  # pylint: disable=broad-except
             msg = "Internal server error <%s>" % hash(err)
             LOGGER.exception(msg)
-            CSAF_FAILED_IMPORT.inc()
             DatabaseHandler.rollback()
             if isinstance(err, DatabaseError):
                 return "DB_ERROR"
@@ -1046,8 +1033,7 @@ def all_sync_handlers() -> list:
     handlers.extend([KatelloRepoListHandler] if SYNC_REPO_LIST_SOURCE == RepoListSource.KATELLO else [])  # type: ignore[list-item]
     handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
-    handlers.extend([CpeSyncHandler] if SYNC_CPE else [])  # type: ignore[list-item]
-    handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]
+    handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]  # CPE is included in CSAF sync
     handlers.extend([ReleaseSyncHandler] if SYNC_RELEASES else [])  # type: ignore[list-item]
     handlers.extend([ReleaseGraphSyncHandler] if SYNC_RELEASE_GRAPH else [])  # type: ignore[list-item]
     return handlers
