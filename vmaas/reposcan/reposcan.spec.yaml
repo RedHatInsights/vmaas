@@ -204,19 +204,9 @@ paths:
       tags:
         - Sync
 
-  /sync/cpe:
-    put:
-      summary: Sync CPE metadata
-      operationId: vmaas.reposcan.reposcan.CpeSyncHandler.put
-      <<: *secured
-      responses:
-        <<: *sync_responses
-      tags:
-        - Sync
-
   /sync/csaf:
     put:
-      summary: Sync CSAF metadata
+      summary: Sync CPE + CSAF metadata
       operationId: vmaas.reposcan.reposcan.CsafSyncHandler.put
       <<: *secured
       parameters:
