@@ -172,27 +172,27 @@ arches:
     name: mpdecimal
     evr: 2.5.1-3.el9
     sourcerpm: mpdecimal-2.5.1-3.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-1.20.1-28.el9_8.5.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-1.20.1-28.el9_8.6.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 45914
-    checksum: sha256:4434134fe86e0bb445beaa624661cf3d25d14e30fe0c8b9af78a0d2c2a042777
+    size: 46072
+    checksum: sha256:b578313ca4e91efdba71acd8694c2abbdc2324772d91493f325b506bbb465cd2
     name: nginx
-    evr: 2:1.20.1-28.el9_8.5
-    sourcerpm: nginx-1.20.1-28.el9_8.5.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-core-1.20.1-28.el9_8.5.x86_64.rpm
+    evr: 2:1.20.1-28.el9_8.6
+    sourcerpm: nginx-1.20.1-28.el9_8.6.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-core-1.20.1-28.el9_8.6.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 593526
-    checksum: sha256:f3b57f41db3765603f2b195aed9b2410a3803e20a31d84bd4b22f820a38f9955
+    size: 595771
+    checksum: sha256:c4f0b6160dd764a8507ae8a7bf4b725a3c0cd288a41fc7f6103fd298dcac30e0
     name: nginx-core
-    evr: 2:1.20.1-28.el9_8.5
-    sourcerpm: nginx-1.20.1-28.el9_8.5.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-filesystem-1.20.1-28.el9_8.5.noarch.rpm
+    evr: 2:1.20.1-28.el9_8.6
+    sourcerpm: nginx-1.20.1-28.el9_8.6.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/n/nginx-filesystem-1.20.1-28.el9_8.6.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 17539
-    checksum: sha256:dd719c68fb0a659400ba0a82f460ecc60bc287ee587776b548899d3a9f78b723
+    size: 17708
+    checksum: sha256:855287d121559addddae5d3581d56e8df37d6ba5bbb93bafcfe7c20ceab4f9e4
     name: nginx-filesystem
-    evr: 2:1.20.1-28.el9_8.5
-    sourcerpm: nginx-1.20.1-28.el9_8.5.src.rpm
+    evr: 2:1.20.1-28.el9_8.6
+    sourcerpm: nginx-1.20.1-28.el9_8.6.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/o/openssl-devel-3.5.5-6.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 5029526
@@ -795,12 +795,12 @@ arches:
     checksum: sha256:2f5ece89d6a8d892816f386462d8be291ad83f1500b4c4b3655dcc7ed5192c0d
     name: mpdecimal
     evr: 2.5.1-3.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/n/nginx-1.20.1-28.el9_8.5.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/n/nginx-1.20.1-28.el9_8.6.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
-    size: 1142712
-    checksum: sha256:73fad54a25ddd764b93d9c28403aefe8cad3e274cc0d9a7c74a0861374e373ea
+    size: 1152675
+    checksum: sha256:eb6314a74de561c09f3afa6fae140b684022100f710896fdc74d8a213436c091
     name: nginx
-    evr: 2:1.20.1-28.el9_8.5
+    evr: 2:1.20.1-28.el9_8.6
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/p/postgresql-16.14-1.module+el9.8.0+24360+ff98e86a.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
     size: 48442323
@@ -1132,7 +1132,7 @@ arches:
     name: zstd
     evr: 1.5.5-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/9a8a13a357ae6a6e8ba3afdbca49e3587f5cde9f07e32d7582840c72581b8566-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/1f5bdfd38fb983eaf0f39b0dfaf9f320d1d8fdd1225eb0b6e4c02705d2ad6a51-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 68115
-    checksum: sha256:9a8a13a357ae6a6e8ba3afdbca49e3587f5cde9f07e32d7582840c72581b8566
+    checksum: sha256:1f5bdfd38fb983eaf0f39b0dfaf9f320d1d8fdd1225eb0b6e4c02705d2ad6a51
