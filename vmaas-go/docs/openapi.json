@@ -59,7 +59,6 @@
           },
           "type": "array"
         },
-        "description": "TODO: use `omitzero` from go1.24",
         "type": "object"
       },
       "vmaas.CveDetail": {
@@ -929,7 +928,8 @@
             "type": "string"
           },
           "rpm_name_list": {
-            "$ref": "#/components/schemas/vmaas.ContentData"
+            "$ref": "#/components/schemas/vmaas.ContentData",
+            "description": "TODO: use `omitzero` from go1.24"
           }
         },
         "type": "object"
@@ -1438,7 +1438,7 @@
       "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
     },
     "title": "VMaaS webapp API",
-    "version": "3.12.0"
+    "version": "3.12.1"
   },
   "externalDocs": {
     "description": "",
@@ -1452,16 +1452,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.CvesRequest",
-                    "summary": "cve_list",
-                    "description": "cve_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.CvesRequest",
+                "summary": "cve_list",
+                "description": "cve_list"
               }
             }
           },
@@ -1607,16 +1600,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.ErrataRequest",
-                    "summary": "errata_list",
-                    "description": "errata_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.ErrataRequest",
+                "summary": "errata_list",
+                "description": "errata_list"
               }
             }
           },
@@ -1782,16 +1768,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.RPMPkgNamesRequest",
-                    "summary": "rpm_name_list",
-                    "description": "rpm_name_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.RPMPkgNamesRequest",
+                "summary": "rpm_name_list",
+                "description": "rpm_name_list"
               }
             }
           },
@@ -1909,16 +1888,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest",
-                    "summary": "srpm_name_list",
-                    "description": "srpm_name_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.SRPMPkgNamesRequest",
+                "summary": "srpm_name_list",
+                "description": "srpm_name_list"
               }
             }
           },
@@ -2036,16 +2008,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.PackagesRequest",
-                    "summary": "package_list",
-                    "description": "package_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.PackagesRequest",
+                "summary": "package_list",
+                "description": "package_list"
               }
             }
           },
@@ -2163,16 +2128,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.Request",
-                    "summary": "package_list",
-                    "description": "package_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.Request",
+                "summary": "package_list",
+                "description": "package_list"
               }
             }
           },
@@ -2337,16 +2295,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.PkgTreeRequest",
-                    "summary": "package_name_list",
-                    "description": "package_name_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.PkgTreeRequest",
+                "summary": "package_name_list",
+                "description": "package_name_list"
               }
             }
           },
@@ -2464,16 +2415,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.ReposRequest",
-                    "summary": "repository_list",
-                    "description": "repository_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.ReposRequest",
+                "summary": "repository_list",
+                "description": "repository_list"
               }
             }
           },
@@ -2591,16 +2535,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.Request",
-                    "summary": "package_list",
-                    "description": "package_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.Request",
+                "summary": "package_list",
+                "description": "package_list"
               }
             }
           },
@@ -2746,16 +2683,9 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "type": "object"
-                  },
-                  {
-                    "$ref": "#/components/schemas/vmaas.Request",
-                    "summary": "package_list",
-                    "description": "package_list"
-                  }
-                ]
+                "$ref": "#/components/schemas/vmaas.Request",
+                "summary": "package_list",
+                "description": "package_list"
               }
             }
           },
