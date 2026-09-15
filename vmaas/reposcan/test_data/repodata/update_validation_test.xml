@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updates>
+  <update from="you@your_domain.com" status="stable" type="security" version="1.4">
+    <id>vmaas_test_1</id>
+    <title>VMaaS test errata</title>
+    <release>CentOS other</release>
+    <issued date="2018-04-05 10:50:53" />
+    <updated date="2018-04-05 10:50:53" />
+    <severity>Critical</severity>
+    <references>
+      <reference href="references" type="CEFS"/>
+    </references>
+    <description>VMaaS test errata</description>
+    <pkglist>
+      <collection short="EL-other">
+        <name>CentOS other</name>
+        <package arch="noarch" epoch="0" name="test-vmaas" release="3" src="" version="0.3">
+          <filename>test-vmaas-0.3-3.noarch.rpm</filename>
+        </package>
+      </collection>
+    </pkglist>
+  </update>
+</updates>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updates>
+<update from="you@your_domain.com" status="stable" type="security" version="1.4">
+<id>vmaas_test_x86_64_1</id>
+<title>VMaaS test errata for x86_64 package #1</title>
+<release>CentOS other</release>
+<issued date="2018-04-14 10:50:53" />
+<updated date="2018-04-14 10:50:53" />
+<severity>Moderate</severity>
+<references>
+<reference href="references" type="CEFS"/>
+</references>
+<description>VMaaS test errata</description>
+<pkglist>
+<collection short="EL-other">
+<name>CentOS other</name>
+<package arch="x86_64" epoch="0" name="test-arch-vmaas" release="2" src="" version="2">
+<filename>test-arch-vmaas-2-2.x86_64.rpm</filename>
+</package>
+</collection>
+</pkglist>
+</update>
+<update from="you@your_domain.com" status="stable" type="security" version="1.4">
+<id>vmaas_test_x86_64_2</id>
+<title>VMaaS test errata for x86_64 package #2</title>
+<release>CentOS other</release>
+<issued date="2018-04-16 10:50:53" />
+<updated date="2018-04-16 10:50:53" />
+<severity>Critical</severity>
+<references>
+<reference href="references" type="CEFS"/>
+</references>
+<description>VMaaS test errata</description>
+<pkglist>
+<collection short="EL-other">
+<name>CentOS other</name>
+<package arch="INVALID_ARCH" epoch="0" name="test-arch-vmaas" release="3" src="" version="3">
+<filename>test-arch-vmaas-3-3.INVALID_ARCH.rpm</filename>
+</package>
+</collection>
+</pkglist>
+</update>
+<update from="you@your_domain.com" status="stable" type="security" version="1.4">
+<id>vmaas_test_i386_1.1</id>
+<title>VMaaS test errata for i386 package #1 from x86_64</title>
+<release>CentOS other</release>
+<issued date="2018-04-14 10:50:53" />
+<updated date="2018-04-14 10:50:53" />
+<severity>Moderate</severity>
+<references>
+<reference href="references" id="999999" type="bugzilla" title="Not a CVE"/>
+</references>
+<description>VMaaS test errata</description>
+<pkglist>
+<collection short="EL-other">
+<name>CentOS other</name>
+<package arch="i386" epoch="0" name="test-arch-vmaas" release="2" src="" version="2">
+<filename>test-arch-vmaas-2-2.i386.rpm</filename>
+</package>
+</collection>
+</pkglist>
+</update>
+<update from="you@your_domain.com" status="stable" type="security" version="1.4">
+<id>vmaas_test_i386_2.1</id>
+<title>VMaaS test errata for i386 package #2 from x86_64 repo</title>
+<release>CentOS other</release>
+<issued date="2018-04-16 10:50:53" />
+<updated date="2018-04-16 10:50:53" />
+<severity>Critical</severity>
+<references>
+<reference href="references" id="CVE-INVALID" type="cve" title="Bad CVE"/>
+</references>
+<description>VMaaS test errata</description>
+<pkglist>
+<collection short="EL-other">
+<name>CentOS other</name>
+<package arch="i386" epoch="0" name="test-arch-vmaas" release="3" src="" version="3">
+<filename>test-arch-vmaas-3-3.i386.rpm</filename>
+</package>
+</collection>
+</pkglist>
+</update>
+</updates>
