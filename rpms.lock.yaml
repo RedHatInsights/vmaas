@@ -704,13 +704,6 @@ arches:
     name: systemd
     evr: 252-67.el9_8.6
     sourcerpm: systemd-252-67.el9_8.6.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/s/systemd-libs-252-67.el9_8.6.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 662007
-    checksum: sha256:d491d7375ed820bf4fa0d5f6d80a6f1a72cfa6ff31e79dabf9288246061cf88e
-    name: systemd-libs
-    evr: 252-67.el9_8.6
-    sourcerpm: systemd-252-67.el9_8.6.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/s/systemd-pam-252-67.el9_8.6.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-rpms
     size: 258340
@@ -1139,7 +1132,7 @@ arches:
     name: zstd
     evr: 1.5.5-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/aecbf3d071e0ded2f7f36d9f2bc95199a5fdf7d8ccc8785afe9ba4d601fe3ccd-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/aaa485a55271d00fdc760cc4f40a7c55fdf52eeaf443cd49f35f1b9ad5e8c413-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 69979
-    checksum: sha256:aecbf3d071e0ded2f7f36d9f2bc95199a5fdf7d8ccc8785afe9ba4d601fe3ccd
+    size: 70375
+    checksum: sha256:aaa485a55271d00fdc760cc4f40a7c55fdf52eeaf443cd49f35f1b9ad5e8c413
