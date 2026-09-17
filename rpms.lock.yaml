@@ -186,20 +186,20 @@ arches:
     name: popt-devel
     evr: 1.18-8.el9
     sourcerpm: popt-1.18-8.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/p/postgresql-18.4-2.module+el9.8.0+24359+da7fad50.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/p/postgresql-18.6-1.module+el9.8.0+24816+5c11f535.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 2155327
-    checksum: sha256:fa4fe5e4d4e9df24295ce6910c4f085c8938b0b44853495fc3c85c42828dbc5f
+    size: 2167044
+    checksum: sha256:82e1b3160276b529c38cfed352078e183553f65e6d9631ff23b18a0571e69884
     name: postgresql
-    evr: 18.4-2.module+el9.8.0+24359+da7fad50
-    sourcerpm: postgresql-18.4-2.module+el9.8.0+24359+da7fad50.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/p/postgresql-private-libs-18.4-2.module+el9.8.0+24359+da7fad50.x86_64.rpm
+    evr: 18.6-1.module+el9.8.0+24816+5c11f535
+    sourcerpm: postgresql-18.6-1.module+el9.8.0+24816+5c11f535.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/p/postgresql-private-libs-18.6-1.module+el9.8.0+24816+5c11f535.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 167946
-    checksum: sha256:71f7e51e54c450532e656cbcd3b14e9454cc584076d6bf6e475369d4ad4ba1ec
+    size: 168276
+    checksum: sha256:87f3bd7c43ff87e0068d1edfd1829f03087aea453f3dc8c081a02e5cd78fdfd7
     name: postgresql-private-libs
-    evr: 18.4-2.module+el9.8.0+24359+da7fad50
-    sourcerpm: postgresql-18.4-2.module+el9.8.0+24359+da7fad50.src.rpm
+    evr: 18.6-1.module+el9.8.0+24816+5c11f535
+    sourcerpm: postgresql-18.6-1.module+el9.8.0+24816+5c11f535.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/p/python-unversioned-command-3.9.25-7.el9_8.3.noarch.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 15791
@@ -669,13 +669,6 @@ arches:
     name: systemd
     evr: 252-67.el9_8.6
     sourcerpm: systemd-252-67.el9_8.6.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/s/systemd-libs-252-67.el9_8.6.x86_64.rpm
-    repoid: rhel-9-for-x86_64-baseos-rpms
-    size: 662007
-    checksum: sha256:d491d7375ed820bf4fa0d5f6d80a6f1a72cfa6ff31e79dabf9288246061cf88e
-    name: systemd-libs
-    evr: 252-67.el9_8.6
-    sourcerpm: systemd-252-67.el9_8.6.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/s/systemd-pam-252-67.el9_8.6.x86_64.rpm
     repoid: rhel-9-for-x86_64-baseos-rpms
     size: 258340
@@ -767,12 +760,12 @@ arches:
     checksum: sha256:2f5ece89d6a8d892816f386462d8be291ad83f1500b4c4b3655dcc7ed5192c0d
     name: mpdecimal
     evr: 2.5.1-3.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/p/postgresql-18.4-2.module+el9.8.0+24359+da7fad50.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/p/postgresql-18.6-1.module+el9.8.0+24816+5c11f535.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
-    size: 47663882
-    checksum: sha256:7e6722b01c3aade7be4f1b6f5ac81085fd7c1f72bf9320415de0c785e619a704
+    size: 47790685
+    checksum: sha256:1feda293ece860fdae411325d46d5a27e0186a4e1480549d0237efd78448d18e
     name: postgresql
-    evr: 18.4-2.module+el9.8.0+24359+da7fad50
+    evr: 18.6-1.module+el9.8.0+24816+5c11f535
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/p/python3.12-3.12.14-1.el9_8.src.rpm
     repoid: rhel-9-for-x86_64-appstream-source-rpms
     size: 20894742
@@ -1086,7 +1079,7 @@ arches:
     name: zstd
     evr: 1.5.5-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/aecbf3d071e0ded2f7f36d9f2bc95199a5fdf7d8ccc8785afe9ba4d601fe3ccd-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/aaa485a55271d00fdc760cc4f40a7c55fdf52eeaf443cd49f35f1b9ad5e8c413-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 69979
-    checksum: sha256:aecbf3d071e0ded2f7f36d9f2bc95199a5fdf7d8ccc8785afe9ba4d601fe3ccd
+    size: 70375
+    checksum: sha256:aaa485a55271d00fdc760cc4f40a7c55fdf52eeaf443cd49f35f1b9ad5e8c413
