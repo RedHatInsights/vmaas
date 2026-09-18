@@ -162,6 +162,61 @@ class TestCsafStore:
         res = cur.fetchone()
         assert not res
 
+    def test_store_missing_packages(self, csaf_store: CsafStore) -> None:
+        """CSAF products can be stored before the RPM repository catalog exists."""
+        cve = "CVE-2026-9999"
+        timestamp = datetime.now(timezone.utc)
+        affected_package = "affected-package"
+        fixed_package = "fixed-package-1:2.3.4-5.el9.x86_64"
+        csaf_data = m.CsafData(
+            files=m.CsafFiles(
+                {"file": m.CsafFile("file", timestamp, cves=[cve], cve_file_timestamp=timestamp)}
+            ),
+            cves=m.CsafCves(
+                {
+                    cve: m.CsafProducts(
+                        [
+                            m.CsafProduct("cpe:/o:redhat:enterprise_linux:9", affected_package, 4),
+                            m.CsafProduct("cpe:/o:redhat:enterprise_linux:9", fixed_package, 3),
+                        ]
+                    )
+                }
+            ),
+        )
+        cur = csaf_store.conn.cursor()
+        cur.execute("INSERT INTO cve (name) VALUES (%s)", (cve,))
+        csaf_store.conn.commit()
+
+        csaf_store.store(csaf_data)
+
+        cur.execute("SELECT name FROM package_name ORDER BY name")
+        assert cur.fetchall() == [(affected_package,), ("fixed-package",)]
+        cur.execute(
+            """
+            SELECT evr.epoch, evr.version, evr.release, arch.name
+            FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            JOIN evr ON package.evr_id = evr.id
+            JOIN arch ON package.arch_id = arch.id
+            WHERE package_name.name = %s
+            """,
+            ("fixed-package",),
+        )
+        assert cur.fetchall() == [("1", "2.3.4", "5.el9", "x86_64")]
+        cur.execute(
+            """
+            SELECT package_name.name, csaf_product.package_id IS NOT NULL
+            FROM csaf_cve_product
+            JOIN csaf_product ON csaf_cve_product.csaf_product_id = csaf_product.id
+            JOIN package_name ON csaf_product.package_name_id = package_name.id
+            WHERE csaf_cve_product.cve_id = (SELECT id FROM cve WHERE name = %s)
+            ORDER BY package_name.name
+            """,
+            (cve,),
+        )
+        assert cur.fetchall() == [(affected_package, False), ("fixed-package", True)]
+        cur.close()
+
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
         """Test getting product attribute_id."""
         mapping = {"key": 9}
