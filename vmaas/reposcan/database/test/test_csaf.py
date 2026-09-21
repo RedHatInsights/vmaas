@@ -11,6 +11,7 @@ import vmaas.reposcan.redhatcsaf.modeling as m
 from vmaas.reposcan.conftest import reset_db
 from vmaas.reposcan.conftest import write_testing_data
 from vmaas.reposcan.database.csaf_store import CsafStore
+from vmaas.reposcan.database.package_store import PackageStore
 
 
 EXISTING_PRODUCTS = [
@@ -215,6 +216,58 @@ class TestCsafStore:
             (cve,),
         )
         assert cur.fetchall() == [(affected_package, False), ("fixed-package", True)]
+        cur.execute(
+            """
+            SELECT description, source_package_id FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            WHERE package_name.name = %s
+            """,
+            ("fixed-package",),
+        )
+        assert cur.fetchone() == (None, None)
+
+        cur.execute("INSERT INTO product (name) VALUES ('product') RETURNING id")
+        product_id = cur.fetchone()[0]
+        cur.execute("INSERT INTO content_set (label, product_id) VALUES ('content-set', %s) RETURNING id", (product_id,))
+        content_set_id = cur.fetchone()[0]
+        cur.execute(
+            "INSERT INTO repo (url, content_set_id, org_id, eol) VALUES ('repo-url', %s, 1, false) RETURNING id",
+            (content_set_id,),
+        )
+        repo_id = cur.fetchone()[0]
+        csaf_store.conn.commit()
+
+        description = "Fixed package description"
+        PackageStore().store(  # type: ignore[no-untyped-call]
+            repo_id,
+            [
+                {
+                    "name": "fixed-package",
+                    "epoch": "1",
+                    "ver": "2.3.4",
+                    "rel": "5.el9",
+                    "arch": "x86_64",
+                    "srpm": "fixed-package-1:2.3.4-5.el9.src.rpm",
+                    "summary": "Fixed package summary",
+                    "description": description,
+                }
+            ],
+        )
+        cur.execute(
+            """
+            SELECT package.description, package.source_package_id, source_arch.name FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            LEFT JOIN package AS source_package ON package.source_package_id = source_package.id
+            LEFT JOIN arch AS source_arch ON source_package.arch_id = source_arch.id
+            WHERE package_name.name = %s
+              AND package.arch_id = (SELECT id FROM arch WHERE name = 'x86_64')
+            """,
+            ("fixed-package",),
+        )
+        description_after_sync, source_package_id, source_arch = cur.fetchone()
+        assert description_after_sync == description
+        assert source_package_id is not None
+        assert source_arch == "src"
         cur.close()
 
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
