@@ -122,6 +122,40 @@ class CsafStore(ObjectStore):
             raise KeyError(f"missing {attr_type}={value}") from err
 
     def _load_product_attr_ids(self, products: model.CsafProducts) -> None:
+        package_names: set[str] = set()
+        fixed_packages: list[dict[str, str | None]] = []
+        parsed_fixed_packages: dict[int, tuple[str, str, str, str, str]] = {}
+        skipped = []
+        for product in products:
+            if product.status_id == model.CsafProductStatus.KNOWN_AFFECTED:
+                package_names.add(product.package)
+            elif product.status_id == model.CsafProductStatus.FIXED:
+                try:
+                    parsed_package = rpm.parse_rpm_name(product.package, raise_exception=True)
+                except rpm.RPMParseException as err:
+                    self.logger.debug("Skipping product %s, %s", product, err)
+                    skipped.append(product)
+                    continue
+                parsed_fixed_packages[id(product)] = parsed_package
+                name, epoch, ver, rel, arch = parsed_package
+                package_names.add(name)
+                fixed_packages.append(
+                    {
+                        "name": name,
+                        "epoch": epoch,
+                        "ver": ver,
+                        "rel": rel,
+                        "arch": arch,
+                        "srpm": None,
+                        "summary": None,
+                        "description": None,
+                    }
+                )
+        self.package_store.populate_csaf_packages(package_names, fixed_packages)
+
+        for product in skipped:
+            products.remove(product)
+
         skipped = []
         for product in products:
             try:
@@ -138,8 +172,7 @@ class CsafStore(ObjectStore):
                             "package_name", self.package_store.package_name_map, value=product.package
                         )
                     case model.CsafProductStatus.FIXED:
-                        # parse package into NEVRA
-                        name, epoch, ver, rel, arch = rpm.parse_rpm_name(product.package)
+                        name, epoch, ver, rel, arch = parsed_fixed_packages[id(product)]
                         name_id = self.package_store.package_name_map[name]
                         evr_id = self.package_store.evr_map[(epoch, ver, rel)]
                         arch_id = self.package_store.arch_map[arch]
@@ -151,7 +184,7 @@ class CsafStore(ObjectStore):
                         raise NotImplementedError(f"Unsupported product_status_id '{product.status_id}'")
 
                 products.add_to_lookup(product)
-            except (AttributeError, KeyError, rpm.RPMParseException) as err:
+            except (AttributeError, KeyError) as err:
                 self.logger.debug("Skipping product %s, %s", product, err)
                 skipped.append(product)
 

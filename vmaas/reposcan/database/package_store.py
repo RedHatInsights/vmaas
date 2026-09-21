@@ -83,6 +83,14 @@ class PackageStore(ObjectStore):
         self.populate_dep_table("package_name", unique_names, self.package_name_map)
         self.populate_evrs(unique_evrs)
 
+    def populate_csaf_packages(
+        self, package_names: set[str], packages: list[dict[str, str | None]]
+    ) -> None:
+        """Populate package records referenced by CSAF data without a repository association."""
+        self.populate_dep_table("package_name", package_names, self.package_name_map)
+        self._populate_dependent_tables(packages)
+        self._populate_packages(packages)
+
     def _get_source_package_id(self, pkg):
         source_package_id = None
         if pkg["srpm"]:
