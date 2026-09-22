@@ -124,7 +124,7 @@ class CsafStore(ObjectStore):
     def _load_product_attr_ids(self, products: model.CsafProducts) -> None:
         package_names: set[str] = set()
         fixed_packages: list[dict[str, str | None]] = []
-        parsed_fixed_packages: dict[int, rpm.ParsedNEVRA] = {}
+        parsed_fixed_packages: dict[str, rpm.ParsedNEVRA] = {}
         skipped = []
         for product in products:
             if product.status_id == model.CsafProductStatus.KNOWN_AFFECTED:
@@ -136,7 +136,7 @@ class CsafStore(ObjectStore):
                     self.logger.debug("Skipping product %s, %s", product, err)
                     skipped.append(product)
                     continue
-                parsed_fixed_packages[id(product)] = parsed_package
+                parsed_fixed_packages[product.package] = parsed_package
                 package_names.add(parsed_package.name)
                 fixed_packages.append(
                     {
@@ -171,7 +171,7 @@ class CsafStore(ObjectStore):
                             "package_name", self.package_store.package_name_map, value=product.package
                         )
                     case model.CsafProductStatus.FIXED:
-                        name, epoch, ver, rel, arch = parsed_fixed_packages[id(product)]
+                        name, epoch, ver, rel, arch = parsed_fixed_packages[product.package]
                         name_id = self.package_store.package_name_map[name]
                         evr_id = self.package_store.evr_map[(epoch, ver, rel)]
                         arch_id = self.package_store.arch_map[arch]
