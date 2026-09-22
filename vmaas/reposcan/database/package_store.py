@@ -19,6 +19,11 @@ class PackageStore(ObjectStore):
         self.evr_map = self._prepare_table_map(cols=["epoch", "version", "release"], table="evr")
         self.package_name_map = self._prepare_table_map(cols=["name"], table="package_name")
         self.package_map = self._prepare_table_map(cols=["name_id", "evr_id", "arch_id"], table="package")
+        self.package_csaf_no_metadata_map = self._prepare_table_map(
+            cols=["name_id", "evr_id", "arch_id"],
+            table="package",
+            where="summary IS NULL AND arch_id != (SELECT id FROM arch WHERE name = 'src')",
+        )
 
     def populate_dep_table(self, table, unique_items, table_map):
         """Populate dependency table with column 'name'."""
@@ -83,6 +88,14 @@ class PackageStore(ObjectStore):
         self.populate_dep_table("package_name", unique_names, self.package_name_map)
         self.populate_evrs(unique_evrs)
 
+    def populate_csaf_packages(
+        self, package_names: set[str], packages: list[dict[str, str | None]]
+    ) -> None:
+        """Populate package records referenced by CSAF data without a repository association."""
+        self.populate_dep_table("package_name", package_names, self.package_name_map)
+        self._populate_dependent_tables(packages)
+        self._populate_packages(packages)
+
     def _get_source_package_id(self, pkg):
         source_package_id = None
         if pkg["srpm"]:
@@ -94,7 +107,7 @@ class PackageStore(ObjectStore):
             source_package_id = self.package_map[(name_id, evr_id, arch_id)]
         return source_package_id
 
-    def _populate_packages(self, packages):
+    def _populate_packages(self, packages):  # pylint: disable=too-many-branches
         unique_packages = {}
         for pkg in packages:
             name_id = self.package_name_map[pkg["name"]]
@@ -105,11 +118,17 @@ class PackageStore(ObjectStore):
                 (name_id, evr_id, arch_id, pkg["summary"], pkg["description"], source_package_id)
         package_ids = []
         to_import = []
+        to_update = []
         for name_id, evr_id, arch_id in unique_packages:
-            if (name_id, evr_id, arch_id) not in self.package_map:
-                to_import.append(unique_packages[(name_id, evr_id, arch_id)])
+            package_key = (name_id, evr_id, arch_id)
+            if package_key not in self.package_map:
+                to_import.append(unique_packages[package_key])
             else:
-                package_ids.append(self.package_map[(name_id, evr_id, arch_id)])
+                package_id = self.package_map[package_key]
+                package_ids.append(package_id)
+                package = unique_packages[package_key]
+                if package_key in self.package_csaf_no_metadata_map and any(package[3:]):
+                    to_update.append((package_key, package_id, package[3], package[4], package[5]))
 
         self.logger.debug("Packages to import: %d", len(to_import))
         if to_import:
@@ -127,6 +146,25 @@ class PackageStore(ObjectStore):
                 self.conn.commit()
             except Exception:  # pylint: disable=broad-except
                 self.logger.exception("Failure while inserting into package table")
+                self.conn.rollback()
+            finally:
+                cur.close()
+        if to_update:
+            cur = self.conn.cursor()
+            try:
+                execute_values(cur,
+                               """update package as p set
+                                      summary = coalesce(p.summary, v.summary),
+                                      description = coalesce(p.description, v.description),
+                                      source_package_id = coalesce(p.source_package_id, v.source_package_id)
+                                   from (values %s) as v(id, summary, description, source_package_id)
+                                   where p.id = v.id""",
+                               [package[1:] for package in to_update], page_size=len(to_update))
+                self.conn.commit()
+                for package_key, *_ in to_update:
+                    self.package_csaf_no_metadata_map.pop(package_key, None)
+            except Exception:  # pylint: disable=broad-except
+                self.logger.exception("Failure while updating package metadata")
                 self.conn.rollback()
             finally:
                 cur.close()
