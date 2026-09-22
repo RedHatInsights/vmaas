@@ -11,6 +11,7 @@ import vmaas.reposcan.redhatcsaf.modeling as m
 from vmaas.reposcan.conftest import reset_db
 from vmaas.reposcan.conftest import write_testing_data
 from vmaas.reposcan.database.csaf_store import CsafStore
+from vmaas.reposcan.database.package_store import PackageStore
 
 
 EXISTING_PRODUCTS = [
@@ -162,6 +163,113 @@ class TestCsafStore:
         res = cur.fetchone()
         assert not res
 
+    def test_store_missing_packages(self, csaf_store: CsafStore) -> None:
+        """CSAF products can be stored before the RPM repository catalog exists."""
+        cve = "CVE-2026-9999"
+        timestamp = datetime.now(timezone.utc)
+        affected_package = "affected-package"
+        fixed_package = "fixed-package-1:2.3.4-5.el9.x86_64"
+        csaf_data = m.CsafData(
+            files=m.CsafFiles(
+                {"file": m.CsafFile("file", timestamp, cves=[cve], cve_file_timestamp=timestamp)}
+            ),
+            cves=m.CsafCves(
+                {
+                    cve: m.CsafProducts(
+                        [
+                            m.CsafProduct("cpe:/o:redhat:enterprise_linux:9", affected_package, 4),
+                            m.CsafProduct("cpe:/o:redhat:enterprise_linux:9", fixed_package, 3),
+                        ]
+                    )
+                }
+            ),
+        )
+        cur = csaf_store.conn.cursor()
+        cur.execute("INSERT INTO cve (name) VALUES (%s)", (cve,))
+        csaf_store.conn.commit()
+
+        csaf_store.store(csaf_data)
+
+        cur.execute("SELECT name FROM package_name ORDER BY name")
+        assert cur.fetchall() == [(affected_package,), ("fixed-package",)]
+        cur.execute(
+            """
+            SELECT evr.epoch, evr.version, evr.release, arch.name
+            FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            JOIN evr ON package.evr_id = evr.id
+            JOIN arch ON package.arch_id = arch.id
+            WHERE package_name.name = %s
+            """,
+            ("fixed-package",),
+        )
+        assert cur.fetchall() == [("1", "2.3.4", "5.el9", "x86_64")]
+        cur.execute(
+            """
+            SELECT package_name.name, csaf_product.package_id IS NOT NULL
+            FROM csaf_cve_product
+            JOIN csaf_product ON csaf_cve_product.csaf_product_id = csaf_product.id
+            JOIN package_name ON csaf_product.package_name_id = package_name.id
+            WHERE csaf_cve_product.cve_id = (SELECT id FROM cve WHERE name = %s)
+            ORDER BY package_name.name
+            """,
+            (cve,),
+        )
+        assert cur.fetchall() == [(affected_package, False), ("fixed-package", True)]
+        cur.execute(
+            """
+            SELECT description, source_package_id FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            WHERE package_name.name = %s
+            """,
+            ("fixed-package",),
+        )
+        assert cur.fetchone() == (None, None)
+
+        cur.execute("INSERT INTO product (name) VALUES ('product') RETURNING id")
+        product_id = cur.fetchone()[0]
+        cur.execute("INSERT INTO content_set (label, product_id) VALUES ('content-set', %s) RETURNING id", (product_id,))
+        content_set_id = cur.fetchone()[0]
+        cur.execute(
+            "INSERT INTO repo (url, content_set_id, org_id, eol) VALUES ('repo-url', %s, 1, false) RETURNING id",
+            (content_set_id,),
+        )
+        repo_id = cur.fetchone()[0]
+        csaf_store.conn.commit()
+
+        description = "Fixed package description"
+        PackageStore().store(  # type: ignore[no-untyped-call]
+            repo_id,
+            [
+                {
+                    "name": "fixed-package",
+                    "epoch": "1",
+                    "ver": "2.3.4",
+                    "rel": "5.el9",
+                    "arch": "x86_64",
+                    "srpm": "fixed-package-1:2.3.4-5.el9.src.rpm",
+                    "summary": "Fixed package summary",
+                    "description": description,
+                }
+            ],
+        )
+        cur.execute(
+            """
+            SELECT package.description, package.source_package_id, source_arch.name FROM package
+            JOIN package_name ON package.name_id = package_name.id
+            LEFT JOIN package AS source_package ON package.source_package_id = source_package.id
+            LEFT JOIN arch AS source_arch ON source_package.arch_id = source_arch.id
+            WHERE package_name.name = %s
+              AND package.arch_id = (SELECT id FROM arch WHERE name = 'x86_64')
+            """,
+            ("fixed-package",),
+        )
+        description_after_sync, source_package_id, source_arch = cur.fetchone()
+        assert description_after_sync == description
+        assert source_package_id is not None
+        assert source_arch == "src"
+        cur.close()
+
     def test_get_product_attr_id(self, csaf_store: CsafStore) -> None:
         """Test getting product attribute_id."""
         mapping = {"key": 9}
@@ -177,14 +285,14 @@ class TestCsafStore:
         products_obj = m.CsafProducts(
             EXISTING_PRODUCTS
             + [
-                # will be skipped - missing cpe
+                # will be inserted - missing cpe
                 m.CsafProduct("cpe_missing", "pkg1000", 4, None),
                 # will be inserted - missing package
                 m.CsafProduct("cpe1000", "pkg_missing", 4, None),
             ]
         )
         csaf_store._load_product_attr_ids(products_obj)
-        assert len(products_obj) == len(EXISTING_PRODUCTS) + 1  # existing + missing cpe
+        assert len(products_obj) == len(EXISTING_PRODUCTS) + 2  # existing + missing cpe and package
         for product in products_obj:
             assert product.cpe_id
             assert product.package_name_id or product.package_id

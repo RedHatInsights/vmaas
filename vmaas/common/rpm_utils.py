@@ -3,12 +3,23 @@ SRPM processing functions module.
 """
 
 import re
+from typing import NamedTuple
 
 
 class RPMParseException(Exception):
     """
     SRPM name parsing exception.
     """
+
+
+class ParsedNEVRA(NamedTuple):
+    """Parsed RPM name, epoch, version, release, and architecture."""
+
+    name: str
+    epoch: str | None
+    version: str
+    release: str
+    arch: str
 
 
 # This will parse package names in the following formats:
@@ -22,7 +33,7 @@ NEVRA_RE = re.compile(
 
 
 def parse_rpm_name(rpm_name: str, default_epoch: str | None = None,
-                   raise_exception: bool = False) -> tuple[str, str, str, str, str]:
+                   raise_exception: bool = False) -> ParsedNEVRA:
     """
     Extract components from rpm name.
     """
@@ -34,7 +45,7 @@ def parse_rpm_name(rpm_name: str, default_epoch: str | None = None,
     if not match:
         if raise_exception:
             raise RPMParseException("Failed to parse rpm name '%s'!" % rpm_name)
-        return ('', default_epoch, '', '', '')
+        return ParsedNEVRA('', default_epoch, '', '', '')
 
     name = match.group('pn')
     epoch = match.group('e1')
@@ -45,7 +56,7 @@ def parse_rpm_name(rpm_name: str, default_epoch: str | None = None,
     version = match.group('ver')
     release = match.group('rel')
     arch = match.group('arch')
-    return name, epoch, version, release, arch
+    return ParsedNEVRA(name, epoch, version, release, arch)
 
 
 def join_rpm_name(name, epoch, version, release, arch):

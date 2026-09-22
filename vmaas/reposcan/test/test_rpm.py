@@ -10,12 +10,18 @@ class TestSrpm:
 
     def test_parse_1_srpm(self):
         """Test parsing valid srpm name."""
-        name, epoch, ver, rel, arch = rpm_utils.parse_rpm_name("389-ds-base-1.3.7.8-1.fc27.src.rpm")
+        parsed = rpm_utils.parse_rpm_name("389-ds-base-1.3.7.8-1.fc27.src.rpm")
+        name, epoch, ver, rel, arch = parsed
         assert epoch is None
         assert name == "389-ds-base"
         assert ver == "1.3.7.8"
         assert rel == "1.fc27"
         assert arch == "src"
+        assert parsed.name == name
+        assert parsed.epoch == epoch
+        assert parsed.version == ver
+        assert parsed.release == rel
+        assert parsed.arch == arch
 
     def test_parse_2_rpm(self):
         """Test parsing valid rpm name."""
