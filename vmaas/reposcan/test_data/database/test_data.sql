@@ -1,3 +1,5 @@
+DELETE FROM csaf_cve_product;
+DELETE FROM csaf_product;
 DELETE FROM errata_cve;
 DELETE FROM cve;
 DELETE FROM pkg_errata;
