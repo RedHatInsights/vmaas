@@ -195,18 +195,18 @@ class TestAssetManagerGetReleaseGraphs:
 
     def test_success(self):
         graph_content = json.dumps({"nodes": [], "edges": []})
+        # Index contains full paths
         fake_source = FakeAssetSource({
-            "release_graphs_index.json": json.dumps(["rhel9.json"]),
+            "release_graphs_index.json": json.dumps(["release_graphs/rhel9.json"]),
             "release_graphs/rhel9.json": graph_content,
         })
         with patch.object(AssetManager, "_get_source", return_value=fake_source), \
-                patch.object(reposcan, "RELEASE_GRAPH_INDEX_PATH", "release_graphs_index.json"), \
-                patch.object(reposcan, "RELEASE_GRAPH_DIR", "release_graphs"):
+                patch.object(reposcan, "RELEASE_GRAPH_INDEX_PATH", "release_graphs_index.json"):
             release_graphs = AssetManager.get_git_release_graphs()
 
         assert release_graphs is not None
-        assert "rhel9.json" in release_graphs
-        assert release_graphs["rhel9.json"].name == "rhel9.json"
+        assert "release_graphs/rhel9.json" in release_graphs
+        assert release_graphs["release_graphs/rhel9.json"].name == "release_graphs/rhel9.json"
 
     def test_missing_index_returns_none(self):
         fake_source = FakeAssetSource({})
@@ -222,13 +222,12 @@ class TestAssetManagerGetReleaseGraphs:
 
     def test_missing_listed_graph_file_returns_none(self):
         fake_source = FakeAssetSource({
-            "release_graphs_index.json": json.dumps(["rhel9.json", "rhel10.json"]),
+            "release_graphs_index.json": json.dumps(["release_graphs/rhel9.json", "release_graphs/rhel10.json"]),
             "release_graphs/rhel9.json": json.dumps({"nodes": []}),
             # rhel10.json intentionally missing
         })
         with patch.object(AssetManager, "_get_source", return_value=fake_source), \
-                patch.object(reposcan, "RELEASE_GRAPH_INDEX_PATH", "release_graphs_index.json"), \
-                patch.object(reposcan, "RELEASE_GRAPH_DIR", "release_graphs"):
+                patch.object(reposcan, "RELEASE_GRAPH_INDEX_PATH", "release_graphs_index.json"):
             assert AssetManager.get_git_release_graphs() is None
 
     def test_no_source_configured(self):

@@ -315,7 +315,7 @@ class AssetManager:
 
         release_graphs = {}
         for name in graph_names:
-            content = source.fetch(f"{RELEASE_GRAPH_DIR}/{name}")
+            content = source.fetch(name)
             if content is None:
                 return None
             release_graphs[name] = ReleaseGraph(name, content)
