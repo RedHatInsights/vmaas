@@ -69,7 +69,7 @@ class TestReposcanApp(TestCase):
                    "name": "Testing repo desc",
                    "baseurl": "http://localhost:8888/$releasever/$basearch/",
                    "releasever": ["Server"],
-                   "basearch": ["Arch"]
+                   "basearch": ["x86_64"]
                  }
                }
              }
@@ -97,7 +97,7 @@ class TestReposcanApp(TestCase):
                    "name": "Testing repo desc",
                    "baseurl": "http://localhost:8888/$releasever/$basearch/",
                    "releasever": ["Server"],
-                   "basearch": ["Arch"]
+                   "basearch": ["x86_64"]
                  }
                }
              }
