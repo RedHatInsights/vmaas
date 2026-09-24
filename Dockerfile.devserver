@@ -4,7 +4,7 @@ WORKDIR /devserver
 
 COPY requirements.txt /devserver/
 
-RUN microdnf install -y git-daemon nginx subscription-manager python3-pip && \
+RUN microdnf install -y nginx subscription-manager python3-pip && \
     microdnf clean all && \
     pip3 install --no-cache-dir -r requirements.txt
 
