@@ -1079,6 +1079,16 @@ data:
               "datasource": {
                 "uid": "$datasource"
               },
+              "expr": "sum(vmaas_reposcan_failed_repo_metadata_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "repomd download failed",
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
               "expr": "sum(vmaas_reposcan_failed_metadata_checksum_total)",
               "format": "time_series",
               "intervalFactor": 1,
