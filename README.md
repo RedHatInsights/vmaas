@@ -71,7 +71,7 @@ The devserver container provides a local environment for testing VMaaS with real
 **What it does:**
 - Downloads repository metadata (repomd.xml, primary, updateinfo, modules) from Red Hat CDN using subscription-manager
 - Serves the downloaded data via nginx on port 8000
-- Generates a repolist pointing to the local nginx server and serves it as a VMaaS asset under `/assets/`
+- Creates a local git repository (vmaas-assets.git) with the repolist pointing to the local nginx server
 
 **Usage:**
 1. Obtain your Red Hat System activation key from https://console.redhat.com/insights/connector/activation-keys
@@ -90,8 +90,8 @@ The devserver container provides a local environment for testing VMaaS with real
 4. On first run, it will:
    - Register with Red Hat Subscription Manager
    - Download repository metadata from Red Hat CDN
-   - Generate a repolist asset with modified URLs
-   - Start nginx
+   - Generate a local git repository with modified URLs
+   - Start nginx and git daemon
    - Unregister from Red Hat Subscription Manager and free the entitlement allocation
 
 5. Now you can sync your repository data into VMaaS using reposcan API:
