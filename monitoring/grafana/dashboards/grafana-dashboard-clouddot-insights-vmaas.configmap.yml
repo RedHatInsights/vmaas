@@ -1079,11 +1079,61 @@ data:
               "datasource": {
                 "uid": "$datasource"
               },
+              "expr": "sum(vmaas_reposcan_failed_repo_metadata_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "repomd download failed",
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
               "expr": "sum(vmaas_reposcan_failed_metadata_checksum_total)",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "metadata checksum failed",
               "refId": "E"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_csaf_download_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "csaf download failed",
+              "refId": "F"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_csaf_import_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "csaf import failed",
+              "refId": "G"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_csaf_update_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "csaf update failed",
+              "refId": "H"
+            },
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "expr": "sum(vmaas_reposcan_failed_csaf_delete_total)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "csaf delete failed",
+              "refId": "I"
             }
           ],
           "title": "vmaas reposync errors",
