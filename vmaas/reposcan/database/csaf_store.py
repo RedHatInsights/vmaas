@@ -38,6 +38,9 @@ class CsafStoreRetryCVE(CsafStoreSkippedCVE):
     """CsafStoreRetryCVE exception."""
 
 
+PRODUCT_QUERY_BATCH_SIZE = 500
+
+
 class CsafStore(ObjectStore):
     """Class providing interface for fetching/importing CSAF data from/into the DB."""
 
@@ -297,9 +300,11 @@ class CsafStore(ObjectStore):
                         module_null=val["module_null"],  # type: ignore[arg-type]
                         package_null=val["package_null"],  # type: ignore[arg-type]
                     )
-                    cur.execute(formatted_query, (product_tuples,))
-                    rows = cur.fetchall()
-                    all_rows.extend(rows)
+                    for i in range(0, len(product_tuples), PRODUCT_QUERY_BATCH_SIZE):
+                        batch = product_tuples[i: i + PRODUCT_QUERY_BATCH_SIZE]
+                        cur.execute(formatted_query, (batch,))
+                        rows = cur.fetchall()
+                        all_rows.extend(rows)
 
             self._set_product_ids(all_rows, products)
         except Exception as exc:
