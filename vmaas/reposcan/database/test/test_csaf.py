@@ -402,3 +402,42 @@ class TestCsafStore:
         csaf_store._update_file_timestamp(CVE, files)
         self.assert_cve_count(csaf_store, 0)
         self.assert_file_timestamp(csaf_store, timestamp)
+
+    def _setup_large_products(self, csaf_store: CsafStore, count: int) -> None:
+        """Insert a large number of CPEs, packages, and products into the DB."""
+        timestamp = datetime.now()
+        write_testing_data(csaf_store.conn)
+
+        cpes = tuple((10_000 + i, f"cpe{10_000 + i}") for i in range(count))
+        package_names = tuple((10_000 + i, f"pkg{10_000 + i}") for i in range(count))
+        packages = tuple((10_000 + i, 10_000 + i, 201, 1, timestamp) for i in range(count))
+        db_products = tuple((10_000 + i, 10_000 + i, 10_000 + i, None, None) for i in range(count))
+
+        cur = csaf_store.conn.cursor()
+        execute_values(cur, "INSERT INTO cpe(id, label) VALUES %s", cpes)
+        execute_values(cur, "INSERT INTO package_name(id, name) VALUES %s", package_names)
+        execute_values(
+            cur, "INSERT INTO package(id, name_id, evr_id, arch_id, modified) VALUES %s", packages
+        )
+        execute_values(
+            cur,
+            "INSERT INTO csaf_product(id, cpe_id, package_name_id, package_id, module_stream) VALUES %s",
+            db_products,
+        )
+        csaf_store.conn.commit()
+        cur.close()
+
+    def test_update_product_ids_batch(self, csaf_store: CsafStore) -> None:
+        """Test that _update_product_ids handles large numbers of products.
+        """
+        count = 10000
+        self._setup_large_products(csaf_store, count)
+
+        store = CsafStore()
+        products_obj = m.CsafProducts(
+            [m.CsafProduct(f"cpe{10_000 + i}", f"pkg{10_000 + i}", 4, None) for i in range(count)]
+        )
+        store._update_product_ids(products_obj)
+
+        matched = [p for p in products_obj if p.id_ is not None]
+        assert len(matched) == count
