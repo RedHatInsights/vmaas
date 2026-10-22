@@ -26,6 +26,7 @@ from vmaas.reposcan.download.downloader import DownloadItem
 from vmaas.reposcan.download.downloader import FileDownloader
 from vmaas.reposcan.download.downloader import VALID_HTTP_CODES
 from vmaas.reposcan.download.unpacker import TarZstUnpacker
+from vmaas.reposcan.exporter import main as export_data
 from vmaas.reposcan.mnm import CSAF_FAILED_DOWNLOAD
 from vmaas.reposcan.redhatcsaf.modeling import CsafCves
 from vmaas.reposcan.redhatcsaf.modeling import CsafData
@@ -310,6 +311,17 @@ class CsafController:
                     self.csaf_store.store(to_store)
                 finally:
                     self.clean(batch=batch)
+
+                # Export after every batch instead of only once at the end of the full sync,
+                # so the webapp can pick up a partial-but-valid cache almost immediately (via
+                # its existing PeriodicCacheReload poll) instead of blocking on the entire CSAF
+                # sync. Safe because export reads committed data via MVCC snapshots and writes
+                # atomically (temp file + symlink swap) - a mid-sync export just reflects
+                # whatever's been committed so far.
+                try:
+                    export_data()
+                except Exception:  # pylint: disable=broad-except
+                    self.logger.exception("Incremental export after batch %d/%d failed", i, len(batches))
             self.csaf_store.delete_unreferenced_products()
         finally:
             self.clean()
