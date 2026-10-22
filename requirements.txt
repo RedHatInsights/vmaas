@@ -368,9 +368,9 @@ cryptography==50.0.2 ; python_version == "3.12" \
 gitdb==4.0.12 ; python_version == "3.12" \
     --hash=sha256:5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571 \
     --hash=sha256:67073e15955400952c6565cc3e707c554a4eea2e428946f7a4c162fab9bd9bcf
-gitpython==3.1.59 ; python_version == "3.12" \
-    --hash=sha256:0a1475cfdc38a5bfba1a3e9a4a9da52a39749ecec322b772915c019f94e5b7e4 \
-    --hash=sha256:67a82f537384578643624c8b2c531938a9b82be431663e575dcf638526631d4c
+gitpython==3.2.1 ; python_version == "3.12" \
+    --hash=sha256:0f1229ec5c057bdabdeeda8bda4f17bda679ab33dbccc00f24e6a480553c8613 \
+    --hash=sha256:d66b0832aa8755c1a84892937282df0befb16c97e5a64aeebd68be9c5e323f53
 h11==0.16.0 ; python_version == "3.12" \
     --hash=sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1 \
     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
