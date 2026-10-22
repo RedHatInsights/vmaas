@@ -11,6 +11,8 @@ from vmaas.common.config import Config
 from vmaas.common.logging_utils import get_logger, init_logging
 from vmaas.common.paths import DB_UPGRADES_PATH, DB_CREATE_SQL_PATH
 from vmaas.reposcan.database.database_handler import DatabaseHandler, init_db
+from vmaas.reposcan.exporter import DUMP
+from vmaas.reposcan.exporter import main as export_data
 
 LOGGER = get_logger(__name__)
 SCHEMA_VER_NAME = 'schema_version'
@@ -254,6 +256,14 @@ def main():
 
     upgrader = DatabaseUpgrade()
     upgrader.upgrade()
+
+    # On a fresh deploy there's no cache file yet, and the webapp will corrupt/retry against
+    # a 404 until reposcan's first sync produces one (which can take many minutes). Write a
+    # schema-valid, empty cache immediately so the webapp has something loadable on its very
+    # first attempt. Never overwrites an existing cache (real data from a prior run/restart).
+    if not os.path.exists(DUMP):
+        LOGGER.info("No cache file found, exporting an initial empty cache")
+        export_data()
 
 
 if __name__ == "__main__":
