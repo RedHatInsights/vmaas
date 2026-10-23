@@ -761,7 +761,7 @@ class SqliteDump:
         dump.execute("INSERT INTO dump_schema VALUES (?)", (DUMP_SCHEMA_VERSION,))
 
 
-def main():
+def main() -> None:
     """ Main loop."""
     init_logging()
     init_db()
