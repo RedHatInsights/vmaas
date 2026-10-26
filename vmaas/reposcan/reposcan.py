@@ -1287,6 +1287,9 @@ def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
     if not os.path.exists(DUMP):
         LOGGER.info("No cache file found, exporting an initial empty cache")
         export_data()
+        # export_data() only reads, never commits; without this the connection sits
+        # idle-in-transaction for the rest of the process's life if sync is disabled.
+        DatabaseHandler.rollback()
 
     startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
     startup_metrics_gauge_delay = int(os.getenv('METRICS_GAUGE_REFRESH_DELAY_SECONDS', "30"))
