@@ -168,14 +168,14 @@ class TestReposcanApp(TestCase):
 def _create_app():
     """Call create_app() the same way main.py does."""
     return reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
-                                 reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
-                                 "": "reposcan.healthz.spec.yaml"})
+                                reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
+                                "": "reposcan.healthz.spec.yaml"})
 
 
 class TestReposcanInitialCache:
     """Test the startup bootstrap of an initial empty cache in create_app()."""
 
-    def test_exports_and_rolls_back_when_cache_missing(self, tmp_path, monkeypatch):
+    def test_missing_cache_exports(self, tmp_path, monkeypatch):
         """No cache file yet: create_app() exports one and rolls back the connection."""
         dump_file = tmp_path / "vmaas.db"
         export_mock = MagicMock()
@@ -189,7 +189,7 @@ class TestReposcanInitialCache:
         export_mock.assert_called_once()
         rollback_mock.assert_called_once()
 
-    def test_skips_export_when_cache_exists(self, tmp_path, monkeypatch):
+    def test_existing_cache_skips(self, tmp_path, monkeypatch):
         """Existing cache: create_app() must not export or touch the file."""
         dump_file = tmp_path / "vmaas.db"
         dump_file.write_bytes(b"existing-cache")
