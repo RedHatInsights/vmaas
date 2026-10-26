@@ -6,8 +6,9 @@ import socket
 import threading
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from vmaas.reposcan import reposcan
 from vmaas.reposcan.test.test_case import TestCase
 
 
@@ -162,3 +163,44 @@ class TestReposcanApp(TestCase):
         """Test metrics endpoint."""
         resp = self.fetch('/metrics', method='GET')
         self.assertEqual(HTTPStatus.OK, resp.status)
+
+
+def _create_app():
+    """Call create_app() the same way main.py does."""
+    return reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
+                                 reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
+                                 "": "reposcan.healthz.spec.yaml"})
+
+
+class TestReposcanInitialCache:
+    """Test the startup bootstrap of an initial empty cache in create_app()."""
+
+    def test_exports_and_rolls_back_when_cache_missing(self, tmp_path, monkeypatch):
+        """No cache file yet: create_app() exports one and rolls back the connection."""
+        dump_file = tmp_path / "vmaas.db"
+        export_mock = MagicMock()
+        rollback_mock = MagicMock()
+        monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
+        monkeypatch.setattr(reposcan, "export_data", export_mock)
+        monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
+
+        _create_app()
+
+        export_mock.assert_called_once()
+        rollback_mock.assert_called_once()
+
+    def test_skips_export_when_cache_exists(self, tmp_path, monkeypatch):
+        """Existing cache: create_app() must not export or touch the file."""
+        dump_file = tmp_path / "vmaas.db"
+        dump_file.write_bytes(b"existing-cache")
+        export_mock = MagicMock()
+        rollback_mock = MagicMock()
+        monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
+        monkeypatch.setattr(reposcan, "export_data", export_mock)
+        monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
+
+        _create_app()
+
+        export_mock.assert_not_called()
+        rollback_mock.assert_not_called()
+        assert dump_file.read_bytes() == b"existing-cache"
