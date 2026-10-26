@@ -1274,22 +1274,28 @@ def sync_queued_repos():
     RepoQueueSyncHandler.start_task(queue=queue)
 
 
-def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
-    """Create reposcan app."""
-    init_logging()
-    SyncTask.init()
-    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+def bootstrap_initial_cache():
+    """Write a schema-valid empty cache if none exists yet (fresh deploy).
 
-    # On a fresh deploy there's no cache file yet, and the webapp will retry against a 404
-    # until this process's first sync produces one (which can take many minutes). Write a
-    # schema-valid, empty cache immediately so the webapp has something loadable on its very
-    # first attempt. Never overwrites an existing cache (real data from a prior run/restart).
+    The webapp will retry against a 404 until this process's first sync produces a cache
+    (which can take many minutes). Never overwrites an existing cache (real data from a
+    prior run/restart).
+    """
     if not os.path.exists(DUMP):
         LOGGER.info("No cache file found, exporting an initial empty cache")
         export_data()
         # export_data() only reads, never commits; without this the connection sits
         # idle-in-transaction for the rest of the process's life if sync is disabled.
         DatabaseHandler.rollback()
+
+
+def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
+    """Create reposcan app."""
+    init_logging()
+    SyncTask.init()
+    LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+
+    bootstrap_initial_cache()
 
     startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
     startup_metrics_gauge_delay = int(os.getenv('METRICS_GAUGE_REFRESH_DELAY_SECONDS', "30"))
