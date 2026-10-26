@@ -165,18 +165,17 @@ class TestReposcanApp(TestCase):
         self.assertEqual(HTTPStatus.OK, resp.status)
 
 
-def _create_app():
-    """Call create_app() the same way main.py does."""
-    return reposcan.create_app({reposcan.DEFAULT_PATH + "/v1": "reposcan.spec.yaml",
-                                reposcan.DEFAULT_PATH_API + "/v1": "reposcan.spec.yaml",
-                                "": "reposcan.healthz.spec.yaml"})
-
-
 class TestReposcanInitialCache:
-    """Test the startup bootstrap of an initial empty cache in create_app()."""
+    """Test bootstrap_initial_cache(), called by create_app() on reposcan startup.
+
+    Calls bootstrap_initial_cache() directly rather than create_app() itself: create_app()
+    starts a real BackgroundScheduler against the shared DatabaseHandler connection, which
+    previously raced test_integration.py's reset_db() (DROP/CREATE SCHEMA) and left it in
+    an aborted-transaction state.
+    """
 
     def test_missing_cache_exports(self, tmp_path, monkeypatch):
-        """No cache file yet: create_app() exports one and rolls back the connection."""
+        """No cache file yet: exports one and rolls back the connection."""
         dump_file = tmp_path / "vmaas.db"
         export_mock = MagicMock()
         rollback_mock = MagicMock()
@@ -184,13 +183,13 @@ class TestReposcanInitialCache:
         monkeypatch.setattr(reposcan, "export_data", export_mock)
         monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
 
-        _create_app()
+        reposcan.bootstrap_initial_cache()
 
         export_mock.assert_called_once()
         rollback_mock.assert_called_once()
 
     def test_existing_cache_skips(self, tmp_path, monkeypatch):
-        """Existing cache: create_app() must not export or touch the file."""
+        """Existing cache: must not export or touch the file."""
         dump_file = tmp_path / "vmaas.db"
         dump_file.write_bytes(b"existing-cache")
         export_mock = MagicMock()
@@ -199,7 +198,7 @@ class TestReposcanInitialCache:
         monkeypatch.setattr(reposcan, "export_data", export_mock)
         monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
 
-        _create_app()
+        reposcan.bootstrap_initial_cache()
 
         export_mock.assert_not_called()
         rollback_mock.assert_not_called()
