@@ -222,6 +222,24 @@ paths:
       tags:
         - Sync
 
+  /sync/vexfeed:
+    put:
+      summary: Sync CPE + GA VEX feed metadata
+      operationId: vmaas.reposcan.reposcan.VexFeedSyncHandler.put
+      <<: *secured
+      parameters:
+        - name: sync_all
+          description: Sync all VEX feed files (clean re-sync)
+          required: false
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        <<: *sync_responses
+      tags:
+        - Sync
+
   /sync/release:
     put:
       summary: Sync RHEL OS release version metadata

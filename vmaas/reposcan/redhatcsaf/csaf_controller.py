@@ -66,10 +66,11 @@ class CsafController:
         self._signature_verifier: SignatureVerifier | None = None
         self.archive_name: str = "archive.tar.zst"
         self.archive_timestamp: datetime | None = None
+        self.base_url: str = CSAF_VEX_BASE_URL
 
     def _download_index(self) -> dict[Path, int]:
         """Download CSAF index changes.csv file."""
-        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_INDEX_CSV,
+        item = DownloadItem(source_url=self.base_url + CSAF_VEX_INDEX_CSV,
                             target_path=self.tmp_directory / CSAF_VEX_INDEX_CSV)
         self.downloader.add(item)
         self.downloader.run()
@@ -106,7 +107,7 @@ class CsafController:
     def _queue_download_csaf_payload_and_signature(self, csaf_payload_name: str) -> tuple[DownloadItem, DownloadItem | None]:
         """Queue a CSAF file/archive and optionally its signature for download."""
         file_item = DownloadItem(
-            source_url=CSAF_VEX_BASE_URL + csaf_payload_name,
+            source_url=self.base_url + csaf_payload_name,
             target_path=self.tmp_directory / csaf_payload_name,
         )
         self.downloader.add(file_item)
@@ -114,7 +115,7 @@ class CsafController:
             return (file_item, None)  # Signature verification is disabled, do not download signature files
 
         signature_item = DownloadItem(
-            source_url=CSAF_VEX_BASE_URL + csaf_payload_name + CSAF_VEX_SIGNATURE_FILE_SUFFIX,
+            source_url=self.base_url + csaf_payload_name + CSAF_VEX_SIGNATURE_FILE_SUFFIX,
             target_path=self.tmp_directory / (csaf_payload_name + CSAF_VEX_SIGNATURE_FILE_SUFFIX),
         )
         self.downloader.add(signature_item)
@@ -189,7 +190,7 @@ class CsafController:
         """Download CSAF archive."""
         # Download TXT file with latest archive name
         archive_latest_path = self.tmp_directory / CSAF_VEX_ARCHIVE_TXT
-        item = DownloadItem(source_url=CSAF_VEX_BASE_URL + CSAF_VEX_ARCHIVE_TXT,
+        item = DownloadItem(source_url=self.base_url + CSAF_VEX_ARCHIVE_TXT,
                             target_path=archive_latest_path)
         self.downloader.add(item)
         self.downloader.run()

@@ -46,6 +46,7 @@ from vmaas.reposcan.mnm import ADMIN_REQUESTS, FAILED_AUTH, FAILED_IMPORT_CVE, F
 from vmaas.reposcan.pkgtree import main as export_pkgtree, PKGTREE_FILE
 from vmaas.reposcan.redhatcpe.cpe_controller import CpeController
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
+from vmaas.reposcan.redhatcsaf.vexfeed_controller import VexFeedController
 from vmaas.reposcan.redhatcve.cvemap_controller import CvemapController
 from vmaas.reposcan.redhatrelease.release_controller import ReleaseController
 from vmaas.reposcan.repodata.repository_controller import RepositoryController
@@ -94,6 +95,7 @@ SYNC_REPO_LIST_SOURCE = os.getenv("SYNC_REPO_LIST_SOURCE", str(RepoListSource.MA
 SYNC_REPOS = strtobool(os.getenv("SYNC_REPOS", "yes"))
 SYNC_CVE_MAP = strtobool(os.getenv("SYNC_CVE_MAP", "yes"))
 SYNC_CSAF = strtobool(os.getenv("SYNC_CSAF", "yes"))  # CPE sync is included in CSAF sync
+SYNC_VEXFEED = strtobool(os.getenv("SYNC_VEXFEED", "yes"))
 SYNC_RELEASES = strtobool(os.getenv("SYNC_RELEASES", "yes"))
 SYNC_RELEASE_GRAPH = strtobool(os.getenv("SYNC_RELEASE_GRAPH", "yes"))
 REPO_SYNC_QUEUE_INTERVAL_MINUTES = int(os.getenv("REPO_SYNC_QUEUE_INTERVAL_MINUTES", "5"))
@@ -940,6 +942,47 @@ class CsafSyncHandler(SyncHandler):
         return "OK"
 
 
+class VexFeedSyncHandler(SyncHandler):
+    """Handler for CPE + GA VEX feed sync API."""
+
+    task_type = "Sync CPE + VEX feed metadata"
+
+    @classmethod
+    def put(cls, sync_all=False, **kwargs):
+        """Sync CPE + VEX feed metadata."""
+        status_code, status_msg = cls.start_task(sync_all=sync_all)
+        return status_msg, status_code
+
+    @staticmethod
+    def run_task(*args, **kwargs):
+        """Function to start syncing CPEs and GA VEX feed."""
+        stage = "init"
+        try:
+            sync_all = kwargs.get("sync_all", False)
+            init_logging()
+            init_db()
+            stage = "CPE"
+            cpe_controller = CpeController()
+            cpe_controller.store()
+            stage = "VEX feed"
+            controller = VexFeedController()
+            controller.store(sync_all=sync_all)
+        except Exception as err:  # pylint: disable=broad-except
+            msg = "Internal server error (%s) <%s>" % (stage, hash(err))
+            LOGGER.exception(msg)
+            if stage == "CPE":
+                FAILED_IMPORT_CPE.inc()
+            else:
+                CSAF_FAILED_IMPORT.inc()
+            DatabaseHandler.rollback()
+            if isinstance(err, DatabaseError):
+                return "DB_ERROR"
+            return "ERROR"
+        finally:
+            DatabaseHandler.close_connection()
+        return "OK"
+
+
 class ReleaseSyncHandler(SyncHandler):
     """Handler for RHEL OS release version sync API."""
 
@@ -1032,6 +1075,7 @@ def all_sync_handlers() -> list:
     handlers.extend([RepoSyncHandler] if SYNC_REPOS else [])  # type: ignore[list-item]
     handlers.extend([CvemapSyncHandler] if SYNC_CVE_MAP else [])  # type: ignore[list-item]
     handlers.extend([CsafSyncHandler] if SYNC_CSAF else [])  # type: ignore[list-item]  # CPE is included in CSAF sync
+    handlers.extend([VexFeedSyncHandler] if SYNC_VEXFEED else [])  # type: ignore[list-item]  # CPE is included in VEX feed sync
     handlers.extend([ReleaseSyncHandler] if SYNC_RELEASES else [])  # type: ignore[list-item]
     handlers.extend([ReleaseGraphSyncHandler] if SYNC_RELEASE_GRAPH else [])  # type: ignore[list-item]
     return handlers
