@@ -1257,11 +1257,26 @@ def sync_queued_repos():
     RepoQueueSyncHandler.start_task(queue=queue)
 
 
+def bootstrap_initial_cache():
+    """Write a schema-valid empty cache if none exists yet (fresh deploy).
+
+    The webapp will retry against a 404 until this process's first sync produces a cache
+    (which can take many minutes). Never overwrites an existing cache (real data from a
+    prior run/restart).
+    """
+    if not os.path.exists(DUMP):
+        LOGGER.info("No cache file found, exporting an initial empty cache")
+        export_data()
+
+
 def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements
     """Create reposcan app."""
     init_logging()
     SyncTask.init()
     LOGGER.info("Starting (version %s).", VMAAS_VERSION)
+
+    bootstrap_initial_cache()
+
     startup_sync_delay = int(os.getenv('REPOSCAN_SYNC_DELAY_MINUTES', "15"))
     startup_metrics_gauge_delay = int(os.getenv('METRICS_GAUGE_REFRESH_DELAY_SECONDS', "30"))
 

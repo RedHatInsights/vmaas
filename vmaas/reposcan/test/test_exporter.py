@@ -5,6 +5,8 @@ Unit test classes for exporter module.
 import time
 import sqlite3
 
+import psycopg2.extensions
+
 from vmaas.common.date_utils import parse_datetime
 from vmaas.reposcan.exporter import SqliteDump
 from vmaas.reposcan.conftest import write_testing_data
@@ -20,6 +22,9 @@ class TestExporter:
         write_testing_data(db_conn)
         sqlite_dump = SqliteDump(db_conn, TEST_DUMP_FILE)
         sqlite_dump.dump(time.time())
+
+        assert db_conn.get_transaction_status() == psycopg2.extensions.TRANSACTION_STATUS_IDLE
+
         with sqlite3.connect(TEST_DUMP_FILE) as dbdump:
             # from IPython import embed; embed()
 
@@ -32,6 +37,18 @@ class TestExporter:
             self.check_errata(dbdump)
             self.check_modules(dbdump)
             self.check_src_pkg_id(dbdump)
+
+    def test_failed_dump_commits(self, db_conn, monkeypatch):
+        """A failed dump must still commit/close the transaction, not leave it aborted."""
+        def _boom(self, dump):
+            raise RuntimeError("simulated dump failure")
+
+        monkeypatch.setattr(SqliteDump, "_dump_csaf", _boom)
+        sqlite_dump = SqliteDump(db_conn, TEST_DUMP_FILE)
+
+        sqlite_dump.dump(time.time())
+
+        assert db_conn.get_transaction_status() == psycopg2.extensions.TRANSACTION_STATUS_IDLE
 
     def check_predefined_content(self, dbdump):
         """Check the predefined database content"""
