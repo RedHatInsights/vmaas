@@ -124,6 +124,12 @@ class SqliteDump:
             for fname in old_data[self.keep_copies:]:
                 LOGGER.info("Removing old dump %s", fname)
                 remove_file_if_exists(fname)
+        finally:
+            # dump() only ever runs SELECTs against db_instance, so there's nothing to lose by
+            # always committing here (even after a failed query, Postgres treats COMMIT on an
+            # aborted transaction as a no-op rollback); this ends the transaction the named
+            # cursors above leave open so the caller's connection never idles in-transaction.
+            self.db_instance.commit()
 
     def _dump_content_set_src_pkg_names(self, dump):
         """Select all packages"""

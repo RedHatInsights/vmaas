@@ -1284,9 +1284,6 @@ def bootstrap_initial_cache():
     if not os.path.exists(DUMP):
         LOGGER.info("No cache file found, exporting an initial empty cache")
         export_data()
-        # export_data() only reads, never commits; without this the connection sits
-        # idle-in-transaction for the rest of the process's life if sync is disabled.
-        DatabaseHandler.rollback()
 
 
 def create_app(specs):  # pylint: disable=too-many-branches,too-many-statements

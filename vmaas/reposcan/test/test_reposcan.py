@@ -175,31 +175,25 @@ class TestReposcanInitialCache:
     """
 
     def test_missing_cache_exports(self, tmp_path, monkeypatch):
-        """No cache file yet: exports one and rolls back the connection."""
+        """No cache file yet: exports one."""
         dump_file = tmp_path / "vmaas.db"
         export_mock = MagicMock()
-        rollback_mock = MagicMock()
         monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
         monkeypatch.setattr(reposcan, "export_data", export_mock)
-        monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
 
         reposcan.bootstrap_initial_cache()
 
         export_mock.assert_called_once()
-        rollback_mock.assert_called_once()
 
     def test_existing_cache_skips(self, tmp_path, monkeypatch):
         """Existing cache: must not export or touch the file."""
         dump_file = tmp_path / "vmaas.db"
         dump_file.write_bytes(b"existing-cache")
         export_mock = MagicMock()
-        rollback_mock = MagicMock()
         monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
         monkeypatch.setattr(reposcan, "export_data", export_mock)
-        monkeypatch.setattr(reposcan.DatabaseHandler, "rollback", rollback_mock)
 
         reposcan.bootstrap_initial_cache()
 
         export_mock.assert_not_called()
-        rollback_mock.assert_not_called()
         assert dump_file.read_bytes() == b"existing-cache"
