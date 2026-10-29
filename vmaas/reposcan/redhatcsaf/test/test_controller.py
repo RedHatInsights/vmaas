@@ -1,12 +1,13 @@
 """Unit tests of csaf_controller.py."""
 import pathlib
+from collections.abc import Generator
 from datetime import datetime
 
 import pytest
 from psycopg2.extensions import connection
 
 import vmaas.reposcan.redhatcsaf.modeling as m
-from vmaas.reposcan.conftest import EXPECTED_CSAF
+from vmaas.reposcan.conftest import EXPECTED_CSAF, reset_db
 from vmaas.reposcan.redhatcsaf.csaf_controller import CsafController
 
 
@@ -14,11 +15,14 @@ class TestCsafController:
     """CsafController tests."""
 
     @pytest.fixture
-    def csaf(self, db_conn: connection) -> CsafController:  # pylint: disable=unused-argument
-        """Fixture returning CsafController obj with tmp_directory se to current directory."""
+    def csaf(  # pylint: disable=unused-argument
+        self, db_conn: connection
+    ) -> Generator[CsafController, None, None]:
+        """Fixture returning CsafController obj with tmp_directory set to current directory."""
         csaf = CsafController()
         csaf.tmp_directory = pathlib.Path(__file__).parent.resolve()
-        return csaf
+        yield csaf
+        reset_db(csaf.csaf_store.conn)
 
     @pytest.mark.parametrize("data", EXPECTED_CSAF, ids=[x[0] for x in EXPECTED_CSAF])
     def test_parse_csaf_file(self, data: tuple[str, m.CsafCves], csaf: CsafController) -> None:
