@@ -6,8 +6,9 @@ import socket
 import threading
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from vmaas.reposcan import reposcan
 from vmaas.reposcan.test.test_case import TestCase
 
 
@@ -162,3 +163,37 @@ class TestReposcanApp(TestCase):
         """Test metrics endpoint."""
         resp = self.fetch('/metrics', method='GET')
         self.assertEqual(HTTPStatus.OK, resp.status)
+
+
+class TestReposcanInitialCache:
+    """Test bootstrap_initial_cache(), called by create_app() on reposcan startup.
+
+    Calls bootstrap_initial_cache() directly rather than create_app() itself: create_app()
+    starts a real BackgroundScheduler against the shared DatabaseHandler connection, which
+    previously raced test_integration.py's reset_db() (DROP/CREATE SCHEMA) and left it in
+    an aborted-transaction state.
+    """
+
+    def test_missing_cache_exports(self, tmp_path, monkeypatch):
+        """No cache file yet: exports one."""
+        dump_file = tmp_path / "vmaas.db"
+        export_mock = MagicMock()
+        monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
+        monkeypatch.setattr(reposcan, "export_data", export_mock)
+
+        reposcan.bootstrap_initial_cache()
+
+        export_mock.assert_called_once()
+
+    def test_existing_cache_skips(self, tmp_path, monkeypatch):
+        """Existing cache: must not export or touch the file."""
+        dump_file = tmp_path / "vmaas.db"
+        dump_file.write_bytes(b"existing-cache")
+        export_mock = MagicMock()
+        monkeypatch.setattr(reposcan, "DUMP", str(dump_file))
+        monkeypatch.setattr(reposcan, "export_data", export_mock)
+
+        reposcan.bootstrap_initial_cache()
+
+        export_mock.assert_not_called()
+        assert dump_file.read_bytes() == b"existing-cache"
