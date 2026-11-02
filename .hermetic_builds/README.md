@@ -96,11 +96,11 @@ make generate-requirements-build-txt
 - **Input**: Requires `requirements.txt` and scripts `.hermetic_builds/prep_dependencies.sh` and `.hermetic_builds/generate_requirements_build.sh`.
 - **Output**: Creates `requirements-build.in` (updated) and `requirements-build.txt` with locked dependencies and hashes.
 - **Customization**:
-  - Ensure `.hermetic_builds/prep_dependencies.sh` installs `wget` and sets up `pip/pip3` and `python/python3` commands. If the `BASE_IMAGE` or environment changes, adjust the script to include necessary packages (e.g., `python3.12`, `python3.12-pip`, `wget`). Example snippet:
+  - Ensure `.hermetic_builds/prep_dependencies.sh` installs `wget` and sets up `pip/pip3` and `python/python3` commands. If the `BASE_IMAGE` or environment changes, adjust the script to include necessary packages (e.g., `python3.14`, `python3.14-pip`, `wget`). Example snippet:
     ```bash
-    microdnf install -y python3.12 python3.12-pip wget
-    ln -s $(which python3.12) /usr/local/bin/python3
-    ln -s $(which pip3.12) /usr/local/bin/pip3
+    microdnf install -y python3.14 python3.14-pip wget
+    ln -s $(which python3.14) /usr/local/bin/python3
+    ln -s $(which pip3.14) /usr/local/bin/pip3
     ```
   - Verify both scripts are executable (`chmod +x .hermetic_builds/*.sh`).
 - **Optional**: Specify a custom `BASE_IMAGE`, e.g., `make generate-requirements-build-txt BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest`.

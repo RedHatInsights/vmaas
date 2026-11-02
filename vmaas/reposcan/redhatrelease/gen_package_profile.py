@@ -6,7 +6,7 @@ External script to generate system package profile using DNF.
 
 This script is executed using platform Python and not imported directly
 due to incompatibility between platform Python version of the libdnf (and others) - 3.6
-and Python version running the application - 3.12.
+and Python version running the application - 3.14.
 
 This code might be included in the application after the running image is upgraded from UBI 8.
 """

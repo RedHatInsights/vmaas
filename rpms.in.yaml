@@ -1,7 +1,4 @@
-packages: [go-toolset, rpm-devel, python312, python3.12-pip, python3-rpm, python3-dnf, which, gzip, shadow-utils, diffutils, systemd, libicu, postgresql, cargo, rust, python3.12-devel, libffi-devel, postgresql-devel, openssl-devel]
+packages: [go-toolset, rpm-devel, python3.14, python3.14-pip, python3-rpm, python3-dnf, which, gzip, shadow-utils, diffutils, systemd, libicu, postgresql18, cargo, rust, python3.14-devel, libffi-devel, postgresql18-server-devel, openssl-devel]
 contentOrigin:
   repofiles: [".hermetic_builds/redhat.repo"]
 arches: [x86_64]
-
-moduleEnable:
-  - postgresql:18

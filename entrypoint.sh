@@ -1,7 +1,7 @@
 #!/bin/sh
 
 public_port () {
-    python3.12 -c "import os;import app_common_python as a;print(a.LoadedConfig.publicPort or os.getenv('BIND_PUBLIC_PORT', '8000'))"
+    python3.14 -c "import os;import app_common_python as a;print(a.LoadedConfig.publicPort or os.getenv('BIND_PUBLIC_PORT', '8000'))"
 }
 
 if [[ "$#" == "0" ]]; then
@@ -13,7 +13,7 @@ cd "$(dirname "$0")"
 
 if [[ "$1" == "database-upgrade" ]]; then
     set -e
-    python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade
+    python3.14 -m vmaas.common.wait_for_services python3.14 -m vmaas.reposcan.database.upgrade
     shift
 fi
 
@@ -25,7 +25,7 @@ if [[ ! -z $1 ]]; then
         /vmaas/go/src/vmaas/main reposcan-data-server &
         cd vmaas/reposcan
         port=$(public_port)
-        exec python3.12 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port --no-access-log main:app
+        exec python3.14 -m vmaas.common.wait_for_services uvicorn --host 0.0.0.0 --port $port --no-access-log main:app
     elif [[ "$1" == "sleep" ]]; then
         # "developer" mode
         echo "Sleeping ..."
