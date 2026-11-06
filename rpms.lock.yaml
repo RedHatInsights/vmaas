@@ -53,13 +53,13 @@ arches:
     name: cpp
     evr: 14.3.1-4.4.el10
     sourcerpm: gcc-14.3.1-4.4.el10.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/d/delve-1.26.1-2.el10_2.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/d/delve-1.26.1-3.el10_2.x86_64.rpm
     repoid: rhel-10-for-x86_64-appstream-rpms
-    size: 5726236
-    checksum: sha256:7e1a4940b4e32809f3eac2fbb5ce8516b0007e8413a6eb93b0cf45977877c0b7
+    size: 5742448
+    checksum: sha256:43824a35c281c4fa84743c2835ef02c7b8a6476af3a4dc53387a0477bd0c3fe2
     name: delve
-    evr: 1.26.1-2.el10_2
-    sourcerpm: delve-1.26.1-2.el10_2.src.rpm
+    evr: 1.26.1-3.el10_2
+    sourcerpm: delve-1.26.1-3.el10_2.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/g/gcc-14.3.1-4.4.el10.x86_64.rpm
     repoid: rhel-10-for-x86_64-appstream-rpms
     size: 39854147
@@ -130,13 +130,13 @@ arches:
     name: golang-src
     evr: 1.26.10-1.el10_2
     sourcerpm: golang-1.26.10-1.el10_2.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/k/kernel-headers-6.12.0-211.73.1.el10_2.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/k/kernel-headers-6.12.0-211.74.1.el10_2.x86_64.rpm
     repoid: rhel-10-for-x86_64-appstream-rpms
-    size: 3787953
-    checksum: sha256:152317192cffe55bac71d2512e63b86dc0e40e5090a42376803b9ac8ea33f257
+    size: 3789065
+    checksum: sha256:74eb045ad0eda5d8c2aec91eca86a813494480e2c29ef5b9e5b1e5e5a026f79d
     name: kernel-headers
-    evr: 6.12.0-211.73.1.el10_2
-    sourcerpm: kernel-6.12.0-211.73.1.el10_2.src.rpm
+    evr: 6.12.0-211.74.1.el10_2
+    sourcerpm: kernel-6.12.0-211.74.1.el10_2.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os/Packages/k/keyutils-libs-devel-1.6.3-5.el10.x86_64.rpm
     repoid: rhel-10-for-x86_64-appstream-rpms
     size: 66541
@@ -1131,6 +1131,13 @@ arches:
     name: libpkgconf
     evr: 2.1.0-3.el10
     sourcerpm: pkgconf-2.1.0-3.el10.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os/Packages/l/libpq-16.14-1.el10_2.x86_64.rpm
+    repoid: rhel-10-for-x86_64-baseos-rpms
+    size: 267622
+    checksum: sha256:3d17af5d06734a065ccc7f89d4f7a6bc84eb14bdc91f4241d8615cf7f3291850
+    name: libpq
+    evr: 16.14-1.el10_2
+    sourcerpm: libpq-16.14-1.el10_2.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os/Packages/l/libpwquality-1.4.5-12.el10.x86_64.rpm
     repoid: rhel-10-for-x86_64-baseos-rpms
     size: 129792
@@ -1341,13 +1348,13 @@ arches:
     name: tpm2-tss
     evr: 4.1.3-6.el10
     sourcerpm: tpm2-tss-4.1.3-6.el10.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os/Packages/t/tzdata-2026e-1.el10_2.noarch.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os/Packages/t/tzdata-2026f-1.el10_2.noarch.rpm
     repoid: rhel-10-for-x86_64-baseos-rpms
-    size: 936696
-    checksum: sha256:d0ce19e2ee66af9dc7b9b5c78fcbc79b0463997dcf9fbf7a63b4cd5157c41191
+    size: 937604
+    checksum: sha256:3f7e1eb06e0fdccdc43224b352853a59c7f26b9fd15e4ac21007f1003d914ee1
     name: tzdata
-    evr: 2026e-1.el10_2
-    sourcerpm: tzdata-2026e-1.el10_2.src.rpm
+    evr: 2026f-1.el10_2
+    sourcerpm: tzdata-2026f-1.el10_2.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os/Packages/u/util-linux-2.40.2-18.el10_2.20.x86_64.rpm
     repoid: rhel-10-for-x86_64-baseos-rpms
     size: 1328304
@@ -1388,12 +1395,12 @@ arches:
     checksum: sha256:9e58036fed799a4c985b5a234b3c8042eb25ca3b575934ba8c46c2bdd37a3f7d
     name: cmake
     evr: 3.31.8-1.el10
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/source/SRPMS/Packages/d/delve-1.26.1-2.el10_2.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/source/SRPMS/Packages/d/delve-1.26.1-3.el10_2.src.rpm
     repoid: rhel-10-for-x86_64-appstream-source-rpms
-    size: 9545607
-    checksum: sha256:a099f3f487558ab7ac959461554b05358b3fe0513954f32a82238f4ee9091707
+    size: 9545523
+    checksum: sha256:541df81951866cf0ebe50f708059c36765163ba9ad564e82edee7ff30019577b
     name: delve
-    evr: 1.26.1-2.el10_2
+    evr: 1.26.1-3.el10_2
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/source/SRPMS/Packages/g/git-2.52.0-1.el10.src.rpm
     repoid: rhel-10-for-x86_64-appstream-source-rpms
     size: 8050887
@@ -1826,12 +1833,12 @@ arches:
     checksum: sha256:5715b494471c7d28ee7dbac67ea1b1fdb6ab711e032dab9b2a062ee9c330de20
     name: jansson
     evr: 2.14-3.el10
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/k/kernel-6.12.0-211.73.1.el10_2.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/k/kernel-6.12.0-211.74.1.el10_2.src.rpm
     repoid: rhel-10-for-x86_64-baseos-source-rpms
-    size: 159942422
-    checksum: sha256:5f915d4426700e5da97925e5a40e6a8782e21a64d1077ed48ca6e77b8cb65100
+    size: 159948666
+    checksum: sha256:f66f3e61dd509124b0800708a68fbb360cbdce8eb607776fe49cef316c5824e3
     name: kernel
-    evr: 6.12.0-211.73.1.el10_2
+    evr: 6.12.0-211.74.1.el10_2
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/k/keyutils-1.6.3-5.el10.src.rpm
     repoid: rhel-10-for-x86_64-baseos-source-rpms
     size: 165798
@@ -1904,6 +1911,12 @@ arches:
     checksum: sha256:c4c5e3b25ef13eb5996c318dd2dcaa3ed01c36c9baf58926198df00abdeccc6b
     name: libfido2
     evr: 1.14.0-7.el10
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/l/libpq-16.14-1.el10_2.src.rpm
+    repoid: rhel-10-for-x86_64-baseos-source-rpms
+    size: 25032845
+    checksum: sha256:5b6500d1b6b584301ffa5fae465103483475881df71e8c95866604586601e34b
+    name: libpq
+    evr: 16.14-1.el10_2
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/l/libpwquality-1.4.5-12.el10.src.rpm
     repoid: rhel-10-for-x86_64-baseos-source-rpms
     size: 464773
@@ -2060,12 +2073,12 @@ arches:
     checksum: sha256:2d72c9bde823f6a7350ed12aa40cfe42934e09602dd14f3137d369d2713e6e8b
     name: tpm2-tss
     evr: 4.1.3-6.el10
-  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/t/tzdata-2026e-1.el10_2.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/t/tzdata-2026f-1.el10_2.src.rpm
     repoid: rhel-10-for-x86_64-baseos-source-rpms
-    size: 941701
-    checksum: sha256:4c2e93fdd2e869d735dfdcdb4b54c28abfe76483e1d76685052598c96a57ded3
+    size: 944379
+    checksum: sha256:94923e270f98951f006b0c104c5bf56af6425a2865147dce84b1fab127f08ae7
     name: tzdata
-    evr: 2026e-1.el10_2
+    evr: 2026f-1.el10_2
   - url: https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/source/SRPMS/Packages/u/util-linux-2.40.2-18.el10_2.20.src.rpm
     repoid: rhel-10-for-x86_64-baseos-source-rpms
     size: 9111194
