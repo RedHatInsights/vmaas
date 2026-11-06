@@ -99,8 +99,7 @@ class TestResponse:
         parsed = None
         try:
             parsed = response.json()
-        # pylint: disable=broad-except
-        except Exception:
+        except json.JSONDecodeError:
             pass
 
         if not parsed and response.content:
@@ -112,9 +111,7 @@ class TestResponse:
     @property
     def ok(self):
         """Checks if response has return code that indicates success."""
-        if self.raw and self.raw.status_code >= 200 and self.raw.status_code < 400:
-            return True
-        return False
+        return bool(self.raw and 200 <= self.raw.status_code < 400)
 
     def check_response(self, status_code=None, validate=True):
         """Asserts that the response HTTP status code and content is as expected."""
