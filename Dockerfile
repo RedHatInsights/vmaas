@@ -1,13 +1,13 @@
 ARG ALT_REPO
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1791898448@sha256:c4c285d42941ebb2bd4da878479008e1e4536bb599aad1dbe568f89de9053661 AS buildimg
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1793642335 AS buildimg
 
 ARG ALT_REPO
 
 ARG VAR_RPMS=""
-RUN (microdnf module enable -y postgresql:18 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
+RUN (microdnf repoquery postgresql18 | grep postgresql18 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        go-toolset rpm-devel python3.12-pip cargo rust python3.12-devel libffi-devel postgresql-devel openssl-devel gzip \
+        go-toolset rpm-devel python3.14-pip cargo rust python3.14-devel libffi-devel postgresql18-server-devel openssl-devel gzip \
         $VAR_RPMS && \
     microdnf clean all
 
@@ -23,21 +23,20 @@ ADD requirements.txt     /vmaas/
 ADD requirements-dev.txt /vmaas/
 
 ARG VAR_PIP_INSTALL_OPT=""
-RUN pip3.12 install --upgrade pip && \
-    pip3.12 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
-    pip3.12 cache purge
+RUN pip3.14 install --upgrade pip && \
+    pip3.14 install -r requirements.txt $VAR_PIP_INSTALL_OPT && \
+    pip3.14 cache purge
 
 # -------------
 # runtime image
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1791898448@sha256:c4c285d42941ebb2bd4da878479008e1e4536bb599aad1dbe568f89de9053661 AS runtimeimg
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2-1793642335 AS runtimeimg
 
 ARG ALT_REPO
 
-RUN (microdnf module enable -y postgresql:18 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
+RUN (microdnf repoquery postgresql18 | grep postgresql18 || curl -o /etc/yum.repos.d/postgresql.repo $ALT_REPO) && \
     microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3-rpm python3-dnf which gzip shadow-utils diffutils systemd libicu postgresql libpq && \
-        ln -s /usr/lib64/python3.9/site-packages/rpm /usr/lib64/python3.12/site-packages/rpm && \
-        ln -s $(basename /usr/lib64/python3.9/site-packages/rpm/_rpm.*.so) /usr/lib64/python3.9/site-packages/rpm/_rpm.so && \
+        python3.14 python3-rpm python3-dnf which gzip shadow-utils diffutils systemd libicu postgresql18 libpq && \
+        ln -s /usr/lib64/python3.12/site-packages/rpm /usr/lib64/python3.14/site-packages/rpm && \
     microdnf clean all
 
 WORKDIR /vmaas
@@ -53,8 +52,8 @@ USER vmaas
 COPY --from=buildimg --chown=vmaas:root /vmaas/go/src/vmaas/main /vmaas/go/src/vmaas/
 
 # Python deps
-COPY --from=buildimg /usr/local/lib/python3.12/site-packages   /usr/local/lib/python3.12/site-packages
-COPY --from=buildimg /usr/local/lib64/python3.12/site-packages /usr/local/lib64/python3.12/site-packages
+COPY --from=buildimg /usr/local/lib/python3.14/site-packages   /usr/local/lib/python3.14/site-packages
+COPY --from=buildimg /usr/local/lib64/python3.14/site-packages /usr/local/lib64/python3.14/site-packages
 COPY --from=buildimg /usr/local/bin/uvicorn                    /usr/local/bin/
 
 COPY --from=buildimg --chown=vmaas:root /vmaas/requirements.txt /vmaas/

@@ -24,11 +24,11 @@ fi
 
 mkdir -p $workdir
 cat <<EOF > $workdir$dockerfile
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM registry.access.redhat.com/ubi10/ubi-minimal
 RUN microdnf install -y --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-        python312 python3.12-pip python3.12-devel libpq-devel gcc git && \
+        python3.14 python3.14-pip python3.14-devel libpq-devel gcc git && \
     microdnf clean all
-RUN pip3.12 install --upgrade "pip<25.1" && pip3.12 install --upgrade poetry poetry-plugin-export pybuild-deps "pip-tools<7.6.1"
+RUN pip3.14 install --upgrade "pip<25.1" && pip3.14 install --upgrade poetry poetry-plugin-export pybuild-deps "pip-tools<7.6.1"
 EOF
 
 current_dir=$(pwd)
