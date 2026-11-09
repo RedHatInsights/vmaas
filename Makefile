@@ -1,5 +1,5 @@
 # Default value for BASE_IMAGE
-BASE_IMAGE ?= registry.access.redhat.com/ubi9/ubi-minimal:latest
+BASE_IMAGE ?= registry.access.redhat.com/ubi10/ubi-minimal:latest
 # Default value for CONTAINERFILE
 CONTAINERFILE ?= Dockerfile
 # Define the AWK command based on platform (gawk on macOS, awk elsewhere)
@@ -8,19 +8,19 @@ ifeq ($(shell uname),Darwin)
 AWK = gawk
 endif
 
-PYTHON = python3.12
+PYTHON = python3.14
 
 # Generate the ubi.repo file from the specified BASE_IMAGE
 # Usage: make generate-repo-file [BASE_IMAGE=<image>]
-# Example: make generate-repo-file BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+# Example: make generate-repo-file BASE_IMAGE=registry.access.redhat.com/ubi10/ubi:latest
 #          make generate-repo-file (uses default BASE_IMAGE)
 .PHONY: generate-repo-file
 generate-repo-file:
 	podman run -it $(BASE_IMAGE) cat /etc/yum.repos.d/ubi.repo > ubi.repo
-	sed -i 's/ubi-9-appstream-source-rpms/ubi-9-for-x86_64-appstream-source-rpms/' ubi.repo
-	sed -i 's/ubi-9-appstream-rpms/ubi-9-for-x86_64-appstream-rpms/' ubi.repo
-	sed -i 's/ubi-9-baseos-source-rpms/ubi-9-for-x86_64-baseos-source-rpms/' ubi.repo
-	sed -i 's/ubi-9-baseos-rpms/ubi-9-for-x86_64-baseos-rpms/' ubi.repo
+	sed -i 's/ubi-10-appstream-source-rpms/ubi-10-for-x86_64-appstream-source-rpms/' ubi.repo
+	sed -i 's/ubi-10-appstream-rpms/ubi-10-for-x86_64-appstream-rpms/' ubi.repo
+	sed -i 's/ubi-10-baseos-source-rpms/ubi-10-for-x86_64-baseos-source-rpms/' ubi.repo
+	sed -i 's/ubi-10-baseos-rpms/ubi-10-for-x86_64-baseos-rpms/' ubi.repo
 	sed -i 's/\r$$//' ubi.repo
 	sed -i '/\[.*x86_64.*\]/,/^\[/ s/enabled[[:space:]]*=[[:space:]]*0/enabled = 1/g' ubi.repo
 
@@ -45,7 +45,7 @@ generate-rpms-in-yaml:
 
 # Generate rpms.lock.yaml using rpm-lockfile-prototype
 # Usage: make generate-rpm-lockfile [BASE_IMAGE=<image>]
-# Example: make generate-rpm-lockfile BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+# Example: make generate-rpm-lockfile BASE_IMAGE=registry.access.redhat.com/ubi10/ubi:latest
 #          make generate-rpm-lockfile (uses default BASE_IMAGE)
 .PHONY: generate-rpm-lockfile
 generate-rpm-lockfile: rpms.in.yaml
@@ -63,7 +63,7 @@ generate-rpm-lockfile: rpms.in.yaml
 # https://konflux.pages.redhat.com/docs/users/building/activation-keys-subscription.html
 # export KEY_NAME=<subscription key>
 # export ORG_ID=<org id>
-# podman run --rm -it -e KEY_NAME=${KEY_NAME} -e ORG_ID=${ORG_ID} -v $(pwd):/source:Z registry.access.redhat.com/ubi9
+# podman run --rm -it -e KEY_NAME=${KEY_NAME} -e ORG_ID=${ORG_ID} -v $(pwd):/source:Z registry.access.redhat.com/ubi10
 # subscription-manager register --activationkey="$KEY_NAME" --org="$ORG_ID"
 # suibscription-manager refresh
 # cp -r /etc/pki/entitlement /source
@@ -74,7 +74,7 @@ generate-rpm-lockfile: rpms.in.yaml
 # update rpms.in.yaml (add redhat.repo to repofiles)
 #
 # Usage: make generate-rpm-lockfile [BASE_IMAGE=<image>]
-# Example: make generate-rpm-lockfile BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+# Example: make generate-rpm-lockfile BASE_IMAGE=registry.access.redhat.com/ubi10/ubi:latest
 #          make generate-rpm-lockfile (uses default BASE_IMAGE)
 #
 .PHONY: generate-rpm-lockfile-subscription
@@ -154,7 +154,7 @@ generate-requirements-build-in:
 
 # Generate requirements-build.txt using pip-tools and pybuild-deps
 # Usage: make generate-requirements-build-txt [BASE_IMAGE=<image>]
-# Example: make generate-requirements-build-txt BASE_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+# Example: make generate-requirements-build-txt BASE_IMAGE=registry.access.redhat.com/ubi10/ubi:latest
 .PHONY: generate-requirements-build-txt
 generate-requirements-build-txt:
 	@if [ ! -f requirements.txt ]; then \

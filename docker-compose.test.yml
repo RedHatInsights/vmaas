@@ -17,8 +17,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-18/repo/rhel-9/group_insights-postgresql-18-rhel-9.repo"
-        VAR_RPMS: "findutils postgresql"
+        ALT_REPO: "https://copr.fedorainfracloud.org/coprs/g/insights/postgresql-18/repo/rhel-10/group_insights-postgresql-18-rhel-10.repo"
+        VAR_RPMS: "findutils postgresql18"
         VAR_PIP_INSTALL_OPT: "-r requirements-dev.txt"
       target: buildimg
     image: vmaas/test:latest
@@ -41,8 +41,8 @@ services:
     security_opt:
       - label=disable
     command: >
-      bash -c 'cd /vmaas && python3.12 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
-                         && python3.12 -m vmaas.common.wait_for_services python3.12 -m vmaas.reposcan.database.upgrade \
+      bash -c 'cd /vmaas && python3.14 ./scripts/validate_dashboards.py ./monitoring/grafana/dashboards/ \
+                         && python3.14 -m vmaas.common.wait_for_services python3.14 -m vmaas.reposcan.database.upgrade \
                          && ./run_tests.sh vmaas/common \
                          && ./run_tests.sh vmaas/reposcan \
                          && ./run_tests.sh vmaas/webapp \

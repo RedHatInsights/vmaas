@@ -1,5 +1,5 @@
 #!/bin/bash
-PYTHON_VER="3.12"
+PYTHON_VER="3.14"
 
 microdnf install --setopt=tsflags=nodocs -y python${PYTHON_VER} python${PYTHON_VER}-pip python${PYTHON_VER}-devel which gcc gcc-c++ make zlib-devel openssl-devel libzstd-devel zip && \
     microdnf upgrade -y && \

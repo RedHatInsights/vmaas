@@ -24,7 +24,7 @@ fi
 
 mkdir -p $workdir
 cat <<EOF > $workdir$dockerfile
-FROM registry.access.redhat.com/ubi9/ubi
+FROM registry.access.redhat.com/ubi10/ubi
 RUN dnf install -y python3 python3-pip python3-dnf skopeo rpm git-core
 RUN python3 -m pip install https://github.com/konflux-ci/rpm-lockfile-prototype/archive/refs/heads/main.tar.gz
 EOF
@@ -38,9 +38,9 @@ $cmd run --rm -d --name rpms-locker-container rpms-locker sleep infinity
 $cmd exec rpms-locker-container bash -c "mkdir -p /tmp/.hermetic_builds"
 $cmd cp "./rpms.in.yaml" rpms-locker-container:"/tmp/"
 $cmd exec -it rpms-locker-container bash -c "subscription-manager register"
-$cmd exec -it rpms-locker-container bash -c "subscription-manager repos --enable rhel-9-for-x86_64-baseos-source-rpms --enable rhel-9-for-x86_64-appstream-source-rpms"
+$cmd exec -it rpms-locker-container bash -c "subscription-manager repos --enable rhel-10-for-x86_64-baseos-source-rpms --enable rhel-10-for-x86_64-appstream-source-rpms"
 $cmd exec rpms-locker-container bash -c "cp /etc/yum.repos.d/redhat.repo /tmp/.hermetic_builds/ && sed -i \"s/\$(uname -m)/\\\$basearch/g\" /tmp/.hermetic_builds/redhat.repo"
-$cmd exec rpms-locker-container bash -c "rpm-lockfile-prototype --outfile=/tmp/rpms.lock.yaml --image registry.access.redhat.com/ubi9/ubi-minimal:latest /tmp/rpms.in.yaml"
+$cmd exec rpms-locker-container bash -c "rpm-lockfile-prototype --outfile=/tmp/rpms.lock.yaml --image registry.access.redhat.com/ubi10/ubi-minimal:latest /tmp/rpms.in.yaml"
 
 $cmd cp rpms-locker-container:"/tmp/rpms.lock.yaml" "./"
 $cmd exec rpms-locker-container bash -c "subscription-manager unregister"
