@@ -39,20 +39,20 @@ arches:
     name: git-core
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-283.el9_8.x86_64.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-284.el9_8.4.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 46663
-    checksum: sha256:5f47e3ae6aea8fde6cbb02357463b3e8c884971284267ced3806b16a93a5c2e5
+    size: 46698
+    checksum: sha256:f21fdd965e9b63befd52ffcd5e7b6c3185e8428b0d5e44aaf8d4a197aa070641
     name: glibc-devel
-    evr: 2.34-283.el9_8
-    sourcerpm: glibc-2.34-283.el9_8.src.rpm
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-headers-2.34-283.el9_8.x86_64.rpm
+    evr: 2.34-284.el9_8.4
+    sourcerpm: glibc-2.34-284.el9_8.4.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/glibc-headers-2.34-284.el9_8.4.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 567260
-    checksum: sha256:796a7079041c288eec9e74437c2f9f85513c0dfade393877a9281828bb55e966
+    size: 567199
+    checksum: sha256:ead799f61c7605a153977650a649a696c2dff04625daac734a52c20acbf81475
     name: glibc-headers
-    evr: 2.34-283.el9_8
-    sourcerpm: glibc-2.34-283.el9_8.src.rpm
+    evr: 2.34-284.el9_8.4
+    sourcerpm: glibc-2.34-284.el9_8.4.src.rpm
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/g/go-toolset-1.26.10-1.el9_8.x86_64.rpm
     repoid: rhel-9-for-x86_64-appstream-rpms
     size: 12577
@@ -903,12 +903,12 @@ arches:
     checksum: sha256:19dec462f2880508570ca42a82c2f76fbd95fcad8d3e3ff812e9ca50cdeb2d8f
     name: gcc
     evr: 11.5.0-14.el9
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/g/glibc-2.34-283.el9_8.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/g/glibc-2.34-284.el9_8.4.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
-    size: 20462553
-    checksum: sha256:9007b0a97151f43f812049a925cb418753f9fd643fe1283cc7eddc7e6785e2f3
+    size: 20477160
+    checksum: sha256:ff2a86e349fd42aedd630420c2af443e9ea7228cc576984e3f1bcf2a9b29bfda
     name: glibc
-    evr: 2.34-283.el9_8
+    evr: 2.34-284.el9_8.4
   - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/g/gpgme-1.15.1-6.el9.src.rpm
     repoid: rhel-9-for-x86_64-baseos-source-rpms
     size: 1737968
@@ -1132,7 +1132,7 @@ arches:
     name: zstd
     evr: 1.5.5-1.el9
   module_metadata:
-  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/399e4604edac3e92b9c933e7646e761b6df3281a4851da70b70d028c7c298d7b-modules.yaml.gz
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/38f1977d80a2cefd17f71af363bd325e66d259bf3c000c4ca926a9f961310d01-modules.yaml.gz
     repoid: rhel-9-for-x86_64-appstream-rpms
-    size: 74112
-    checksum: sha256:399e4604edac3e92b9c933e7646e761b6df3281a4851da70b70d028c7c298d7b
+    size: 75333
+    checksum: sha256:38f1977d80a2cefd17f71af363bd325e66d259bf3c000c4ca926a9f961310d01
