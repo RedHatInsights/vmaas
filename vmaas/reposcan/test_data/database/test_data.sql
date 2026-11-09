@@ -1,3 +1,5 @@
+DELETE FROM vexfeed_cve_product;
+DELETE FROM vexfeed_product;
 DELETE FROM csaf_cve_product;
 DELETE FROM csaf_product;
 DELETE FROM errata_cve;
