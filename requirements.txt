@@ -19,9 +19,9 @@ boto3==1.40.6 ; python_version == "3.12" \
 botocore==1.40.6 ; python_version == "3.12" \
     --hash=sha256:b253f107617791a29ca81c6f0fca20ac1afdba01869eb43017022bbbb8387f34 \
     --hash=sha256:e132eac967a7526596e31ca571d7f1ef9676c6a9c4f1322446768994ccab64aa
-certifi==2025.8.3 ; python_version == "3.12" \
-    --hash=sha256:e564105f78ded564e3ae7c923924435e1daa7463faeab5bb932bc53ffae63407 \
-    --hash=sha256:f6c12493cfb1b06ba2ff328595af9350c65d6644968e5d3a2ffd78699af217a5
+certifi==2026.10.18; python_version == "3.12" \
+    --hash=sha256:73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62 \
+    --hash=sha256:b9995d97b64d0431a5af837d8ca8cd6238104d1f319f04bd93ea43124d6c861e
 cffi==2.0.0 ; python_version == "3.12" \
     --hash=sha256:0cf2d91ecc3fcc0625c2c530fe004f82c110405f101548512cce44322fa8ac44 \
     --hash=sha256:f73b96c41e3b2adedc34a7356e64c8eb96e03a3782b535e043a986276ce12a49 \
