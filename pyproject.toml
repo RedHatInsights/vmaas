@@ -31,7 +31,7 @@ dependencies = [
     "zstandard (>=0.25.0,<0.26.0)",
     "python-gnupg>=0.5.2",
     # maturin@1.13.2 requires rustc 1.89 (not in RHEL 9 yet)
-    "maturin==1.13.1",
+    "maturin==1.16.0",
 ]
 
 [tool.poetry.group.dev.dependencies]
