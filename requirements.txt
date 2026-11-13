@@ -573,9 +573,9 @@ pyyaml==6.0.3 ; python_version == "3.12" \
 referencing==0.37.0 ; python_version == "3.12" \
     --hash=sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231 \
     --hash=sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8
-requests==2.32.5 ; python_version == "3.12" \
-    --hash=sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6 \
-    --hash=sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf
+requests==2.33.0; python_version == "3.12" \
+    --hash=sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b \
+    --hash=sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652
 rpds-py==0.30.0 ; python_version == "3.12" \
     --hash=sha256:07ae8a593e1c3c6b82ca3292efbe73c30b61332fd612e05abee07c79359f292f \
     --hash=sha256:0a59119fc6e3f460315fe9d08149f8102aa322299deaa5cab5b40092345c2136 \
