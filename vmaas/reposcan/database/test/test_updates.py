@@ -20,6 +20,9 @@ BULK_MODULE_STREAM_ID = 1103
 # IN lists overflow Postgres max_stack_depth (2MB default, 6144kB tuned) well
 # below this count when the DELETE is not batched.
 BULK_ASSOCIATIONS = 50000
+# Orphaned associations without a module stream. NULL never matches in a
+# row-comparison IN list, so these need the separate "IS NULL" delete.
+BULK_NULL_ASSOCIATIONS = 25000
 
 UPDATE_ERRATA1 = {
     "from": "updates@repourl.com",
@@ -76,13 +79,13 @@ class TestUpdateStore:
         yield store
         reset_db(store.conn)
 
-    def _setup_bulk_associations(self, store: UpdateStore, count: int) -> None:
-        """Associate a large number of extra packages with errata1 in repo 801."""
-        write_testing_data(store.conn)
-        package_names = tuple((10_000 + i, f"pkg-bulk-{i}") for i in range(count))
-        packages = tuple((10_000 + i, 10_000 + i, 201, 1, None, None) for i in range(count))
-        pkg_repo = tuple((10_000 + i, REPO_ID) for i in range(count))
-        pkg_errata = tuple((10_000 + i, ERRATA_ID, BULK_MODULE_STREAM_ID) for i in range(count))
+    def _setup_bulk_associations(self, store: UpdateStore, count: int, module_stream_id: int | None,
+                                 first_pkg_id: int) -> None:
+        """Associate a number of extra packages with errata1 in repo 801."""
+        package_names = tuple((first_pkg_id + i, f"pkg-bulk-{first_pkg_id + i}") for i in range(count))
+        packages = tuple((first_pkg_id + i, first_pkg_id + i, 201, 1, None, None) for i in range(count))
+        pkg_repo = tuple((first_pkg_id + i, REPO_ID) for i in range(count))
+        pkg_errata = tuple((first_pkg_id + i, ERRATA_ID, module_stream_id) for i in range(count))
 
         with store.conn.cursor() as cur:
             execute_values(cur, "INSERT INTO package_name(id, name) VALUES %s", package_names)
@@ -108,15 +111,19 @@ class TestUpdateStore:
         """Test that _associate_packages handles a large number of disassociations.
 
         A repo sync removing many pkg_errata associations used to raise
-        StatementTooComplex (stack depth limit exceeded) on the bulk DELETE.
+        StatementTooComplex (stack depth limit exceeded) on the bulk DELETE,
+        and associations without a module stream were never deleted at all.
         """
-        self._setup_bulk_associations(update_store, BULK_ASSOCIATIONS)
+        write_testing_data(update_store.conn)
+        self._setup_bulk_associations(update_store, BULK_ASSOCIATIONS, BULK_MODULE_STREAM_ID, 10_000)
+        self._setup_bulk_associations(update_store, BULK_NULL_ASSOCIATIONS, None, 60_000)
         # packages 301 and 302 from test data plus the bulk associations
-        assert self._errata_pkg_count(update_store) == BULK_ASSOCIATIONS + 2
+        assert self._errata_pkg_count(update_store) == BULK_ASSOCIATIONS + BULK_NULL_ASSOCIATIONS + 2
 
         update_store.store(REPO_ID, [UPDATE_ERRATA1])
 
-        # All orphaned bulk associations are gone.
+        # All orphaned bulk associations are gone, including the ones without
+        # a module stream (NULL never matches in row comparison IN lists).
         with update_store.conn.cursor() as cur:
             cur.execute("select count(*) from pkg_errata where pkg_id >= 10000")
             assert cur.fetchone()[0] == 0

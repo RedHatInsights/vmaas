@@ -20,6 +20,26 @@ def delete_in_batches(cur, query, tuples):
         cur.execute(query, (batch,))
 
 
+def delete_pkg_errata_in_batches(cur, to_disassociate):
+    """Delete pkg_errata associations in batches.
+
+    Row comparison with a NULL never matches in an IN list
+    ("(a, b, NULL) IN ((a, b, NULL))" is NULL, not true), so associations
+    without a module stream are deleted with a separate query using
+    "IS NULL" - the same approach as CSAF product updates.
+    """
+    with_module = [row for row in to_disassociate if row[2] is not None]
+    without_module = [(row[0], row[1]) for row in to_disassociate if row[2] is None]
+    if with_module:
+        delete_in_batches(cur,
+                          "delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
+                          with_module)
+    if without_module:
+        delete_in_batches(cur,
+                          "delete from pkg_errata where (pkg_id, errata_id) in %s and module_stream_id is null",
+                          without_module)
+
+
 class UpdateStore(ObjectStore):
     """
     Class providing interface for storing updates and related info.
@@ -184,8 +204,7 @@ class UpdateStore(ObjectStore):
                 execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                                to_associate, page_size=len(to_associate))
             if to_disassociate:
-                delete_in_batches(cur, "delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
-                                  to_disassociate)
+                delete_pkg_errata_in_batches(cur, to_disassociate)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing src package associations.")
@@ -220,8 +239,7 @@ class UpdateStore(ObjectStore):
                 execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                                list(to_associate), page_size=len(to_associate))
             if to_disassociate:
-                delete_in_batches(cur, "delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
-                                  to_disassociate)
+                delete_pkg_errata_in_batches(cur, to_disassociate)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing package associations.")
