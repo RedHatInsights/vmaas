@@ -6,6 +6,39 @@ from psycopg2.extras import execute_values
 from vmaas.reposcan.database.object_store import ObjectStore
 from vmaas.reposcan.database.modules_store import ModulesStore
 
+# Row-comparison "IN ((a,b,c), ...)" lists are not collapsed into an array
+# expression by Postgres, so each tuple adds parser stack depth. Large
+# disassociation sets overflow max_stack_depth (2MB default, ~7k tuples;
+# 6144kB tuned, ~20k tuples), hence delete in batches.
+DELETE_QUERY_BATCH_SIZE = 200
+
+
+def delete_in_batches(cur, query, tuples):
+    """Run a DELETE ... IN %s query in batches to avoid stack depth overflow."""
+    for i in range(0, len(tuples), DELETE_QUERY_BATCH_SIZE):
+        batch = tuple(tuples[i:i + DELETE_QUERY_BATCH_SIZE])
+        cur.execute(query, (batch,))
+
+
+def delete_pkg_errata_in_batches(cur, to_disassociate):
+    """Delete pkg_errata associations in batches.
+
+    Row comparison with a NULL never matches in an IN list
+    ("(a, b, NULL) IN ((a, b, NULL))" is NULL, not true), so associations
+    without a module stream are deleted with a separate query using
+    "IS NULL" - the same approach as CSAF product updates.
+    """
+    with_module = [row for row in to_disassociate if row[2] is not None]
+    without_module = [(row[0], row[1]) for row in to_disassociate if row[2] is None]
+    if with_module:
+        delete_in_batches(cur,
+                          "delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
+                          with_module)
+    if without_module:
+        delete_in_batches(cur,
+                          "delete from pkg_errata where (pkg_id, errata_id) in %s and module_stream_id is null",
+                          without_module)
+
 
 class UpdateStore(ObjectStore):
     """
@@ -171,8 +204,7 @@ class UpdateStore(ObjectStore):
                 execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                                to_associate, page_size=len(to_associate))
             if to_disassociate:
-                cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
-                            (tuple(to_disassociate),))
+                delete_pkg_errata_in_batches(cur, to_disassociate)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing src package associations.")
@@ -207,8 +239,7 @@ class UpdateStore(ObjectStore):
                 execute_values(cur, "insert into pkg_errata (pkg_id, errata_id, module_stream_id) values %s",
                                list(to_associate), page_size=len(to_associate))
             if to_disassociate:
-                cur.execute("delete from pkg_errata where (pkg_id, errata_id, module_stream_id) in %s",
-                            (tuple(to_disassociate),))
+                delete_pkg_errata_in_batches(cur, to_disassociate)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure changing package associations.")
@@ -320,7 +351,8 @@ class UpdateStore(ObjectStore):
                                to_associate, page_size=len(to_associate))
 
             if to_disassociate:
-                cur.execute("delete from errata_cve where (errata_id, cve_id) in %s", (tuple(to_disassociate),))
+                delete_in_batches(cur, "delete from errata_cve where (errata_id, cve_id) in %s",
+                                  to_disassociate)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure updating errata_cve data.")
@@ -359,8 +391,8 @@ class UpdateStore(ObjectStore):
                                "insert into errata_refs (errata_id, type, name) values %s",
                                list(refs_to_add), page_size=len(refs_to_add))
             if refs_to_remove:
-                cur.execute("delete from errata_refs where (errata_id, type, name) in %s",
-                            (tuple(refs_to_remove),))
+                delete_in_batches(cur, "delete from errata_refs where (errata_id, type, name) in %s",
+                                  refs_to_remove)
             self.conn.commit()
         except Exception:  # pylint: disable=broad-except
             self.logger.exception("Failure updating errata_refs data.")
