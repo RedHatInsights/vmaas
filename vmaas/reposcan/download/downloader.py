@@ -2,6 +2,7 @@
 Module containing classes for downloading files using HTTP.
 """
 import os
+import ssl
 from threading import Thread
 from queue import Queue, Empty
 from pathlib import Path
@@ -9,6 +10,8 @@ from pathlib import Path
 from urllib3.exceptions import ProtocolError
 
 import requests
+
+from requests.adapters import HTTPAdapter
 
 from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
 
@@ -20,6 +23,24 @@ DEFAULT_RETRY_COUNT = "3"
 VALID_HTTP_CODES = [200]
 
 FAILED_THRESHOLD = 5
+
+
+class NonStrictTLSAdapter(HTTPAdapter):
+    """HTTPS adapter for trusted legacy CA bundles rejected by OpenSSL 3.x strict mode."""
+
+    def __init__(self, ca_cert, *args, **kwargs):
+        self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.ssl_context.load_verify_locations(cafile=ca_cert)
+        self.ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+        super().__init__(*args, **kwargs)
+
+    def init_poolmanager(self, connections, maxsize, block=False, **pool_kwargs):
+        pool_kwargs["ssl_context"] = self.ssl_context
+        super().init_poolmanager(connections, maxsize, block, **pool_kwargs)
+
+    def proxy_manager_for(self, proxy, **proxy_kwargs):
+        proxy_kwargs["ssl_context"] = self.ssl_context
+        return super().proxy_manager_for(proxy, **proxy_kwargs)
 
 
 class DownloadItem:
@@ -48,11 +69,23 @@ class FileDownloadThread(Thread):
         Thread.__init__(self)
         self.queue = queue
         self.session = requests.Session()
+        self.ca_sessions = {}
         self.logger = logger
         self.progress_logger = progress_logger
         self.chunk_size = int(os.getenv('CHUNK_SIZE', DEFAULT_CHUNK_SIZE))
         self.retry_count = int(os.getenv('RETRY_COUNT', DEFAULT_RETRY_COUNT))
         self.headers_only = headers_only
+
+    def get_session(self, ca_cert):
+        """Return the default session or one configured for the supplied CA bundle."""
+        if not ca_cert:
+            return self.session
+
+        if ca_cert not in self.ca_sessions:
+            session = requests.Session()
+            session.mount("https://", NonStrictTLSAdapter(ca_cert))
+            self.ca_sessions[ca_cert] = session
+        return self.ca_sessions[ca_cert]
 
     def _download(self, download_item):
         with open(download_item.target_path, "wb") as file_handle:
@@ -71,14 +104,15 @@ class FileDownloadThread(Thread):
 
             req_args = {'url': download_item.source_url, 'verify': verify, 'cert': cert, 'stream': True,
                         'allow_redirects': True}
+            session = self.get_session(download_item.ca_cert)
             if self.headers_only:
-                with self.session.head(**req_args) as response:
+                with session.head(**req_args) as response:
                     headers = ["%s:%s" % (key, value)
                                for key, value in response.headers.items()]
                     file_handle.write(bytearray("\n".join(headers).encode('utf8')))
                     download_item.status_code = response.status_code
             else:
-                with self.session.get(**req_args) as response:
+                with session.get(**req_args) as response:
                     while True:
                         chunk = response.raw.read(self.chunk_size, decode_content=True)
                         if chunk == b"":
@@ -117,6 +151,8 @@ class FileDownloadThread(Thread):
                 break
 
         self.session.close()
+        for session in self.ca_sessions.values():
+            session.close()
 
 
 class FileDownloader:
