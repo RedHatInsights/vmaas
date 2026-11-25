@@ -1,7 +1,8 @@
 services:
   vmaas_database:
     container_name: vmaas-database
-    image: docker.io/library/postgres:18
+    # Keep the server aligned with the PostgreSQL client available in the test image.
+    image: docker.io/library/postgres:18.6
     restart: unless-stopped
     environment:
       POSTGRES_DB: vmaas
