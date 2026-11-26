@@ -1228,9 +1228,10 @@ class SyncTask:
 
     @classmethod
     def cancel(cls):
-        """Terminate the process pool."""
-        cls._process.terminate()
-        cls._process.join()
+        """Discard running and queued tasks, then recreate the worker pool."""
+        cls.workers.terminate()
+        cls.workers.join()
+        cls.workers = Pool(1)
         cls.finish()
 
 
