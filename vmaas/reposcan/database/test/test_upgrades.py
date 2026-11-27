@@ -24,6 +24,9 @@ def _run_pg_dump(dump_args_in):
                  "--restrict-key", "testupgrade"]
     dump_args.extend(dump_args_in)
     dump = subprocess.check_output(dump_args).decode("utf-8")
+    if "-s" in dump_args_in:
+        # Internal PostgreSQL column versions differ across schema rebuilds.
+        dump = re.sub(r"\bpg_attver\s*=\s*[0-9]+\b", "pg_attver=0", dump)
     dump = re.sub(r",?\n+", "\n", dump).splitlines()
     dump.sort()
     return dump
